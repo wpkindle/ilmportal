@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { RefreshCw, ShieldCheck, CheckCircle2, AlertCircle } from 'lucide-react';
 
-export default function CaptchaBox({ onValidate, isVerified, setIsVerified }) {
+export default function CaptchaBox({ onValidate, isVerified, setIsVerified, compact = false }) {
   const canvasRef = useRef(null);
   const [captchaCode, setCaptchaCode] = useState('');
   const [userInput, setUserInput] = useState('');
@@ -70,7 +70,7 @@ export default function CaptchaBox({ onValidate, isVerified, setIsVerified }) {
 
       ctx.translate(x, y);
       ctx.rotate(angle);
-      ctx.font = 'bold 22px monospace, sans-serif';
+      ctx.font = 'bold 20px monospace, sans-serif';
       ctx.fillStyle = color;
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
@@ -102,8 +102,64 @@ export default function CaptchaBox({ onValidate, isVerified, setIsVerified }) {
     if (onValidate) onValidate(valid);
   };
 
+  if (compact) {
+    return (
+      <div className="p-2 bg-slate-50 rounded-xl border border-slate-200 flex flex-col gap-1.5">
+        <div className="flex items-center justify-between">
+          <span className="text-[10.5px] font-bold text-slate-700 flex items-center gap-1">
+            <ShieldCheck className="w-3 h-3 text-emerald-600" />
+            <span>Security Code *</span>
+          </span>
+          {isVerified && (
+            <span className="text-[10px] font-bold text-emerald-700 flex items-center gap-0.5">
+              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+              <span>Verified</span>
+            </span>
+          )}
+        </div>
+
+        <div className="flex items-center gap-2">
+          <div className="relative flex items-center gap-1 bg-white px-1.5 py-0.5 rounded-lg border border-slate-200 shrink-0">
+            <canvas
+              ref={canvasRef}
+              width={120}
+              height={30}
+              className="rounded cursor-pointer"
+              onClick={refreshCaptcha}
+              title="Click to refresh image"
+            />
+            <button
+              type="button"
+              onClick={refreshCaptcha}
+              className="p-1 hover:bg-slate-100 rounded text-slate-400 hover:text-slate-700"
+              title="Get new code"
+            >
+              <RefreshCw className="w-3 h-3" />
+            </button>
+          </div>
+
+          <input
+            type="text"
+            required
+            maxLength={6}
+            placeholder="Type code"
+            value={userInput}
+            onChange={handleInputChange}
+            className={`w-full px-2.5 py-1.5 bg-white rounded-lg text-xs font-mono font-bold tracking-wider outline-none ${
+              isVerified
+                ? 'border border-emerald-500 text-emerald-900'
+                : touched && userInput.length >= 4
+                ? 'border border-rose-400 text-rose-900'
+                : 'border border-slate-200 text-slate-800 focus:border-emerald-500'
+            }`}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="p-3.5 bg-slate-50/90 rounded-2xl border border-slate-200 space-y-2.5">
+    <div className="p-3 bg-slate-50/90 rounded-2xl border border-slate-200 space-y-2">
       <div className="flex items-center justify-between">
         <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
           <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
@@ -117,13 +173,13 @@ export default function CaptchaBox({ onValidate, isVerified, setIsVerified }) {
         )}
       </div>
 
-      <div className="flex flex-col sm:flex-row items-center gap-2.5">
+      <div className="flex flex-col sm:flex-row items-center gap-2">
         {/* Canvas visual challenge */}
-        <div className="relative flex items-center gap-1.5 bg-white p-1 rounded-xl border border-slate-200 shadow-2xs shrink-0">
+        <div className="relative flex items-center gap-1 bg-white p-1 rounded-xl border border-slate-200 shrink-0">
           <canvas
             ref={canvasRef}
-            width={140}
-            height={38}
+            width={130}
+            height={34}
             className="rounded-lg cursor-pointer"
             onClick={refreshCaptcha}
             title="Click to refresh image"
@@ -147,7 +203,7 @@ export default function CaptchaBox({ onValidate, isVerified, setIsVerified }) {
             placeholder="Enter code above"
             value={userInput}
             onChange={handleInputChange}
-            className={`w-full px-3 py-2 bg-white rounded-xl text-xs font-mono font-bold tracking-wider outline-none transition-all ${
+            className={`w-full px-3 py-1.5 bg-white rounded-xl text-xs font-mono font-bold tracking-wider outline-none transition-all ${
               isVerified
                 ? 'border-2 border-emerald-500 text-emerald-900 focus:ring-2 focus:ring-emerald-500'
                 : touched && userInput.length >= 4

@@ -25,6 +25,7 @@ import {
 import { api } from '../../services/api';
 import CustomSelect from '../../components/common/CustomSelect';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import CaptchaBox from '../../components/common/CaptchaBox';
 import { allPakistaniCities } from '../../data/pakistanAreas';
 
 const cityOptions = allPakistaniCities.map((c) => ({ value: c, label: c }));
@@ -43,6 +44,7 @@ function RegisterContent() {
   const [age, setAge] = useState('');
   const [phone, setPhone] = useState('');
   const [city, setCity] = useState('Lahore');
+  const [captchaVerified, setCaptchaVerified] = useState(false);
   
   // Tutor Specific Required Attachments
   const [avatar, setAvatar] = useState('');
@@ -95,6 +97,12 @@ function RegisterContent() {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    if (!captchaVerified) {
+      setError('Please complete the security verification (CAPTCHA) below');
+      setLoading(false);
+      return;
+    }
 
     if (role === 'student') {
       if (!gender) {
@@ -458,10 +466,16 @@ function RegisterContent() {
               </div>
             )}
 
+            {/* Security CAPTCHA Box */}
+            <CaptchaBox
+              isVerified={captchaVerified}
+              setIsVerified={setCaptchaVerified}
+            />
+
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !captchaVerified}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-700/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 mt-2"
             >
               {loading ? (

@@ -18,11 +18,15 @@ import {
   Upload,
   Clock,
   CheckCircle2,
-  BookOpen
+  BookOpen,
+  Plus,
+  Trash2,
+  FileText
 } from 'lucide-react';
 import { api } from '../../../services/api';
 import CustomSelect from '../../../components/common/CustomSelect';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
+import CaptchaBox from '../../../components/common/CaptchaBox';
 import { allPakistaniCities } from '../../../data/pakistanAreas';
 
 const cityOptions = allPakistaniCities.map((c) => ({ value: c, label: c }));
@@ -38,11 +42,11 @@ export default function TutorRegisterPage() {
   const [age, setAge] = useState('');
   const [phone, setPhone] = useState('');
   const [city, setCity] = useState('Lahore');
-
-  // Tutor Specific Required Attachments
   const [avatar, setAvatar] = useState('');
-  const [sanadTitle, setSanadTitle] = useState('');
-  const [sanadFileUrl, setSanadFileUrl] = useState('');
+
+  // Multiple Sanad / Degree Documents State
+  const [sanadDocuments, setSanadDocuments] = useState([]);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -65,31 +69,59 @@ export default function TutorRegisterPage() {
     reader.readAsDataURL(file);
   };
 
-  // Handle Sanad / Degree Document Upload
-  const handleSanadSelect = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  // Handle Multiple Sanad / Degree Documents Upload
+  const handleSanadsSelect = (e) => {
+    const files = Array.from(e.target.files || []);
+    if (files.length === 0) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      setError('Degree / Sanad file size must be under 10MB');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setSanadFileUrl(reader.result);
-      if (!sanadTitle) {
-        setSanadTitle(file.name.replace(/\.[^/.]+$/, ''));
+    files.forEach((file) => {
+      if (file.size > 10 * 1024 * 1024) {
+        setError(`File "${file.name}" exceeds the 10MB limit.`);
+        return;
       }
-      setError('');
-    };
-    reader.readAsDataURL(file);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const defaultTitle = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
+        setSanadDocuments((prev) => [
+          ...prev,
+          {
+            id: Date.now() + Math.random().toString(36).substring(2, 7),
+            title: defaultTitle || 'Sanad / Educational Certificate',
+            fileName: file.name,
+            fileSize: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
+            fileUrl: reader.result,
+            fileType: file.type || (file.name.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg')
+          }
+        ]);
+        setError('');
+      };
+      reader.readAsDataURL(file);
+    });
+  };
+
+  // Update specific document title
+  const handleDocumentTitleChange = (id, newTitle) => {
+    setSanadDocuments((prev) =>
+      prev.map((doc) => (doc.id === id ? { ...doc, title: newTitle } : doc))
+    );
+  };
+
+  // Remove a document
+  const handleRemoveDocument = (id) => {
+    setSanadDocuments((prev) => prev.filter((doc) => doc.id !== id));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    if (!captchaVerified) {
+      setError('Please complete the security verification (CAPTCHA) below');
+      setLoading(false);
+      return;
+    }
 
     if (!gender) {
       setError('Tutor Gender is required');
@@ -111,8 +143,8 @@ export default function TutorRegisterPage() {
       setLoading(false);
       return;
     }
-    if (!sanadTitle.trim() || !sanadFileUrl) {
-      setError('Please provide your Sanad / Degree certificate title and document');
+    if (sanadDocuments.length === 0) {
+      setError('Please upload at least one Sanad or Educational Degree certificate');
       setLoading(false);
       return;
     }
@@ -128,8 +160,13 @@ export default function TutorRegisterPage() {
         age: Number(age),
         phone: phone.trim(),
         avatar,
-        sanadTitle: sanadTitle.trim(),
-        sanadFileUrl
+        sanadDocuments: sanadDocuments.map((d) => ({
+          title: d.title.trim() || 'Sanad / Degree Certificate',
+          fileUrl: d.fileUrl,
+          fileType: d.fileType
+        })),
+        sanadTitle: sanadDocuments[0]?.title || 'Sanad / Degree Certificate',
+        sanadFileUrl: sanadDocuments[0]?.fileUrl || ''
       };
 
       const res = await api.register(payload);
@@ -353,82 +390,117 @@ export default function TutorRegisterPage() {
               </div>
             </div>
 
-            {/* Tutor Sanad / Degree Document Upload Section (Required) */}
+            {/* Multiple Sanad / Degree Documents Upload Section */}
             <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-200/80 space-y-3">
-              <div className="flex items-center gap-2">
-                <Award className="w-4 h-4 text-emerald-700 shrink-0" />
-                <h4 className="text-xs font-bold text-emerald-950">
-                  Sanad / Educational Degree Document *
-                </h4>
-              </div>
-
-              <div>
-                <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                  Degree / Sanad Title *
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. Dars-e-Nizami (Shahadat-ul-Almiya), BS Islamic Studies, MSc Physics"
-                  value={sanadTitle}
-                  onChange={(e) => setSanadTitle(e.target.value)}
-                  className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:border-emerald-500 font-medium"
-                />
-              </div>
-
-              <div>
-                <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                  Upload Degree / Certificate (JPG, PNG, PDF) *
-                </label>
-                <div className="border-2 border-dashed border-emerald-200 hover:border-emerald-400 bg-white rounded-xl p-3 text-center transition-colors">
-                  {sanadFileUrl ? (
-                    <div className="flex items-center justify-between p-2 bg-emerald-50 rounded-lg text-emerald-900 text-xs">
-                      <div className="flex items-center gap-2 truncate">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span className="truncate font-semibold">{sanadTitle || 'Document Attached'}</span>
-                      </div>
-                      <label className="text-emerald-700 hover:underline cursor-pointer font-bold text-[11px] shrink-0 ml-2">
-                        Change
-                        <input
-                          type="file"
-                          accept=".pdf,image/*"
-                          onChange={handleSanadSelect}
-                          className="hidden"
-                        />
-                      </label>
-                    </div>
-                  ) : (
-                    <label className="cursor-pointer block py-2">
-                      <Upload className="w-5 h-5 text-emerald-600 mx-auto mb-1" />
-                      <span className="text-xs font-bold text-emerald-700 block">
-                        Click to select certificate / Sanad document
-                      </span>
-                      <span className="text-[10px] text-slate-400 block mt-0.5">
-                        High resolution photo or PDF up to 10MB
-                      </span>
-                      <input
-                        type="file"
-                        accept=".pdf,image/*"
-                        onChange={handleSanadSelect}
-                        className="hidden"
-                      />
-                    </label>
-                  )}
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Award className="w-4 h-4 text-emerald-700 shrink-0" />
+                  <h4 className="text-xs font-bold text-emerald-950">
+                    Sanad & Degree Documents *
+                  </h4>
                 </div>
+                <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-full">
+                  {sanadDocuments.length} Attached
+                </span>
+              </div>
+
+              <p className="text-[11px] text-slate-500">
+                Attach one or multiple Sanad certificates, degrees, or Tajweed diplomas (JPG, PNG, PDF up to 10MB each).
+              </p>
+
+              {/* Uploaded Documents List */}
+              {sanadDocuments.length > 0 && (
+                <div className="space-y-2.5">
+                  {sanadDocuments.map((doc, idx) => (
+                    <div
+                      key={doc.id}
+                      className="p-3 bg-white rounded-xl border border-emerald-200/90 shadow-2xs space-y-2"
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          {doc.fileType?.includes('pdf') ? (
+                            <FileText className="w-5 h-5 text-rose-500 shrink-0" />
+                          ) : (
+                            <img
+                              src={doc.fileUrl}
+                              alt="Doc Preview"
+                              className="w-6 h-6 rounded object-cover border border-slate-200 shrink-0"
+                            />
+                          )}
+                          <span className="text-xs font-bold text-slate-800 truncate">
+                            Document #{idx + 1}: {doc.fileName}
+                          </span>
+                          <span className="text-[10px] text-slate-400 shrink-0">
+                            ({doc.fileSize})
+                          </span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveDocument(doc.id)}
+                          className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                          title="Remove document"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+
+                      {/* Document Title input */}
+                      <div>
+                        <input
+                          type="text"
+                          required
+                          value={doc.title}
+                          onChange={(e) => handleDocumentTitleChange(doc.id, e.target.value)}
+                          placeholder="e.g. Shahadat-ul-Almiya / Hifz Sanad / BS Islamic Studies"
+                          className="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-emerald-500 font-medium"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* Add Files Dropzone Button */}
+              <div className="border-2 border-dashed border-emerald-300 hover:border-emerald-500 bg-white rounded-xl p-3.5 text-center transition-colors">
+                <label className="cursor-pointer block">
+                  <Upload className="w-5 h-5 text-emerald-600 mx-auto mb-1" />
+                  <span className="text-xs font-bold text-emerald-700 block">
+                    {sanadDocuments.length > 0
+                      ? '+ Click to attach another degree / certificate'
+                      : 'Click to select Sanad / Degree files (Select Multiple)'}
+                  </span>
+                  <span className="text-[10px] text-slate-400 block mt-0.5">
+                    Select JPG, PNG, or PDF documents
+                  </span>
+                  <input
+                    type="file"
+                    multiple
+                    accept=".pdf,image/*"
+                    onChange={handleSanadsSelect}
+                    className="hidden"
+                  />
+                </label>
               </div>
 
               <div className="flex items-start gap-2 p-2.5 bg-amber-50 rounded-xl border border-amber-200/60 text-[10px] text-amber-900 font-medium">
                 <Clock className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
                 <span>
-                  Our academic verification board will authenticate your Sanad / Degree before issuing your public verified badge.
+                  Our academic board will review these credentials once submitted. You will not need to upload them again during onboarding.
                 </span>
               </div>
             </div>
 
+            {/* Security CAPTCHA Box */}
+            <CaptchaBox
+              isVerified={captchaVerified}
+              setIsVerified={setCaptchaVerified}
+            />
+
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !captchaVerified}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer mt-2"
             >
               {loading ? (
@@ -464,4 +536,3 @@ export default function TutorRegisterPage() {
     </div>
   );
 }
-

@@ -138,10 +138,22 @@ exports.register = async (req, res) => {
       verificationOtpExpires: otpExpires
     });
 
-    // If registered as tutor, create initial pending profile with uploaded Sanad/Degree
+    // If registered as tutor, create initial pending profile with uploaded Sanad/Degree(s)
     if (userRole === 'tutor') {
       const initialSanads = [];
-      if (sanadFileUrl) {
+
+      if (req.body.sanadDocuments && Array.isArray(req.body.sanadDocuments) && req.body.sanadDocuments.length > 0) {
+        req.body.sanadDocuments.forEach((doc) => {
+          if (doc && doc.fileUrl) {
+            initialSanads.push({
+              title: doc.title || 'Sanad / Degree Certificate',
+              fileUrl: doc.fileUrl,
+              fileType: doc.fileType || (doc.fileUrl.startsWith('data:application/pdf') ? 'application/pdf' : 'image/jpeg'),
+              uploadedAt: new Date()
+            });
+          }
+        });
+      } else if (sanadFileUrl) {
         initialSanads.push({
           title: sanadTitle || qualifications || 'Sanad / Educational Degree',
           fileUrl: sanadFileUrl,

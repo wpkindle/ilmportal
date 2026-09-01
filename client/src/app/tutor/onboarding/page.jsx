@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
-import { BookOpen, ShieldCheck, Award, Upload, CheckCircle2, ArrowRight } from 'lucide-react';
+import { BookOpen, ShieldCheck, Award, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import CustomSelect from '../../../components/common/CustomSelect';
 
@@ -17,15 +17,14 @@ export default function TutorOnboardingPage() {
   const [locations, setLocations] = useState([]);
 
   // Form State
-  const [bio, setBio] = useState('');
+  const [bio, setBio] = useState('Assalam-o-Alaikum! I am an experienced tutor committed to high quality Quranic and academic teaching.');
   const [gender, setGender] = useState('male');
-  const [qualifications, setQualifications] = useState('');
-  const [experienceYears, setExperienceYears] = useState(2);
+  const [qualifications, setQualifications] = useState('Dars-e-Nizami / Master Degree');
+  const [experienceYears, setExperienceYears] = useState(3);
+  const [hourlyRate, setHourlyRate] = useState(1500);
   const [teachingMode, setTeachingMode] = useState('online');
   const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
-  const [sanadTitle, setSanadTitle] = useState('Dars-e-Nizami Degree / Certificate');
-  const [sanadFile, setSanadFile] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
@@ -34,12 +33,21 @@ export default function TutorOnboardingPage() {
   useEffect(() => {
     const fetchMetadata = async () => {
       try {
-        const [catRes, locRes] = await Promise.all([
+        const [catRes, locRes, profileRes] = await Promise.all([
           api.getCategories(),
-          api.getLocations()
+          api.getLocations(),
+          api.getMyTutorProfile().catch(() => ({ success: false }))
         ]);
-        if (catRes.success) setCategories(catRes.categories);
-        if (locRes.success) setLocations(locRes.locations);
+        if (catRes.success) setCategories(catRes.categories || []);
+        if (locRes.success) setLocations(locRes.locations || []);
+
+        if (profileRes.success && profileRes.profile) {
+          if (profileRes.profile.bio) setBio(profileRes.profile.bio);
+          if (profileRes.profile.qualifications) setQualifications(profileRes.profile.qualifications);
+          if (profileRes.profile.experienceYears) setExperienceYears(profileRes.profile.experienceYears);
+          if (profileRes.profile.hourlyRate) setHourlyRate(profileRes.profile.hourlyRate);
+          if (profileRes.profile.subjects) setSelectedSubjects(profileRes.profile.subjects.map(s => s._id || s));
+        }
       } catch (err) {
         console.error(err);
       } finally {
@@ -55,12 +63,6 @@ export default function TutorOnboardingPage() {
     );
   };
 
-  const handleToggleCity = (id) => {
-    setSelectedCities(prev =>
-      prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
-    );
-  };
-
   const handleCompleteOnboarding = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -68,23 +70,17 @@ export default function TutorOnboardingPage() {
 
     try {
       const profileRes = await api.updateMyTutorProfile({
-        bio,
+        bio: bio.trim(),
         gender,
-        qualifications,
+        qualifications: qualifications.trim(),
         experienceYears: Number(experienceYears),
+        hourlyRate: Number(hourlyRate),
         teachingMode,
         subjects: selectedSubjects,
         cities: selectedCities
       });
 
       if (profileRes.success) {
-        if (sanadFile) {
-          const formData = new FormData();
-          formData.append('sanad', sanadFile);
-          formData.append('title', sanadTitle);
-          await api.uploadSanad(formData);
-        }
-
         updateTutorProfileState(profileRes.profile);
         router.push('/tutor/dashboard');
       }
@@ -104,23 +100,23 @@ export default function TutorOnboardingPage() {
         {/* Top Header */}
         <div className="text-center space-y-2">
           <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 bg-emerald-100 px-3 py-1 rounded-full">
-            Tutor Onboarding & Sanad Verification
+            Tutor Onboarding & Subjects Setup
           </span>
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
-            Complete Your Teaching Profile
+            Configure Your Teaching Subjects
           </h1>
           <p className="text-xs text-slate-500">
-            Set your subjects, teaching cities, and submit credentials for admin review.
+            Set your teaching disciplines, experience, and hourly rates to start receiving student bookings.
           </p>
         </div>
 
-        {/* Step Tabs Indicator */}
+        {/* Step Tabs Indicator (2 Steps Only) */}
         <div className="flex items-center justify-center gap-2">
-          {[1, 2, 3].map((s) => (
+          {[1, 2].map((s) => (
             <div
               key={s}
               className={`h-2 rounded-full transition-all ${
-                step === s ? 'w-12 bg-emerald-600' : 'w-4 bg-slate-200'
+                step === s ? 'w-16 bg-emerald-600' : 'w-6 bg-slate-200'
               }`}
             />
           ))}
@@ -128,7 +124,7 @@ export default function TutorOnboardingPage() {
 
         <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-6">
           {error && (
-            <div className="p-3 bg-red-50 text-red-700 rounded-2xl text-xs font-semibold">
+            <div className="p-3.5 bg-red-50 text-red-700 rounded-2xl text-xs font-semibold">
               {error}
             </div>
           )}
@@ -138,7 +134,7 @@ export default function TutorOnboardingPage() {
             <div className="space-y-4">
               <div>
                 <h3 className="font-bold text-sm text-slate-900">Step 1: Select Subjects You Teach</h3>
-                <p className="text-xs text-slate-500">Choose one or more Quranic or academic disciplines.</p>
+                <p className="text-xs text-slate-500">Choose all the Quranic and academic subjects you offer.</p>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-80 overflow-y-auto p-1">
@@ -150,76 +146,119 @@ export default function TutorOnboardingPage() {
                       onClick={() => handleToggleSubject(cat._id)}
                       className={`p-3 rounded-2xl border text-xs cursor-pointer transition-all ${
                         isChecked
-                          ? 'bg-emerald-50 border-emerald-300 text-emerald-900 font-bold'
+                          ? 'bg-emerald-50 border-emerald-400 text-emerald-900 font-bold shadow-2xs'
                           : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
                       }`}
                     >
-                      <p>{cat.name}</p>
+                      <p className="flex items-center justify-between">
+                        <span>{cat.name}</span>
+                        {isChecked && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />}
+                      </p>
                       <span className="text-[10px] text-slate-400 capitalize">{cat.type}</span>
                     </div>
                   );
                 })}
               </div>
 
-              <div className="flex justify-end pt-2">
+              <div className="flex justify-between items-center pt-2">
+                <span className="text-xs font-bold text-emerald-700">
+                  {selectedSubjects.length} Subject{selectedSubjects.length !== 1 ? 's' : ''} Selected
+                </span>
                 <button
                   type="button"
                   disabled={selectedSubjects.length === 0}
                   onClick={() => setStep(2)}
-                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md disabled:opacity-40 flex items-center gap-1.5"
+                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md disabled:opacity-40 flex items-center gap-1.5 transition-all"
                 >
-                  <span>Next: Bio & Qualifications</span>
+                  <span>Next: Bio & Hourly Rate</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             </div>
           )}
 
-          {/* Step 2: Bio & Experience */}
+          {/* Step 2: Teaching Bio, Experience, Hourly Rate & Finalize */}
           {step === 2 && (
-            <div className="space-y-4">
+            <form onSubmit={handleCompleteOnboarding} className="space-y-4">
               <div>
-                <h3 className="font-bold text-sm text-slate-900">Step 2: Teaching Bio & Background</h3>
-                <p className="text-xs text-slate-500">Tell students about your qualifications and teaching style.</p>
+                <h3 className="font-bold text-sm text-slate-900">Step 2: Teaching Bio & Rates</h3>
+                <p className="text-xs text-slate-500">Set your bio, experience, and hourly rate for student bookings.</p>
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">About Yourself *</label>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Teaching Bio / Introduction *</label>
                 <textarea
                   rows="3"
                   required
                   placeholder="Introduce yourself, your Quran Tajweed mastery, or academic experience..."
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  className="w-full p-3 bg-slate-50 border rounded-2xl text-xs text-slate-800 outline-none focus:bg-white focus:border-emerald-500"
+                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-800 outline-none focus:bg-white focus:border-emerald-500"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Degree / Sanad Title *</label>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Degree Title</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Shahadat-ul-Alimiyya / M.Sc"
+                    placeholder="e.g. Shahadat-ul-Alimiyya"
                     value={qualifications}
                     onChange={(e) => setQualifications(e.target.value)}
-                    className="w-full p-2.5 bg-slate-50 border rounded-2xl text-xs text-slate-800"
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-800"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Teaching Mode</label>
-                  <CustomSelect
-                    options={[
-                      { value: 'online', label: 'Online (Live WebRTC)', sublabel: 'In-platform HD Classroom' },
-                      { value: 'physical', label: 'In-Person', sublabel: 'Home Tutoring' },
-                      { value: 'both', label: 'Both Online & In-Person', sublabel: 'Hybrid Tutoring' }
-                    ]}
-                    value={teachingMode}
-                    onChange={setTeachingMode}
-                    variant="filter"
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Experience (Years)</label>
+                  <input
+                    type="number"
+                    min="1"
+                    max="50"
+                    required
+                    value={experienceYears}
+                    onChange={(e) => setExperienceYears(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-800 font-bold"
                   />
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 block mb-1">Hourly Rate (PKR)</label>
+                  <input
+                    type="number"
+                    min="500"
+                    step="100"
+                    required
+                    value={hourlyRate}
+                    onChange={(e) => setHourlyRate(e.target.value)}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-800 font-bold"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">Teaching Mode</label>
+                <CustomSelect
+                  options={[
+                    { value: 'online', label: 'Online (Live WebRTC)', sublabel: 'In-platform HD Classroom' },
+                    { value: 'physical', label: 'In-Person', sublabel: 'Home Tutoring' },
+                    { value: 'both', label: 'Both Online & In-Person', sublabel: 'Hybrid Tutoring' }
+                  ]}
+                  value={teachingMode}
+                  onChange={setTeachingMode}
+                  variant="filter"
+                />
+              </div>
+
+              {/* Sanad Already Attached Notice */}
+              <div className="p-3.5 bg-emerald-50 rounded-2xl border border-emerald-200/80 flex items-start gap-2.5 text-xs text-emerald-900">
+                <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-bold">Sanad & Degree Documents Attached</p>
+                  <p className="text-[11px] text-emerald-800/80 mt-0.5">
+                    Your credentials uploaded during registration have been saved and sent to platform administrators for verification.
+                  </p>
                 </div>
               </div>
 
@@ -232,62 +271,11 @@ export default function TutorOnboardingPage() {
                   Back
                 </button>
                 <button
-                  type="button"
-                  disabled={!bio.trim() || !qualifications.trim()}
-                  onClick={() => setStep(3)}
-                  className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md disabled:opacity-40 flex items-center gap-1.5"
-                >
-                  <span>Next: Upload Sanad</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Step 3: Sanad Upload */}
-          {step === 3 && (
-            <form onSubmit={handleCompleteOnboarding} className="space-y-4">
-              <div>
-                <h3 className="font-bold text-sm text-slate-900">Step 3: Upload Sanad / Degree Document</h3>
-                <p className="text-xs text-slate-500">Upload an authentic scan of your certificate for admin verification.</p>
-              </div>
-
-              <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 space-y-3">
-                <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Document Title</label>
-                  <input
-                    type="text"
-                    value={sanadTitle}
-                    onChange={(e) => setSanadTitle(e.target.value)}
-                    className="w-full p-2 bg-white border rounded-xl text-xs text-slate-800"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-slate-700 block mb-1">Select Certificate File (JPG, PNG, PDF)</label>
-                  <input
-                    type="file"
-                    accept="image/*,application/pdf"
-                    onChange={(e) => setSanadFile(e.target.files[0])}
-                    className="text-xs text-slate-500"
-                  />
-                </div>
-              </div>
-
-              <div className="flex justify-between pt-2">
-                <button
-                  type="button"
-                  onClick={() => setStep(2)}
-                  className="px-4 py-2 border rounded-xl text-xs font-bold text-slate-600"
-                >
-                  Back
-                </button>
-                <button
                   type="submit"
-                  disabled={loading}
-                  className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md disabled:opacity-50 flex items-center gap-1.5"
+                  disabled={loading || !bio.trim()}
+                  className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md disabled:opacity-50 flex items-center gap-1.5 transition-all"
                 >
-                  <span>{loading ? 'Submitting Application...' : 'Complete & Submit'}</span>
+                  <span>{loading ? 'Finalizing Profile...' : 'Complete & Go to Dashboard'}</span>
                   <CheckCircle2 className="w-4 h-4" />
                 </button>
               </div>
@@ -300,4 +288,3 @@ export default function TutorOnboardingPage() {
     </div>
   );
 }
-

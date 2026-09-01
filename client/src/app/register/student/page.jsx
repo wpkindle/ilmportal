@@ -19,6 +19,7 @@ import {
 import { api } from '../../../services/api';
 import CustomSelect from '../../../components/common/CustomSelect';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
+import CaptchaBox from '../../../components/common/CaptchaBox';
 import { allPakistaniCities } from '../../../data/pakistanAreas';
 
 const cityOptions = allPakistaniCities.map((c) => ({ value: c, label: c }));
@@ -34,6 +35,7 @@ export default function StudentRegisterPage() {
   const [age, setAge] = useState('');
   const [phone, setPhone] = useState('');
   const [city, setCity] = useState('Lahore');
+  const [captchaVerified, setCaptchaVerified] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -42,6 +44,12 @@ export default function StudentRegisterPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
+
+    if (!captchaVerified) {
+      setError('Please complete the visual security verification (CAPTCHA) below');
+      setLoading(false);
+      return;
+    }
 
     if (!gender) {
       setError('Student Gender is required');
@@ -261,10 +269,16 @@ export default function StudentRegisterPage() {
               </div>
             </div>
 
+            {/* Security CAPTCHA Box */}
+            <CaptchaBox
+              isVerified={captchaVerified}
+              setIsVerified={setCaptchaVerified}
+            />
+
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !captchaVerified}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer mt-2"
             >
               {loading ? (

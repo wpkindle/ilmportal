@@ -251,57 +251,57 @@ export default function AdminUsersModerationPage() {
                     onClick={() => { setRoleFilter('all'); setStatusFilter('all'); }}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                       roleFilter === 'all' && statusFilter === 'all'
-                        ? 'bg-slate-900 text-white'
+                        ? 'bg-slate-900 text-white shadow-2xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
-                    All Users
+                    All Users ({users.length})
                   </button>
                   <button
-                    onClick={() => setRoleFilter('student')}
+                    onClick={() => { setRoleFilter('student'); setStatusFilter('all'); }}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      roleFilter === 'student'
-                        ? 'bg-emerald-600 text-white'
+                      roleFilter === 'student' && statusFilter === 'all'
+                        ? 'bg-emerald-600 text-white shadow-2xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
                     Students
                   </button>
                   <button
-                    onClick={() => setRoleFilter('tutor')}
+                    onClick={() => { setRoleFilter('tutor'); setStatusFilter('all'); }}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      roleFilter === 'tutor'
-                        ? 'bg-blue-600 text-white'
+                      roleFilter === 'tutor' && statusFilter === 'all'
+                        ? 'bg-blue-600 text-white shadow-2xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
                     Tutors
                   </button>
                   <button
-                    onClick={() => setStatusFilter('warned')}
+                    onClick={() => { setStatusFilter('warned'); setRoleFilter('all'); }}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                       statusFilter === 'warned'
-                        ? 'bg-amber-600 text-white'
+                        ? 'bg-amber-600 text-white shadow-2xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
                     ⚠️ Warned
                   </button>
                   <button
-                    onClick={() => setStatusFilter('under_review')}
+                    onClick={() => { setStatusFilter('under_review'); setRoleFilter('all'); }}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                       statusFilter === 'under_review'
-                        ? 'bg-orange-600 text-white'
+                        ? 'bg-orange-600 text-white shadow-2xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
                     🔍 Under Review
                   </button>
                   <button
-                    onClick={() => setStatusFilter('suspended')}
+                    onClick={() => { setStatusFilter('suspended'); setRoleFilter('all'); }}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                       statusFilter === 'suspended'
-                        ? 'bg-rose-700 text-white'
+                        ? 'bg-rose-600 text-white shadow-2xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >

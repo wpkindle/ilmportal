@@ -261,14 +261,46 @@ exports.getAllUsers = async (req, res) => {
     const { role, search, city, status, isVerified } = req.query;
     const query = {};
 
-    if (role && role !== 'all') query.role = role;
-    if (city && city !== 'all') query.city = new RegExp(city, 'i');
-    if (status && status !== 'all') query.status = status;
-    if (isVerified !== undefined && isVerified !== 'all') query.isVerified = isVerified === 'true';
+    if (role && role !== 'all') {
+      query.role = role;
+    }
 
-    if (search) {
+    if (city && city !== 'all') {
+      query.city = new RegExp(city.trim(), 'i');
+    }
+
+    if (status && status !== 'all') {
+      if (status === 'warned') {
+        query.$or = [{ status: 'warned' }, { warningCount: { $gt: 0 } }];
+      } else if (status === 'suspended') {
+        query.$or = [{ status: 'suspended' }, { status: 'deactivated' }, { isActive: false }];
+      } else if (status === 'under_review') {
+        query.status = 'under_review';
+      } else if (status === 'active') {
+        query.$and = [
+          { $or: [{ status: 'active' }, { status: { $exists: false } }, { status: null }] },
+          { isActive: { $ne: false } }
+        ];
+      } else {
+        query.status = status;
+      }
+    }
+
+    if (isVerified !== undefined && isVerified !== 'all') {
+      query.isVerified = isVerified === 'true';
+    }
+
+    if (search && search.trim()) {
       const searchRegex = new RegExp(search.trim(), 'i');
-      query.$or = [{ name: searchRegex }, { email: searchRegex }, { phone: searchRegex }];
+      const searchConditions = [{ name: searchRegex }, { email: searchRegex }, { phone: searchRegex }];
+      if (query.$or) {
+        query.$and = (query.$and || []).concat([{ $or: query.$or }, { $or: searchConditions }]);
+        delete query.$or;
+      } else if (query.$and) {
+        query.$and.push({ $or: searchConditions });
+      } else {
+        query.$or = searchConditions;
+      }
     }
 
     const users = await User.find(query).sort({ createdAt: -1 });

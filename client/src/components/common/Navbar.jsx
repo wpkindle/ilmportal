@@ -161,24 +161,24 @@ const Navbar = () => {
   return (
     <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-2xs">
       <PromotionTopBar />
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-20">
+      <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
           
           {/* Brand Logo & Tagline */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-800 via-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-700/20 group-hover:scale-105 transition-transform">
-              <BookOpen className="w-6 h-6" />
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-emerald-800 via-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-700/20 group-hover:scale-105 transition-transform">
+              <BookOpen className="w-5 h-5" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-xl font-black tracking-tight text-slate-900 font-display">
+                <span className="text-lg sm:text-xl font-black tracking-tight text-slate-900 font-display">
                   Ilm<span className="text-emerald-700">Portal</span>
                 </span>
-                <span className="px-1.5 py-0.5 rounded text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200/60">
+                <span className="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200/60">
                   Pakistan
                 </span>
               </div>
-              <p className="text-[10px] font-medium text-slate-400 -mt-0.5 hidden sm:block">
+              <p className="text-[9.5px] font-medium text-slate-400 -mt-0.5 hidden sm:block">
                 Quran & Academic Tutoring Platform
               </p>
             </div>
@@ -188,7 +188,7 @@ const Navbar = () => {
           <nav className="hidden lg:flex items-center gap-1">
             <Link
               href="/courses"
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                 pathname.startsWith('/courses')
                   ? 'text-emerald-800 bg-emerald-50'
                   : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
@@ -202,7 +202,7 @@ const Navbar = () => {
 
             <Link
               href="/tutors"
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 pathname === '/tutors'
                   ? 'text-emerald-800 bg-emerald-50'
                   : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
@@ -215,7 +215,7 @@ const Navbar = () => {
             <div className="relative" ref={subjectsRef}>
               <button
                 onClick={() => setSubjectsDropdownOpen(!subjectsDropdownOpen)}
-                className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   subjectsDropdownOpen || pathname.includes('/tutors')
                     ? 'text-emerald-800 bg-emerald-50'
                     : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
@@ -267,7 +267,7 @@ const Navbar = () => {
 
             <Link
               href="/how-it-works"
-              className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 pathname === '/how-it-works'
                   ? 'text-emerald-800 bg-emerald-50'
                   : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
@@ -434,10 +434,10 @@ const Navbar = () => {
               </div>
             ) : (
               /* Unauthenticated Dual Portal Buttons (Student & Tutor) */
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 sm:gap-2">
                 <Link
                   href="/login?role=student"
-                  className="flex items-center gap-1.5 px-3 sm:px-3.5 py-2 bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-bold rounded-xl shadow-sm transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-bold rounded-xl shadow-xs transition-all"
                 >
                   <GraduationCap className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Student Portal</span>
@@ -445,7 +445,7 @@ const Navbar = () => {
 
                 <Link
                   href="/login?role=tutor"
-                  className="flex items-center gap-1.5 px-3 sm:px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all"
+                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-xs hover:shadow-md transition-all"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-200" />
                   <span>Tutor Portal</span>

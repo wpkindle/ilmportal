@@ -1,11 +1,13 @@
 const getApiBase = () => {
   if (typeof window === 'undefined') {
-    return process.env.INTERNAL_API_URL || 'http://127.0.0.1:5000/api';
+    return process.env.BACKEND_URL
+      ? `${process.env.BACKEND_URL.replace(/\/$/, '')}/api`
+      : (process.env.INTERNAL_API_URL || 'https://ilmportal-backend.onrender.com/api');
   }
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
-  if (window.location.hostname === 'ilmportal.vercel.app') {
+  if (window.location.hostname === 'ilmportal.vercel.app' || window.location.hostname.includes('vercel.app')) {
     return 'https://ilmportal-backend.onrender.com/api';
   }
   return '/api';

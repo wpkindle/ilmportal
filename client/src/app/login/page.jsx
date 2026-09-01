@@ -3,7 +3,19 @@
 import React, { useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { BookOpen, Lock, Mail, ArrowRight, Sparkles, Eye, EyeOff } from 'lucide-react';
+import {
+  BookOpen,
+  Lock,
+  Mail,
+  ArrowRight,
+  Sparkles,
+  Eye,
+  EyeOff,
+  GraduationCap,
+  ShieldCheck,
+  User,
+  AlertCircle
+} from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 
@@ -14,11 +26,14 @@ function LoginContent() {
   const roleParam = searchParams.get('role');
   const redirect = searchParams.get('redirect') || '/';
 
+  const [activeTab, setActiveTab] = useState(roleParam === 'tutor' ? 'tutor' : 'student');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const isTutorMode = activeTab === 'tutor';
 
   const performLogin = async (loginEmail, loginPass) => {
     setLoading(true);
@@ -36,7 +51,7 @@ function LoginContent() {
     } catch (err) {
       console.error('Login error:', err);
       if (err.isUnverified || err.message?.toLowerCase().includes('verify')) {
-        router.push(`/verify-email?email=${encodeURIComponent(loginEmail.trim())}&role=${roleParam}`);
+        router.push(`/verify-email?email=${encodeURIComponent(loginEmail.trim())}&role=${activeTab}`);
       } else {
         setError(err.message || 'Invalid email or password');
       }
@@ -60,69 +75,108 @@ function LoginContent() {
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 flex items-center justify-center">
       <div className="max-w-md w-full space-y-6">
         
-        {/* Top Logo */}
+        {/* Top Logo & Title */}
         <div className="text-center space-y-2">
           <Link href="/" className="inline-flex items-center gap-3">
             <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-800 to-teal-500 flex items-center justify-center text-white shadow-lg shadow-emerald-700/20">
               <BookOpen className="w-6 h-6" />
             </div>
           </Link>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
-            {roleParam === 'student' ? 'Student Portal Sign In' : roleParam === 'tutor' ? 'Tutor Portal Sign In' : 'Sign in to IlmPortal'}
-          </h2>
+          
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
+            {isTutorMode ? 'Tutor Portal Sign In' : 'Student Portal Sign In'}
+          </h1>
           <p className="text-xs text-slate-500">
-            Pakistan's Premier Quran & Academic Tutoring Platform
+            {isTutorMode
+              ? 'Access your teaching dashboard, classroom schedules, and student trials'
+              : 'Access your Quran & academic courses, tests, and live 1:1 classes'}
           </p>
         </div>
 
-        {/* Demo Login Quick-Fill Box */}
+        {/* Portal Switcher Tabs */}
+        <div className="bg-white p-1 rounded-2xl border border-slate-200 shadow-xs flex">
+          <button
+            type="button"
+            onClick={() => { setActiveTab('student'); setError(''); }}
+            className={`flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+              !isTutorMode
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <GraduationCap className="w-4 h-4" />
+            <span>Student Portal</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => { setActiveTab('tutor'); setError(''); }}
+            className={`flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
+              isTutorMode
+                ? 'bg-emerald-600 text-white shadow-xs'
+                : 'text-slate-600 hover:text-slate-900'
+            }`}
+          >
+            <ShieldCheck className="w-4 h-4" />
+            <span>Tutor Portal</span>
+          </button>
+        </div>
+
+        {/* 1-Click Demo Login Quick Box */}
         <div className="bg-white p-4 rounded-3xl border border-slate-200/90 shadow-2xs space-y-2">
-          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-700">
-            <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-            <span>1-Click Demo Logins:</span>
+          <div className="flex items-center justify-between text-xs font-bold text-slate-700">
+            <span className="flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+              <span>Instant 1-Click Demo Access:</span>
+            </span>
           </div>
-          <div className="grid grid-cols-2 gap-2 text-xs font-bold">
-            <button
-              type="button"
-              disabled={loading}
-              onClick={() => handle1ClickDemo('student.hamza@example.com', 'Password@123')}
-              className="py-2.5 px-3 bg-emerald-50/80 hover:bg-emerald-100 text-emerald-900 rounded-xl transition-all border border-emerald-200/80 flex items-center justify-center gap-1.5 active:scale-98 disabled:opacity-50 cursor-pointer shadow-2xs"
-            >
-              <span>🎓 Student Demo</span>
-            </button>
+          
+          {isTutorMode ? (
             <button
               type="button"
               disabled={loading}
               onClick={() => handle1ClickDemo('qari.huzaifa@example.com', 'Password@123')}
-              className="py-2.5 px-3 bg-teal-50/80 hover:bg-teal-100 text-teal-900 rounded-xl transition-all border border-teal-200/80 flex items-center justify-center gap-1.5 active:scale-98 disabled:opacity-50 cursor-pointer shadow-2xs"
+              className="w-full py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 rounded-xl transition-all border border-emerald-200 flex items-center justify-center gap-2 font-bold text-xs shadow-2xs cursor-pointer"
             >
-              <span>🕌 Tutor Demo</span>
+              <ShieldCheck className="w-4 h-4 text-emerald-600" />
+              <span>Sign In as Verified Tutor Demo (Qari Huzaifa)</span>
             </button>
-          </div>
+          ) : (
+            <button
+              type="button"
+              disabled={loading}
+              onClick={() => handle1ClickDemo('student.hamza@example.com', 'Password@123')}
+              className="w-full py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 rounded-xl transition-all border border-emerald-200 flex items-center justify-center gap-2 font-bold text-xs shadow-2xs cursor-pointer"
+            >
+              <GraduationCap className="w-4 h-4 text-emerald-600" />
+              <span>Sign In as Student Demo (Hamza Khan)</span>
+            </button>
+          )}
         </div>
 
-        {/* Login Form */}
-        <div className="bg-white p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-5">
+        {/* Login Form Card */}
+        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-5">
           {error && (
-            <div className="p-3 bg-red-50 text-red-700 rounded-2xl text-xs font-semibold">
-              {error}
+            <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 rounded-2xl text-xs font-semibold flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-red-500" />
+              <span>{error}</span>
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="text-xs font-bold text-slate-700 block mb-1">
-                Email Address
+                {isTutorMode ? 'Tutor Email Address' : 'Student Email Address'}
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   required
-                  placeholder="name@example.com"
+                  placeholder={isTutorMode ? 'tutor@example.com' : 'student@example.com'}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-800 outline-none focus:border-emerald-500 focus:bg-white transition-all"
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-800 outline-none focus:border-emerald-500 focus:bg-white transition-all font-medium"
                 />
               </div>
             </div>
@@ -142,7 +196,7 @@ function LoginContent() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-800 outline-none focus:border-emerald-500 focus:bg-white transition-all"
+                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-800 outline-none focus:border-emerald-500 focus:bg-white transition-all font-medium"
                 />
                 <button
                   type="button"
@@ -158,22 +212,55 @@ function LoginContent() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+              className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
-              <span>{loading ? 'Authenticating...' : 'Sign In'}</span>
-              <ArrowRight className="w-4 h-4" />
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <span>{isTutorMode ? 'Sign In as Tutor' : 'Sign In as Student'}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </form>
 
-          <div className="pt-3 border-t border-slate-100 text-center text-xs text-slate-500">
-            Don't have an account?{' '}
-            <Link
-              href={roleParam === 'tutor' ? '/register/tutor' : roleParam === 'student' ? '/register/student' : '/register'}
-              className="font-bold text-emerald-700 hover:underline"
-            >
-              Create Account
-            </Link>
+          {/* Registration Links Box */}
+          <div className="pt-4 border-t border-slate-100 space-y-2 text-center text-xs">
+            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-1">
+              <p className="text-slate-600">
+                Don't have an account yet?
+              </p>
+              {isTutorMode ? (
+                <Link
+                  href="/register/tutor"
+                  className="inline-flex items-center gap-1 font-black text-emerald-700 hover:underline text-xs"
+                >
+                  <span>Create Tutor Account & Join Faculty</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              ) : (
+                <Link
+                  href="/register/student"
+                  className="inline-flex items-center gap-1 font-black text-emerald-700 hover:underline text-xs"
+                >
+                  <span>Create Student Account</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+              )}
+            </div>
+
+            <div className="pt-1 flex items-center justify-center gap-3 text-[11px] text-slate-500">
+              <Link href="/register/student" className="hover:text-emerald-700 font-semibold">
+                Student Registration
+              </Link>
+              <span>&bull;</span>
+              <Link href="/register/tutor" className="hover:text-emerald-700 font-semibold">
+                Tutor Registration
+              </Link>
+            </div>
           </div>
+
         </div>
 
       </div>
@@ -188,4 +275,3 @@ export default function LoginPage() {
     </Suspense>
   );
 }
-

@@ -437,7 +437,7 @@ const Navbar = () => {
               /* Unauthenticated Dual Portal Buttons (Student & Tutor) */
               <div className="flex items-center gap-2">
                 <Link
-                  href="/register/student"
+                  href="/login?role=student"
                   className="flex items-center gap-1.5 px-3 sm:px-3.5 py-2 bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-bold rounded-xl shadow-sm transition-all"
                 >
                   <GraduationCap className="w-3.5 h-3.5 text-emerald-400" />
@@ -445,7 +445,7 @@ const Navbar = () => {
                 </Link>
 
                 <Link
-                  href="/register/tutor"
+                  href="/login?role=tutor"
                   className="flex items-center gap-1.5 px-3 sm:px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-200" />
@@ -541,14 +541,14 @@ const Navbar = () => {
             ) : (
               <div className="pt-3 border-t border-slate-100 grid grid-cols-2 gap-2">
                 <Link
-                  href="/register/student"
+                  href="/login?role=student"
                   className="flex items-center justify-center gap-1.5 py-2.5 bg-slate-900 text-white rounded-xl text-xs font-bold text-center"
                 >
                   <GraduationCap className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Student Portal</span>
                 </Link>
                 <Link
-                  href="/register/tutor"
+                  href="/login?role=tutor"
                   className="flex items-center justify-center gap-1.5 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold text-center"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-200" />

@@ -93,6 +93,9 @@ export const AuthProvider = ({ children }) => {
     setToken(null);
     setUser(null);
     setTutorProfile(null);
+    if (typeof window !== 'undefined') {
+      window.location.href = '/';
+    }
   };
 
   const updateUserProfile = async (updates) => {

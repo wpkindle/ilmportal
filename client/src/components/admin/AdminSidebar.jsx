@@ -16,14 +16,17 @@ import {
   History,
   Settings,
   ShieldCheck,
-  AlertTriangle
+  AlertTriangle,
+  LogOut
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
+import { useAuth } from '../../context/AuthContext';
 
 const AdminSidebar = () => {
   const pathname = usePathname();
   const { socket } = useSocket();
+  const { logout } = useAuth();
   const [pendingReportsCount, setPendingReportsCount] = useState(0);
 
   const fetchReportCounts = async () => {
@@ -118,9 +121,19 @@ const AdminSidebar = () => {
           })}
         </nav>
 
+        <div className="pt-4 border-t border-slate-800">
+          <button
+            onClick={() => logout()}
+            className="w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-xs font-bold text-rose-400 hover:text-white hover:bg-rose-950/50 border border-rose-900/30 transition-all cursor-pointer"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Sign Out from Admin</span>
+          </button>
+        </div>
+
       </div>
 
-      <div className="pt-6 mt-6 border-t border-slate-800 text-[11px] text-slate-500 px-2">
+      <div className="pt-4 mt-4 border-t border-slate-800 text-[11px] text-slate-500 px-2">
         <p className="font-semibold text-slate-400">IlmPortal Core v1.0</p>
         <p>Real-time audit logging active</p>
       </div>

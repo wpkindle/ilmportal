@@ -121,9 +121,8 @@ const Navbar = () => {
   }, [pathname]);
 
   const handleLogout = () => {
-    logout();
-    router.push('/');
     setUserMenuOpen(false);
+    logout();
   };
 
   const getDashboardRoute = () => {

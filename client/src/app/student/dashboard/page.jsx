@@ -220,7 +220,7 @@ export default function StudentDashboardPage() {
 
                     <div className="flex items-center gap-2">
                       <Link
-                        href={`/student/messages?conversation=${[user.id || user._id, deal.tutor?._id].sort().join('_')}`}
+                        href={`/student/messages?conversation=${[user?.id || user?._id || '', deal.tutor?._id || ''].sort().join('_')}`}
                         className="px-3 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 transition-colors"
                       >
                         <MessageSquare className="w-4 h-4 text-emerald-600" />

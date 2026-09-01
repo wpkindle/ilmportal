@@ -115,7 +115,7 @@ function LoginContent() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
             <div>
               <label className="text-xs font-bold text-slate-700 block mb-1">
                 {isTutorMode ? 'Tutor Email Address' : 'Student Email Address'}
@@ -125,6 +125,7 @@ function LoginContent() {
                 <input
                   type="email"
                   required
+                  autoComplete="off"
                   placeholder={isTutorMode ? 'tutor@example.com' : 'student@example.com'}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
@@ -145,6 +146,7 @@ function LoginContent() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
+                  autoComplete="new-password"
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}

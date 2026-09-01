@@ -163,3 +163,4 @@ export default function AccountStatusBanner({ user, role = 'student', showVerifi
     </div>
   );
 }
+

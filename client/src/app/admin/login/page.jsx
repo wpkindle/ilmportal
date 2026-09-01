@@ -124,7 +124,7 @@ export default function AdminLoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleAdminLogin} className="space-y-4">
+          <form onSubmit={handleAdminLogin} autoComplete="off" className="space-y-4">
             <div>
               <label className="text-xs font-bold text-slate-400 block mb-1">
                 Admin Email Address
@@ -134,6 +134,7 @@ export default function AdminLoginPage() {
                 <input
                   type="email"
                   required
+                  autoComplete="off"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="admin@pakistanlms.pk"
@@ -151,6 +152,7 @@ export default function AdminLoginPage() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
+                  autoComplete="new-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"

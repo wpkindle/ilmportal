@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <rect width="120" height="120" rx="28" fill="#E31837"/>
+  <circle cx="60" cy="52" r="32" fill="#1C1C1C"/>
+  <!-- JazzCash double arc logo -->
+  <path d="M50 36 C42 42 42 58 50 64 C56 68 62 65 64 61 L58 57 C55 59 52 61 49 58 C44 54 44 46 49 42 C52 39 55 41 58 43 L64 39 C62 35 56 32 50 36 Z" fill="#FFFFFF"/>
+  <path d="M68 36 C62 32 56 35 54 39 L60 43 C63 41 66 39 69 42 C74 46 74 54 69 58 C66 61 63 59 60 57 L54 61 C56 65 62 68 68 64 C76 58 76 42 68 36 Z" fill="#FFA500"/>
+  <text x="60" y="104" font-family="Arial, sans-serif" font-size="12" font-weight="900" fill="#FFFFFF" text-anchor="middle" letter-spacing="0.5">JazzCash</text>
+</svg>
+

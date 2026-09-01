@@ -1,0 +1,6 @@
+{
+  "watch": ["src/"],
+  "delay": 1000,
+  "signal": "SIGINT"
+}
+

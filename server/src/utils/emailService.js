@@ -1,0 +1,665 @@
+const nodemailer = require('nodemailer');
+
+let transporter = null;
+
+const initTransporter = () => {
+  try {
+    const smtpHost = process.env.SMTP_HOST;
+    const smtpUser = process.env.SMTP_USER;
+    const smtpPass = process.env.SMTP_PASS;
+    const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10);
+    const smtpService = process.env.SMTP_SERVICE; // e.g. 'gmail'
+
+    if (smtpService && smtpUser && smtpPass && smtpUser !== 'your_email@gmail.com') {
+      transporter = nodemailer.createTransport({
+        service: smtpService,
+        auth: {
+          user: smtpUser,
+          pass: smtpPass
+        }
+      });
+      console.log(`📡 [EMAIL SERVICE] Configured with ${smtpService} service for ${smtpUser}`);
+    } else if (smtpHost && smtpUser && smtpPass && smtpUser !== 'your_smtp_user') {
+      transporter = nodemailer.createTransport({
+        host: smtpHost,
+        port: smtpPort,
+        secure: smtpPort === 465 || process.env.SMTP_SECURE === 'true',
+        auth: {
+          user: smtpUser,
+          pass: smtpPass
+        },
+        tls: {
+          rejectUnauthorized: false
+        }
+      });
+      console.log(`📡 [EMAIL SERVICE] Configured with custom SMTP host: ${smtpHost}:${smtpPort}`);
+    } else {
+      console.log(`⚠️ [EMAIL SERVICE] No live SMTP configured. Using development console logger.`);
+      console.log(`ℹ️ [TIP] To receive real emails to your Gmail/Inbox, set SMTP_SERVICE=gmail, SMTP_USER, and SMTP_PASS (App Password) in server/.env.`);
+    }
+  } catch (e) {
+    console.error('Error initializing email transporter:', e.message);
+  }
+};
+
+initTransporter();
+
+const getClientBaseUrl = () => process.env.CLIENT_URL || 'http://localhost:3000';
+
+const sendEmail = async ({ to, subject, html, text }) => {
+  try {
+    if (transporter) {
+      const fromAddress = `"IlmPortal Pakistan" <${process.env.SMTP_USER || process.env.SMTP_FROM || 'noreply@pakistanlms.pk'}>`;
+      const info = await transporter.sendMail({
+        from: fromAddress,
+        to,
+        subject,
+        text: text || html.replace(/<[^>]*>?/gm, ''),
+        html
+      });
+      console.log(`\n======================================================`);
+      console.log(`📧 [LIVE EMAIL SENT SUCCESSFULLY]`);
+      console.log(`📬 To: ${to}`);
+      console.log(`📋 Subject: ${subject}`);
+      console.log(`🆔 MessageId: ${info.messageId}`);
+      console.log(`======================================================\n`);
+      return true;
+    } else {
+      console.log(`\n======================================================`);
+      console.log(`📧 [EMAIL DISPATCHED TO: ${to}]`);
+      console.log(`📋 Subject: ${subject}`);
+      console.log(`📝 Content:\n${text || html.replace(/<[^>]*>?/gm, '')}`);
+      console.log(`======================================================\n`);
+      return true;
+    }
+  } catch (error) {
+    console.error('Email sending error:', error.message);
+    return false;
+  }
+};
+
+// ==========================================
+// 1. VERIFICATION OTP EMAIL TEMPLATE
+// ==========================================
+const sendVerificationOtpEmail = async (to, name, otp) => {
+  console.log(`\n======================================================`);
+  console.log(`🔑 [VERIFICATION OTP GENERATED FOR ${to}]`);
+  console.log(`👉 CODE: ${otp}`);
+  console.log(`======================================================\n`);
+
+  const subject = `🔐 ${otp} is your IlmPortal Verification Code`;
+  const clientUrl = getClientBaseUrl();
+  const verifyLink = `${clientUrl}/verify-email?email=${encodeURIComponent(to)}`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Email Verification</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f1f5f9; padding: 30px 10px;">
+        <tr>
+          <td align="center">
+            
+            <!-- Email Container -->
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0;">
+              
+              <!-- Brand Header -->
+              <tr>
+                <td align="center" style="padding: 35px 30px 25px 30px; background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #0d9488 100%); color: #ffffff;">
+                  <table border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                      <td align="center" style="padding-bottom: 12px;">
+                        <div style="width: 52px; height: 52px; background: rgba(255, 255, 255, 0.18); border: 2px solid rgba(255, 255, 255, 0.4); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; line-height: 52px; font-size: 26px;">
+                          📖
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td align="center">
+                        <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; color: #ffffff;">IlmPortal Pakistan</h1>
+                        <p style="margin: 4px 0 0 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #a7f3d0;">Online Quran & Academic LMS</p>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+
+              <!-- Main Content Body -->
+              <tr>
+                <td style="padding: 35px 35px 25px 35px;">
+                  <h2 style="margin: 0 0 12px 0; font-size: 20px; font-weight: 800; color: #0f172a;">
+                    Assalam-o-Alaikum, ${name}! 👋
+                  </h2>
+                  <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.6; color: #475569;">
+                    Welcome to <strong>IlmPortal Pakistan</strong>. To complete your account registration and activate your verified portal access, please enter the 6-digit confirmation code below:
+                  </p>
+
+                  <!-- OTP Display Card -->
+                  <div style="margin: 28px 0; padding: 24px; background: linear-gradient(180deg, #f0fdf4 0%, #ecfdf5 100%); border: 2px dashed #059669; border-radius: 16px; text-align: center;">
+                    <span style="display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #065f46; margin-bottom: 8px;">
+                      Your One-Time Passcode (OTP)
+                    </span>
+                    <div style="font-size: 38px; font-weight: 900; letter-spacing: 12px; color: #047857; font-family: 'Courier New', Courier, monospace; padding-left: 12px;">
+                      ${otp}
+                    </div>
+                    <span style="display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 600; color: #64748b;">
+                      ⏳ Valid for the next <strong>15 minutes</strong>
+                    </span>
+                  </div>
+
+                  <!-- Direct Action Button -->
+                  <div style="text-align: center; margin: 28px 0;">
+                    <a href="${verifyLink}" style="display: inline-block; padding: 14px 34px; background-color: #059669; color: #ffffff; font-size: 14px; font-weight: 800; text-decoration: none; border-radius: 12px; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);">
+                      Verify Account Now →
+                    </a>
+                  </div>
+
+                  <!-- Security Advisory Notice -->
+                  <div style="background-color: #f8fafc; border-left: 4px solid #059669; padding: 14px 16px; border-radius: 8px; margin-top: 25px;">
+                    <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #475569;">
+                      <strong style="color: #0f172a;">Security Advisory:</strong> If you did not create an account on IlmPortal Pakistan, please ignore this email. Never share your OTP with anyone.
+                    </p>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Footer -->
+              <tr>
+                <td style="padding: 25px 35px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
+                  <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #334155;">
+                    IlmPortal Pakistan &bull; Quality Quranic & Academic Education
+                  </p>
+                  <p style="margin: 0; font-size: 11px; color: #94a3b8;">
+                    Islamabad &bull; Lahore &bull; Karachi &bull; Peshawar &bull; Quetta &bull; Nationwide
+                  </p>
+                </td>
+              </tr>
+
+            </table>
+            
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({ to, subject, html, text: `Assalam-o-Alaikum ${name}, your IlmPortal verification OTP code is: ${otp}. It will expire in 15 minutes.` });
+};
+
+// ==========================================
+// 2. TUTOR APPLICATION APPROVAL & REJECTION EMAIL
+// ==========================================
+const sendTutorStatusEmail = async (to, name, status, reason = '') => {
+  const isApproved = status === 'approved';
+  const clientUrl = getClientBaseUrl();
+
+  if (isApproved) {
+    const subject = `🎉 Congratulations! Your Tutor Profile is Approved & Live on IlmPortal`;
+    const dashboardUrl = `${clientUrl}/tutor/dashboard`;
+    const profileUrl = `${clientUrl}/tutor/profile`;
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tutor Profile Approved</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f1f5f9; padding: 30px 10px;">
+          <tr>
+            <td align="center">
+              
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 620px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0;">
+                
+                <!-- Celebratory Emerald Header -->
+                <tr>
+                  <td align="center" style="padding: 40px 30px 30px 30px; background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #0f766e 100%); color: #ffffff;">
+                    <div style="width: 64px; height: 64px; background: #ffffff; border-radius: 20px; display: inline-flex; align-items: center; justify-content: center; line-height: 64px; font-size: 32px; box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15); margin-bottom: 15px;">
+                      🎓
+                    </div>
+                    <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; color: #ffffff;">Mubarak! You Are Verified</h1>
+                    <p style="margin: 6px 0 0 0; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #a7f3d0;">Sanad & Credentials Approved</p>
+                  </td>
+                </tr>
+
+                <!-- Content Body -->
+                <tr>
+                  <td style="padding: 35px 35px 25px 35px;">
+                    <h2 style="margin: 0 0 12px 0; font-size: 20px; font-weight: 800; color: #0f172a;">
+                      Assalam-o-Alaikum, ${name}! 🎉
+                    </h2>
+                    <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.6; color: #475569;">
+                      We are thrilled to inform you that our Academic Verification Committee has reviewed and <strong>approved your educational qualifications and Sanad degrees</strong>. Your tutor profile is now officially <strong>LIVE</strong> across Pakistan!
+                    </p>
+
+                    <!-- Official Verification Summary Card -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin: 24px 0;">
+                      <h3 style="margin: 0 0 14px 0; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+                        🌟 Official Credential Status
+                      </h3>
+                      <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                        <tr>
+                          <td style="padding: 6px 0; color: #64748b;">Verification Badge:</td>
+                          <td style="padding: 6px 0; font-weight: 800; text-align: right; color: #059669;">
+                            ✅ Sanad-Certified Tutor
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 6px 0; color: #64748b;">Public Visibility:</td>
+                          <td style="padding: 6px 0; font-weight: 700; text-align: right; color: #0f172a;">
+                            Active in Pakistan Tutor Directory
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 6px 0; color: #64748b;">Tutoring Features:</td>
+                          <td style="padding: 6px 0; font-weight: 700; text-align: right; color: #0f172a;">
+                            1:1 WebRTC Video & Voice Chat
+                          </td>
+                        </tr>
+                        <tr>
+                          <td style="padding: 6px 0; color: #64748b;">Free Trial Matching:</td>
+                          <td style="padding: 6px 0; font-weight: 700; text-align: right; color: #059669;">
+                            3-Day Student Trial Active
+                          </td>
+                        </tr>
+                      </table>
+                    </div>
+
+                    <!-- What's Next Steps -->
+                    <h3 style="margin: 25px 0 12px 0; font-size: 15px; font-weight: 800; color: #0f172a;">
+                      🚀 Next Steps to Start Teaching:
+                    </h3>
+                    <ul style="margin: 0 0 25px 0; padding-left: 20px; font-size: 13px; line-height: 1.8; color: #475569;">
+                      <li><strong>Course Studio:</strong> Create curriculum chapters, quiz tests, and reading materials in your Course Studio.</li>
+                      <li><strong>Student Messages:</strong> Respond to incoming student inquiries and send custom deal offers.</li>
+                      <li><strong>WebRTC Classroom:</strong> Conduct 1:1 live interactive video classes with digital Quran reader tools.</li>
+                    </ul>
+
+                    <!-- Action CTA Button -->
+                    <div style="text-align: center; margin: 30px 0;">
+                      <a href="${dashboardUrl}" style="display: inline-block; padding: 15px 36px; background-color: #059669; color: #ffffff; font-size: 15px; font-weight: 800; text-decoration: none; border-radius: 14px; box-shadow: 0 5px 15px rgba(5, 150, 105, 0.35);">
+                        Open Tutor Portal & Dashboard →
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                  <td style="padding: 25px 35px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
+                    <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #334155;">
+                      IlmPortal Pakistan &bull; Quality Quranic & Academic Education
+                    </p>
+                    <p style="margin: 0; font-size: 11px; color: #94a3b8;">
+                      Need assistance? Contact our instructor support team at support@pakistanlms.pk
+                    </p>
+                  </td>
+                </tr>
+
+              </table>
+              
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+
+    return sendEmail({
+      to,
+      subject,
+      html,
+      text: `Assalam-o-Alaikum ${name}! Mubarak! Your tutor profile and Sanad credentials have been approved on IlmPortal Pakistan. Access your tutor dashboard at: ${dashboardUrl}`
+    });
+  } else {
+    // Rejection or Revision Request
+    const subject = `⚠️ Update on Your IlmPortal Tutor Application`;
+    const profileUrl = `${clientUrl}/tutor/profile`;
+
+    const html = `
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tutor Application Update</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f1f5f9; padding: 30px 10px;">
+          <tr>
+            <td align="center">
+              
+              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0;">
+                
+                <!-- Notice Header -->
+                <tr>
+                  <td align="center" style="padding: 35px 30px 25px 30px; background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 50%, #c2410c 100%); color: #ffffff;">
+                    <div style="width: 54px; height: 54px; background: rgba(255, 255, 255, 0.18); border: 2px solid rgba(255, 255, 255, 0.4); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; line-height: 54px; font-size: 26px; margin-bottom: 10px;">
+                      📋
+                    </div>
+                    <h1 style="margin: 0; font-size: 24px; font-weight: 900; letter-spacing: -0.5px; color: #ffffff;">Application Review Update</h1>
+                    <p style="margin: 4px 0 0 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #fecaca;">Action Required on Credentials</p>
+                  </td>
+                </tr>
+
+                <!-- Content Body -->
+                <tr>
+                  <td style="padding: 35px 35px 25px 35px;">
+                    <h2 style="margin: 0 0 12px 0; font-size: 18px; font-weight: 800; color: #0f172a;">
+                      Assalam-o-Alaikum, ${name},
+                    </h2>
+                    <p style="margin: 0 0 18px 0; font-size: 14px; line-height: 1.6; color: #475569;">
+                      Thank you for submitting your application to teach on IlmPortal Pakistan. Our verification team reviewed your submitted documents and could not approve your profile at this stage.
+                    </p>
+
+                    <!-- Reason Card -->
+                    <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 14px; padding: 18px; margin: 20px 0;">
+                      <h4 style="margin: 0 0 8px 0; font-size: 12px; font-weight: 800; text-transform: uppercase; color: #9f1239;">
+                        Feedback from Verification Team:
+                      </h4>
+                      <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #be123c; font-weight: 600;">
+                        "${reason || 'Please provide higher resolution scans of your Sanad / Shahada degree or verify your contact details.'}"
+                      </p>
+                    </div>
+
+                    <p style="margin: 0 0 20px 0; font-size: 13px; line-height: 1.6; color: #475569;">
+                      You can easily update your profile, upload clearer certificate images (JPG, PNG, or PDF), and re-submit for prompt re-evaluation:
+                    </p>
+
+                    <!-- Re-submit Action CTA -->
+                    <div style="text-align: center; margin: 28px 0;">
+                      <a href="${profileUrl}" style="display: inline-block; padding: 14px 32px; background-color: #0f172a; color: #ffffff; font-size: 14px; font-weight: 800; text-decoration: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);">
+                        Update & Re-Submit Sanad Documents →
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                  <td style="padding: 25px 35px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
+                    <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #334155;">
+                      IlmPortal Pakistan &bull; Quality Quranic & Academic Education
+                    </p>
+                    <p style="margin: 0; font-size: 11px; color: #94a3b8;">
+                      If you have questions, please reach out to admin@pakistanlms.pk
+                    </p>
+                  </td>
+                </tr>
+
+              </table>
+              
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+
+    return sendEmail({
+      to,
+      subject,
+      html,
+      text: `Assalam-o-Alaikum ${name}. Update on your IlmPortal tutor application: ${reason || 'Please upload updated documents.'}. Update your profile at: ${profileUrl}`
+    });
+  }
+};
+
+// ==========================================
+// 3. DEDICATED 1:1 CHAT INVITATION EMAIL
+// ==========================================
+const sendDedicatedChatInvitationEmail = async ({
+  to,
+  recipientRole = 'student',
+  studentName,
+  tutorName,
+  chatUrl,
+  studentAge,
+  studentGender,
+  studentCity
+}) => {
+  const isStudent = recipientRole === 'student';
+  const subject = isStudent
+    ? `💬 Your Dedicated 1:1 Chat with ${tutorName} is Ready | IlmPortal`
+    : `📩 New Student Inquiry: ${studentName} wants to connect with you | IlmPortal`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>1:1 Tutoring Chat</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f1f5f9; padding: 30px 10px;">
+        <tr>
+          <td align="center">
+            
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 620px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0;">
+              
+              <!-- Brand Header -->
+              <tr>
+                <td align="center" style="padding: 35px 30px 25px 30px; background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #0d9488 100%); color: #ffffff;">
+                  <div style="width: 54px; height: 54px; background: rgba(255, 255, 255, 0.18); border: 2px solid rgba(255, 255, 255, 0.4); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; line-height: 54px; font-size: 26px; margin-bottom: 10px;">
+                    💬
+                  </div>
+                  <h1 style="margin: 0; font-size: 24px; font-weight: 900; letter-spacing: -0.5px; color: #ffffff;">Dedicated 1:1 Discussion</h1>
+                  <p style="margin: 4px 0 0 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #a7f3d0;">Private & Secure Tutoring Channel</p>
+                </td>
+              </tr>
+
+              <!-- Content Body -->
+              <tr>
+                <td style="padding: 35px 35px 25px 35px;">
+                  <h2 style="margin: 0 0 12px 0; font-size: 20px; font-weight: 800; color: #0f172a;">
+                    ${isStudent ? `Assalam-o-Alaikum, ${studentName}!` : `Assalam-o-Alaikum, ${tutorName}!`}
+                  </h2>
+                  <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.6; color: #475569;">
+                    ${isStudent
+                      ? `Your dedicated private chat channel with <strong>${tutorName}</strong> is ready. You can discuss class timings, ask questions, exchange voice notes 🎙️, and coordinate your 3-day free trial directly.`
+                      : `A new student <strong>${studentName}</strong> has sent you an inquiry to connect for tutoring.`
+                    }
+                  </p>
+
+                  <!-- Details Card -->
+                  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin: 24px 0;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                      <tr>
+                        <td style="padding: 6px 0; color: #64748b;">${isStudent ? 'Sanad-Certified Tutor:' : 'Student Name:'}</td>
+                        <td style="padding: 6px 0; font-weight: 800; text-align: right; color: #0f172a;">
+                          ${isStudent ? tutorName : studentName}
+                        </td>
+                      </tr>
+                      ${!isStudent && studentAge ? `
+                      <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Student Demographics:</td>
+                        <td style="padding: 6px 0; font-weight: 700; text-align: right; color: #0f172a;">
+                          ${studentAge} Years &bull; ${studentGender || 'Student'}
+                        </td>
+                      </tr>` : ''}
+                      <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Location:</td>
+                        <td style="padding: 6px 0; font-weight: 700; text-align: right; color: #0f172a;">
+                          ${studentCity || 'Pakistan'}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Supported Features:</td>
+                        <td style="padding: 6px 0; font-weight: 700; text-align: right; color: #059669;">
+                          🎙️ Voice Notes &bull; 📹 WebRTC Video Call
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+
+                  <!-- Direct Chat CTA Button -->
+                  <div style="text-align: center; margin: 28px 0;">
+                    <a href="${chatUrl}" style="display: inline-block; padding: 15px 36px; background-color: #059669; color: #ffffff; font-size: 15px; font-weight: 800; text-decoration: none; border-radius: 14px; box-shadow: 0 5px 15px rgba(5, 150, 105, 0.35);">
+                      Open Dedicated Chat Room →
+                    </a>
+                  </div>
+
+                  <!-- Fallback Link -->
+                  <p style="text-align: center; color: #64748b; font-size: 11px; margin: 15px 0 0 0;">
+                    Or copy-paste this direct URL into your browser:<br/>
+                    <a href="${chatUrl}" style="color: #059669; word-break: break-all; font-weight: 600;">${chatUrl}</a>
+                  </p>
+                </td>
+              </tr>
+
+              <!-- Footer -->
+              <tr>
+                <td style="padding: 25px 35px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
+                  <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #334155;">
+                    IlmPortal Pakistan &bull; Safe, Verified & High-Quality Tutoring
+                  </p>
+                  <p style="margin: 0; font-size: 11px; color: #94a3b8;">
+                    Keep communications inside the platform to protect your account and ensure verified course records.
+                  </p>
+                </td>
+              </tr>
+
+            </table>
+            
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to,
+    subject,
+    html,
+    text: `Your dedicated chat room with ${isStudent ? tutorName : studentName} is open at: ${chatUrl}`
+  });
+};
+
+// ==========================================
+// 4. COURSE COMPLETION CERTIFICATE EMAIL
+// ==========================================
+const sendCertificateIssuedEmail = async ({ to, studentName, courseTitle, instructorName, certificateId, verificationUrl }) => {
+  const subject = `🎓 Mubarak! Your Course Completion Certificate: ${courseTitle}`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Official Certificate</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f1f5f9; padding: 30px 10px;">
+        <tr>
+          <td align="center">
+            
+            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 650px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); border: 2px solid #059669;">
+              
+              <!-- Brand Header -->
+              <tr>
+                <td align="center" style="padding: 35px 30px 25px 30px; background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #d97706 100%); color: #ffffff;">
+                  <div style="width: 60px; height: 60px; background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 18px; display: inline-flex; align-items: center; justify-content: center; line-height: 60px; font-size: 30px; margin-bottom: 12px;">
+                    🎓
+                  </div>
+                  <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; color: #ffffff;">Official Certificate Awarded</h1>
+                  <p style="margin: 4px 0 0 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #fef3c7;">IlmPortal Pakistan Credential</p>
+                </td>
+              </tr>
+
+              <!-- Content Body -->
+              <tr>
+                <td style="padding: 35px 35px 25px 35px;">
+                  <div style="text-align: center; margin-bottom: 25px;">
+                    <h2 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 900; color: #065f46;">
+                      Mubarak & Congratulations!
+                    </h2>
+                    <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.5;">
+                      This official certificate acknowledges that <strong>${studentName}</strong> has successfully completed the curriculum requirements for:
+                    </p>
+                    <div style="margin: 18px 0; padding: 14px 20px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; font-size: 18px; font-weight: 800; color: #065f46;">
+                      ${courseTitle}
+                    </div>
+                    <p style="margin: 0; font-size: 13px; color: #64748b;">
+                      Supervised by Sanad-Certified Instructor: <strong style="color: #0f172a;">${instructorName}</strong>
+                    </p>
+                  </div>
+
+                  <!-- Metadata Table -->
+                  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px; margin: 24px 0;">
+                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                      <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Certificate ID:</td>
+                        <td style="padding: 6px 0; font-weight: 800; text-align: right; font-family: monospace; color: #0f172a;">
+                          ${certificateId}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Issue Date:</td>
+                        <td style="padding: 6px 0; font-weight: 700; text-align: right; color: #0f172a;">
+                          ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
+                        </td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 6px 0; color: #64748b;">Verification Status:</td>
+                        <td style="padding: 6px 0; font-weight: 800; text-align: right; color: #059669;">
+                          Authentic & Verified
+                        </td>
+                      </tr>
+                    </table>
+                  </div>
+
+                  <!-- Download Button -->
+                  <div style="text-align: center; margin: 30px 0;">
+                    <a href="${verificationUrl}" style="display: inline-block; padding: 15px 36px; background-color: #059669; color: #ffffff; font-size: 15px; font-weight: 800; text-decoration: none; border-radius: 14px; box-shadow: 0 5px 15px rgba(5, 150, 105, 0.35);">
+                      View & Download PDF Certificate →
+                    </a>
+                  </div>
+                </td>
+              </tr>
+
+              <!-- Footer -->
+              <tr>
+                <td style="padding: 25px 35px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
+                  <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #334155;">
+                    IlmPortal Pakistan &bull; Quality Quranic & Academic Education
+                  </p>
+                  <p style="margin: 0; font-size: 11px; color: #94a3b8;">
+                    You can verify this certificate at any time using the link above.
+                  </p>
+                </td>
+              </tr>
+
+            </table>
+            
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to,
+    subject,
+    html,
+    text: `Congratulations ${studentName}! You have earned your completion certificate for "${courseTitle}". Download it at: ${verificationUrl}`
+  });
+};
+
+module.exports = {
+  sendEmail,
+  sendVerificationOtpEmail,
+  sendTutorStatusEmail,
+  sendCertificateIssuedEmail,
+  sendDedicatedChatInvitationEmail
+};

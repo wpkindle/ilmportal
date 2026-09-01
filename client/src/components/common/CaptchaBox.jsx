@@ -167,3 +167,4 @@ export default function CaptchaBox({ onValidate, isVerified, setIsVerified }) {
     </div>
   );
 }
+

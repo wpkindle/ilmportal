@@ -100,6 +100,13 @@ export default function AdminUsersModerationPage() {
       if (res.success) {
         setActionFeedback({ message: `Warning issued to ${selectedUser.name}!`, type: 'success' });
         setWarningModalOpen(false);
+        setUsers((prev) =>
+          prev.map((u) =>
+            u._id === selectedUser._id
+              ? { ...u, status: 'warned', warningCount: (u.warningCount || 0) + 1 }
+              : u
+          )
+        );
         fetchUsers();
       }
     } catch (err) {
@@ -132,6 +139,17 @@ export default function AdminUsersModerationPage() {
       if (res.success) {
         setActionFeedback({ message: `Account status updated to ${statusForm.status}!`, type: 'success' });
         setStatusModalOpen(false);
+        setUsers((prev) =>
+          prev.map((u) =>
+            u._id === selectedUser._id
+              ? {
+                  ...u,
+                  status: statusForm.status,
+                  isActive: statusForm.status !== 'suspended' && statusForm.status !== 'deactivated'
+                }
+              : u
+          )
+        );
         fetchUsers();
       }
     } catch (err) {
@@ -157,6 +175,7 @@ export default function AdminUsersModerationPage() {
       if (res.success) {
         setActionFeedback({ message: `Account for ${selectedUser.name} deleted successfully.`, type: 'success' });
         setDeleteModalOpen(false);
+        setUsers((prev) => prev.filter((u) => u._id !== selectedUser._id));
         fetchUsers();
       }
     } catch (err) {

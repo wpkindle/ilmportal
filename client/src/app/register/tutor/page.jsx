@@ -82,12 +82,11 @@ export default function TutorRegisterPage() {
 
       const reader = new FileReader();
       reader.onloadend = () => {
-        const defaultTitle = file.name.replace(/\.[^/.]+$/, '').replace(/[-_]/g, ' ');
         setSanadDocuments((prev) => [
           ...prev,
           {
             id: Date.now() + Math.random().toString(36).substring(2, 7),
-            title: defaultTitle || 'Sanad / Educational Certificate',
+            title: '',
             fileName: file.name,
             fileSize: (file.size / (1024 * 1024)).toFixed(2) + ' MB',
             fileUrl: reader.result,
@@ -427,8 +426,11 @@ export default function TutorRegisterPage() {
                               className="w-6 h-6 rounded object-cover border border-slate-200 shrink-0"
                             />
                           )}
-                          <span className="text-xs font-bold text-slate-800 truncate">
-                            Document #{idx + 1}: {doc.fileName}
+                          <span className="text-xs font-bold text-slate-800">
+                            Sanad #{idx + 1}
+                          </span>
+                          <span className="text-[11px] text-slate-500 font-mono truncate max-w-[150px] sm:max-w-[200px]" title={doc.fileName}>
+                            {doc.fileName}
                           </span>
                           <span className="text-[10px] text-slate-400 shrink-0">
                             ({doc.fileSize})
@@ -438,22 +440,25 @@ export default function TutorRegisterPage() {
                         <button
                           type="button"
                           onClick={() => handleRemoveDocument(doc.id)}
-                          className="p-1 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors"
+                          className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                           title="Remove document"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Trash2 className="w-4 h-4" />
                         </button>
                       </div>
 
                       {/* Document Title input */}
                       <div>
+                        <label className="text-[10px] font-bold text-slate-600 block mb-0.5">
+                          Certificate Title / Sanad Name *
+                        </label>
                         <input
                           type="text"
                           required
                           value={doc.title}
                           onChange={(e) => handleDocumentTitleChange(doc.id, e.target.value)}
-                          placeholder="e.g. Shahadat-ul-Almiya / Hifz Sanad / BS Islamic Studies"
-                          className="w-full px-3 py-1.5 text-xs bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-emerald-500 font-medium"
+                          placeholder="e.g. Shahadat-ul-Almiya / Hifz Sanad / Tajweed Certificate / BS Degree"
+                          className="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500 focus:bg-white font-medium"
                         />
                       </div>
                     </div>

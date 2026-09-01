@@ -3,17 +3,19 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { ShieldCheck, Lock, Mail, ArrowRight, Sparkles, KeyRound, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
+import { ShieldCheck, Lock, Mail, ArrowRight, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
+import CaptchaBox from '../../../components/common/CaptchaBox';
 
 export default function AdminLoginPage() {
   const { user, login } = useAuth();
   const router = useRouter();
 
-  const [email, setEmail] = useState('admin@pakistanlms.pk');
-  const [password, setPassword] = useState('Admin@12345');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -26,6 +28,11 @@ export default function AdminLoginPage() {
   }, [user, router]);
 
   const performLogin = async (loginEmail, loginPass) => {
+    if (!captchaVerified) {
+      setError('Please complete the security verification (CAPTCHA) below');
+      return;
+    }
+
     setLoading(true);
     setError('');
     setSuccess('');
@@ -73,12 +80,6 @@ export default function AdminLoginPage() {
     performLogin(email, password);
   };
 
-  const handle1ClickLogin = () => {
-    setEmail('admin@pakistanlms.pk');
-    setPassword('Admin@12345');
-    performLogin('admin@pakistanlms.pk', 'Admin@12345');
-  };
-
   return (
     <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-slate-950 flex items-center justify-center relative overflow-hidden">
       
@@ -104,33 +105,6 @@ export default function AdminLoginPage() {
               Authorized personnel only. Sanad audits, JazzCash approvals & CMS control.
             </p>
           </div>
-        </div>
-
-        {/* 1-Click Instant Master Admin Sign-In */}
-        <div className="p-5 bg-gradient-to-br from-emerald-950/70 via-slate-900 to-slate-900 border border-emerald-500/30 rounded-3xl space-y-3 shadow-xl">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2 text-xs font-bold text-emerald-300">
-              <Sparkles className="w-4 h-4 text-emerald-400" />
-              <span>1-Click Master Admin Access</span>
-            </div>
-            <span className="text-[9px] uppercase font-mono px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded font-bold">
-              Root Level
-            </span>
-          </div>
-
-          <p className="text-[11px] text-slate-300 leading-relaxed">
-            Click below to instantly authenticate as Master Admin with full access to Sanad verifications, user databases, and payment audit logs.
-          </p>
-
-          <button
-            type="button"
-            onClick={handle1ClickLogin}
-            disabled={loading}
-            className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 active:scale-[0.99] text-slate-950 font-black text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
-          >
-            <KeyRound className="w-4 h-4" />
-            <span>{loading ? 'Authenticating Admin...' : 'Launch Master Admin Dashboard'}</span>
-          </button>
         </div>
 
         {/* Standard Manual Login Card */}
@@ -186,26 +160,41 @@ export default function AdminLoginPage() {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-slate-300 cursor-pointer p-1"
-                  title={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </button>
               </div>
             </div>
 
+            {/* Security CAPTCHA Box */}
+            <CaptchaBox
+              isVerified={captchaVerified}
+              setIsVerified={setCaptchaVerified}
+            />
+
             <button
               type="submit"
-              disabled={loading}
-              className="w-full py-3 bg-slate-800 hover:bg-slate-700 active:bg-slate-600 text-white font-bold text-xs sm:text-sm rounded-2xl border border-slate-700 transition-all flex items-center justify-center gap-2 disabled:opacity-60 cursor-pointer"
+              disabled={loading || !captchaVerified}
+              className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
-              <span>{loading ? 'Verifying...' : 'Sign In with Password'}</span>
-              <ArrowRight className="w-4 h-4" />
+              {loading ? (
+                <div className="w-5 h-5 border-2 border-slate-950 border-t-transparent rounded-full animate-spin" />
+              ) : (
+                <>
+                  <span>Authenticate & Enter Console</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
           </form>
 
-          <div className="pt-3 border-t border-slate-800/80 text-center">
-            <Link href="/" className="text-xs text-slate-500 hover:text-emerald-400 transition-colors">
-              &larr; Return to Public Platform
+          {/* Footer Note */}
+          <div className="pt-2 text-center">
+            <Link
+              href="/"
+              className="text-xs text-slate-500 hover:text-emerald-400 transition-colors"
+            >
+              &larr; Return to Public Portal
             </Link>
           </div>
 

@@ -8,16 +8,15 @@ import {
   Lock,
   Mail,
   ArrowRight,
-  Sparkles,
   Eye,
   EyeOff,
   GraduationCap,
   ShieldCheck,
-  User,
   AlertCircle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import CaptchaBox from '../../components/common/CaptchaBox';
 
 function LoginContent() {
   const { login } = useAuth();
@@ -30,12 +29,18 @@ function LoginContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [captchaVerified, setCaptchaVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const isTutorMode = activeTab === 'tutor';
 
   const performLogin = async (loginEmail, loginPass) => {
+    if (!captchaVerified) {
+      setError('Please complete the security verification (CAPTCHA) below');
+      return;
+    }
+
     setLoading(true);
     setError('');
 
@@ -63,12 +68,6 @@ function LoginContent() {
   const handleSubmit = (e) => {
     e.preventDefault();
     performLogin(email, password);
-  };
-
-  const handle1ClickDemo = (demoEmail, demoPass) => {
-    setEmail(demoEmail);
-    setPassword(demoPass);
-    performLogin(demoEmail, demoPass);
   };
 
   return (
@@ -120,38 +119,6 @@ function LoginContent() {
             <ShieldCheck className="w-4 h-4" />
             <span>Tutor Portal</span>
           </button>
-        </div>
-
-        {/* 1-Click Demo Login Quick Box */}
-        <div className="bg-white p-4 rounded-3xl border border-slate-200/90 shadow-2xs space-y-2">
-          <div className="flex items-center justify-between text-xs font-bold text-slate-700">
-            <span className="flex items-center gap-1.5">
-              <Sparkles className="w-3.5 h-3.5 text-amber-500" />
-              <span>Instant 1-Click Demo Access:</span>
-            </span>
-          </div>
-          
-          {isTutorMode ? (
-            <button
-              type="button"
-              disabled={loading}
-              onClick={() => handle1ClickDemo('qari.huzaifa@example.com', 'Password@123')}
-              className="w-full py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 rounded-xl transition-all border border-emerald-200 flex items-center justify-center gap-2 font-bold text-xs shadow-2xs cursor-pointer"
-            >
-              <ShieldCheck className="w-4 h-4 text-emerald-600" />
-              <span>Sign In as Verified Tutor Demo (Qari Huzaifa)</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              disabled={loading}
-              onClick={() => handle1ClickDemo('student.hamza@example.com', 'Password@123')}
-              className="w-full py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-900 rounded-xl transition-all border border-emerald-200 flex items-center justify-center gap-2 font-bold text-xs shadow-2xs cursor-pointer"
-            >
-              <GraduationCap className="w-4 h-4 text-emerald-600" />
-              <span>Sign In as Student Demo (Hamza Khan)</span>
-            </button>
-          )}
         </div>
 
         {/* Login Form Card */}
@@ -209,9 +176,15 @@ function LoginContent() {
               </div>
             </div>
 
+            {/* Security CAPTCHA Box */}
+            <CaptchaBox
+              isVerified={captchaVerified}
+              setIsVerified={setCaptchaVerified}
+            />
+
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !captchaVerified}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               {loading ? (

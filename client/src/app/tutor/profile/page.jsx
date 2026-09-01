@@ -27,6 +27,7 @@ import {
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
 import ProfileCompletionMeter from '../../../components/common/ProfileCompletionMeter';
+import AccountStatusBanner from '../../../components/common/AccountStatusBanner';
 import { SanadModal } from '../../../components/common/SanadBadge';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import { allPakistaniCities } from '../../../data/pakistanAreas';
@@ -313,6 +314,9 @@ export default function TutorProfilePage() {
             <span>Go to Dashboard</span>
           </Link>
         </div>
+
+        {/* Account Status / Warning / Audit Notice Banner */}
+        <AccountStatusBanner user={user} role="tutor" />
 
         {/* Dynamic Profile Completion Meter Widget */}
         <ProfileCompletionMeter user={user} tutorProfile={tutorProfile} />

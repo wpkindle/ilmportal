@@ -21,6 +21,7 @@ import { useAuth } from '../../../context/AuthContext';
 import TrialBanner from '../../../components/common/TrialBanner';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import ProfileCompletionMeter from '../../../components/common/ProfileCompletionMeter';
+import AccountStatusBanner from '../../../components/common/AccountStatusBanner';
 
 export default function TutorDashboardPage() {
   const { user, tutorProfile } = useAuth();
@@ -59,6 +60,9 @@ export default function TutorDashboardPage() {
     <div className="py-8 bg-slate-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
+        {/* Account Status / Warning Notice / Audit Banner */}
+        <AccountStatusBanner user={user} role="tutor" />
+
         {/* Verification Status Banner */}
         {isPending && (
           <div className="p-5 bg-amber-50 border border-amber-200 rounded-3xl flex items-center justify-between gap-4 text-amber-900 shadow-2xs">

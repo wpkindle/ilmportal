@@ -21,6 +21,7 @@ import {
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
 import ProfileCompletionMeter from '../../../components/common/ProfileCompletionMeter';
+import AccountStatusBanner from '../../../components/common/AccountStatusBanner';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import { allPakistaniCities } from '../../../data/pakistanAreas';
 
@@ -201,6 +202,9 @@ export default function StudentProfilePage() {
             <span>Go to Dashboard</span>
           </Link>
         </div>
+
+        {/* Account Status / Warnings / Review Banner */}
+        <AccountStatusBanner user={user} role="student" />
 
         {/* Dynamic Profile Completion Meter Widget */}
         <ProfileCompletionMeter user={user} />

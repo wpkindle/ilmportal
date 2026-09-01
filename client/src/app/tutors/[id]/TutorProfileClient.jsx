@@ -87,11 +87,24 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
               </div>
 
               <div className="space-y-1.5">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-xl sm:text-2xl font-black text-slate-900">{tutorName}</h1>
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800">
                     {tutor.gender || 'Teacher'}
                   </span>
+                  {tutorUser.status === 'under_review' ? (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-orange-100 text-orange-800 border border-orange-200">
+                      🔍 Under Review
+                    </span>
+                  ) : tutorUser.status === 'warned' ? (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-100 text-amber-800 border border-amber-200">
+                      ⚠️ Policy Warning
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      ✅ Verified Faculty
+                    </span>
+                  )}
                 </div>
 
                 <p className="text-xs sm:text-sm font-semibold text-slate-600 flex items-center gap-2">

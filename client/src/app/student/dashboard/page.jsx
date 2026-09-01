@@ -20,6 +20,7 @@ import {
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import TrialBanner from '../../../components/common/TrialBanner';
+import AccountStatusBanner from '../../../components/common/AccountStatusBanner';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import CustomSelect from '../../../components/common/CustomSelect';
 
@@ -133,6 +134,9 @@ export default function StudentDashboardPage() {
             </Link>
           </div>
         </div>
+
+        {/* Account Status / Warning Notice Banner */}
+        <AccountStatusBanner user={user} role="student" />
 
         {/* 4 Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">

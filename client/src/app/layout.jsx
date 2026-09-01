@@ -7,6 +7,11 @@ export const metadata = {
   title: 'IlmPortal Pakistan - Quran & Academic Tutoring LMS',
   description: 'Pakistan’s #1 online tutoring platform for Quran recitation, Tajweed, Hifz, and Academic subjects (Matric, FSc, O/A Levels) across Lahore, Karachi, Islamabad, Peshawar, Quetta, and all cities.',
   keywords: 'Quran tutor Pakistan, Tajweed tutor Lahore, O Level tutor Karachi, Online Quran Academy, Hifz tutor, Matric science tutor, In-platform WebRTC classroom',
+  icons: {
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
+  },
   openGraph: {
     title: 'IlmPortal Pakistan - Online Quran & Academic Tutoring',
     description: 'Connect with verified Pakistani Quran Qaris and Cambridge/Matric educators for live in-platform video classrooms.',

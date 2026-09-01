@@ -331,8 +331,8 @@ const Navbar = () => {
 
                   {/* Dropdown Menu */}
                   {userMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-60 bg-white rounded-3xl shadow-2xl border border-slate-200 py-2 z-50 animate-in fade-in duration-150">
-                      <div className="px-4 py-3 border-b border-slate-100">
+                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in duration-150">
+                      <div className="px-5 py-3.5 border-b border-slate-100 bg-gradient-to-b from-slate-50/80 to-white">
                         <p className="text-xs font-bold text-slate-900 truncate">{user?.name}</p>
                         <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>
                         <span className="inline-block mt-1.5 px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 text-emerald-800 uppercase">
@@ -340,11 +340,11 @@ const Navbar = () => {
                         </span>
                       </div>
 
-                      <div className="py-1.5">
+                      <div className="p-2 space-y-0.5">
                         <Link
                           href={getDashboardRoute()}
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                          className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
                         >
                           <Layers className="w-4 h-4 text-emerald-600" />
                           <span>{isAdmin ? 'Admin Dashboard' : isTutor ? 'Tutor Dashboard' : 'Student Dashboard'}</span>
@@ -355,7 +355,7 @@ const Navbar = () => {
                             <Link
                               href="/student/deals"
                               onClick={() => setUserMenuOpen(false)}
-                              className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
                             >
                               <BookOpen className="w-4 h-4 text-emerald-600" />
                               <span>My Courses & Subscriptions</span>
@@ -363,7 +363,7 @@ const Navbar = () => {
                             <Link
                               href="/student/certificates"
                               onClick={() => setUserMenuOpen(false)}
-                              className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
                             >
                               <Award className="w-4 h-4 text-emerald-600" />
                               <span>My Certificates</span>
@@ -371,7 +371,7 @@ const Navbar = () => {
                             <Link
                               href="/student/profile"
                               onClick={() => setUserMenuOpen(false)}
-                              className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
                             >
                               <User className="w-4 h-4 text-emerald-600" />
                               <span>Profile & Account Settings</span>
@@ -384,7 +384,7 @@ const Navbar = () => {
                             <Link
                               href="/tutor/courses"
                               onClick={() => setUserMenuOpen(false)}
-                              className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
                             >
                               <BookOpen className="w-4 h-4 text-emerald-600" />
                               <span>Course Studio (Chapters, Tests)</span>
@@ -392,7 +392,7 @@ const Navbar = () => {
                             <Link
                               href="/tutor/deals"
                               onClick={() => setUserMenuOpen(false)}
-                              className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
                             >
                               <CreditCard className="w-4 h-4 text-emerald-600" />
                               <span>Student Deals & Trials</span>
@@ -400,7 +400,7 @@ const Navbar = () => {
                             <Link
                               href="/tutor/profile"
                               onClick={() => setUserMenuOpen(false)}
-                              className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 transition-colors"
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
                             >
                               <User className="w-4 h-4 text-emerald-600" />
                               <span>Profile & Sanad Credentials</span>
@@ -412,7 +412,7 @@ const Navbar = () => {
                           <Link
                             href="/admin/tutor-approvals"
                             onClick={() => setUserMenuOpen(false)}
-                            className="flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-purple-700 hover:bg-purple-50 transition-colors"
+                            className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-purple-700 hover:bg-purple-50 rounded-2xl transition-colors"
                           >
                             <ShieldCheck className="w-4 h-4 text-purple-600" />
                             <span>Tutor Approvals Queue</span>
@@ -420,12 +420,12 @@ const Navbar = () => {
                         )}
                       </div>
 
-                      <div className="border-t border-slate-100 pt-1">
+                      <div className="p-2 border-t border-slate-100 bg-slate-50/50">
                         <button
                           onClick={handleLogout}
-                          className="w-full flex items-center gap-2.5 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors"
+                          className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-rose-600 hover:bg-rose-100/70 rounded-2xl transition-colors text-left"
                         >
-                          <LogOut className="w-4 h-4 text-red-500" />
+                          <LogOut className="w-4 h-4 text-rose-500" />
                           <span>Sign Out</span>
                         </button>
                       </div>

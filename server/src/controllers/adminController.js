@@ -387,19 +387,15 @@ exports.issueUserWarning = async (req, res) => {
       });
     }
 
-    // Send Branded Email Notice
+    // Send Branded Email Notice asynchronously without blocking response
     if (sendEmail !== false) {
-      try {
-        await sendAccountWarningEmail({
-          to: user.email,
-          userName: user.name,
-          reason,
-          message,
-          warningCount: user.warningCount
-        });
-      } catch (e) {
-        console.error('Failed to send warning email:', e.message);
-      }
+      sendAccountWarningEmail({
+        to: user.email,
+        userName: user.name,
+        reason,
+        message,
+        warningCount: user.warningCount
+      }).catch((e) => console.error('Failed to send warning email:', e.message));
     }
 
     await logAction(
@@ -500,19 +496,15 @@ exports.updateUserStatus = async (req, res) => {
       });
     }
 
-    // Send Email
+    // Send Status Email Notice asynchronously without blocking response
     if (sendEmail !== false) {
-      try {
-        await sendAccountStatusEmail({
-          to: user.email,
-          userName: user.name,
-          status,
-          reason,
-          notes
-        });
-      } catch (e) {
-        console.error('Failed to send status email:', e.message);
-      }
+      sendAccountStatusEmail({
+        to: user.email,
+        userName: user.name,
+        status,
+        reason,
+        notes
+      }).catch((e) => console.error('Failed to send status email:', e.message));
     }
 
     await logAction(

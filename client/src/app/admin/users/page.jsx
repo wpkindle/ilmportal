@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import AdminSidebar from '../../../components/admin/AdminSidebar';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import { api } from '../../../services/api';
@@ -24,11 +24,10 @@ import {
 } from 'lucide-react';
 
 export default function AdminUsersModerationPage() {
-  const [users, setUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [activeTab, setActiveTab] = useState('all'); // 'all' | 'student' | 'tutor' | 'warned' | 'under_review' | 'suspended'
   const [selectedUser, setSelectedUser] = useState(null);
 
   // Modals state
@@ -54,13 +53,9 @@ export default function AdminUsersModerationPage() {
   const fetchUsers = async () => {
     try {
       setLoading(true);
-      const res = await api.getAdminUsers({
-        role: roleFilter !== 'all' ? roleFilter : undefined,
-        status: statusFilter !== 'all' ? statusFilter : undefined,
-        search: search.trim() ? search.trim() : undefined
-      });
+      const res = await api.getAdminUsers({});
       if (res.success) {
-        setUsers(res.users || []);
+        setAllUsers(res.users || []);
       }
     } catch (err) {
       console.error('Error fetching users:', err);
@@ -71,12 +66,42 @@ export default function AdminUsersModerationPage() {
 
   useEffect(() => {
     fetchUsers();
-  }, [roleFilter, statusFilter]);
+  }, []);
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    fetchUsers();
-  };
+  // Stable summary counts computed across ALL users (never drops when clicking tabs!)
+  const stats = useMemo(() => {
+    const total = allUsers.length;
+    const students = allUsers.filter((u) => u.role === 'student').length;
+    const tutors = allUsers.filter((u) => u.role === 'tutor').length;
+    const warned = allUsers.filter((u) => (u.warningCount || 0) > 0 || u.status === 'warned').length;
+    const underReview = allUsers.filter((u) => u.status === 'under_review').length;
+    const suspended = allUsers.filter((u) => u.status === 'suspended' || u.status === 'deactivated' || !u.isActive).length;
+    return { total, students, tutors, warned, underReview, suspended };
+  }, [allUsers]);
+
+  // Instant reactive client-side filter (0ms latency, no server roundtrips on tab switch!)
+  const filteredUsers = useMemo(() => {
+    return allUsers.filter((u) => {
+      // Tab filter
+      if (activeTab === 'student' && u.role !== 'student') return false;
+      if (activeTab === 'tutor' && u.role !== 'tutor') return false;
+      if (activeTab === 'warned' && (u.warningCount || 0) === 0 && u.status !== 'warned') return false;
+      if (activeTab === 'under_review' && u.status !== 'under_review') return false;
+      if (activeTab === 'suspended' && u.status !== 'suspended' && u.status !== 'deactivated' && u.isActive !== false) return false;
+
+      // Search filter
+      if (search.trim()) {
+        const q = search.trim().toLowerCase();
+        const matchName = u.name?.toLowerCase().includes(q);
+        const matchEmail = u.email?.toLowerCase().includes(q);
+        const matchPhone = u.phone?.toLowerCase().includes(q);
+        const matchCity = u.city?.toLowerCase().includes(q);
+        if (!matchName && !matchEmail && !matchPhone && !matchCity) return false;
+      }
+
+      return true;
+    });
+  }, [allUsers, activeTab, search]);
 
   // Open Warning Modal
   const openWarningModal = (u) => {
@@ -98,16 +123,15 @@ export default function AdminUsersModerationPage() {
       setActionLoading(true);
       const res = await api.issueUserWarning(selectedUser._id, warningForm);
       if (res.success) {
-        setActionFeedback({ message: `Warning issued to ${selectedUser.name}!`, type: 'success' });
+        setActionFeedback({ message: `Warning strike issued to ${selectedUser.name}!`, type: 'success' });
         setWarningModalOpen(false);
-        setUsers((prev) =>
+        setAllUsers((prev) =>
           prev.map((u) =>
             u._id === selectedUser._id
               ? { ...u, status: 'warned', warningCount: (u.warningCount || 0) + 1 }
               : u
           )
         );
-        fetchUsers();
       }
     } catch (err) {
       setActionFeedback({ message: err.message || 'Error issuing warning', type: 'error' });
@@ -139,7 +163,7 @@ export default function AdminUsersModerationPage() {
       if (res.success) {
         setActionFeedback({ message: `Account status updated to ${statusForm.status}!`, type: 'success' });
         setStatusModalOpen(false);
-        setUsers((prev) =>
+        setAllUsers((prev) =>
           prev.map((u) =>
             u._id === selectedUser._id
               ? {
@@ -150,7 +174,6 @@ export default function AdminUsersModerationPage() {
               : u
           )
         );
-        fetchUsers();
       }
     } catch (err) {
       setActionFeedback({ message: err.message || 'Error updating status', type: 'error' });
@@ -175,8 +198,7 @@ export default function AdminUsersModerationPage() {
       if (res.success) {
         setActionFeedback({ message: `Account for ${selectedUser.name} deleted successfully.`, type: 'success' });
         setDeleteModalOpen(false);
-        setUsers((prev) => prev.filter((u) => u._id !== selectedUser._id));
-        fetchUsers();
+        setAllUsers((prev) => prev.filter((u) => u._id !== selectedUser._id));
       }
     } catch (err) {
       setActionFeedback({ message: err.message || 'Error deleting account', type: 'error' });
@@ -184,13 +206,6 @@ export default function AdminUsersModerationPage() {
       setActionLoading(false);
     }
   };
-
-  // Summary Metrics
-  const totalStudents = users.filter((u) => u.role === 'student').length;
-  const totalTutors = users.filter((u) => u.role === 'tutor').length;
-  const totalWarned = users.filter((u) => (u.warningCount || 0) > 0 || u.status === 'warned').length;
-  const totalUnderReview = users.filter((u) => u.status === 'under_review').length;
-  const totalSuspended = users.filter((u) => u.status === 'suspended' || u.status === 'deactivated' || !u.isActive).length;
 
   return (
     <div className="py-8 bg-slate-50 min-h-screen">
@@ -205,7 +220,7 @@ export default function AdminUsersModerationPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-black text-slate-900 flex items-center gap-2.5">
-                  <ShieldAlert className="w-7 h-7 text-purple-700" />
+                  <ShieldAlert className="w-8 h-8 text-purple-600" />
                   <span>User Accounts & Moderation</span>
                 </h1>
                 <p className="text-xs text-slate-500 mt-1">
@@ -215,14 +230,15 @@ export default function AdminUsersModerationPage() {
 
               <button
                 onClick={fetchUsers}
-                className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 flex items-center gap-1.5 shadow-2xs self-start"
+                disabled={loading}
+                className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 flex items-center gap-1.5 shadow-2xs self-start sm:self-center transition-all cursor-pointer"
               >
-                <RefreshCw className="w-3.5 h-3.5" />
+                <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
                 <span>Refresh List</span>
               </button>
             </div>
 
-            {/* Feedback Alert */}
+            {/* Action Feedback Banner */}
             {actionFeedback.message && (
               <div className={`p-4 rounded-2xl flex items-center justify-between text-xs font-bold ${
                 actionFeedback.type === 'success'
@@ -230,32 +246,36 @@ export default function AdminUsersModerationPage() {
                   : 'bg-rose-50 text-rose-800 border border-rose-200'
               }`}>
                 <span>{actionFeedback.message}</span>
-                <button onClick={() => setActionFeedback({ message: '', type: '' })} className="p-1 hover:opacity-75">
+                <button onClick={() => setActionFeedback({ message: '', type: '' })} className="p-1 hover:opacity-75 cursor-pointer">
                   <X className="w-4 h-4" />
                 </button>
               </div>
             )}
 
-            {/* Metrics Bar */}
+            {/* Persistent Summary Stats Cards (Never drops when clicking tabs!) */}
             <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
               <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
-                <p className="text-xl font-black text-slate-900">{users.length}</p>
+                <p className="text-2xl font-black text-slate-900">{stats.total}</p>
                 <p className="text-[11px] text-slate-500 font-medium">Total Accounts</p>
               </div>
+
               <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
-                <p className="text-xl font-black text-emerald-700">{totalStudents}</p>
+                <p className="text-2xl font-black text-emerald-600">{stats.students}</p>
                 <p className="text-[11px] text-slate-500 font-medium">Students</p>
               </div>
+
               <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
-                <p className="text-xl font-black text-blue-700">{totalTutors}</p>
+                <p className="text-2xl font-black text-blue-600">{stats.tutors}</p>
                 <p className="text-[11px] text-slate-500 font-medium">Tutors</p>
               </div>
-              <div className="bg-white p-4 rounded-2xl border border-amber-200 shadow-2xs">
-                <p className="text-xl font-black text-amber-700">{totalWarned}</p>
+
+              <div className="bg-white p-4 rounded-2xl border border-amber-200 bg-amber-50/20 shadow-2xs">
+                <p className="text-2xl font-black text-amber-600">{stats.warned}</p>
                 <p className="text-[11px] text-slate-500 font-medium">Warned Accounts</p>
               </div>
-              <div className="bg-white p-4 rounded-2xl border border-rose-200 shadow-2xs">
-                <p className="text-xl font-black text-rose-700">{totalUnderReview + totalSuspended}</p>
+
+              <div className="bg-white p-4 rounded-2xl border border-rose-200 bg-rose-50/20 shadow-2xs">
+                <p className="text-2xl font-black text-rose-600">{stats.underReview + stats.suspended}</p>
                 <p className="text-[11px] text-slate-500 font-medium">Under Review / Suspended</p>
               </div>
             </div>
@@ -263,263 +283,228 @@ export default function AdminUsersModerationPage() {
             {/* Filter & Search Bar */}
             <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs space-y-4">
               
-              {/* Role & Status Tabs */}
-              <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-slate-100">
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <button
-                    onClick={() => { setRoleFilter('all'); setStatusFilter('all'); }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      roleFilter === 'all' && statusFilter === 'all'
-                        ? 'bg-slate-900 text-white shadow-2xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    All Users ({users.length})
-                  </button>
-                  <button
-                    onClick={() => { setRoleFilter('student'); setStatusFilter('all'); }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      roleFilter === 'student' && statusFilter === 'all'
-                        ? 'bg-emerald-600 text-white shadow-2xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    Students
-                  </button>
-                  <button
-                    onClick={() => { setRoleFilter('tutor'); setStatusFilter('all'); }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      roleFilter === 'tutor' && statusFilter === 'all'
-                        ? 'bg-blue-600 text-white shadow-2xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    Tutors
-                  </button>
-                  <button
-                    onClick={() => { setStatusFilter('warned'); setRoleFilter('all'); }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      statusFilter === 'warned'
-                        ? 'bg-amber-600 text-white shadow-2xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    ⚠️ Warned
-                  </button>
-                  <button
-                    onClick={() => { setStatusFilter('under_review'); setRoleFilter('all'); }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      statusFilter === 'under_review'
-                        ? 'bg-orange-600 text-white shadow-2xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    🔍 Under Review
-                  </button>
-                  <button
-                    onClick={() => { setStatusFilter('suspended'); setRoleFilter('all'); }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      statusFilter === 'suspended'
-                        ? 'bg-rose-600 text-white shadow-2xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    ⛔ Suspended
-                  </button>
-                </div>
+              {/* Stable Role & Status Tabs */}
+              <div className="flex flex-wrap items-center gap-1.5 pb-3 border-b border-slate-100">
+                <button
+                  onClick={() => setActiveTab('all')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === 'all'
+                      ? 'bg-slate-900 text-white shadow-2xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  All Users ({stats.total})
+                </button>
+                <button
+                  onClick={() => setActiveTab('student')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === 'student'
+                      ? 'bg-emerald-600 text-white shadow-2xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  Students ({stats.students})
+                </button>
+                <button
+                  onClick={() => setActiveTab('tutor')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === 'tutor'
+                      ? 'bg-blue-600 text-white shadow-2xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  Tutors ({stats.tutors})
+                </button>
+                <button
+                  onClick={() => setActiveTab('warned')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === 'warned'
+                      ? 'bg-amber-600 text-white shadow-2xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  ⚠️ Warned ({stats.warned})
+                </button>
+                <button
+                  onClick={() => setActiveTab('under_review')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === 'under_review'
+                      ? 'bg-orange-600 text-white shadow-2xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  🔍 Under Review ({stats.underReview})
+                </button>
+                <button
+                  onClick={() => setActiveTab('suspended')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    activeTab === 'suspended'
+                      ? 'bg-rose-600 text-white shadow-2xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  ⛔ Suspended ({stats.suspended})
+                </button>
               </div>
 
-              {/* Search input form */}
-              <form onSubmit={handleSearchSubmit} className="flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search by student/tutor name, email, or phone number..."
-                    className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-slate-50/50"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl transition-colors shadow-2xs shrink-0"
-                >
-                  Search
-                </button>
-              </form>
+              {/* Instant Search Bar */}
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Filter by student/tutor name, email, city, or phone number in real time..."
+                  className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-slate-50/50"
+                />
+              </div>
             </div>
 
             {/* Users Table List */}
             {loading ? (
               <LoadingSpinner text="Fetching platform accounts..." />
-            ) : users.length === 0 ? (
-              <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center space-y-3">
+            ) : filteredUsers.length === 0 ? (
+              <div className="p-12 text-center bg-white rounded-3xl border border-dashed border-slate-200 space-y-2">
                 <Users className="w-10 h-10 text-slate-300 mx-auto" />
-                <h3 className="text-base font-bold text-slate-700">No matching accounts found</h3>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Try adjusting your search terms, role selection, or status filters.
-                </p>
+                <h3 className="text-sm font-bold text-slate-700">No accounts match the selected filter</h3>
+                <p className="text-xs text-slate-400">Try selecting a different tab or clearing your search keywords.</p>
               </div>
             ) : (
-              <div className="space-y-4">
-                {users.map((u) => (
+              <div className="space-y-3">
+                {filteredUsers.map((u) => (
                   <div
                     key={u._id}
-                    className="bg-white p-5 rounded-3xl border border-slate-200 shadow-2xs hover:shadow-sm transition-all space-y-4"
+                    className="p-5 bg-white hover:bg-slate-50/80 rounded-3xl border border-slate-200 shadow-xs transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
                   >
-                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                      
-                      {/* User Info Avatar & Details */}
-                      <div className="flex items-start gap-3.5">
-                        <img
-                          src={u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=059669&color=fff`}
-                          alt={u.name}
-                          className="w-12 h-12 rounded-2xl object-cover border border-slate-100 shrink-0"
-                        />
-                        <div className="space-y-1">
-                          <div className="flex flex-wrap items-center gap-2">
-                            <h3 className="text-sm font-black text-slate-900">{u.name}</h3>
-                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                              u.role === 'admin'
-                                ? 'bg-purple-100 text-purple-800'
-                                : u.role === 'tutor'
-                                ? 'bg-blue-100 text-blue-800'
-                                : 'bg-emerald-100 text-emerald-800'
-                            }`}>
-                              {u.role}
-                            </span>
-                            
-                            {/* Status Badge */}
-                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                              u.status === 'suspended' || u.status === 'deactivated' || !u.isActive
-                                ? 'bg-red-100 text-red-800 border border-red-200'
-                                : u.status === 'under_review'
-                                ? 'bg-orange-100 text-orange-800 border border-orange-200 animate-pulse'
-                                : u.status === 'warned'
-                                ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                                : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                            }`}>
-                              {u.status || (u.isActive ? 'active' : 'suspended')}
-                            </span>
+                    {/* User Info Left */}
+                    <div className="flex items-start gap-4">
+                      <img
+                        src={u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=059669&color=fff`}
+                        alt={u.name}
+                        className="w-12 h-12 rounded-2xl object-cover border border-slate-100 shrink-0"
+                      />
+                      <div className="space-y-1.5">
+                        <div className="flex flex-wrap items-center gap-2">
+                          <h4 className="text-sm font-black text-slate-900">{u.name}</h4>
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider ${
+                            u.role === 'admin'
+                              ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                              : u.role === 'tutor'
+                              ? 'bg-blue-100 text-blue-800 border border-blue-200'
+                              : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                          }`}>
+                            {u.role}
+                          </span>
 
-                            {/* Strike Counter */}
-                            {(u.warningCount || 0) > 0 && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500 text-white flex items-center gap-1 shadow-2xs">
-                                <span>⚠️ {u.warningCount} Strike{u.warningCount > 1 ? 's' : ''}</span>
-                              </span>
-                            )}
-                          </div>
+                          {/* Status Badge */}
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                            u.status === 'suspended' || u.status === 'deactivated' || !u.isActive
+                              ? 'bg-red-100 text-red-800 border border-red-200'
+                              : u.status === 'under_review'
+                              ? 'bg-orange-100 text-orange-800 border border-orange-200 animate-pulse'
+                              : u.status === 'warned'
+                              ? 'bg-amber-100 text-amber-800 border border-amber-200'
+                              : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                          }`}>
+                            {u.status || (u.isActive ? 'active' : 'suspended')}
+                          </span>
 
-                          <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                          {/* Strikes Counter Badge */}
+                          {(u.warningCount || 0) > 0 && (
+                            <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500 text-white shadow-2xs">
+                              ⚠️ {u.warningCount} Strike{u.warningCount > 1 ? 's' : ''}
+                            </span>
+                          )}
+                        </div>
+
+                        <div className="flex flex-wrap items-center gap-3 text-xs text-slate-500">
+                          <span className="flex items-center gap-1 font-mono">
+                            <Mail className="w-3.5 h-3.5 text-slate-400" />
+                            <span>{u.email}</span>
+                          </span>
+                          {u.phone && (
                             <span className="flex items-center gap-1 font-mono">
-                              <Mail className="w-3.5 h-3.5 text-slate-400" />
-                              <span>{u.email}</span>
+                              <Phone className="w-3.5 h-3.5 text-slate-400" />
+                              <span>{u.phone}</span>
                             </span>
-                            {u.phone && (
-                              <span className="flex items-center gap-1 font-mono">
-                                <Phone className="w-3.5 h-3.5 text-slate-400" />
-                                <span>{u.phone}</span>
-                              </span>
-                            )}
-                            <span className="flex items-center gap-1">
-                              <MapPin className="w-3.5 h-3.5 text-slate-400" />
-                              <span>{u.city || 'Pakistan'}</span>
+                          )}
+                          <span className="flex items-center gap-1">
+                            <MapPin className="w-3.5 h-3.5 text-slate-400" />
+                            <span>{u.city || 'Pakistan'}</span>
+                          </span>
+                          <span className="flex items-center gap-1 font-semibold text-slate-700">
+                            <Handshake className="w-3.5 h-3.5 text-purple-600" />
+                            <span>{u.dealCount || 0} Deals</span>
+                          </span>
+                          {u.reportsCount > 0 && (
+                            <span className="flex items-center gap-1 font-bold text-rose-600">
+                              <AlertTriangle className="w-3.5 h-3.5" />
+                              <span>{u.reportsCount} Reports</span>
                             </span>
-                            <span className="flex items-center gap-1 font-semibold text-slate-600">
-                              <Handshake className="w-3.5 h-3.5 text-purple-600" />
-                              <span>{u.dealCount || 0} Deals</span>
-                            </span>
-                            {u.reportsCount > 0 && (
-                              <span className="flex items-center gap-1 font-bold text-rose-600">
-                                <AlertTriangle className="w-3.5 h-3.5" />
-                                <span>{u.reportsCount} Incident Reports</span>
-                              </span>
-                            )}
-                          </div>
+                          )}
                         </div>
                       </div>
-
-                      {/* Action Buttons Toolbar */}
-                      <div className="flex flex-wrap items-center gap-2 self-start md:self-center">
-                        
-                        {/* Issue Official Warning */}
-                        <button
-                          onClick={() => openWarningModal(u)}
-                          className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs rounded-xl border border-amber-200 transition-colors flex items-center gap-1.5 shadow-2xs"
-                        >
-                          <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
-                          <span>Warning</span>
-                        </button>
-
-                        {/* Place Under Review / Restore */}
-                        {u.status === 'under_review' ? (
-                          <button
-                            onClick={() => openStatusModal(u, 'active')}
-                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 shadow-2xs"
-                          >
-                            <CheckCircle2 className="w-3.5 h-3.5" />
-                            <span>Reactivate Account</span>
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => openStatusModal(u, 'under_review')}
-                            className="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-800 font-bold text-xs rounded-xl border border-orange-200 transition-colors flex items-center gap-1.5 shadow-2xs"
-                          >
-                            <Clock className="w-3.5 h-3.5 text-orange-600" />
-                            <span>Set Under Review</span>
-                          </button>
-                        )}
-
-                        {/* Suspend or Activate Toggle */}
-                        {u.status === 'suspended' || u.status === 'deactivated' || !u.isActive ? (
-                          <button
-                            onClick={() => openStatusModal(u, 'active')}
-                            className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 transition-colors flex items-center gap-1.5 shadow-2xs"
-                          >
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>Unban</span>
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => openStatusModal(u, 'suspended')}
-                            className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold text-xs rounded-xl border border-rose-200 transition-colors flex items-center gap-1.5 shadow-2xs"
-                          >
-                            <Ban className="w-3.5 h-3.5 text-rose-600" />
-                            <span>Suspend</span>
-                          </button>
-                        )}
-
-                        {/* Delete / Remove Account */}
-                        <button
-                          onClick={() => openDeleteModal(u)}
-                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
-                          title="Permanently Delete Account"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </div>
-
                     </div>
 
-                    {/* Warnings & Sanad Meta Drawer */}
-                    {u.warnings && u.warnings.length > 0 && (
-                      <div className="p-3 bg-amber-50/60 rounded-2xl border border-amber-100 text-xs space-y-2">
-                        <div className="flex items-center justify-between font-bold text-amber-900">
-                          <span className="flex items-center gap-1.5">
-                            <AlertCircle className="w-4 h-4 text-amber-600" />
-                            <span>Active Policy Warnings ({u.warnings.length}):</span>
-                          </span>
-                        </div>
-                        <div className="space-y-1 pl-5">
-                          {u.warnings.map((w, idx) => (
-                            <p key={idx} className="text-amber-800 text-[11px]">
-                              &bull; <strong>{w.reason}:</strong> &ldquo;{w.message}&rdquo; <span className="text-slate-400">({new Date(w.issuedAt).toLocaleDateString()})</span>
-                            </p>
-                          ))}
-                        </div>
-                      </div>
-                    )}
+                    {/* Action Buttons Right */}
+                    <div className="flex flex-wrap items-center gap-2 self-start md:self-center">
+                      
+                      {/* Warning Button */}
+                      <button
+                        onClick={() => openWarningModal(u)}
+                        className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs rounded-xl border border-amber-200 transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                      >
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Warning</span>
+                      </button>
+
+                      {/* Under Review / Reactivate */}
+                      {u.status === 'under_review' ? (
+                        <button
+                          onClick={() => openStatusModal(u, 'active')}
+                          className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Reactivate</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => openStatusModal(u, 'under_review')}
+                          className="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-800 font-bold text-xs rounded-xl border border-orange-200 transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                        >
+                          <Clock className="w-3.5 h-3.5 text-orange-600" />
+                          <span>Under Review</span>
+                        </button>
+                      )}
+
+                      {/* Suspend / Unban */}
+                      {u.status === 'suspended' || u.status === 'deactivated' || !u.isActive ? (
+                        <button
+                          onClick={() => openStatusModal(u, 'active')}
+                          className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Unban</span>
+                        </button>
+                      ) : (
+                        <button
+                          onClick={() => openStatusModal(u, 'suspended')}
+                          className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold text-xs rounded-xl border border-rose-200 transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                        >
+                          <Ban className="w-3.5 h-3.5 text-rose-600" />
+                          <span>Suspend</span>
+                        </button>
+                      )}
+
+                      {/* Delete Account */}
+                      <button
+                        onClick={() => openDeleteModal(u)}
+                        className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
+                        title="Permanently Delete Account"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -539,7 +524,7 @@ export default function AdminUsersModerationPage() {
                 <AlertTriangle className="w-5 h-5 text-amber-600" />
                 <span>Issue Warning to {selectedUser.name}</span>
               </div>
-              <button onClick={() => setWarningModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setWarningModalOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -594,14 +579,14 @@ export default function AdminUsersModerationPage() {
                 <button
                   type="button"
                   onClick={() => setWarningModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
+                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>{actionLoading ? 'Issuing Strike...' : 'Issue Warning & Strike'}</span>
@@ -627,7 +612,7 @@ export default function AdminUsersModerationPage() {
                 {statusForm.status === 'suspended' ? <Ban className="w-5 h-5 text-rose-600" /> : statusForm.status === 'under_review' ? <Clock className="w-5 h-5 text-orange-600" /> : <CheckCircle2 className="w-5 h-5 text-emerald-600" />}
                 <span>Set Status: {statusForm.status.replace('_', ' ').toUpperCase()}</span>
               </div>
-              <button onClick={() => setStatusModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setStatusModalOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -677,14 +662,14 @@ export default function AdminUsersModerationPage() {
                 <button
                   type="button"
                   onClick={() => setStatusModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className={`px-5 py-2 font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 ${
+                  className={`px-5 py-2 font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer ${
                     statusForm.status === 'suspended'
                       ? 'bg-rose-700 hover:bg-rose-800 text-white'
                       : statusForm.status === 'under_review'
@@ -709,7 +694,7 @@ export default function AdminUsersModerationPage() {
                 <Trash2 className="w-5 h-5 text-rose-600" />
                 <span>Delete Account: {selectedUser.name}</span>
               </div>
-              <button onClick={() => setDeleteModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setDeleteModalOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -725,14 +710,14 @@ export default function AdminUsersModerationPage() {
               <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
                 <button
                   onClick={() => setDeleteModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteAccount}
                   disabled={actionLoading}
-                  className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
+                  className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>{actionLoading ? 'Deleting...' : 'Confirm Delete Account'}</span>
@@ -746,4 +731,3 @@ export default function AdminUsersModerationPage() {
     </div>
   );
 }
-

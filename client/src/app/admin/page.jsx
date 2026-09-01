@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import AdminSidebar from '../../components/admin/AdminSidebar';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -31,14 +31,13 @@ import {
 
 export default function AdminDashboardPage() {
   const [stats, setStats] = useState(null);
-  const [users, setUsers] = useState([]);
+  const [allUsers, setAllUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [usersLoading, setUsersLoading] = useState(true);
 
   // User filters & search
   const [search, setSearch] = useState('');
-  const [roleFilter, setRoleFilter] = useState('all');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [activeTab, setActiveTab] = useState('all'); // 'all' | 'student' | 'tutor' | 'warned' | 'under_review' | 'suspended'
   const [selectedUser, setSelectedUser] = useState(null);
 
   // Modals state
@@ -75,13 +74,9 @@ export default function AdminDashboardPage() {
   const fetchUsers = async () => {
     try {
       setUsersLoading(true);
-      const res = await api.getAdminUsers({
-        role: roleFilter !== 'all' ? roleFilter : undefined,
-        status: statusFilter !== 'all' ? statusFilter : undefined,
-        search: search.trim() ? search.trim() : undefined
-      });
+      const res = await api.getAdminUsers({});
       if (res.success) {
-        setUsers(res.users || []);
+        setAllUsers(res.users || []);
       }
     } catch (err) {
       console.error('Error fetching users:', err);
@@ -92,16 +87,43 @@ export default function AdminDashboardPage() {
 
   useEffect(() => {
     fetchStats();
+    fetchUsers();
   }, []);
 
-  useEffect(() => {
-    fetchUsers();
-  }, [roleFilter, statusFilter]);
+  // Stable summary counts for tabs
+  const userCounts = useMemo(() => {
+    const total = allUsers.length;
+    const students = allUsers.filter((u) => u.role === 'student').length;
+    const tutors = allUsers.filter((u) => u.role === 'tutor').length;
+    const warned = allUsers.filter((u) => (u.warningCount || 0) > 0 || u.status === 'warned').length;
+    const underReview = allUsers.filter((u) => u.status === 'under_review').length;
+    const suspended = allUsers.filter((u) => u.status === 'suspended' || u.status === 'deactivated' || !u.isActive).length;
+    return { total, students, tutors, warned, underReview, suspended };
+  }, [allUsers]);
 
-  const handleSearchSubmit = (e) => {
-    e.preventDefault();
-    fetchUsers();
-  };
+  // Instant reactive client-side filter
+  const filteredUsers = useMemo(() => {
+    return allUsers.filter((u) => {
+      // Tab filter
+      if (activeTab === 'student' && u.role !== 'student') return false;
+      if (activeTab === 'tutor' && u.role !== 'tutor') return false;
+      if (activeTab === 'warned' && (u.warningCount || 0) === 0 && u.status !== 'warned') return false;
+      if (activeTab === 'under_review' && u.status !== 'under_review') return false;
+      if (activeTab === 'suspended' && u.status !== 'suspended' && u.status !== 'deactivated' && u.isActive !== false) return false;
+
+      // Search filter
+      if (search.trim()) {
+        const q = search.trim().toLowerCase();
+        const matchName = u.name?.toLowerCase().includes(q);
+        const matchEmail = u.email?.toLowerCase().includes(q);
+        const matchPhone = u.phone?.toLowerCase().includes(q);
+        const matchCity = u.city?.toLowerCase().includes(q);
+        if (!matchName && !matchEmail && !matchPhone && !matchCity) return false;
+      }
+
+      return true;
+    });
+  }, [allUsers, activeTab, search]);
 
   // Open Warning Modal
   const openWarningModal = (u) => {
@@ -123,17 +145,15 @@ export default function AdminDashboardPage() {
       setActionLoading(true);
       const res = await api.issueUserWarning(selectedUser._id, warningForm);
       if (res.success) {
-        setActionFeedback({ message: `Warning issued to ${selectedUser.name}!`, type: 'success' });
+        setActionFeedback({ message: `Warning strike issued to ${selectedUser.name}!`, type: 'success' });
         setWarningModalOpen(false);
-        setUsers((prev) =>
+        setAllUsers((prev) =>
           prev.map((u) =>
             u._id === selectedUser._id
               ? { ...u, status: 'warned', warningCount: (u.warningCount || 0) + 1 }
               : u
           )
         );
-        fetchUsers();
-        fetchStats();
       }
     } catch (err) {
       setActionFeedback({ message: err.message || 'Error issuing warning', type: 'error' });
@@ -165,7 +185,7 @@ export default function AdminDashboardPage() {
       if (res.success) {
         setActionFeedback({ message: `Account status updated to ${statusForm.status}!`, type: 'success' });
         setStatusModalOpen(false);
-        setUsers((prev) =>
+        setAllUsers((prev) =>
           prev.map((u) =>
             u._id === selectedUser._id
               ? {
@@ -176,8 +196,6 @@ export default function AdminDashboardPage() {
               : u
           )
         );
-        fetchUsers();
-        fetchStats();
       }
     } catch (err) {
       setActionFeedback({ message: err.message || 'Error updating status', type: 'error' });
@@ -202,9 +220,7 @@ export default function AdminDashboardPage() {
       if (res.success) {
         setActionFeedback({ message: `Account for ${selectedUser.name} deleted successfully.`, type: 'success' });
         setDeleteModalOpen(false);
-        setUsers((prev) => prev.filter((u) => u._id !== selectedUser._id));
-        fetchUsers();
-        fetchStats();
+        setAllUsers((prev) => prev.filter((u) => u._id !== selectedUser._id));
       }
     } catch (err) {
       setActionFeedback({ message: err.message || 'Error deleting account', type: 'error' });
@@ -258,14 +274,14 @@ export default function AdminDashboardPage() {
               <div className="flex items-center gap-2">
                 <Link
                   href="/admin/users"
-                  className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all"
+                  className="px-4 py-2 bg-purple-700 hover:bg-purple-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer"
                 >
                   <Users className="w-4 h-4" />
                   <span>Moderation Console</span>
                 </Link>
                 <button
                   onClick={() => { fetchStats(); fetchUsers(); }}
-                  className="px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 flex items-center gap-1.5 shadow-2xs"
+                  className="px-3 py-2 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 flex items-center gap-1.5 shadow-2xs cursor-pointer"
                 >
                   <RefreshCw className="w-3.5 h-3.5" />
                   <span>Refresh</span>
@@ -281,7 +297,7 @@ export default function AdminDashboardPage() {
                   : 'bg-rose-50 text-rose-800 border border-rose-200'
               }`}>
                 <span>{actionFeedback.message}</span>
-                <button onClick={() => setActionFeedback({ message: '', type: '' })} className="p-1 hover:opacity-75">
+                <button onClick={() => setActionFeedback({ message: '', type: '' })} className="p-1 hover:opacity-75 cursor-pointer">
                   <X className="w-4 h-4" />
                 </button>
               </div>
@@ -318,11 +334,11 @@ export default function AdminDashboardPage() {
                 <div className="p-2 bg-emerald-100 text-emerald-700 w-fit rounded-xl mb-3">
                   <Users className="w-5 h-5" />
                 </div>
-                <p className="text-2xl font-black text-slate-900">{stats?.totalStudents || 0}</p>
+                <p className="text-2xl font-black text-slate-900">{stats?.totalStudents || userCounts.students}</p>
                 <p className="text-xs text-slate-500 font-medium">Registered Students</p>
                 <button
-                  onClick={() => setRoleFilter('student')}
-                  className="text-[10px] font-bold text-emerald-700 hover:underline mt-1 block"
+                  onClick={() => setActiveTab('student')}
+                  className="text-[10px] font-bold text-emerald-700 hover:underline mt-1 block cursor-pointer"
                 >
                   View Students &rarr;
                 </button>
@@ -333,11 +349,11 @@ export default function AdminDashboardPage() {
                 <div className="p-2 bg-blue-100 text-blue-700 w-fit rounded-xl mb-3">
                   <ShieldCheck className="w-5 h-5" />
                 </div>
-                <p className="text-2xl font-black text-blue-600">{stats?.approvedTutors || 0}</p>
+                <p className="text-2xl font-black text-blue-600">{stats?.approvedTutors || userCounts.tutors}</p>
                 <p className="text-xs text-slate-500 font-medium">Approved Live Tutors</p>
                 <button
-                  onClick={() => setRoleFilter('tutor')}
-                  className="text-[10px] font-bold text-blue-700 hover:underline mt-1 block"
+                  onClick={() => setActiveTab('tutor')}
+                  className="text-[10px] font-bold text-blue-700 hover:underline mt-1 block cursor-pointer"
                 >
                   View Tutors &rarr;
                 </button>
@@ -404,103 +420,95 @@ export default function AdminDashboardPage() {
                   </p>
                 </div>
 
-                {/* Filter Tabs */}
+                {/* Stable Filter Tabs */}
                 <div className="flex flex-wrap items-center gap-1.5">
                   <button
-                    onClick={() => { setRoleFilter('all'); setStatusFilter('all'); }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      roleFilter === 'all' && statusFilter === 'all'
+                    onClick={() => setActiveTab('all')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'all'
                         ? 'bg-slate-900 text-white shadow-2xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
-                    All ({users.length})
+                    All ({userCounts.total})
                   </button>
                   <button
-                    onClick={() => { setRoleFilter('student'); setStatusFilter('all'); }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      roleFilter === 'student' && statusFilter === 'all'
+                    onClick={() => setActiveTab('student')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'student'
                         ? 'bg-emerald-600 text-white shadow-2xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
-                    Students
+                    Students ({userCounts.students})
                   </button>
                   <button
-                    onClick={() => { setRoleFilter('tutor'); setStatusFilter('all'); }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      roleFilter === 'tutor' && statusFilter === 'all'
+                    onClick={() => setActiveTab('tutor')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'tutor'
                         ? 'bg-blue-600 text-white shadow-2xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
-                    Tutors
+                    Tutors ({userCounts.tutors})
                   </button>
                   <button
-                    onClick={() => { setStatusFilter('under_review'); setRoleFilter('all'); }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      statusFilter === 'under_review'
-                        ? 'bg-orange-600 text-white shadow-2xs'
-                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                    }`}
-                  >
-                    🔍 Under Review
-                  </button>
-                  <button
-                    onClick={() => { setStatusFilter('warned'); setRoleFilter('all'); }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      statusFilter === 'warned'
+                    onClick={() => setActiveTab('warned')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'warned'
                         ? 'bg-amber-600 text-white shadow-2xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
-                    ⚠️ Warned
+                    ⚠️ Warned ({userCounts.warned})
                   </button>
                   <button
-                    onClick={() => { setStatusFilter('suspended'); setRoleFilter('all'); }}
-                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
-                      statusFilter === 'suspended'
+                    onClick={() => setActiveTab('under_review')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'under_review'
+                        ? 'bg-orange-600 text-white shadow-2xs'
+                        : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    }`}
+                  >
+                    🔍 Under Review ({userCounts.underReview})
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('suspended')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                      activeTab === 'suspended'
                         ? 'bg-rose-600 text-white shadow-2xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
-                    ⛔ Suspended
+                    ⛔ Suspended ({userCounts.suspended})
                   </button>
                 </div>
               </div>
 
               {/* Instant Search Bar */}
-              <form onSubmit={handleSearchSubmit} className="flex gap-2">
-                <div className="relative flex-1">
-                  <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input
-                    type="text"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Search by student or tutor name, email, or phone number..."
-                    className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-slate-50/50"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-2xs"
-                >
-                  Search
-                </button>
-              </form>
+              <div className="relative">
+                <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input
+                  type="text"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  placeholder="Filter by student/tutor name, email, city, or phone number in real time..."
+                  className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-slate-50/50"
+                />
+              </div>
 
               {/* Users List Cards */}
               {usersLoading ? (
                 <LoadingSpinner text="Fetching platform accounts..." />
-              ) : users.length === 0 ? (
+              ) : filteredUsers.length === 0 ? (
                 <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-2">
                   <Users className="w-8 h-8 text-slate-300 mx-auto" />
                   <p className="text-xs font-bold text-slate-700">No matching accounts found</p>
-                  <p className="text-[11px] text-slate-400">Try adjusting your role or search filters.</p>
+                  <p className="text-[11px] text-slate-400">Try selecting a different tab or clearing search.</p>
                 </div>
               ) : (
                 <div className="space-y-3">
-                  {users.map((u) => (
+                  {filteredUsers.map((u) => (
                     <div
                       key={u._id}
                       className="p-4 bg-slate-50/70 hover:bg-slate-50 rounded-2xl border border-slate-200 transition-all flex flex-col md:flex-row md:items-center justify-between gap-4"
@@ -581,7 +589,7 @@ export default function AdminDashboardPage() {
                         {/* Warning Button */}
                         <button
                           onClick={() => openWarningModal(u)}
-                          className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs rounded-xl border border-amber-200 transition-colors flex items-center gap-1.5 shadow-2xs"
+                          className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs rounded-xl border border-amber-200 transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
                         >
                           <AlertTriangle className="w-3.5 h-3.5 text-amber-600" />
                           <span>Warning</span>
@@ -591,7 +599,7 @@ export default function AdminDashboardPage() {
                         {u.status === 'under_review' ? (
                           <button
                             onClick={() => openStatusModal(u, 'active')}
-                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 shadow-2xs"
+                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             <span>Reactivate</span>
@@ -599,7 +607,7 @@ export default function AdminDashboardPage() {
                         ) : (
                           <button
                             onClick={() => openStatusModal(u, 'under_review')}
-                            className="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-800 font-bold text-xs rounded-xl border border-orange-200 transition-colors flex items-center gap-1.5 shadow-2xs"
+                            className="px-3 py-1.5 bg-orange-50 hover:bg-orange-100 text-orange-800 font-bold text-xs rounded-xl border border-orange-200 transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
                           >
                             <Clock className="w-3.5 h-3.5 text-orange-600" />
                             <span>Under Review</span>
@@ -610,7 +618,7 @@ export default function AdminDashboardPage() {
                         {u.status === 'suspended' || u.status === 'deactivated' || !u.isActive ? (
                           <button
                             onClick={() => openStatusModal(u, 'active')}
-                            className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 transition-colors flex items-center gap-1.5 shadow-2xs"
+                            className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                             <span>Unban</span>
@@ -618,7 +626,7 @@ export default function AdminDashboardPage() {
                         ) : (
                           <button
                             onClick={() => openStatusModal(u, 'suspended')}
-                            className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold text-xs rounded-xl border border-rose-200 transition-colors flex items-center gap-1.5 shadow-2xs"
+                            className="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-800 font-bold text-xs rounded-xl border border-rose-200 transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
                           >
                             <Ban className="w-3.5 h-3.5 text-rose-600" />
                             <span>Suspend</span>
@@ -628,7 +636,7 @@ export default function AdminDashboardPage() {
                         {/* Delete Account */}
                         <button
                           onClick={() => openDeleteModal(u)}
-                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors"
+                          className="p-1.5 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-colors cursor-pointer"
                           title="Permanently Delete Account"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -756,7 +764,7 @@ export default function AdminDashboardPage() {
                 <AlertTriangle className="w-5 h-5 text-amber-600" />
                 <span>Issue Warning to {selectedUser.name}</span>
               </div>
-              <button onClick={() => setWarningModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setWarningModalOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -811,14 +819,14 @@ export default function AdminDashboardPage() {
                 <button
                   type="button"
                   onClick={() => setWarningModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
+                  className="px-5 py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <Send className="w-3.5 h-3.5" />
                   <span>{actionLoading ? 'Issuing Strike...' : 'Issue Warning & Strike'}</span>
@@ -844,7 +852,7 @@ export default function AdminDashboardPage() {
                 {statusForm.status === 'suspended' ? <Ban className="w-5 h-5 text-rose-600" /> : statusForm.status === 'under_review' ? <Clock className="w-5 h-5 text-orange-600" /> : <CheckCircle2 className="w-5 h-5 text-emerald-600" />}
                 <span>Set Status: {statusForm.status.replace('_', ' ').toUpperCase()}</span>
               </div>
-              <button onClick={() => setStatusModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setStatusModalOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -894,14 +902,14 @@ export default function AdminDashboardPage() {
                 <button
                   type="button"
                   onClick={() => setStatusModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={actionLoading}
-                  className={`px-5 py-2 font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 ${
+                  className={`px-5 py-2 font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer ${
                     statusForm.status === 'suspended'
                       ? 'bg-rose-700 hover:bg-rose-800 text-white'
                       : statusForm.status === 'under_review'
@@ -926,7 +934,7 @@ export default function AdminDashboardPage() {
                 <Trash2 className="w-5 h-5 text-rose-600" />
                 <span>Delete Account: {selectedUser.name}</span>
               </div>
-              <button onClick={() => setDeleteModalOpen(false)} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setDeleteModalOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
                 <X className="w-5 h-5" />
               </button>
             </div>
@@ -942,14 +950,14 @@ export default function AdminDashboardPage() {
               <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
                 <button
                   onClick={() => setDeleteModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleDeleteAccount}
                   disabled={actionLoading}
-                  className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5"
+                  className="px-5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                   <span>{actionLoading ? 'Deleting...' : 'Confirm Delete Account'}</span>

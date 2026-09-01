@@ -1,6 +1,17 @@
-const API_BASE = typeof window === 'undefined'
-  ? (process.env.INTERNAL_API_URL || 'http://127.0.0.1:5000/api')
-  : '/api';
+const getApiBase = () => {
+  if (typeof window === 'undefined') {
+    return process.env.INTERNAL_API_URL || 'http://127.0.0.1:5000/api';
+  }
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL;
+  }
+  if (window.location.hostname === 'ilmportal.vercel.app') {
+    return 'https://ilmportal-backend.onrender.com/api';
+  }
+  return '/api';
+};
+
+const API_BASE = getApiBase();
 
 const getHeaders = (isMultipart = false) => {
   const token = typeof window !== 'undefined' ? localStorage.getItem('ilm_token') : null;
@@ -20,8 +31,8 @@ const handleResponse = async (response) => {
     data = await response.json();
   } catch (e) {
     data = {
-      message: response.status === 502 || response.status === 500 || response.status === 504
-        ? 'Server is starting up. Please try again in 2 seconds.'
+      message: response.status === 502 || response.status === 503 || response.status === 504
+        ? 'Server is warming up. Please retry in a moment.'
         : (response.statusText || 'Unable to connect to service. Please try again.')
     };
   }

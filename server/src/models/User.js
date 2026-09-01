@@ -71,6 +71,29 @@ const userSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true
+  },
+  status: {
+    type: String,
+    enum: ['active', 'warned', 'under_review', 'suspended', 'deactivated'],
+    default: 'active'
+  },
+  warningCount: {
+    type: Number,
+    default: 0
+  },
+  warnings: [{
+    reason: { type: String, required: true },
+    message: { type: String, required: true },
+    issuedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    issuedAt: { type: Date, default: Date.now }
+  }],
+  adminNotes: {
+    type: String,
+    default: ''
+  },
+  underReviewReason: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true

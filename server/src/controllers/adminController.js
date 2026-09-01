@@ -10,7 +10,7 @@ const Notification = require('../models/Notification');
 const AuditLog = require('../models/AuditLog');
 const SystemConfig = require('../models/SystemConfig');
 const Report = require('../models/Report');
-const { sendTutorStatusEmail } = require('../utils/emailService');
+const { sendTutorStatusEmail, sendAccountWarningEmail, sendAccountStatusEmail } = require('../utils/emailService');
 
 // Helper to log admin actions
 const logAction = async (adminId, action, entityType, entityId, details, req) => {
@@ -254,13 +254,16 @@ exports.contactTutor = async (req, res) => {
 
 // @desc    Get All Users with search & filters
 // @route   GET /api/admin/users
+// @desc    Get All Users with search, role, and status filters
+// @route   GET /api/admin/users
 exports.getAllUsers = async (req, res) => {
   try {
-    const { role, search, city, isVerified } = req.query;
+    const { role, search, city, status, isVerified } = req.query;
     const query = {};
 
     if (role && role !== 'all') query.role = role;
     if (city && city !== 'all') query.city = new RegExp(city, 'i');
+    if (status && status !== 'all') query.status = status;
     if (isVerified !== undefined && isVerified !== 'all') query.isVerified = isVerified === 'true';
 
     if (search) {
@@ -270,10 +273,30 @@ exports.getAllUsers = async (req, res) => {
 
     const users = await User.find(query).sort({ createdAt: -1 });
 
+    // Enhance each user with tutor profile info & active deals count
+    const enrichedUsers = await Promise.all(
+      users.map(async (u) => {
+        const uObj = u.toObject();
+        if (u.role === 'tutor') {
+          const profile = await TutorProfile.findOne({ user: u._id })
+            .populate('subjects', 'name slug')
+            .populate('cities', 'name');
+          uObj.tutorProfile = profile;
+        }
+        const dealCount = await Deal.countDocuments({
+          $or: [{ student: u._id }, { tutor: u._id }]
+        });
+        const reportsCount = await Report.countDocuments({ reportedUser: u._id });
+        uObj.dealCount = dealCount;
+        uObj.reportsCount = reportsCount;
+        return uObj;
+      })
+    );
+
     res.status(200).json({
       success: true,
-      count: users.length,
-      users
+      count: enrichedUsers.length,
+      users: enrichedUsers
     });
   } catch (error) {
     res.status(500).json({
@@ -283,7 +306,261 @@ exports.getAllUsers = async (req, res) => {
   }
 };
 
-// @desc    Toggle User Active Status (Ban / Unban)
+// @desc    Issue Official Warning to User (Student or Tutor)
+// @route   PUT /api/admin/users/:id/warning
+exports.issueUserWarning = async (req, res) => {
+  try {
+    const { reason, message, sendEmail } = req.body;
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (!reason || !message) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide warning violation reason and message explanation.'
+      });
+    }
+
+    user.warningCount = (user.warningCount || 0) + 1;
+    user.status = 'warned';
+    user.warnings.push({
+      reason,
+      message,
+      issuedBy: req.user.id,
+      issuedAt: new Date()
+    });
+
+    await user.save();
+
+    // Create In-App Notification
+    await Notification.create({
+      recipient: user._id,
+      sender: req.user.id,
+      title: `⚠️ Policy Warning Notice (Strike #${user.warningCount})`,
+      message: `Violation: ${reason}. Message: "${message}". Please adhere to community guidelines.`,
+      type: 'admin_alert',
+      link: user.role === 'tutor' ? '/tutor/dashboard' : '/student/dashboard'
+    });
+
+    // Real-time Socket Alert
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`user_${user._id}`).emit('notification-alert', {
+        title: `⚠️ Policy Warning Notice (Strike #${user.warningCount})`,
+        message: `Violation: ${reason}. "${message}"`,
+        type: 'admin_alert'
+      });
+    }
+
+    // Send Branded Email Notice
+    if (sendEmail !== false) {
+      try {
+        await sendAccountWarningEmail({
+          to: user.email,
+          userName: user.name,
+          reason,
+          message,
+          warningCount: user.warningCount
+        });
+      } catch (e) {
+        console.error('Failed to send warning email:', e.message);
+      }
+    }
+
+    await logAction(
+      req.user.id,
+      'WARN_USER',
+      'user',
+      user._id,
+      { userName: user.name, role: user.role, reason, warningCount: user.warningCount },
+      req
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Official warning issued to ${user.name} (Strike #${user.warningCount})`,
+      user
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error issuing warning'
+    });
+  }
+};
+
+// @desc    Update User Moderation Status (Active / Under Review / Suspended / Deactivated)
+// @route   PUT /api/admin/users/:id/status
+exports.updateUserStatus = async (req, res) => {
+  try {
+    const { status, reason, notes, sendEmail } = req.body;
+    const user = await User.findById(req.params.id);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    const validStatuses = ['active', 'warned', 'under_review', 'suspended', 'deactivated'];
+    if (!validStatuses.includes(status)) {
+      return res.status(400).json({
+        success: false,
+        message: `Invalid status. Must be one of: ${validStatuses.join(', ')}`
+      });
+    }
+
+    const prevStatus = user.status;
+    user.status = status;
+    user.isActive = status !== 'suspended' && status !== 'deactivated';
+    if (notes) user.adminNotes = notes;
+    if (reason) user.underReviewReason = reason;
+
+    await user.save();
+
+    // If Tutor, sync verificationStatus in TutorProfile
+    if (user.role === 'tutor') {
+      const tutorProfile = await TutorProfile.findOne({ user: user._id });
+      if (tutorProfile) {
+        if (status === 'under_review') {
+          tutorProfile.verificationStatus = 'under_review';
+        } else if (status === 'suspended' || status === 'deactivated') {
+          tutorProfile.verificationStatus = 'suspended';
+        } else if (status === 'active' && tutorProfile.verificationStatus !== 'approved') {
+          tutorProfile.verificationStatus = 'approved';
+        }
+        await tutorProfile.save();
+      }
+    }
+
+    // In-App Notification
+    let notifTitle = 'Account Status Notice';
+    let notifMsg = `Your account status has been set to: ${status.replace('_', ' ').toUpperCase()}.`;
+    if (status === 'active') {
+      notifTitle = '✅ Account Reinstated & Active';
+      notifMsg = 'Your account has been fully verified and is active on IlmPortal.';
+    } else if (status === 'under_review') {
+      notifTitle = '🔍 Account Placed Under Administrative Review';
+      notifMsg = `Your account is temporarily under review. Reason: ${reason || 'Standard safety audit'}.`;
+    } else if (status === 'suspended') {
+      notifTitle = '⛔ Account Suspended';
+      notifMsg = `Your account access has been suspended by administration. Reason: ${reason || 'Policy violation'}.`;
+    }
+
+    await Notification.create({
+      recipient: user._id,
+      sender: req.user.id,
+      title: notifTitle,
+      message: notifMsg,
+      type: 'admin_alert',
+      link: user.role === 'tutor' ? '/tutor/dashboard' : '/student/dashboard'
+    });
+
+    // Real-time socket event
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`user_${user._id}`).emit('notification-alert', {
+        title: notifTitle,
+        message: notifMsg,
+        type: 'admin_alert',
+        accountStatus: status
+      });
+    }
+
+    // Send Email
+    if (sendEmail !== false) {
+      try {
+        await sendAccountStatusEmail({
+          to: user.email,
+          userName: user.name,
+          status,
+          reason,
+          notes
+        });
+      } catch (e) {
+        console.error('Failed to send status email:', e.message);
+      }
+    }
+
+    await logAction(
+      req.user.id,
+      'UPDATE_USER_STATUS',
+      'user',
+      user._id,
+      { userName: user.name, role: user.role, prevStatus, newStatus: status, reason },
+      req
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `User ${user.name} status updated from ${prevStatus} to ${status}`,
+      user
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error updating user status'
+    });
+  }
+};
+
+// @desc    Permanently Delete / Remove User Account
+// @route   DELETE /api/admin/users/:id
+exports.deleteUserAccount = async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (user.role === 'admin' && user._id.toString() === req.user.id) {
+      return res.status(400).json({
+        success: false,
+        message: 'Cannot delete your own administrator account.'
+      });
+    }
+
+    const userName = user.name;
+    const userEmail = user.email;
+    const userRole = user.role;
+
+    // Delete associated tutor profile if tutor
+    if (user.role === 'tutor') {
+      await TutorProfile.deleteOne({ user: user._id });
+    }
+
+    // Cancel any active deals
+    await Deal.updateMany(
+      { $or: [{ student: user._id }, { tutor: user._id }] },
+      { status: 'cancelled' }
+    );
+
+    // Delete User
+    await User.findByIdAndDelete(user._id);
+
+    await logAction(
+      req.user.id,
+      'DELETE_USER_ACCOUNT',
+      'user',
+      user._id,
+      { userName, userEmail, userRole },
+      req
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Account for ${userName} (${userEmail}) has been permanently deleted.`
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error deleting user'
+    });
+  }
+};
+
+// @desc    Toggle User Active Status (Legacy Ban / Unban)
 // @route   PUT /api/admin/users/:id/toggle-status
 exports.toggleUserStatus = async (req, res) => {
   try {
@@ -293,6 +570,7 @@ exports.toggleUserStatus = async (req, res) => {
     }
 
     user.isActive = !user.isActive;
+    user.status = user.isActive ? 'active' : 'suspended';
     await user.save();
 
     await logAction(req.user.id, user.isActive ? 'ACTIVATE_USER' : 'DEACTIVATE_USER', 'user', user._id, { userName: user.name }, req);

@@ -54,6 +54,7 @@ const AdminSidebar = () => {
 
   const navItems = [
     { to: '/admin', label: 'Analytics & Overview', icon: LayoutDashboard, exact: true },
+    { to: '/admin/users', label: 'Users & Moderation', icon: Users },
     {
       to: '/admin/reports',
       label: 'Incident & Safety Reports',

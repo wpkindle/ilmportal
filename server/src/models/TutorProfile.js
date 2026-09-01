@@ -49,7 +49,7 @@ const tutorProfileSchema = new mongoose.Schema({
   }],
   verificationStatus: {
     type: String,
-    enum: ['pending', 'approved', 'rejected', 'contact_needed'],
+    enum: ['pending', 'approved', 'rejected', 'contact_needed', 'under_review', 'suspended'],
     default: 'pending'
   },
   rejectionReason: {

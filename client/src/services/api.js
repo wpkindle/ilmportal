@@ -485,6 +485,36 @@ export const api = {
     body: JSON.stringify(body)
   }).then(handleResponse),
 
+  // User Management & Moderation
+  getAdminUsers: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return fetch(`${API_BASE}/admin/users?${query}`, {
+      headers: getHeaders()
+    }).then(handleResponse);
+  },
+
+  issueUserWarning: (id, body) => fetch(`${API_BASE}/admin/users/${id}/warning`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  updateUserStatus: (id, body) => fetch(`${API_BASE}/admin/users/${id}/status`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  deleteUserAccount: (id) => fetch(`${API_BASE}/admin/users/${id}`, {
+    method: 'DELETE',
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  toggleUserStatus: (id) => fetch(`${API_BASE}/admin/users/${id}/toggle-status`, {
+    method: 'PUT',
+    headers: getHeaders()
+  }).then(handleResponse),
+
   // Safety & Incident Reports
   createReport: (body) => fetch(`${API_BASE}/reports`, {
     method: 'POST',

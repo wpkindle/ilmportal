@@ -656,10 +656,156 @@ const sendCertificateIssuedEmail = async ({ to, studentName, courseTitle, instru
   });
 };
 
+/**
+ * Send Account Warning Email
+ */
+const sendAccountWarningEmail = async ({ to, userName, reason, message, warningCount }) => {
+  const subject = `⚠️ Official Platform Policy Warning (Strike #${warningCount || 1}) - IlmPortal Pakistan`;
+  const portalUrl = getClientBaseUrl();
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"></head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center">
+            <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+              <tr>
+                <td style="padding: 30px; background-color: #991b1b; text-align: center;">
+                  <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 900;">⚠️ Official Policy Notice</h1>
+                  <p style="color: #fecaca; margin: 6px 0 0 0; font-size: 13px;">IlmPortal Trust, Safety & Quality Team</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 35px 30px;">
+                  <p style="font-size: 15px; color: #334155; margin-top: 0;">Dear <strong>${userName}</strong>,</p>
+                  <p style="font-size: 14px; color: #475569; line-height: 1.6;">
+                    This is an official administrative notice regarding activity on your account that conflicts with our community guidelines and safety policies.
+                  </p>
+
+                  <div style="background-color: #fef2f2; border: 1px solid #fecaca; border-left: 4px solid #dc2626; border-radius: 8px; padding: 18px; margin: 20px 0;">
+                    <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 800; text-transform: uppercase; color: #991b1b;">
+                      Violation Category: ${reason}
+                    </p>
+                    <p style="margin: 0; font-size: 14px; color: #7f1d1d; line-height: 1.5;">
+                      "${message}"
+                    </p>
+                  </div>
+
+                  <p style="font-size: 13px; color: #64748b; line-height: 1.6;">
+                    Total Warnings on Record: <strong>${warningCount || 1}</strong>. Please ensure all future communications and classroom sessions strictly adhere to our terms. Continued violations may result in permanent suspension.
+                  </p>
+
+                  <table width="100%" cellpadding="0" cellspacing="0" style="margin-top: 25px;">
+                    <tr>
+                      <td align="center">
+                        <a href="${portalUrl}" style="display: inline-block; padding: 12px 28px; background-color: #0f172a; color: #ffffff; font-size: 13px; font-weight: 700; text-decoration: none; border-radius: 10px;">
+                          Visit Account Portal &rarr;
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 20px 30px; background-color: #f1f5f9; text-align: center; border-top: 1px solid #e2e8f0;">
+                  <p style="margin: 0; font-size: 11px; color: #64748b;">IlmPortal Trust & Safety Center &bull; Pakistan</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to,
+    subject,
+    html,
+    text: `Policy Warning from IlmPortal Pakistan: Category: ${reason}. Statement: ${message}. Total Warnings: ${warningCount || 1}.`
+  });
+};
+
+/**
+ * Send Account Status Change Email (Under Review / Suspended / Reinstated)
+ */
+const sendAccountStatusEmail = async ({ to, userName, status, reason, notes }) => {
+  const isSuspended = status === 'suspended' || status === 'deactivated';
+  const isReview = status === 'under_review';
+  const isRestored = status === 'active';
+
+  const statusLabel = isSuspended ? 'Account Suspended' : isReview ? 'Account Under Review' : 'Account Reinstated (Active)';
+  const headerBg = isSuspended ? '#7f1d1d' : isReview ? '#9a3412' : '#047857';
+  const subject = `Account Notice: ${statusLabel} - IlmPortal Pakistan`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"></head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px;">
+      <table width="100%" cellpadding="0" cellspacing="0">
+        <tr>
+          <td align="center">
+            <table width="600" cellpadding="0" cellspacing="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+              <tr>
+                <td style="padding: 30px; background-color: ${headerBg}; text-align: center;">
+                  <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 900;">${statusLabel}</h1>
+                  <p style="color: #ffffff; opacity: 0.9; margin: 6px 0 0 0; font-size: 13px;">IlmPortal Administration</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 35px 30px;">
+                  <p style="font-size: 15px; color: #334155; margin-top: 0;">Dear <strong>${userName}</strong>,</p>
+                  
+                  ${isRestored ? `
+                    <p style="font-size: 14px; color: #065f46; line-height: 1.6;">
+                      We are pleased to inform you that your IlmPortal account is now fully active and verified. Your profile and courses are visible to students across Pakistan.
+                    </p>
+                  ` : `
+                    <p style="font-size: 14px; color: #475569; line-height: 1.6;">
+                      Your account status has been updated by platform moderation to: <strong>${statusLabel}</strong>.
+                    </p>
+                    ${reason ? `
+                      <div style="background-color: #fff7ed; border-left: 4px solid #ea580c; border-radius: 6px; padding: 15px; margin: 15px 0;">
+                        <p style="margin: 0; font-size: 13px; color: #9a3412;"><strong>Reason:</strong> ${reason}</p>
+                        ${notes ? `<p style="margin: 8px 0 0 0; font-size: 13px; color: #7c2d12;">${notes}</p>` : ''}
+                      </div>
+                    ` : ''}
+                  `}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 20px 30px; background-color: #f1f5f9; text-align: center; border-top: 1px solid #e2e8f0;">
+                  <p style="margin: 0; font-size: 11px; color: #64748b;">IlmPortal Moderation & Compliance &bull; Pakistan</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to,
+    subject,
+    html,
+    text: `Your account status on IlmPortal has been updated to: ${statusLabel}. Details: ${reason || ''} ${notes || ''}`
+  });
+};
+
 module.exports = {
   sendEmail,
   sendVerificationOtpEmail,
   sendTutorStatusEmail,
   sendCertificateIssuedEmail,
-  sendDedicatedChatInvitationEmail
+  sendDedicatedChatInvitationEmail,
+  sendAccountWarningEmail,
+  sendAccountStatusEmail
 };
+

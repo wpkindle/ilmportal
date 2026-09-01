@@ -7,6 +7,9 @@ const {
   rejectTutor,
   contactTutor,
   getAllUsers,
+  issueUserWarning,
+  updateUserStatus,
+  deleteUserAccount,
   toggleUserStatus,
   getAllDeals,
   verifyDealPayment,
@@ -42,8 +45,11 @@ router.put('/tutors/:id/approve', approveTutor);
 router.put('/tutors/:id/reject', rejectTutor);
 router.put('/tutors/:id/contact', contactTutor);
 
-// User Management
+// User Management & Moderation
 router.get('/users', getAllUsers);
+router.put('/users/:id/warning', issueUserWarning);
+router.put('/users/:id/status', updateUserStatus);
+router.delete('/users/:id', deleteUserAccount);
 router.put('/users/:id/toggle-status', toggleUserStatus);
 
 // Deals & Payments

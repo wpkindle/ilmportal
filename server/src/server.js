@@ -52,6 +52,24 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/certificates', require('./routes/certificateRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
 
+// Root status endpoint
+app.get('/', (req, res) => {
+  res.status(200).json({
+    status: 'online',
+    project: 'Pakistan-Wide Quran & Academic Tutoring LMS Backend',
+    version: '1.0.0',
+    timestamp: new Date().toISOString(),
+    endpoints: {
+      health: '/api/health',
+      auth: '/api/auth',
+      tutors: '/api/tutors',
+      courses: '/api/courses',
+      deals: '/api/deals',
+      reports: '/api/reports'
+    }
+  });
+});
+
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.status(200).json({

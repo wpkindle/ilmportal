@@ -347,7 +347,7 @@ export default function TutorProfilePage() {
                 <p className="text-xs text-slate-500">{email || 'tutor@example.com'}</p>
                 <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800">
-                    Qari / Academic Tutor
+                    Tutor
                   </span>
                   {tutorProfile?.verificationStatus === 'approved' ? (
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white flex items-center gap-1">

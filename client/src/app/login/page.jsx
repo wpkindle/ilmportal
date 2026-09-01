@@ -168,7 +168,7 @@ function LoginContent() {
           <div className="pt-3 border-t border-slate-100 text-center text-xs text-slate-500">
             Don't have an account?{' '}
             <Link
-              href={roleParam ? `/register?role=${roleParam}` : '/register'}
+              href={roleParam === 'tutor' ? '/register/tutor' : roleParam === 'student' ? '/register/student' : '/register'}
               className="font-bold text-emerald-700 hover:underline"
             >
               Create Account

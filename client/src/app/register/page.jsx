@@ -197,7 +197,7 @@ function RegisterContent() {
             }`}
           >
             <User className="w-4 h-4" />
-            <span>Student / Parent</span>
+            <span>Student</span>
           </button>
 
           <button
@@ -210,7 +210,7 @@ function RegisterContent() {
             }`}
           >
             <GraduationCap className="w-4 h-4" />
-            <span>Tutor / Qari</span>
+            <span>Tutor</span>
           </button>
         </div>
 

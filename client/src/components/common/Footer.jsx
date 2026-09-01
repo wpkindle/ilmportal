@@ -39,13 +39,13 @@ const Footer = () => {
             <h4 className="text-xs font-bold text-white uppercase tracking-wider">Portals & Access</h4>
             <ul className="space-y-2 text-xs">
               <li>
-                <Link href="/login?role=student" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+                <Link href="/register/student" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
                   <GraduationCap className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Student Portal</span>
                 </Link>
               </li>
               <li>
-                <Link href="/login?role=tutor" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+                <Link href="/register/tutor" className="hover:text-emerald-400 transition-colors flex items-center gap-1.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                   <span>Tutor Portal</span>
                 </Link>
@@ -58,11 +58,6 @@ const Footer = () => {
               <li>
                 <Link href="/how-it-works" className="hover:text-emerald-400 transition-colors">
                   How It Works
-                </Link>
-              </li>
-              <li>
-                <Link href="/register" className="hover:text-emerald-400 transition-colors">
-                  Join IlmPortal
                 </Link>
               </li>
             </ul>

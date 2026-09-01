@@ -261,15 +261,15 @@ exports.getAllUsers = async (req, res) => {
     const { role, search, city, status, isVerified } = req.query;
     const query = {};
 
-    if (role && role !== 'all') {
+    if (role && role !== 'all' && role !== 'undefined' && role !== 'null') {
       query.role = role;
     }
 
-    if (city && city !== 'all') {
+    if (city && city !== 'all' && city !== 'undefined' && city !== 'null' && city.trim()) {
       query.city = new RegExp(city.trim(), 'i');
     }
 
-    if (status && status !== 'all') {
+    if (status && status !== 'all' && status !== 'undefined' && status !== 'null') {
       if (status === 'warned') {
         query.$or = [{ status: 'warned' }, { warningCount: { $gt: 0 } }];
       } else if (status === 'suspended') {
@@ -286,11 +286,11 @@ exports.getAllUsers = async (req, res) => {
       }
     }
 
-    if (isVerified !== undefined && isVerified !== 'all') {
+    if (isVerified !== undefined && isVerified !== 'all' && isVerified !== 'undefined' && isVerified !== 'null') {
       query.isVerified = isVerified === 'true';
     }
 
-    if (search && search.trim()) {
+    if (search && search !== 'undefined' && search !== 'null' && search.trim()) {
       const searchRegex = new RegExp(search.trim(), 'i');
       const searchConditions = [{ name: searchRegex }, { email: searchRegex }, { phone: searchRegex }];
       if (query.$or) {

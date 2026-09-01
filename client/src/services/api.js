@@ -383,18 +383,6 @@ export const api = {
     body: JSON.stringify({ notes })
   }).then(handleResponse),
 
-  getAdminUsers: (params = {}) => {
-    const query = new URLSearchParams(params).toString();
-    return fetch(`${API_BASE}/admin/users?${query}`, {
-      headers: getHeaders()
-    }).then(handleResponse);
-  },
-
-  toggleUserStatus: (id) => fetch(`${API_BASE}/admin/users/${id}/toggle-status`, {
-    method: 'PUT',
-    headers: getHeaders()
-  }).then(handleResponse),
-
   getAdminDeals: (params = {}) => {
     const query = new URLSearchParams(params).toString();
     return fetch(`${API_BASE}/admin/deals?${query}`, {
@@ -487,8 +475,15 @@ export const api = {
 
   // User Management & Moderation
   getAdminUsers: (params = {}) => {
-    const query = new URLSearchParams(params).toString();
-    return fetch(`${API_BASE}/admin/users?${query}`, {
+    const cleanParams = {};
+    Object.keys(params).forEach((key) => {
+      const val = params[key];
+      if (val !== undefined && val !== null && val !== '' && val !== 'all' && val !== 'undefined' && val !== 'null') {
+        cleanParams[key] = val;
+      }
+    });
+    const query = new URLSearchParams(cleanParams).toString();
+    return fetch(`${API_BASE}/admin/users${query ? '?' + query : ''}`, {
       headers: getHeaders()
     }).then(handleResponse);
   },

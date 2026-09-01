@@ -135,3 +135,4 @@ export default function FeaturedTutorsShowcase({ initialTutors = [] }) {
     </section>
   );
 }
+

@@ -25,15 +25,15 @@ function LoginContent() {
   const roleParam = searchParams.get('role');
   const redirect = searchParams.get('redirect') || '/';
 
-  const [activeTab, setActiveTab] = useState(roleParam === 'tutor' ? 'tutor' : 'student');
+  // Dedicated role mode based on URL: default is student unless explicitly tutor
+  const isTutorMode = roleParam === 'tutor';
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [captchaVerified, setCaptchaVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-
-  const isTutorMode = activeTab === 'tutor';
 
   const performLogin = async (loginEmail, loginPass) => {
     if (!captchaVerified) {
@@ -56,7 +56,7 @@ function LoginContent() {
     } catch (err) {
       console.error('Login error:', err);
       if (err.isUnverified || err.message?.toLowerCase().includes('verify')) {
-        router.push(`/verify-email?email=${encodeURIComponent(loginEmail.trim())}&role=${activeTab}`);
+        router.push(`/verify-email?email=${encodeURIComponent(loginEmail.trim())}&role=${isTutorMode ? 'tutor' : 'student'}`);
       } else {
         setError(err.message || 'Invalid email or password');
       }
@@ -81,6 +81,20 @@ function LoginContent() {
               <BookOpen className="w-6 h-6" />
             </div>
           </Link>
+
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-100 text-emerald-800 text-xs font-bold mx-auto">
+            {isTutorMode ? (
+              <>
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Tutor Portal</span>
+              </>
+            ) : (
+              <>
+                <GraduationCap className="w-3.5 h-3.5" />
+                <span>Student Portal</span>
+              </>
+            )}
+          </div>
           
           <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
             {isTutorMode ? 'Tutor Portal Sign In' : 'Student Portal Sign In'}
@@ -90,35 +104,6 @@ function LoginContent() {
               ? 'Access your teaching dashboard, classroom schedules, and student trials'
               : 'Access your Quran & academic courses, tests, and live 1:1 classes'}
           </p>
-        </div>
-
-        {/* Portal Switcher Tabs */}
-        <div className="bg-white p-1 rounded-2xl border border-slate-200 shadow-xs flex">
-          <button
-            type="button"
-            onClick={() => { setActiveTab('student'); setError(''); }}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-              !isTutorMode
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <GraduationCap className="w-4 h-4" />
-            <span>Student Portal</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => { setActiveTab('tutor'); setError(''); }}
-            className={`flex-1 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
-              isTutorMode
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
-            }`}
-          >
-            <ShieldCheck className="w-4 h-4" />
-            <span>Tutor Portal</span>
-          </button>
         </div>
 
         {/* Login Form Card */}
@@ -191,15 +176,15 @@ function LoginContent() {
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>{isTutorMode ? 'Sign In as Tutor' : 'Sign In as Student'}</span>
+                  <span>{isTutorMode ? 'Sign In to Tutor Portal' : 'Sign In to Student Portal'}</span>
                   <ArrowRight className="w-4 h-4" />
                 </>
               )}
             </button>
           </form>
 
-          {/* Registration Links Box */}
-          <div className="pt-4 border-t border-slate-100 space-y-2 text-center text-xs">
+          {/* Registration Link Box for clicked role only */}
+          <div className="pt-4 border-t border-slate-100 text-center text-xs">
             <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-1">
               <p className="text-slate-600">
                 Don't have an account yet?
@@ -221,16 +206,6 @@ function LoginContent() {
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
               )}
-            </div>
-
-            <div className="pt-1 flex items-center justify-center gap-3 text-[11px] text-slate-500">
-              <Link href="/register/student" className="hover:text-emerald-700 font-semibold">
-                Student Registration
-              </Link>
-              <span>&bull;</span>
-              <Link href="/register/tutor" className="hover:text-emerald-700 font-semibold">
-                Tutor Registration
-              </Link>
             </div>
           </div>
 

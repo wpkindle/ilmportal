@@ -22,12 +22,9 @@ import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
 import ProfileCompletionMeter from '../../../components/common/ProfileCompletionMeter';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
+import { allPakistaniCities } from '../../../data/pakistanAreas';
 
-const pakistaniCities = [
-  'Islamabad', 'Lahore', 'Karachi', 'Rawalpindi', 'Peshawar',
-  'Faisalabad', 'Multan', 'Quetta', 'Sialkot', 'Gujranwala',
-  'Hyderabad', 'Abbottabad', 'Bahawalpur', 'Sargodha', 'Sukkur'
-];
+const pakistaniCities = allPakistaniCities;
 
 export default function StudentProfilePage() {
   const { user, updateUserProfile, loading: authLoading } = useAuth();

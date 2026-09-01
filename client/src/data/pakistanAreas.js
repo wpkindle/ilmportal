@@ -1,3 +1,99 @@
+/**
+ * Comprehensive Master Directory of All Pakistani Cities across all provinces
+ * (Punjab, Sindh, Khyber Pakhtunkhwa, Balochistan, Islamabad ICT, AJK, Gilgit-Baltistan)
+ */
+
+export const allPakistaniCities = [
+  // Federal Capital
+  'Islamabad',
+
+  // Punjab Major Cities & Districts
+  'Lahore', 'Faisalabad', 'Rawalpindi', 'Gujranwala', 'Multan', 'Bahawalpur', 'Sargodha',
+  'Sialkot', 'Sheikhupura', 'Jhang', 'Rahim Yar Khan', 'Gujrat', 'Sahiwal', 'Wah Cantt',
+  'Kasur', 'Okara', 'Dera Ghazi Khan', 'Chiniot', 'Kamoke', 'Mandi Bahauddin', 'Jhelum',
+  'Sadiqabad', 'Khanewal', 'Hafizabad', 'Muzaffargarh', 'Khanpur', 'Gojra', 'Bahawalnagar',
+  'Muridke', 'Pakpattan', 'Toba Tek Singh', 'Vehari', 'Kot Addu', 'Wazirabad', 'Chakwal',
+  'Mianwali', 'Attock', 'Lodhran', 'Bhakkar', 'Layyah', 'Khushab', 'Narowal', 'Rajanpur',
+  'Taxila', 'Murree', 'Burewala', 'Chichawatni', 'Daska', 'Kamalia', 'Pattoki', 'Shorkot',
+  'Taunsa Sharif', 'Kot Radha Kishan', 'Haroonabad', 'Jaranwala', 'Sambrial', 'Mailsi',
+  'Jalalpur Jattan', 'Ahmedpur East', 'Dinga', 'Kharian', 'Mian Channu', 'Dunya Pur',
+
+  // Sindh Major Cities & Districts
+  'Karachi', 'Hyderabad', 'Sukkur', 'Larkana', 'Nawabshah (Shaheed Benazirabad)', 'Mirpur Khas',
+  'Jacobabad', 'Shikarpur', 'Khairpur', 'Dadu', 'Tando Adam', 'Tando Allahyar', 'Thatta',
+  'Badin', 'Ghotki', 'Umerkot', 'Kotri', 'Kashmore', 'Sanghar', 'Kandhkot', 'Shahdadkot',
+  'Matiari', 'Jamshoro', 'Moro', 'Ratodero', 'Rohri', 'Mehrabpur', 'Sehwan', 'Mirpur Mathelo',
+  'Khipro', 'Digri', 'Naukot', 'Pano Akil', 'Naushahro Feroze', 'Daharki',
+
+  // Khyber Pakhtunkhwa (KP) Major Cities & Districts
+  'Peshawar', 'Mardan', 'Abbottabad', 'Mingora (Swat)', 'Kohat', 'Dera Ismail Khan',
+  'Bannu', 'Swabi', 'Charsadda', 'Nowshera', 'Mansehra', 'Haripur', 'Batkhela', 'Karak',
+  'Hangu', 'Timergara (Dir)', 'Chitral', 'Parachinar', 'Tank', 'Upper Dir', 'Lower Dir',
+  'Buner', 'Shangla', 'Malakand', 'Risalpur', 'Shabqadar', 'Tangi', 'Pabbi', 'Topi',
+  'Dargai', 'Kabal', 'Barikot', 'Matta', 'Khwazakhela', 'Alpuri', 'Gadoon', 'Wana', 'Miranshah',
+
+  // Balochistan Major Cities & Districts
+  'Quetta', 'Turbat', 'Khuzdar', 'Hub', 'Chaman', 'Gwadar', 'Sibi', 'Zhob', 'Loralai',
+  'Dera Murad Jamali', 'Dera Allah Yar', 'Nushki', 'Kalat', 'Kharan', 'Mastung', 'Pishin',
+  'Qila Saifullah', 'Qila Abdullah', 'Panjgur', 'Usta Mohammad', 'Sohbatpur', 'Barkhan',
+  'Duki', 'Harnai', 'Jaffarabad', 'Jhal Magsi', 'Kech', 'Kohlu', 'Lasbela', 'Musakhel',
+  'Nasirabad', 'Surab', 'Washuk', 'Ziarat', 'Pasni', 'Ormara', 'Jiwani',
+
+  // Azad Jammu & Kashmir (AJK)
+  'Muzaffarabad', 'Mirpur (AJK)', 'Rawalakot', 'Kotli', 'Bhimber', 'Bagh', 'Pallandri',
+  'Hattian Bala', 'Haveli', 'Chakswari', 'Dadyal', 'Islamgarh', 'Sehnsa',
+
+  // Gilgit-Baltistan
+  'Gilgit', 'Skardu', 'Hunza', 'Chilas', 'Diamer', 'Ghangche', 'Nagar', 'Astore', 'Ghizer',
+  'Shigar', 'Kharmang', 'Aliabad', 'Karimabad', 'Gahkuch', 'Khaplu'
+].sort();
+
+// Province-based grouping for categorized selectors
+export const pakistaniCitiesByProvince = {
+  'Federal Capital': ['Islamabad'],
+  'Punjab': [
+    'Lahore', 'Faisalabad', 'Rawalpindi', 'Gujranwala', 'Multan', 'Bahawalpur', 'Sargodha',
+    'Sialkot', 'Sheikhupura', 'Jhang', 'Rahim Yar Khan', 'Gujrat', 'Sahiwal', 'Wah Cantt',
+    'Kasur', 'Okara', 'Dera Ghazi Khan', 'Chiniot', 'Kamoke', 'Mandi Bahauddin', 'Jhelum',
+    'Sadiqabad', 'Khanewal', 'Hafizabad', 'Muzaffargarh', 'Khanpur', 'Gojra', 'Bahawalnagar',
+    'Muridke', 'Pakpattan', 'Toba Tek Singh', 'Vehari', 'Kot Addu', 'Wazirabad', 'Chakwal',
+    'Mianwali', 'Attock', 'Lodhran', 'Bhakkar', 'Layyah', 'Khushab', 'Narowal', 'Rajanpur',
+    'Taxila', 'Murree', 'Burewala', 'Chichawatni', 'Daska', 'Kamalia', 'Pattoki', 'Shorkot',
+    'Taunsa Sharif', 'Kot Radha Kishan', 'Haroonabad', 'Jaranwala', 'Sambrial', 'Mailsi',
+    'Jalalpur Jattan', 'Ahmedpur East', 'Dinga', 'Kharian', 'Mian Channu', 'Dunya Pur'
+  ],
+  'Sindh': [
+    'Karachi', 'Hyderabad', 'Sukkur', 'Larkana', 'Nawabshah (Shaheed Benazirabad)', 'Mirpur Khas',
+    'Jacobabad', 'Shikarpur', 'Khairpur', 'Dadu', 'Tando Adam', 'Tando Allahyar', 'Thatta',
+    'Badin', 'Ghotki', 'Umerkot', 'Kotri', 'Kashmore', 'Sanghar', 'Kandhkot', 'Shahdadkot',
+    'Matiari', 'Jamshoro', 'Moro', 'Ratodero', 'Rohri', 'Mehrabpur', 'Sehwan', 'Mirpur Mathelo',
+    'Khipro', 'Digri', 'Naukot', 'Pano Akil', 'Naushahro Feroze', 'Daharki'
+  ],
+  'Khyber Pakhtunkhwa': [
+    'Peshawar', 'Mardan', 'Abbottabad', 'Mingora (Swat)', 'Kohat', 'Dera Ismail Khan',
+    'Bannu', 'Swabi', 'Charsadda', 'Nowshera', 'Mansehra', 'Haripur', 'Batkhela', 'Karak',
+    'Hangu', 'Timergara (Dir)', 'Chitral', 'Parachinar', 'Tank', 'Upper Dir', 'Lower Dir',
+    'Buner', 'Shangla', 'Malakand', 'Risalpur', 'Shabqadar', 'Tangi', 'Pabbi', 'Topi',
+    'Dargai', 'Kabal', 'Barikot', 'Matta', 'Khwazakhela', 'Alpuri', 'Gadoon', 'Wana', 'Miranshah'
+  ],
+  'Balochistan': [
+    'Quetta', 'Turbat', 'Khuzdar', 'Hub', 'Chaman', 'Gwadar', 'Sibi', 'Zhob', 'Loralai',
+    'Dera Murad Jamali', 'Dera Allah Yar', 'Nushki', 'Kalat', 'Kharan', 'Mastung', 'Pishin',
+    'Qila Saifullah', 'Qila Abdullah', 'Panjgur', 'Usta Mohammad', 'Sohbatpur', 'Barkhan',
+    'Duki', 'Harnai', 'Jaffarabad', 'Jhal Magsi', 'Kech', 'Kohlu', 'Lasbela', 'Musakhel',
+    'Nasirabad', 'Surab', 'Washuk', 'Ziarat', 'Pasni', 'Ormara', 'Jiwani'
+  ],
+  'Azad Jammu & Kashmir': [
+    'Muzaffarabad', 'Mirpur (AJK)', 'Rawalakot', 'Kotli', 'Bhimber', 'Bagh', 'Pallandri',
+    'Hattian Bala', 'Haveli', 'Chakswari', 'Dadyal', 'Islamgarh', 'Sehnsa'
+  ],
+  'Gilgit-Baltistan': [
+    'Gilgit', 'Skardu', 'Hunza', 'Chilas', 'Diamer', 'Ghangche', 'Nagar', 'Astore', 'Ghizer',
+    'Shigar', 'Kharmang', 'Aliabad', 'Karimabad', 'Gahkuch', 'Khaplu'
+  ]
+};
+
+// Detailed neighborhood/area breakdowns for metropolitan areas
 export const pakistaniCityAreas = {
   'Lahore': [
     'DHA (Phase 1-9)',
@@ -128,4 +224,3 @@ export const pakistaniCityAreas = {
     'Citi Housing Gujranwala'
   ]
 };
-

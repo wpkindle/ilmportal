@@ -7,15 +7,12 @@ import { api } from '../../../services/api';
 import {
   Users,
   Search,
-  Filter,
   AlertTriangle,
   ShieldAlert,
-  ShieldCheck,
   Ban,
   Trash2,
   CheckCircle2,
   Clock,
-  Eye,
   Mail,
   Phone,
   MapPin,
@@ -38,11 +35,10 @@ export default function AdminUsersModerationPage() {
   const [warningModalOpen, setWarningModalOpen] = useState(false);
   const [statusModalOpen, setStatusModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [historyModalOpen, setHistoryModalOpen] = useState(false);
 
   // Form states
   const [warningForm, setWarningForm] = useState({
-    reason: 'inappropriate_conduct',
+    reason: 'Inappropriate Conduct / Disrespect',
     message: '',
     sendEmail: true
   });
@@ -86,8 +82,8 @@ export default function AdminUsersModerationPage() {
   const openWarningModal = (u) => {
     setSelectedUser(u);
     setWarningForm({
-      reason: 'Policy Violation',
-      message: 'Please ensure all communications and sessions follow IlmPortal community standards.',
+      reason: 'Inappropriate Conduct / Disrespect',
+      message: 'Please ensure all communications and sessions strictly follow IlmPortal community guidelines.',
       sendEmail: true
     });
     setWarningModalOpen(true);

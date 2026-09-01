@@ -29,12 +29,9 @@ import { api } from '../../../services/api';
 import ProfileCompletionMeter from '../../../components/common/ProfileCompletionMeter';
 import { SanadModal } from '../../../components/common/SanadBadge';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
+import { allPakistaniCities } from '../../../data/pakistanAreas';
 
-const pakistaniCities = [
-  'Islamabad', 'Lahore', 'Karachi', 'Rawalpindi', 'Peshawar',
-  'Faisalabad', 'Multan', 'Quetta', 'Sialkot', 'Gujranwala',
-  'Hyderabad', 'Abbottabad', 'Bahawalpur', 'Sargodha', 'Sukkur'
-];
+const pakistaniCities = allPakistaniCities;
 
 export default function TutorProfilePage() {
   const { user, tutorProfile, updateUserProfile, updateTutorProfileState, loading: authLoading } = useAuth();

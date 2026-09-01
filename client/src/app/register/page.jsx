@@ -25,17 +25,9 @@ import {
 import { api } from '../../services/api';
 import CustomSelect from '../../components/common/CustomSelect';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { allPakistaniCities } from '../../data/pakistanAreas';
 
-const pakistaniCities = [
-  'Islamabad', 'Lahore', 'Karachi', 'Rawalpindi', 'Peshawar',
-  'Faisalabad', 'Multan', 'Quetta', 'Sialkot', 'Gujranwala',
-  'Hyderabad', 'Abbottabad', 'Bahawalpur', 'Sargodha', 'Sukkur'
-];
-
-const cityOptions = [
-  { value: 'all', label: 'All Pakistani Cities' },
-  ...pakistaniCities.map((c) => ({ value: c, label: c }))
-];
+const cityOptions = allPakistaniCities.map((c) => ({ value: c, label: c }));
 
 function RegisterContent() {
   const router = useRouter();

@@ -19,50 +19,130 @@ const Certificate = require('../models/Certificate');
 dotenv.config();
 
 const locationsData = [
-  // Punjab
+  // Islamabad Capital Territory
+  { name: 'Islamabad', province: 'Islamabad Capital Territory', isMajorCity: true },
+
+  // Punjab Major Cities & Districts
   { name: 'Lahore', province: 'Punjab', isMajorCity: true },
   { name: 'Rawalpindi', province: 'Punjab', isMajorCity: true },
   { name: 'Faisalabad', province: 'Punjab', isMajorCity: true },
   { name: 'Multan', province: 'Punjab', isMajorCity: true },
   { name: 'Gujranwala', province: 'Punjab', isMajorCity: true },
   { name: 'Sialkot', province: 'Punjab', isMajorCity: true },
-  { name: 'Bahawalpur', province: 'Punjab', isMajorCity: false },
-  { name: 'Sargodha', province: 'Punjab', isMajorCity: false },
+  { name: 'Bahawalpur', province: 'Punjab', isMajorCity: true },
+  { name: 'Sargodha', province: 'Punjab', isMajorCity: true },
   { name: 'Gujrat', province: 'Punjab', isMajorCity: false },
   { name: 'Sheikhupura', province: 'Punjab', isMajorCity: false },
   { name: 'Jhelum', province: 'Punjab', isMajorCity: false },
-  
-  // Sindh
+  { name: 'Jhang', province: 'Punjab', isMajorCity: false },
+  { name: 'Rahim Yar Khan', province: 'Punjab', isMajorCity: false },
+  { name: 'Sahiwal', province: 'Punjab', isMajorCity: false },
+  { name: 'Wah Cantt', province: 'Punjab', isMajorCity: false },
+  { name: 'Kasur', province: 'Punjab', isMajorCity: false },
+  { name: 'Okara', province: 'Punjab', isMajorCity: false },
+  { name: 'Dera Ghazi Khan', province: 'Punjab', isMajorCity: false },
+  { name: 'Chiniot', province: 'Punjab', isMajorCity: false },
+  { name: 'Kamoke', province: 'Punjab', isMajorCity: false },
+  { name: 'Mandi Bahauddin', province: 'Punjab', isMajorCity: false },
+  { name: 'Sadiqabad', province: 'Punjab', isMajorCity: false },
+  { name: 'Khanewal', province: 'Punjab', isMajorCity: false },
+  { name: 'Hafizabad', province: 'Punjab', isMajorCity: false },
+  { name: 'Muzaffargarh', province: 'Punjab', isMajorCity: false },
+  { name: 'Khanpur', province: 'Punjab', isMajorCity: false },
+  { name: 'Gojra', province: 'Punjab', isMajorCity: false },
+  { name: 'Bahawalnagar', province: 'Punjab', isMajorCity: false },
+  { name: 'Muridke', province: 'Punjab', isMajorCity: false },
+  { name: 'Pakpattan', province: 'Punjab', isMajorCity: false },
+  { name: 'Toba Tek Singh', province: 'Punjab', isMajorCity: false },
+  { name: 'Vehari', province: 'Punjab', isMajorCity: false },
+  { name: 'Kot Addu', province: 'Punjab', isMajorCity: false },
+  { name: 'Wazirabad', province: 'Punjab', isMajorCity: false },
+  { name: 'Chakwal', province: 'Punjab', isMajorCity: false },
+  { name: 'Mianwali', province: 'Punjab', isMajorCity: false },
+  { name: 'Attock', province: 'Punjab', isMajorCity: false },
+  { name: 'Lodhran', province: 'Punjab', isMajorCity: false },
+  { name: 'Bhakkar', province: 'Punjab', isMajorCity: false },
+  { name: 'Layyah', province: 'Punjab', isMajorCity: false },
+  { name: 'Khushab', province: 'Punjab', isMajorCity: false },
+  { name: 'Narowal', province: 'Punjab', isMajorCity: false },
+  { name: 'Rajanpur', province: 'Punjab', isMajorCity: false },
+  { name: 'Taxila', province: 'Punjab', isMajorCity: false },
+  { name: 'Murree', province: 'Punjab', isMajorCity: false },
+  { name: 'Burewala', province: 'Punjab', isMajorCity: false },
+
+  // Sindh Major Cities & Districts
   { name: 'Karachi', province: 'Sindh', isMajorCity: true },
   { name: 'Hyderabad', province: 'Sindh', isMajorCity: true },
-  { name: 'Sukkur', province: 'Sindh', isMajorCity: false },
-  { name: 'Larkana', province: 'Sindh', isMajorCity: false },
+  { name: 'Sukkur', province: 'Sindh', isMajorCity: true },
+  { name: 'Larkana', province: 'Sindh', isMajorCity: true },
+  { name: 'Nawabshah (Shaheed Benazirabad)', province: 'Sindh', isMajorCity: false },
   { name: 'Mirpur Khas', province: 'Sindh', isMajorCity: false },
-  
-  // Khyber Pakhtunkhwa
+  { name: 'Jacobabad', province: 'Sindh', isMajorCity: false },
+  { name: 'Shikarpur', province: 'Sindh', isMajorCity: false },
+  { name: 'Khairpur', province: 'Sindh', isMajorCity: false },
+  { name: 'Dadu', province: 'Sindh', isMajorCity: false },
+  { name: 'Tando Adam', province: 'Sindh', isMajorCity: false },
+  { name: 'Tando Allahyar', province: 'Sindh', isMajorCity: false },
+  { name: 'Thatta', province: 'Sindh', isMajorCity: false },
+  { name: 'Badin', province: 'Sindh', isMajorCity: false },
+  { name: 'Ghotki', province: 'Sindh', isMajorCity: false },
+  { name: 'Umerkot', province: 'Sindh', isMajorCity: false },
+  { name: 'Kotri', province: 'Sindh', isMajorCity: false },
+  { name: 'Kashmore', province: 'Sindh', isMajorCity: false },
+  { name: 'Sanghar', province: 'Sindh', isMajorCity: false },
+
+  // Khyber Pakhtunkhwa (KP) Major Cities & Districts
   { name: 'Peshawar', province: 'Khyber Pakhtunkhwa', isMajorCity: true },
   { name: 'Abbottabad', province: 'Khyber Pakhtunkhwa', isMajorCity: true },
-  { name: 'Mardan', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
-  { name: 'Swat', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
+  { name: 'Mardan', province: 'Khyber Pakhtunkhwa', isMajorCity: true },
+  { name: 'Mingora (Swat)', province: 'Khyber Pakhtunkhwa', isMajorCity: true },
+  { name: 'Kohat', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
   { name: 'Dera Ismail Khan', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
-  
-  // Balochistan
+  { name: 'Bannu', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
+  { name: 'Swabi', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
+  { name: 'Charsadda', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
+  { name: 'Nowshera', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
+  { name: 'Mansehra', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
+  { name: 'Haripur', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
+  { name: 'Batkhela', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
+  { name: 'Karak', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
+  { name: 'Hangu', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
+  { name: 'Timergara (Dir)', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
+  { name: 'Chitral', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
+  { name: 'Parachinar', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
+  { name: 'Tank', province: 'Khyber Pakhtunkhwa', isMajorCity: false },
+
+  // Balochistan Major Cities & Districts
   { name: 'Quetta', province: 'Balochistan', isMajorCity: true },
-  { name: 'Gwadar', province: 'Balochistan', isMajorCity: false },
   { name: 'Turbat', province: 'Balochistan', isMajorCity: false },
-  
-  // Islamabad Capital Territory
-  { name: 'Islamabad', province: 'Islamabad Capital Territory', isMajorCity: true },
-  
-  // Azad Jammu & Kashmir
+  { name: 'Khuzdar', province: 'Balochistan', isMajorCity: false },
+  { name: 'Hub', province: 'Balochistan', isMajorCity: false },
+  { name: 'Chaman', province: 'Balochistan', isMajorCity: false },
+  { name: 'Gwadar', province: 'Balochistan', isMajorCity: true },
+  { name: 'Sibi', province: 'Balochistan', isMajorCity: false },
+  { name: 'Zhob', province: 'Balochistan', isMajorCity: false },
+  { name: 'Loralai', province: 'Balochistan', isMajorCity: false },
+  { name: 'Dera Murad Jamali', province: 'Balochistan', isMajorCity: false },
+  { name: 'Dera Allah Yar', province: 'Balochistan', isMajorCity: false },
+  { name: 'Nushki', province: 'Balochistan', isMajorCity: false },
+  { name: 'Kalat', province: 'Balochistan', isMajorCity: false },
+  { name: 'Kharan', province: 'Balochistan', isMajorCity: false },
+  { name: 'Mastung', province: 'Balochistan', isMajorCity: false },
+  { name: 'Pishin', province: 'Balochistan', isMajorCity: false },
+
+  // Azad Jammu & Kashmir (AJK)
   { name: 'Muzaffarabad', province: 'Azad Jammu & Kashmir', isMajorCity: true },
   { name: 'Mirpur (AJK)', province: 'Azad Jammu & Kashmir', isMajorCity: true },
   { name: 'Rawalakot', province: 'Azad Jammu & Kashmir', isMajorCity: false },
-  
+  { name: 'Kotli', province: 'Azad Jammu & Kashmir', isMajorCity: false },
+  { name: 'Bhimber', province: 'Azad Jammu & Kashmir', isMajorCity: false },
+  { name: 'Bagh', province: 'Azad Jammu & Kashmir', isMajorCity: false },
+
   // Gilgit-Baltistan
   { name: 'Gilgit', province: 'Gilgit-Baltistan', isMajorCity: true },
   { name: 'Skardu', province: 'Gilgit-Baltistan', isMajorCity: true },
-  { name: 'Hunza', province: 'Gilgit-Baltistan', isMajorCity: false }
+  { name: 'Hunza', province: 'Gilgit-Baltistan', isMajorCity: false },
+  { name: 'Chilas', province: 'Gilgit-Baltistan', isMajorCity: false }
 ];
 
 const categoriesData = [

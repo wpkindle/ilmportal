@@ -28,24 +28,9 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
+import { allPakistaniCities } from '../../data/pakistanAreas';
 
-const pakistaniCities = [
-  'Lahore',
-  'Karachi',
-  'Islamabad',
-  'Rawalpindi',
-  'Peshawar',
-  'Faisalabad',
-  'Multan',
-  'Quetta',
-  'Hyderabad',
-  'Abbottabad',
-  'Bahawalpur',
-  'Sargodha',
-  'Sialkot',
-  'Gujranwala',
-  'Sukkur'
-];
+const pakistaniCities = allPakistaniCities;
 
 export default function StudentAuthModal({
   isOpen,

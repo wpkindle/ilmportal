@@ -191,34 +191,52 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Dual Portal Action Gateways */}
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 max-w-xl mx-auto">
+        {/* Dual Role Gateway Action Cards */}
+        <div className="mt-8 flex flex-col sm:flex-row items-stretch justify-center gap-3.5 max-w-2xl mx-auto">
+          {/* Student Portal Card */}
           <Link
-            href="/login?role=student"
-            className="w-full sm:w-1/2 group relative p-4 rounded-2xl bg-gradient-to-br from-slate-900/90 to-slate-950/90 hover:from-slate-800 hover:to-slate-900 border border-emerald-500/40 hover:border-emerald-400 shadow-xl shadow-emerald-950/50 transition-all flex items-center gap-3.5 text-left backdrop-blur-xl hover:scale-[1.02] active:scale-[0.98]"
+            href="/register/student"
+            className="w-full sm:w-1/2 group relative p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-slate-900/90 to-slate-950/90 hover:from-emerald-900/90 hover:to-slate-900 border border-emerald-500/40 hover:border-emerald-400 shadow-xl shadow-emerald-950/40 transition-all duration-200 flex items-center gap-3.5 text-left backdrop-blur-xl hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-              <GraduationCap className="w-5 h-5 text-emerald-400" />
+            <div className="w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-inner">
+              <GraduationCap className="w-5 h-5" />
             </div>
-            <div className="min-w-0">
-              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">Student Gateway</span>
-              <p className="text-xs sm:text-sm font-black text-white group-hover:text-emerald-200 transition-colors">Start Learning Free</p>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">Students &amp; Parents</span>
+                <span className="text-[9px] font-bold px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30">Free Trial</span>
+              </div>
+              <p className="text-xs sm:text-sm font-extrabold text-white group-hover:text-emerald-100 transition-colors truncate">
+                Find a Tutor &amp; Learn
+              </p>
+              <p className="text-[10px] text-slate-400 truncate">1:1 Live Video or Home Tutoring</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-500 ml-auto group-hover:text-emerald-400 group-hover:translate-x-1 transition-all shrink-0" />
+            <div className="w-7 h-7 rounded-lg bg-white/5 group-hover:bg-emerald-500/20 flex items-center justify-center text-slate-400 group-hover:text-emerald-300 transition-colors shrink-0">
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </div>
           </Link>
 
+          {/* Tutor Portal Card */}
           <Link
-            href="/login?role=tutor"
-            className="w-full sm:w-1/2 group relative p-4 rounded-2xl bg-gradient-to-br from-emerald-950/80 to-slate-950/90 hover:from-emerald-900/80 hover:to-slate-900 border border-teal-500/40 hover:border-teal-400 shadow-xl shadow-emerald-950/50 transition-all flex items-center gap-3.5 text-left backdrop-blur-xl hover:scale-[1.02] active:scale-[0.98]"
+            href="/register/tutor"
+            className="w-full sm:w-1/2 group relative p-4 rounded-2xl bg-gradient-to-r from-slate-900/90 via-slate-900/90 to-teal-950/70 hover:from-slate-850 hover:to-teal-900/80 border border-slate-700/80 hover:border-teal-400/60 shadow-xl shadow-slate-950/50 transition-all duration-200 flex items-center gap-3.5 text-left backdrop-blur-xl hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
           >
-            <div className="w-10 h-10 rounded-xl bg-teal-500/20 border border-teal-400/30 text-teal-300 flex items-center justify-center shrink-0 group-hover:scale-110 transition-transform">
-              <ShieldCheck className="w-5 h-5 text-teal-300" />
+            <div className="w-11 h-11 rounded-xl bg-teal-500/20 border border-teal-400/40 text-teal-300 flex items-center justify-center shrink-0 group-hover:bg-teal-500 group-hover:text-white transition-all shadow-inner">
+              <ShieldCheck className="w-5 h-5" />
             </div>
-            <div className="min-w-0">
-              <span className="text-[10px] font-black uppercase tracking-wider text-teal-400 block">Educator Gateway</span>
-              <p className="text-xs sm:text-sm font-black text-white group-hover:text-teal-200 transition-colors">Join as Verified Tutor</p>
+            <div className="min-w-0 flex-1">
+              <div className="flex items-center gap-1.5">
+                <span className="text-[10px] font-black uppercase tracking-wider text-teal-400">Qaris &amp; Teachers</span>
+                <span className="text-[9px] font-bold px-1.5 py-0.2 bg-teal-500/20 text-teal-300 rounded border border-teal-500/30">Sanad</span>
+              </div>
+              <p className="text-xs sm:text-sm font-extrabold text-white group-hover:text-teal-100 transition-colors truncate">
+                Join as Verified Tutor
+              </p>
+              <p className="text-[10px] text-slate-400 truncate">Teach Students &amp; Earn Online</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-slate-500 ml-auto group-hover:text-teal-400 group-hover:translate-x-1 transition-all shrink-0" />
+            <div className="w-7 h-7 rounded-lg bg-white/5 group-hover:bg-teal-500/20 flex items-center justify-center text-slate-400 group-hover:text-teal-300 transition-colors shrink-0">
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+            </div>
           </Link>
         </div>
 

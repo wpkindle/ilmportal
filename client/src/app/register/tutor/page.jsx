@@ -232,12 +232,6 @@ export default function TutorRegisterPage() {
                 Sign In to Tutor Portal
               </Link>
             </p>
-            <p className="text-slate-500 pt-1">
-              Looking to learn as a student?{' '}
-              <Link href="/register/student" className="font-bold text-emerald-700 hover:underline">
-                Go to Student Registration &rarr;
-              </Link>
-            </p>
           </div>
 
         </div>

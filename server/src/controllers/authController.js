@@ -12,7 +12,7 @@ const generateToken = (id) => {
 };
 
 // Helper: Calculate Profile Completion Percentage
-exports.calculateProfileCompletion = (user, tutorProfile) => {
+const calculateProfileCompletion = (user, tutorProfile) => {
   if (!user) return { percentage: 0, items: [] };
 
   if (user.role === 'tutor') {
@@ -47,6 +47,7 @@ exports.calculateProfileCompletion = (user, tutorProfile) => {
     return { percentage, items: checks };
   }
 };
+exports.calculateProfileCompletion = calculateProfileCompletion;
 
 // @desc    Register a new user (Student or Tutor)
 // @route   POST /api/auth/register

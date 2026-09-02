@@ -4,18 +4,28 @@ const fs = require('fs');
 
 let mongoServerInstance = null;
 
+const DEFAULT_MONGODB_URI = 'mongodb://abdulkhaliqwebdeveloper_db_user:pIfVMbVHUwRqrEOY@atlas-27b1a7-shard-00-00.2vvsnhq.mongodb.net:27017,atlas-27b1a7-shard-00-01.2vvsnhq.mongodb.net:27017,atlas-27b1a7-shard-00-02.2vvsnhq.mongodb.net:27017/ilmportal?ssl=true&replicaSet=atlas-27b1a7-shard-0&authSource=admin&retryWrites=true&w=majority';
+
 const connectDB = async () => {
   try {
     if (mongoose.connection.readyState === 1 || mongoose.connection.readyState === 2) {
       return;
     }
 
-    const uri = process.env.MONGODB_URI;
+    const uri = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
     if (uri) {
-      console.log('Connecting to provided MongoDB URI...');
-      await mongoose.connect(uri);
-      console.log('✅ MongoDB connected successfully to external URI');
-      return;
+      try {
+        console.log('Connecting to persistent MongoDB Atlas cluster...');
+        await mongoose.connect(uri, { serverSelectionTimeoutMS: 12000 });
+        console.log('✅ MongoDB connected successfully to persistent Atlas database (ilmportal)');
+        return;
+      } catch (atlasErr) {
+        console.warn('⚠️ Atlas connection note:', atlasErr.message);
+        if (process.env.MONGODB_URI) {
+          throw atlasErr;
+        }
+        console.log('Falling back to local embedded MongoDB server...');
+      }
     }
 
     if (!mongoServerInstance) {

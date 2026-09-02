@@ -22,7 +22,7 @@ export default function TutorOnboardingPage() {
   const [qualifications, setQualifications] = useState('Dars-e-Nizami / Master Degree');
   const [experienceYears, setExperienceYears] = useState(3);
   const [hourlyRate, setHourlyRate] = useState(1500);
-  const [teachingMode, setTeachingMode] = useState('online');
+  const [teachingModes, setTeachingModes] = useState(['online']);
   const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
 
@@ -75,7 +75,7 @@ export default function TutorOnboardingPage() {
         qualifications: qualifications.trim(),
         experienceYears: Number(experienceYears),
         hourlyRate: Number(hourlyRate),
-        teachingMode,
+        teachingModes,
         subjects: selectedSubjects,
         cities: selectedCities
       });
@@ -238,17 +238,44 @@ export default function TutorOnboardingPage() {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Teaching Mode</label>
-                <CustomSelect
-                  options={[
-                    { value: 'online', label: 'Online (Live WebRTC)', sublabel: 'In-platform HD Classroom' },
-                    { value: 'physical', label: 'In-Person', sublabel: 'Home Tutoring' },
-                    { value: 'both', label: 'Both Online & In-Person', sublabel: 'Hybrid Tutoring' }
-                  ]}
-                  value={teachingMode}
-                  onChange={setTeachingMode}
-                  variant="filter"
-                />
+                <label className="text-xs font-bold text-slate-700 block mb-2">Teaching Mode</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    { value: 'online', label: 'Online', sub: 'Live WebRTC Classroom', icon: '🌐' },
+                    { value: 'in_person', label: 'In-Person', sub: 'Home / Centre Tutoring', icon: '🏠' }
+                  ].map((m) => {
+                    const active = teachingModes.includes(m.value);
+                    return (
+                      <button
+                        key={m.value}
+                        type="button"
+                        onClick={() =>
+                          setTeachingModes(prev =>
+                            active
+                              ? prev.filter(v => v !== m.value).length === 0
+                                ? prev  // keep at least one
+                                : prev.filter(v => v !== m.value)
+                              : [...prev, m.value]
+                          )
+                        }
+                        className={`flex flex-col items-start gap-0.5 p-3 rounded-2xl border-2 text-left transition-all ${
+                          active
+                            ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
+                            : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
+                        }`}
+                      >
+                        <span className="text-base leading-none">{m.icon}</span>
+                        <span className="text-xs font-bold mt-1">{m.label}</span>
+                        <span className="text-[10px] opacity-70">{m.sub}</span>
+                        {active && (
+                          <span className="text-[9px] font-bold bg-emerald-600 text-white px-1.5 py-0.5 rounded-full mt-1">
+                            ✓ Selected
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Sanad Already Attached Notice */}

@@ -57,7 +57,7 @@ function TutorProfileContent() {
   const [qualifications, setQualifications] = useState('');
   const [experienceYears, setExperienceYears] = useState(2);
   const [hourlyRate, setHourlyRate] = useState(1500);
-  const [teachingMode, setTeachingMode] = useState('both');
+  const [teachingModes, setTeachingModes] = useState(['online']);
   const [uploadedSanads, setUploadedSanads] = useState([]);
   const [selectedSanadForView, setSelectedSanadForView] = useState(null);
 
@@ -103,14 +103,10 @@ function TutorProfileContent() {
       setExperienceYears(tutorProfile.experienceYears || 2);
       setHourlyRate(tutorProfile.hourlyRate || 1500);
       setUploadedSanads(tutorProfile.sanadDocuments || []);
-      const mode = Array.isArray(tutorProfile.teachingModes)
-        ? tutorProfile.teachingModes.includes('in_person') && tutorProfile.teachingModes.includes('online')
-          ? 'both'
-          : tutorProfile.teachingModes.includes('in_person')
-            ? 'in_person'
-            : 'online'
-        : 'online';
-      setTeachingMode(mode);
+      const modes = Array.isArray(tutorProfile.teachingModes) && tutorProfile.teachingModes.length > 0
+        ? tutorProfile.teachingModes
+        : ['online'];
+      setTeachingModes(modes);
     }
   }, [user, tutorProfile]);
 
@@ -233,7 +229,7 @@ function TutorProfileContent() {
         qualifications: qualifications.trim(),
         experienceYears: Number(experienceYears),
         hourlyRate: Number(hourlyRate),
-        teachingMode
+        teachingModes
       });
 
       if (res.success) {
@@ -427,21 +423,42 @@ function TutorProfileContent() {
                 <Briefcase className="w-4 h-4 text-emerald-600" />
                 <span>Teaching Modes</span>
               </h4>
-              <div className="grid grid-cols-3 gap-1.5 p-1 bg-slate-100 rounded-2xl">
-                {['online', 'in_person', 'both'].map((m) => (
-                  <button
-                    key={m}
-                    type="button"
-                    onClick={() => setTeachingMode(m)}
-                    className={`py-2 px-1 rounded-xl text-[11px] font-bold transition-all text-center capitalize cursor-pointer ${
-                      teachingMode === m
-                        ? 'bg-emerald-600 text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 bg-transparent'
-                    }`}
-                  >
-                    {m === 'in_person' ? 'Physical' : m}
-                  </button>
-                ))}
+              <div className="grid grid-cols-2 gap-2">
+                {[
+                  { value: 'online', label: 'Online', sub: 'Live WebRTC Classroom', icon: '🌐' },
+                  { value: 'in_person', label: 'In-Person', sub: 'Home / Centre Tutoring', icon: '🏠' }
+                ].map((m) => {
+                  const active = teachingModes.includes(m.value);
+                  return (
+                    <button
+                      key={m.value}
+                      type="button"
+                      onClick={() =>
+                        setTeachingModes(prev =>
+                          active
+                            ? prev.filter(v => v !== m.value).length === 0
+                              ? prev
+                              : prev.filter(v => v !== m.value)
+                            : [...prev, m.value]
+                        )
+                      }
+                      className={`flex flex-col items-start gap-0.5 p-3 rounded-2xl border-2 text-left transition-all ${
+                        active
+                          ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
+                          : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
+                      }`}
+                    >
+                      <span className="text-base leading-none">{m.icon}</span>
+                      <span className="text-xs font-bold mt-1">{m.label}</span>
+                      <span className="text-[10px] opacity-70">{m.sub}</span>
+                      {active && (
+                        <span className="text-[9px] font-bold bg-emerald-600 text-white px-1.5 py-0.5 rounded-full mt-1">
+                          ✓ Selected
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
               </div>
             </div>
 

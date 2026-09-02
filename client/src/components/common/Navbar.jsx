@@ -239,7 +239,7 @@ const Navbar = () => {
               </button>
 
               {subjectsDropdownOpen && (
-                <div className="absolute left-0 mt-2 w-[760px] max-w-[92vw] bg-white rounded-3xl shadow-2xl border border-slate-200/90 p-5 z-50 animate-in fade-in slide-in-from-top-2 duration-150 grid grid-cols-1 md:grid-cols-3 gap-5">
+                <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-[680px] max-w-[calc(100vw-2rem)] bg-white rounded-3xl shadow-2xl border border-slate-200/90 p-4 sm:p-5 z-50 animate-in fade-in slide-in-from-top-2 duration-150 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
                   {subjectCategories.map((cat, idx) => (
                     <div key={idx} className="space-y-2">
                       <div className="flex items-center gap-2 pb-1 border-b border-slate-100">
@@ -254,7 +254,7 @@ const Navbar = () => {
                             <Link
                               href={item.link}
                               onClick={() => setSubjectsDropdownOpen(false)}
-                              className="text-[11px] font-semibold text-slate-600 hover:text-emerald-700 hover:translate-x-0.5 block py-1 transition-all"
+                              className="text-[11px] font-semibold text-slate-600 hover:text-emerald-700 hover:translate-x-0.5 block py-0.5 transition-all"
                             >
                               &bull; {item.name}
                             </Link>
@@ -263,7 +263,7 @@ const Navbar = () => {
                       </ul>
                     </div>
                   ))}
-                  <div className="col-span-1 md:col-span-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <div className="col-span-1 md:col-span-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
                     <span className="text-slate-500 font-medium">Over 20+ disciplines & structured courses</span>
                     <Link
                       href="/courses"

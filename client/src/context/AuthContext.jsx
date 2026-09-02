@@ -27,22 +27,44 @@ export const AuthProvider = ({ children }) => {
         return;
       }
 
-      try {
-        const data = await api.getMe();
-        if (data.success) {
-          setUser(data.user);
-          if (data.tutorProfile) {
-            setTutorProfile(data.tutorProfile);
+      // Try up to 3 times to handle Render cold-start delays
+      let lastErr = null;
+      for (let attempt = 0; attempt < 3; attempt++) {
+        try {
+          const data = await api.getMe();
+          if (data.success) {
+            setUser(data.user);
+            if (data.tutorProfile) {
+              setTutorProfile(data.tutorProfile);
+            }
+            setLoading(false);
+            return;
+          } else {
+            // Explicit server rejection — token is bad, log out
+            logout();
+            return;
           }
-        } else {
-          logout();
+        } catch (err) {
+          lastErr = err;
+          // Only logout on explicit 401/403 (invalid/expired token or deactivated)
+          // Do NOT logout on network errors (ECONNREFUSED), 500, 502, 503, 504 (Render cold start)
+          const status = err?.status ?? 0;
+          if (status === 401 || status === 403) {
+            logout();
+            return;
+          }
+          // Network/server error — wait before retrying
+          if (attempt < 2) {
+            await new Promise(r => setTimeout(r, (attempt + 1) * 1500));
+          }
         }
-      } catch (err) {
-        console.error('Auth verification error:', err);
-        logout();
-      } finally {
-        setLoading(false);
       }
+
+      // All retries exhausted for a non-auth error (server down/cold start)
+      // Keep the user's token intact — do NOT call logout()
+      // They'll stay logged in visually; next navigation will retry
+      console.warn('Auth check failed after retries (server may be waking up):', lastErr?.message);
+      setLoading(false);
     };
 
     fetchCurrentUser();

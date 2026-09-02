@@ -8,21 +8,89 @@ const initSocket = (io) => {
   io.on('connection', (socket) => {
     console.log(`🔌 Socket client connected: ${socket.id}`);
 
-    // Register user socket
+    // Register user socket & send current online users list
     socket.on('register-user', (userId) => {
       if (userId) {
-        onlineUsers.set(userId.toString(), socket.id);
-        socket.userId = userId.toString();
-        socket.join(`user_${userId}`);
-        console.log(`👤 User registered on socket: ${userId} (${socket.id})`);
-        io.emit('user-online-status', { userId, status: 'online' });
+        const idStr = userId.toString();
+        onlineUsers.set(idStr, socket.id);
+        socket.userId = idStr;
+        socket.join(`user_${idStr}`);
+        console.log(`👤 User registered on socket: ${idStr} (${socket.id})`);
+
+        // 1. Send all currently online user IDs to the newly connected user
+        socket.emit('initial-online-users', Array.from(onlineUsers.keys()));
+
+        // 2. Broadcast to everyone that this user came online
+        io.emit('user-online-status', { userId: idStr, status: 'online' });
       }
     });
 
-    // Join 1:1 Chat Conversation Room
-    socket.on('join-conversation', (conversationId) => {
+    // Join 1:1 Chat Conversation Room & automatically mark messages as seen
+    socket.on('join-conversation', async (conversationId) => {
       socket.join(`conv_${conversationId}`);
       console.log(`💬 Socket ${socket.id} joined conversation: conv_${conversationId}`);
+
+      if (socket.userId) {
+        try {
+          const updateResult = await Message.updateMany(
+            { conversationId, recipient: socket.userId, isRead: false },
+            { isRead: true, isDelivered: true, readAt: new Date() }
+          );
+
+          if (updateResult.modifiedCount > 0) {
+            // Notify other party in the conversation that messages were seen
+            io.to(`conv_${conversationId}`).emit('messages-seen', {
+              conversationId,
+              readerId: socket.userId,
+              seenAt: new Date()
+            });
+
+            // Update recipient's unread badge count
+            const remainingUnread = await Message.countDocuments({
+              recipient: socket.userId,
+              isRead: false
+            });
+            io.to(`user_${socket.userId}`).emit('unread-count-updated', {
+              totalUnread: remainingUnread,
+              conversationId
+            });
+          }
+        } catch (err) {
+          console.error('Error auto-marking messages as seen:', err);
+        }
+      }
+    });
+
+    // Explicit Mark Messages Seen Event from Client
+    socket.on('mark-messages-seen', async ({ conversationId, readerId }) => {
+      try {
+        const rId = readerId || socket.userId;
+        if (!rId || !conversationId) return;
+
+        await Message.updateMany(
+          { conversationId, recipient: rId, isRead: false },
+          { isRead: true, isDelivered: true, readAt: new Date() }
+        );
+
+        // Broadcast to conversation room
+        io.to(`conv_${conversationId}`).emit('messages-seen', {
+          conversationId,
+          readerId: rId,
+          seenAt: new Date()
+        });
+
+        // Push new unread total to reader's personal room
+        const totalUnread = await Message.countDocuments({
+          recipient: rId,
+          isRead: false
+        });
+        io.to(`user_${rId}`).emit('unread-count-updated', {
+          totalUnread,
+          conversationId
+        });
+      } catch (err) {
+        console.error('Socket mark-messages-seen error:', err);
+      }
     });
 
     // Send 1:1 Chat Message
@@ -30,6 +98,8 @@ const initSocket = (io) => {
       try {
         const { conversationId, senderId, recipientId, text, messageType, dealId, dealOfferData, voiceData, voiceDuration } = data;
         
+        const isRecipientOnline = recipientId && onlineUsers.has(recipientId.toString());
+
         const message = await Message.create({
           conversationId,
           sender: senderId,
@@ -39,7 +109,10 @@ const initSocket = (io) => {
           messageType: messageType || (voiceData ? 'voice' : 'text'),
           voiceData: voiceData || '',
           voiceDuration: voiceDuration || 0,
-          dealOfferData: dealOfferData || undefined
+          dealOfferData: dealOfferData || undefined,
+          isDelivered: isRecipientOnline,
+          deliveredAt: isRecipientOnline ? new Date() : undefined,
+          isRead: false
         });
 
         const populatedMsg = await Message.findById(message._id)

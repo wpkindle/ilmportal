@@ -46,9 +46,19 @@ const messageSchema = new mongoose.Schema({
     notes: String,
     dealId: mongoose.Schema.Types.ObjectId
   },
+  isDelivered: {
+    type: Boolean,
+    default: false
+  },
+  deliveredAt: {
+    type: Date
+  },
   isRead: {
     type: Boolean,
     default: false
+  },
+  readAt: {
+    type: Date
   }
 }, {
   timestamps: true

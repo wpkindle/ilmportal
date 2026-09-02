@@ -11,7 +11,7 @@ import { useSocket } from '../../../context/SocketContext';
 
 function TutorMessagesContent() {
   const { user } = useAuth();
-  const { onlineUsers } = useSocket();
+  const { socket, onlineUsers } = useSocket();
   const searchParams = useSearchParams();
   const activeConvParam = searchParams.get('conversation');
 
@@ -23,8 +23,8 @@ function TutorMessagesContent() {
     try {
       const res = await api.getConversations();
       if (res.success) {
-        setConversations(res.conversations);
-        return res.conversations;
+        setConversations(res.conversations || []);
+        return res.conversations || [];
       }
     } catch (err) {
       console.error('Error fetching tutor conversations:', err);
@@ -46,7 +46,32 @@ function TutorMessagesContent() {
     init();
   }, [activeConvParam, fetchConversations]);
 
-  // Optimistically clear unread, then re-fetch after backend marks as read
+  // Real-time socket sync for unread badges and new messages
+  useEffect(() => {
+    if (!socket) return;
+
+    const handleUnreadUpdate = ({ totalUnread, conversationId: updatedConvId }) => {
+      setConversations(prev =>
+        prev.map(c =>
+          c.conversationId === updatedConvId ? { ...c, unreadCount: 0 } : c
+        )
+      );
+    };
+
+    const handleNewMessage = (msg) => {
+      fetchConversations();
+    };
+
+    socket.on('unread-count-updated', handleUnreadUpdate);
+    socket.on('new-message', handleNewMessage);
+
+    return () => {
+      socket.off('unread-count-updated', handleUnreadUpdate);
+      socket.off('new-message', handleNewMessage);
+    };
+  }, [socket, fetchConversations]);
+
+  // Optimistically clear unread, emit seen event, then re-fetch
   const handleSelectConversation = async (conv) => {
     setConversations(prev =>
       prev.map(c =>
@@ -54,7 +79,13 @@ function TutorMessagesContent() {
       )
     );
     setActiveConversation(conv);
-    setTimeout(() => fetchConversations(), 1500);
+    if (socket && user) {
+      socket.emit('mark-messages-seen', {
+        conversationId: conv.conversationId,
+        readerId: user._id || user.id
+      });
+    }
+    setTimeout(() => fetchConversations(), 1200);
   };
 
   if (loading) return <LoadingSpinner text="Loading messages..." />;
@@ -66,9 +97,14 @@ function TutorMessagesContent() {
 
           {/* Sidebar */}
           <div className="lg:col-span-4 bg-white rounded-3xl p-4 border border-slate-200 shadow-sm h-[75vh] flex flex-col">
-            <h2 className="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center gap-2">
-              <MessageSquare className="w-4 h-4 text-emerald-600" />
-              <span>Student Inquiries &amp; Deals</span>
+            <h2 className="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-4 h-4 text-emerald-600" />
+                <span>Student Inquiries &amp; Deals</span>
+              </div>
+              <span className="text-[10px] text-slate-400 font-bold">
+                {conversations.length} Active
+              </span>
             </h2>
 
             <div className="flex-1 overflow-y-auto space-y-1.5 mt-3">
@@ -79,47 +115,69 @@ function TutorMessagesContent() {
               ) : (
                 conversations.map((conv) => {
                   const isSelected = activeConversation?.conversationId === conv.conversationId;
-                  const isStudentOnline = conv.partner?._id && onlineUsers.includes(conv.partner._id);
+                  const partnerIdStr = conv.partner?._id ? conv.partner._id.toString() : '';
+                  const isStudentOnline = partnerIdStr ? onlineUsers.some(id => id.toString() === partnerIdStr) : false;
+
                   return (
                     <button
                       key={conv.conversationId}
                       onClick={() => handleSelectConversation(conv)}
                       className={`w-full p-3 rounded-2xl text-left transition-all flex items-center gap-3 ${
                         isSelected
-                          ? 'bg-emerald-50 border border-emerald-200'
-                          : 'hover:bg-slate-50'
+                          ? 'bg-emerald-50/90 border border-emerald-300/80 shadow-2xs'
+                          : 'hover:bg-slate-50 border border-transparent'
                       }`}
                     >
-                      {/* Avatar with online dot */}
+                      {/* Avatar with Fiverr / Upwork style status dot */}
                       <div className="relative shrink-0">
                         <img
                           src={conv.partner?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.partner?.name || 'S')}&background=059669&color=fff`}
                           alt={conv.partner?.name}
-                          className="w-10 h-10 rounded-full object-cover"
+                          className="w-11 h-11 rounded-2xl object-cover border border-slate-200"
                         />
-                        {isStudentOnline && (
-                          <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full" />
+                        {isStudentOnline ? (
+                          <span
+                            className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full ring-2 ring-emerald-500/20"
+                            title="Online"
+                          />
+                        ) : (
+                          <span
+                            className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-slate-300 border-2 border-white rounded-full"
+                            title="Offline"
+                          />
                         )}
                       </div>
 
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between gap-2">
+                        <div className="flex items-center justify-between gap-1.5">
                           <h4 className="text-xs font-bold text-slate-900 truncate">
                             {conv.partner?.name}
                           </h4>
-                          <div className="flex items-center gap-1 shrink-0">
-                            {isStudentOnline && (
-                              <span className="text-[9px] font-bold text-emerald-600">Online</span>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {/* Fiverr / Upwork Presence Badge */}
+                            {isStudentOnline ? (
+                              <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-700 bg-emerald-100/90 px-2 py-0.2 rounded-full border border-emerald-300">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                                <span>Online</span>
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-[9.5px] font-medium text-slate-400 bg-slate-100 px-1.5 py-0.2 rounded-full border border-slate-200">
+                                <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                                <span>Offline</span>
+                              </span>
                             )}
+
                             {conv.unreadCount > 0 && (
-                              <span className="min-w-[16px] h-4 px-1 bg-emerald-600 text-white rounded-full text-[10px] font-bold flex items-center justify-center">
+                              <span className="min-w-[18px] h-4 px-1.5 bg-emerald-600 text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs">
                                 {conv.unreadCount}
                               </span>
                             )}
                           </div>
                         </div>
+
                         <p className="text-[11px] text-slate-500 truncate mt-0.5">
-                          {conv.lastMessage?.text || 'Offer sent'}
+                          {conv.lastMessage?.text || (conv.lastMessage?.voiceData ? '🎙️ Voice note' : 'Offer sent')}
                         </p>
                       </div>
                     </button>

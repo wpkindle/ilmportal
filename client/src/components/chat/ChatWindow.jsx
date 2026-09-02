@@ -16,7 +16,9 @@ import {
   Trash2,
   Radio,
   Flag,
-  AlertTriangle
+  AlertTriangle,
+  Check,
+  CheckCheck
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -48,7 +50,8 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
 
   const messagesContainerRef = useRef(null);
 
-  const isPartnerOnline = partner?._id && onlineUsers.includes(partner._id);
+  const partnerIdStr = partner?._id ? partner._id.toString() : '';
+  const isPartnerOnline = partnerIdStr ? onlineUsers.some(id => id.toString() === partnerIdStr) : false;
 
   // Scroll ONLY the inner chat messages container (never scrolls the outer page/window)
   const scrollToBottom = (smooth = true) => {
@@ -68,6 +71,13 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
         const res = await api.getChatMessages(conversationId);
         if (res.success) {
           setMessages(res.messages || []);
+          // Emit socket event to notify other party that messages are seen
+          if (socket && user) {
+            socket.emit('mark-messages-seen', {
+              conversationId,
+              readerId: user._id || user.id
+            });
+          }
         }
 
         // Fetch active/pending deal if available
@@ -90,9 +100,9 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
     };
 
     fetchMessages();
-  }, [conversationId]);
+  }, [conversationId, socket]);
 
-  // Socket listener for new incoming messages and deal status updates
+  // Socket listener for new incoming messages, deal updates, and seen receipts
   useEffect(() => {
     if (!socket || !conversationId) return;
 
@@ -104,89 +114,100 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
           if (prev.some((m) => m._id === msg._id)) return prev;
           return [...prev, msg];
         });
+
+        // If I am the recipient of this new message, mark it as seen immediately
+        const currentUserId = (user?._id || user?.id)?.toString();
+        const recipientId = (msg.recipient?._id || msg.recipient)?.toString();
+        if (currentUserId && recipientId === currentUserId) {
+          socket.emit('mark-messages-seen', {
+            conversationId,
+            readerId: currentUserId
+          });
+        }
       }
     };
 
-    const handleDealStatusUpdated = (updatedDeal) => {
-      setPartnerDeal(updatedDeal);
-      setMessages((prev) =>
-        prev.map((m) => {
-          const match =
-            m.deal?._id === updatedDeal._id ||
-            m.deal === updatedDeal._id ||
-            m.dealOfferData?.dealId === updatedDeal._id ||
-            m.dealOfferData?._id === updatedDeal._id;
-          if (match) {
-            return {
-              ...m,
-              deal: updatedDeal,
-              dealOfferData: { ...m.dealOfferData, ...updatedDeal, status: updatedDeal.status }
-            };
-          }
-          return m;
-        })
-      );
+    // When the other person reads my messages
+    const handleMessagesSeen = ({ conversationId: seenConvId, readerId }) => {
+      const currentUserId = (user?._id || user?.id)?.toString();
+      if (seenConvId === conversationId && readerId.toString() !== currentUserId) {
+        setMessages((prev) =>
+          prev.map((m) => {
+            const senderId = (m.sender?._id || m.sender)?.toString();
+            if (senderId === currentUserId) {
+              return { ...m, isRead: true, isDelivered: true, readAt: new Date() };
+            }
+            return m;
+          })
+        );
+      }
     };
 
     socket.on('new-message', handleReceiveMessage);
-    socket.on('receive-message', handleReceiveMessage);
-    socket.on('deal-status-updated', handleDealStatusUpdated);
+    socket.on('messages-seen', handleMessagesSeen);
 
     return () => {
       socket.off('new-message', handleReceiveMessage);
-      socket.off('receive-message', handleReceiveMessage);
-      socket.off('deal-status-updated', handleDealStatusUpdated);
+      socket.off('messages-seen', handleMessagesSeen);
     };
-  }, [socket, conversationId]);
+  }, [socket, conversationId, user]);
 
-  // Scroll only the internal messages container when messages list updates
   useEffect(() => {
-    scrollToBottom(true);
+    scrollToBottom(false);
   }, [messages]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!inputText.trim()) return;
+    if (!inputText.trim() || !user || !partner?._id) return;
 
-    const currentText = inputText;
+    const payload = {
+      conversationId,
+      senderId: user._id || user.id,
+      recipientId: partner._id,
+      text: inputText.trim(),
+      messageType: 'text'
+    };
+
     setInputText('');
 
-    try {
-      const res = await api.sendChatMessage({
-        conversationId,
-        recipientId: partner?._id,
-        text: currentText,
-        messageType: 'text'
-      });
-
-      if (res.success && res.chatMessage) {
-        setMessages((prev) => {
-          if (prev.some((m) => m._id === res.chatMessage._id)) return prev;
-          return [...prev, res.chatMessage];
-        });
+    if (socket && socket.connected) {
+      socket.emit('send-message', payload);
+    } else {
+      try {
+        const res = await api.sendChatMessage(payload);
+        if (res.success && res.chatMessage) {
+          setMessages((prev) => {
+            if (prev.some((m) => m._id === res.chatMessage._id)) return prev;
+            return [...prev, res.chatMessage];
+          });
+        }
+      } catch (err) {
+        console.error('Error sending message fallback:', err);
       }
-    } catch (err) {
-      console.error('Error sending message:', err);
-      setInputText(currentText);
     }
   };
 
-  // --- Voice Note Logic ---
+  // Start Audio Recording
   const startRecording = async () => {
     try {
+      if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+        alert('Voice recording is not supported in this browser.');
+        return;
+      }
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaStreamRef.current = stream;
-      const mediaRecorder = new MediaRecorder(stream);
-      mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
 
-      mediaRecorder.ondataavailable = (event) => {
+      const recorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = recorder;
+
+      recorder.ondataavailable = (event) => {
         if (event.data.size > 0) {
           audioChunksRef.current.push(event.data);
         }
       };
 
-      mediaRecorder.start();
+      recorder.start(100);
       setIsRecording(true);
       setRecordDuration(0);
 
@@ -195,10 +216,11 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
       }, 1000);
     } catch (err) {
       console.error('Microphone access denied:', err);
-      alert('Microphone access is required to record voice messages.');
+      alert('Microphone permission is required to record voice notes.');
     }
   };
 
+  // Cancel Audio Recording
   const cancelRecording = () => {
     if (recordIntervalRef.current) clearInterval(recordIntervalRef.current);
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
@@ -212,39 +234,40 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
     audioChunksRef.current = [];
   };
 
+  // Stop and Send Audio Recording
   const sendVoiceRecording = () => {
-    if (!mediaRecorderRef.current) return;
-
+    if (!mediaRecorderRef.current || !isRecording) return;
     if (recordIntervalRef.current) clearInterval(recordIntervalRef.current);
-    const finalDuration = recordDuration;
 
     mediaRecorderRef.current.onstop = async () => {
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm;codecs=opus' });
       const reader = new FileReader();
 
       reader.onloadend = async () => {
         const base64Audio = reader.result;
+        const payload = {
+          conversationId,
+          senderId: user._id || user.id,
+          recipientId: partner._id,
+          messageType: 'voice',
+          voiceData: base64Audio,
+          voiceDuration: recordDuration
+        };
 
-        try {
-          // Send Voice Message via API (persists to MongoDB and broadcasts via Socket.IO)
-          const res = await api.sendChatMessage({
-            conversationId,
-            recipientId: partner?._id,
-            messageType: 'voice',
-            voiceData: base64Audio,
-            voiceDuration: finalDuration,
-            text: '🎙️ Voice Message'
-          });
-
-          if (res.success && res.chatMessage) {
-            setMessages((prev) => {
-              if (prev.some((m) => m._id === res.chatMessage._id)) return prev;
-              return [...prev, res.chatMessage];
-            });
+        if (socket && socket.connected) {
+          socket.emit('send-message', payload);
+        } else {
+          try {
+            const res = await api.sendChatMessage(payload);
+            if (res.success && res.chatMessage) {
+              setMessages((prev) => {
+                if (prev.some((m) => m._id === res.chatMessage._id)) return prev;
+                return [...prev, res.chatMessage];
+              });
+            }
+          } catch (err) {
+            console.error('Error sending voice message:', err);
           }
-        } catch (err) {
-          console.error('Error sending voice message:', err);
-          alert('Failed to send voice note.');
         }
       };
 
@@ -281,47 +304,68 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
   return (
     <div className="flex flex-col h-[75vh] bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
       
-      {/* Top Chat Header */}
-      <div className="p-4 bg-slate-50/80 border-b border-slate-200/80 flex items-center justify-between">
-        <div className="flex items-center gap-3">
-          <div className="relative">
+      {/* Top Chat Header (Fiverr / Upwork Style Online/Offline Badge) */}
+      <div className="p-4 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3 min-w-0">
+          <div className="relative shrink-0">
             <img
               src={partner?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(partner?.name || 'User')}&background=059669&color=fff`}
               alt={partner?.name}
-              className="w-10 h-10 rounded-2xl object-cover border border-slate-200"
+              className="w-11 h-11 rounded-2xl object-cover border-2 border-white shadow-sm"
             />
-            {isPartnerOnline && (
-              <span className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full" />
+            {isPartnerOnline ? (
+              <span
+                className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full ring-2 ring-emerald-500/20 shadow-xs"
+                title="Online Now"
+              />
+            ) : (
+              <span
+                className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-slate-300 border-2 border-white rounded-full"
+                title="Offline"
+              />
             )}
           </div>
 
-          <div>
-            <h3 className="font-bold text-xs sm:text-sm text-slate-900 flex items-center gap-1.5">
-              <span>{partner?.name || 'Tutoring Chat'}</span>
-              <span className="text-[10px] uppercase font-bold text-slate-400 bg-slate-200 px-1.5 py-0.2 rounded">
+          <div className="min-w-0">
+            <div className="flex items-center gap-2">
+              <h3 className="font-black text-xs sm:text-sm text-slate-900 truncate">
+                {partner?.name || 'Tutoring Chat'}
+              </h3>
+              <span className="text-[9px] uppercase font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 shrink-0">
                 {partner?.role}
               </span>
-            </h3>
-            <p className="text-[11px] text-slate-500 flex items-center gap-2">
+            </div>
+
+            <div className="flex items-center gap-2 mt-0.5 text-[11px] flex-wrap">
+              {/* Fiverr/Upwork style active presence badge */}
               {isPartnerOnline ? (
-                <span className="text-emerald-600 font-semibold">Online now</span>
+                <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full border border-emerald-300/70 text-[10px]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                  <span>Online</span>
+                </span>
               ) : (
-                <span>{partner?.city || 'Pakistan'}</span>
+                <span className="inline-flex items-center gap-1 font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200 text-[10px]">
+                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                  <span>Offline</span>
+                </span>
               )}
-              <span>&bull;</span>
-              <span className="text-[10px] text-emerald-700 font-medium">Voice Notes Enabled 🎙️</span>
-            </p>
+
+              <span className="text-slate-300">&bull;</span>
+              <span className="text-slate-500 text-[11px] truncate">{partner?.city || 'Pakistan'}</span>
+              <span className="text-slate-300 hidden sm:inline">&bull;</span>
+              <span className="text-[10px] text-emerald-700 font-medium hidden sm:inline">Voice Notes 🎙️</span>
+            </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 shrink-0">
           {/* Live In-Platform Video Classroom Button (Identical deterministic room for Student & Tutor) */}
           <Link
             href={`/classroom/${conversationId}`}
-            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+            className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all cursor-pointer"
             title="Start or Join In-Platform HD Video Class"
           >
-            <Video className="w-3.5 h-3.5 text-white" />
+            <Video className="w-3.5 h-3.5 text-white shrink-0" />
             <span className="hidden sm:inline">Join Live Class</span>
             <span className="sm:hidden">Class</span>
           </Link>
@@ -331,11 +375,11 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
             <button
               type="button"
               onClick={() => setReportModalOpen(true)}
-              className="px-2.5 py-1.5 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 text-rose-700 border border-rose-200/80 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
+              className="px-2.5 py-2 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 text-rose-700 border border-rose-200/80 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
               title="Report an issue or safety concern with this user to platform admin"
             >
               <Flag className="w-3.5 h-3.5 text-rose-500" />
-              <span className="hidden sm:inline">Report to Admin</span>
+              <span className="hidden md:inline">Report</span>
             </button>
           )}
 
@@ -344,7 +388,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
             <button
               type="button"
               onClick={() => setDealModalOpen(true)}
-              className="px-3 py-1.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+              className="px-3 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
               <span className="hidden sm:inline">Send Course Offer</span>
@@ -355,7 +399,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
       </div>
 
       {/* Community Safety & Quality Notice Banner */}
-      <div className="px-4 py-2.5 bg-emerald-50/80 border-b border-emerald-100/90 flex items-start gap-2.5 text-xs text-emerald-950">
+      <div className="px-4 py-2 bg-emerald-50/80 border-b border-emerald-100/90 flex items-start gap-2.5 text-xs text-emerald-950">
         <div className="p-1 rounded-lg bg-emerald-200/90 text-emerald-800 shrink-0 mt-0.5">
           <ShieldCheck className="w-4 h-4" />
         </div>
@@ -379,8 +423,8 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
         )}
 
         {messages.map((msg) => {
-          const currentUserId = user?._id || user?.id;
-          const msgSenderId = msg.sender?._id || msg.sender;
+          const currentUserId = (user?._id || user?.id)?.toString();
+          const msgSenderId = (msg.sender?._id || msg.sender)?.toString();
           const isMe = msgSenderId === currentUserId;
           const isVoiceMsg = msg.messageType === 'voice' || !!msg.voiceData;
 
@@ -412,9 +456,33 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
                 </div>
               )}
 
-              <span className="text-[9px] text-slate-400 mt-1 px-1 font-mono">
-                {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </span>
+              {/* Timestamp + Sent / Delivered / Seen Status for Outgoing Messages */}
+              <div className="flex items-center gap-1.5 mt-1 px-1 text-[9px] font-mono text-slate-400">
+                <span>
+                  {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                </span>
+
+                {isMe && (
+                  <span className="flex items-center gap-0.5 ml-1">
+                    {msg.isRead ? (
+                      <span className="flex items-center gap-0.5 text-emerald-600 font-bold" title={`Seen ${msg.readAt ? new Date(msg.readAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}`}>
+                        <CheckCheck className="w-3.5 h-3.5 text-emerald-500" />
+                        <span className="text-[8.5px] uppercase tracking-wider">Seen</span>
+                      </span>
+                    ) : msg.isDelivered ? (
+                      <span className="flex items-center gap-0.5 text-slate-400 font-medium" title="Delivered">
+                        <CheckCheck className="w-3.5 h-3.5 text-slate-400" />
+                        <span className="text-[8.5px] uppercase tracking-wider">Delivered</span>
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-0.5 text-slate-400" title="Sent">
+                        <Check className="w-3 h-3 text-slate-400" />
+                        <span className="text-[8.5px] uppercase tracking-wider">Sent</span>
+                      </span>
+                    )}
+                  </span>
+                )}
+              </div>
             </div>
           );
         })}

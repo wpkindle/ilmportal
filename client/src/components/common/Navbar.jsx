@@ -106,12 +106,31 @@ const Navbar = () => {
       }
     };
 
+    const handleUnreadCountUpdated = ({ totalUnread }) => {
+      if (typeof totalUnread === 'number') {
+        setUnreadMessagesCount(totalUnread);
+      }
+    };
+
+    const handleMessagesSeen = () => {
+      api.getConversations().then((res) => {
+        if (res.success && res.conversations) {
+          const totalUnread = res.conversations.reduce((sum, c) => sum + (c.unreadCount || 0), 0);
+          setUnreadMessagesCount(totalUnread);
+        }
+      }).catch(() => {});
+    };
+
     socket.on('new-message', handleNewMessage);
     socket.on('notification-alert', handleNotificationAlert);
+    socket.on('unread-count-updated', handleUnreadCountUpdated);
+    socket.on('messages-seen', handleMessagesSeen);
 
     return () => {
       socket.off('new-message', handleNewMessage);
       socket.off('notification-alert', handleNotificationAlert);
+      socket.off('unread-count-updated', handleUnreadCountUpdated);
+      socket.off('messages-seen', handleMessagesSeen);
     };
   }, [socket, isAuthenticated, pathname]);
 

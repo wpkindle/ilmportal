@@ -176,12 +176,20 @@ const initSocket = (io) => {
     });
 
     // WebRTC Peer Signaling (Offer / Answer / ICE Candidate)
-    socket.on('webrtc-signal', ({ targetSocketId, signalData, callerInfo }) => {
-      io.to(targetSocketId).emit('webrtc-signal-received', {
-        callerSocketId: socket.id,
-        signalData,
-        callerInfo
-      });
+    socket.on('webrtc-signal', ({ roomId, targetSocketId, signalData, callerInfo }) => {
+      if (targetSocketId) {
+        io.to(targetSocketId).emit('webrtc-signal-received', {
+          callerSocketId: socket.id,
+          signalData,
+          callerInfo
+        });
+      } else if (roomId) {
+        socket.to(`class_${roomId}`).emit('webrtc-signal-received', {
+          callerSocketId: socket.id,
+          signalData,
+          callerInfo
+        });
+      }
     });
 
     // Camera / Mic / Screen Share state broadcasts

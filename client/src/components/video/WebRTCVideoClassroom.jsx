@@ -26,7 +26,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import { api } from '../../services/api';
 
-// Comprehensive STUN + Free OpenRelay TURN servers for 100% NAT/Firewall traversal
+// Free Google STUN & OpenRelay TURN configuration for 100% reliable cross-network audio/video streaming
 const ICE_SERVERS = {
   iceServers: [
     { urls: 'stun:stun.l.google.com:19302' },
@@ -51,7 +51,8 @@ const ICE_SERVERS = {
       username: 'openrelayproject',
       credential: 'openrelayproject'
     }
-  ]
+  ],
+  iceCandidatePoolSize: 10
 };
 
 const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
@@ -81,6 +82,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
+  const remoteAudioRef = useRef(null);
   const spotlightRemoteVideoRef = useRef(null);
   const quranRemoteVideoRef = useRef(null);
   const peerConnectionRef = useRef(null);
@@ -114,21 +116,22 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       } catch (e) {}
     }
 
-    console.log('🔧 Creating new RTCPeerConnection with STUN & OpenRelay TURN for:', targetSocketId);
+    console.log('🔧 Creating new RTCPeerConnection for:', targetSocketId || roomId);
     const pc = new RTCPeerConnection(ICE_SERVERS);
     peerConnectionRef.current = pc;
     iceCandidateQueue.current = [];
 
-    // Add local tracks if available
+    // Add local tracks (Audio + Video) to peer connection
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach((track) => {
+        console.log('➕ Adding local track to PC:', track.kind, track.label);
         pc.addTrack(track, localStreamRef.current);
       });
     }
 
     // When remote track arrives
     pc.ontrack = (event) => {
-      console.log('🎥 ONTRACK event fired! Tracks:', event.track.kind);
+      console.log('🎥 ONTRACK received remote track:', event.track.kind, event.streams);
       let stream = event.streams && event.streams[0];
       if (!stream) {
         stream = new MediaStream([event.track]);
@@ -137,24 +140,38 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       setPeerConnected(true);
       setIsConnecting(false);
 
+      // Bind to remote video elements
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = stream;
-        remoteVideoRef.current.play().catch(() => {});
+        remoteVideoRef.current.muted = false;
+        remoteVideoRef.current.volume = 1.0;
+        remoteVideoRef.current.play().catch((e) => console.warn('Video play error:', e));
       }
       if (spotlightRemoteVideoRef.current) {
         spotlightRemoteVideoRef.current.srcObject = stream;
+        spotlightRemoteVideoRef.current.muted = false;
         spotlightRemoteVideoRef.current.play().catch(() => {});
       }
       if (quranRemoteVideoRef.current) {
         quranRemoteVideoRef.current.srcObject = stream;
+        quranRemoteVideoRef.current.muted = false;
         quranRemoteVideoRef.current.play().catch(() => {});
+      }
+
+      // Explicitly bind to dedicated remote audio element for guaranteed voice playback
+      if (remoteAudioRef.current) {
+        remoteAudioRef.current.srcObject = stream;
+        remoteAudioRef.current.muted = false;
+        remoteAudioRef.current.volume = 1.0;
+        remoteAudioRef.current.play().catch((e) => console.warn('Audio play error:', e));
       }
     };
 
     // Send local ICE candidates to peer via socket
     pc.onicecandidate = (event) => {
-      if (event.candidate && targetSocketId && socket) {
+      if (event.candidate && socket) {
         socket.emit('webrtc-signal', {
+          roomId,
           targetSocketId,
           signalData: { type: 'candidate', candidate: event.candidate },
           callerInfo: {
@@ -177,7 +194,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     };
 
     return pc;
-  }, [socket, user]);
+  }, [socket, user, roomId]);
 
   // Flush queued ICE candidates after remote description is set
   const processCandidateQueue = async (pc) => {
@@ -193,7 +210,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
   // Initiate WebRTC Offer to target peer
   const sendOffer = useCallback(async (targetSocketId) => {
-    if (!targetSocketId || !socket) return;
+    if (!socket) return;
     setIsConnecting(true);
     const pc = createPeerConnection(targetSocketId);
 
@@ -204,8 +221,9 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       });
       await pc.setLocalDescription(offer);
 
-      console.log('📤 Sending WebRTC Offer to:', targetSocketId);
+      console.log('📤 Sending WebRTC Offer for room:', roomId, 'target:', targetSocketId);
       socket.emit('webrtc-signal', {
+        roomId,
         targetSocketId,
         signalData: { type: 'offer', offer },
         callerInfo: {
@@ -218,25 +236,26 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       console.error('Error creating/sending offer:', err);
       setIsConnecting(false);
     }
-  }, [socket, user, createPeerConnection]);
+  }, [socket, user, roomId, createPeerConnection]);
 
   // Initialize Local Media & Socket Signaling
   useEffect(() => {
     let activeStream = null;
 
     const initMediaAndSignaling = async () => {
-      // 1. Get User Media
+      // 1. Get User Media with full audio and video tracks
       try {
         if (typeof navigator !== 'undefined' && navigator.mediaDevices) {
           const stream = await navigator.mediaDevices.getUserMedia({
             video: {
-              width: { ideal: 1280 },
-              height: { ideal: 720 },
+              width: { ideal: 1280, min: 640 },
+              height: { ideal: 720, min: 480 },
               facingMode: 'user'
             },
             audio: {
               echoCancellation: true,
-              noiseSuppression: true
+              noiseSuppression: true,
+              autoGainControl: true
             }
           });
           activeStream = stream;
@@ -287,7 +306,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
         socket.on('webrtc-signal-received', async ({ callerSocketId, signalData, callerInfo }) => {
           if (!signalData) return;
           if (callerInfo) setRemotePeerInfo(callerInfo);
-          targetPeerSocketIdRef.current = callerSocketId;
+          if (callerSocketId) targetPeerSocketIdRef.current = callerSocketId;
 
           // 1. Handle Offer
           if (signalData.type === 'offer' && signalData.offer) {
@@ -303,6 +322,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
               console.log('📤 Sending WebRTC Answer to:', callerSocketId);
               socket.emit('webrtc-signal', {
+                roomId,
                 targetSocketId: callerSocketId,
                 signalData: { type: 'answer', answer },
                 callerInfo: myInfo
@@ -377,20 +397,30 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     };
   }, [roomId, socket, user, createPeerConnection, sendOffer]);
 
-  // Keep video elements updated when remote stream arrives or viewMode changes
+  // Keep video and audio elements updated when remote stream arrives or viewMode changes
   useEffect(() => {
     if (remoteStream) {
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = remoteStream;
+        remoteVideoRef.current.muted = false;
+        remoteVideoRef.current.volume = 1.0;
         remoteVideoRef.current.play().catch(() => {});
       }
       if (spotlightRemoteVideoRef.current) {
         spotlightRemoteVideoRef.current.srcObject = remoteStream;
+        spotlightRemoteVideoRef.current.muted = false;
         spotlightRemoteVideoRef.current.play().catch(() => {});
       }
       if (quranRemoteVideoRef.current) {
         quranRemoteVideoRef.current.srcObject = remoteStream;
+        quranRemoteVideoRef.current.muted = false;
         quranRemoteVideoRef.current.play().catch(() => {});
+      }
+      if (remoteAudioRef.current) {
+        remoteAudioRef.current.srcObject = remoteStream;
+        remoteAudioRef.current.muted = false;
+        remoteAudioRef.current.volume = 1.0;
+        remoteAudioRef.current.play().catch(() => {});
       }
     }
     if (localStream && localVideoRef.current) {
@@ -399,20 +429,9 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     }
   }, [remoteStream, localStream, viewMode]);
 
-  // Manual reconnect trigger
+  // Manual connect/reconnect action
   const handleManualReconnect = () => {
-    if (targetPeerSocketIdRef.current) {
-      sendOffer(targetPeerSocketIdRef.current);
-    } else if (socket && roomId) {
-      socket.emit('join-classroom', {
-        roomId,
-        user: {
-          id: user?._id || user?.id,
-          name: user?.name,
-          role: user?.role
-        }
-      });
-    }
+    sendOffer(targetPeerSocketIdRef.current || null);
   };
 
   // Toggle Microphone
@@ -531,6 +550,9 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       ref={containerRef}
       className="flex flex-col h-screen w-screen bg-slate-950 text-white overflow-hidden fixed inset-0 z-50 select-none font-sans"
     >
+      {/* Hidden dedicated remote audio element to guarantee live voice sound playback */}
+      <audio ref={remoteAudioRef} autoPlay playsInline />
+
       {/* Safety & Recording Warning Modal */}
       {safetyModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
@@ -542,10 +564,10 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             <div className="space-y-1.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-red-500/20 text-red-300 border border-red-500/30">
                 <span className="w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-                <span>Encrypted HD Live Video Classroom</span>
+                <span>Encrypted HD Live Video &amp; Audio</span>
               </div>
               <h3 className="text-lg sm:text-xl font-black text-white">
-                Live Class Safety Notice
+                Live Classroom Safety Notice
               </h3>
               <p className="text-xs text-slate-300 leading-relaxed pt-1">
                 Welcome to your 1:1 live session. All classroom communications are monitored for academic quality and minor protection under platform guidelines.
@@ -554,11 +576,16 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
             <button
               type="button"
-              onClick={() => setSafetyModalOpen(false)}
+              onClick={() => {
+                setSafetyModalOpen(false);
+                if (remoteAudioRef.current) {
+                  remoteAudioRef.current.play().catch(() => {});
+                }
+              }}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4" />
-              <span>Enter Classroom Now</span>
+              <span>Enter Classroom with Video &amp; Voice</span>
             </button>
           </div>
         </div>
@@ -572,7 +599,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             <h2 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2 truncate">
               <span>{sessionData?.title || 'Live Tutoring Class'}</span>
               <span className="text-[9px] font-bold px-1.5 py-0.2 bg-red-950/80 text-red-300 rounded border border-red-800 shrink-0">
-                REC • Live
+                REC • Live Audio &amp; Video
               </span>
             </h2>
           </div>
@@ -618,11 +645,11 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       {/* Main Classroom Stage */}
       <div className="flex-1 flex overflow-hidden relative bg-slate-950">
         
-        {/* VIEW MODE 1: True Dual 50/50 Conference Grid (Google Meet / Zoom style) */}
+        {/* VIEW MODE 1: True Dual 50/50 Conference Grid (One Side Tutor, One Side Student) */}
         {viewMode === 'grid' && (
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 p-3 sm:p-4 h-full w-full overflow-hidden">
             
-            {/* Card 1: Remote Peer (Tutor or Student) */}
+            {/* Card 1 (Left): Remote Peer (Tutor or Student) */}
             <div className="w-full h-full rounded-3xl overflow-hidden bg-slate-900 border-2 border-slate-800/90 flex items-center justify-center relative shadow-2xl">
               <video
                 ref={remoteVideoRef}
@@ -631,7 +658,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                 className={`w-full h-full object-cover ${!peerConnected ? 'hidden' : ''}`}
               />
 
-              {/* Waiting Radar when peer hasn't connected */}
+              {/* Waiting screen when remote peer hasn't connected */}
               {!peerConnected && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-gradient-to-b from-slate-900 to-slate-950 space-y-3">
                   <div className="relative">
@@ -643,10 +670,10 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
                   <div>
                     <h3 className="text-base sm:text-lg font-bold text-white">
-                      Waiting for {otherRoleName} to connect video...
+                      Waiting for {otherRoleName} to connect...
                     </h3>
                     <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
-                      Automated live connection active. Both participants stream directly over peer-to-peer HD video.
+                      Automated peer-to-peer live stream active. Your partner’s HD video and voice will connect automatically.
                     </p>
                   </div>
 
@@ -655,7 +682,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                     className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isConnecting ? 'animate-spin' : ''}`} />
-                    <span>{isConnecting ? 'Connecting Stream...' : 'Connect Video Feed'}</span>
+                    <span>{isConnecting ? 'Connecting Stream...' : 'Connect Video & Voice Now'}</span>
                   </button>
                 </div>
               )}
@@ -670,7 +697,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               </div>
             </div>
 
-            {/* Card 2: Local User (Self) */}
+            {/* Card 2 (Right): Local User (Self) */}
             <div className="w-full h-full rounded-3xl overflow-hidden bg-slate-900 border-2 border-emerald-500/40 flex items-center justify-center relative shadow-2xl">
               <video
                 ref={localVideoRef}

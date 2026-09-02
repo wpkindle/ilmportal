@@ -28,23 +28,99 @@ const Footer = () => {
   }
 
   return (
-    <footer className="relative bg-gradient-to-b from-slate-950 via-[#0b1320] to-slate-950 text-slate-300 pt-16 pb-12 overflow-hidden border-t border-slate-800/80 selection:bg-emerald-500 selection:text-white">
+    <footer className="relative bg-slate-950 text-slate-300 pt-20 pb-12 overflow-hidden border-t border-slate-900 selection:bg-emerald-500 selection:text-white">
       
-      {/* Subtle Ambient Depth (Clean Dark Styling) */}
+      {/* 🔮 Embedded CSS Animations for High-Performance GPU Acceleration */}
+      <style jsx>{`
+        @keyframes floatSlow1 {
+          0%, 100% { transform: translate(0px, 0px) scale(1); }
+          50% { transform: translate(35px, -25px) scale(1.12); }
+        }
+        @keyframes floatSlow2 {
+          0%, 100% { transform: translate(0px, 0px) scale(1.05); }
+          50% { transform: translate(-40px, 30px) scale(0.95); }
+        }
+        @keyframes floatSlow3 {
+          0%, 100% { transform: translate(0px, 0px) scale(0.98); }
+          50% { transform: translate(25px, 20px) scale(1.08); }
+        }
+        @keyframes beamScan {
+          0% { transform: translateX(-100%); opacity: 0; }
+          20% { opacity: 1; }
+          80% { opacity: 1; }
+          100% { transform: translateX(200%); opacity: 0; }
+        }
+        @keyframes starDrift1 {
+          0% { transform: translateY(0) rotate(0deg); opacity: 0.15; }
+          50% { transform: translateY(-40px) rotate(45deg); opacity: 0.4; }
+          100% { transform: translateY(-80px) rotate(90deg); opacity: 0.1; }
+        }
+        @keyframes starDrift2 {
+          0% { transform: translateY(0) rotate(0deg); opacity: 0.2; }
+          50% { transform: translateY(-50px) rotate(-60deg); opacity: 0.45; }
+          100% { transform: translateY(-100px) rotate(-120deg); opacity: 0.1; }
+        }
+        .anim-orb-1 { animation: floatSlow1 14s ease-in-out infinite; }
+        .anim-orb-2 { animation: floatSlow2 18s ease-in-out infinite; }
+        .anim-orb-3 { animation: floatSlow3 16s ease-in-out infinite; }
+        .anim-beam { animation: beamScan 7s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
+        .anim-star-1 { animation: starDrift1 12s ease-in-out infinite; }
+        .anim-star-2 { animation: starDrift2 15s ease-in-out infinite 2s; }
+      `}</style>
+
+      {/* 🌌 Animated Background Ambient Glows & Floating Stars */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3/4 max-w-5xl h-[1px] bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent" />
-        <div className="absolute -top-32 left-1/3 w-[500px] h-[300px] bg-emerald-500/5 rounded-full blur-[120px]" />
-        <div className="absolute -bottom-32 right-1/4 w-[500px] h-[300px] bg-teal-500/5 rounded-full blur-[120px]" />
+        
+        {/* Top Sweeping Animated Laser Beam */}
+        <div className="absolute top-0 left-0 right-0 h-[1px] bg-slate-800 overflow-hidden">
+          <div className="w-1/3 h-full bg-gradient-to-r from-transparent via-emerald-400 to-transparent anim-beam" />
+        </div>
+
+        {/* Floating Animated Radial Glow Orbs */}
+        <div className="absolute -top-36 left-1/4 w-[480px] h-[480px] bg-emerald-500/15 rounded-full blur-[100px] anim-orb-1" />
+        <div className="absolute top-32 right-12 w-[420px] h-[420px] bg-teal-500/15 rounded-full blur-[110px] anim-orb-2" />
+        <div className="absolute -bottom-24 left-1/2 -translate-x-1/2 w-[650px] h-[320px] bg-emerald-600/10 rounded-full blur-[120px] anim-orb-3" />
+
+        {/* Floating Islamic Geometric Stars (Subtle background motifs) */}
+        <div className="absolute top-24 left-[10%] text-emerald-400/20 anim-star-1">
+          <svg width="36" height="36" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0L14.59 4.41L19.5 3.5L18.59 8.41L23 11L18.59 13.59L19.5 18.5L14.59 17.59L12 22L9.41 17.59L4.5 18.5L5.41 13.59L1 11L5.41 8.41L4.5 3.5L9.41 4.41L12 0Z" />
+          </svg>
+        </div>
+
+        <div className="absolute bottom-32 right-[12%] text-teal-400/20 anim-star-2">
+          <svg width="44" height="44" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0L14.59 4.41L19.5 3.5L18.59 8.41L23 11L18.59 13.59L19.5 18.5L14.59 17.59L12 22L9.41 17.59L4.5 18.5L5.41 13.59L1 11L5.41 8.41L4.5 3.5L9.41 4.41L12 0Z" />
+          </svg>
+        </div>
+
+        <div className="absolute top-1/2 left-[48%] text-cyan-400/15 anim-star-1" style={{ animationDelay: '4s' }}>
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 0L14.59 4.41L19.5 3.5L18.59 8.41L23 11L18.59 13.59L19.5 18.5L14.59 17.59L12 22L9.41 17.59L4.5 18.5L5.41 13.59L1 11L5.41 8.41L4.5 3.5L9.41 4.41L12 0Z" />
+          </svg>
+        </div>
+
+        {/* Subtle decorative grid overlay */}
+        <div 
+          className="absolute inset-0 opacity-[0.035]"
+          style={{
+            backgroundImage: `radial-gradient(circle at 1px 1px, #10b981 1px, transparent 0)`,
+            backgroundSize: '28px 28px'
+          }}
+        />
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-14">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-16">
 
-        {/* 🌟 Pre-Footer Callout Banner */}
-        <div className="relative rounded-3xl bg-slate-900/90 border border-slate-800 p-6 sm:p-10 shadow-2xl backdrop-blur-md overflow-hidden">
+        {/* 🌟 Pre-Footer Callout Banner with Animated Shimmer Glow */}
+        <div className="relative rounded-3xl bg-gradient-to-r from-slate-900 via-emerald-950/50 to-slate-900 border border-emerald-500/30 p-6 sm:p-10 shadow-2xl backdrop-blur-md overflow-hidden group">
+          <div className="absolute -right-10 -bottom-10 w-72 h-72 bg-emerald-500/15 rounded-full blur-3xl group-hover:bg-emerald-500/25 transition-all duration-700 pointer-events-none anim-orb-2" />
+          <div className="absolute -left-10 -top-10 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl group-hover:bg-teal-500/20 transition-all duration-700 pointer-events-none anim-orb-1" />
+          
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6 relative z-10">
             <div className="space-y-2 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 shadow-inner">
+                <Sparkles className="w-3.5 h-3.5 text-emerald-400 animate-pulse" />
                 <span>3-Day Free Trial Available on All Subjects</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
@@ -58,14 +134,14 @@ const Footer = () => {
             <div className="flex flex-wrap items-center justify-center gap-3 shrink-0">
               <Link
                 href="/tutors"
-                className="px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-900/40 transition-all flex items-center gap-2 cursor-pointer"
+                className="px-6 py-3.5 bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-500 hover:from-emerald-500 hover:to-teal-400 active:scale-95 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-xl shadow-emerald-600/30 hover:shadow-emerald-500/40 transition-all flex items-center gap-2 cursor-pointer"
               >
                 <span>Find a Verified Tutor</span>
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
                 href="/register/tutor"
-                className="px-5 py-3.5 bg-slate-800 hover:bg-slate-750 text-slate-200 hover:text-white font-bold text-xs sm:text-sm rounded-2xl border border-slate-700 hover:border-slate-600 transition-all flex items-center gap-2 cursor-pointer"
+                className="px-5 py-3.5 bg-slate-800/90 hover:bg-slate-800 text-slate-200 hover:text-white font-bold text-xs sm:text-sm rounded-2xl border border-slate-700 hover:border-emerald-500/50 transition-all flex items-center gap-2 cursor-pointer"
               >
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
                 <span>Teach on IlmPortal</span>
@@ -78,16 +154,16 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pb-12 border-b border-slate-800/80">
           
           {/* Col 1: Brand, Mission & Contact Info */}
-          <div className="lg:col-span-2 space-y-4">
+          <div className="lg:col-span-2 space-y-5">
             <Link href="/" className="inline-flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-lg shadow-emerald-600/30 group-hover:scale-105 transition-transform duration-300">
-                <BookOpen className="w-5 h-5" />
+              <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-emerald-400 flex items-center justify-center text-white shadow-xl shadow-emerald-600/30 group-hover:scale-105 transition-transform duration-300 ring-2 ring-emerald-400/20">
+                <BookOpen className="w-6 h-6" />
               </div>
               <div>
-                <span className="text-xl font-black tracking-tight text-white flex items-center gap-1.5">
-                  Ilm<span className="text-emerald-400">Portal</span>
+                <span className="text-2xl font-black tracking-tight text-white flex items-center gap-1.5">
+                  Ilm<span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">Portal</span>
                 </span>
-                <span className="text-[10px] uppercase font-bold tracking-widest text-slate-400 block -mt-1">
+                <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-400/90 block -mt-1">
                   Pakistan&apos;s National LMS
                 </span>
               </div>
@@ -97,18 +173,18 @@ const Footer = () => {
               Pakistan&apos;s premier dedicated Islamic &amp; academic tutoring platform. Empowering families nationwide with Sanad-verified Qaris, certified Alimahs, and Cambridge/Matric exam specialists.
             </p>
 
-            {/* Quick Contact Info */}
-            <div className="space-y-2 pt-2 text-xs text-slate-300">
+            {/* Quick Contact Micro-Cards */}
+            <div className="space-y-2.5 pt-2 text-xs text-slate-300">
               <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-emerald-400 shrink-0">
-                  <MapPin className="w-3 h-3" />
+                <div className="w-7 h-7 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-emerald-400 shrink-0">
+                  <MapPin className="w-3.5 h-3.5" />
                 </div>
                 <span>Gulberg III / DHA Phase 5, Lahore, Pakistan</span>
               </div>
 
               <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-emerald-400 shrink-0">
-                  <Mail className="w-3 h-3" />
+                <div className="w-7 h-7 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Mail className="w-3.5 h-3.5" />
                 </div>
                 <a href="mailto:support@ilmportal.pk" className="hover:text-emerald-400 transition-colors">
                   support@ilmportal.pk
@@ -116,24 +192,24 @@ const Footer = () => {
               </div>
 
               <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center text-emerald-400 shrink-0">
-                  <Phone className="w-3 h-3" />
+                <div className="w-7 h-7 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Phone className="w-3.5 h-3.5" />
                 </div>
                 <span>+92 (42) 3589-7860 &bull; WhatsApp: +92 300 1234567</span>
               </div>
             </div>
 
-            {/* Trust Badges */}
+            {/* Trust Badges Pill Bar */}
             <div className="flex flex-wrap items-center gap-2 pt-2">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900 text-emerald-300 border border-slate-800">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900 text-emerald-300 border border-slate-800 hover:border-emerald-500/40 transition-colors">
                 <ShieldCheck className="w-3 h-3 text-emerald-400" />
                 <span>Sanad Verified</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900 text-teal-300 border border-slate-800">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900 text-teal-300 border border-slate-800 hover:border-teal-500/40 transition-colors">
                 <Lock className="w-3 h-3 text-teal-400" />
                 <span>PECA 2016 Compliant</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900 text-cyan-300 border border-slate-800">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900 text-cyan-300 border border-slate-800 hover:border-cyan-500/40 transition-colors">
                 <Globe className="w-3 h-3 text-cyan-400" />
                 <span>Serving All Over Pakistan</span>
               </span>
@@ -141,38 +217,41 @@ const Footer = () => {
           </div>
 
           {/* Col 2: Portals & Learning Hub */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-              Portals &amp; Hub
-            </h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-4 rounded-full bg-emerald-500" />
+              <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">
+                Portals &amp; Hub
+              </h4>
+            </div>
+            <ul className="space-y-2.5 text-xs text-slate-400">
               <li>
                 <Link href="/register/student" className="hover:text-emerald-400 transition-colors flex items-center gap-2 group">
-                  <GraduationCap className="w-3.5 h-3.5 text-emerald-500" />
+                  <GraduationCap className="w-3.5 h-3.5 text-emerald-500 group-hover:scale-110 transition-transform" />
                   <span>Student Portal</span>
                 </Link>
               </li>
               <li>
                 <Link href="/register/tutor" className="hover:text-emerald-400 transition-colors flex items-center gap-2 group">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 group-hover:scale-110 transition-transform" />
                   <span>Tutor Registration</span>
                 </Link>
               </li>
               <li>
                 <Link href="/tutors" className="hover:text-emerald-400 transition-colors flex items-center gap-2 group">
-                  <Compass className="w-3.5 h-3.5 text-emerald-500" />
+                  <Compass className="w-3.5 h-3.5 text-emerald-500 group-hover:scale-110 transition-transform" />
                   <span>Explore All Tutors</span>
                 </Link>
               </li>
               <li>
                 <Link href="/courses" className="hover:text-emerald-400 transition-colors flex items-center gap-2 group">
-                  <BookOpen className="w-3.5 h-3.5 text-emerald-500" />
+                  <BookOpen className="w-3.5 h-3.5 text-emerald-500 group-hover:scale-110 transition-transform" />
                   <span>LMS Masterclasses</span>
                 </Link>
               </li>
               <li>
                 <Link href="/how-it-works" className="hover:text-emerald-400 transition-colors flex items-center gap-2 group">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 group-hover:scale-110 transition-transform" />
                   <span>How It Works</span>
                 </Link>
               </li>
@@ -180,11 +259,14 @@ const Footer = () => {
           </div>
 
           {/* Col 3: Quran Disciplines */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-              Quran Studies
-            </h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-4 rounded-full bg-teal-500" />
+              <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">
+                Quran Studies
+              </h4>
+            </div>
+            <ul className="space-y-2.5 text-xs text-slate-400">
               <li>
                 <Link href="/tutors?category=tajweed-al-quran" className="hover:text-emerald-400 transition-colors block">
                   Tajweed al-Quran
@@ -219,11 +301,14 @@ const Footer = () => {
           </div>
 
           {/* Col 4: Academic Tutoring */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-              Academics
-            </h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-4 rounded-full bg-cyan-500" />
+              <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">
+                Academics
+              </h4>
+            </div>
+            <ul className="space-y-2.5 text-xs text-slate-400">
               <li>
                 <Link href="/tutors?category=o-level-cambridge" className="hover:text-emerald-400 transition-colors block">
                   Cambridge O-Level &amp; IGCSE
@@ -258,11 +343,14 @@ const Footer = () => {
           </div>
 
           {/* Col 5: Company & Legal Policies */}
-          <div className="space-y-3">
-            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-              Company &amp; Legal
-            </h4>
-            <ul className="space-y-2 text-xs text-slate-400">
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <div className="w-1.5 h-4 rounded-full bg-amber-500" />
+              <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">
+                Company &amp; Legal
+              </h4>
+            </div>
+            <ul className="space-y-2.5 text-xs text-slate-400">
               <li>
                 <Link href="/about-us" className="hover:text-emerald-400 transition-colors block">
                   About Our Mission
@@ -293,27 +381,27 @@ const Footer = () => {
 
         </div>
 
-        {/* 💳 Payment Method Trust Bar */}
-        <div className="py-5 px-6 rounded-2xl bg-slate-900 border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
+        {/* 💳 Payment Method Trust Bar with Soft Shimmer */}
+        <div className="py-6 px-6 rounded-2xl bg-slate-900/80 border border-slate-800/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs shadow-inner">
           <div className="flex items-center gap-2 text-slate-300">
             <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span className="font-semibold text-white">Supported Tuition Payment Channels:</span>
+            <span className="font-semibold text-white">Supported Secure Tuition Payment Gateways:</span>
           </div>
 
-          <div className="flex flex-wrap items-center gap-2.5">
-            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-amber-300">
+          <div className="flex flex-wrap items-center gap-3">
+            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-amber-300 hover:border-amber-500/40 transition-colors">
               ⚡ JazzCash
             </span>
-            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-emerald-300">
+            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-emerald-300 hover:border-emerald-500/40 transition-colors">
               🟢 EasyPaisa
             </span>
-            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-cyan-300">
+            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-cyan-300 hover:border-cyan-500/40 transition-colors">
               🏦 Meezan Islamic Bank
             </span>
-            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-purple-300">
+            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-purple-300 hover:border-purple-500/40 transition-colors">
               ✨ Raast Instant ID
             </span>
-            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-slate-300">
+            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-slate-200 hover:border-slate-600 transition-colors">
               💳 1Link ATM
             </span>
           </div>
@@ -321,9 +409,12 @@ const Footer = () => {
 
         {/* 📜 Bottom Copyright & Founder Dedication */}
         <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} IlmPortal Pakistan. All rights reserved.</p>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <p>© {new Date().getFullYear()} IlmPortal Pakistan. All rights reserved.</p>
+          </div>
 
-          <div className="flex items-center gap-2 text-xs text-slate-400">
+          <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-900/60 px-4 py-2 rounded-xl border border-slate-800/60">
             <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 shrink-0" />
             <span className="text-slate-300 font-medium text-[11px]">
               An initiative by <strong className="text-white">Mr. &amp; Mrs. Abdul Khaliq</strong> from Lahore, Pakistan.

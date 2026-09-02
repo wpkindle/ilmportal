@@ -235,7 +235,7 @@ function StudentProfileContent() {
           {/* Left Column: Avatar & Quick Summary Card */}
           <div className="lg:col-span-1 space-y-6">
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs text-center space-y-4">
-              <div className="relative inline-block mx-auto">
+              <div id="profile-avatar" className="relative inline-block mx-auto scroll-mt-28">
                 <img
                   src={avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Student')}&background=059669&color=fff&size=200`}
                   alt={name}
@@ -318,7 +318,7 @@ function StudentProfileContent() {
 
               <form onSubmit={handleProfileSubmit} className="space-y-4">
                 {/* Full Name */}
-                <div>
+                <div id="profile-name" className="scroll-mt-28">
                   <label className="text-xs font-bold text-slate-700 block mb-1">
                     Student Full Name *
                   </label>
@@ -333,7 +333,7 @@ function StudentProfileContent() {
 
                 {/* Gender & Age Row */}
                 <div className="grid grid-cols-2 gap-3 items-start">
-                  <div>
+                  <div id="profile-gender" className="scroll-mt-28">
                     <label className="text-xs font-bold text-slate-700 block mb-1">
                       Gender *
                     </label>
@@ -363,7 +363,7 @@ function StudentProfileContent() {
                     </div>
                   </div>
 
-                  <div>
+                  <div id="profile-age" className="scroll-mt-28">
                     <label className="text-xs font-bold text-slate-700 block mb-1">
                       Age (Years) *
                     </label>
@@ -396,7 +396,7 @@ function StudentProfileContent() {
 
                 {/* City & Mobile Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
+                  <div id="profile-city" className="scroll-mt-28">
                     <label className="text-xs font-bold text-slate-700 block mb-1">
                       City Location *
                     </label>
@@ -411,7 +411,7 @@ function StudentProfileContent() {
                     </select>
                   </div>
 
-                  <div>
+                  <div id="profile-phone" className="scroll-mt-28">
                     <label className="text-xs font-bold text-slate-700 block mb-1 flex items-center justify-between">
                       <span>Mobile Number</span>
                       <span className="text-[10px] text-slate-400 font-normal">Optional</span>

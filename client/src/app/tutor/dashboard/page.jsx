@@ -20,7 +20,6 @@ import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import TrialBanner from '../../../components/common/TrialBanner';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
-import ProfileCompletionMeter from '../../../components/common/ProfileCompletionMeter';
 import AccountStatusBanner from '../../../components/common/AccountStatusBanner';
 
 export default function TutorDashboardPage() {
@@ -137,9 +136,6 @@ export default function TutorDashboardPage() {
             </div>
           </div>
         )}
-
-        {/* Dynamic Profile Completion Meter */}
-        <ProfileCompletionMeter user={user} tutorProfile={tutorProfile} />
 
         {/* Course Studio Banner */}
         <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 rounded-3xl p-6 text-white border border-emerald-500/30 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">

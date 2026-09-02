@@ -348,7 +348,7 @@ function TutorProfileContent() {
           <div className="lg:col-span-1 space-y-6">
             
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-xs text-center space-y-4">
-              <div className="relative inline-block mx-auto">
+              <div id="profile-avatar" className="relative inline-block mx-auto scroll-mt-28">
                 <img
                   src={avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Tutor')}&background=047857&color=fff&size=200`}
                   alt={name}
@@ -470,7 +470,7 @@ function TutorProfileContent() {
               <form onSubmit={handleProfileSubmit} className="space-y-4">
                 
                 {/* Name */}
-                <div>
+                <div id="profile-name" className="scroll-mt-28">
                   <label className="text-xs font-bold text-slate-700 block mb-1">
                     Full Name *
                   </label>
@@ -485,7 +485,7 @@ function TutorProfileContent() {
 
                 {/* Gender & Age Row */}
                 <div className="grid grid-cols-2 gap-3 items-start">
-                  <div>
+                  <div id="profile-gender" className="scroll-mt-28">
                     <label className="text-xs font-bold text-slate-700 block mb-1">
                       Gender *
                     </label>
@@ -515,7 +515,7 @@ function TutorProfileContent() {
                     </div>
                   </div>
 
-                  <div>
+                  <div id="profile-age" className="scroll-mt-28">
                     <label className="text-xs font-bold text-slate-700 block mb-1">
                       Tutor Age (Years) *
                     </label>
@@ -548,7 +548,7 @@ function TutorProfileContent() {
 
                 {/* City & Mobile (WhatsApp) Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
+                  <div id="profile-city" className="scroll-mt-28">
                     <label className="text-xs font-bold text-slate-700 block mb-1">
                       City Location *
                     </label>
@@ -563,7 +563,7 @@ function TutorProfileContent() {
                     </select>
                   </div>
 
-                  <div>
+                  <div id="profile-phone" className="scroll-mt-28">
                     <label className="text-xs font-bold text-slate-700 block mb-1">
                       Mobile Number (WhatsApp) *
                     </label>
@@ -580,7 +580,7 @@ function TutorProfileContent() {
 
                 {/* Hourly Rate & Experience Years Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div>
+                  <div id="profile-rate" className="scroll-mt-28">
                     <label className="text-xs font-bold text-slate-700 block mb-1 flex items-center justify-between">
                       <span>Hourly Tuition Fee (PKR) *</span>
                     </label>
@@ -616,7 +616,7 @@ function TutorProfileContent() {
                 </div>
 
                 {/* Educational Qualifications & Degrees */}
-                <div>
+                <div id="profile-qualifications" className="scroll-mt-28">
                   <label className="text-xs font-bold text-slate-700 block mb-1">
                     Academic Qualifications & Sanad Degrees *
                   </label>
@@ -631,7 +631,7 @@ function TutorProfileContent() {
                 </div>
 
                 {/* Teaching Bio / Headline */}
-                <div>
+                <div id="profile-bio" className="scroll-mt-28">
                   <label className="text-xs font-bold text-slate-700 block mb-1">
                     Teaching Bio & Approach *
                   </label>
@@ -659,7 +659,7 @@ function TutorProfileContent() {
             </div>
 
             {/* 2. Sanad & Degree Documents Manager */}
-            <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-xs space-y-5">
+            <div id="profile-sanads" className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-xs space-y-5 scroll-mt-28">
               <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
                 <div>
                   <h2 className="text-sm font-black text-slate-900 flex items-center gap-2">

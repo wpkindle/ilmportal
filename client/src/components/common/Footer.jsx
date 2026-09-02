@@ -153,7 +153,7 @@ const Footer = () => {
               </span>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900 text-cyan-300 border border-slate-800">
                 <Globe className="w-3 h-3 text-cyan-400" />
-                <span>31+ Cities</span>
+                <span>Serving All Over Pakistan</span>
               </span>
             </div>
           </div>

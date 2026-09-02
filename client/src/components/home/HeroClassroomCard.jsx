@@ -152,9 +152,9 @@ export default function HeroClassroomCard() {
           <div className="p-2.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
             <div className="flex items-center justify-center gap-1 text-emerald-400 font-black text-xs">
               <Users className="w-3.5 h-3.5" />
-              <span>31+ Cities</span>
+              <span>All Over Pakistan</span>
             </div>
-            <p className="text-[10px] text-slate-400 font-medium mt-0.5">All Pakistan Coverage</p>
+            <p className="text-[10px] text-slate-400 font-medium mt-0.5">Nationwide &amp; Overseas</p>
           </div>
 
           <div className="p-2.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">

@@ -95,7 +95,7 @@ export default function AdminCMSPagesPage() {
         address: 'Lahore, Punjab, Pakistan',
         workingHours: 'Monday – Saturday: 9:00 AM – 9:00 PM PKT'
       },
-      content: `### We Are Here to Support Your Learning Journey\nHave questions about finding a verified Qari, scheduling 3-day free trials, requesting a female Alimah, or joining our faculty? Our dedicated administrative team in Lahore is ready to assist you.\n\n---\n\n### Our Communication Channels\n* **WhatsApp Helpline**: Fast, direct assistance for student enrollment and tutor onboarding.\n* **Email Support**: For formal verification inquiries, institutional partnerships, and Sanad submissions.\n* **Headquarters**: Lahore, Punjab, Pakistan, serving students across 31+ Pakistani cities.`
+      content: `### We Are Here to Support Your Learning Journey\nHave questions about finding a verified Qari, scheduling 3-day free trials, requesting a female Alimah, or joining our faculty? Our dedicated administrative team in Lahore is ready to assist you.\n\n---\n\n### Our Communication Channels\n* **WhatsApp Helpline**: Fast, direct assistance for student enrollment and tutor onboarding.\n* **Email Support**: For formal verification inquiries, institutional partnerships, and Sanad submissions.\n* **Headquarters**: Lahore, Punjab, Pakistan, serving students nationwide across Pakistan & overseas.`
     }
   };
 

@@ -121,6 +121,6 @@ Have questions about finding a verified Qari, scheduling 3-day free trials, requ
 ### Our Communication Channels
 * **WhatsApp Helpline**: Fast, direct assistance for student enrollment and tutor onboarding.
 * **Email Support**: For formal verification inquiries, institutional partnerships, and Sanad submissions.
-* **Headquarters**: Lahore, Punjab, Pakistan, serving students across 31+ Pakistani cities.`
+* **Headquarters**: Lahore, Punjab, Pakistan, serving students nationwide across Pakistan & overseas.`
   }
 };

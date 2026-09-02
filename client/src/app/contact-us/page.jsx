@@ -146,7 +146,7 @@ export default function ContactUsPage() {
               </div>
               <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Head Office</h4>
               <p className="text-sm font-black text-slate-900">{contact.address}</p>
-              <p className="text-[11px] text-slate-500">Operating across 31+ Pakistani cities</p>
+              <p className="text-[11px] text-slate-500">Serving nationwide across all of Pakistan &amp; overseas</p>
             </div>
 
             {/* Hours */}
@@ -180,7 +180,7 @@ export default function ContactUsPage() {
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Common Questions</h4>
                 <div className="space-y-2 text-xs text-slate-600">
                   <p><strong>Are you a tutor looking to teach?</strong> Register and upload your Sanad certificate on the Tutor Portal.</p>
-                  <p><strong>Looking for female Alimahs?</strong> Female teachers are available for female students and kids across all 31+ cities.</p>
+                  <p><strong>Looking for female Alimahs?</strong> Female teachers are available for female students and kids nationwide across all of Pakistan.</p>
                   <p><strong>Payment confirmation?</strong> Submit your JazzCash/EasyPaisa TID on your active deal card for 2–4 hour verification.</p>
                 </div>
               </div>

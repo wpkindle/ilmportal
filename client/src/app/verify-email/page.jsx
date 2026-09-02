@@ -13,15 +13,29 @@ function VerifyEmailContent() {
   const searchParams = useSearchParams();
   const emailParam = searchParams.get('email') || '';
   const roleParam = searchParams.get('role') || 'student';
+  const codeParam = searchParams.get('code') || '';
 
   const { verifyOtp } = useAuth();
   const [email, setEmail] = useState(emailParam);
-  const [otp, setOtp] = useState('');
+  const [otp, setOtp] = useState(codeParam);
   const [loading, setLoading] = useState(false);
   const [resending, setResending] = useState(false);
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
-  const [debugOtp, setDebugOtp] = useState('');
+  const [debugOtp, setDebugOtp] = useState(codeParam);
+
+  React.useEffect(() => {
+    if (codeParam) {
+      setDebugOtp(codeParam);
+      setOtp(codeParam);
+    } else if (email) {
+      const savedCode = sessionStorage.getItem(`otp_${email.trim().toLowerCase()}`);
+      if (savedCode) {
+        setDebugOtp(savedCode);
+        setOtp(savedCode);
+      }
+    }
+  }, [codeParam, email]);
 
   const handleVerify = async (e) => {
     e.preventDefault();

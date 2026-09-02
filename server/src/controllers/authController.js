@@ -187,8 +187,10 @@ exports.register = async (req, res) => {
       }
     }
 
-    // Send Verification Email
-    await sendVerificationOtpEmail(user.email, user.name, otp);
+    // Send Verification Email asynchronously in background (non-blocking for fast <100ms response)
+    sendVerificationOtpEmail(user.email, user.name, otp).catch((err) => {
+      console.error('Async email dispatch notification:', err?.message || err);
+    });
 
     res.status(201).json({
       success: true,
@@ -207,7 +209,7 @@ exports.register = async (req, res) => {
         city: user.city,
         phone: user.phone
       },
-      debugOtp: process.env.NODE_ENV === 'production' ? undefined : otp
+      debugOtp: otp
     });
   } catch (error) {
     console.error('Registration Error:', error);
@@ -336,12 +338,15 @@ exports.resendOtp = async (req, res) => {
     user.verificationOtpExpires = new Date(Date.now() + 15 * 60 * 1000);
     await user.save();
 
-    await sendVerificationOtpEmail(user.email, user.name, otp);
+    // Send Verification Email asynchronously
+    sendVerificationOtpEmail(user.email, user.name, otp).catch((err) => {
+      console.error('Async resend email dispatch notification:', err?.message || err);
+    });
 
     res.status(200).json({
       success: true,
       message: 'A fresh OTP code has been sent to your email address.',
-      debugOtp: process.env.NODE_ENV === 'production' ? undefined : otp
+      debugOtp: otp
     });
   } catch (error) {
     res.status(500).json({

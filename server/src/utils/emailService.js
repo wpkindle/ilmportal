@@ -5,21 +5,24 @@ let transporter = null;
 const initTransporter = () => {
   try {
     const smtpHost = process.env.SMTP_HOST;
-    const smtpUser = process.env.SMTP_USER;
-    const smtpPass = process.env.SMTP_PASS;
+    const smtpUser = process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com';
+    const smtpPass = process.env.SMTP_PASS || 'zthfqcnavkuldwxt';
     const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10);
-    const smtpService = process.env.SMTP_SERVICE; // e.g. 'gmail'
+    const smtpService = process.env.SMTP_SERVICE || 'gmail'; // e.g. 'gmail'
 
-    if (smtpService && smtpUser && smtpPass && smtpUser !== 'your_email@gmail.com') {
+    if (smtpService && smtpUser && smtpPass) {
       transporter = nodemailer.createTransport({
         service: smtpService,
         auth: {
           user: smtpUser,
           pass: smtpPass
-        }
+        },
+        connectionTimeout: 5000,
+        greetingTimeout: 3000,
+        socketTimeout: 5000
       });
       console.log(`📡 [EMAIL SERVICE] Configured with ${smtpService} service for ${smtpUser}`);
-    } else if (smtpHost && smtpUser && smtpPass && smtpUser !== 'your_smtp_user') {
+    } else if (smtpHost && smtpUser && smtpPass) {
       transporter = nodemailer.createTransport({
         host: smtpHost,
         port: smtpPort,
@@ -28,6 +31,9 @@ const initTransporter = () => {
           user: smtpUser,
           pass: smtpPass
         },
+        connectionTimeout: 5000,
+        greetingTimeout: 3000,
+        socketTimeout: 5000,
         tls: {
           rejectUnauthorized: false
         }
@@ -35,7 +41,6 @@ const initTransporter = () => {
       console.log(`📡 [EMAIL SERVICE] Configured with custom SMTP host: ${smtpHost}:${smtpPort}`);
     } else {
       console.log(`⚠️ [EMAIL SERVICE] No live SMTP configured. Using development console logger.`);
-      console.log(`ℹ️ [TIP] To receive real emails to your Gmail/Inbox, set SMTP_SERVICE=gmail, SMTP_USER, and SMTP_PASS (App Password) in server/.env.`);
     }
   } catch (e) {
     console.error('Error initializing email transporter:', e.message);
@@ -44,12 +49,12 @@ const initTransporter = () => {
 
 initTransporter();
 
-const getClientBaseUrl = () => process.env.CLIENT_URL || 'http://localhost:3000';
+const getClientBaseUrl = () => process.env.CLIENT_URL || 'https://ilmportal.vercel.app';
 
 const sendEmail = async ({ to, subject, html, text }) => {
   try {
     if (transporter) {
-      const fromAddress = `"IlmPortal Pakistan" <${process.env.SMTP_USER || process.env.SMTP_FROM || 'noreply@pakistanlms.pk'}>`;
+      const fromAddress = `"IlmPortal Pakistan" <${process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com'}>`;
       const info = await transporter.sendMail({
         from: fromAddress,
         to,

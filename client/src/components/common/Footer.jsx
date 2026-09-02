@@ -32,6 +32,11 @@ const Footer = () => {
               <span>&bull;</span>
               <span>All 31+ Pakistani Cities</span>
             </div>
+
+            <div className="inline-flex items-center gap-2 text-xs font-medium text-emerald-300 bg-emerald-950/70 border border-emerald-800/70 px-3 py-1.5 rounded-xl">
+              <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400 shrink-0" />
+              <span>An initiative by Mr. & Mrs. Abdul Khaliq from Lahore, Pakistan.</span>
+            </div>
           </div>
 
           {/* Col 2: Portals & Quick Links */}
@@ -132,8 +137,9 @@ const Footer = () => {
         {/* Bottom Bar */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} IlmPortal Pakistan. All rights reserved.</p>
-          <div className="flex items-center gap-6">
-            <span>Built for Students & Tutors across Pakistan</span>
+          <div className="flex items-center gap-2 text-xs text-slate-400">
+            <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
+            <span className="text-slate-300 font-medium">An initiative by Mr. & Mrs. Abdul Khaliq from Lahore, Pakistan.</span>
           </div>
         </div>
       </div>

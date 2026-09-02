@@ -29,14 +29,19 @@ const getHeaders = (isMultipart = false) => {
 
 const handleResponse = async (response) => {
   let data = {};
+  const text = await response.text();
   try {
-    data = await response.json();
+    data = JSON.parse(text);
   } catch (e) {
-    data = {
-      message: response.status === 502 || response.status === 503 || response.status === 504
-        ? 'Server is warming up. Please retry in a moment.'
-        : (response.statusText || 'Unable to connect to service. Please try again.')
-    };
+    let cleanMsg = response.statusText;
+    if (response.status === 502 || response.status === 503 || response.status === 504) {
+      cleanMsg = 'Server is warming up. Please retry in a few seconds.';
+    } else if (text && text.length < 150 && !text.includes('<')) {
+      cleanMsg = text;
+    } else if (!cleanMsg) {
+      cleanMsg = 'Unable to connect to service. Please try again.';
+    }
+    data = { message: cleanMsg };
   }
   if (!response.ok) {
     const error = new Error(data.message || 'An error occurred while processing request');
@@ -116,11 +121,41 @@ export const api = {
     body: JSON.stringify(body)
   }).then(handleResponse),
 
-  deleteAccount: (body) => fetch(`${API_BASE}/auth/delete-account`, {
-    method: 'DELETE',
-    headers: getHeaders(),
-    body: JSON.stringify(body || {})
-  }).then(handleResponse),
+  deleteAccount: async (body) => {
+    // Try POST first for robust proxy compatibility
+    try {
+      const res = await fetch(`${API_BASE}/auth/delete-account`, {
+        method: 'POST',
+        headers: getHeaders(),
+        body: JSON.stringify(body || {})
+      });
+      return await handleResponse(res);
+    } catch (err) {
+      // If 404 or 405 on POST, try DELETE as fallback
+      if (err.status === 404 || err.status === 405) {
+        const delRes = await fetch(`${API_BASE}/auth/delete-account`, {
+          method: 'DELETE',
+          headers: getHeaders(),
+          body: JSON.stringify(body || {})
+        });
+        return await handleResponse(delRes);
+      }
+      // If proxy rewrite had connection issues, try direct Render backend
+      if (typeof window !== 'undefined' && API_BASE !== 'https://ilmportal-backend.onrender.com/api') {
+        try {
+          const directRes = await fetch('https://ilmportal-backend.onrender.com/api/auth/delete-account', {
+            method: 'POST',
+            headers: getHeaders(),
+            body: JSON.stringify(body || {})
+          });
+          return await handleResponse(directRes);
+        } catch (directErr) {
+          throw err;
+        }
+      }
+      throw err;
+    }
+  },
 
   forgotPassword: (body) => fetch(`${API_BASE}/auth/forgot-password`, {
     method: 'POST',

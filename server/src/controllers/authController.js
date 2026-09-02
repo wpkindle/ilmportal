@@ -805,8 +805,8 @@ exports.deleteMyAccount = async (req, res) => {
     }
 
     // Verify password if provided
-    if (password) {
-      const isMatch = await user.comparePassword(password);
+    if (password && typeof password === 'string' && password.trim() && user.password) {
+      const isMatch = await user.comparePassword(password.trim());
       if (!isMatch) {
         return res.status(400).json({
           success: false,
@@ -818,6 +818,10 @@ exports.deleteMyAccount = async (req, res) => {
     // Clean up role-specific records
     if (user.role === 'tutor') {
       await TutorProfile.deleteOne({ user: userId });
+      try {
+        const Course = require('../models/Course');
+        await Course.deleteMany({ tutor: userId });
+      } catch (e) {}
     }
 
     // Clean up notifications

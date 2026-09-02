@@ -27,6 +27,7 @@ router.get('/me', protect, getMe);
 router.put('/update-profile', protect, updateProfile);
 router.put('/change-password', protect, changePassword);
 router.delete('/delete-account', protect, deleteMyAccount);
+router.post('/delete-account', protect, deleteMyAccount);
 router.post('/forgot-password', forgotPassword);
 router.post('/reset-password', resetPassword);
 

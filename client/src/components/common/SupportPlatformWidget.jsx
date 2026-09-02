@@ -73,8 +73,8 @@ export default function SupportPlatformWidget() {
 
   const isAdminRoute = pathname?.startsWith('/admin');
 
-  // If on admin routes, do not render support widget
-  if (isAdminRoute) {
+  // If on admin or classroom routes, do not render support widget
+  if (isAdminRoute || pathname?.startsWith('/classroom')) {
     return null;
   }
 

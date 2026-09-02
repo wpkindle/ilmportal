@@ -1,8 +1,15 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { BookOpen, ShieldCheck, Heart, Mail, Phone, MapPin, GraduationCap } from 'lucide-react';
 
 const Footer = () => {
+  const pathname = usePathname();
+  if (pathname?.startsWith('/classroom')) {
+    return null;
+  }
   return (
     <footer className="bg-slate-950 text-slate-300 pt-16 pb-12 border-t border-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

@@ -205,6 +205,10 @@ const Navbar = () => {
     }
   ];
 
+  if (pathname?.startsWith('/classroom')) {
+    return null;
+  }
+
   return (
     <>
       <PromotionTopBar />

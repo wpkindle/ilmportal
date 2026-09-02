@@ -42,11 +42,8 @@ export default function VideoClassroomPage() {
   if (loading) return <LoadingSpinner text="Connecting to In-Platform Video Classroom..." />;
 
   return (
-    <div className="p-4 sm:p-6 bg-slate-900 min-h-screen flex items-center justify-center">
-      <div className="max-w-7xl w-full">
-        <WebRTCVideoClassroom roomId={roomId} sessionData={sessionData} />
-      </div>
+    <div className="h-screen w-screen bg-slate-950 flex flex-col overflow-hidden fixed inset-0 z-50">
+      <WebRTCVideoClassroom roomId={roomId} sessionData={sessionData} />
     </div>
   );
 }
-

@@ -212,8 +212,8 @@ export default function LiveActivityToast() {
     };
   }, [isAdminRoute]);
 
-  // If on admin routes, do not render toast
-  if (isAdminRoute) {
+  // If on admin or classroom routes, do not render toast
+  if (isAdminRoute || pathname?.startsWith('/classroom')) {
     return null;
   }
 

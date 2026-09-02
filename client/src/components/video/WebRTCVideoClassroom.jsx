@@ -1,32 +1,98 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import {
+  Mic,
+  MicOff,
+  Video,
+  VideoOff,
+  Monitor,
+  MonitorOff,
+  PhoneOff,
+  MessageSquare,
   Users,
   Clock,
   ShieldCheck,
   BookOpen,
-  PhoneOff,
-  Maximize2,
-  ExternalLink,
+  Send,
+  LayoutGrid,
+  RefreshCw,
   Sparkles,
-  LayoutGrid
+  Volume2
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import { useSocket } from '../../context/SocketContext';
 import { api } from '../../services/api';
+
+// Comprehensive STUN and Free OpenRelay TURN servers for cross-network connectivity
+const ICE_SERVERS = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' },
+    { urls: 'stun:stun1.l.google.com:19302' },
+    { urls: 'stun:stun2.l.google.com:19302' },
+    { urls: 'stun:stun3.l.google.com:19302' },
+    { urls: 'stun:stun4.l.google.com:19302' },
+    { urls: 'stun:stun.services.mozilla.com' },
+    { urls: 'stun:stun.sipgate.net' },
+    {
+      urls: 'turn:openrelay.metered.ca:80',
+      username: 'openrelayproject',
+      credential: 'openrelayproject'
+    },
+    {
+      urls: 'turn:openrelay.metered.ca:443',
+      username: 'openrelayproject',
+      credential: 'openrelayproject'
+    },
+    {
+      urls: 'turn:openrelay.metered.ca:443?transport=tcp',
+      username: 'openrelayproject',
+      credential: 'openrelayproject'
+    }
+  ]
+};
 
 const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
   const { user } = useAuth();
+  const { socket } = useSocket();
   const router = useRouter();
 
+  // Safety Modal State
   const [safetyModalOpen, setSafetyModalOpen] = useState(true);
-  const [classDurationSeconds, setClassDurationSeconds] = useState(0);
-  const [quranOpen, setQuranOpen] = useState(false);
-  const [loadingConference, setLoadingConference] = useState(true);
 
-  const jitsiContainerRef = useRef(null);
-  const jitsiApiRef = useRef(null);
+  // Layout view modes: 'grid' (50/50 dual conference) | 'spotlight' | 'quran'
+  const [viewMode, setViewMode] = useState('grid');
+
+  // Media & Connection states
+  const [localStream, setLocalStream] = useState(null);
+  const [remoteStream, setRemoteStream] = useState(null);
+  const [remotePeerInfo, setRemotePeerInfo] = useState(null);
+  const [isMicOn, setIsMicOn] = useState(true);
+  const [isCameraOn, setIsCameraOn] = useState(true);
+  const [isScreenSharing, setIsScreenSharing] = useState(false);
+  const [chatOpen, setChatOpen] = useState(false);
+  const [chatMessages, setChatMessages] = useState([]);
+  const [chatInput, setChatInput] = useState('');
+  const [classDurationSeconds, setClassDurationSeconds] = useState(0);
+  const [peerConnected, setPeerConnected] = useState(false);
+  const [isConnecting, setIsConnecting] = useState(false);
+
+  const localVideoRef = useRef(null);
+  const remoteVideoRef = useRef(null);
+  const remoteAudioRef = useRef(null);
+  const spotlightRemoteVideoRef = useRef(null);
+  const quranRemoteVideoRef = useRef(null);
+  const peerConnectionRef = useRef(null);
+  const localStreamRef = useRef(null);
+  const screenTrackRef = useRef(null);
+  const containerRef = useRef(null);
+  const targetPeerSocketIdRef = useRef(null);
+  const iceCandidateQueue = useRef([]);
+  const makingOffer = useRef(false);
+
+  // Determine polite peer to prevent glare: Tutor is impolite (initiator), Student is polite
+  const isPolite = user?.role !== 'tutor';
 
   // Classroom timer
   useEffect(() => {
@@ -42,118 +108,437 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     return `${mins.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
-  const cleanRoomName = `IlmPortalClass_${(roomId || 'classroom').replace(/[^a-zA-Z0-9]/g, '_')}`;
+  // Helper to create and configure RTCPeerConnection
+  const createPeerConnection = useCallback((targetSocketId) => {
+    targetPeerSocketIdRef.current = targetSocketId;
 
-  // Initialize Embedded Zoom/Meet Style Conference (Jitsi Meet Enterprise SFU)
-  useEffect(() => {
-    let isMounted = true;
+    if (peerConnectionRef.current) {
+      try {
+        peerConnectionRef.current.close();
+      } catch (e) {}
+    }
 
-    const loadAndInitJitsi = () => {
-      const initConference = () => {
-        if (!jitsiContainerRef.current || !window.JitsiMeetExternalAPI) return;
+    console.log('🔧 Creating in-platform RTCPeerConnection for:', targetSocketId || roomId);
+    const pc = new RTCPeerConnection(ICE_SERVERS);
+    peerConnectionRef.current = pc;
+    iceCandidateQueue.current = [];
 
-        // Clean any previous instance
-        if (jitsiApiRef.current) {
-          try {
-            jitsiApiRef.current.dispose();
-          } catch (e) {}
-        }
+    // Add local tracks (Audio + Video) to peer connection
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((track) => {
+        console.log('➕ Adding local track:', track.kind);
+        pc.addTrack(track, localStreamRef.current);
+      });
+    }
 
-        const domain = 'meet.jit.si';
-        const roleLabel = user?.role === 'tutor' ? 'Tutor' : 'Student';
-        const displayName = `${user?.name || 'User'} (${roleLabel})`;
+    // When remote track arrives
+    pc.ontrack = (event) => {
+      console.log('🎉 Received remote track:', event.track.kind, event.streams);
+      let stream = event.streams && event.streams[0];
+      if (!stream) {
+        stream = new MediaStream([event.track]);
+      }
+      setRemoteStream(stream);
+      setPeerConnected(true);
+      setIsConnecting(false);
 
-        const options = {
-          roomName: cleanRoomName,
-          width: '100%',
-          height: '100%',
-          parentNode: jitsiContainerRef.current,
-          userInfo: {
-            displayName,
-            email: user?.email
-          },
-          configOverwrite: {
-            startWithAudioMuted: false,
-            startWithVideoMuted: false,
-            enableWelcomePage: false,
-            prejoinPageEnabled: false,
-            disableDeepLinking: true,
-            enableTileView: true,
-            defaultRemoteDisplayName: user?.role === 'tutor' ? 'Student' : 'Tutor',
-            toolbarButtons: [
-              'microphone',
-              'camera',
-              'desktop',
-              'chat',
-              'raisehand',
-              'tileview',
-              'fullscreen',
-              'hangup'
-            ]
-          },
-          interfaceConfigOverwrite: {
-            SHOW_JITSI_WATERMARK: false,
-            SHOW_WATERMARK_FOR_GUESTS: false,
-            SHOW_BRAND_WATERMARK: false,
-            DEFAULT_REMOTE_DISPLAY_NAME: user?.role === 'tutor' ? 'Student' : 'Tutor',
-            TOOLBAR_BUTTONS: [
-              'microphone',
-              'camera',
-              'desktop',
-              'chat',
-              'raisehand',
-              'tileview',
-              'fullscreen',
-              'hangup'
-            ]
+      // Play on remote video
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = stream;
+        remoteVideoRef.current.muted = false;
+        remoteVideoRef.current.volume = 1.0;
+        remoteVideoRef.current.play().catch(() => {});
+      }
+      if (spotlightRemoteVideoRef.current) {
+        spotlightRemoteVideoRef.current.srcObject = stream;
+        spotlightRemoteVideoRef.current.muted = false;
+        spotlightRemoteVideoRef.current.play().catch(() => {});
+      }
+      if (quranRemoteVideoRef.current) {
+        quranRemoteVideoRef.current.srcObject = stream;
+        quranRemoteVideoRef.current.muted = false;
+        quranRemoteVideoRef.current.play().catch(() => {});
+      }
+
+      // Play on dedicated audio element to guarantee live voice sound
+      if (remoteAudioRef.current) {
+        remoteAudioRef.current.srcObject = stream;
+        remoteAudioRef.current.muted = false;
+        remoteAudioRef.current.volume = 1.0;
+        remoteAudioRef.current.play().catch(() => {});
+      }
+    };
+
+    // Send local ICE candidates to peer via socket
+    pc.onicecandidate = (event) => {
+      if (event.candidate && socket) {
+        socket.emit('webrtc-signal', {
+          roomId,
+          targetSocketId,
+          signalData: { type: 'candidate', candidate: event.candidate },
+          callerInfo: {
+            id: user?._id || user?.id,
+            name: user?.name,
+            role: user?.role
           }
+        });
+      }
+    };
+
+    pc.oniceconnectionstatechange = () => {
+      console.log('📡 WebRTC ICE state:', pc.iceConnectionState);
+      if (['connected', 'completed'].includes(pc.iceConnectionState)) {
+        setPeerConnected(true);
+        setIsConnecting(false);
+      } else if (['disconnected', 'failed', 'closed'].includes(pc.iceConnectionState)) {
+        setPeerConnected(false);
+      }
+    };
+
+    return pc;
+  }, [socket, user, roomId]);
+
+  // Flush queued ICE candidates
+  const processCandidateQueue = async (pc) => {
+    while (iceCandidateQueue.current.length > 0) {
+      const candidate = iceCandidateQueue.current.shift();
+      try {
+        await pc.addIceCandidate(new RTCIceCandidate(candidate));
+      } catch (e) {
+        console.warn('ICE queue apply warning:', e);
+      }
+    }
+  };
+
+  // Initiate WebRTC Offer
+  const sendOffer = useCallback(async (targetSocketId) => {
+    if (!socket) return;
+    setIsConnecting(true);
+    const pc = createPeerConnection(targetSocketId);
+
+    try {
+      makingOffer.current = true;
+      const offer = await pc.createOffer({
+        offerToReceiveAudio: true,
+        offerToReceiveVideo: true
+      });
+      await pc.setLocalDescription(offer);
+
+      console.log('📤 Sending WebRTC Offer to partner');
+      socket.emit('webrtc-signal', {
+        roomId,
+        targetSocketId,
+        signalData: { type: 'offer', offer },
+        callerInfo: {
+          id: user?._id || user?.id,
+          name: user?.name,
+          role: user?.role
+        }
+      });
+    } catch (err) {
+      console.error('Error creating offer:', err);
+      setIsConnecting(false);
+    } finally {
+      makingOffer.current = false;
+    }
+  }, [socket, user, roomId, createPeerConnection]);
+
+  // Initialize Local Media & Socket Signaling
+  useEffect(() => {
+    let activeStream = null;
+
+    const initMediaAndSignaling = async () => {
+      // 1. Capture local HD Camera & Microphone
+      try {
+        if (typeof navigator !== 'undefined' && navigator.mediaDevices) {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: {
+              width: { ideal: 1280, min: 640 },
+              height: { ideal: 720, min: 480 },
+              facingMode: 'user'
+            },
+            audio: {
+              echoCancellation: true,
+              noiseSuppression: true,
+              autoGainControl: true
+            }
+          });
+          activeStream = stream;
+          localStreamRef.current = stream;
+          setLocalStream(stream);
+
+          if (localVideoRef.current) {
+            localVideoRef.current.srcObject = stream;
+            localVideoRef.current.play().catch(() => {});
+          }
+        }
+      } catch (err) {
+        console.warn('Media capture error:', err.message);
+      }
+
+      // 2. Join Socket Classroom Room
+      if (socket && roomId) {
+        const myInfo = {
+          id: user?._id || user?.id,
+          name: user?.name || 'Class Participant',
+          role: user?.role || 'student'
         };
 
-        try {
-          const apiInstance = new window.JitsiMeetExternalAPI(domain, options);
-          jitsiApiRef.current = apiInstance;
+        socket.emit('join-classroom', {
+          roomId,
+          user: myInfo
+        });
 
-          apiInstance.addEventListener('videoConferenceJoined', () => {
-            if (isMounted) setLoadingConference(false);
-          });
+        // When existing peers are in room
+        socket.on('existing-peers', async ({ peers }) => {
+          if (Array.isArray(peers) && peers.length > 0) {
+            const peerSocketId = peers[0];
+            targetPeerSocketIdRef.current = peerSocketId;
+            // If tutor, send offer; if student, wait for tutor offer or send if no offer after 2s
+            if (user?.role === 'tutor') {
+              sendOffer(peerSocketId);
+            }
+          }
+        });
 
-          apiInstance.addEventListener('readyToClose', () => {
-            handleLeaveClassroom();
-          });
-        } catch (err) {
-          console.error('Error initiating conference:', err);
-          if (isMounted) setLoadingConference(false);
-        }
-      };
+        // When a new peer joins after me
+        socket.on('peer-joined', ({ socketId, user: joinedUser }) => {
+          console.log('👋 Peer joined:', joinedUser?.name, socketId);
+          setRemotePeerInfo(joinedUser);
+          targetPeerSocketIdRef.current = socketId;
+          // Initiator sends offer
+          sendOffer(socketId);
+        });
 
-      if (window.JitsiMeetExternalAPI) {
-        initConference();
-      } else {
-        const existingScript = document.getElementById('jitsi-external-api');
-        if (existingScript) {
-          existingScript.onload = initConference;
-        } else {
-          const script = document.createElement('script');
-          script.id = 'jitsi-external-api';
-          script.src = 'https://meet.jit.si/external_api.js';
-          script.async = true;
-          script.onload = initConference;
-          document.body.appendChild(script);
-        }
+        // Signaling receiver with Perfect Negotiation (Glaring prevention)
+        socket.on('webrtc-signal-received', async ({ callerSocketId, signalData, callerInfo }) => {
+          if (!signalData) return;
+          if (callerInfo) setRemotePeerInfo(callerInfo);
+          if (callerSocketId) targetPeerSocketIdRef.current = callerSocketId;
+
+          // 1. Handle Offer
+          if (signalData.type === 'offer' && signalData.offer) {
+            console.log('📥 Received WebRTC Offer');
+            const pc = peerConnectionRef.current || createPeerConnection(callerSocketId);
+
+            try {
+              const offerCollision = makingOffer.current || pc.signalingState !== 'stable';
+              if (offerCollision && !isPolite) {
+                console.log('Ignoring conflicting offer because impolite');
+                return;
+              }
+
+              await pc.setRemoteDescription(new RTCSessionDescription(signalData.offer));
+              await processCandidateQueue(pc);
+
+              const answer = await pc.createAnswer();
+              await pc.setLocalDescription(answer);
+
+              console.log('📤 Sending WebRTC Answer');
+              socket.emit('webrtc-signal', {
+                roomId,
+                targetSocketId: callerSocketId,
+                signalData: { type: 'answer', answer },
+                callerInfo: myInfo
+              });
+            } catch (err) {
+              console.error('Error processing WebRTC offer:', err);
+            }
+          }
+
+          // 2. Handle Answer
+          if (signalData.type === 'answer' && signalData.answer) {
+            console.log('📥 Received WebRTC Answer');
+            const pc = peerConnectionRef.current;
+            if (pc && pc.signalingState !== 'stable') {
+              try {
+                await pc.setRemoteDescription(new RTCSessionDescription(signalData.answer));
+                await processCandidateQueue(pc);
+              } catch (err) {
+                console.error('Error setting remote answer:', err);
+              }
+            }
+          }
+
+          // 3. Handle Candidate
+          if (signalData.type === 'candidate' && signalData.candidate) {
+            const pc = peerConnectionRef.current;
+            if (pc && pc.remoteDescription && pc.remoteDescription.type) {
+              try {
+                await pc.addIceCandidate(new RTCIceCandidate(signalData.candidate));
+              } catch (err) {
+                console.warn('Error applying ICE candidate:', err);
+              }
+            } else {
+              iceCandidateQueue.current.push(signalData.candidate);
+            }
+          }
+        });
+
+        socket.on('classroom-chat-received', (msg) => {
+          setChatMessages((prev) => [...prev, msg]);
+        });
+
+        socket.on('peer-left', () => {
+          console.log('👋 Peer left');
+          setPeerConnected(false);
+          setRemoteStream(null);
+          setRemotePeerInfo(null);
+        });
       }
     };
 
-    loadAndInitJitsi();
+    initMediaAndSignaling();
 
     return () => {
-      isMounted = false;
-      if (jitsiApiRef.current) {
+      if (activeStream) {
+        activeStream.getTracks().forEach((track) => track.stop());
+      }
+      if (peerConnectionRef.current) {
         try {
-          jitsiApiRef.current.dispose();
+          peerConnectionRef.current.close();
         } catch (e) {}
       }
+      if (socket) {
+        socket.emit('leave-classroom', { roomId, user });
+        socket.off('existing-peers');
+        socket.off('peer-joined');
+        socket.off('webrtc-signal-received');
+        socket.off('classroom-chat-received');
+        socket.off('peer-left');
+      }
     };
-  }, [roomId, cleanRoomName, user]);
+  }, [roomId, socket, user, isPolite, createPeerConnection, sendOffer]);
+
+  // Keep video and audio elements updated when stream arrives
+  useEffect(() => {
+    if (remoteStream) {
+      if (remoteVideoRef.current) {
+        remoteVideoRef.current.srcObject = remoteStream;
+        remoteVideoRef.current.muted = false;
+        remoteVideoRef.current.volume = 1.0;
+        remoteVideoRef.current.play().catch(() => {});
+      }
+      if (remoteAudioRef.current) {
+        remoteAudioRef.current.srcObject = remoteStream;
+        remoteAudioRef.current.muted = false;
+        remoteAudioRef.current.volume = 1.0;
+        remoteAudioRef.current.play().catch(() => {});
+      }
+      if (spotlightRemoteVideoRef.current) {
+        spotlightRemoteVideoRef.current.srcObject = remoteStream;
+        spotlightRemoteVideoRef.current.muted = false;
+        spotlightRemoteVideoRef.current.play().catch(() => {});
+      }
+      if (quranRemoteVideoRef.current) {
+        quranRemoteVideoRef.current.srcObject = remoteStream;
+        quranRemoteVideoRef.current.muted = false;
+        quranRemoteVideoRef.current.play().catch(() => {});
+      }
+    }
+    if (localStream && localVideoRef.current) {
+      localVideoRef.current.srcObject = localStream;
+      localVideoRef.current.play().catch(() => {});
+    }
+  }, [remoteStream, localStream, viewMode]);
+
+  // Manual connect/reconnect action
+  const handleManualReconnect = () => {
+    sendOffer(targetPeerSocketIdRef.current || null);
+  };
+
+  // Toggle Microphone
+  const toggleMic = () => {
+    if (localStreamRef.current) {
+      localStreamRef.current.getAudioTracks().forEach((track) => {
+        track.enabled = !isMicOn;
+      });
+    }
+    setIsMicOn(!isMicOn);
+    if (socket) {
+      socket.emit('media-toggle', { roomId, type: 'mic', enabled: !isMicOn });
+    }
+  };
+
+  // Toggle Camera
+  const toggleCamera = () => {
+    if (localStreamRef.current) {
+      localStreamRef.current.getVideoTracks().forEach((track) => {
+        track.enabled = !isCameraOn;
+      });
+    }
+    setIsCameraOn(!isCameraOn);
+    if (socket) {
+      socket.emit('media-toggle', { roomId, type: 'camera', enabled: !isCameraOn });
+    }
+  };
+
+  // Toggle Screen Sharing
+  const toggleScreenShare = async () => {
+    if (isScreenSharing) {
+      if (screenTrackRef.current) {
+        screenTrackRef.current.stop();
+      }
+      if (localStreamRef.current) {
+        const videoTrack = localStreamRef.current.getVideoTracks()[0];
+        if (peerConnectionRef.current && videoTrack) {
+          const sender = peerConnectionRef.current
+            .getSenders()
+            .find((s) => s.track && s.track.kind === 'video');
+          if (sender) sender.replaceTrack(videoTrack);
+        }
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = localStreamRef.current;
+        }
+      }
+      setIsScreenSharing(false);
+    } else {
+      try {
+        const screenStream = await navigator.mediaDevices.getDisplayMedia({ video: true });
+        const screenTrack = screenStream.getVideoTracks()[0];
+        screenTrackRef.current = screenTrack;
+
+        if (peerConnectionRef.current) {
+          const sender = peerConnectionRef.current
+            .getSenders()
+            .find((s) => s.track && s.track.kind === 'video');
+          if (sender) sender.replaceTrack(screenTrack);
+        }
+
+        if (localVideoRef.current) {
+          localVideoRef.current.srcObject = screenStream;
+        }
+
+        screenTrack.onended = () => {
+          toggleScreenShare();
+        };
+
+        setIsScreenSharing(true);
+      } catch (err) {
+        console.error('Screen sharing error:', err);
+      }
+    }
+  };
+
+  // Send in-classroom live text message
+  const handleSendChatMessage = (e) => {
+    e.preventDefault();
+    if (!chatInput.trim()) return;
+
+    const messageData = {
+      roomId,
+      sender: user?.name || 'Participant',
+      message: chatInput.trim(),
+      timestamp: new Date().toISOString()
+    };
+
+    if (socket) {
+      socket.emit('classroom-chat-message', messageData);
+    } else {
+      setChatMessages((prev) => [...prev, messageData]);
+    }
+    setChatInput('');
+  };
 
   // Leave / End Classroom
   const handleLeaveClassroom = async () => {
@@ -170,10 +555,18 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     router.push(user?.role === 'tutor' ? '/tutor/dashboard' : '/student/dashboard');
   };
 
+  const otherRoleName = user?.role === 'tutor' ? 'Student' : 'Tutor';
+  const otherPartyName = remotePeerInfo?.name || sessionData?.tutor?.name || sessionData?.student?.name || otherRoleName;
+
   return (
-    <div className="flex flex-col h-screen w-screen bg-slate-950 text-white overflow-hidden fixed inset-0 z-50 select-none font-sans">
-      
-      {/* Safety Notice Modal */}
+    <div
+      ref={containerRef}
+      className="flex flex-col h-screen w-screen bg-slate-950 text-white overflow-hidden fixed inset-0 z-50 select-none font-sans"
+    >
+      {/* Hidden dedicated remote audio element for guaranteed live voice playback */}
+      <audio ref={remoteAudioRef} autoPlay playsInline />
+
+      {/* Safety & Recording Warning Modal */}
       {safetyModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-slate-900 border border-slate-700/90 rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-5 relative overflow-hidden text-center">
@@ -184,43 +577,48 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             <div className="space-y-1.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>HD Video &amp; Voice Conference Room</span>
+                <span>100% In-Platform 1:1 Live Classroom</span>
               </div>
               <h3 className="text-lg sm:text-xl font-black text-white">
-                Live 1:1 Class Safety Notice
+                Live Classroom Safety Notice
               </h3>
               <p className="text-xs text-slate-300 leading-relaxed pt-1">
-                Welcome to your interactive live session. All classroom communications are monitored for academic quality and student safety under IlmPortal guidelines.
+                Welcome to your 1:1 live session. No third-party accounts or external logins are required. All classroom sessions run 100% securely inside IlmPortal.
               </p>
             </div>
 
             <button
               type="button"
-              onClick={() => setSafetyModalOpen(false)}
+              onClick={() => {
+                setSafetyModalOpen(false);
+                if (remoteAudioRef.current) {
+                  remoteAudioRef.current.play().catch(() => {});
+                }
+              }}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4" />
-              <span>Join Live Video Conference</span>
+              <span>Enter Classroom Now</span>
             </button>
           </div>
         </div>
       )}
 
       {/* Top Classroom Bar */}
-      <div className="px-4 py-2.5 bg-slate-900/95 backdrop-blur-md border-b border-slate-800/90 flex items-center justify-between z-20 shrink-0">
+      <div className="px-4 py-3 bg-slate-900/95 backdrop-blur-md border-b border-slate-800/90 flex items-center justify-between z-20 shrink-0">
         <div className="flex items-center gap-3 min-w-0">
           <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
           <div className="min-w-0">
             <h2 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2 truncate">
-              <span>{sessionData?.title || 'Live Tutoring Classroom'}</span>
+              <span>{sessionData?.title || 'Live Tutoring Class'}</span>
               <span className="text-[9px] font-bold px-1.5 py-0.2 bg-red-950/80 text-red-300 rounded border border-red-800 shrink-0">
-                LIVE • HD Audio &amp; Video
+                REC • Live Audio &amp; Video
               </span>
             </h2>
           </div>
         </div>
 
-        {/* Center/Right Controls: Timer, Quran Reader & Exit */}
+        {/* Center/Right Timer & View Modes */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Duration Timer */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/90 border border-slate-700 text-xs font-mono font-bold text-amber-400">
@@ -228,83 +626,329 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             <span>{formatTime(classDurationSeconds)}</span>
           </div>
 
-          {/* Digital Quran Reader Drawer Toggle */}
+          {/* Conference 50/50 Grid vs Spotlight Mode Toggle */}
           <button
-            onClick={() => setQuranOpen(!quranOpen)}
+            onClick={() => setViewMode(viewMode === 'grid' ? 'spotlight' : 'grid')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border cursor-pointer ${
-              quranOpen
+              viewMode === 'grid'
+                ? 'bg-emerald-600/90 text-white border-emerald-500 shadow-xs'
+                : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
+            }`}
+            title="Toggle Conference Grid View"
+          >
+            <LayoutGrid className="w-3.5 h-3.5 text-white" />
+            <span className="hidden sm:inline">{viewMode === 'grid' ? 'Conference Grid' : 'Spotlight'}</span>
+          </button>
+
+          {/* Digital Quran Reader Tab */}
+          <button
+            onClick={() => setViewMode(viewMode === 'quran' ? 'grid' : 'quran')}
+            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border cursor-pointer ${
+              viewMode === 'quran'
                 ? 'bg-emerald-600 text-white border-emerald-500 shadow-xs'
                 : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
             }`}
           >
             <BookOpen className="w-3.5 h-3.5 text-emerald-300" />
-            <span className="hidden sm:inline">{quranOpen ? 'Hide Quran' : 'Quran Reader'}</span>
-          </button>
-
-          {/* End / Leave Class */}
-          <button
-            onClick={handleLeaveClassroom}
-            className="px-3 py-1.5 bg-red-600/90 hover:bg-red-600 text-white text-xs font-bold rounded-xl border border-red-500 flex items-center gap-1.5 cursor-pointer transition-all"
-          >
-            <PhoneOff className="w-3 h-3" />
-            <span className="hidden sm:inline">Leave</span>
+            <span className="hidden sm:inline">Quran Reader</span>
           </button>
         </div>
       </div>
 
-      {/* Main Conference Area */}
+      {/* Main Classroom Stage */}
       <div className="flex-1 flex overflow-hidden relative bg-slate-950">
         
-        {/* Left Side: Embedded Zoom/Meet Style Video Conference (with 50/50 dual grid, audio & screen sharing) */}
-        <div className="flex-1 h-full w-full relative bg-slate-950">
-          <div
-            ref={jitsiContainerRef}
-            className="w-full h-full"
-            style={{ minHeight: '100%' }}
-          />
-        </div>
+        {/* VIEW MODE 1: True Dual 50/50 Conference Grid (One Side Tutor, One Side Student) */}
+        {viewMode === 'grid' && (
+          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 p-3 sm:p-4 h-full w-full overflow-hidden">
+            
+            {/* Card 1 (Left): Remote Peer (Tutor or Student) */}
+            <div className="w-full h-full rounded-3xl overflow-hidden bg-slate-900 border-2 border-slate-800/90 flex items-center justify-center relative shadow-2xl">
+              <video
+                ref={remoteVideoRef}
+                autoPlay
+                playsInline
+                className={`w-full h-full object-cover ${!peerConnected ? 'hidden' : ''}`}
+              />
 
-        {/* Right Side: Slide-out Quran & Tajweed Viewer Drawer */}
-        {quranOpen && (
-          <div className="w-full sm:w-96 md:w-[420px] bg-amber-50 text-slate-900 border-l-4 border-amber-300 flex flex-col z-30 animate-in slide-in-from-right duration-200 overflow-y-auto p-5 shadow-2xl">
-            <div className="flex items-center justify-between pb-3 border-b border-amber-200">
-              <div className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5 text-emerald-800" />
-                <h3 className="text-sm font-bold text-emerald-950">Digital Quran &amp; Tajweed</h3>
+              {/* Waiting screen when remote peer hasn't connected */}
+              {!peerConnected && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-gradient-to-b from-slate-900 to-slate-950 space-y-3">
+                  <div className="relative">
+                    <div className="w-20 h-20 rounded-3xl bg-emerald-950 text-emerald-400 flex items-center justify-center border border-emerald-800/80 shadow-lg">
+                      <Users className="w-10 h-10 animate-pulse" />
+                    </div>
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full animate-ping" />
+                  </div>
+
+                  <div>
+                    <h3 className="text-base sm:text-lg font-bold text-white">
+                      Waiting for {otherRoleName} to connect...
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
+                      Automated in-platform live stream active. Your partner’s HD video and voice will connect directly.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={handleManualReconnect}
+                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
+                  >
+                    <RefreshCw className={`w-3.5 h-3.5 ${isConnecting ? 'animate-spin' : ''}`} />
+                    <span>{isConnecting ? 'Connecting Stream...' : 'Connect Video & Voice Now'}</span>
+                  </button>
+                </div>
+              )}
+
+              {/* Peer Name & Role Badge */}
+              <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-sm text-xs font-bold text-white flex items-center gap-2 border border-white/10 z-10">
+                <span className={`w-2 h-2 rounded-full ${peerConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}`} />
+                <span>{otherPartyName}</span>
+                <span className="text-[10px] font-normal text-slate-300 bg-white/10 px-1.5 py-0.2 rounded">
+                  {otherRoleName}
+                </span>
               </div>
-              <button
-                onClick={() => setQuranOpen(false)}
-                className="text-slate-500 hover:text-slate-800 text-sm font-bold px-2 py-0.5 rounded-lg hover:bg-amber-100 cursor-pointer"
-              >
-                ✕
-              </button>
             </div>
 
-            <div className="py-4 space-y-6 text-center">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-900 bg-emerald-100/90 px-3 py-1 rounded-full border border-emerald-300">
-                Surah Al-Fatihah (سورة الفاتحة)
-              </span>
+            {/* Card 2 (Right): Local User (Self) */}
+            <div className="w-full h-full rounded-3xl overflow-hidden bg-slate-900 border-2 border-emerald-500/40 flex items-center justify-center relative shadow-2xl">
+              <video
+                ref={localVideoRef}
+                autoPlay
+                muted
+                playsInline
+                className={`w-full h-full object-cover ${!isCameraOn ? 'hidden' : ''}`}
+              />
 
-              <div className="font-arabic text-2xl text-emerald-950 leading-[2.4] text-center select-none pt-2" dir="rtl">
-                بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ﴿١﴾<br />
-                الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ﴿٢﴾<br />
-                الرَّحْمَٰنِ الرَّحِيمِ ﴿٣﴾<br />
-                مَالِكِ يَوْمِ الدِّينِ ﴿٤﴾<br />
-                إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ﴿٥﴾<br />
-                اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ ﴿٦﴾<br />
-                صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ ﴿٧﴾
+              {!isCameraOn && (
+                <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900 text-slate-400 text-xs">
+                  <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center mb-2 border border-slate-700">
+                    <VideoOff className="w-8 h-8 text-slate-500" />
+                  </div>
+                  <span className="font-bold text-slate-300">Your Camera is Off</span>
+                </div>
+              )}
+
+              {/* Local User Badge */}
+              <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-sm text-xs font-bold text-white flex items-center gap-2 border border-white/10 z-10">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span>You ({user?.name || 'Self'})</span>
+                <span className="text-[10px] font-normal text-emerald-300 bg-emerald-950/80 px-1.5 py-0.2 rounded border border-emerald-700/50">
+                  {user?.role || 'Active'}
+                </span>
               </div>
+            </div>
 
-              <div className="p-3 bg-amber-100/70 rounded-2xl border border-amber-200 text-left text-xs text-slate-700 space-y-1">
-                <p className="font-bold text-emerald-900">Tajweed Articulation Points (Makharij):</p>
-                <p className="text-[11px] leading-relaxed">
-                  Focus on correct pronunciation of <span className="font-bold">ح (Ḥā)</span> in الرَّحْمَٰنِ and the heavy letter <span className="font-bold">ض (Ḍād)</span> in الضَّالِّينَ.
-                </p>
+          </div>
+        )}
+
+        {/* VIEW MODE 2: Spotlight View (Large Remote + Floating Local PiP) */}
+        {viewMode === 'spotlight' && (
+          <div className="flex-1 flex items-center justify-center p-4 relative h-full w-full">
+            <div className="w-full h-full rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center relative shadow-inner">
+              <video
+                ref={spotlightRemoteVideoRef}
+                autoPlay
+                playsInline
+                className={`w-full h-full object-cover ${!peerConnected ? 'hidden' : ''}`}
+              />
+
+              {!peerConnected && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-slate-900/90 backdrop-blur-xs">
+                  <div className="w-16 h-16 rounded-full bg-emerald-950 text-emerald-400 flex items-center justify-center mb-3 border border-emerald-800 animate-pulse">
+                    <Users className="w-8 h-8" />
+                  </div>
+                  <h3 className="text-base font-bold text-white">
+                    Waiting for {otherRoleName} to connect...
+                  </h3>
+                </div>
+              )}
+            </div>
+
+            {/* Floating Local PiP */}
+            <div className="absolute bottom-6 right-6 w-40 sm:w-56 aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border-2 border-emerald-500/70 bg-slate-900 z-20">
+              <video
+                ref={localVideoRef}
+                autoPlay
+                muted
+                playsInline
+                className={`w-full h-full object-cover ${!isCameraOn ? 'hidden' : ''}`}
+              />
+              <div className="absolute bottom-1.5 left-2 px-2 py-0.5 rounded bg-black/70 text-[10px] font-bold text-white">
+                You ({user?.name?.split(' ')[0]})
               </div>
             </div>
           </div>
         )}
 
+        {/* VIEW MODE 3: Digital Quran Reader Split Mode */}
+        {viewMode === 'quran' && (
+          <div className="flex-1 flex flex-col md:flex-row gap-3 p-3 sm:p-4 h-full w-full overflow-hidden">
+            {/* Quran Text Viewer */}
+            <div className="flex-1 bg-amber-50 text-slate-900 rounded-3xl p-6 sm:p-8 overflow-y-auto border-4 border-amber-200 shadow-2xl flex flex-col items-center justify-center">
+              <div className="max-w-2xl text-center space-y-6">
+                <span className="text-xs font-bold uppercase tracking-widest text-emerald-900 bg-emerald-100 px-4 py-1.5 rounded-full border border-emerald-200">
+                  Surah Al-Fatihah (سورة الفاتحة) &bull; Live Tajweed Reference
+                </span>
+                <div className="font-arabic text-2xl sm:text-4xl text-emerald-950 leading-[2.2] text-center select-none" dir="rtl">
+                  بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ﴿١﴾<br />
+                  الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ﴿٢﴾<br />
+                  الرَّحْمَٰنِ الرَّحِيمِ ﴿٣﴾<br />
+                  مَالِكِ يَوْمِ الدِّينِ ﴿٤﴾<br />
+                  إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ ﴿٥﴾<br />
+                  اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ ﴿٦﴾<br />
+                  صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ ﴿٧﴾
+                </div>
+                <p className="text-xs text-slate-500 italic">
+                  Interactive reference mode for Tajweed articulation, Qira'at rules, and Makharij correction.
+                </p>
+              </div>
+            </div>
+
+            {/* Side Floating Video Strip */}
+            <div className="w-full md:w-64 flex md:flex-col gap-2 shrink-0">
+              <div className="flex-1 aspect-[4/3] rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 relative">
+                <video
+                  ref={quranRemoteVideoRef}
+                  autoPlay
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+                <span className="absolute bottom-1 left-2 text-[10px] bg-black/60 px-1.5 py-0.2 rounded text-white font-bold">
+                  {otherPartyName}
+                </span>
+              </div>
+              <div className="flex-1 aspect-[4/3] rounded-2xl overflow-hidden bg-slate-900 border border-emerald-500/50 relative">
+                <video
+                  ref={localVideoRef}
+                  autoPlay
+                  muted
+                  playsInline
+                  className="w-full h-full object-cover"
+                />
+                <span className="absolute bottom-1 left-2 text-[10px] bg-black/60 px-1.5 py-0.2 rounded text-white font-bold">
+                  You
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* In-Call Live Chat Sidebar */}
+        {chatOpen && (
+          <div className="w-80 bg-slate-900/95 border-l border-slate-800 flex flex-col z-30 animate-in slide-in-from-right duration-200">
+            <div className="p-3.5 border-b border-slate-800 font-bold text-xs text-emerald-400 flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" />
+                <span>In-Class Live Chat</span>
+              </div>
+              <button
+                onClick={() => setChatOpen(false)}
+                className="text-slate-400 hover:text-white text-xs font-bold px-2 py-0.5 rounded-lg hover:bg-slate-800 cursor-pointer"
+              >
+                ✕
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-3 space-y-2 text-xs">
+              {chatMessages.length === 0 ? (
+                <p className="text-center text-slate-500 py-12">
+                  Send live questions, notes, or Ayah references during the class.
+                </p>
+              ) : (
+                chatMessages.map((msg, i) => (
+                  <div key={i} className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/80">
+                    <span className="font-bold text-emerald-400 text-[11px] block">
+                      {msg.sender}
+                    </span>
+                    <p className="text-slate-200 mt-0.5 leading-relaxed">{msg.message}</p>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <form onSubmit={handleSendChatMessage} className="p-2.5 border-t border-slate-800 flex gap-1.5">
+              <input
+                type="text"
+                placeholder="Type in-call message..."
+                value={chatInput}
+                onChange={(e) => setChatInput(e.target.value)}
+                className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-emerald-500 font-medium"
+              />
+              <button
+                type="submit"
+                className="p-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl cursor-pointer"
+              >
+                <Send className="w-3.5 h-3.5" />
+              </button>
+            </form>
+          </div>
+        )}
+
+      </div>
+
+      {/* Bottom Floating Controls Bar */}
+      <div className="px-4 py-3 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/90 flex items-center justify-center gap-3 sm:gap-4 z-30 shrink-0">
+        {/* Mic Toggle */}
+        <button
+          onClick={toggleMic}
+          className={`p-3 sm:p-3.5 rounded-2xl transition-all shadow-md cursor-pointer ${
+            isMicOn
+              ? 'bg-slate-800 hover:bg-slate-700 text-white'
+              : 'bg-red-600 hover:bg-red-700 text-white ring-2 ring-red-400'
+          }`}
+          title={isMicOn ? 'Mute Microphone' : 'Unmute Microphone'}
+        >
+          {isMicOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+        </button>
+
+        {/* Camera Toggle */}
+        <button
+          onClick={toggleCamera}
+          className={`p-3 sm:p-3.5 rounded-2xl transition-all shadow-md cursor-pointer ${
+            isCameraOn
+              ? 'bg-slate-800 hover:bg-slate-700 text-white'
+              : 'bg-red-600 hover:bg-red-700 text-white ring-2 ring-red-400'
+          }`}
+          title={isCameraOn ? 'Turn Camera Off' : 'Turn Camera On'}
+        >
+          {isCameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
+        </button>
+
+        {/* Screen Share Toggle */}
+        <button
+          onClick={toggleScreenShare}
+          className={`p-3 sm:p-3.5 rounded-2xl transition-all shadow-md cursor-pointer ${
+            isScreenSharing
+              ? 'bg-emerald-600 hover:bg-emerald-700 text-white ring-2 ring-emerald-400'
+              : 'bg-slate-800 hover:bg-slate-700 text-white'
+          }`}
+          title="Share Screen (Slides, Whiteboard, Notes)"
+        >
+          {isScreenSharing ? <MonitorOff className="w-5 h-5" /> : <Monitor className="w-5 h-5" />}
+        </button>
+
+        {/* In-Call Chat Toggle */}
+        <button
+          onClick={() => setChatOpen(!chatOpen)}
+          className={`p-3 sm:p-3.5 rounded-2xl transition-all shadow-md cursor-pointer ${
+            chatOpen
+              ? 'bg-emerald-600 text-white ring-2 ring-emerald-400'
+              : 'bg-slate-800 hover:bg-slate-700 text-white'
+          }`}
+          title="In-Class Text Chat"
+        >
+          <MessageSquare className="w-5 h-5" />
+        </button>
+
+        {/* Leave Classroom */}
+        <button
+          onClick={handleLeaveClassroom}
+          className="px-4 sm:px-5 py-3 sm:py-3.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-red-600/30 flex items-center gap-2 transition-all cursor-pointer hover:scale-105"
+        >
+          <PhoneOff className="w-4 h-4" />
+          <span>Leave Class</span>
+        </button>
       </div>
 
     </div>

@@ -137,11 +137,11 @@ const Navbar = () => {
       icon: BookOpen,
       color: 'text-emerald-600 bg-emerald-50',
       items: [
-        { name: '⭐ Nazra Quran for Kids (Ages 5–12) [Course]', link: '/courses/nazra-quran-kids' },
         { name: 'Nazra Quran Reading & Qaida', link: '/tutors?category=nazra-quran' },
         { name: 'Tajweed al-Quran', link: '/tutors?category=tajweed-al-quran' },
         { name: 'Hifz al-Quran Memorization', link: '/tutors?category=hifz-al-quran' },
-        { name: 'Tafseer & Quranic Translation', link: '/tutors?category=quran-translation-tafseer' }
+        { name: 'Tafseer & Quranic Translation', link: '/tutors?category=quran-translation-tafseer' },
+        { name: 'Islamic Studies & Fiqh', link: '/tutors?category=islamic-studies-fiqh' }
       ]
     },
     {
@@ -154,6 +154,18 @@ const Navbar = () => {
         { name: 'Cambridge O Level Coaching', link: '/tutors?category=o-level-cambridge' },
         { name: 'Cambridge A Level Coaching', link: '/tutors?category=a-level-cambridge' },
         { name: 'MDCAT & ECAT Entry Prep', link: '/tutors?category=entry-test-prep' }
+      ]
+    },
+    {
+      title: 'Structured Courses',
+      icon: BookMarked,
+      color: 'text-amber-600 bg-amber-50',
+      items: [
+        { name: 'Nazra Quran for Kids (Ages 5–12)', link: '/courses/nazra-quran-kids' },
+        { name: 'Tajweed Mastery Masterclass', link: '/courses' },
+        { name: 'Noorani Qaida for Beginners', link: '/courses' },
+        { name: 'Cambridge O-Level Mathematics', link: '/courses' },
+        { name: 'Browse All LMS Courses →', link: '/courses' }
       ]
     }
   ];
@@ -227,7 +239,7 @@ const Navbar = () => {
               </button>
 
               {subjectsDropdownOpen && (
-                <div className="absolute left-0 mt-2 w-[540px] bg-white rounded-3xl shadow-2xl border border-slate-200/90 p-5 z-50 animate-in fade-in slide-in-from-top-2 duration-150 grid grid-cols-2 gap-4">
+                <div className="absolute left-0 mt-2 w-[760px] max-w-[92vw] bg-white rounded-3xl shadow-2xl border border-slate-200/90 p-5 z-50 animate-in fade-in slide-in-from-top-2 duration-150 grid grid-cols-1 md:grid-cols-3 gap-5">
                   {subjectCategories.map((cat, idx) => (
                     <div key={idx} className="space-y-2">
                       <div className="flex items-center gap-2 pb-1 border-b border-slate-100">
@@ -251,14 +263,14 @@ const Navbar = () => {
                       </ul>
                     </div>
                   ))}
-                  <div className="col-span-2 pt-2 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">Over 20+ disciplines across Pakistan</span>
+                  <div className="col-span-1 md:col-span-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+                    <span className="text-slate-500 font-medium">Over 20+ disciplines & structured courses</span>
                     <Link
-                      href="/tutors"
+                      href="/courses"
                       onClick={() => setSubjectsDropdownOpen(false)}
                       className="font-bold text-emerald-700 hover:underline flex items-center gap-1"
                     >
-                      <span>View All Verified Tutors</span>
+                      <span>Explore Course Catalog</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>

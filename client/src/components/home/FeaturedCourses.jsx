@@ -29,10 +29,10 @@ const fallbackCourses = [
     thumbnail: 'https://images.unsplash.com/photo-1609599006353-e629aaabfeae?w=800&q=80',
     priceSuggested: { amount: 3500, unit: 'month' },
     stages: [
-      { name: 'Stage 1: Letter Recognition (Huroof)', lessonCount: 12, badgeReward: 'Huroof Explorer Badge ⭐' },
-      { name: 'Stage 2: Vowel Sounds (Harakat)', lessonCount: 8, badgeReward: 'Harakat Master Badge 🌟' },
-      { name: 'Stage 3: Word Blending & Joining', lessonCount: 8, badgeReward: 'Qaida Graduate Badge 🎖️' },
-      { name: 'Stage 4: Short Surahs & Celebration', lessonCount: 10, badgeReward: 'Junior Qari Certificate 🏆' }
+      { name: 'Stage 1: Letter Recognition (Huroof)', lessonCount: 12, badgeReward: 'Huroof Explorer Badge' },
+      { name: 'Stage 2: Short & Long Vowels (Harakat)', lessonCount: 16, badgeReward: 'Harakat Master Badge' },
+      { name: 'Stage 3: Word Formation & Noon Sakin', lessonCount: 18, badgeReward: 'Tajweed Junior Badge' },
+      { name: 'Stage 4: Complete Juz Amma Recitation', lessonCount: 24, badgeReward: 'Juz Amma Graduate Ribbon' }
     ]
   },
   {
@@ -141,8 +141,9 @@ export default function FeaturedCourses() {
                       </span>
 
                       {isKidsCourse && (
-                        <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-500 text-slate-950 shadow-lg">
-                          ⭐ POPULAR FOR KIDS
+                        <span className="px-3 py-1 rounded-full text-xs font-black bg-amber-500 text-slate-950 shadow-lg flex items-center gap-1">
+                          <Sparkles className="w-3 h-3 text-slate-950" />
+                          <span>POPULAR FOR KIDS</span>
                         </span>
                       )}
                     </div>

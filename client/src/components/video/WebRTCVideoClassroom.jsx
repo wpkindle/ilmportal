@@ -144,11 +144,15 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     peerConnectionRef.current = pc;
     iceCandidateQueue.current = [];
 
-    // Add local tracks (Audio + Video) to peer connection
+    // Add local tracks (Audio + Video) to peer connection — ensuring no duplicate senders
     if (localStreamRef.current) {
+      const existingSenders = pc.getSenders();
       localStreamRef.current.getTracks().forEach((track) => {
-        console.log('➕ Adding local track:', track.kind);
-        pc.addTrack(track, localStreamRef.current);
+        const alreadyAdded = existingSenders.some((s) => s.track && s.track.kind === track.kind);
+        if (!alreadyAdded) {
+          console.log('➕ Adding unique local track to PC:', track.kind);
+          pc.addTrack(track, localStreamRef.current);
+        }
       });
     }
 

@@ -9,6 +9,8 @@ import {
   Mail,
   Lock,
   User,
+  AtSign,
+  Phone,
   MapPin,
   Sparkles,
   ArrowRight,
@@ -59,12 +61,10 @@ export default function StudentAuthModal({
   // Registration Form
   const [registerForm, setRegisterForm] = useState({
     name: '',
+    username: '',
     email: '',
-    password: '',
-    gender: 'male',
-    age: '',
-    city: 'Lahore',
     phone: '',
+    password: '',
     role: 'student'
   });
 
@@ -149,12 +149,18 @@ export default function StudentAuthModal({
     setInfoMessage('');
 
     if (!registerForm.name.trim()) {
-      setError('Student name is required');
+      setError('Full name is required');
       setLoading(false);
       return;
     }
-    if (!registerForm.age || Number(registerForm.age) < 3 || Number(registerForm.age) > 100) {
-      setError('Please enter a valid student age (3–100 years)');
+    const cleanUser = registerForm.username.trim().toLowerCase().replace(/[^a-z0-9_.-]/g, '');
+    if (cleanUser.length < 3) {
+      setError('Username must be at least 3 characters');
+      setLoading(false);
+      return;
+    }
+    if (!registerForm.phone.trim()) {
+      setError('Mobile / WhatsApp number is required');
       setLoading(false);
       return;
     }
@@ -162,19 +168,16 @@ export default function StudentAuthModal({
     try {
       const res = await api.register({
         name: registerForm.name.trim(),
-        email: registerForm.email.trim(),
-        password: registerForm.password,
-        gender: registerForm.gender,
-        age: Number(registerForm.age),
-        city: registerForm.city,
+        username: cleanUser,
+        email: registerForm.email.trim().toLowerCase(),
         phone: registerForm.phone.trim(),
-        guardianPhone: registerForm.phone.trim(),
+        number: registerForm.phone.trim(),
+        password: registerForm.password,
         role: 'student'
       });
 
       if (res.success) {
         setOtpEmail(registerForm.email.trim());
-        if (res.debugOtp) setDebugOtp(res.debugOtp);
         setMode('verify_otp');
         setInfoMessage('Verification code sent to your email.');
       }
@@ -380,18 +383,18 @@ export default function StudentAuthModal({
             <form onSubmit={handleLoginSubmit} autoComplete="off" className="space-y-2.5">
               <div>
                 <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                  Student Email Address
+                  Email or Username
                 </label>
                 <div className="relative">
                   <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
                   <input
-                    type="email"
+                    type="text"
                     required
                     autoComplete="off"
-                    placeholder="student@example.com"
+                    placeholder="student@example.com or username"
                     value={loginForm.email}
                     onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
-                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500"
+                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500 font-medium"
                   />
                 </div>
               </div>
@@ -450,14 +453,14 @@ export default function StudentAuthModal({
             </form>
           )}
 
-          {/* 2. REGISTRATION FORM (WIDE 3-COLUMN COMPACT LAYOUT) */}
+          {/* 2. REGISTRATION FORM (STRAIGHTFORWARD 5-FIELD LAYOUT) */}
           {mode === 'register' && (
             <form onSubmit={handleRegisterSubmit} autoComplete="off" className="space-y-2">
               
               {/* Row 1: Full Name */}
               <div>
                 <label className="text-[11px] font-bold text-slate-700 block mb-0.5">
-                  Student Full Name *
+                  Full Name *
                 </label>
                 <div className="relative">
                   <User className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -468,15 +471,54 @@ export default function StudentAuthModal({
                     placeholder="e.g. Hamza Khan"
                     value={registerForm.name}
                     onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
-                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500"
+                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500 font-medium"
                   />
                 </div>
               </div>
 
-              {/* Row 2: Email */}
+              {/* Row 2: Username & Phone Number in 2 columns */}
+              <div className="grid grid-cols-2 gap-2">
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 block mb-0.5">
+                    Username *
+                  </label>
+                  <div className="relative">
+                    <AtSign className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="text"
+                      required
+                      autoComplete="off"
+                      placeholder="e.g. hamza_khan"
+                      value={registerForm.username}
+                      onChange={(e) => setRegisterForm({ ...registerForm, username: e.target.value.toLowerCase().replace(/[^a-z0-9_.-]/g, '') })}
+                      className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500 font-medium"
+                    />
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-[11px] font-bold text-slate-700 block mb-0.5">
+                    Mobile / WhatsApp *
+                  </label>
+                  <div className="relative">
+                    <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                    <input
+                      type="tel"
+                      required
+                      autoComplete="off"
+                      placeholder="0300-1234567"
+                      value={registerForm.phone}
+                      onChange={(e) => setRegisterForm({ ...registerForm, phone: e.target.value })}
+                      className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500 font-medium"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Row 3: Email Address */}
               <div>
                 <label className="text-[11px] font-bold text-slate-700 block mb-0.5">
-                  Email Address (Verification Code sent here) *
+                  Email Address *
                 </label>
                 <div className="relative">
                   <Mail className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
@@ -487,69 +529,8 @@ export default function StudentAuthModal({
                     placeholder="student@example.com"
                     value={registerForm.email}
                     onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
-                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500"
+                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500 font-medium"
                   />
-                </div>
-              </div>
-
-              {/* Row 3: Gender, Age & City in 3 Compact Columns */}
-              <div className="grid grid-cols-3 gap-2 items-start">
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-0.5">
-                    Gender *
-                  </label>
-                  <div className="grid grid-cols-2 gap-0.5 p-0.5 bg-slate-100 rounded-lg border border-slate-200">
-                    <button
-                      type="button"
-                      onClick={() => setRegisterForm({ ...registerForm, gender: 'male' })}
-                      className={`py-1 rounded text-[10.5px] font-bold transition-all ${
-                        registerForm.gender === 'male' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600'
-                      }`}
-                    >
-                      Male
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setRegisterForm({ ...registerForm, gender: 'female' })}
-                      className={`py-1 rounded text-[10.5px] font-bold transition-all ${
-                        registerForm.gender === 'female' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600'
-                      }`}
-                    >
-                      Female
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-0.5">
-                    Age (Years) *
-                  </label>
-                  <input
-                    type="number"
-                    min="3"
-                    max="100"
-                    required
-                    autoComplete="off"
-                    placeholder="e.g. 10"
-                    value={registerForm.age}
-                    onChange={(e) => setRegisterForm({ ...registerForm, age: e.target.value })}
-                    className="w-full px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 outline-none focus:border-emerald-500 font-bold"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-0.5">
-                    City *
-                  </label>
-                  <select
-                    value={registerForm.city}
-                    onChange={(e) => setRegisterForm({ ...registerForm, city: e.target.value })}
-                    className="w-full px-2 py-1 bg-slate-50 border border-slate-200 rounded-lg text-xs text-slate-800 outline-none focus:border-emerald-500"
-                  >
-                    {pakistaniCities.map((c) => (
-                      <option key={c} value={c}>{c}</option>
-                    ))}
-                  </select>
                 </div>
               </div>
 
@@ -567,7 +548,7 @@ export default function StudentAuthModal({
                     placeholder="Minimum 6 characters"
                     value={registerForm.password}
                     onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
-                    className="w-full pl-8 pr-8 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500"
+                    className="w-full pl-8 pr-8 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500 font-medium"
                   />
                   <button
                     type="button"

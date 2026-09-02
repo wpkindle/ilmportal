@@ -54,28 +54,40 @@ exports.register = async (req, res) => {
   try {
     const {
       name,
+      username,
       email,
+      phone,
+      number,
       password,
       role,
-      phone,
       guardianPhone,
       city,
       gender,
-      age,
-      avatar,
-      sanadTitle,
-      sanadFileUrl,
-      qualifications,
-      experienceYears,
-      hourlyRate,
-      bio
+      age
     } = req.body;
 
+    const userPhone = (phone || number || '').trim();
+
     if (!name || !name.trim()) {
-      return res.status(400).json({ success: false, message: 'Name is required' });
+      return res.status(400).json({ success: false, message: 'Full name is required' });
     }
+    if (!username || !username.trim()) {
+      return res.status(400).json({ success: false, message: 'Username is required' });
+    }
+
+    const cleanUsername = username.toLowerCase().trim().replace(/[^a-z0-9_.-]/g, '');
+    if (cleanUsername.length < 3 || cleanUsername.length > 30) {
+      return res.status(400).json({
+        success: false,
+        message: 'Username must be 3–30 characters long (letters, numbers, underscores, dashes)'
+      });
+    }
+
     if (!email || !email.trim()) {
       return res.status(400).json({ success: false, message: 'Email address is required' });
+    }
+    if (!userPhone) {
+      return res.status(400).json({ success: false, message: 'Phone / WhatsApp number is required' });
     }
     if (!password || password.length < 6) {
       return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
@@ -83,38 +95,21 @@ exports.register = async (req, res) => {
 
     const userRole = role === 'tutor' ? 'tutor' : 'student';
 
-    if (userRole === 'student') {
-      if (!gender) {
-        return res.status(400).json({ success: false, message: 'Student gender is required' });
-      }
-      if (!age || Number(age) < 3 || Number(age) > 100) {
-        return res.status(400).json({ success: false, message: 'Valid student age is required' });
-      }
-    }
-
-    if (userRole === 'tutor') {
-      if (!gender) {
-        return res.status(400).json({ success: false, message: 'Tutor gender is required' });
-      }
-      if (!age || Number(age) < 18 || Number(age) > 90) {
-        return res.status(400).json({ success: false, message: 'Valid tutor age (18–90) is required' });
-      }
-      if (!phone || !phone.trim()) {
-        return res.status(400).json({ success: false, message: 'Mobile number (WhatsApp) is required for tutors' });
-      }
-      if (!avatar || !avatar.trim()) {
-        return res.status(400).json({ success: false, message: 'Profile picture is required for tutor registration' });
-      }
-      if (!sanadFileUrl || !sanadFileUrl.trim()) {
-        return res.status(400).json({ success: false, message: 'Sanad or Educational Degree certificate upload is required for tutors' });
-      }
-    }
-
-    const userExists = await User.findOne({ email: email.toLowerCase().trim() });
-    if (userExists) {
+    // 1. Check if email already exists
+    const emailExists = await User.findOne({ email: email.toLowerCase().trim() });
+    if (emailExists) {
       return res.status(400).json({
         success: false,
         message: 'An account with this email address already exists.'
+      });
+    }
+
+    // 2. Check if username already exists
+    const usernameExists = await User.findOne({ username: cleanUsername });
+    if (usernameExists) {
+      return res.status(400).json({
+        success: false,
+        message: 'This username is already taken. Please choose another username.'
       });
     }
 
@@ -124,63 +119,40 @@ exports.register = async (req, res) => {
 
     const user = await User.create({
       name: name.trim(),
+      username: cleanUsername,
       email: email.toLowerCase().trim(),
       password,
       role: userRole,
-      avatar: avatar ? avatar.trim() : '',
+      phone: userPhone,
+      guardianPhone: (guardianPhone || userPhone).trim(),
       gender: gender || 'male',
       age: age ? Number(age) : undefined,
-      phone: phone ? phone.trim() : (guardianPhone ? guardianPhone.trim() : ''),
-      guardianPhone: guardianPhone ? guardianPhone.trim() : (phone ? phone.trim() : ''),
       city: city || 'Lahore',
       isVerified: false,
       verificationOtp: otp,
       verificationOtpExpires: otpExpires
     });
 
-    // If registered as tutor, create initial pending profile with uploaded Sanad/Degree(s)
+    // If registered as tutor, create initial TutorProfile ready for later profile setup
     if (userRole === 'tutor') {
-      const initialSanads = [];
-
-      if (req.body.sanadDocuments && Array.isArray(req.body.sanadDocuments) && req.body.sanadDocuments.length > 0) {
-        req.body.sanadDocuments.forEach((doc) => {
-          if (doc && doc.fileUrl) {
-            initialSanads.push({
-              title: doc.title || 'Sanad / Degree Certificate',
-              fileUrl: doc.fileUrl,
-              fileType: doc.fileType || (doc.fileUrl.startsWith('data:application/pdf') ? 'application/pdf' : 'image/jpeg'),
-              uploadedAt: new Date()
-            });
-          }
-        });
-      } else if (sanadFileUrl) {
-        initialSanads.push({
-          title: sanadTitle || qualifications || 'Sanad / Educational Degree',
-          fileUrl: sanadFileUrl,
-          fileType: sanadFileUrl.startsWith('data:application/pdf') ? 'application/pdf' : 'image/jpeg',
-          uploadedAt: new Date()
-        });
-      }
-
       await TutorProfile.create({
         user: user._id,
-        bio: bio || 'Assalam-o-Alaikum! I am an experienced tutor dedicated to providing high-quality Quranic and Academic education.',
-        qualifications: qualifications || sanadTitle || 'Verified Degree / Sanad',
-        experienceYears: experienceYears ? Number(experienceYears) : 2,
-        hourlyRate: hourlyRate ? Number(hourlyRate) : 1500,
+        bio: req.body.bio || 'Assalam-o-Alaikum! I am an experienced tutor on IlmPortal.',
+        qualifications: req.body.qualifications || 'Tutor Qualifications',
+        experienceYears: req.body.experienceYears ? Number(req.body.experienceYears) : 2,
+        hourlyRate: req.body.hourlyRate ? Number(req.body.hourlyRate) : 1500,
         gender: gender || 'male',
-        sanadDocuments: initialSanads,
         verificationStatus: 'pending'
       });
 
-      // Create Admin notification for new tutor registration
+      // Notify admin
       const adminUser = await User.findOne({ role: 'admin' });
       if (adminUser) {
         await Notification.create({
           recipient: adminUser._id,
           sender: user._id,
-          title: 'New Tutor Registration Pending Verification',
-          message: `${user.name} (${user.city}) has submitted educational degrees and registered as a tutor for verification.`,
+          title: 'New Tutor Registration',
+          message: `${user.name} (@${user.username}) registered as a tutor.`,
           type: 'tutor_application',
           link: '/admin/tutor-approvals'
         });
@@ -196,10 +168,12 @@ exports.register = async (req, res) => {
       success: true,
       message: 'Registration successful! A 6-digit verification code has been sent to your email.',
       email: user.email,
+      username: user.username,
       isVerified: false,
       user: {
         id: user._id,
         name: user.name,
+        username: user.username,
         email: user.email,
         role: user.role,
         avatar: user.avatar,
@@ -297,6 +271,7 @@ exports.verifyOtp = async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
+        username: user.username,
         email: user.email,
         role: user.role,
         avatar: user.avatar,
@@ -318,17 +293,37 @@ exports.verifyOtp = async (req, res) => {
   }
 };
 
-// @desc    Resend OTP Code
+// @desc    Resend Verification OTP
 // @route   POST /api/auth/resend-otp
 exports.resendOtp = async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ email: email.toLowerCase() });
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Email address is required'
+      });
+    }
+
+    const user = await User.findOne({
+      $or: [
+        { email: email.toLowerCase().trim() },
+        { username: email.toLowerCase().trim() }
+      ]
+    });
 
     if (!user) {
       return res.status(404).json({
         success: false,
-        message: 'No account found with this email'
+        message: 'No account found with this email or username'
+      });
+    }
+
+    if (user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'Account is already verified. Please proceed to login.'
       });
     }
 
@@ -337,9 +332,9 @@ exports.resendOtp = async (req, res) => {
     user.verificationOtpExpires = new Date(Date.now() + 15 * 60 * 1000);
     await user.save();
 
-    // Send Verification Email asynchronously
+    // Send Verification Email asynchronously in background (non-blocking for fast <100ms response)
     sendVerificationOtpEmail(user.email, user.name, otp).catch((err) => {
-      console.error('Async resend email dispatch notification:', err?.message || err);
+      console.error('Async email dispatch notification:', err?.message || err);
     });
 
     res.status(200).json({
@@ -363,11 +358,17 @@ exports.login = async (req, res) => {
     if (!email || !password) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide both email and password'
+        message: 'Please provide both email/username and password'
       });
     }
 
-    const user = await User.findOne({ email: email.toLowerCase() }).select('+password');
+    const identifier = email.toLowerCase().trim();
+    const user = await User.findOne({
+      $or: [
+        { email: identifier },
+        { username: identifier }
+      ]
+    }).select('+password');
 
     if (!user || !(await user.comparePassword(password))) {
       return res.status(401).json({
@@ -390,14 +391,15 @@ exports.login = async (req, res) => {
       user.verificationOtpExpires = new Date(Date.now() + 15 * 60 * 1000);
       await user.save();
 
-      await sendVerificationOtpEmail(user.email, user.name, otp);
+      sendVerificationOtpEmail(user.email, user.name, otp).catch((err) => {
+        console.error('Async email dispatch notification:', err?.message || err);
+      });
 
       return res.status(403).json({
         success: false,
         isUnverified: true,
         email: user.email,
-        message: 'Please verify your email address before logging in. A 6-digit verification code has been sent to your email.',
-        debugOtp: process.env.NODE_ENV === 'production' ? undefined : otp
+        message: 'Please verify your email address before logging in. A 6-digit verification code has been sent to your email.'
       });
     }
 
@@ -418,6 +420,7 @@ exports.login = async (req, res) => {
       user: {
         id: user._id,
         name: user.name,
+        username: user.username,
         email: user.email,
         role: user.role,
         avatar: user.avatar,

@@ -50,6 +50,22 @@ const Navbar = () => {
       return;
     }
 
+    // When on the messages page, clear immediately (backend marks as read on getMessages)
+    if (pathname?.includes('/messages')) {
+      setUnreadMessagesCount(0);
+      // Re-fetch after 2s to reflect any still-unread from other conversations
+      const timer = setTimeout(async () => {
+        try {
+          const res = await api.getConversations();
+          if (res.success && res.conversations) {
+            const totalUnread = res.conversations.reduce((sum, c) => sum + (c.unreadCount || 0), 0);
+            setUnreadMessagesCount(totalUnread);
+          }
+        } catch (e) {}
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+
     const fetchUnreadCount = async () => {
       try {
         const res = await api.getConversations();

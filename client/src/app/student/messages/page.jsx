@@ -1,15 +1,17 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { api } from '../../../services/api';
 import ChatWindow from '../../../components/chat/ChatWindow';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
-import { MessageSquare, User, Clock } from 'lucide-react';
+import { MessageSquare } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
+import { useSocket } from '../../../context/SocketContext';
 
 function StudentMessagesContent() {
   const { user } = useAuth();
+  const { onlineUsers } = useSocket();
   const searchParams = useSearchParams();
   const activeConvParam = searchParams.get('conversation');
   const tutorIdParam = searchParams.get('tutorId');
@@ -18,54 +20,66 @@ function StudentMessagesContent() {
   const [activeConversation, setActiveConversation] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const fetchConversations = useCallback(async () => {
+    try {
+      const res = await api.getConversations();
+      if (res.success) {
+        setConversations(res.conversations);
+        return res.conversations;
+      }
+    } catch (err) {
+      console.error('Error loading conversations:', err);
+    }
+    return [];
+  }, []);
+
   useEffect(() => {
-    const fetchConversations = async () => {
-      try {
-        const res = await api.getConversations();
-        if (res.success) {
-          setConversations(res.conversations);
-          
-          if (activeConvParam) {
-            const found = res.conversations.find(c => c.conversationId === activeConvParam);
-            if (found) {
-              setActiveConversation(found);
-            } else if (tutorIdParam) {
-              // Fetch tutor details to build a temporary thread
-              const tutorRes = await api.getTutorById(tutorIdParam);
-              if (tutorRes.success) {
-                setActiveConversation({
-                  conversationId: activeConvParam,
-                  partner: tutorRes.tutor.user
-                });
-              }
-            }
-          } else if (res.conversations.length > 0) {
-            setActiveConversation(res.conversations[0]);
+    const init = async () => {
+      const convs = await fetchConversations();
+      if (activeConvParam) {
+        const found = convs.find(c => c.conversationId === activeConvParam);
+        if (found) {
+          setActiveConversation(found);
+        } else if (tutorIdParam) {
+          const tutorRes = await api.getTutorById(tutorIdParam).catch(() => null);
+          if (tutorRes?.success) {
+            setActiveConversation({
+              conversationId: activeConvParam,
+              partner: tutorRes.tutor.user
+            });
           }
         }
-      } catch (err) {
-        console.error('Error loading conversations:', err);
-      } finally {
-        setLoading(false);
+      } else if (convs.length > 0) {
+        setActiveConversation(convs[0]);
       }
+      setLoading(false);
     };
+    init();
+  }, [activeConvParam, tutorIdParam, fetchConversations]);
 
-    fetchConversations();
-  }, [activeConvParam, tutorIdParam]);
+  // Optimistically clear unread count, re-fetch after backend marks as read
+  const handleSelectConversation = (conv) => {
+    setConversations(prev =>
+      prev.map(c =>
+        c.conversationId === conv.conversationId ? { ...c, unreadCount: 0 } : c
+      )
+    );
+    setActiveConversation(conv);
+    setTimeout(() => fetchConversations(), 1500);
+  };
 
   if (loading) return <LoadingSpinner text="Loading messages..." />;
 
   return (
     <div className="py-8 bg-slate-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          {/* Left Sidebar: Conversations Threads List */}
+
+          {/* Sidebar */}
           <div className="lg:col-span-4 bg-white rounded-3xl p-4 border border-slate-200 shadow-sm h-[75vh] flex flex-col">
             <h2 className="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center gap-2">
               <MessageSquare className="w-4 h-4 text-emerald-600" />
-              <span>Messages & Tutors</span>
+              <span>Messages &amp; Tutors</span>
             </h2>
 
             <div className="flex-1 overflow-y-auto space-y-1.5 mt-3">
@@ -76,31 +90,44 @@ function StudentMessagesContent() {
               ) : (
                 conversations.map((conv) => {
                   const isSelected = activeConversation?.conversationId === conv.conversationId;
+                  const isTutorOnline = conv.partner?._id && onlineUsers.includes(conv.partner._id);
                   return (
                     <button
                       key={conv.conversationId}
-                      onClick={() => setActiveConversation(conv)}
+                      onClick={() => handleSelectConversation(conv)}
                       className={`w-full p-3 rounded-2xl text-left transition-all flex items-center gap-3 ${
                         isSelected
                           ? 'bg-emerald-50 border border-emerald-200'
                           : 'hover:bg-slate-50'
                       }`}
                     >
-                      <img
-                        src={conv.partner?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.partner?.name || 'T')}&background=059669&color=fff`}
-                        alt={conv.partner?.name}
-                        className="w-10 h-10 rounded-full object-cover"
-                      />
+                      {/* Avatar with online dot */}
+                      <div className="relative shrink-0">
+                        <img
+                          src={conv.partner?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.partner?.name || 'T')}&background=059669&color=fff`}
+                          alt={conv.partner?.name}
+                          className="w-10 h-10 rounded-full object-cover"
+                        />
+                        {isTutorOnline && (
+                          <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-white rounded-full" />
+                        )}
+                      </div>
+
                       <div className="flex-1 min-w-0">
-                        <div className="flex items-center justify-between">
+                        <div className="flex items-center justify-between gap-2">
                           <h4 className="text-xs font-bold text-slate-900 truncate">
                             {conv.partner?.name}
                           </h4>
-                          {conv.unreadCount > 0 && (
-                            <span className="w-4 h-4 bg-emerald-600 text-white rounded-full text-[10px] font-bold flex items-center justify-center">
-                              {conv.unreadCount}
-                            </span>
-                          )}
+                          <div className="flex items-center gap-1 shrink-0">
+                            {isTutorOnline && (
+                              <span className="text-[9px] font-bold text-emerald-600">Online</span>
+                            )}
+                            {conv.unreadCount > 0 && (
+                              <span className="min-w-[16px] h-4 px-1 bg-emerald-600 text-white rounded-full text-[10px] font-bold flex items-center justify-center">
+                                {conv.unreadCount}
+                              </span>
+                            )}
+                          </div>
                         </div>
                         <p className="text-[11px] text-slate-500 truncate mt-0.5">
                           {conv.lastMessage?.text || 'Sent an offer'}
@@ -113,7 +140,7 @@ function StudentMessagesContent() {
             </div>
           </div>
 
-          {/* Right Main Chat Window */}
+          {/* Chat Window */}
           <div className="lg:col-span-8">
             {activeConversation ? (
               <ChatWindow
@@ -131,7 +158,6 @@ function StudentMessagesContent() {
           </div>
 
         </div>
-
       </div>
     </div>
   );
@@ -144,4 +170,3 @@ export default function StudentMessagesPage() {
     </Suspense>
   );
 }
-

@@ -227,7 +227,17 @@ export default function TutorDashboardPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {/* Join Live Classroom */}
+                      {deal.mode !== 'in_person' && (
+                        <Link
+                          href={`/classroom/${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
+                          className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all"
+                        >
+                          <Video className="w-4 h-4" />
+                          <span>Join Live Class</span>
+                        </Link>
+                      )}
                       <Link
                         href={`/tutor/messages?conversation=${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
                         className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5"

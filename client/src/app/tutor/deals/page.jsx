@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { api } from '../../../services/api';
 import TrialBanner from '../../../components/common/TrialBanner';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
-import { BookOpen, MessageSquare, Plus } from 'lucide-react';
+import { BookOpen, MessageSquare, Plus, Video } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 
 export default function TutorDealsPage() {
@@ -73,13 +73,24 @@ export default function TutorDealsPage() {
                     </div>
                   </div>
 
-                  <Link
-                    href={`/tutor/messages?conversation=${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
-                    className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl flex items-center gap-1.5"
-                  >
-                    <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Open Chat</span>
-                  </Link>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {deal.mode !== 'in_person' && (
+                      <Link
+                        href={`/classroom/${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
+                        className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all"
+                      >
+                        <Video className="w-3.5 h-3.5" />
+                        <span>Join Live Class</span>
+                      </Link>
+                    )}
+                    <Link
+                      href={`/tutor/messages?conversation=${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
+                      className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl flex items-center gap-1.5"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Open Chat</span>
+                    </Link>
+                  </div>
                 </div>
 
                 <TrialBanner deal={deal} onPayClick={() => {}} />

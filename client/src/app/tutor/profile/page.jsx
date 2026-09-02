@@ -598,7 +598,7 @@ function TutorProfileContent() {
                       <span>Hourly Tuition Fee (PKR) *</span>
                     </label>
                     <div className="relative">
-                      <DollarSign className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <span className="text-[11px] font-bold text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 select-none">PKR</span>
                       <input
                         type="number"
                         min="300"
@@ -607,7 +607,7 @@ function TutorProfileContent() {
                         required
                         value={hourlyRate}
                         onChange={(e) => setHourlyRate(e.target.value)}
-                        className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 font-bold"
+                        className="w-full pl-12 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 font-bold"
                       />
                     </div>
                   </div>

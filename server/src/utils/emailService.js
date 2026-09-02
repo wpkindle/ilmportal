@@ -12,16 +12,18 @@ const initTransporter = () => {
 
     if (smtpService && smtpUser && smtpPass) {
       transporter = nodemailer.createTransport({
-        service: smtpService,
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true,
         auth: {
           user: smtpUser,
           pass: smtpPass
         },
-        connectionTimeout: 5000,
-        greetingTimeout: 3000,
-        socketTimeout: 5000
+        connectionTimeout: 7000,
+        greetingTimeout: 5000,
+        socketTimeout: 8000
       });
-      console.log(`📡 [EMAIL SERVICE] Configured with ${smtpService} service for ${smtpUser}`);
+      console.log(`📡 [EMAIL SERVICE] Configured with Gmail SSL port 465 for ${smtpUser}`);
     } else if (smtpHost && smtpUser && smtpPass) {
       transporter = nodemailer.createTransport({
         host: smtpHost,
@@ -31,9 +33,9 @@ const initTransporter = () => {
           user: smtpUser,
           pass: smtpPass
         },
-        connectionTimeout: 5000,
-        greetingTimeout: 3000,
-        socketTimeout: 5000,
+        connectionTimeout: 7000,
+        greetingTimeout: 5000,
+        socketTimeout: 8000,
         tls: {
           rejectUnauthorized: false
         }
@@ -51,7 +53,80 @@ initTransporter();
 
 const getClientBaseUrl = () => process.env.CLIENT_URL || 'https://ilmportal.vercel.app';
 
+// HTTP REST API Email Dispatch (Port 443 / HTTPS - NEVER blocked by cloud firewalls)
+const sendViaHttpApi = async ({ to, subject, html, text }) => {
+  // 1. Resend HTTP API (https://resend.com)
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const fromAddr = process.env.RESEND_FROM || 'IlmPortal <onboarding@resend.dev>';
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY.trim()}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: fromAddr,
+          to: Array.isArray(to) ? to : [to],
+          subject,
+          html,
+          text: text || html.replace(/<[^>]*>?/gm, '')
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        console.log(`📧 [LIVE EMAIL SENT VIA RESEND HTTP API] MessageId: ${data.id} to ${to}`);
+        return { success: true, messageId: data.id, provider: 'resend', response: '250 OK via Resend' };
+      } else {
+        console.error('Resend HTTP API error:', data);
+        return { success: false, error: data.message || 'Resend error', provider: 'resend' };
+      }
+    } catch (err) {
+      console.error('Resend fetch error:', err.message);
+    }
+  }
+
+  // 2. Brevo HTTP API (https://brevo.com)
+  if (process.env.BREVO_API_KEY) {
+    try {
+      const fromEmail = process.env.BREVO_FROM || 'abdulkhaliqwebdeveloper@gmail.com';
+      const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'api-key': process.env.BREVO_API_KEY.trim(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          sender: { name: 'IlmPortal Pakistan', email: fromEmail },
+          to: [{ email: to }],
+          subject,
+          htmlContent: html,
+          textContent: text || html.replace(/<[^>]*>?/gm, '')
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        console.log(`📧 [LIVE EMAIL SENT VIA BREVO HTTP API] MessageId: ${data.messageId} to ${to}`);
+        return { success: true, messageId: data.messageId, provider: 'brevo', response: '250 OK via Brevo' };
+      } else {
+        console.error('Brevo HTTP API error:', data);
+        return { success: false, error: data.message || 'Brevo error', provider: 'brevo' };
+      }
+    } catch (err) {
+      console.error('Brevo fetch error:', err.message);
+    }
+  }
+
+  return null;
+};
+
 const sendEmail = async ({ to, subject, html, text }) => {
+  // First check if an HTTP API provider is configured
+  const httpResult = await sendViaHttpApi({ to, subject, html, text });
+  if (httpResult && httpResult.success) {
+    return true;
+  }
+
   try {
     if (transporter) {
       const fromAddress = `"IlmPortal Pakistan" <${process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com'}>`;
@@ -63,7 +138,7 @@ const sendEmail = async ({ to, subject, html, text }) => {
         html
       });
       console.log(`\n======================================================`);
-      console.log(`📧 [LIVE EMAIL SENT SUCCESSFULLY]`);
+      console.log(`📧 [LIVE EMAIL SENT SUCCESSFULLY VIA SMTP]`);
       console.log(`📬 To: ${to}`);
       console.log(`📋 Subject: ${subject}`);
       console.log(`🆔 MessageId: ${info.messageId}`);
@@ -84,6 +159,11 @@ const sendEmail = async ({ to, subject, html, text }) => {
 };
 
 const sendEmailDetailed = async ({ to, subject, html, text }) => {
+  const httpResult = await sendViaHttpApi({ to, subject, html, text });
+  if (httpResult) {
+    return httpResult;
+  }
+
   if (!transporter) {
     return { success: false, error: 'No transporter initialized' };
   }
@@ -96,7 +176,7 @@ const sendEmailDetailed = async ({ to, subject, html, text }) => {
       text: text || html.replace(/<[^>]*>?/gm, ''),
       html
     });
-    return { success: true, messageId: info.messageId, response: info.response, to };
+    return { success: true, messageId: info.messageId, response: info.response, to, provider: 'smtp' };
   } catch (error) {
     console.error('Detailed sendMail error:', error);
     return {
@@ -105,7 +185,8 @@ const sendEmailDetailed = async ({ to, subject, html, text }) => {
       code: error.code,
       command: error.command,
       response: error.response,
-      responseCode: error.responseCode
+      responseCode: error.responseCode,
+      provider: 'smtp'
     };
   }
 };

@@ -642,7 +642,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                 Live Classroom Safety Notice
               </h3>
               <p className="text-xs text-slate-300 leading-relaxed pt-1">
-                Welcome to your 1:1 live session. All classroom communications are monitored for academic quality and student safety under IlmPortal guidelines.
+                Quick heads-up: Sharing or requesting outside contact details is strictly prohibited. Our AI safety system automatically detects contact sharing, and violations will result in a permanent ban.
               </p>
             </div>
 
@@ -670,8 +670,8 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           <div className="min-w-0">
             <h2 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2 truncate">
               <span>{sessionData?.title || 'Live Tutoring Class'}</span>
-              <span className="text-[9px] font-bold px-1.5 py-0.2 bg-red-950/80 text-red-300 rounded border border-red-800 shrink-0">
-                REC • Live Audio &amp; Video
+              <span className="text-[9px] font-bold px-1.5 py-0.2 bg-emerald-950/80 text-emerald-300 rounded border border-emerald-800 shrink-0">
+                LIVE • 1:1 Class
               </span>
             </h2>
           </div>

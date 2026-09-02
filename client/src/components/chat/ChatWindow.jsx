@@ -404,7 +404,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
           <ShieldCheck className="w-4 h-4" />
         </div>
         <p className="text-[11px] sm:text-xs text-emerald-900 leading-snug font-medium">
-          <strong className="text-emerald-950 font-bold">Safety Notice:</strong> To keep our community safe and high-quality, this conversation is being saved. Please remember not to share or request personal details. This helps protect your account and keeps our platform safe for everyone!
+          <strong className="text-emerald-950 font-bold">Quick heads-up:</strong> Sharing or requesting outside contact details is strictly prohibited. Our AI safety system automatically detects contact sharing, and violations will result in a permanent ban.
         </p>
       </div>
 

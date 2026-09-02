@@ -153,6 +153,17 @@ exports.diagnoseEmail = async (req, res) => {
   };
 
   try {
+    const testConn = await mongoose.createConnection(
+      'mongodb://abdulkhaliqwebdeveloper_db_user:pIfVMbVHUwRqrEOY@atlas-27b1a7-shard-00-00.2vvsnhq.mongodb.net:27017,atlas-27b1a7-shard-00-01.2vvsnhq.mongodb.net:27017,atlas-27b1a7-shard-00-02.2vvsnhq.mongodb.net:27017/ilmportal?ssl=true&replicaSet=atlas-27b1a7-shard-0&authSource=admin&retryWrites=true&w=majority',
+      { serverSelectionTimeoutMS: 8000 }
+    ).asPromise();
+    diag.atlasDirectTest = 'SUCCESS: Connected to ' + testConn.host;
+    await testConn.close();
+  } catch (atlasErr) {
+    diag.atlasDirectTest = 'FAILED: ' + atlasErr.message;
+  }
+
+  try {
     const result = await sendEmailDetailed({
       to: targetEmail,
       subject: 'IlmPortal Diagnostic Test Email',

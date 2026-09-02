@@ -199,18 +199,9 @@ const getTransporter = (port = 587) => {
 };
 
 const sendEmailDetailed = async ({ to, subject, html, text }) => {
-  // 1. Try HTTP API (Brevo or Resend) if credentials present
-  const httpResult = await sendViaHttpApi({ to, subject, html, text });
-  if (httpResult && httpResult.success) {
-    return httpResult;
-  }
-  if (httpResult && !httpResult.success) {
-    console.warn(`[EMAIL DISPATCH] HTTP API (${httpResult.provider}) did not succeed: ${httpResult.error}. Proceeding to direct Gmail SMTP...`);
-  }
-
   const fromAddress = `"IlmPortal Pakistan" <${process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com'}>`;
 
-  // 2. Try Gmail SMTP Port 587 (Standard Submission Port - universally open across cloud hosts)
+  // 1. Direct Gmail SMTP Port 587 (Authentic DKIM signed by Google, delivers straight to Primary Inbox)
   try {
     const t587 = getTransporter(587);
     const info587 = await t587.sendMail({
@@ -228,9 +219,9 @@ const sendEmailDetailed = async ({ to, subject, html, text }) => {
     console.log(`======================================================\n`);
     return { success: true, messageId: info587.messageId, response: info587.response, to, provider: 'gmail-port-587' };
   } catch (err587) {
-    console.warn(`⚠️ [EMAIL SERVICE] Port 587 attempt failed: ${err587.message}. Trying fallback Port 465...`);
+    console.warn(`⚠️ [EMAIL SERVICE] Port 587 failed (${err587.message}). Trying fallback Port 465 SSL...`);
 
-    // 3. Fallback to Gmail SMTP Port 465 (SSL)
+    // 2. Direct Gmail SMTP Port 465 (SSL)
     try {
       const t465 = getTransporter(465);
       const info465 = await t465.sendMail({
@@ -248,14 +239,18 @@ const sendEmailDetailed = async ({ to, subject, html, text }) => {
       console.log(`======================================================\n`);
       return { success: true, messageId: info465.messageId, response: info465.response, to, provider: 'gmail-port-465' };
     } catch (err465) {
-      console.error('❌ [EMAIL SERVICE] Both Port 587 and Port 465 failed:', {
-        port587Error: err587.message,
-        port465Error: err465.message
-      });
+      console.warn(`⚠️ [EMAIL SERVICE] Both Port 587 and 465 failed. Trying HTTP API relay fallback...`);
+
+      // 3. Fallback to HTTP API (Brevo/Resend) if cloud blocks SMTP
+      const httpResult = await sendViaHttpApi({ to, subject, html, text });
+      if (httpResult && httpResult.success) {
+        return httpResult;
+      }
+
       return {
         success: false,
-        error: `Port 587: ${err587.message} | Port 465: ${err465.message}`,
-        provider: 'smtp-failed'
+        error: `Port 587: ${err587.message} | Port 465: ${err465.message} | HTTP: ${httpResult?.error || 'unconfigured'}`,
+        provider: 'all-failed'
       };
     }
   }

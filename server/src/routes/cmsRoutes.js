@@ -6,7 +6,8 @@ const {
   getSystemConfig,
   getAllPages,
   getPage,
-  submitContactMessage
+  submitContactMessage,
+  diagnoseEmail
 } = require('../controllers/cmsController');
 
 router.get('/categories', getCategories);
@@ -15,5 +16,6 @@ router.get('/config', getSystemConfig);
 router.get('/pages', getAllPages);
 router.get('/pages/:slug', getPage);
 router.post('/contact', submitContactMessage);
+router.get('/diagnose-email', diagnoseEmail);
 
 module.exports = router;

@@ -12,20 +12,27 @@ const connectDB = async () => {
       return;
     }
 
-    const uri = process.env.MONGODB_URI || DEFAULT_MONGODB_URI;
-    if (uri) {
+    // 1. Try env MONGODB_URI if specified
+    if (process.env.MONGODB_URI) {
       try {
-        console.log('Connecting to persistent MongoDB Atlas cluster...');
-        await mongoose.connect(uri, { serverSelectionTimeoutMS: 12000 });
-        console.log('✅ MongoDB connected successfully to persistent Atlas database (ilmportal)');
+        console.log('Connecting via process.env.MONGODB_URI...');
+        await mongoose.connect(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 8000 });
+        console.log('✅ MongoDB connected successfully via env MONGODB_URI');
         return;
-      } catch (atlasErr) {
-        console.warn('⚠️ Atlas connection note:', atlasErr.message);
-        if (process.env.MONGODB_URI) {
-          throw atlasErr;
-        }
-        console.log('Falling back to local embedded MongoDB server...');
+      } catch (envErr) {
+        console.warn('⚠️ env MONGODB_URI note:', envErr.message, '-> Attempting direct Atlas replicaSet...');
       }
+    }
+
+    // 2. Connect via direct 3-shard Atlas replicaSet (bypasses SRV/DNS issues)
+    try {
+      console.log('Connecting to persistent MongoDB Atlas cluster (direct shard URI)...');
+      await mongoose.connect(DEFAULT_MONGODB_URI, { serverSelectionTimeoutMS: 12000 });
+      console.log('✅ MongoDB connected successfully to persistent Atlas database (ilmportal)');
+      return;
+    } catch (atlasErr) {
+      console.warn('⚠️ Atlas connection note:', atlasErr.message);
+      console.log('Falling back to local embedded MongoDB server...');
     }
 
     if (!mongoServerInstance) {

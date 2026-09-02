@@ -161,36 +161,103 @@ const sendEmail = async ({ to, subject, html, text }) => {
   }
 };
 
-const sendEmailDetailed = async ({ to, subject, html, text }) => {
-  const httpResult = await sendViaHttpApi({ to, subject, html, text });
-  if (httpResult) {
-    return httpResult;
+const getTransporter = (port = 587) => {
+  const smtpHost = process.env.SMTP_HOST;
+  const smtpUser = process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com';
+  const smtpPass = process.env.SMTP_PASS || 'zthfqcnavkuldwxt';
+
+  if (smtpHost) {
+    const customPort = parseInt(process.env.SMTP_PORT || port, 10);
+    return nodemailer.createTransport({
+      host: smtpHost,
+      port: customPort,
+      secure: customPort === 465,
+      auth: { user: smtpUser, pass: smtpPass },
+      connectionTimeout: 10000,
+      greetingTimeout: 8000,
+      socketTimeout: 12000,
+      tls: { rejectUnauthorized: false }
+    });
   }
 
-  if (!transporter) {
-    return { success: false, error: 'No transporter initialized' };
+  // Gmail SMTP
+  return nodemailer.createTransport({
+    host: 'smtp.gmail.com',
+    port: port,
+    secure: port === 465,
+    auth: {
+      user: smtpUser,
+      pass: smtpPass
+    },
+    tls: {
+      rejectUnauthorized: false
+    },
+    connectionTimeout: 10000,
+    greetingTimeout: 8000,
+    socketTimeout: 12000
+  });
+};
+
+const sendEmailDetailed = async ({ to, subject, html, text }) => {
+  // 1. Try HTTP API (Brevo or Resend) if credentials present
+  const httpResult = await sendViaHttpApi({ to, subject, html, text });
+  if (httpResult && httpResult.success) {
+    return httpResult;
   }
+  if (httpResult && !httpResult.success) {
+    console.warn(`[EMAIL DISPATCH] HTTP API (${httpResult.provider}) did not succeed: ${httpResult.error}. Proceeding to direct Gmail SMTP...`);
+  }
+
   const fromAddress = `"IlmPortal Pakistan" <${process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com'}>`;
+
+  // 2. Try Gmail SMTP Port 587 (Standard Submission Port - universally open across cloud hosts)
   try {
-    const info = await transporter.sendMail({
+    const t587 = getTransporter(587);
+    const info587 = await t587.sendMail({
       from: fromAddress,
       to,
       subject,
       text: text || html.replace(/<[^>]*>?/gm, ''),
       html
     });
-    return { success: true, messageId: info.messageId, response: info.response, to, provider: 'smtp' };
-  } catch (error) {
-    console.error('Detailed sendMail error:', error);
-    return {
-      success: false,
-      error: error.message,
-      code: error.code,
-      command: error.command,
-      response: error.response,
-      responseCode: error.responseCode,
-      provider: 'smtp'
-    };
+    console.log(`\n======================================================`);
+    console.log(`📧 [LIVE EMAIL SENT SUCCESSFULLY VIA GMAIL PORT 587]`);
+    console.log(`📬 To: ${to}`);
+    console.log(`📋 Subject: ${subject}`);
+    console.log(`🆔 MessageId: ${info587.messageId}`);
+    console.log(`======================================================\n`);
+    return { success: true, messageId: info587.messageId, response: info587.response, to, provider: 'gmail-port-587' };
+  } catch (err587) {
+    console.warn(`⚠️ [EMAIL SERVICE] Port 587 attempt failed: ${err587.message}. Trying fallback Port 465...`);
+
+    // 3. Fallback to Gmail SMTP Port 465 (SSL)
+    try {
+      const t465 = getTransporter(465);
+      const info465 = await t465.sendMail({
+        from: fromAddress,
+        to,
+        subject,
+        text: text || html.replace(/<[^>]*>?/gm, ''),
+        html
+      });
+      console.log(`\n======================================================`);
+      console.log(`📧 [LIVE EMAIL SENT SUCCESSFULLY VIA GMAIL PORT 465]`);
+      console.log(`📬 To: ${to}`);
+      console.log(`📋 Subject: ${subject}`);
+      console.log(`🆔 MessageId: ${info465.messageId}`);
+      console.log(`======================================================\n`);
+      return { success: true, messageId: info465.messageId, response: info465.response, to, provider: 'gmail-port-465' };
+    } catch (err465) {
+      console.error('❌ [EMAIL SERVICE] Both Port 587 and Port 465 failed:', {
+        port587Error: err587.message,
+        port465Error: err465.message
+      });
+      return {
+        success: false,
+        error: `Port 587: ${err587.message} | Port 465: ${err465.message}`,
+        provider: 'smtp-failed'
+      };
+    }
   }
 };
 

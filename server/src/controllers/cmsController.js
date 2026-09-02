@@ -135,3 +135,36 @@ exports.submitContactMessage = async (req, res) => {
     });
   }
 };
+
+// @desc    Live Email & DB Diagnostic
+// @route   GET /api/cms/diagnose-email
+exports.diagnoseEmail = async (req, res) => {
+  const targetEmail = req.query.to || 'abdulkhaliqwebdeveloper@gmail.com';
+  const { sendEmailDetailed } = require('../utils/emailService');
+  const mongoose = require('mongoose');
+
+  const diag = {
+    targetEmail,
+    dbHost: mongoose.connection.host,
+    dbName: mongoose.connection.name,
+    isAtlas: (mongoose.connection.host || '').includes('mongodb.net'),
+    envUser: process.env.SMTP_USER || 'default fallback',
+    hasEnvPass: !!(process.env.SMTP_PASS),
+  };
+
+  try {
+    const result = await sendEmailDetailed({
+      to: targetEmail,
+      subject: 'IlmPortal Diagnostic Test Email',
+      html: '<p>This is a live diagnostic email from IlmPortal backend.</p>',
+      text: 'This is a live diagnostic email from IlmPortal backend.'
+    });
+    diag.result = result;
+    res.status(200).json({ success: true, diag });
+  } catch (err) {
+    diag.error = err.message;
+    diag.code = err.code;
+    diag.stack = err.stack;
+    res.status(500).json({ success: false, diag });
+  }
+};

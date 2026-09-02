@@ -64,6 +64,22 @@ const tuneSdpForVoiceQuality = (sdp) => {
   });
 };
 
+// Smooth audio fade-in to prevent sudden pops/screeches when audio track attaches
+const fadeInAudio = (audioEl, targetVolume, duration = 300) => {
+  if (!audioEl) return;
+  const steps = 15;
+  const stepTime = duration / steps;
+  const stepVolume = targetVolume / steps;
+  let currentStep = 0;
+  audioEl.volume = 0;
+
+  const fade = setInterval(() => {
+    currentStep++;
+    audioEl.volume = Math.min(stepVolume * currentStep, targetVolume);
+    if (currentStep >= steps) clearInterval(fade);
+  }, stepTime);
+};
+
 const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
   const { user } = useAuth();
   const { socket } = useSocket();
@@ -185,12 +201,17 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
         quranRemoteVideoRef.current.play().catch(() => {});
       }
 
-      // ONLY the single dedicated audio tag plays remote voice
+      // ONLY the single dedicated audio tag plays remote voice with smooth fade-in
       if (remoteAudioRef.current) {
         remoteAudioRef.current.srcObject = stream;
         remoteAudioRef.current.muted = isSpeakerMuted;
-        remoteAudioRef.current.volume = speakerVolume;
-        remoteAudioRef.current.play().catch(() => {});
+        remoteAudioRef.current.play()
+          .then(() => {
+            if (!isSpeakerMuted) {
+              fadeInAudio(remoteAudioRef.current, speakerVolume);
+            }
+          })
+          .catch(() => {});
       }
     };
 
@@ -454,8 +475,13 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       if (remoteAudioRef.current) {
         remoteAudioRef.current.srcObject = remoteStream;
         remoteAudioRef.current.muted = isSpeakerMuted;
-        remoteAudioRef.current.volume = speakerVolume;
-        remoteAudioRef.current.play().catch(() => {});
+        remoteAudioRef.current.play()
+          .then(() => {
+            if (!isSpeakerMuted) {
+              fadeInAudio(remoteAudioRef.current, speakerVolume);
+            }
+          })
+          .catch(() => {});
       }
       if (spotlightRemoteVideoRef.current) {
         spotlightRemoteVideoRef.current.srcObject = remoteStream;

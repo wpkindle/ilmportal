@@ -2,8 +2,6 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Navbar from '../../components/common/Navbar';
-import Footer from '../../components/common/Footer';
 import CMSContentRenderer from '../../components/common/CMSContentRenderer';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { api } from '../../services/api';
@@ -30,8 +28,7 @@ export default function TermsPage() {
   }, []);
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
-      <Navbar />
+    <div className="flex-1 bg-slate-50">
 
       {/* Hero Banner */}
       <section className="bg-gradient-to-b from-slate-900 to-slate-950 text-white pt-12 pb-16 border-b border-slate-800">
@@ -95,8 +92,6 @@ export default function TermsPage() {
 
         </div>
       </main>
-
-      <Footer />
     </div>
   );
 }

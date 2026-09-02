@@ -162,20 +162,8 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} IlmPortal Pakistan. All rights reserved.</p>
-          
-          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400 font-medium">
-            <Link href="/about-us" className="hover:text-emerald-400 transition-colors">About</Link>
-            <span>&bull;</span>
-            <Link href="/contact-us" className="hover:text-emerald-400 transition-colors">Contact</Link>
-            <span>&bull;</span>
-            <Link href="/privacy-policy" className="hover:text-emerald-400 transition-colors">Privacy</Link>
-            <span>&bull;</span>
-            <Link href="/terms" className="hover:text-emerald-400 transition-colors">Terms</Link>
-            <span>&bull;</span>
-            <Link href="/disclaimer" className="hover:text-emerald-400 transition-colors">Disclaimer</Link>
-          </div>
 
           <div className="flex items-center gap-2 text-xs text-slate-400">
             <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 shrink-0" />

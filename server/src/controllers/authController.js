@@ -208,8 +208,7 @@ exports.register = async (req, res) => {
         isVerified: false,
         city: user.city,
         phone: user.phone
-      },
-      debugOtp: otp
+      }
     });
   } catch (error) {
     console.error('Registration Error:', error);
@@ -345,8 +344,7 @@ exports.resendOtp = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'A fresh OTP code has been sent to your email address.',
-      debugOtp: otp
+      message: 'A fresh OTP code has been sent to your email address.'
     });
   } catch (error) {
     res.status(500).json({

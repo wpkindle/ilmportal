@@ -76,12 +76,8 @@ export default function StudentRegisterPage() {
 
       const res = await api.register(payload);
 
-      if (res.debugOtp) {
-        sessionStorage.setItem(`otp_${email.trim().toLowerCase()}`, res.debugOtp);
-      }
-
       if (res.requiresVerification || res.isVerified === false || res.message?.toLowerCase().includes('otp') || res.message?.toLowerCase().includes('verification') || res.success) {
-        router.push(`/verify-email?email=${encodeURIComponent(email.trim())}&role=student${res.debugOtp ? `&code=${res.debugOtp}` : ''}`);
+        router.push(`/verify-email?email=${encodeURIComponent(email.trim())}&role=student`);
       } else {
         router.push('/login?role=student&registered=true');
       }

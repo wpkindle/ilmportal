@@ -633,19 +633,6 @@ export default function StudentAuthModal({
                   className="w-full py-2 text-center text-2xl font-mono tracking-widest font-black bg-slate-50 border-2 border-emerald-500/40 rounded-xl text-slate-900 outline-none focus:border-emerald-600 focus:bg-white"
                 />
 
-                {debugOtp && (
-                  <div className="p-1.5 bg-amber-50 rounded-lg border border-amber-200 flex items-center justify-between text-xs">
-                    <span className="text-amber-900 font-mono">Code: <strong>{debugOtp}</strong></span>
-                    <button
-                      type="button"
-                      onClick={() => setOtpCode(debugOtp)}
-                      className="px-2 py-0.5 bg-amber-200 text-amber-900 font-bold rounded text-[10px]"
-                    >
-                      Auto-Fill
-                    </button>
-                  </div>
-                )}
-
                 <button
                   type="submit"
                   disabled={loading || otpCode.length < 6}

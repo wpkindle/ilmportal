@@ -331,17 +331,17 @@ function TutorProfileContent() {
             <div className="space-y-1">
               <h3 className="text-sm font-bold text-emerald-950 flex items-center gap-2">
                 <span>🎉 Email Verified Successfully!</span>
-                <span className="text-[10px] bg-emerald-600 text-white font-extrabold px-2 py-0.5 rounded-full">ACTIVE</span>
+                <span className="text-[10px] bg-emerald-600 text-white font-extrabold px-2 py-0.5 rounded-full">EMAIL CONFIRMED</span>
               </h3>
               <p className="text-xs text-emerald-900 leading-relaxed font-medium">
-                Welcome to IlmPortal Teaching Faculty! Your account is active and verified. Please complete your tutor profile details below (such as Teaching Subjects, Degree / Sanad Certificates, Hourly Rates, and Bio) so our team can approve your public listing.
+                Welcome to IlmPortal! Your email address is confirmed. Please complete your profile 100%, then the administration will review it. Profile will be visible to the public on approval from administration.
               </p>
             </div>
           </div>
         )}
 
         {/* Account Status / Warning / Audit Notice Banner */}
-        <AccountStatusBanner user={user} role="tutor" />
+        <AccountStatusBanner user={user} tutorProfile={tutorProfile} role="tutor" />
 
         {/* Dynamic Profile Completion Meter Widget */}
         <ProfileCompletionMeter user={user} tutorProfile={tutorProfile} />
@@ -379,14 +379,19 @@ function TutorProfileContent() {
                     Tutor
                   </span>
                   {tutorProfile?.verificationStatus === 'approved' ? (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white flex items-center gap-1">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white flex items-center gap-1 shadow-xs">
                       <ShieldCheck className="w-3 h-3" />
-                      <span>Verified Sanad</span>
+                      <span>Verified & Approved</span>
+                    </span>
+                  ) : tutorProfile?.verificationStatus === 'under_review' ? (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-900 border border-blue-200 flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-blue-600 animate-pulse" />
+                      <span>Under Admin Review</span>
                     </span>
                   ) : (
-                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-amber-600" />
-                      <span>Pending Verification</span>
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-200 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3 text-slate-500" />
+                      <span>Incomplete Profile</span>
                     </span>
                   )}
                 </div>

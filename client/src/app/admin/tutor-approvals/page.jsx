@@ -10,7 +10,15 @@ import { CheckCircle2, XCircle, Mail, FileText, Award, MapPin } from 'lucide-rea
 export default function TutorApprovalPage() {
   const [tutors, setTutors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [statusFilter, setStatusFilter] = useState('pending');
+  const [statusFilter, setStatusFilter] = useState('under_review');
+  const [counts, setCounts] = useState({
+    under_review: 0,
+    incomplete: 0,
+    approved: 0,
+    contact_needed: 0,
+    rejected: 0,
+    all: 0
+  });
 
   // Preview Sanad Modal
   const [sanadModalOpen, setSanadModalOpen] = useState(false);
@@ -28,7 +36,10 @@ export default function TutorApprovalPage() {
     setLoading(true);
     try {
       const res = await api.getTutorQueue(statusFilter);
-      if (res.success) setTutors(res.tutors);
+      if (res.success) {
+        setTutors(res.tutors);
+        if (res.counts) setCounts(res.counts);
+      }
     } catch (e) {
       console.error(e);
     } finally {
@@ -108,16 +119,30 @@ export default function TutorApprovalPage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 bg-slate-200/80 p-1 rounded-2xl text-xs font-bold">
-                {['pending', 'approved', 'contact_needed', 'rejected', 'all'].map((st) => (
+              <div className="flex flex-wrap items-center gap-2 bg-slate-200/80 p-1.5 rounded-2xl text-xs font-bold">
+                {[
+                  { id: 'under_review', label: 'Under Review', count: counts.under_review, badgeBg: 'bg-blue-600 text-white' },
+                  { id: 'incomplete', label: 'Incomplete Profiles', count: counts.incomplete, badgeBg: 'bg-amber-600 text-white' },
+                  { id: 'approved', label: 'Approved & Live', count: counts.approved, badgeBg: 'bg-emerald-600 text-white' },
+                  { id: 'contact_needed', label: 'Needs Contact', count: counts.contact_needed, badgeBg: 'bg-purple-600 text-white' },
+                  { id: 'rejected', label: 'Rejected', count: counts.rejected, badgeBg: 'bg-rose-600 text-white' },
+                  { id: 'all', label: 'All Tutors', count: counts.all, badgeBg: 'bg-slate-600 text-white' }
+                ].map((tab) => (
                   <button
-                    key={st}
-                    onClick={() => setStatusFilter(st)}
-                    className={`px-3 py-1.5 rounded-xl capitalize transition-all ${
-                      statusFilter === st ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600'
+                    key={tab.id}
+                    onClick={() => setStatusFilter(tab.id)}
+                    className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-1.5 ${
+                      statusFilter === tab.id
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
-                    {st.replace('_', ' ')}
+                    <span>{tab.label}</span>
+                    {tab.count !== undefined && (
+                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-black ${tab.badgeBg}`}>
+                        {tab.count}
+                      </span>
+                    )}
                   </button>
                 ))}
               </div>
@@ -126,8 +151,9 @@ export default function TutorApprovalPage() {
             {loading ? (
               <LoadingSpinner text="Loading applicant queue..." />
             ) : tutors.length === 0 ? (
-              <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center text-xs text-slate-400">
-                No tutors found in the <strong>{statusFilter}</strong> queue.
+              <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center text-xs text-slate-400 space-y-2">
+                <p className="font-bold text-sm text-slate-700">No tutors found in the {statusFilter.replace('_', ' ')} section.</p>
+                <p>Profiles will appear here automatically as tutors register and update their profiles.</p>
               </div>
             ) : (
               <div className="space-y-4">
@@ -146,12 +172,24 @@ export default function TutorApprovalPage() {
                         <div>
                           <div className="flex items-center gap-2">
                             <h3 className="font-bold text-base text-slate-900">{tutor.user?.name}</h3>
-                            <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-amber-100 text-amber-900">
-                              {tutor.verificationStatus}
+                            <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border ${
+                              tutor.verificationStatus === 'approved'
+                                ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                                : tutor.verificationStatus === 'under_review'
+                                ? 'bg-blue-100 text-blue-900 border-blue-300'
+                                : tutor.verificationStatus === 'incomplete'
+                                ? 'bg-amber-100 text-amber-900 border-amber-300'
+                                : 'bg-slate-100 text-slate-800 border-slate-300'
+                            }`}>
+                              {tutor.verificationStatus === 'under_review'
+                                ? 'Under Review (100% Done)'
+                                : tutor.verificationStatus === 'incomplete'
+                                ? 'Incomplete Profile'
+                                : tutor.verificationStatus.replace('_', ' ')}
                             </span>
                           </div>
                           <p className="text-xs text-slate-500 mt-0.5">
-                            {tutor.user?.email} &bull; {tutor.user?.phone} &bull; {tutor.user?.city}
+                            {tutor.user?.email} &bull; {tutor.user?.phone} &bull; {tutor.user?.city || 'No City'}
                           </p>
                           <p className="text-xs font-semibold text-emerald-800 mt-1">
                             Degree/Sanad: {tutor.qualifications || 'Not specified'} ({tutor.experienceYears} Yrs Exp)
@@ -173,8 +211,36 @@ export default function TutorApprovalPage() {
                       </button>
                     </div>
 
+                    {/* Profile Completion Bar */}
+                    {tutor.completion && (
+                      <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-1.5">
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="font-bold text-slate-700">Profile Strength & Completion:</span>
+                          <span className={`font-black ${tutor.completion.percentage >= 100 ? 'text-emerald-700' : 'text-amber-700'}`}>
+                            {tutor.completion.percentage}% {tutor.completion.percentage >= 100 ? '✓ 100% Ready for Approval' : '(Incomplete)'}
+                          </span>
+                        </div>
+                        <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
+                          <div
+                            className={`h-full transition-all rounded-full ${tutor.completion.percentage >= 100 ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                            style={{ width: `${tutor.completion.percentage}%` }}
+                          />
+                        </div>
+                        {tutor.completion.items && tutor.completion.items.some(i => !i.done) && (
+                          <div className="flex flex-wrap gap-1.5 pt-1">
+                            <span className="text-[10px] text-slate-500 font-bold self-center">Missing:</span>
+                            {tutor.completion.items.filter(i => !i.done).map(item => (
+                              <span key={item.key} className="text-[10px] font-semibold text-rose-700 bg-rose-50 border border-rose-200 px-2 py-0.5 rounded-md">
+                                {item.label}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    )}
+
                     <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-2xl">
-                      {tutor.bio}
+                      {tutor.bio || 'No teaching bio written yet.'}
                     </p>
 
                     {/* Action Bar */}
@@ -183,7 +249,7 @@ export default function TutorApprovalPage() {
                         <button
                           onClick={() => handleApprove(tutor._id)}
                           disabled={actionLoading}
-                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5"
+                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 cursor-pointer"
                         >
                           <CheckCircle2 className="w-4 h-4" />
                           <span>Approve & Make Live</span>

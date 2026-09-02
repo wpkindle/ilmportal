@@ -12,7 +12,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 
-export default function AccountStatusBanner({ user, role = 'student', showVerifiedState = true }) {
+export default function AccountStatusBanner({ user, tutorProfile, role = 'student', showVerifiedState = true }) {
   if (!user) return null;
 
   const status = user.status || (user.isActive === false ? 'suspended' : 'active');
@@ -52,43 +52,66 @@ export default function AccountStatusBanner({ user, role = 'student', showVerifi
     );
   }
 
-  // 2. UNDER REVIEW STATE
-  if (status === 'under_review') {
+  // 2. UNDER REVIEW STATE (or Tutor awaiting profile approval)
+  const isTutorUnderReview = isTutor && (
+    tutorProfile?.verificationStatus === 'under_review' ||
+    tutorProfile?.verificationStatus === 'pending' ||
+    status === 'under_review'
+  );
+
+  if (isTutorUnderReview) {
     return (
-      <div className="bg-orange-50 border-2 border-orange-300 rounded-3xl p-5 shadow-xs space-y-3">
+      <div className="bg-blue-50 border-2 border-blue-300 rounded-3xl p-4 sm:p-5 shadow-xs space-y-2">
         <div className="flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-2xl bg-orange-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-orange-500/20 animate-pulse">
-            <Clock className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-600/20">
+            <Clock className="w-5 h-5 animate-pulse" />
           </div>
           <div className="space-y-1 flex-1">
             <div className="flex items-center gap-2">
-              <h3 className="text-sm sm:text-base font-black text-orange-950">
-                Account Placed Under Administrative Review
+              <h3 className="text-sm sm:text-base font-black text-blue-950">
+                Profile 100% Complete — Under Administrative Review
               </h3>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-orange-200 text-orange-900 border border-orange-300">
-                Under Audit
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-blue-200 text-blue-900 border border-blue-300">
+                Under Review
               </span>
             </div>
-            <p className="text-xs text-orange-800 leading-relaxed">
-              {isTutor
-                ? 'Your Sanad documents, teaching credentials, and profile are undergoing administrative verification.'
-                : 'Your student account is currently undergoing a routine administrative review.'}
+            <p className="text-xs text-blue-900 leading-relaxed font-medium">
+              Your profile has been automatically submitted to the administration. Profile will be visible to the public on approval from administration.
             </p>
-            <div className="p-3 bg-white/80 rounded-2xl border border-orange-200 text-xs text-orange-900 space-y-1">
-              <p className="font-bold text-[11px] text-orange-950 uppercase tracking-wider">
-                Admin Review Status:
-              </p>
-              <p className="font-medium">
-                {underReviewReason}
-              </p>
-            </div>
           </div>
         </div>
       </div>
     );
   }
 
-  // 3. WARNED STATE / ACTIVE STRIKES
+  // 3. TUTOR INCOMPLETE PROFILE STATE
+  const isTutorIncomplete = isTutor && tutorProfile?.verificationStatus === 'incomplete';
+  if (isTutorIncomplete) {
+    return (
+      <div className="bg-amber-50 border-2 border-amber-300 rounded-3xl p-4 sm:p-5 shadow-xs space-y-2">
+        <div className="flex items-start gap-3.5">
+          <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-500/20">
+            <AlertCircle className="w-5 h-5" />
+          </div>
+          <div className="space-y-1 flex-1">
+            <div className="flex items-center gap-2">
+              <h3 className="text-sm sm:text-base font-black text-amber-950">
+                Profile Incomplete — Action Required
+              </h3>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-200 text-amber-900 border border-amber-300">
+                Incomplete
+              </span>
+            </div>
+            <p className="text-xs text-amber-900 leading-relaxed font-medium">
+              Complete your profile 100%, then the administration will review it. Profile will be visible to public on approval from administration.
+            </p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 4. WARNED STATE / ACTIVE STRIKES
   if (status === 'warned' || warningCount > 0) {
     return (
       <div className="bg-amber-50 border-2 border-amber-300 rounded-3xl p-5 shadow-xs space-y-4">
@@ -99,34 +122,22 @@ export default function AccountStatusBanner({ user, role = 'student', showVerifi
           <div className="space-y-1 flex-1">
             <div className="flex flex-wrap items-center gap-2">
               <h3 className="text-sm sm:text-base font-black text-amber-950">
-                Official Account Policy Warning Notice
+                Administrative Policy Warning Issued ({warningCount} Active)
               </h3>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-500 text-white shadow-2xs">
-                ⚠️ Strike #{warningCount}
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-200 text-amber-900 border border-amber-300">
+                Warning Active
               </span>
             </div>
-            <p className="text-xs text-amber-900 leading-relaxed">
-              Administration has issued an official warning regarding conduct or policy adherence on IlmPortal. Further strikes may result in temporary or permanent profile suspension.
+            <p className="text-xs text-amber-800 leading-relaxed">
+              An administrator has flagged account activity requiring your attention. Please review the notices below.
             </p>
           </div>
         </div>
-
-        {/* Warning Details Log */}
-        {warnings && warnings.length > 0 && (
+        {warnings.length > 0 && (
           <div className="space-y-2 pt-2 border-t border-amber-200/80">
-            <p className="text-[11px] font-bold text-amber-950 uppercase tracking-wider">
-              Recent Warning Log:
-            </p>
-            {warnings.slice(-2).reverse().map((w, idx) => (
-              <div key={idx} className="p-3 bg-white rounded-2xl border border-amber-200 space-y-1">
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="font-black text-amber-900">{w.reason}</span>
-                  {w.issuedAt && (
-                    <span className="text-[10px] text-slate-400 font-mono">
-                      {new Date(w.issuedAt).toLocaleDateString([], { month: 'short', day: 'numeric', year: 'numeric' })}
-                    </span>
-                  )}
-                </div>
+            {warnings.map((w, idx) => (
+              <div key={idx} className="p-3 bg-white/80 rounded-2xl border border-amber-200 text-xs text-amber-900 space-y-1">
+                <p className="font-bold text-amber-950">{w.reason}</p>
                 <p className="text-xs text-slate-700 font-medium">"{w.message}"</p>
               </div>
             ))}
@@ -136,11 +147,16 @@ export default function AccountStatusBanner({ user, role = 'student', showVerifi
     );
   }
 
-  // 4. ACTIVE / GOOD STANDING STATE
+  // 5. ACTIVE / APPROVED / GOOD STANDING STATE
   if (!showVerifiedState) return null;
 
+  // If tutor is NOT approved yet, do NOT render verified faculty state
+  if (isTutor && tutorProfile?.verificationStatus !== 'approved') {
+    return null;
+  }
+
   return (
-    <div className="bg-emerald-50 border border-emerald-200/90 rounded-2xl p-3.5 flex items-center justify-between gap-3">
+    <div className="bg-emerald-50 border border-emerald-200/90 rounded-2xl p-3.5 flex items-center justify-between gap-3 shadow-xs">
       <div className="flex items-center gap-2.5">
         <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
           <ShieldCheck className="w-4 h-4" />
@@ -151,11 +167,13 @@ export default function AccountStatusBanner({ user, role = 'student', showVerifi
               {isTutor ? 'Verified Faculty Account' : 'Verified Student Account'}
             </span>
             <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-200/80 text-emerald-900">
-              Good Standing
+              Approved & Live
             </span>
           </div>
           <p className="text-[11px] text-emerald-700 font-medium">
-            Account verified & fully active across Pakistan LMS portal
+            {isTutor
+              ? 'Your profile is approved by administration and publicly visible to students across Pakistan.'
+              : 'Account verified & fully active across Pakistan LMS portal'}
           </p>
         </div>
       </div>

@@ -153,6 +153,19 @@ exports.getTutorById = async (req, res) => {
       });
     }
 
+    // Only approved tutors are visible to public (admin and tutor themselves can view)
+    const reqUserId = req.user?._id?.toString() || req.user?.id?.toString();
+    const tutorUserId = tutor.user?._id?.toString() || tutor.user?.toString();
+    const isAdmin = req.user?.role === 'admin';
+    const isOwner = reqUserId && reqUserId === tutorUserId;
+
+    if (tutor.verificationStatus !== 'approved' && !isAdmin && !isOwner) {
+      return res.status(403).json({
+        success: false,
+        message: 'This tutor profile is currently under review by administration and not yet publicly visible.'
+      });
+    }
+
     // Fetch verified reviews for this tutor
     const reviews = await Review.find({ tutor: tutor.user._id, isHidden: false })
       .populate('student', 'name avatar city')
@@ -280,13 +293,39 @@ exports.uploadSanad = async (req, res) => {
     };
 
     profile.sanadDocuments.push(newDoc);
-    profile.verificationStatus = 'pending'; // Set to pending review whenever new document is added
+
+    const user = await User.findById(req.user.id);
+    const { calculateProfileCompletion } = require('./authController');
+    const completion = user ? calculateProfileCompletion(user, profile) : { percentage: 0 };
+
+    if (profile.verificationStatus !== 'approved' && profile.verificationStatus !== 'suspended') {
+      if (completion.percentage >= 100) {
+        profile.verificationStatus = 'under_review';
+        const adminUser = await User.findOne({ role: 'admin' });
+        if (adminUser) {
+          const Notification = require('../models/Notification');
+          await Notification.create({
+            recipient: adminUser._id,
+            title: 'Tutor Profile 100% Complete — Ready for Review',
+            message: `${user.name} has completed 100% of their teaching profile with Sanad documents.`,
+            type: 'system',
+            link: '/admin/tutor-approvals'
+          });
+        }
+      } else {
+        profile.verificationStatus = 'incomplete';
+      }
+    }
     await profile.save();
 
     res.status(200).json({
       success: true,
-      message: 'Sanad document uploaded successfully. Admin team will review your application.',
-      sanadDocuments: profile.sanadDocuments
+      message: completion.percentage >= 100
+        ? 'Sanad document uploaded and profile is 100% complete! Submitted to administration for review.'
+        : `Sanad document uploaded. Profile is ${completion.percentage}% complete. Complete remaining fields to submit for review.`,
+      sanadDocuments: profile.sanadDocuments,
+      verificationStatus: profile.verificationStatus,
+      completion
     });
   } catch (error) {
     res.status(500).json({

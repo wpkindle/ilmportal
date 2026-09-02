@@ -36,7 +36,8 @@ exports.getDashboardStats = async (req, res) => {
     const totalStudents = await User.countDocuments({ role: 'student' });
     const totalTutors = await User.countDocuments({ role: 'tutor' });
     const approvedTutors = await TutorProfile.countDocuments({ verificationStatus: 'approved' });
-    const pendingTutorApprovals = await TutorProfile.countDocuments({ verificationStatus: 'pending' });
+    const pendingTutorApprovals = await TutorProfile.countDocuments({ verificationStatus: { $in: ['under_review', 'pending'] } });
+    const incompleteTutors = await TutorProfile.countDocuments({ verificationStatus: 'incomplete' });
     
     const totalDeals = await Deal.countDocuments();
     const activeTrialDeals = await Deal.countDocuments({ status: 'active_trial' });
@@ -101,8 +102,22 @@ exports.getDashboardStats = async (req, res) => {
 // @route   GET /api/admin/tutors/queue
 exports.getTutorApprovalQueue = async (req, res) => {
   try {
-    const { status = 'pending' } = req.query;
-    const filter = status === 'all' ? {} : { verificationStatus: status };
+    const { status = 'under_review' } = req.query;
+    let filter = {};
+
+    if (status === 'under_review') {
+      filter = { verificationStatus: { $in: ['under_review', 'pending'] } };
+    } else if (status === 'incomplete') {
+      filter = { verificationStatus: 'incomplete' };
+    } else if (status === 'approved') {
+      filter = { verificationStatus: 'approved' };
+    } else if (status === 'contact_needed') {
+      filter = { verificationStatus: 'contact_needed' };
+    } else if (status === 'rejected') {
+      filter = { verificationStatus: 'rejected' };
+    } else if (status !== 'all') {
+      filter = { verificationStatus: status };
+    }
 
     const tutors = await TutorProfile.find(filter)
       .populate('user', 'name email avatar phone city isVerified createdAt')
@@ -110,10 +125,29 @@ exports.getTutorApprovalQueue = async (req, res) => {
       .populate('cities', 'name province')
       .sort({ createdAt: -1 });
 
+    const { calculateProfileCompletion } = require('./authController');
+    const tutorsWithCompletion = tutors.map((t) => {
+      const completion = t.user ? calculateProfileCompletion(t.user, t) : { percentage: 0, items: [] };
+      return {
+        ...t.toObject(),
+        completion
+      };
+    });
+
+    const counts = {
+      under_review: await TutorProfile.countDocuments({ verificationStatus: { $in: ['under_review', 'pending'] } }),
+      incomplete: await TutorProfile.countDocuments({ verificationStatus: 'incomplete' }),
+      approved: await TutorProfile.countDocuments({ verificationStatus: 'approved' }),
+      contact_needed: await TutorProfile.countDocuments({ verificationStatus: 'contact_needed' }),
+      rejected: await TutorProfile.countDocuments({ verificationStatus: 'rejected' }),
+      all: await TutorProfile.countDocuments({})
+    };
+
     res.status(200).json({
       success: true,
-      count: tutors.length,
-      tutors
+      count: tutorsWithCompletion.length,
+      counts,
+      tutors: tutorsWithCompletion
     });
   } catch (error) {
     res.status(500).json({

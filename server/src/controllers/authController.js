@@ -12,7 +12,7 @@ const generateToken = (id) => {
 };
 
 // Helper: Calculate Profile Completion Percentage
-const calculateProfileCompletion = (user, tutorProfile) => {
+exports.calculateProfileCompletion = (user, tutorProfile) => {
   if (!user) return { percentage: 0, items: [] };
 
   if (user.role === 'tutor') {
@@ -74,61 +74,49 @@ exports.register = async (req, res) => {
     if (!username || !username.trim()) {
       return res.status(400).json({ success: false, message: 'Username is required' });
     }
-
-    const cleanUsername = username.toLowerCase().trim().replace(/[^a-z0-9_.-]/g, '');
-    if (cleanUsername.length < 3 || cleanUsername.length > 30) {
-      return res.status(400).json({
-        success: false,
-        message: 'Username must be 3–30 characters long (letters, numbers, underscores, dashes)'
-      });
-    }
-
     if (!email || !email.trim()) {
       return res.status(400).json({ success: false, message: 'Email address is required' });
     }
     if (!userPhone) {
-      return res.status(400).json({ success: false, message: 'Phone / WhatsApp number is required' });
+      return res.status(400).json({ success: false, message: 'Phone number is required' });
     }
     if (!password || password.length < 6) {
       return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
     }
 
+    const emailClean = email.toLowerCase().trim();
+    const usernameClean = username.toLowerCase().trim().replace(/[^a-z0-9_]/g, '');
+
+    // Check if email exists
+    const emailExists = await User.findOne({ email: emailClean });
+    if (emailExists) {
+      return res.status(400).json({ success: false, message: 'An account with this email already exists' });
+    }
+
+    // Check if username exists
+    const usernameExists = await User.findOne({ username: usernameClean });
+    if (usernameExists) {
+      return res.status(400).json({ success: false, message: 'Username is already taken. Please choose another.' });
+    }
+
     const userRole = role === 'tutor' ? 'tutor' : 'student';
 
-    // 1. Check if email already exists
-    const emailExists = await User.findOne({ email: email.toLowerCase().trim() });
-    if (emailExists) {
-      return res.status(400).json({
-        success: false,
-        message: 'An account with this email address already exists.'
-      });
-    }
-
-    // 2. Check if username already exists
-    const usernameExists = await User.findOne({ username: cleanUsername });
-    if (usernameExists) {
-      return res.status(400).json({
-        success: false,
-        message: 'This username is already taken. Please choose another username.'
-      });
-    }
-
-    // Generate 6-digit OTP and 1-Click Verification Token
+    // Generate Verification Token (Email Link)
+    const verificationToken = crypto.randomBytes(32).toString('hex');
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-    const verificationToken = crypto.randomBytes(32).toString('hex');
 
     const user = await User.create({
       name: name.trim(),
-      username: cleanUsername,
-      email: email.toLowerCase().trim(),
+      username: usernameClean,
+      email: emailClean,
+      phone: userPhone,
       password,
       role: userRole,
-      phone: userPhone,
-      guardianPhone: (guardianPhone || '').trim(),
+      city: (city || '').trim(),
       gender: (gender || '').trim(),
       age: age ? Number(age) : undefined,
-      city: (city || '').trim(),
+      guardianPhone: (guardianPhone || '').trim(),
       isVerified: false,
       verificationOtp: otp,
       verificationOtpExpires: otpExpires,
@@ -136,7 +124,7 @@ exports.register = async (req, res) => {
       verificationTokenExpires: otpExpires
     });
 
-    // If registered as tutor, create initial TutorProfile ready for later profile setup
+    // If registered as tutor, create initial TutorProfile in incomplete state
     if (userRole === 'tutor') {
       await TutorProfile.create({
         user: user._id,
@@ -145,7 +133,7 @@ exports.register = async (req, res) => {
         experienceYears: req.body.experienceYears ? Number(req.body.experienceYears) : 1,
         hourlyRate: req.body.hourlyRate ? Number(req.body.hourlyRate) : 1500,
         gender: (gender || '').trim(),
-        verificationStatus: 'pending'
+        verificationStatus: 'incomplete'
       });
 
       // Notify admin
@@ -633,6 +621,36 @@ exports.updateProfile = async (req, res) => {
       }
 
       await tutorProfile.save();
+
+      // Auto-transition verification status based on 100% completion
+      const completion = calculateProfileCompletion(user, tutorProfile);
+
+      if (tutorProfile.verificationStatus !== 'approved' && tutorProfile.verificationStatus !== 'suspended') {
+        if (completion.percentage >= 100) {
+          if (tutorProfile.verificationStatus !== 'under_review') {
+            tutorProfile.verificationStatus = 'under_review';
+            await tutorProfile.save();
+
+            // Notify admin
+            const adminUser = await User.findOne({ role: 'admin' });
+            if (adminUser) {
+              await Notification.create({
+                recipient: adminUser._id,
+                title: 'Tutor Profile 100% Complete — Ready for Review',
+                message: `${user.name} has completed 100% of their teaching profile and submitted for review.`,
+                type: 'system',
+                link: '/admin/tutor-approvals'
+              });
+            }
+          }
+        } else {
+          // If < 100%, remain incomplete
+          if (tutorProfile.verificationStatus === 'under_review' || tutorProfile.verificationStatus === 'pending') {
+            tutorProfile.verificationStatus = 'incomplete';
+            await tutorProfile.save();
+          }
+        }
+      }
     }
 
     const completion = calculateProfileCompletion(user, tutorProfile);

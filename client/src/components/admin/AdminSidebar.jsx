@@ -17,6 +17,7 @@ import {
   Settings,
   ShieldCheck,
   AlertTriangle,
+  FileText,
   LogOut
 } from 'lucide-react';
 import { api } from '../../services/api';
@@ -74,6 +75,7 @@ const AdminSidebar = () => {
     { to: '/admin/reviews', label: 'Ratings & Reviews Control', icon: Star },
     { to: '/admin/sessions', label: 'Session & Classroom Logs', icon: Video },
     { to: '/admin/audit-logs', label: 'Audit Trail Logs', icon: History },
+    { to: '/admin/pages', label: 'CMS Legal & Public Pages', icon: FileText },
     { to: '/admin/settings', label: 'System & Trial Settings', icon: Settings },
   ];
 

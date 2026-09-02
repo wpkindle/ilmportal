@@ -27,7 +27,8 @@ const {
   createLocation,
   updateLocation,
   deleteLocation,
-  updateSystemConfig
+  updateSystemConfig,
+  updatePage
 } = require('../controllers/adminController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
@@ -80,7 +81,8 @@ router.post('/locations', createLocation);
 router.put('/locations/:id', updateLocation);
 router.delete('/locations/:id', deleteLocation);
 
-// System Config
+// System Config & CMS Pages
 router.put('/system-config', updateSystemConfig);
+router.put('/pages/:slug', updatePage);
 
 module.exports = router;

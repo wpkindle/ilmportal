@@ -588,5 +588,26 @@ export const api = {
     method: 'PUT',
     headers: getHeaders(),
     body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  // CMS Pages & Policies
+  getPage: (slug) => fetch(`${API_BASE}/cms/pages/${slug}`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  getAllPages: () => fetch(`${API_BASE}/cms/pages`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  updatePage: (slug, body) => fetch(`${API_BASE}/admin/pages/${slug}`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  submitContactMessage: (body) => fetch(`${API_BASE}/cms/contact`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
   }).then(handleResponse)
 };

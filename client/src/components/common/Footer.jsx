@@ -32,11 +32,6 @@ const Footer = () => {
               <span>&bull;</span>
               <span>All 31+ Pakistani Cities</span>
             </div>
-
-            <div className="inline-flex items-center gap-2 text-xs font-medium text-emerald-300 bg-emerald-950/70 border border-emerald-800/70 px-3 py-1.5 rounded-xl">
-              <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400 shrink-0" />
-              <span>An initiative by Mr. & Mrs. Abdul Khaliq from Lahore, Pakistan.</span>
-            </div>
           </div>
 
           {/* Col 2: Portals & Quick Links */}
@@ -132,13 +127,58 @@ const Footer = () => {
             </ul>
           </div>
 
+          {/* Col 5: Company & Legal */}
+          <div className="space-y-3">
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">Company & Legal</h4>
+            <ul className="space-y-2 text-xs">
+              <li>
+                <Link href="/about-us" className="hover:text-emerald-400 transition-colors">
+                  About Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/contact-us" className="hover:text-emerald-400 transition-colors">
+                  Contact Us
+                </Link>
+              </li>
+              <li>
+                <Link href="/privacy-policy" className="hover:text-emerald-400 transition-colors">
+                  Privacy Policy
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="hover:text-emerald-400 transition-colors">
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link href="/disclaimer" className="hover:text-emerald-400 transition-colors">
+                  Disclaimer
+                </Link>
+              </li>
+            </ul>
+          </div>
+
         </div>
 
         {/* Bottom Bar */}
-        <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <p>© {new Date().getFullYear()} IlmPortal Pakistan. All rights reserved.</p>
+          
+          <div className="flex flex-wrap items-center justify-center gap-4 text-xs text-slate-400 font-medium">
+            <Link href="/about-us" className="hover:text-emerald-400 transition-colors">About</Link>
+            <span>&bull;</span>
+            <Link href="/contact-us" className="hover:text-emerald-400 transition-colors">Contact</Link>
+            <span>&bull;</span>
+            <Link href="/privacy-policy" className="hover:text-emerald-400 transition-colors">Privacy</Link>
+            <span>&bull;</span>
+            <Link href="/terms" className="hover:text-emerald-400 transition-colors">Terms</Link>
+            <span>&bull;</span>
+            <Link href="/disclaimer" className="hover:text-emerald-400 transition-colors">Disclaimer</Link>
+          </div>
+
           <div className="flex items-center gap-2 text-xs text-slate-400">
-            <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" />
+            <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 shrink-0" />
             <span className="text-slate-300 font-medium">An initiative by Mr. & Mrs. Abdul Khaliq from Lahore, Pakistan.</span>
           </div>
         </div>

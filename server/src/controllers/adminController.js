@@ -1229,7 +1229,45 @@ exports.updateSystemConfig = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message || 'Error updating config'
+      message: error.message || 'Error updating system config'
+    });
+  }
+};
+
+const Page = require('../models/Page');
+
+// @desc    Update CMS Page Content (Admin)
+// @route   PUT /api/admin/pages/:slug
+exports.updatePage = async (req, res) => {
+  try {
+    const { slug } = req.params;
+    const { title, subtitle, content, metaDescription, contactDetails, aboutDetails } = req.body;
+
+    let page = await Page.findOne({ slug });
+    if (!page) {
+      page = new Page({ slug, title: title || slug, content: content || '' });
+    }
+
+    if (title !== undefined) page.title = title;
+    if (subtitle !== undefined) page.subtitle = subtitle;
+    if (content !== undefined) page.content = content;
+    if (metaDescription !== undefined) page.metaDescription = metaDescription;
+    if (contactDetails) page.contactDetails = { ...page.contactDetails, ...contactDetails };
+    if (aboutDetails) page.aboutDetails = { ...page.aboutDetails, ...aboutDetails };
+    page.lastUpdatedBy = req.user._id || req.user.id;
+
+    await page.save();
+    await logAction(req.user.id, 'UPDATE_CMS_PAGE', 'page', page._id, { slug, title: page.title }, req);
+
+    res.status(200).json({
+      success: true,
+      message: `${page.title} updated successfully!`,
+      page
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error updating CMS page'
     });
   }
 };

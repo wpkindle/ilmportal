@@ -326,19 +326,7 @@ const seedDatabase = async () => {
       phone: '+92 300 1234567',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
     });
-    console.log('✅ Seeded Admin Account (admin@pakistanlms.pk / Admin@12345)');
-
-    const ownerAdmin = await User.create({
-      name: 'Abdul Khaliq',
-      email: 'abdulkhaliqwebdeveloper@gmail.com',
-      password: 'Admin@12345',
-      role: 'admin',
-      isVerified: true,
-      city: 'Lahore',
-      phone: '+92 300 1234567',
-      avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
-    });
-    console.log('✅ Seeded Owner Admin Account (abdulkhaliqwebdeveloper@gmail.com / Admin@12345)');
+    console.log('✅ Seeded Super Admin Account (admin@pakistanlms.pk / Admin@12345)');
 
     // 5. Seed Verified Tutors
     // Tutor 1: Qari Muhammad Huzaifa (Lahore - Quran & Tajweed)

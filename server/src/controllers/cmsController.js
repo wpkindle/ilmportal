@@ -55,3 +55,83 @@ exports.getSystemConfig = async (req, res) => {
     });
   }
 };
+
+const Page = require('../models/Page');
+const Notification = require('../models/Notification');
+const User = require('../models/User');
+
+// @desc    Get all CMS pages
+// @route   GET /api/cms/pages
+exports.getAllPages = async (req, res) => {
+  try {
+    const pages = await Page.find({}).select('slug title subtitle metaDescription updatedAt');
+    res.status(200).json({
+      success: true,
+      pages
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error fetching pages'
+    });
+  }
+};
+
+// @desc    Get single CMS page by slug
+// @route   GET /api/cms/pages/:slug
+exports.getPage = async (req, res) => {
+  try {
+    const page = await Page.findOne({ slug: req.params.slug });
+    if (!page) {
+      return res.status(404).json({
+        success: false,
+        message: 'Page not found'
+      });
+    }
+    res.status(200).json({
+      success: true,
+      page
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error fetching page'
+    });
+  }
+};
+
+// @desc    Submit contact us inquiry
+// @route   POST /api/cms/contact
+exports.submitContactMessage = async (req, res) => {
+  try {
+    const { name, email, phone, subject, message } = req.body;
+    if (!name || !email || !message) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide name, email, and message'
+      });
+    }
+
+    // Find admin user to notify
+    const adminUser = await User.findOne({ role: 'admin' });
+    if (adminUser) {
+      await Notification.create({
+        recipient: adminUser._id,
+        title: `New Inquiry from ${name}: ${subject || 'General Inquiry'}`,
+        message: `Contact: ${email} | Phone: ${phone || 'N/A'}\nMessage: ${message}`,
+        type: 'system',
+        link: '/admin/pages'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Your inquiry has been received! Our support team in Lahore will respond promptly.'
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error submitting contact inquiry'
+    });
+  }
+};

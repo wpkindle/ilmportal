@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
+import Link from 'next/link';
 import {
   Send,
   Sparkles,
@@ -314,6 +315,17 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
         </div>
 
         <div className="flex items-center gap-2">
+          {/* Live In-Platform Video Classroom Button (Identical deterministic room for Student & Tutor) */}
+          <Link
+            href={`/classroom/${conversationId}`}
+            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+            title="Start or Join In-Platform HD Video Class"
+          >
+            <Video className="w-3.5 h-3.5 text-white" />
+            <span className="hidden sm:inline">Join Live Class</span>
+            <span className="sm:hidden">Class</span>
+          </Link>
+
           {/* Report to Admin Button for both Student & Tutor */}
           {partner && (
             <button

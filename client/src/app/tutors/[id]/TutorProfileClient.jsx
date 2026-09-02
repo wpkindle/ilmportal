@@ -134,6 +134,16 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                 onClick={() => setSanadModalOpen(true)}
               />
 
+              {isAuthenticated && (user?.id || user?._id) !== (tutorUser._id || tutorUser.id || tutor._id) && (
+                <Link
+                  href={`/classroom/${[user?.id || user?._id, tutorUser._id || tutorUser.id || tutor._id].sort().join('_')}`}
+                  className="px-5 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md flex items-center justify-center gap-2 transition-all"
+                >
+                  <Video className="w-4 h-4 text-emerald-400" />
+                  <span>Join Live Class</span>
+                </Link>
+              )}
+
               <button
                 onClick={handleStartChat}
                 className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2"

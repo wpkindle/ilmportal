@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { api } from '../../../services/api';
 import TrialBanner from '../../../components/common/TrialBanner';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
-import { BookOpen, Star, MessageSquare, CreditCard, X, CheckCircle2 } from 'lucide-react';
+import { BookOpen, Star, MessageSquare, CreditCard, X, CheckCircle2, Video } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 
 export default function MyDealsPage() {
@@ -119,7 +119,17 @@ export default function MyDealsPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    {deal.mode !== 'in_person' && (
+                      <Link
+                        href={`/classroom/${[user?.id || user?._id, deal.tutor?._id].sort().join('_')}`}
+                        className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all"
+                      >
+                        <Video className="w-3.5 h-3.5" />
+                        <span>Join Live Class</span>
+                      </Link>
+                    )}
+
                     <button
                       onClick={() => setReviewModalDeal(deal)}
                       className="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs rounded-xl border border-amber-200 transition-colors flex items-center gap-1.5"

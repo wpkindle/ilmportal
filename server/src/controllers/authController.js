@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const TutorProfile = require('../models/TutorProfile');
 const Notification = require('../models/Notification');
-const { sendVerificationOtpEmail } = require('../utils/emailService');
+const { sendVerificationOtpEmail, sendEmailDetailed } = require('../utils/emailService');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
@@ -662,5 +662,21 @@ exports.resetPassword = async (req, res) => {
       success: false,
       message: error.message || 'Error resetting password'
     });
+  }
+};
+
+// @desc    Diagnostic Email Test Route
+// @route   GET /api/auth/test-email
+exports.testEmail = async (req, res) => {
+  try {
+    const to = req.query.to || 'abdulkhaliqwebdeveloper@gmail.com';
+    const result = await sendEmailDetailed({
+      to,
+      subject: '🧪 IlmPortal Diagnostic Email Test',
+      html: `<h3>IlmPortal Email Dispatch Verification</h3><p>This email confirms that live Gmail SMTP is functioning properly from the server to <strong>${to}</strong>.</p>`
+    });
+    res.json(result);
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
   }
 };

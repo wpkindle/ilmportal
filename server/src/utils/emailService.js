@@ -77,9 +77,30 @@ const sendEmail = async ({ to, subject, html, text }) => {
       console.log(`======================================================\n`);
       return true;
     }
+const sendEmailDetailed = async ({ to, subject, html, text }) => {
+  if (!transporter) {
+    return { success: false, error: 'No transporter initialized' };
+  }
+  const fromAddress = `"IlmPortal Pakistan" <${process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com'}>`;
+  try {
+    const info = await transporter.sendMail({
+      from: fromAddress,
+      to,
+      subject,
+      text: text || html.replace(/<[^>]*>?/gm, ''),
+      html
+    });
+    return { success: true, messageId: info.messageId, response: info.response, to };
   } catch (error) {
-    console.error('Email sending error:', error.message);
-    return false;
+    console.error('Detailed sendMail error:', error);
+    return {
+      success: false,
+      error: error.message,
+      code: error.code,
+      command: error.command,
+      response: error.response,
+      responseCode: error.responseCode
+    };
   }
 };
 
@@ -806,6 +827,7 @@ const sendAccountStatusEmail = async ({ to, userName, status, reason, notes }) =
 
 module.exports = {
   sendEmail,
+  sendEmailDetailed,
   sendVerificationOtpEmail,
   sendTutorStatusEmail,
   sendCertificateIssuedEmail,

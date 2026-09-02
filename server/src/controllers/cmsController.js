@@ -59,12 +59,24 @@ exports.getSystemConfig = async (req, res) => {
 const Page = require('../models/Page');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
+const defaultPages = require('../utils/defaultPages');
 
 // @desc    Get all CMS pages
 // @route   GET /api/cms/pages
 exports.getAllPages = async (req, res) => {
   try {
-    const pages = await Page.find({}).select('slug title subtitle metaDescription updatedAt');
+    let pages = await Page.find({}).select('slug title subtitle metaDescription updatedAt');
+    if (!pages || pages.length < 5) {
+      // Auto-provision any missing pages
+      for (const [slug, data] of Object.entries(defaultPages)) {
+        if (!pages.find(p => p.slug === slug)) {
+          try {
+            await Page.create(data);
+          } catch (e) {}
+        }
+      }
+      pages = await Page.find({}).select('slug title subtitle metaDescription updatedAt');
+    }
     res.status(200).json({
       success: true,
       pages
@@ -81,13 +93,26 @@ exports.getAllPages = async (req, res) => {
 // @route   GET /api/cms/pages/:slug
 exports.getPage = async (req, res) => {
   try {
-    const page = await Page.findOne({ slug: req.params.slug });
+    const slug = req.params.slug;
+    let page = await Page.findOne({ slug });
+
+    // If page doesn't exist in DB yet, auto-provision it immediately!
+    if (!page && defaultPages[slug]) {
+      try {
+        page = await Page.create(defaultPages[slug]);
+        console.log(`✅ Auto-provisioned CMS page "${slug}" into database.`);
+      } catch (createErr) {
+        page = { ...defaultPages[slug], _id: slug, updatedAt: new Date().toISOString() };
+      }
+    }
+
     if (!page) {
       return res.status(404).json({
         success: false,
         message: 'Page not found'
       });
     }
+
     res.status(200).json({
       success: true,
       page

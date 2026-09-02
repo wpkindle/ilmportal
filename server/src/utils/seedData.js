@@ -15,6 +15,8 @@ const SystemConfig = require('../models/SystemConfig');
 const AuditLog = require('../models/AuditLog');
 const Course = require('../models/Course');
 const Certificate = require('../models/Certificate');
+const Page = require('../models/Page');
+const defaultPages = require('./defaultPages');
 
 dotenv.config();
 
@@ -1353,6 +1355,16 @@ const seedDatabase = async () => {
     console.log('✅ Seeded Sample Course Completion Certificate for Hamza Khan');
 
     console.log('✅ Seeded Sample Messages, Reviews, and WebRTC Classroom Sessions');
+
+    // Seed CMS Pages (Privacy, Terms, Disclaimer, About Us, Contact Us)
+    for (const [slug, pageData] of Object.entries(defaultPages)) {
+      const existingPage = await Page.findOne({ slug });
+      if (!existingPage) {
+        await Page.create(pageData);
+      }
+    }
+    console.log('✅ Seeded CMS Pages (Privacy, Terms, Disclaimer, About Us, Contact Us)');
+
     console.log('\n======================================================');
     console.log('🎉 Database Seeding Complete!');
     console.log('Credentials Summary:');

@@ -54,28 +54,86 @@ export default function AdminCMSPagesPage() {
     { slug: 'contact-us', label: 'Contact Us', path: '/contact-us', icon: Phone }
   ];
 
+  const DEFAULT_PAGE_TEMPLATES = {
+    'privacy-policy': {
+      title: 'Privacy Policy',
+      subtitle: 'How IlmPortal Pakistan protects and handles your personal information, Sanad credentials, and family data.',
+      metaDescription: 'Read the official privacy policy of IlmPortal Pakistan. We prioritize student minor safety, Sanad encryption, and PECA 2016 compliance.',
+      content: `### 1. Information We Collect\nWe collect information you provide directly during student or tutor registration:\n* **Account Credentials**: Name, email address, phone/WhatsApp number, city, and password.\n* **Tutor Qualifications**: Sanad degree certificates, educational background, years of experience, and CNIC/identity details for verification.\n* **Student & Parent Information**: Grade level, learning goals, preferred schedule, and guardian contact details for minors.\n\n---\n\n### 2. Minor Safety & Family Privacy\nProtecting young learners is our highest responsibility:\n* Classes for minors are monitored under parent-accessible dashboards.\n* Personal contact numbers between tutors and minors are kept confidential within our in-platform chat and video classroom.\n* Parents may request female Alimah tutors specifically for female students or young children.\n\n---\n\n### 3. Sanad & Document Protection\nAll uploaded academic certificates and Sanad degrees are stored in private encrypted storage and accessible solely to authorized administration staff in Lahore for verification purposes.\n\n---\n\n### 4. Legal Compliance under PECA 2016\nIlmPortal complies with the Prevention of Electronic Crimes Act (PECA 2016) and applicable Pakistani privacy laws.`
+    },
+    'terms': {
+      title: 'Terms of Service',
+      subtitle: 'User agreements, ethical guidelines, and platform rules for students, parents, and tutors.',
+      metaDescription: 'Official Terms of Service for IlmPortal Pakistan. Guidelines for students, parents, and verified Quran and academic faculty.',
+      content: `### 1. Acceptance of Terms\nBy accessing IlmPortal Pakistan, registering an account, booking classes, or offering tutoring services, you agree to comply with these terms, Pakistani law, and Islamic adab of knowledge.\n\n---\n\n### 2. Code of Conduct & Ethical Teaching\nAll users must uphold respectful, professional, and Islamic conduct:\n* Tutors must deliver classes punctually according to the agreed schedule.\n* Harassment, abusive language, or non-educational interactions will result in instant permanent suspension.\n* Respect for Quranic sanctity, proper etiquette during recitation, and Islamic modesty are mandatory.\n\n---\n\n### 3. 3-Day Free Trial Policy\n* Every student is entitled to a 3-day free trial with their selected tutor.\n* No upfront payment is required during the trial.\n\n---\n\n### 4. Deals & Payments\n* Monthly tuition fees agreed between tutors and students are processed transparently.\n* Payment receipts via JazzCash, EasyPaisa, or Pakistani bank transfers are verified within 2 to 4 hours.`
+    },
+    'disclaimer': {
+      title: 'Platform Disclaimer',
+      subtitle: 'Transparency on verification scope, academic outcomes, and operational boundaries.',
+      metaDescription: 'Official disclaimer for IlmPortal Pakistan detailing verification scope, independent faculty, and academic outcomes.',
+      content: `### 1. Independent Faculty & LMS Technology\nIlmPortal Pakistan operates as an educational technology platform and directory connecting students with independent Quran teachers, Qaris, Alimahs, and academic tutors.\n\n---\n\n### 2. Scope of Sanad & Profile Verification\n* The "Sanad Verified" badge certifies that our administration in Lahore reviewed submitted certificates, Ijazahs, or degrees at the time of verification.\n* Parents and students are encouraged to conduct their own assessment during the 3-day free trial.\n\n---\n\n### 3. Academic & Board Exam Outcomes\nWhile our faculty strives for excellence in Cambridge CAIE (O/A Levels), Matric/FSc, and Quran memorization (Hifz), student academic performance depends upon individual dedication and home study.`
+    },
+    'about-us': {
+      title: 'About IlmPortal Pakistan',
+      subtitle: 'Empowering Pakistani homes with authentic Quranic education and academic excellence.',
+      metaDescription: 'Learn about IlmPortal Pakistan, founded in Lahore to deliver verified Quranic learning and academic tutoring nationwide.',
+      aboutDetails: {
+        mission: 'Empowering Pakistani families with accessible, authentic Quranic studies and high-achieving academic tutoring from the safety of home.',
+        vision: 'To be the most trusted and credible learning platform in Pakistan, upholding academic excellence and authentic Quranic tradition.',
+        initiativeText: 'An initiative by Mr. & Mrs. Abdul Khaliq from Lahore, Pakistan.'
+      },
+      content: `### Dedicated to Authentic Knowledge & Character Building\nFounded in Lahore, Punjab, IlmPortal Pakistan was created to bridge a vital gap in our society: connecting Pakistani households with genuine, certified Quran scholars and distinguished academic tutors in a safe, technologically advanced digital classroom.\n\n---\n\n### An Initiative with a Purpose\n**An initiative by Mr. & Mrs. Abdul Khaliq from Lahore, Pakistan.**\nGuided by the timeless Hadith: *"The best of you are those who learn the Quran and teach it"*, our platform is dedicated to making authentic Quran recitation, Tajweed, and high-standard academic coaching accessible to every Pakistani household.\n\n---\n\n### What Sets IlmPortal Apart\n* **Sanad-Verified Faculty**: Only tutors with authentic degrees from recognized institutions (Wifaq-ul-Madaris, Tanzeem-ul-Madaris, HEC-recognized universities, and Cambridge-certified coaches) are approved.\n* **Female Faculty for Families**: Certified Alimahs and female academic teachers available across Pakistan for girls and young learners.\n* **3-Day Risk-Free Trial**: Try classes with zero financial commitment before committing to a monthly deal.\n* **In-Platform WebRTC Classroom**: No external video links needed; students and teachers learn directly on our safe, monitored platform.`
+    },
+    'contact-us': {
+      title: 'Contact IlmPortal Pakistan',
+      subtitle: 'We are here to assist students, parents, and tutors across Pakistan.',
+      metaDescription: 'Get in touch with IlmPortal Pakistan. Contact our Lahore administration via WhatsApp, phone, or direct online inquiry.',
+      contactDetails: {
+        email: 'support@pakistanlms.pk',
+        phone: '+92 300 1234567',
+        whatsapp: '+92 300 1234567',
+        address: 'Lahore, Punjab, Pakistan',
+        workingHours: 'Monday – Saturday: 9:00 AM – 9:00 PM PKT'
+      },
+      content: `### We Are Here to Support Your Learning Journey\nHave questions about finding a verified Qari, scheduling 3-day free trials, requesting a female Alimah, or joining our faculty? Our dedicated administrative team in Lahore is ready to assist you.\n\n---\n\n### Our Communication Channels\n* **WhatsApp Helpline**: Fast, direct assistance for student enrollment and tutor onboarding.\n* **Email Support**: For formal verification inquiries, institutional partnerships, and Sanad submissions.\n* **Headquarters**: Lahore, Punjab, Pakistan, serving students across 31+ Pakistani cities.`
+    }
+  };
+
   const fetchPageData = async (slug) => {
     setLoading(true);
     setSuccessMessage('');
     setErrorMessage('');
     try {
       const res = await api.getPage(slug);
-      if (res.success && res.page) {
-        setTitle(res.page.title || '');
-        setSubtitle(res.page.subtitle || '');
-        setMetaDescription(res.page.metaDescription || '');
-        setContent(res.page.content || '');
-        if (res.page.contactDetails) {
-          setContactDetails(res.page.contactDetails);
+      const pageData = (res && res.success && res.page) ? res.page : DEFAULT_PAGE_TEMPLATES[slug];
+      if (pageData) {
+        setTitle(pageData.title || '');
+        setSubtitle(pageData.subtitle || '');
+        setMetaDescription(pageData.metaDescription || '');
+        setContent(pageData.content || '');
+        if (pageData.contactDetails) {
+          setContactDetails(pageData.contactDetails);
         }
-        if (res.page.aboutDetails) {
-          setAboutDetails(res.page.aboutDetails);
+        if (pageData.aboutDetails) {
+          setAboutDetails(pageData.aboutDetails);
         }
-        setLastUpdated(res.page.updatedAt || '');
+        setLastUpdated(pageData.updatedAt || '');
       }
     } catch (err) {
-      console.error(err);
-      setErrorMessage(err.message || 'Error loading page data');
+      console.warn('Using default template for slug:', slug, err.message);
+      const fallback = DEFAULT_PAGE_TEMPLATES[slug];
+      if (fallback) {
+        setTitle(fallback.title || '');
+        setSubtitle(fallback.subtitle || '');
+        setMetaDescription(fallback.metaDescription || '');
+        setContent(fallback.content || '');
+        if (fallback.contactDetails) {
+          setContactDetails(fallback.contactDetails);
+        }
+        if (fallback.aboutDetails) {
+          setAboutDetails(fallback.aboutDetails);
+        }
+      }
     } finally {
       setLoading(false);
     }

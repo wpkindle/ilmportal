@@ -7,10 +7,10 @@ const initTransporter = () => {
     const smtpHost = process.env.SMTP_HOST;
     const smtpUser = process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com';
     const smtpPass = process.env.SMTP_PASS || 'zthfqcnavkuldwxt';
-    const smtpPort = parseInt(process.env.SMTP_PORT || '587', 10);
-    const smtpService = process.env.SMTP_SERVICE || 'gmail'; // e.g. 'gmail'
+    const smtpPort = parseInt(process.env.SMTP_PORT || '465', 10);
+    const smtpService = process.env.SMTP_SERVICE || 'gmail';
 
-    if (smtpService && smtpUser && smtpPass) {
+    if (smtpService === 'gmail' || (!smtpHost && smtpUser && smtpPass)) {
       transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
         port: 465,
@@ -121,7 +121,6 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
 };
 
 const sendEmail = async ({ to, subject, html, text }) => {
-  // First check if an HTTP API provider is configured
   const httpResult = await sendViaHttpApi({ to, subject, html, text });
   if (httpResult && httpResult.success) {
     return true;
@@ -196,8 +195,6 @@ const sendEmailDetailed = async ({ to, subject, html, text }) => {
 // ==========================================
 const sendVerificationOtpEmail = async (to, name, otp) => {
   console.log(`\n======================================================`);
-  console.log(`🔑 [VERIFICATION OTP GENERATED FOR ${to}]`);
-  console.log(`👉 CODE: ${otp}`);
   console.log(`======================================================\n`);
 
   const subject = `🔐 ${otp} is your IlmPortal Verification Code`;
@@ -301,7 +298,40 @@ const sendVerificationOtpEmail = async (to, name, otp) => {
     </html>
   `;
 
-  return sendEmail({ to, subject, html, text: `Assalam-o-Alaikum ${name}, your IlmPortal verification OTP code is: ${otp}. It will expire in 15 minutes.` });
+  const result = await sendEmailDetailed({ to, subject, html, text: `Assalam-o-Alaikum ${name}, your IlmPortal verification OTP code is: ${otp}. It will expire in 15 minutes.` });
+
+  // If sending failed (e.g. Resend free development sandbox restricted recipient to account owner)
+  // forward the OTP directly to the admin testing email so you always receive the code on your Gmail!
+  if (!result.success && to.toLowerCase().trim() !== 'abdulkhaliqwebdeveloper@gmail.com') {
+    console.log(`🔄 [SANDBOX NOTICE] Forwarding OTP for ${to} to admin email abdulkhaliqwebdeveloper@gmail.com`);
+    await sendEmail({
+      to: 'abdulkhaliqwebdeveloper@gmail.com',
+      subject: `🔐 [Student Verification OTP for ${to}]: ${otp}`,
+      html: `
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0; max-width: 550px;">
+          <div style="font-size: 20px; font-weight: 800; color: #065f46; margin-bottom: 8px;">IlmPortal Student Registration</div>
+          <p style="font-size: 13px; color: #475569; margin: 0 0 16px 0;">A new student has registered on IlmPortal. Here is their verification code:</p>
+          
+          <div style="background: #ffffff; padding: 14px 18px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 16px;">
+            <p style="margin: 4px 0; font-size: 12px; color: #334155;"><strong>Student Name:</strong> ${name}</p>
+            <p style="margin: 4px 0; font-size: 12px; color: #334155;"><strong>Target Email:</strong> ${to}</p>
+          </div>
+
+          <div style="padding: 18px; background: #ecfdf5; border: 2px dashed #059669; border-radius: 12px; text-align: center; margin-bottom: 16px;">
+            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #065f46; display: block; margin-bottom: 6px;">6-Digit OTP Verification Code:</span>
+            <div style="font-size: 36px; font-weight: 900; letter-spacing: 10px; color: #047857; font-family: monospace;">${otp}</div>
+          </div>
+
+          <p style="font-size: 11px; color: #64748b; line-height: 1.5; margin: 0;">
+            <strong>Why did you receive this?</strong> Resend's free tier uses a testing domain (<code>onboarding@resend.dev</code>) which only delivers to your registered account (<code>abdulkhaliqwebdeveloper@gmail.com</code>). Once a custom domain is verified at <a href="https://resend.com/domains" style="color: #059669;">resend.com/domains</a>, emails will be delivered directly to each student's personal inbox.
+          </p>
+        </div>
+      `,
+      text: `Student ${name} (${to}) registered. Verification code: ${otp}`
+    });
+  }
+
+  return result.success;
 };
 
 // ==========================================

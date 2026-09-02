@@ -22,10 +22,10 @@ const calculateProfileCompletion = (user, tutorProfile) => {
       { key: 'phone', label: 'Mobile Number (WhatsApp)', weight: 10, done: !!user.phone?.trim() },
       { key: 'avatar', label: 'Profile Picture', weight: 15, done: !!user.avatar?.trim() },
       { key: 'age', label: 'Tutor Age', weight: 10, done: !!user.age },
-      { key: 'gender', label: 'Gender', weight: 5, done: !!user.gender },
+      { key: 'gender', label: 'Gender', weight: 5, done: !!user.gender?.trim() },
       { key: 'city', label: 'City Location', weight: 10, done: !!user.city?.trim() },
-      { key: 'bio', label: 'Teaching Bio', weight: 10, done: !!tutorProfile?.bio?.trim() && tutorProfile.bio.length > 20 },
-      { key: 'qualifications', label: 'Educational Qualifications', weight: 10, done: !!tutorProfile?.qualifications?.trim() },
+      { key: 'bio', label: 'Teaching Bio', weight: 10, done: !!tutorProfile?.bio?.trim() && tutorProfile.bio.length > 20 && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmPortal') },
+      { key: 'qualifications', label: 'Educational Qualifications', weight: 10, done: !!tutorProfile?.qualifications?.trim() && tutorProfile.qualifications !== 'Tutor Qualifications' },
       { key: 'sanad', label: 'Sanad / Degree Document', weight: 10, done: Array.isArray(tutorProfile?.sanadDocuments) && tutorProfile.sanadDocuments.length > 0 }
     ];
 
@@ -39,7 +39,7 @@ const calculateProfileCompletion = (user, tutorProfile) => {
       { key: 'phone', label: 'Contact Phone Number', weight: 15, done: !!user.phone?.trim() || !!user.guardianPhone?.trim() },
       { key: 'avatar', label: 'Profile Picture', weight: 15, done: !!user.avatar?.trim() },
       { key: 'age', label: 'Student Age', weight: 15, done: !!user.age },
-      { key: 'gender', label: 'Gender', weight: 10, done: !!user.gender },
+      { key: 'gender', label: 'Gender', weight: 10, done: !!user.gender?.trim() },
       { key: 'city', label: 'City', weight: 15, done: !!user.city?.trim() }
     ];
 
@@ -125,10 +125,10 @@ exports.register = async (req, res) => {
       password,
       role: userRole,
       phone: userPhone,
-      guardianPhone: (guardianPhone || userPhone).trim(),
-      gender: gender || 'male',
+      guardianPhone: (guardianPhone || '').trim(),
+      gender: (gender || '').trim(),
       age: age ? Number(age) : undefined,
-      city: city || 'Lahore',
+      city: (city || '').trim(),
       isVerified: false,
       verificationOtp: otp,
       verificationOtpExpires: otpExpires,
@@ -140,11 +140,11 @@ exports.register = async (req, res) => {
     if (userRole === 'tutor') {
       await TutorProfile.create({
         user: user._id,
-        bio: req.body.bio || 'Assalam-o-Alaikum! I am an experienced tutor on IlmPortal.',
-        qualifications: req.body.qualifications || 'Tutor Qualifications',
-        experienceYears: req.body.experienceYears ? Number(req.body.experienceYears) : 2,
+        bio: (req.body.bio || '').trim(),
+        qualifications: (req.body.qualifications || '').trim(),
+        experienceYears: req.body.experienceYears ? Number(req.body.experienceYears) : 1,
         hourlyRate: req.body.hourlyRate ? Number(req.body.hourlyRate) : 1500,
-        gender: gender || 'male',
+        gender: (gender || '').trim(),
         verificationStatus: 'pending'
       });
 

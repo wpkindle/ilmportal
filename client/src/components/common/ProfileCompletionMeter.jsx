@@ -63,7 +63,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         key: 'gender',
         label: 'Gender',
         weight: 5,
-        done: !!user.gender,
+        done: !!user.gender && user.gender.trim() !== '',
         link: '/tutor/profile#profile-gender',
         actionLabel: 'Set Gender'
       },
@@ -71,7 +71,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         key: 'city',
         label: 'City Location',
         weight: 10,
-        done: !!user.city?.trim(),
+        done: !!user.city && user.city.trim() !== '',
         link: '/tutor/profile#profile-city',
         actionLabel: 'Select City'
       },
@@ -79,7 +79,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         key: 'bio',
         label: 'Teaching Bio & Headline',
         weight: 10,
-        done: !!tutorProfile?.bio?.trim() && tutorProfile.bio.length > 20,
+        done: !!tutorProfile?.bio?.trim() && tutorProfile.bio.length > 20 && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmPortal'),
         link: '/tutor/profile#profile-bio',
         actionLabel: 'Write Bio'
       },
@@ -87,7 +87,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         key: 'qualifications',
         label: 'Educational Qualifications',
         weight: 10,
-        done: !!tutorProfile?.qualifications?.trim(),
+        done: !!tutorProfile?.qualifications?.trim() && tutorProfile.qualifications !== 'Tutor Qualifications',
         link: '/tutor/profile#profile-qualifications',
         actionLabel: 'Add Degrees'
       },
@@ -150,7 +150,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         key: 'gender',
         label: 'Gender',
         weight: 10,
-        done: !!user.gender,
+        done: !!user.gender && user.gender.trim() !== '',
         link: '/student/profile#profile-gender',
         actionLabel: 'Set Gender'
       },
@@ -158,7 +158,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         key: 'city',
         label: 'City Location',
         weight: 15,
-        done: !!user.city?.trim(),
+        done: !!user.city && user.city.trim() !== '',
         link: '/student/profile#profile-city',
         actionLabel: 'Select City'
       }

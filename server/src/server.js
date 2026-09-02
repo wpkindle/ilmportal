@@ -102,6 +102,20 @@ const startServer = async () => {
         await seedDatabase();
       }
 
+      // Clear legacy unintended default city/gender for accounts registered without them
+      try {
+        await User.updateMany(
+          { role: { $ne: 'admin' }, age: { $exists: false }, avatar: { $in: ['', null] }, city: 'Lahore' },
+          { $set: { city: '' } }
+        );
+        await User.updateMany(
+          { role: { $ne: 'admin' }, age: { $exists: false }, avatar: { $in: ['', null] }, gender: 'male' },
+          { $set: { gender: '' } }
+        );
+      } catch (cleanupErr) {
+        console.warn('Profile defaults cleanup note:', cleanupErr.message);
+      }
+
       server.on('error', (e) => {
         if (e.code === 'EADDRINUSE') {
           console.error(`Port ${PORT} is currently in use. Exiting for clean supervisor restart...`);

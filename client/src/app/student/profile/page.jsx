@@ -67,8 +67,8 @@ function StudentProfileContent() {
       setName(user.name || '');
       setEmail(user.email || '');
       setPhone(user.phone || user.guardianPhone || '');
-      setCity(user.city || 'Lahore');
-      setGender(user.gender || 'male');
+      setCity(user.city || '');
+      setGender(user.gender || '');
       setAge(user.age ? String(user.age) : '');
       setAvatar(user.avatar || '');
     }
@@ -276,7 +276,7 @@ function StudentProfileContent() {
               <div className="pt-3 border-t border-slate-100 text-left space-y-2 text-xs text-slate-600">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Gender:</span>
-                  <span className="font-bold capitalize">{gender}</span>
+                  <span className="font-bold capitalize">{gender || 'Not set'}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Age:</span>
@@ -284,7 +284,7 @@ function StudentProfileContent() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">City:</span>
-                  <span className="font-bold">{city || 'Lahore'}</span>
+                  <span className="font-bold">{city || 'Not set'}</span>
                 </div>
               </div>
             </div>
@@ -340,30 +340,16 @@ function StudentProfileContent() {
                     <label className="text-xs font-bold text-slate-700 block mb-1">
                       Gender *
                     </label>
-                    <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-2xl border border-slate-200/80">
-                      <button
-                        type="button"
-                        onClick={() => setGender('male')}
-                        className={`py-2 rounded-xl text-xs font-bold transition-all cursor-pointer text-center ${
-                          gender === 'male'
-                            ? 'bg-emerald-600 text-white shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900 bg-transparent'
-                        }`}
-                      >
-                        Male
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setGender('female')}
-                        className={`py-2 rounded-xl text-xs font-bold transition-all cursor-pointer text-center ${
-                          gender === 'female'
-                            ? 'bg-emerald-600 text-white shadow-xs'
-                            : 'text-slate-600 hover:text-slate-900 bg-transparent'
-                        }`}
-                      >
-                        Female
-                      </button>
-                    </div>
+                    <select
+                      value={gender}
+                      onChange={(e) => setGender(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 font-semibold h-[42px]"
+                    >
+                      <option value="">-- Select Gender --</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                    </select>
                   </div>
 
                   <div id="profile-age" className="scroll-mt-28">
@@ -408,6 +394,7 @@ function StudentProfileContent() {
                       onChange={(e) => setCity(e.target.value)}
                       className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 font-semibold"
                     >
+                      <option value="">-- Select City in Pakistan --</option>
                       {pakistaniCities.map((c) => (
                         <option key={c} value={c}>{c}</option>
                       ))}

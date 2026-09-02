@@ -64,8 +64,8 @@ const userSchema = new mongoose.Schema({
   },
   gender: {
     type: String,
-    enum: ['male', 'female', 'other'],
-    default: 'male'
+    enum: ['male', 'female', 'other', ''],
+    default: ''
   },
   age: {
     type: Number,
@@ -82,7 +82,7 @@ const userSchema = new mongoose.Schema({
   },
   city: {
     type: String,
-    default: 'Lahore'
+    default: ''
   },
   isActive: {
     type: Boolean,

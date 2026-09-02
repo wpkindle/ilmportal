@@ -77,6 +77,12 @@ const sendEmail = async ({ to, subject, html, text }) => {
       console.log(`======================================================\n`);
       return true;
     }
+  } catch (error) {
+    console.error('Email sending error:', error.message);
+    return false;
+  }
+};
+
 const sendEmailDetailed = async ({ to, subject, html, text }) => {
   if (!transporter) {
     return { success: false, error: 'No transporter initialized' };

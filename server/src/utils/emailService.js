@@ -55,38 +55,7 @@ const getClientBaseUrl = () => process.env.CLIENT_URL || 'https://ilmportal.verc
 
 // HTTP REST API Email Dispatch (Port 443 / HTTPS - NEVER blocked by cloud firewalls)
 const sendViaHttpApi = async ({ to, subject, html, text }) => {
-  // 1. Resend HTTP API (https://resend.com)
-  if (process.env.RESEND_API_KEY) {
-    try {
-      const fromAddr = process.env.RESEND_FROM || 'IlmPortal <onboarding@resend.dev>';
-      const res = await fetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${process.env.RESEND_API_KEY.trim()}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          from: fromAddr,
-          to: Array.isArray(to) ? to : [to],
-          subject,
-          html,
-          text: text || html.replace(/<[^>]*>?/gm, '')
-        })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        console.log(`📧 [LIVE EMAIL SENT VIA RESEND HTTP API] MessageId: ${data.id} to ${to}`);
-        return { success: true, messageId: data.id, provider: 'resend', response: '250 OK via Resend' };
-      } else {
-        console.error('Resend HTTP API error:', data);
-        return { success: false, error: data.message || 'Resend error', provider: 'resend' };
-      }
-    } catch (err) {
-      console.error('Resend fetch error:', err.message);
-    }
-  }
-
-  // 2. Brevo HTTP API (https://brevo.com)
+  // 1. Brevo HTTP API (https://brevo.com - Sends to ANY recipient without domain verification)
   if (process.env.BREVO_API_KEY) {
     try {
       const fromEmail = process.env.BREVO_FROM || 'abdulkhaliqwebdeveloper@gmail.com';
@@ -114,6 +83,37 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
       }
     } catch (err) {
       console.error('Brevo fetch error:', err.message);
+    }
+  }
+
+  // 2. Resend HTTP API (https://resend.com)
+  if (process.env.RESEND_API_KEY) {
+    try {
+      const fromAddr = process.env.RESEND_FROM || 'IlmPortal <onboarding@resend.dev>';
+      const res = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${process.env.RESEND_API_KEY.trim()}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: fromAddr,
+          to: Array.isArray(to) ? to : [to],
+          subject,
+          html,
+          text: text || html.replace(/<[^>]*>?/gm, '')
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        console.log(`📧 [LIVE EMAIL SENT VIA RESEND HTTP API] MessageId: ${data.id} to ${to}`);
+        return { success: true, messageId: data.id, provider: 'resend', response: '250 OK via Resend' };
+      } else {
+        console.error('Resend HTTP API error:', data);
+        return { success: false, error: data.message || 'Resend error', provider: 'resend' };
+      }
+    } catch (err) {
+      console.error('Resend fetch error:', err.message);
     }
   }
 

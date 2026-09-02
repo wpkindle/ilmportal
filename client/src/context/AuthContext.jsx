@@ -88,6 +88,24 @@ export const AuthProvider = ({ children }) => {
     throw new Error(data.message || 'Verification failed');
   };
 
+  const verifyToken = async (token, email) => {
+    const data = await api.verifyToken({ token, email });
+    if (data.success) {
+      if (data.token) {
+        localStorage.setItem('ilm_token', data.token);
+        setToken(data.token);
+      }
+      if (data.user) {
+        setUser(data.user);
+      }
+      if (data.tutorProfile) {
+        setTutorProfile(data.tutorProfile);
+      }
+      return data;
+    }
+    throw new Error(data.message || 'Verification link failed');
+  };
+
   const logout = () => {
     localStorage.removeItem('ilm_token');
     setToken(null);
@@ -126,6 +144,7 @@ export const AuthProvider = ({ children }) => {
         login,
         register,
         verifyOtp,
+        verifyToken,
         logout,
         updateUserProfile,
         updateTutorProfileState,

@@ -61,6 +61,12 @@ export const api = {
     body: JSON.stringify(body)
   }).then(handleResponse),
 
+  verifyToken: (body) => fetch(`${API_BASE}/auth/verify-token`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
   resendOtp: (body) => fetch(`${API_BASE}/auth/resend-otp`, {
     method: 'POST',
     headers: getHeaders(),

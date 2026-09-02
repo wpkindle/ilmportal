@@ -113,9 +113,10 @@ exports.register = async (req, res) => {
       });
     }
 
-    // Generate 6-digit OTP
+    // Generate 6-digit OTP and 1-Click Verification Token
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    const otpExpires = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+    const otpExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+    const verificationToken = crypto.randomBytes(32).toString('hex');
 
     const user = await User.create({
       name: name.trim(),
@@ -130,7 +131,9 @@ exports.register = async (req, res) => {
       city: city || 'Lahore',
       isVerified: false,
       verificationOtp: otp,
-      verificationOtpExpires: otpExpires
+      verificationOtpExpires: otpExpires,
+      verificationToken,
+      verificationTokenExpires: otpExpires
     });
 
     // If registered as tutor, create initial TutorProfile ready for later profile setup
@@ -160,15 +163,16 @@ exports.register = async (req, res) => {
     }
 
     // Send Verification Email asynchronously in background (non-blocking for fast <100ms response)
-    sendVerificationOtpEmail(user.email, user.name, otp).catch((err) => {
+    sendVerificationOtpEmail(user.email, user.name, otp, verificationToken).catch((err) => {
       console.error('Async email dispatch notification:', err?.message || err);
     });
 
     res.status(201).json({
       success: true,
-      message: 'Registration successful! A 6-digit verification code has been sent to your email.',
+      message: 'Registration successful! A verification link has been sent to your email.',
       email: user.email,
       username: user.username,
+      verificationToken,
       isVerified: false,
       user: {
         id: user._id,
@@ -293,7 +297,94 @@ exports.verifyOtp = async (req, res) => {
   }
 };
 
-// @desc    Resend Verification OTP
+// @desc    Verify Email via 1-Click Verification Link
+// @route   POST /api/auth/verify-token or GET /api/auth/verify-token
+exports.verifyToken = async (req, res) => {
+  try {
+    const token = req.body?.token || req.query?.token;
+    const email = req.body?.email || req.query?.email;
+
+    if (!token) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification link token is missing'
+      });
+    }
+
+    const cleanToken = token.trim();
+    let user = await User.findOne({
+      $or: [
+        { verificationToken: cleanToken },
+        { verificationOtp: cleanToken }
+      ]
+    });
+
+    if (!user && email) {
+      const emailUser = await User.findOne({ email: email.toLowerCase().trim() });
+      if (emailUser && emailUser.isVerified) {
+        user = emailUser;
+      }
+    }
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid or expired verification link. Please request a new verification email.'
+      });
+    }
+
+    if (user.verificationTokenExpires && user.verificationTokenExpires < Date.now() && !user.isVerified) {
+      return res.status(400).json({
+        success: false,
+        message: 'This verification link has expired. Please request a new verification email.'
+      });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpires = undefined;
+    user.verificationOtp = undefined;
+    user.verificationOtpExpires = undefined;
+    await user.save();
+
+    let tutorProfile = null;
+    if (user.role === 'tutor') {
+      tutorProfile = await TutorProfile.findOne({ user: user._id });
+    }
+
+    const jwtToken = generateToken(user._id);
+    const completion = calculateProfileCompletion(user, tutorProfile);
+
+    res.status(200).json({
+      success: true,
+      message: '🎉 Email verified successfully! Welcome to IlmPortal Pakistan.',
+      token: jwtToken,
+      user: {
+        id: user._id,
+        name: user.name,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        avatar: user.avatar,
+        gender: user.gender,
+        age: user.age,
+        isVerified: true,
+        city: user.city,
+        phone: user.phone
+      },
+      tutorProfile,
+      completion
+    });
+  } catch (error) {
+    console.error('Token Verification Error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server error during link verification'
+    });
+  }
+};
+
+// @desc    Resend Verification Email / Link
 // @route   POST /api/auth/resend-otp
 exports.resendOtp = async (req, res) => {
   try {
@@ -328,23 +419,28 @@ exports.resendOtp = async (req, res) => {
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const verificationToken = crypto.randomBytes(32).toString('hex');
+    const tokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
     user.verificationOtp = otp;
-    user.verificationOtpExpires = new Date(Date.now() + 15 * 60 * 1000);
+    user.verificationOtpExpires = tokenExpires;
+    user.verificationToken = verificationToken;
+    user.verificationTokenExpires = tokenExpires;
     await user.save();
 
     // Send Verification Email asynchronously in background (non-blocking for fast <100ms response)
-    sendVerificationOtpEmail(user.email, user.name, otp).catch((err) => {
+    sendVerificationOtpEmail(user.email, user.name, otp, verificationToken).catch((err) => {
       console.error('Async email dispatch notification:', err?.message || err);
     });
 
     res.status(200).json({
       success: true,
-      message: 'A fresh OTP code has been sent to your email address.'
+      message: 'A fresh verification link has been sent to your email address.'
     });
   } catch (error) {
     res.status(500).json({
       success: false,
-      message: error.message || 'Error resending OTP'
+      message: error.message || 'Error resending verification email'
     });
   }
 };
@@ -385,13 +481,18 @@ exports.login = async (req, res) => {
     }
 
     if (!user.isVerified) {
-      // Refresh OTP and dispatch email
+      // Refresh OTP and verification link
       const otp = Math.floor(100000 + Math.random() * 900000).toString();
+      const verificationToken = crypto.randomBytes(32).toString('hex');
+      const tokenExpires = new Date(Date.now() + 24 * 60 * 60 * 1000);
+
       user.verificationOtp = otp;
-      user.verificationOtpExpires = new Date(Date.now() + 15 * 60 * 1000);
+      user.verificationOtpExpires = tokenExpires;
+      user.verificationToken = verificationToken;
+      user.verificationTokenExpires = tokenExpires;
       await user.save();
 
-      sendVerificationOtpEmail(user.email, user.name, otp).catch((err) => {
+      sendVerificationOtpEmail(user.email, user.name, otp, verificationToken).catch((err) => {
         console.error('Async email dispatch notification:', err?.message || err);
       });
 
@@ -399,7 +500,7 @@ exports.login = async (req, res) => {
         success: false,
         isUnverified: true,
         email: user.email,
-        message: 'Please verify your email address before logging in. A 6-digit verification code has been sent to your email.'
+        message: 'Please verify your email address. A fresh verification link has been sent to your email.'
       });
     }
 

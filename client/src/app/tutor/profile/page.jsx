@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import {
   User,
   Mail,
@@ -34,7 +35,9 @@ import { allPakistaniCities } from '../../../data/pakistanAreas';
 
 const pakistaniCities = allPakistaniCities;
 
-export default function TutorProfilePage() {
+function TutorProfileContent() {
+  const searchParams = useSearchParams();
+  const isVerifiedNotice = searchParams.get('verified') === 'true';
   const { user, tutorProfile, updateUserProfile, updateTutorProfileState, loading: authLoading } = useAuth();
 
   // Basic Account Details
@@ -314,6 +317,24 @@ export default function TutorProfilePage() {
             <span>Go to Dashboard</span>
           </Link>
         </div>
+
+        {/* 1-Click Email Verification Success Banner */}
+        {isVerifiedNotice && (
+          <div className="p-4 sm:p-5 bg-gradient-to-r from-emerald-50 to-teal-50 border-2 border-emerald-500 rounded-3xl flex items-start gap-3.5 shadow-sm animate-in fade-in">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+              <CheckCircle2 className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-emerald-950 flex items-center gap-2">
+                <span>🎉 Email Verified Successfully!</span>
+                <span className="text-[10px] bg-emerald-600 text-white font-extrabold px-2 py-0.5 rounded-full">ACTIVE</span>
+              </h3>
+              <p className="text-xs text-emerald-900 leading-relaxed font-medium">
+                Welcome to IlmPortal Teaching Faculty! Your account is active and verified. Please complete your tutor profile details below (such as Teaching Subjects, Degree / Sanad Certificates, Hourly Rates, and Bio) so our team can approve your public listing.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Account Status / Warning / Audit Notice Banner */}
         <AccountStatusBanner user={user} role="tutor" />
@@ -895,5 +916,13 @@ export default function TutorProfilePage() {
       )}
 
     </div>
+  );
+}
+
+export default function TutorProfilePage() {
+  return (
+    <Suspense fallback={<LoadingSpinner text="Loading tutor profile settings..." />}>
+      <TutorProfileContent />
+    </Suspense>
   );
 }

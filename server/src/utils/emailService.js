@@ -197,13 +197,18 @@ const sendEmailDetailed = async ({ to, subject, html, text }) => {
 // ==========================================
 // 1. VERIFICATION OTP EMAIL TEMPLATE
 // ==========================================
-const sendVerificationOtpEmail = async (to, name, otp) => {
+const sendVerificationOtpEmail = async (to, name, otp, token) => {
   console.log(`\n======================================================`);
+  console.log(`📧 [PREPARING 1-CLICK VERIFICATION EMAIL]`);
+  console.log(`📬 To: ${to}`);
+  console.log(`👤 Name: ${name}`);
+  console.log(`🔑 Token: ${token || otp}`);
   console.log(`======================================================\n`);
 
-  const subject = `🔐 ${otp} is your IlmPortal Verification Code`;
+  const subject = `🔐 Verify Your Account - IlmPortal Pakistan`;
   const clientUrl = getClientBaseUrl();
-  const verifyLink = `${clientUrl}/verify-email?email=${encodeURIComponent(to)}`;
+  const tokenParam = token || otp;
+  const verifyLink = `${clientUrl}/verify-email?token=${encodeURIComponent(tokenParam)}&email=${encodeURIComponent(to)}`;
 
   const html = `
     <!DOCTYPE html>
@@ -211,7 +216,7 @@ const sendVerificationOtpEmail = async (to, name, otp) => {
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Email Verification</title>
+      <title>Verify Your Account - IlmPortal</title>
     </head>
     <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
       <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f1f5f9; padding: 30px 10px;">
@@ -249,33 +254,34 @@ const sendVerificationOtpEmail = async (to, name, otp) => {
                     Assalam-o-Alaikum, ${name}! 👋
                   </h2>
                   <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.6; color: #475569;">
-                    Welcome to <strong>IlmPortal Pakistan</strong>. To complete your account registration and activate your verified portal access, please enter the 6-digit confirmation code below:
+                    Thank you for joining <strong>IlmPortal Pakistan</strong>. To activate your account and complete your profile, please click the button below:
                   </p>
 
-                  <!-- OTP Display Card -->
-                  <div style="margin: 28px 0; padding: 24px; background: linear-gradient(180deg, #f0fdf4 0%, #ecfdf5 100%); border: 2px dashed #059669; border-radius: 16px; text-align: center;">
-                    <span style="display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; color: #065f46; margin-bottom: 8px;">
-                      Your One-Time Passcode (OTP)
-                    </span>
-                    <div style="font-size: 38px; font-weight: 900; letter-spacing: 12px; color: #047857; font-family: 'Courier New', Courier, monospace; padding-left: 12px;">
-                      ${otp}
-                    </div>
-                    <span style="display: inline-block; margin-top: 10px; font-size: 12px; font-weight: 600; color: #64748b;">
-                      ⏳ Valid for the next <strong>15 minutes</strong>
-                    </span>
+                  <!-- Direct 1-Click Action Button -->
+                  <div style="text-align: center; margin: 32px 0;">
+                    <a href="${verifyLink}" style="display: inline-block; padding: 16px 42px; background-color: #059669; color: #ffffff; font-size: 15px; font-weight: 800; text-decoration: none; border-radius: 14px; box-shadow: 0 4px 18px rgba(5, 150, 105, 0.4); text-transform: uppercase; letter-spacing: 0.5px;">
+                      Verify Account & Go to Profile →
+                    </a>
                   </div>
 
-                  <!-- Direct Action Button -->
-                  <div style="text-align: center; margin: 28px 0;">
-                    <a href="${verifyLink}" style="display: inline-block; padding: 14px 34px; background-color: #059669; color: #ffffff; font-size: 14px; font-weight: 800; text-decoration: none; border-radius: 12px; box-shadow: 0 4px 14px rgba(5, 150, 105, 0.35);">
-                      Verify Account Now →
+                  <p style="margin: 0 0 20px 0; font-size: 13px; line-height: 1.6; color: #64748b; text-align: center;">
+                    ⚡ <em>Clicking the button will immediately verify your account and take you straight to your profile page.</em>
+                  </p>
+
+                  <!-- Direct Link Fallback Box -->
+                  <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 14px 16px; border-radius: 12px; margin-top: 25px; word-break: break-all; font-size: 11px; color: #64748b;">
+                    <span style="font-weight: 700; color: #334155; display: block; margin-bottom: 6px;">
+                      If the button doesn't work, copy and paste this link in your browser:
+                    </span>
+                    <a href="${verifyLink}" style="color: #059669; text-decoration: underline; font-weight: 600;">
+                      ${verifyLink}
                     </a>
                   </div>
 
                   <!-- Security Advisory Notice -->
                   <div style="background-color: #f8fafc; border-left: 4px solid #059669; padding: 14px 16px; border-radius: 8px; margin-top: 25px;">
                     <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #475569;">
-                      <strong style="color: #0f172a;">Security Advisory:</strong> If you did not create an account on IlmPortal Pakistan, please ignore this email. Never share your OTP with anyone.
+                      <strong style="color: #0f172a;">Security Advisory:</strong> If you did not create an account on IlmPortal Pakistan, please ignore this email.
                     </p>
                   </div>
                 </td>
@@ -302,36 +308,42 @@ const sendVerificationOtpEmail = async (to, name, otp) => {
     </html>
   `;
 
-  const result = await sendEmailDetailed({ to, subject, html, text: `Assalam-o-Alaikum ${name}, your IlmPortal verification OTP code is: ${otp}. It will expire in 15 minutes.` });
+  const result = await sendEmailDetailed({
+    to,
+    subject,
+    html,
+    text: `Assalam-o-Alaikum ${name}, please click this link to verify your IlmPortal account: ${verifyLink}`
+  });
 
   // If sending failed (e.g. Resend free development sandbox restricted recipient to account owner)
-  // forward the OTP directly to the admin testing email so you always receive the code on your Gmail!
+  // forward the verification link directly to the admin testing email so you can always verify!
   if (!result.success && to.toLowerCase().trim() !== 'abdulkhaliqwebdeveloper@gmail.com') {
-    console.log(`🔄 [SANDBOX NOTICE] Forwarding OTP for ${to} to admin email abdulkhaliqwebdeveloper@gmail.com`);
+    console.log(`🔄 [SANDBOX NOTICE] Forwarding verification link for ${to} to admin email abdulkhaliqwebdeveloper@gmail.com`);
     await sendEmail({
       to: 'abdulkhaliqwebdeveloper@gmail.com',
-      subject: `🔐 [Student Verification OTP for ${to}]: ${otp}`,
+      subject: `🔐 [Verification Link for ${to}]`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0; max-width: 550px;">
-          <div style="font-size: 20px; font-weight: 800; color: #065f46; margin-bottom: 8px;">IlmPortal Student Registration</div>
-          <p style="font-size: 13px; color: #475569; margin: 0 0 16px 0;">A new student has registered on IlmPortal. Here is their verification code:</p>
+          <div style="font-size: 20px; font-weight: 800; color: #065f46; margin-bottom: 8px;">IlmPortal Account Verification</div>
+          <p style="font-size: 13px; color: #475569; margin: 0 0 16px 0;">New user registered: <strong>${name}</strong> (<code>${to}</code>). Click below to verify their account:</p>
           
-          <div style="background: #ffffff; padding: 14px 18px; border-radius: 12px; border: 1px solid #e2e8f0; margin-bottom: 16px;">
-            <p style="margin: 4px 0; font-size: 12px; color: #334155;"><strong>Student Name:</strong> ${name}</p>
-            <p style="margin: 4px 0; font-size: 12px; color: #334155;"><strong>Target Email:</strong> ${to}</p>
+          <div style="text-align: center; margin: 24px 0;">
+            <a href="${verifyLink}" style="display: inline-block; padding: 14px 32px; background: #059669; color: #ffffff; font-size: 14px; font-weight: 800; text-decoration: none; border-radius: 12px;">
+              Verify Account (${to}) →
+            </a>
           </div>
 
-          <div style="padding: 18px; background: #ecfdf5; border: 2px dashed #059669; border-radius: 12px; text-align: center; margin-bottom: 16px;">
-            <span style="font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 1.5px; color: #065f46; display: block; margin-bottom: 6px;">6-Digit OTP Verification Code:</span>
-            <div style="font-size: 36px; font-weight: 900; letter-spacing: 10px; color: #047857; font-family: monospace;">${otp}</div>
+          <div style="background: #ffffff; padding: 12px 16px; border-radius: 10px; border: 1px solid #e2e8f0; word-break: break-all; font-size: 11px; color: #64748b; margin-bottom: 16px;">
+            <strong>Verification Link:</strong><br/>
+            <a href="${verifyLink}" style="color: #059669;">${verifyLink}</a>
           </div>
 
           <p style="font-size: 11px; color: #64748b; line-height: 1.5; margin: 0;">
-            <strong>Why did you receive this?</strong> Resend's free tier uses a testing domain (<code>onboarding@resend.dev</code>) which only delivers to your registered account (<code>abdulkhaliqwebdeveloper@gmail.com</code>). Once a custom domain is verified at <a href="https://resend.com/domains" style="color: #059669;">resend.com/domains</a>, emails will be delivered directly to each student's personal inbox.
+            <strong>Why did you receive this?</strong> Resend free tier sandbox delivers to the account owner (<code>abdulkhaliqwebdeveloper@gmail.com</code>). Whitelisting Render's IP on Brevo or adding a domain on Resend delivers directly to the user's inbox.
           </p>
         </div>
       `,
-      text: `Student ${name} (${to}) registered. Verification code: ${otp}`
+      text: `User ${name} (${to}) registered. Verification Link: ${verifyLink}`
     });
   }
 

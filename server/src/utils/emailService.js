@@ -55,6 +55,8 @@ const getClientBaseUrl = () => process.env.CLIENT_URL || 'https://ilmportal.verc
 
 // HTTP REST API Email Dispatch (Port 443 / HTTPS - NEVER blocked by cloud firewalls)
 const sendViaHttpApi = async ({ to, subject, html, text }) => {
+  let lastError = null;
+
   // 1. Brevo HTTP API (https://brevo.com - Sends to ANY recipient without domain verification)
   if (process.env.BREVO_API_KEY) {
     try {
@@ -79,10 +81,11 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
         return { success: true, messageId: data.messageId, provider: 'brevo', response: '250 OK via Brevo' };
       } else {
         console.error('Brevo HTTP API error:', data);
-        return { success: false, error: data.message || 'Brevo error', provider: 'brevo' };
+        lastError = { success: false, error: data.message || 'Brevo error', provider: 'brevo' };
       }
     } catch (err) {
       console.error('Brevo fetch error:', err.message);
+      lastError = { success: false, error: err.message, provider: 'brevo' };
     }
   }
 
@@ -110,14 +113,15 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
         return { success: true, messageId: data.id, provider: 'resend', response: '250 OK via Resend' };
       } else {
         console.error('Resend HTTP API error:', data);
-        return { success: false, error: data.message || 'Resend error', provider: 'resend' };
+        lastError = { success: false, error: data.message || 'Resend error', provider: 'resend' };
       }
     } catch (err) {
       console.error('Resend fetch error:', err.message);
+      lastError = { success: false, error: err.message, provider: 'resend' };
     }
   }
 
-  return null;
+  return lastError;
 };
 
 const sendEmail = async ({ to, subject, html, text }) => {

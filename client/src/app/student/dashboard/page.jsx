@@ -98,8 +98,8 @@ export default function StudentDashboardPage() {
   const verifiedPaidCourses = deals.filter(d => d.status === 'active_paid' || d.paymentStatus === 'verified');
 
   return (
-    <div className="py-8 bg-slate-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <div className="py-6 md:py-8 pb-24 md:pb-8 bg-slate-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         
         {/* Top Welcome Card */}
         <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">

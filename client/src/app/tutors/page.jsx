@@ -150,19 +150,21 @@ function TutorSearchContent() {
     router.push('/tutors');
   };
 
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+
   return (
-    <div className="min-h-screen bg-slate-50/50 py-8 sm:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <div className="min-h-screen bg-slate-50/50 py-6 sm:py-12 pb-24 md:pb-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         
         {/* Top Header & Search Bar */}
-        <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm space-y-5">
+        <div className="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-8 shadow-sm space-y-4 sm:space-y-5">
           <div>
             <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">
               <Users className="w-4 h-4" />
               <span>Verified Pakistani Faculty Directory</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Find Your Ideal Quran & Academic Tutor
+            <h1 className="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+              Find Your Ideal Quran &amp; Academic Tutor
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
               Connect with certified Quran teachers and Cambridge/Matric specialists. Flexible rates and agreed timings.
@@ -174,10 +176,10 @@ function TutorSearchContent() {
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search by tutor name, subject (Tajweed, Physics), or qualification..."
+                placeholder="Search tutor name, subject (Tajweed, Physics)..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200/90 rounded-2xl text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-emerald-500 shadow-sm"
+                className="w-full pl-10 pr-4 py-3 sm:py-2.5 min-h-[44px] bg-white border border-slate-200/90 rounded-2xl text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-emerald-500 shadow-sm"
               />
             </div>
 
@@ -191,14 +193,24 @@ function TutorSearchContent() {
                 variant="filter"
               />
             </div>
+
+            {/* Mobile Filter Toggle Button */}
+            <button
+              type="button"
+              onClick={() => setMobileFiltersOpen(true)}
+              className="lg:hidden w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[44px] bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-2xl font-bold text-xs shadow-xs active:bg-emerald-100 transition-colors"
+            >
+              <Users className="w-4 h-4 text-emerald-600" />
+              <span>Filter Tutors &amp; Cities</span>
+            </button>
           </div>
         </div>
 
         {/* 2-Column Layout */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
           
-          {/* Left Column: Filter Sidebar */}
-          <div className="lg:col-span-4 xl:col-span-3">
+          {/* Left Column: Desktop Filter Sidebar */}
+          <div className="hidden lg:block lg:col-span-4 xl:col-span-3">
             <TutorFilterSidebar
               filters={filters}
               categories={categories}
@@ -221,7 +233,7 @@ function TutorSearchContent() {
                 <LoadingSpinner />
               </div>
             ) : tutors.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-3 shadow-sm">
+              <div className="bg-white rounded-3xl border border-slate-200 p-8 sm:p-12 text-center space-y-3 shadow-sm">
                 <Users className="w-12 h-12 text-slate-300 mx-auto" />
                 <h3 className="text-base font-bold text-slate-800">No tutors found</h3>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
@@ -229,7 +241,7 @@ function TutorSearchContent() {
                 </p>
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-500 transition-all cursor-pointer"
+                  className="px-5 py-3 min-h-[44px] bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-500 active:scale-95 transition-all cursor-pointer"
                 >
                   Clear All Filters
                 </button>
@@ -246,6 +258,42 @@ function TutorSearchContent() {
         </div>
 
       </div>
+
+      {/* Mobile Slide-Over Filter Drawer */}
+      {mobileFiltersOpen && (
+        <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end bg-black/70 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="w-full max-h-[85vh] bg-white rounded-t-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-250">
+            <div className="p-4 bg-slate-900 text-white flex items-center justify-between">
+              <span className="text-sm font-bold">Filter Pakistani Tutors</span>
+              <button
+                onClick={() => setMobileFiltersOpen(false)}
+                className="px-3 py-1.5 min-h-[44px] text-xs font-bold text-slate-300 hover:text-white"
+              >
+                Done
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto p-4">
+              <TutorFilterSidebar
+                filters={filters}
+                categories={categories}
+                locations={locations}
+                onFilterChange={handleFilterChange}
+                onReset={handleReset}
+              />
+            </div>
+
+            <div className="p-4 border-t border-slate-200 bg-slate-50 pb-safe">
+              <button
+                onClick={() => setMobileFiltersOpen(false)}
+                className="w-full py-3.5 min-h-[44px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-2xl shadow-lg transition-all"
+              >
+                View {tutors.length} Tutors
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

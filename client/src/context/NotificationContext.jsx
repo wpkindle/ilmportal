@@ -97,3 +97,6 @@ export const useNotifications = () => useContext(NotificationContext) || {
   markAllAsRead: () => {},
   refreshNotifications: () => {}
 };
+
+export const useNotification = useNotifications;
+

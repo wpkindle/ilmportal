@@ -532,6 +532,37 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     }
   };
 
+  // Switch mobile camera (Front / Back facing for recitation book scanning)
+  const [facingMode, setFacingMode] = useState('user');
+  const switchCamera = async () => {
+    const nextMode = facingMode === 'user' ? 'environment' : 'user';
+    setFacingMode(nextMode);
+    try {
+      const newStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: nextMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+        audio: false
+      });
+      const newVideoTrack = newStream.getVideoTracks()[0];
+      if (localStreamRef.current) {
+        const oldVideoTrack = localStreamRef.current.getVideoTracks()[0];
+        if (oldVideoTrack) {
+          oldVideoTrack.stop();
+          localStreamRef.current.removeTrack(oldVideoTrack);
+        }
+        localStreamRef.current.addTrack(newVideoTrack);
+      }
+      if (peerConnectionRef.current) {
+        const sender = peerConnectionRef.current.getSenders().find((s) => s.track && s.track.kind === 'video');
+        if (sender) sender.replaceTrack(newVideoTrack);
+      }
+      if (localVideoRef.current) {
+        localVideoRef.current.srcObject = localStreamRef.current;
+      }
+    } catch (err) {
+      console.warn('Camera switch error:', err);
+    }
+  };
+
   // Toggle Screen Sharing
   const toggleScreenShare = async () => {
     if (isScreenSharing) {
@@ -950,11 +981,11 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       </div>
 
       {/* Bottom Floating Controls Bar */}
-      <div className="px-4 py-3 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/90 flex items-center justify-center gap-2.5 sm:gap-4 z-30 shrink-0">
+      <div className="px-4 py-3 pb-safe bg-slate-900/95 backdrop-blur-md border-t border-slate-800/90 flex items-center justify-center gap-2.5 sm:gap-4 z-30 shrink-0">
         {/* Mic Toggle */}
         <button
           onClick={toggleMic}
-          className={`p-3 sm:p-3.5 rounded-2xl transition-all shadow-md cursor-pointer ${
+          className={`p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl transition-all shadow-md cursor-pointer flex items-center justify-center ${
             isMicOn
               ? 'bg-slate-800 hover:bg-slate-700 text-white'
               : 'bg-red-600 hover:bg-red-700 text-white ring-2 ring-red-400'
@@ -967,7 +998,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
         {/* Camera Toggle */}
         <button
           onClick={toggleCamera}
-          className={`p-3 sm:p-3.5 rounded-2xl transition-all shadow-md cursor-pointer ${
+          className={`p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl transition-all shadow-md cursor-pointer flex items-center justify-center ${
             isCameraOn
               ? 'bg-slate-800 hover:bg-slate-700 text-white'
               : 'bg-red-600 hover:bg-red-700 text-white ring-2 ring-red-400'
@@ -977,14 +1008,27 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           {isCameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
         </button>
 
+        {/* Mobile Switch Camera (Front/Back) */}
+        <button
+          onClick={switchCamera}
+          className="md:hidden p-3 min-h-[44px] min-w-[44px] rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white shadow-md cursor-pointer flex items-center justify-center"
+          title="Flip Camera (Front / Back for Quran scanning)"
+        >
+          <RotateCcw className="w-5 h-5 text-emerald-400" />
+        </button>
+
         {/* Speaker Volume & Mute Toggle */}
         <div className="flex items-center gap-1.5 bg-slate-800/90 px-3 py-2 rounded-2xl border border-slate-700">
           <button
             onClick={() => setIsSpeakerMuted(!isSpeakerMuted)}
-            className="text-slate-300 hover:text-white cursor-pointer"
-            title={isSpeakerMuted ? 'Unmute Partner Audio' : 'Mute Partner Audio'}
+            className="text-slate-300 hover:text-white p-1 rounded-lg cursor-pointer"
+            title={isSpeakerMuted ? 'Unmute Remote Speaker' : 'Mute Remote Speaker'}
           >
-            {isSpeakerMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
+            {isSpeakerMuted || speakerVolume === 0 ? (
+              <VolumeX className="w-4 h-4 text-red-400" />
+            ) : (
+              <Volume2 className="w-4 h-4 text-emerald-400" />
+            )}
           </button>
           <input
             type="range"
@@ -993,47 +1037,52 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             step="0.05"
             value={isSpeakerMuted ? 0 : speakerVolume}
             onChange={(e) => {
-              setSpeakerVolume(parseFloat(e.target.value));
-              if (isSpeakerMuted) setIsSpeakerMuted(false);
+              const val = parseFloat(e.target.value);
+              setSpeakerVolume(val);
+              if (val > 0 && isSpeakerMuted) setIsSpeakerMuted(false);
             }}
-            className="w-14 sm:w-20 accent-emerald-500 cursor-pointer h-1.5 bg-slate-700 rounded-lg"
-            title="Adjust Partner Voice Volume"
+            className="w-14 sm:w-20 accent-emerald-500 h-1.5 bg-slate-700 rounded-lg cursor-pointer"
+            title="Classroom Speaker Volume"
           />
         </div>
 
-        {/* Screen Share Toggle */}
+        {/* Desktop Screen Share Toggle */}
         <button
           onClick={toggleScreenShare}
-          className={`p-3 sm:p-3.5 rounded-2xl transition-all shadow-md cursor-pointer ${
+          className={`hidden md:flex p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl transition-all shadow-md cursor-pointer items-center justify-center ${
             isScreenSharing
-              ? 'bg-emerald-600 hover:bg-emerald-700 text-white ring-2 ring-emerald-400'
-              : 'bg-slate-800 hover:bg-slate-700 text-white'
+              ? 'bg-emerald-600 hover:bg-emerald-500 text-white ring-2 ring-emerald-300'
+              : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white'
           }`}
-          title="Share Screen (Slides, Whiteboard, Notes)"
+          title={isScreenSharing ? 'Stop Screen Share' : 'Share Screen with Student'}
         >
-          {isScreenSharing ? <MonitorOff className="w-5 h-5" /> : <Monitor className="w-5 h-5" />}
+          <Monitor className="w-5 h-5" />
         </button>
 
-        {/* In-Call Chat Toggle */}
+        {/* Live Chat Toggle */}
         <button
           onClick={() => setChatOpen(!chatOpen)}
-          className={`p-3 sm:p-3.5 rounded-2xl transition-all shadow-md cursor-pointer ${
+          className={`relative p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl transition-all shadow-md cursor-pointer flex items-center justify-center ${
             chatOpen
-              ? 'bg-emerald-600 text-white ring-2 ring-emerald-400'
-              : 'bg-slate-800 hover:bg-slate-700 text-white'
+              ? 'bg-emerald-600 text-white'
+              : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white'
           }`}
-          title="In-Class Text Chat"
+          title="Open Classroom Live Chat"
         >
           <MessageSquare className="w-5 h-5" />
+          {chatMessages.length > 0 && !chatOpen && (
+            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full animate-ping" />
+          )}
         </button>
 
         {/* Leave Classroom */}
         <button
           onClick={handleLeaveClassroom}
-          className="px-4 sm:px-5 py-3 sm:py-3.5 bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-red-600/30 flex items-center gap-2 transition-all cursor-pointer hover:scale-105"
+          className="p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold transition-all shadow-lg shadow-red-900/40 cursor-pointer flex items-center justify-center gap-1.5"
+          title="End Live Class Session"
         >
-          <PhoneOff className="w-4 h-4" />
-          <span>Leave Class</span>
+          <PhoneOff className="w-5 h-5" />
+          <span className="hidden sm:inline text-xs font-bold">End Class</span>
         </button>
       </div>
 

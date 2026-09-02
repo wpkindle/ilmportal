@@ -308,6 +308,26 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
 
       </div>
 
+      {/* Mobile Sticky Bottom Action Bar */}
+      <div className="md:hidden fixed bottom-14 left-0 right-0 z-30 p-3 bg-white/95 backdrop-blur-md border-t border-slate-200/90 shadow-2xl flex items-center gap-2.5">
+        <button
+          onClick={handleStartChat}
+          className="flex-1 py-3 px-4 min-h-[48px] bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-2xl shadow-lg shadow-emerald-700/30 flex items-center justify-center gap-2 transition-all cursor-pointer"
+        >
+          <MessageSquare className="w-4 h-4" />
+          <span>Message &amp; Book Free Trial</span>
+        </button>
+
+        <button
+          onClick={() => setSanadModalOpen(true)}
+          className="py-3 px-3.5 min-h-[48px] bg-emerald-50 text-emerald-800 border border-emerald-300 font-bold text-xs rounded-2xl flex items-center justify-center gap-1.5 active:bg-emerald-100 transition-colors shrink-0"
+          title="Inspect verified credentials"
+        >
+          <ShieldCheck className="w-4 h-4 text-emerald-600" />
+          <span>Sanad</span>
+        </button>
+      </div>
+
       {/* Sanad Modal */}
       <SanadModal
         isOpen={sanadModalOpen}

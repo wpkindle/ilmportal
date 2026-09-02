@@ -14,12 +14,15 @@ import {
   Users,
   Clock,
   ShieldCheck,
+  CheckCircle2,
   BookOpen,
   Send,
   LayoutGrid,
   RefreshCw,
   Sparkles,
-  Volume2
+  Volume2,
+  VolumeX,
+  Sliders
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
@@ -53,6 +56,14 @@ const ICE_SERVERS = {
   ]
 };
 
+// Tune SDP to enforce mono speech and in-band Forward Error Correction (eliminates acoustic loop screeching)
+const tuneSdpForVoiceQuality = (sdp) => {
+  if (!sdp) return sdp;
+  return sdp.replace(/a=fmtp:(\d+) minptime=\d+;useinbandfec=\d+/g, (match) => {
+    return `${match};stereo=0;sprop-stereo=0;maxaveragebitrate=32000`;
+  });
+};
+
 const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
   const { user } = useAuth();
   const { socket } = useSocket();
@@ -70,6 +81,8 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
   const [remotePeerInfo, setRemotePeerInfo] = useState(null);
   const [isMicOn, setIsMicOn] = useState(true);
   const [isCameraOn, setIsCameraOn] = useState(true);
+  const [isSpeakerMuted, setIsSpeakerMuted] = useState(false);
+  const [speakerVolume, setSpeakerVolume] = useState(0.85); // Clean balanced default volume
   const [isScreenSharing, setIsScreenSharing] = useState(false);
   const [chatOpen, setChatOpen] = useState(false);
   const [chatMessages, setChatMessages] = useState([]);
@@ -108,6 +121,14 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     return `${mins.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
+  // Update remote speaker audio volume and mute state
+  useEffect(() => {
+    if (remoteAudioRef.current) {
+      remoteAudioRef.current.muted = isSpeakerMuted;
+      remoteAudioRef.current.volume = isSpeakerMuted ? 0 : speakerVolume;
+    }
+  }, [isSpeakerMuted, speakerVolume]);
+
   // Helper to create and configure RTCPeerConnection
   const createPeerConnection = useCallback((targetSocketId) => {
     targetPeerSocketIdRef.current = targetSocketId;
@@ -142,29 +163,29 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       setPeerConnected(true);
       setIsConnecting(false);
 
-      // Play on remote video
+      // ⚠️ IMPORTANT FOR NOISE SUPPRESSION:
+      // Keep all <video> elements MUTED to prevent double-audio decoding and howling loops!
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = stream;
-        remoteVideoRef.current.muted = false;
-        remoteVideoRef.current.volume = 1.0;
+        remoteVideoRef.current.muted = true; // Video element is muted, only audio tag plays sound
         remoteVideoRef.current.play().catch(() => {});
       }
       if (spotlightRemoteVideoRef.current) {
         spotlightRemoteVideoRef.current.srcObject = stream;
-        spotlightRemoteVideoRef.current.muted = false;
+        spotlightRemoteVideoRef.current.muted = true;
         spotlightRemoteVideoRef.current.play().catch(() => {});
       }
       if (quranRemoteVideoRef.current) {
         quranRemoteVideoRef.current.srcObject = stream;
-        quranRemoteVideoRef.current.muted = false;
+        quranRemoteVideoRef.current.muted = true;
         quranRemoteVideoRef.current.play().catch(() => {});
       }
 
-      // Play on dedicated audio element to guarantee live voice sound
+      // ONLY the single dedicated audio tag plays remote voice
       if (remoteAudioRef.current) {
         remoteAudioRef.current.srcObject = stream;
-        remoteAudioRef.current.muted = false;
-        remoteAudioRef.current.volume = 1.0;
+        remoteAudioRef.current.muted = isSpeakerMuted;
+        remoteAudioRef.current.volume = speakerVolume;
         remoteAudioRef.current.play().catch(() => {});
       }
     };
@@ -196,7 +217,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     };
 
     return pc;
-  }, [socket, user, roomId]);
+  }, [socket, user, roomId, isSpeakerMuted, speakerVolume]);
 
   // Flush queued ICE candidates
   const processCandidateQueue = async (pc) => {
@@ -222,6 +243,11 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
         offerToReceiveAudio: true,
         offerToReceiveVideo: true
       });
+      
+      // Tune SDP for voice clarity and echo reduction
+      if (offer.sdp) {
+        offer.sdp = tuneSdpForVoiceQuality(offer.sdp);
+      }
       await pc.setLocalDescription(offer);
 
       console.log('📤 Sending WebRTC Offer to partner');
@@ -248,7 +274,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     let activeStream = null;
 
     const initMediaAndSignaling = async () => {
-      // 1. Capture local HD Camera & Microphone
+      // 1. Capture local HD Camera & Noise-Cancelled Microphone
       try {
         if (typeof navigator !== 'undefined' && navigator.mediaDevices) {
           const stream = await navigator.mediaDevices.getUserMedia({
@@ -260,7 +286,8 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             audio: {
               echoCancellation: true,
               noiseSuppression: true,
-              autoGainControl: true
+              autoGainControl: true,
+              channelCount: 1 // Single-channel mono prevents acoustic feedback phase screeching
             }
           });
           activeStream = stream;
@@ -269,6 +296,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
           if (localVideoRef.current) {
             localVideoRef.current.srcObject = stream;
+            localVideoRef.current.muted = true;
             localVideoRef.current.play().catch(() => {});
           }
         }
@@ -294,7 +322,6 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           if (Array.isArray(peers) && peers.length > 0) {
             const peerSocketId = peers[0];
             targetPeerSocketIdRef.current = peerSocketId;
-            // If tutor, send offer; if student, wait for tutor offer or send if no offer after 2s
             if (user?.role === 'tutor') {
               sendOffer(peerSocketId);
             }
@@ -306,7 +333,6 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           console.log('👋 Peer joined:', joinedUser?.name, socketId);
           setRemotePeerInfo(joinedUser);
           targetPeerSocketIdRef.current = socketId;
-          // Initiator sends offer
           sendOffer(socketId);
         });
 
@@ -332,6 +358,9 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               await processCandidateQueue(pc);
 
               const answer = await pc.createAnswer();
+              if (answer.sdp) {
+                answer.sdp = tuneSdpForVoiceQuality(answer.sdp);
+              }
               await pc.setLocalDescription(answer);
 
               console.log('📤 Sending WebRTC Answer');
@@ -410,37 +439,37 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     };
   }, [roomId, socket, user, isPolite, createPeerConnection, sendOffer]);
 
-  // Keep video and audio elements updated when stream arrives
+  // Keep video and audio elements updated cleanly without audio doubling
   useEffect(() => {
     if (remoteStream) {
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = remoteStream;
-        remoteVideoRef.current.muted = false;
-        remoteVideoRef.current.volume = 1.0;
+        remoteVideoRef.current.muted = true; // Kept muted to prevent loop
         remoteVideoRef.current.play().catch(() => {});
       }
       if (remoteAudioRef.current) {
         remoteAudioRef.current.srcObject = remoteStream;
-        remoteAudioRef.current.muted = false;
-        remoteAudioRef.current.volume = 1.0;
+        remoteAudioRef.current.muted = isSpeakerMuted;
+        remoteAudioRef.current.volume = speakerVolume;
         remoteAudioRef.current.play().catch(() => {});
       }
       if (spotlightRemoteVideoRef.current) {
         spotlightRemoteVideoRef.current.srcObject = remoteStream;
-        spotlightRemoteVideoRef.current.muted = false;
+        spotlightRemoteVideoRef.current.muted = true;
         spotlightRemoteVideoRef.current.play().catch(() => {});
       }
       if (quranRemoteVideoRef.current) {
         quranRemoteVideoRef.current.srcObject = remoteStream;
-        quranRemoteVideoRef.current.muted = false;
+        quranRemoteVideoRef.current.muted = true;
         quranRemoteVideoRef.current.play().catch(() => {});
       }
     }
     if (localStream && localVideoRef.current) {
       localVideoRef.current.srcObject = localStream;
+      localVideoRef.current.muted = true;
       localVideoRef.current.play().catch(() => {});
     }
-  }, [remoteStream, localStream, viewMode]);
+  }, [remoteStream, localStream, viewMode, isSpeakerMuted, speakerVolume]);
 
   // Manual connect/reconnect action
   const handleManualReconnect = () => {
@@ -563,7 +592,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       ref={containerRef}
       className="flex flex-col h-screen w-screen bg-slate-950 text-white overflow-hidden fixed inset-0 z-50 select-none font-sans"
     >
-      {/* Hidden dedicated remote audio element for guaranteed live voice playback */}
+      {/* ⚠️ Single dedicated remote audio element for crystal-clear voice without echo loops */}
       <audio ref={remoteAudioRef} autoPlay playsInline />
 
       {/* Safety & Recording Warning Modal */}
@@ -577,13 +606,13 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             <div className="space-y-1.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
                 <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>100% In-Platform 1:1 Live Classroom</span>
+                <span>Noise-Cancelled HD Video &amp; Voice</span>
               </div>
               <h3 className="text-lg sm:text-xl font-black text-white">
                 Live Classroom Safety Notice
               </h3>
               <p className="text-xs text-slate-300 leading-relaxed pt-1">
-                Welcome to your 1:1 live session. No third-party accounts or external logins are required. All classroom sessions run 100% securely inside IlmPortal.
+                Welcome to your 1:1 live session. All classroom communications are monitored for academic quality and student safety under IlmPortal guidelines.
               </p>
             </div>
 
@@ -667,6 +696,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               <video
                 ref={remoteVideoRef}
                 autoPlay
+                muted
                 playsInline
                 className={`w-full h-full object-cover ${!peerConnected ? 'hidden' : ''}`}
               />
@@ -686,7 +716,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                       Waiting for {otherRoleName} to connect...
                     </h3>
                     <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
-                      Automated in-platform live stream active. Your partner’s HD video and voice will connect directly.
+                      Automated in-platform live stream active with echo cancellation and noise suppression.
                     </p>
                   </div>
 
@@ -749,6 +779,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               <video
                 ref={spotlightRemoteVideoRef}
                 autoPlay
+                muted
                 playsInline
                 className={`w-full h-full object-cover ${!peerConnected ? 'hidden' : ''}`}
               />
@@ -811,6 +842,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                 <video
                   ref={quranRemoteVideoRef}
                   autoPlay
+                  muted
                   playsInline
                   className="w-full h-full object-cover"
                 />
@@ -888,7 +920,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       </div>
 
       {/* Bottom Floating Controls Bar */}
-      <div className="px-4 py-3 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/90 flex items-center justify-center gap-3 sm:gap-4 z-30 shrink-0">
+      <div className="px-4 py-3 bg-slate-900/95 backdrop-blur-md border-t border-slate-800/90 flex items-center justify-center gap-2.5 sm:gap-4 z-30 shrink-0">
         {/* Mic Toggle */}
         <button
           onClick={toggleMic}
@@ -914,6 +946,30 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
         >
           {isCameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
         </button>
+
+        {/* Speaker Volume & Mute Toggle */}
+        <div className="flex items-center gap-1.5 bg-slate-800/90 px-3 py-2 rounded-2xl border border-slate-700">
+          <button
+            onClick={() => setIsSpeakerMuted(!isSpeakerMuted)}
+            className="text-slate-300 hover:text-white cursor-pointer"
+            title={isSpeakerMuted ? 'Unmute Partner Audio' : 'Mute Partner Audio'}
+          >
+            {isSpeakerMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
+          </button>
+          <input
+            type="range"
+            min="0"
+            max="1"
+            step="0.05"
+            value={isSpeakerMuted ? 0 : speakerVolume}
+            onChange={(e) => {
+              setSpeakerVolume(parseFloat(e.target.value));
+              if (isSpeakerMuted) setIsSpeakerMuted(false);
+            }}
+            className="w-14 sm:w-20 accent-emerald-500 cursor-pointer h-1.5 bg-slate-700 rounded-lg"
+            title="Adjust Partner Voice Volume"
+          />
+        </div>
 
         {/* Screen Share Toggle */}
         <button

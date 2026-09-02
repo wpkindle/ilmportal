@@ -17,8 +17,6 @@ import {
   BookOpen
 } from 'lucide-react';
 import { api } from '../../../services/api';
-import CaptchaBox from '../../../components/common/CaptchaBox';
-
 export default function TutorRegisterPage() {
   const router = useRouter();
 
@@ -28,7 +26,6 @@ export default function TutorRegisterPage() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [captchaVerified, setCaptchaVerified] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -37,12 +34,6 @@ export default function TutorRegisterPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-
-    if (!captchaVerified) {
-      setError('Please complete the security verification (CAPTCHA) below');
-      setLoading(false);
-      return;
-    }
 
     const cleanUser = username.trim().toLowerCase().replace(/[^a-z0-9_.-]/g, '');
     if (cleanUser.length < 3) {
@@ -211,12 +202,6 @@ export default function TutorRegisterPage() {
               </div>
             </div>
 
-            {/* Security CAPTCHA Box */}
-            <CaptchaBox
-              isVerified={captchaVerified}
-              setIsVerified={setCaptchaVerified}
-            />
-
             {/* Profile Setup Notice */}
             <p className="text-[11px] text-slate-500 bg-emerald-50/70 p-3 rounded-xl border border-emerald-100 leading-relaxed">
               💡 <strong>Profile Details:</strong> You can upload your degree / Sanad certificates, set your subjects, hourly rates, bio, and profile photo directly from your Tutor Dashboard after signing up.
@@ -225,7 +210,7 @@ export default function TutorRegisterPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading || !captchaVerified}
+              disabled={loading}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer mt-2"
             >
               {loading ? (

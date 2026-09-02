@@ -17,8 +17,6 @@ import {
   BookOpen
 } from 'lucide-react';
 import { api } from '../../../services/api';
-import CaptchaBox from '../../../components/common/CaptchaBox';
-
 export default function StudentRegisterPage() {
   const router = useRouter();
 
@@ -28,7 +26,6 @@ export default function StudentRegisterPage() {
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [captchaVerified, setCaptchaVerified] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -37,12 +34,6 @@ export default function StudentRegisterPage() {
     e.preventDefault();
     setLoading(true);
     setError('');
-
-    if (!captchaVerified) {
-      setError('Please complete the security verification (CAPTCHA) below');
-      setLoading(false);
-      return;
-    }
 
     const cleanUser = username.trim().toLowerCase().replace(/[^a-z0-9_.-]/g, '');
     if (cleanUser.length < 3) {
@@ -211,12 +202,6 @@ export default function StudentRegisterPage() {
               </div>
             </div>
 
-            {/* Security CAPTCHA Box */}
-            <CaptchaBox
-              isVerified={captchaVerified}
-              setIsVerified={setCaptchaVerified}
-            />
-
             {/* Profile note */}
             <p className="text-[11px] text-slate-400 bg-slate-50 p-2.5 rounded-xl border border-slate-100 leading-relaxed">
               💡 Additional details like Gender, Age, City, and Grade can be customized anytime from your Student Profile after signing up.
@@ -225,7 +210,7 @@ export default function StudentRegisterPage() {
             {/* Submit Button */}
             <button
               type="submit"
-              disabled={loading || !captchaVerified}
+              disabled={loading}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer mt-2"
             >
               {loading ? (

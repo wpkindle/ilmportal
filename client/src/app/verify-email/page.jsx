@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { ShieldCheck, Mail, ArrowRight, CheckCircle2, RotateCcw, Sparkles } from 'lucide-react';
+import { ShieldCheck, Mail, ArrowRight, CheckCircle2, RotateCcw, Sparkles, ExternalLink, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
@@ -15,10 +15,8 @@ function VerifyEmailContent() {
   const roleParam = searchParams.get('role') || 'student';
   const tokenParam = searchParams.get('token') || '';
 
-  const { verifyOtp, verifyToken } = useAuth();
+  const { verifyToken } = useAuth();
   const [email, setEmail] = useState(emailParam);
-  const [otp, setOtp] = useState('');
-  const [loading, setLoading] = useState(false);
   const [autoVerifying, setAutoVerifying] = useState(!!tokenParam);
   const [resending, setResending] = useState(false);
   const [message, setMessage] = useState('');
@@ -53,27 +51,6 @@ function VerifyEmailContent() {
       return () => { isMounted = false; };
     }
   }, [tokenParam]);
-
-  const handleVerify = async (e) => {
-    e.preventDefault();
-    setLoading(true);
-    setError('');
-
-    try {
-      const res = await verifyOtp(email.trim(), otp.trim());
-      if (res.success) {
-        if (roleParam === 'tutor') {
-          router.push('/tutor/profile?verified=true');
-        } else {
-          router.push('/student/profile?verified=true');
-        }
-      }
-    } catch (err) {
-      setError(err.message || 'Invalid or expired verification code');
-    } finally {
-      setLoading(false);
-    }
-  };
 
   const handleResend = async () => {
     setResending(true);
@@ -112,14 +89,23 @@ function VerifyEmailContent() {
           </div>
         ) : (
           <>
-            <div className="text-center space-y-2">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
-                <ShieldCheck className="w-6 h-6" />
+            {/* Check Your Email Notice Header */}
+            <div className="text-center space-y-3">
+              <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center mx-auto shadow-lg shadow-emerald-600/20">
+                <Mail className="w-8 h-8" />
               </div>
-              <h2 className="text-2xl font-black text-slate-900">Email Verification</h2>
-              <p className="text-xs text-slate-500 max-w-xs mx-auto">
-                We sent a verification email to <strong className="text-slate-800">{email || 'your email'}</strong>. Click the button in the email to activate your account instantly.
+              <div className="space-y-1">
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                  Verification Required
+                </span>
+                <h2 className="text-2xl font-black text-slate-900">Check Your Email</h2>
+              </div>
+              <p className="text-xs text-slate-600 max-w-xs mx-auto leading-relaxed">
+                We sent a 1-click verification link to:
               </p>
+              <div className="inline-block px-3.5 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 font-mono break-all">
+                {email || 'your registered email'}
+              </div>
             </div>
 
             {error && (
@@ -135,51 +121,51 @@ function VerifyEmailContent() {
               </div>
             )}
 
-            <form onSubmit={handleVerify} className="space-y-4">
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Registered Email</label>
-                <input
-                  type="email"
-                  required
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500"
-                />
+            {/* Instruction Card */}
+            <div className="p-4 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl space-y-2 text-left">
+              <div className="flex items-center gap-2 text-xs font-bold text-emerald-950">
+                <Sparkles className="w-4 h-4 text-emerald-700 shrink-0" />
+                <span>How to verify your account:</span>
               </div>
+              <ol className="text-[11px] text-emerald-900 space-y-1.5 pl-4 list-decimal font-medium leading-relaxed">
+                <li>Open your email inbox (and check <strong>Spam / Junk</strong> folder).</li>
+                <li>Open the email from <strong>IlmPortal Pakistan</strong>.</li>
+                <li>Click the green <strong>&ldquo;Verify Account &amp; Go to Profile&rdquo;</strong> button.</li>
+              </ol>
+            </div>
 
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">Or Enter 6-Digit Code</label>
-                <input
-                  type="text"
-                  required
-                  maxLength={6}
-                  placeholder="••••••"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-2xl text-center text-2xl font-mono font-black tracking-widest text-slate-900 outline-none focus:border-emerald-500 focus:bg-white"
-                />
-              </div>
-
-              <button
-                type="submit"
-                disabled={loading || otp.length < 6}
-                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-2xl shadow-md transition-all disabled:opacity-50 flex items-center justify-center gap-2 cursor-pointer"
+            {/* Action Buttons */}
+            <div className="space-y-2.5 pt-1">
+              <a
+                href="https://mail.google.com"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
-                <span>{loading ? 'Verifying...' : 'Verify & Go to Profile'}</span>
-                <ArrowRight className="w-4 h-4" />
-              </button>
-            </form>
+                <Mail className="w-4 h-4" />
+                <span>Open Gmail Inbox</span>
+                <ExternalLink className="w-3.5 h-3.5 opacity-80" />
+              </a>
 
-            <div className="text-center pt-2">
               <button
                 type="button"
                 onClick={handleResend}
                 disabled={resending}
-                className="text-xs font-bold text-emerald-700 hover:underline flex items-center justify-center gap-1.5 mx-auto cursor-pointer"
+                className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold text-xs rounded-2xl transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span>{resending ? 'Sending Email...' : "Didn't receive email? Resend Verification Link"}</span>
+                <RotateCcw className={`w-3.5 h-3.5 ${resending ? 'animate-spin' : ''}`} />
+                <span>{resending ? 'Sending Link...' : "Didn't receive email? Resend Link"}</span>
               </button>
+            </div>
+
+            <div className="text-center pt-2">
+              <Link
+                href="/login"
+                className="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center justify-center gap-1 transition-colors"
+              >
+                <ArrowLeft className="w-3.5 h-3.5" />
+                <span>Return to Login</span>
+              </Link>
             </div>
           </>
         )}

@@ -16,7 +16,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
-import CaptchaBox from '../../components/common/CaptchaBox';
 
 function LoginContent() {
   const { login } = useAuth();
@@ -31,15 +30,10 @@ function LoginContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [captchaVerified, setCaptchaVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const performLogin = async (loginEmail, loginPass) => {
-    if (!captchaVerified) {
-      setError('Please complete the security verification (CAPTCHA) below');
-      return;
-    }
 
     setLoading(true);
     setError('');
@@ -163,15 +157,9 @@ function LoginContent() {
               </div>
             </div>
 
-            {/* Security CAPTCHA Box */}
-            <CaptchaBox
-              isVerified={captchaVerified}
-              setIsVerified={setCaptchaVerified}
-            />
-
             <button
               type="submit"
-              disabled={loading || !captchaVerified}
+              disabled={loading}
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md shadow-emerald-600/20 hover:shadow-lg transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               {loading ? (

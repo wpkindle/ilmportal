@@ -26,7 +26,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
-import CaptchaBox from './CaptchaBox';
 import { allPakistaniCities } from '../../data/pakistanAreas';
 
 const pakistaniCities = allPakistaniCities;
@@ -46,7 +45,6 @@ export default function StudentAuthModal({
   const [resending, setResending] = useState(false);
   const [error, setError] = useState('');
   const [infoMessage, setInfoMessage] = useState('');
-  const [captchaVerified, setCaptchaVerified] = useState(false);
   
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
@@ -424,16 +422,9 @@ export default function StudentAuthModal({
                 </div>
               </div>
 
-              {/* Compact Security CAPTCHA */}
-              <CaptchaBox
-                compact={true}
-                isVerified={captchaVerified}
-                setIsVerified={setCaptchaVerified}
-              />
-
               <button
                 type="submit"
-                disabled={loading || !captchaVerified}
+                disabled={loading}
                 className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all disabled:opacity-50 mt-1"
               >
                 <MessageSquare className="w-3.5 h-3.5" />
@@ -560,16 +551,9 @@ export default function StudentAuthModal({
                 </div>
               </div>
 
-              {/* Compact Security CAPTCHA */}
-              <CaptchaBox
-                compact={true}
-                isVerified={captchaVerified}
-                setIsVerified={setCaptchaVerified}
-              />
-
               <button
                 type="submit"
-                disabled={loading || !captchaVerified}
+                disabled={loading}
                 className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all disabled:opacity-50 mt-1"
               >
                 <span>{loading ? 'Creating...' : 'Continue to Email Code →'}</span>

@@ -20,7 +20,6 @@ import {
   Layers,
   Clock,
   Briefcase,
-  DollarSign,
   PlusCircle,
   Eye,
   EyeOff,

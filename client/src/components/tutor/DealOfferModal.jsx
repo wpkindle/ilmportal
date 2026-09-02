@@ -10,7 +10,7 @@ import {
   Calendar as CalendarIcon,
   Clock,
   BookOpen,
-  DollarSign,
+  CreditCard,
   Video,
   Home,
   Check,
@@ -225,7 +225,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                <DollarSign className="w-3.5 h-3.5 text-emerald-600" />
+                <CreditCard className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Agreed Tuition Fee (PKR) *</span>
               </label>
               <input

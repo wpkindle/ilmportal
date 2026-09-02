@@ -129,6 +129,20 @@ export const AuthProvider = ({ children }) => {
     setTutorProfile(updatedProfile);
   };
 
+  const deleteAccount = async (password) => {
+    const data = await api.deleteAccount({ password });
+    if (data.success) {
+      localStorage.removeItem('ilm_token');
+      setToken(null);
+      setUser(null);
+      setTutorProfile(null);
+      if (typeof window !== 'undefined') {
+        window.location.href = '/?deleted=true';
+      }
+    }
+    return data;
+  };
+
   const isStudent = user?.role === 'student';
   const isTutor = user?.role === 'tutor';
   const isAdmin = user?.role === 'admin';
@@ -146,6 +160,7 @@ export const AuthProvider = ({ children }) => {
         verifyOtp,
         verifyToken,
         logout,
+        deleteAccount,
         updateUserProfile,
         updateTutorProfileState,
         isStudent,

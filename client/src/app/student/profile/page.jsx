@@ -17,12 +17,14 @@ import {
   Sparkles,
   Layers,
   Eye,
-  EyeOff
+  EyeOff,
+  Trash2
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
 import ProfileCompletionMeter from '../../../components/common/ProfileCompletionMeter';
 import AccountStatusBanner from '../../../components/common/AccountStatusBanner';
+import DeleteAccountModal from '../../../components/common/DeleteAccountModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import { allPakistaniCities } from '../../../data/pakistanAreas';
 
@@ -57,6 +59,7 @@ function StudentProfileContent() {
   const [profileError, setProfileError] = useState('');
   const [passwordSuccess, setPasswordSuccess] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Sync state with current user
   useEffect(() => {
@@ -553,10 +556,51 @@ function StudentProfileContent() {
               </form>
             </div>
 
+            {/* 3. Danger Zone / Delete Account */}
+            <div className="bg-white p-6 sm:p-7 rounded-3xl border border-rose-200 shadow-xs space-y-3.5">
+              <div className="border-b border-rose-100 pb-3 flex items-center justify-between">
+                <div>
+                  <h2 className="text-sm font-black text-rose-950 flex items-center gap-2">
+                    <Trash2 className="w-4 h-4 text-rose-600" />
+                    <span>Danger Zone &mdash; Delete Account</span>
+                  </h2>
+                  <p className="text-xs text-rose-700/80 mt-0.5">
+                    Permanently remove your account and all enrolled student records.
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Deleting your account will erase your profile information, chat histories, active course deals, and certificate records. This action cannot be reversed.
+              </p>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteModal(true)}
+                  className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-bold text-xs rounded-2xl shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete My Account</span>
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
 
       </div>
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteModal && (
+        <DeleteAccountModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          role="student"
+          userName={name}
+        />
+      )}
+
     </div>
   );
 }

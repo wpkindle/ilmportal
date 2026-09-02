@@ -116,6 +116,12 @@ export const api = {
     body: JSON.stringify(body)
   }).then(handleResponse),
 
+  deleteAccount: (body) => fetch(`${API_BASE}/auth/delete-account`, {
+    method: 'DELETE',
+    headers: getHeaders(),
+    body: JSON.stringify(body || {})
+  }).then(handleResponse),
+
   forgotPassword: (body) => fetch(`${API_BASE}/auth/forgot-password`, {
     method: 'POST',
     headers: getHeaders(),

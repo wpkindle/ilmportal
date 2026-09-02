@@ -24,13 +24,15 @@ import {
   PlusCircle,
   Eye,
   EyeOff,
-  ArrowLeft
+  ArrowLeft,
+  Trash2
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
 import ProfileCompletionMeter from '../../../components/common/ProfileCompletionMeter';
 import AccountStatusBanner from '../../../components/common/AccountStatusBanner';
 import { SanadModal } from '../../../components/common/SanadBadge';
+import DeleteAccountModal from '../../../components/common/DeleteAccountModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import { allPakistaniCities } from '../../../data/pakistanAreas';
 
@@ -82,6 +84,7 @@ function TutorProfileContent() {
   const [passwordError, setPasswordError] = useState('');
   const [sanadSuccess, setSanadSuccess] = useState('');
   const [sanadError, setSanadError] = useState('');
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
 
   // Sync state on load
   useEffect(() => {
@@ -901,6 +904,36 @@ function TutorProfileContent() {
               </form>
             </div>
 
+            {/* 4. Danger Zone / Delete Account */}
+            <div className="bg-white p-6 sm:p-7 rounded-3xl border border-rose-200 shadow-xs space-y-3.5">
+              <div className="border-b border-rose-100 pb-3 flex items-center justify-between">
+                <div>
+                  <h2 className="text-sm font-black text-rose-950 flex items-center gap-2">
+                    <Trash2 className="w-4 h-4 text-rose-600" />
+                    <span>Danger Zone &mdash; Delete Account</span>
+                  </h2>
+                  <p className="text-xs text-rose-700/80 mt-0.5">
+                    Permanently remove your tutor listing, courses, and educational credentials.
+                  </p>
+                </div>
+              </div>
+
+              <p className="text-xs text-slate-600 leading-relaxed">
+                Deleting your account will remove your public faculty listing from search results, delete your curriculum courses, student reviews, and Sanad submissions. This action is irreversible.
+              </p>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteModal(true)}
+                  className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-bold text-xs rounded-2xl shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>Delete My Account</span>
+                </button>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -913,6 +946,16 @@ function TutorProfileContent() {
           onClose={() => setSelectedSanadModal(false)}
           sanads={uploadedSanads}
           tutorName={name || 'Tutor'}
+        />
+      )}
+
+      {/* Delete Account Confirmation Modal */}
+      {showDeleteModal && (
+        <DeleteAccountModal
+          isOpen={showDeleteModal}
+          onClose={() => setShowDeleteModal(false)}
+          role="tutor"
+          userName={name}
         />
       )}
 

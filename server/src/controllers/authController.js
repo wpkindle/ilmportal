@@ -784,3 +784,60 @@ exports.testEmail = async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 };
+
+// @desc    Delete Current User Account (Self-Service)
+// @route   DELETE /api/auth/delete-account
+exports.deleteMyAccount = async (req, res) => {
+  try {
+    const { password } = req.body || {};
+    const userId = req.user.id || req.user._id;
+
+    const user = await User.findById(userId).select('+password');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User account not found' });
+    }
+
+    if (user.role === 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'System administrator accounts cannot be self-deleted.'
+      });
+    }
+
+    // Verify password if provided
+    if (password) {
+      const isMatch = await user.comparePassword(password);
+      if (!isMatch) {
+        return res.status(400).json({
+          success: false,
+          message: 'Incorrect password. Please provide your valid current password to confirm account deletion.'
+        });
+      }
+    }
+
+    // Clean up role-specific records
+    if (user.role === 'tutor') {
+      await TutorProfile.deleteOne({ user: userId });
+    }
+
+    // Clean up notifications
+    await Notification.deleteMany({
+      $or: [{ recipient: userId }, { sender: userId }]
+    });
+
+    // Permanently remove user record
+    await User.findByIdAndDelete(userId);
+
+    res.status(200).json({
+      success: true,
+      message: 'Your account and all associated data have been permanently deleted.'
+    });
+  } catch (error) {
+    console.error('Account Deletion Error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server error while deleting account'
+    });
+  }
+};
+

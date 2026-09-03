@@ -37,17 +37,43 @@ const initSocket = (io) => {
         const rId = readerId || socket.userId;
         if (!rId || !conversationId) return;
 
-        await Message.updateMany(
+        const updateResult = await Message.updateMany(
           { conversationId, recipient: rId, isRead: false },
           { isRead: true, isDelivered: true, readAt: new Date() }
         );
 
-        // Broadcast to conversation room
-        io.to(`conv_${conversationId}`).emit('messages-seen', {
-          conversationId,
-          readerId: rId,
-          seenAt: new Date()
-        });
+        if (updateResult.modifiedCount > 0 || true) {
+          const seenPayload = {
+            conversationId,
+            readerId: rId,
+            seenAt: new Date()
+          };
+
+          // 1. Broadcast to active conversation room (reaches both participants if both in room)
+          io.to(`conv_${conversationId}`).emit('messages-seen', seenPayload);
+
+          // 2. Find who sent the unread messages (the other party) and send directly to their user room
+          //    This guarantees the "Seen" tick reaches the sender even if they navigated away from conv room
+          try {
+            const lastMessages = await Message.find(
+              { conversationId, recipient: rId },
+              { sender: 1 }
+            ).limit(5);
+
+            const senderIds = [...new Set(lastMessages.map(m => m.sender?.toString()).filter(Boolean))];
+            for (const sId of senderIds) {
+              if (sId !== rId) {
+                io.to(`user_${sId}`).emit('messages-seen', seenPayload);
+                const senderSocketId = onlineUsers.get(sId);
+                if (senderSocketId) {
+                  io.to(senderSocketId).emit('messages-seen', seenPayload);
+                }
+              }
+            }
+          } catch (lookupErr) {
+            console.warn('Could not lookup sender for seen propagation:', lookupErr.message);
+          }
+        }
 
         // Push new unread total to reader's personal room
         const totalUnread = await Message.countDocuments({

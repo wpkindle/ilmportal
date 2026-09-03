@@ -13,7 +13,7 @@ import { showNativeNotification } from '../../../utils/notificationManager';
 
 function StudentMessagesContent() {
   const { user } = useAuth();
-  const { socket, onlineUsers } = useSocket();
+  const { socket, onlineUsers, onlineStatusMap } = useSocket();
   const searchParams = useSearchParams();
   const activeConvParam = searchParams.get('conversation');
   const tutorIdParam = searchParams.get('tutorId');
@@ -144,7 +144,7 @@ function StudentMessagesContent() {
                 conversations.map((conv) => {
                   const isSelected = activeConversation?.conversationId === conv.conversationId;
                   const partnerIdStr = conv.partner?._id ? conv.partner._id.toString() : '';
-                  const isTutorOnline = partnerIdStr ? onlineUsers.some(id => id.toString() === partnerIdStr) : false;
+                  const isTutorOnline = partnerIdStr ? (onlineStatusMap?.[partnerIdStr] === true) : false;
 
                   return (
                     <button

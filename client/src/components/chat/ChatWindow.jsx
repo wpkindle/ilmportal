@@ -39,7 +39,7 @@ import LoadingSpinner from '../common/LoadingSpinner';
 
 const ChatWindow = ({ conversationId, partner, initialDeal }) => {
   const { user, isTutor, isStudent } = useAuth();
-  const { socket, onlineUsers } = useSocket();
+  const { socket, onlineUsers, onlineStatusMap } = useSocket();
   const { soundEnabled, toggleSound, permissionStatus, requestPermission } = useNotifications();
 
   const [messages, setMessages] = useState([]);
@@ -60,7 +60,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
   const messagesContainerRef = useRef(null);
 
   const partnerIdStr = partner?._id ? partner._id.toString() : '';
-  const isPartnerOnline = partnerIdStr ? onlineUsers.some(id => id.toString() === partnerIdStr) : false;
+  const isPartnerOnline = partnerIdStr ? (onlineStatusMap?.[partnerIdStr] === true) : false;
 
   // Scroll ONLY the inner chat messages container (never scrolls the outer page/window)
   const scrollToBottom = (smooth = true) => {
@@ -251,7 +251,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
       text: textToSend,
       messageType: 'text',
       createdAt: new Date().toISOString(),
-      isDelivered: false,
+      isDelivered: isPartnerOnline,   // if partner is online, show Delivered immediately
       isRead: false
     };
 

@@ -27,15 +27,21 @@ export const SocketProvider = ({ children }) => {
   const [isConnected, setIsConnected] = useState(false);
   const [onlineStatusMap, setOnlineStatusMap] = useState({});
   const socketRef = useRef(null);
+  const userRef = useRef(null);
 
-  const userRef = useRef(user);
+  // Keep userRef current at all times
   useEffect(() => {
     userRef.current = user;
-    if (socketRef.current && (user?._id || user?.id)) {
-      const uId = (user._id || user.id).toString();
+  }, [user]);
+
+  // Register user whenever user identity resolves OR socket reconnects
+  useEffect(() => {
+    if (!socketRef.current || !user) return;
+    const uId = (user._id || user.id)?.toString();
+    if (uId && socketRef.current.connected) {
       socketRef.current.emit('register-user', uId);
     }
-  }, [user]);
+  }, [user, isAuthenticated]);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -53,23 +59,23 @@ export const SocketProvider = ({ children }) => {
     socketRef.current = newSocket;
     setSocket(newSocket);
 
-    newSocket.on('connect', () => {
-      setIsConnected(true);
-      console.log('[WebSocket] Connected successfully!');
+    const registerCurrentUser = () => {
       const u = userRef.current;
       if (u?._id || u?.id) {
         const uId = (u._id || u.id).toString();
         newSocket.emit('register-user', uId);
       }
+    };
+
+    newSocket.on('connect', () => {
+      setIsConnected(true);
+      console.log('[WebSocket] Connected successfully!');
+      registerCurrentUser();
     });
 
     newSocket.io.on('reconnect', () => {
       console.log('[WebSocket] Reconnected to server');
-      const u = userRef.current;
-      if (u?._id || u?.id) {
-        const uId = (u._id || u.id).toString();
-        newSocket.emit('register-user', uId);
-      }
+      registerCurrentUser();
     });
 
     newSocket.on('disconnect', () => {
@@ -83,10 +89,7 @@ export const SocketProvider = ({ children }) => {
         usersList.forEach((id) => {
           if (id) map[id.toString()] = true;
         });
-        setOnlineStatusMap(prev => ({
-          ...prev,
-          ...map
-        }));
+        setOnlineStatusMap(prev => ({ ...prev, ...map }));
       }
     });
 
@@ -100,7 +103,16 @@ export const SocketProvider = ({ children }) => {
       }));
     });
 
+    // Re-register on page visibility change (handles tab switch back after idle)
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && newSocket.connected) {
+        registerCurrentUser();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
     return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
       newSocket.disconnect();
     };
   }, []);

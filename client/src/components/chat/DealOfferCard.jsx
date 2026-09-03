@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { Sparkles, CheckCircle2, XCircle, Clock, Video, MapPin, CreditCard, ShieldCheck, Award } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
+import Tutor72HourClock from '../tutor/Tutor72HourClock';
 
 const runConfetti = async () => {
   if (typeof window !== 'undefined') {
@@ -226,25 +227,23 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
         </div>
       )}
 
-      {/* Active Trial Indicator for Tutor */}
-      {currentStatus === 'active_trial' && !isStudentUser && (
-        <div className="p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30 text-center text-xs font-bold text-emerald-300 flex items-center justify-center gap-2">
-          <Clock className="w-4 h-4 text-emerald-400" />
-          <span>Free Trial Active. Awaiting student continuation decision.</span>
-        </div>
+      {/* 72-Hour Grace Period Clock for Tutors */}
+      {isTutorUser && ['active_trial', 'continuation_agreed', 'restricted'].includes(currentStatus) && (
+        <Tutor72HourClock
+          deal={dealState}
+          className="text-slate-900"
+        />
       )}
 
-      {/* Continuation Agreed - 3-day fee notice */}
-      {currentStatus === 'continuation_agreed' && (
+      {/* Continuation Agreed - Notice for Student */}
+      {currentStatus === 'continuation_agreed' && isStudentUser && (
         <div className="p-3.5 bg-amber-950/60 border border-amber-500/40 rounded-2xl space-y-1.5 text-xs text-amber-200">
           <div className="flex items-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-            <span className="font-bold text-amber-300">Continuation Confirmed by Student!</span>
+            <span className="font-bold text-amber-300">Continuation Confirmed!</span>
           </div>
           <p className="text-[11px] text-slate-300 leading-relaxed">
-            {isTutorUser
-              ? `Student selected to continue! Please clear the platform fee with administration within 3 days (due: ${dealState.tutorFeeDueDate ? new Date(dealState.tutorFeeDueDate).toLocaleDateString() : '3 days'}) to keep classroom active.`
-              : 'You have chosen to continue regular classes. The administration is finalizing tutor platform clearance.'}
+            You have chosen to continue regular classes. Live classes are active.
           </p>
         </div>
       )}

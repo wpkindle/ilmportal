@@ -1,5 +1,6 @@
 const Message = require('../models/Message');
 const User = require('../models/User');
+const Deal = require('../models/Deal');
 const ChatRequest = require('../models/ChatRequest');
 const TutorProfile = require('../models/TutorProfile');
 
@@ -179,6 +180,37 @@ const initSocket = (io) => {
             code: 'TUTOR_TO_TUTOR_FORBIDDEN'
           });
           return;
+        }
+
+        // 72-hour tutor platform fee clearance enforcement
+        if (senderUser?.role === 'tutor') {
+          const deal = await Deal.findOne({
+            $or: [
+              { tutor: senderIdStr, student: recipientIdStr },
+              { tutor: senderIdStr, student: recipientUser?._id }
+            ]
+          }).sort({ createdAt: -1 });
+
+          if (deal) {
+            const now = new Date();
+            if (!deal.tutorFeeDueDate && ['active_trial', 'continuation_agreed', 'active_paid', 'restricted'].includes(deal.status)) {
+              const start = deal.trialStartDate || deal.continuationAgreedAt || deal.createdAt || now;
+              deal.tutorFeeDueDate = new Date(new Date(start).getTime() + 72 * 60 * 60 * 1000);
+            }
+
+            if (deal.tutorFeeDueDate && new Date(deal.tutorFeeDueDate) < now && !deal.tutorFeePaid) {
+              deal.accessRestricted = true;
+              deal.status = 'restricted';
+              deal.restrictionType = 'suspend_access';
+              await deal.save();
+
+              socket.emit('chat-error', {
+                message: 'Chat access restricted: The 72-hour grace period for platform fee clearance has expired without payment verification. Please clear the platform fee with admin to resume chatting.',
+                code: 'TUTOR_FEE_OVERDUE'
+              });
+              return;
+            }
+          }
         }
 
         // Female tutor privacy safeguard

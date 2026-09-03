@@ -146,10 +146,14 @@ exports.respondToDealOffer = async (req, res) => {
 
       const now = new Date();
       const trialEndDate = new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000);
+      const feeDueDate = new Date(now.getTime() + 72 * 60 * 60 * 1000); // 72-hour grace period clock starts when deal starts!
 
       deal.status = 'active_trial';
       deal.trialStartDate = now;
       deal.trialEndDate = trialEndDate;
+      deal.tutorFeeDueDate = feeDueDate;
+      deal.tutorFeePaid = false;
+      deal.accessRestricted = false;
       await deal.save();
 
       // Write acceptance message to chat
@@ -284,23 +288,29 @@ exports.getMyDeals = async (req, res) => {
       .populate('tutor', 'name email phone avatar city')
       .sort({ createdAt: -1 });
 
-    // Check if any trial deals have expired without payment or overdue tutor fees
+    // Check if any deals have overdue tutor fees or expired 72-hour grace period
     const now = new Date();
     for (const deal of deals) {
-      if (deal.status === 'active_trial' && deal.trialEndDate && new Date(deal.trialEndDate) < now) {
-        if (deal.paymentStatus !== 'verified') {
-          deal.status = 'trial_expired';
-          await deal.save();
+      if (['active_trial', 'continuation_agreed', 'active_paid', 'restricted'].includes(deal.status)) {
+        // Ensure tutorFeeDueDate is initialized to 72h from deal start
+        if (!deal.tutorFeeDueDate) {
+          const startTime = deal.trialStartDate || deal.continuationAgreedAt || deal.createdAt || now;
+          deal.tutorFeeDueDate = new Date(new Date(startTime).getTime() + 72 * 60 * 60 * 1000);
         }
-      }
 
-      // Check if tutor platform fee is overdue (> 3 days from continuation agreement)
-      if (deal.status === 'continuation_agreed' && deal.tutorFeeDueDate && new Date(deal.tutorFeeDueDate) < now) {
-        if (!deal.tutorFeePaid) {
+        // Check if 72-hour window passed without payment verification
+        if (deal.tutorFeeDueDate && new Date(deal.tutorFeeDueDate) < now && !deal.tutorFeePaid) {
           deal.accessRestricted = true;
           deal.restrictionType = 'suspend_access';
           deal.status = 'restricted';
           await deal.save();
+        } else if (!deal.tutorFeePaid && new Date(deal.tutorFeeDueDate) >= now) {
+          // Within 72-hour window: full access granted to chat and video
+          if (deal.accessRestricted || deal.status === 'restricted') {
+            deal.accessRestricted = false;
+            deal.status = deal.continuationAgreed ? 'continuation_agreed' : 'active_trial';
+            await deal.save();
+          }
         }
       }
     }

@@ -220,6 +220,37 @@ exports.sendMessage = async (req, res) => {
       });
     }
 
+    // Safeguard: Check if tutor's platform fee clearance has expired (>72 hours)
+    if (req.user.role === 'tutor') {
+      const deal = await Deal.findOne({
+        $or: [
+          { tutor: req.user.id, student: recipientId },
+          { tutor: req.user.id, student: recipientUser._id }
+        ]
+      }).sort({ createdAt: -1 });
+
+      if (deal) {
+        const now = new Date();
+        if (!deal.tutorFeeDueDate && ['active_trial', 'continuation_agreed', 'active_paid', 'restricted'].includes(deal.status)) {
+          const start = deal.trialStartDate || deal.continuationAgreedAt || deal.createdAt || now;
+          deal.tutorFeeDueDate = new Date(new Date(start).getTime() + 72 * 60 * 60 * 1000);
+        }
+
+        if (deal.tutorFeeDueDate && new Date(deal.tutorFeeDueDate) < now && !deal.tutorFeePaid) {
+          deal.accessRestricted = true;
+          deal.status = 'restricted';
+          deal.restrictionType = 'suspend_access';
+          await deal.save();
+
+          return res.status(403).json({
+            success: false,
+            code: 'TUTOR_FEE_OVERDUE',
+            message: 'Chat access restricted: The 72-hour grace period for platform fee clearance has expired without payment verification. Please clear the platform fee with admin to resume chatting.'
+          });
+        }
+      }
+    }
+
     // Safeguard: Check if recipient is a female tutor
     if (req.user.role === 'student') {
       if (recipientUser && recipientUser.role === 'tutor') {

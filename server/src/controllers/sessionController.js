@@ -133,10 +133,15 @@ exports.getSessionByRoomId = async (req, res) => {
           ]
         }).sort({ createdAt: -1 });
 
-        // 72-hour grace period check for platform fee clearance
-        if (deal && deal.status === 'continuation_agreed' && deal.tutorFeeDueDate) {
+        // 72-hour grace period check for platform fee clearance (starts when deal starts!)
+        if (deal && ['active_trial', 'continuation_agreed', 'active_paid', 'restricted'].includes(deal.status)) {
           const now = new Date();
-          if (new Date(deal.tutorFeeDueDate) < now && !deal.tutorFeePaid) {
+          if (!deal.tutorFeeDueDate) {
+            const start = deal.trialStartDate || deal.continuationAgreedAt || deal.createdAt || now;
+            deal.tutorFeeDueDate = new Date(new Date(start).getTime() + 72 * 60 * 60 * 1000);
+          }
+
+          if (deal.tutorFeeDueDate && new Date(deal.tutorFeeDueDate) < now && !deal.tutorFeePaid) {
             deal.accessRestricted = true;
             deal.status = 'restricted';
             deal.restrictionType = 'suspend_access';
@@ -149,11 +154,14 @@ exports.getSessionByRoomId = async (req, res) => {
 
         // Enforce that video call requires an accepted deal and not restricted
         if (req.user?.role !== 'admin') {
-          if (!deal || !['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) || deal.accessRestricted || deal.status === 'restricted') {
+          const isRestrictedDueToFee = deal?.accessRestricted || deal?.status === 'restricted' || (deal?.tutorFeeDueDate && new Date(deal.tutorFeeDueDate) < new Date() && !deal?.tutorFeePaid);
+
+          if (!deal || !['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) || isRestrictedDueToFee) {
             return res.status(403).json({
               success: false,
-              message: deal?.accessRestricted || deal?.status === 'restricted'
-                ? 'Classroom access is paused. The 72-hour tutor platform fee clearance period has expired without payment verification.'
+              isRestricted: isRestrictedDueToFee,
+              message: isRestrictedDueToFee
+                ? 'Video classroom access is restricted. The 72-hour tutor platform fee clearance period has expired without payment verification.'
                 : 'Live video classroom is only available after a tuition deal offer has been accepted.'
             });
           }

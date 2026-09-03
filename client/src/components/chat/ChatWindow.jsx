@@ -30,7 +30,8 @@ import {
   Download,
   ExternalLink,
   X,
-  File
+  File,
+  CreditCard
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -40,6 +41,7 @@ import { soundEngine } from '../../utils/soundEffects';
 import { showNativeNotification } from '../../utils/notificationManager';
 import DealOfferCard from './DealOfferCard';
 import DealOfferModal from '../tutor/DealOfferModal';
+import TutorPaymentModal from '../tutor/TutorPaymentModal';
 import VoiceMessagePlayer from './VoiceMessagePlayer';
 import ReportModal from './ReportModal';
 import LoadingSpinner from '../common/LoadingSpinner';
@@ -91,25 +93,41 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
     }
   }, [initialDeal]);
 
-  // Video call / Live class option is ONLY visible when deal has been accepted!
+  // 72-hour grace period clearance check for tutors
+  const isTutorFeeOverdue = Boolean(
+    isTutor &&
+    partnerDeal &&
+    (
+      partnerDeal.accessRestricted ||
+      partnerDeal.status === 'restricted' ||
+      (partnerDeal.tutorFeeDueDate && new Date(partnerDeal.tutorFeeDueDate) < new Date() && !partnerDeal.tutorFeePaid)
+    )
+  );
+
+  // Video call / Live class option is ONLY visible when deal has been accepted AND tutor is not restricted!
   const isDealAccepted = Boolean(
-    (partnerDeal &&
-      ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) &&
-      !partnerDeal.accessRestricted &&
-      partnerDeal.status !== 'restricted') ||
-    messages.some(
-      (m) =>
-        m.messageType === 'deal_accept' ||
-        m.dealOfferData?.status === 'active_trial' ||
-        m.deal?.status === 'active_trial' ||
-        (m.deal &&
-          ['active_trial', 'continuation_agreed', 'active_paid'].includes(m.deal.status) &&
-          !m.deal.accessRestricted)
+    !isTutorFeeOverdue &&
+    (
+      (partnerDeal &&
+        ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) &&
+        !partnerDeal.accessRestricted &&
+        partnerDeal.status !== 'restricted') ||
+      messages.some(
+        (m) =>
+          m.messageType === 'deal_accept' ||
+          m.dealOfferData?.status === 'active_trial' ||
+          m.deal?.status === 'active_trial' ||
+          (m.deal &&
+            ['active_trial', 'continuation_agreed', 'active_paid'].includes(m.deal.status) &&
+            !m.deal.accessRestricted &&
+            m.deal.status !== 'restricted')
+      )
     )
   );
 
   // Student Profile & Female Tutor Gate State
   const [studentProfileModalOpen, setStudentProfileModalOpen] = useState(false);
+  const [tutorPaymentModalOpen, setTutorPaymentModalOpen] = useState(false);
   const [femaleTutorRequestStatus, setFemaleTutorRequestStatus] = useState(null);
   const [gateModalOpen, setGateModalOpen] = useState(false);
   const [requestModalOpen, setRequestModalOpen] = useState(false);
@@ -1151,7 +1169,27 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
 
       {/* Bottom Message Input Area */}
       <div className="p-2 sm:p-3 bg-white border-t border-slate-200/80 shrink-0">
-        {user?.role === 'tutor' && partner?.role === 'tutor' ? (
+        {isTutorFeeOverdue ? (
+          <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-center space-y-2.5 shadow-xs animate-in fade-in">
+            <div className="flex items-center justify-center gap-2 text-rose-900 font-black text-xs">
+              <AlertTriangle className="w-4 h-4 text-rose-600" />
+              <span>Chat &amp; Video Classroom Access Restricted</span>
+            </div>
+            <p className="text-[11px] text-rose-700 max-w-lg mx-auto leading-relaxed">
+              The 72-hour grace period for platform fee clearance has expired without payment verification. Chat messaging and video classroom joining are paused until the platform fee is cleared with administration.
+            </p>
+            {partnerDeal && (
+              <button
+                type="button"
+                onClick={() => setTutorPaymentModalOpen(true)}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-black text-xs rounded-xl shadow transition-all cursor-pointer hover:scale-105"
+              >
+                <CreditCard className="w-3.5 h-3.5" />
+                <span>Pay Platform Fee ({partnerDeal.platformFee ? `PKR ${partnerDeal.platformFee.toLocaleString()}` : 'Contact Admin'})</span>
+              </button>
+            )}
+          </div>
+        ) : user?.role === 'tutor' && partner?.role === 'tutor' ? (
           <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-center space-y-1">
             <p className="text-xs font-bold text-amber-900">Direct Chat Disabled Between Tutors</p>
             <p className="text-[11px] text-amber-700">
@@ -1379,6 +1417,21 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
           setFemaleTutorRequestStatus(prev => ({ ...prev, requestStatus: 'pending' }));
         }}
       />
+
+      {/* Tutor Platform Fee Payment Modal */}
+      {partnerDeal && (
+        <TutorPaymentModal
+          deal={partnerDeal}
+          isOpen={tutorPaymentModalOpen}
+          onClose={() => setTutorPaymentModalOpen(false)}
+          onSuccess={() => {
+            setTutorPaymentModalOpen(false);
+            setPartnerDeal((prev) =>
+              prev ? { ...prev, paymentStatus: 'submitted_proof', tutorPaymentProofReference: 'Submitted' } : prev
+            );
+          }}
+        />
+      )}
 
     </div>
   );

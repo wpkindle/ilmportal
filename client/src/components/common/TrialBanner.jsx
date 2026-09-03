@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, CreditCard, AlertCircle, CheckCircle2, ShieldCheck, Sparkles } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import Tutor72HourClock from '../tutor/Tutor72HourClock';
 
 const TrialBanner = ({ deal, onPayClick }) => {
   const { isStudent, isTutor, isAdmin } = useAuth();
@@ -33,6 +34,11 @@ const TrialBanner = ({ deal, onPayClick }) => {
   }, [deal]);
 
   if (!deal) return null;
+
+  // If viewed by tutor, show the dedicated 72-hour clearance clock & access status
+  if (isTutor) {
+    return <Tutor72HourClock deal={deal} onPayClick={onPayClick} />;
+  }
 
   // 1. Paid & Verified status
   if (deal.status === 'active_paid' || deal.paymentStatus === 'verified') {

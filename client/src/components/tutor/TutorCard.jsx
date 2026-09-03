@@ -13,6 +13,7 @@ import {
   Sparkles,
   Wifi,
   User,
+  Heart
 } from 'lucide-react';
 import RatingStars from '../common/RatingStars';
 import SanadBadge, { SanadModal } from '../common/SanadBadge';
@@ -177,7 +178,14 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                     {tutorCity}
                   </span>
                   <span className="text-slate-300">·</span>
-                  <span className="capitalize">{data.gender || 'Tutor'}</span>
+                  {data.gender === 'female' ? (
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.2 rounded-full border border-rose-200">
+                      <Heart className="w-2.5 h-2.5 text-rose-500 fill-rose-400" />
+                      <span>Female Educator</span>
+                    </span>
+                  ) : (
+                    <span className="capitalize text-slate-600">{data.gender || 'Tutor'}</span>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-1.5 mt-1 flex-wrap">

@@ -22,11 +22,16 @@ import {
   Sparkles,
   Volume2,
   VolumeX,
-  Sliders
+  Sliders,
+  ShieldAlert,
+  Flag,
+  Lock,
+  AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import { api } from '../../services/api';
+import ReportModal from '../chat/ReportModal';
 
 // Comprehensive STUN and Free OpenRelay TURN servers for cross-network connectivity
 const ICE_SERVERS = {
@@ -96,7 +101,9 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
   const [remoteStream, setRemoteStream] = useState(null);
   const [remotePeerInfo, setRemotePeerInfo] = useState(null);
   const [isMicOn, setIsMicOn] = useState(true);
-  const [isCameraOn, setIsCameraOn] = useState(true);
+  const [isCameraOn, setIsCameraOn] = useState(false); // Camera OFF by default for privacy
+  const [isBackgroundBlurred, setIsBackgroundBlurred] = useState(false);
+  const [classReportModalOpen, setClassReportModalOpen] = useState(false);
   const [isSpeakerMuted, setIsSpeakerMuted] = useState(false);
   const [speakerVolume, setSpeakerVolume] = useState(0.85); // Clean balanced default volume
   const [isScreenSharing, setIsScreenSharing] = useState(false);
@@ -314,6 +321,10 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               autoGainControl: true,
               channelCount: 1 // Single-channel mono prevents acoustic feedback phase screeching
             }
+          });
+          // Female & family safety: Disable camera tracks by default until user opts in
+          stream.getVideoTracks().forEach((track) => {
+            track.enabled = false;
           });
           activeStream = stream;
           localStreamRef.current = stream;
@@ -656,24 +667,81 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       {/* ⚠️ Single dedicated remote audio element for crystal-clear voice without echo loops */}
       <audio ref={remoteAudioRef} autoPlay playsInline />
 
-      {/* Safety & Recording Warning Modal */}
+      {/* 🛡️ Pre-Join Safety, Privacy & Camera Check Modal */}
       {safetyModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-700/90 rounded-3xl max-w-md w-full p-6 sm:p-7 shadow-2xl space-y-5 relative overflow-hidden text-center">
-            <div className="w-14 h-14 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mx-auto text-emerald-400 shadow-inner">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="bg-slate-900 border border-slate-700/90 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 relative overflow-hidden text-center">
+            
+            <div className="w-14 h-14 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center mx-auto text-emerald-400 shadow-inner">
               <ShieldCheck className="w-7 h-7 text-emerald-400" />
             </div>
 
             <div className="space-y-1.5">
               <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>Noise-Cancelled HD Video &amp; Voice</span>
+                <Lock className="w-3 h-3 text-emerald-400" />
+                <span>End-to-End Encrypted Safe-Room</span>
               </div>
               <h3 className="text-lg sm:text-xl font-black text-white">
-                Live Classroom Safety Notice
+                Pre-Class Privacy &amp; Safety Check
               </h3>
               <p className="text-xs text-slate-300 leading-relaxed pt-1">
-                Quick heads-up: Sharing or requesting outside contact details is strictly prohibited. Our AI safety system automatically detects contact sharing, and violations will result in a permanent ban.
+                Your privacy and dignity are protected. Verify your audio/video preferences before entering the classroom.
+              </p>
+            </div>
+
+            {/* Privacy Toggles Strip */}
+            <div className="grid grid-cols-3 gap-2.5 p-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs">
+              {/* Camera State */}
+              <button
+                type="button"
+                onClick={toggleCamera}
+                className={`p-2.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
+                  isCameraOn
+                    ? 'bg-emerald-600/20 border-emerald-500/40 text-emerald-300'
+                    : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                }`}
+              >
+                {isCameraOn ? <Video className="w-4 h-4 text-emerald-400" /> : <VideoOff className="w-4 h-4 text-rose-400" />}
+                <span className="text-[10px] font-bold">Camera: {isCameraOn ? 'ON' : 'OFF'}</span>
+              </button>
+
+              {/* Mic State */}
+              <button
+                type="button"
+                onClick={toggleMic}
+                className={`p-2.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
+                  isMicOn
+                    ? 'bg-emerald-600/20 border-emerald-500/40 text-emerald-300'
+                    : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                }`}
+              >
+                {isMicOn ? <Mic className="w-4 h-4 text-emerald-400" /> : <MicOff className="w-4 h-4 text-rose-400" />}
+                <span className="text-[10px] font-bold">Mic: {isMicOn ? 'ON' : 'MUTE'}</span>
+              </button>
+
+              {/* Blur Background */}
+              <button
+                type="button"
+                onClick={() => setIsBackgroundBlurred(!isBackgroundBlurred)}
+                className={`p-2.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
+                  isBackgroundBlurred
+                    ? 'bg-teal-600/20 border-teal-500/40 text-teal-300'
+                    : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
+                }`}
+              >
+                <Sparkles className="w-4 h-4 text-teal-400" />
+                <span className="text-[10px] font-bold">Blur: {isBackgroundBlurred ? 'ON' : 'OFF'}</span>
+              </button>
+            </div>
+
+            {/* Reassurance Message */}
+            <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-300 text-left space-y-1">
+              <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
+                <CheckCircle2 className="w-3.5 h-3.5" />
+                <span>Female &amp; Family Privacy Priority</span>
+              </div>
+              <p className="text-slate-400 leading-snug">
+                Camera is OFF by default. Unauthorized recording or outside contact solicitation is strictly prohibited under PECA 2016.
               </p>
             </div>
 
@@ -688,7 +756,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4" />
-              <span>Enter Classroom Now</span>
+              <span>Enter Safe Classroom</span>
             </button>
           </div>
         </div>
@@ -708,8 +776,24 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           </div>
         </div>
 
-        {/* Center/Right Timer & View Modes */}
+        {/* Center/Right Timer, Modes & Security Badges */}
         <div className="flex items-center gap-2 sm:gap-3">
+          {/* 🔒 End-to-End Encrypted Label */}
+          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold">
+            <Lock className="w-3 h-3 text-emerald-400" />
+            <span>E2EE 1:1 Safe Room</span>
+          </div>
+
+          {/* Always-Visible Report / Block Button */}
+          <button
+            onClick={() => setClassReportModalOpen(true)}
+            className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-rose-950/80 text-slate-300 hover:text-rose-300 border border-slate-700 hover:border-rose-500/40 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
+            title="Report Concern or Block Participant"
+          >
+            <Flag className="w-3.5 h-3.5 text-rose-400" />
+            <span className="hidden sm:inline">Report / Block</span>
+          </button>
+
           {/* Duration Timer */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/90 border border-slate-700 text-xs font-mono font-bold text-amber-400">
             <Clock className="w-3.5 h-3.5 text-amber-400" />
@@ -808,7 +892,9 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                 autoPlay
                 muted
                 playsInline
-                className={`w-full h-full object-cover ${!isCameraOn ? 'hidden' : ''}`}
+                className={`w-full h-full object-cover transition-all ${!isCameraOn ? 'hidden' : ''} ${
+                  isBackgroundBlurred ? 'filter blur-[5px] scale-105' : ''
+                }`}
               />
 
               {!isCameraOn && (
@@ -822,11 +908,17 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
               {/* Local User Badge */}
               <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-sm text-xs font-bold text-white flex items-center gap-2 border border-white/10 z-10">
-                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span className={`w-2 h-2 rounded-full ${isCameraOn ? 'bg-emerald-500' : 'bg-slate-500'}`} />
                 <span>You ({user?.name || 'Self'})</span>
                 <span className="text-[10px] font-normal text-emerald-300 bg-emerald-950/80 px-1.5 py-0.2 rounded border border-emerald-700/50">
                   {user?.role || 'Active'}
                 </span>
+                {isBackgroundBlurred && (
+                  <span className="text-[9px] font-bold text-teal-300 bg-teal-950/80 px-1.5 py-0.2 rounded border border-teal-700/50 flex items-center gap-1">
+                    <Sparkles className="w-2.5 h-2.5 text-teal-400" />
+                    <span>Blur</span>
+                  </span>
+                )}
               </div>
             </div>
 
@@ -1008,6 +1100,19 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           {isCameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
         </button>
 
+        {/* Privacy Background Blur Toggle */}
+        <button
+          onClick={() => setIsBackgroundBlurred(!isBackgroundBlurred)}
+          className={`p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl transition-all shadow-md cursor-pointer flex items-center justify-center ${
+            isBackgroundBlurred
+              ? 'bg-teal-600 hover:bg-teal-500 text-white ring-2 ring-teal-300'
+              : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white'
+          }`}
+          title={isBackgroundBlurred ? 'Turn Blur Off' : 'Turn Privacy Background Blur On'}
+        >
+          <Sparkles className="w-5 h-5" />
+        </button>
+
         {/* Mobile Switch Camera (Front/Back) */}
         <button
           onClick={switchCamera}
@@ -1075,6 +1180,19 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           )}
         </button>
 
+        {/* 🚨 Emergency Leave & Report Button */}
+        <button
+          onClick={() => {
+            handleLeaveClassroom();
+            setClassReportModalOpen(true);
+          }}
+          className="p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-bold transition-all shadow-lg shadow-amber-900/40 cursor-pointer flex items-center justify-center gap-1.5"
+          title="Emergency Exit & Flag Incident to Lahore Safety Team"
+        >
+          <ShieldAlert className="w-5 h-5 text-white" />
+          <span className="hidden sm:inline text-xs font-bold">Leave &amp; Report</span>
+        </button>
+
         {/* Leave Classroom */}
         <button
           onClick={handleLeaveClassroom}
@@ -1085,6 +1203,15 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           <span className="hidden sm:inline text-xs font-bold">End Class</span>
         </button>
       </div>
+
+      {/* 🛡️ In-Classroom Report & Safety Incident Modal */}
+      <ReportModal
+        isOpen={classReportModalOpen}
+        onClose={() => setClassReportModalOpen(false)}
+        reportedUser={remotePeerInfo || { name: otherPartyName, role: otherRoleName }}
+        conversationId={roomId}
+        messages={chatMessages}
+      />
 
     </div>
   );

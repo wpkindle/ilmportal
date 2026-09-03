@@ -1,5 +1,6 @@
 import React from 'react';
 import Hero from '../components/home/Hero';
+import SafetyShowcase from '../components/home/SafetyShowcase';
 import FeaturedTutorsShowcase from '../components/home/FeaturedTutorsShowcase';
 import SubjectExplorer from '../components/home/SubjectExplorer';
 import CityGrid from '../components/home/CityGrid';
@@ -30,7 +31,10 @@ export default async function HomePage() {
       {/* 1. Hero Section */}
       <Hero />
 
-      {/* 2. Top Verified Tutors Showcase */}
+      {/* 2. Platform Safety & Trust Showcase */}
+      <SafetyShowcase />
+
+      {/* 3. Top Verified Tutors Showcase */}
       <FeaturedTutorsShowcase initialTutors={featuredTutors} />
 
       {/* 3. Subject Disciplines Explorer */}

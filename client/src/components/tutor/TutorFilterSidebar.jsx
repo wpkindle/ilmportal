@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Filter, RotateCcw, MapPin, BookOpen, User, Video, ShieldCheck, Navigation, ArrowUpDown, Sparkles, Clock, Star, Award } from 'lucide-react';
+import { Filter, RotateCcw, MapPin, BookOpen, User, Video, ShieldCheck, Navigation, ArrowUpDown, Sparkles, Clock, Star, Award, Heart } from 'lucide-react';
 import CustomSelect from '../common/CustomSelect';
 import { pakistaniCityAreas } from '../../data/pakistanAreas';
 
@@ -79,6 +79,27 @@ const TutorFilterSidebar = ({
           <span>Reset</span>
         </button>
       </div>
+
+      {/* 🌸 Priority Female Alimah & Educator Quick Toggle */}
+      <button
+        type="button"
+        onClick={() => onFilterChange('gender', filters.gender === 'female' ? '' : 'female')}
+        className={`w-full p-3 rounded-2xl border text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+          filters.gender === 'female'
+            ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-500 shadow-md shadow-emerald-700/20'
+            : 'bg-emerald-50/70 hover:bg-emerald-100 text-emerald-950 border-emerald-200/80'
+        }`}
+      >
+        <div className="flex items-center gap-2">
+          <Heart className={`w-4 h-4 ${filters.gender === 'female' ? 'text-white fill-white' : 'text-rose-500 fill-rose-400'}`} />
+          <span>Female Faculty Only</span>
+        </div>
+        <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold uppercase tracking-wider ${
+          filters.gender === 'female' ? 'bg-white/20 text-white' : 'bg-emerald-200/80 text-emerald-900'
+        }`}>
+          {filters.gender === 'female' ? 'Active' : 'Alimahs'}
+        </span>
+      </button>
 
       {/* 1. Sort Faculty Filter */}
       <div className="space-y-2">

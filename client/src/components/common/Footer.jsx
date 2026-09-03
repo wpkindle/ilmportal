@@ -251,6 +251,12 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link href="/tutors?gender=female" className="hover:text-emerald-400 transition-colors flex items-center gap-2 group">
+                  <Heart className="w-3.5 h-3.5 text-rose-400 group-hover:scale-110 transition-transform" />
+                  <span>Female Alimah Faculty</span>
+                </Link>
+              </li>
+              <li>
                 <Link href="/how-it-works" className="hover:text-emerald-400 transition-colors flex items-center gap-2 group">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500 group-hover:scale-110 transition-transform" />
                   <span>How It Works</span>
@@ -363,6 +369,12 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link href="/safety" className="text-emerald-400 hover:text-emerald-300 font-bold transition-colors flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Safety, Privacy &amp; Trust</span>
+                </Link>
+              </li>
+              <li>
                 <Link href="/privacy-policy" className="hover:text-emerald-400 transition-colors block">
                   Privacy Policy (PECA)
                 </Link>
@@ -406,6 +418,36 @@ const Footer = () => {
               💳 1Link ATM
             </span>
           </div>
+        </div>
+
+        {/* 🔒 Security & Data Compliance Trust Bar */}
+        <div className="py-4 px-6 rounded-2xl bg-slate-900/60 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-slate-400 text-[11px]">
+            <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+              <ShieldCheck className="w-4 h-4" />
+              <span>SSL 256-Bit Transport Encryption</span>
+            </span>
+            <span className="flex items-center gap-1.5 text-teal-400 font-semibold">
+              <Lock className="w-3.5 h-3.5" />
+              <span>PECA 2016 Law Compliant</span>
+            </span>
+            <span className="flex items-center gap-1.5 text-rose-400 font-semibold">
+              <Heart className="w-3.5 h-3.5 fill-rose-400" />
+              <span>Female Safe-Room Verified</span>
+            </span>
+            <span className="flex items-center gap-1.5 text-amber-400 font-semibold">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>Wifaq-ul-Madaris Sanad Verified</span>
+            </span>
+          </div>
+
+          <Link
+            href="/safety"
+            className="text-[11px] font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-1 transition-colors shrink-0"
+          >
+            <span>Learn About Safety Protocols</span>
+            <ArrowRight className="w-3 h-3" />
+          </Link>
         </div>
 
         {/* 📜 Bottom Copyright, Support & Founder Dedication */}

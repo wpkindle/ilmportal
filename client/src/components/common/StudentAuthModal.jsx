@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
+import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import {
   MessageSquare,
@@ -319,9 +320,21 @@ export default function StudentAuthModal({
             </div>
           </div>
 
-          <div className="pt-3 mt-3 border-t border-slate-800/80 text-[10px] text-slate-400 flex items-center justify-between">
-            <span>IlmPortal Trust & Safety</span>
-            <span className="text-emerald-400 font-mono">Verified Scholar</span>
+          <div className="pt-3 mt-3 border-t border-slate-800/80 space-y-2">
+            <div className="text-[10px] text-slate-400 flex items-center justify-between">
+              <span>IlmPortal Trust &amp; Safety</span>
+              <span className="text-emerald-400 font-mono font-bold">Verified Faculty</span>
+            </div>
+            <div className="flex items-center justify-between text-[9px] text-slate-400 font-semibold pt-1 border-t border-slate-800/60">
+              <span className="flex items-center gap-1 text-emerald-400">
+                <ShieldCheck className="w-3 h-3" />
+                <span>SSL Secured</span>
+              </span>
+              <span>&bull;</span>
+              <span>256-Bit Encrypted</span>
+              <span>&bull;</span>
+              <span>PECA 2016</span>
+            </div>
           </div>
         </div>
 
@@ -558,6 +571,15 @@ export default function StudentAuthModal({
                   </button>
                 </div>
               </div>
+
+              {/* Visible Privacy & Terms Trust Notice */}
+              <p className="text-[10px] text-slate-500 leading-tight text-center pt-1">
+                By continuing, you agree to our{' '}
+                <Link href="/terms" target="_blank" className="text-emerald-700 underline font-bold">Terms</Link>
+                {' '}&amp;{' '}
+                <Link href="/privacy-policy" target="_blank" className="text-emerald-700 underline font-bold">Privacy Policy</Link>.
+                {' '}Protected under PECA 2016.
+              </p>
 
               <button
                 type="submit"

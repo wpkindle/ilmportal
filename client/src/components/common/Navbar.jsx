@@ -345,6 +345,18 @@ const Navbar = () => {
             >
               How It Works
             </Link>
+
+            <Link
+              href="/safety"
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                pathname === '/safety'
+                  ? 'text-emerald-800 bg-emerald-50'
+                  : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Safety &amp; Privacy</span>
+            </Link>
           </nav>
 
           {/* Right Action Buttons & User Menu */}
@@ -605,6 +617,14 @@ const Navbar = () => {
                 className="block px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-slate-800 hover:bg-emerald-50 transition-colors"
               >
                 How It Works
+              </Link>
+              <Link
+                href="/safety"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-emerald-800 bg-emerald-50/50 hover:bg-emerald-100 transition-colors"
+              >
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <span>Safety &amp; Privacy (Female Protection)</span>
               </Link>
               <Link
                 href="/contact-us"

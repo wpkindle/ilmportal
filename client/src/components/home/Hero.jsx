@@ -14,7 +14,9 @@ import {
   Users,
   CheckCircle2,
   ArrowRight,
-  ChevronRight
+  ChevronRight,
+  Heart,
+  Lock
 } from 'lucide-react';
 import AnimatedHeroBackground from './AnimatedHeroBackground';
 import CustomSelect from '../common/CustomSelect';
@@ -111,25 +113,45 @@ const Hero = () => {
         
         {/* Top Trust Pill */}
         <div className="flex items-center justify-center mb-6">
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold shadow-2xl backdrop-blur-md">
+          <Link
+            href="/safety"
+            className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-emerald-950/80 hover:bg-emerald-900/90 border border-emerald-500/40 text-emerald-300 text-xs font-bold shadow-2xl backdrop-blur-md transition-all cursor-pointer"
+          >
             <span className="flex h-2.5 w-2.5 relative">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
             </span>
-            <span>Pakistan’s #1 Verified Quran & Academic Tutoring LMS</span>
+            <span>Pakistan’s #1 Protected Quran &amp; Academic LMS</span>
             <span className="hidden sm:inline text-emerald-500">&bull;</span>
-            <span className="hidden sm:inline text-white font-medium">Live WebRTC Video Classroom</span>
-          </div>
+            <span className="hidden sm:inline text-white font-medium">SSL Encrypted &amp; Female Privacy Guaranteed</span>
+            <ChevronRight className="w-3.5 h-3.5 text-emerald-400 hidden sm:inline" />
+          </Link>
         </div>
 
         {/* Main Heading */}
         <div className="max-w-3xl mx-auto space-y-4">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight sm:leading-tight drop-shadow-md">
-            Learn Quran & Academics with <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-200">Verified Pakistani Tutors</span>
+            Learn Safely, Learn Confidently with <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-200">Verified Pakistani Tutors</span>
           </h1>
           <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed drop-shadow-sm font-normal">
-            Connect with Sanad-certified Quran teachers, Alims/Alimahs, and Cambridge/Matric academic coaches for in-platform live video classes and in-person home tutoring.
+            A protected learning sanctuary for Pakistani families. Connect with Sanad-certified Quran teachers, verified female Alimahs, and Cambridge/Matric academic coaches with camera privacy and encrypted 1:1 live classrooms.
           </p>
+
+          {/* Trust & Security Signals */}
+          <div className="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs font-semibold">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-emerald-500/30 text-emerald-300 shadow-xs">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>100% ID &amp; Sanad Verified</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-teal-500/30 text-teal-300 shadow-xs">
+              <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400" />
+              <span>Female Safe-Room Verified</span>
+            </span>
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-blue-500/30 text-blue-300 shadow-xs">
+              <Lock className="w-3.5 h-3.5 text-blue-400" />
+              <span>256-Bit E2EE Classroom</span>
+            </span>
+          </div>
         </div>
 
         {/* Hero Search Bar with Drop-Up Custom Select */}
@@ -178,6 +200,13 @@ const Hero = () => {
 
           {/* Quick Topic Chips */}
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs">
+            <Link
+              href="/tutors?gender=female"
+              className="px-3.5 py-1.5 rounded-full bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 font-bold border border-emerald-400/50 shadow-sm transition-all flex items-center gap-1.5"
+            >
+              <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400" />
+              <span>🌸 Female Tutors &amp; Alimahs</span>
+            </Link>
             <span className="text-slate-400 text-xs font-semibold mr-1">Popular:</span>
             {quickSubjects.map((sub) => (
               <Link

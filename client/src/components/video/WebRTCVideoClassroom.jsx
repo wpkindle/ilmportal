@@ -103,6 +103,8 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
   const [remotePeerInfo, setRemotePeerInfo] = useState(null);
   const [isMicOn, setIsMicOn] = useState(true);
   const [isCameraOn, setIsCameraOn] = useState(false); // Camera OFF by default for privacy
+  const [isRemoteCameraOn, setIsRemoteCameraOn] = useState(true);
+  const [isRemoteMicOn, setIsRemoteMicOn] = useState(true);
   const [isBackgroundBlurred, setIsBackgroundBlurred] = useState(false);
   const [classReportModalOpen, setClassReportModalOpen] = useState(false);
   const [isReportingAfterLeave, setIsReportingAfterLeave] = useState(false);
@@ -210,17 +212,14 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
         quranRemoteVideoRef.current.play().catch(() => {});
       }
 
-      // ONLY the single dedicated audio tag plays remote voice with smooth fade-in
+      // Dedicated audio tag plays remote voice directly
       if (remoteAudioRef.current) {
         remoteAudioRef.current.srcObject = stream;
         remoteAudioRef.current.muted = isSpeakerMuted;
-        remoteAudioRef.current.play()
-          .then(() => {
-            if (!isSpeakerMuted) {
-              fadeInAudio(remoteAudioRef.current, speakerVolume);
-            }
-          })
-          .catch(() => {});
+        remoteAudioRef.current.volume = isSpeakerMuted ? 0 : speakerVolume;
+        remoteAudioRef.current.play().catch((err) => {
+          console.warn('Remote audio autoplay warning:', err);
+        });
       }
     };
 
@@ -251,7 +250,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     };
 
     return pc;
-  }, [socket, user, roomId, isSpeakerMuted, speakerVolume]);
+  }, [socket, user, roomId]);
 
   // Flush queued ICE candidates
   const processCandidateQueue = async (pc) => {
@@ -337,6 +336,16 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             localVideoRef.current.muted = true;
             localVideoRef.current.play().catch(() => {});
           }
+
+          // If peer connection already exists, attach local tracks to it
+          if (peerConnectionRef.current) {
+            const existingSenders = peerConnectionRef.current.getSenders();
+            stream.getTracks().forEach((track) => {
+              if (!existingSenders.some((s) => s.track && s.track.kind === track.kind)) {
+                peerConnectionRef.current.addTrack(track, stream);
+              }
+            });
+          }
         }
       } catch (err) {
         console.warn('Media capture error:', err.message);
@@ -355,23 +364,31 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           user: myInfo
         });
 
-        // When existing peers are in room
+        // When existing peers are in room (I am the newly joined peer)
         socket.on('existing-peers', async ({ peers }) => {
           if (Array.isArray(peers) && peers.length > 0) {
             const peerSocketId = peers[0];
             targetPeerSocketIdRef.current = peerSocketId;
-            if (user?.role === 'tutor') {
-              sendOffer(peerSocketId);
-            }
+            console.log('👀 Existing peer in room detected:', peerSocketId);
+            // We wait for the existing peer to initiate the offer to prevent double-offer glare
           }
         });
 
-        // When a new peer joins after me
+        // When a new peer joins after me (I am the existing peer, so I send the offer)
         socket.on('peer-joined', ({ socketId, user: joinedUser }) => {
-          console.log('👋 Peer joined:', joinedUser?.name, socketId);
+          console.log('👋 Peer joined, initiating offer to:', joinedUser?.name, socketId);
           setRemotePeerInfo(joinedUser);
           targetPeerSocketIdRef.current = socketId;
           sendOffer(socketId);
+        });
+
+        // Remote peer media toggle notifications
+        socket.on('peer-media-toggle', ({ type, enabled }) => {
+          if (type === 'camera') {
+            setIsRemoteCameraOn(enabled);
+          } else if (type === 'mic') {
+            setIsRemoteMicOn(enabled);
+          }
         });
 
         // Signaling receiver with Perfect Negotiation (Glaring prevention)
@@ -382,17 +399,25 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
           // 1. Handle Offer
           if (signalData.type === 'offer' && signalData.offer) {
-            console.log('📥 Received WebRTC Offer');
+            console.log('📥 Received WebRTC Offer from:', callerSocketId);
             const pc = peerConnectionRef.current || createPeerConnection(callerSocketId);
 
             try {
               const offerCollision = makingOffer.current || pc.signalingState !== 'stable';
-              if (offerCollision && !isPolite) {
-                console.log('Ignoring conflicting offer because impolite');
-                return;
+              if (offerCollision) {
+                if (!isPolite) {
+                  console.log('Ignoring conflicting offer because impolite');
+                  return;
+                }
+                console.log('Offer collision on polite peer: rolling back local offer');
+                await Promise.all([
+                  pc.setLocalDescription({ type: 'rollback' }),
+                  pc.setRemoteDescription(new RTCSessionDescription(signalData.offer))
+                ]);
+              } else {
+                await pc.setRemoteDescription(new RTCSessionDescription(signalData.offer));
               }
 
-              await pc.setRemoteDescription(new RTCSessionDescription(signalData.offer));
               await processCandidateQueue(pc);
 
               const answer = await pc.createAnswer();
@@ -686,13 +711,31 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
   const otherRoleName = user?.role === 'tutor' ? 'Student' : 'Tutor';
   const otherPartyName = remotePeerInfo?.name || sessionData?.tutor?.name || sessionData?.student?.name || otherRoleName;
 
-  const targetReportedUser = remotePeerInfo?._id || remotePeerInfo?.id
-    ? remotePeerInfo
-    : {
-        name: otherPartyName,
-        role: otherRoleName,
-        _id: (user?.role === 'tutor' ? sessionData?.student?._id || sessionData?.student : sessionData?.tutor?._id || sessionData?.tutor) || roomId
-      };
+  const getOtherUserId = () => {
+    if (remotePeerInfo?._id || remotePeerInfo?.id) {
+      return remotePeerInfo._id || remotePeerInfo.id;
+    }
+    if (user?.role === 'tutor') {
+      if (sessionData?.student?._id) return sessionData.student._id;
+      if (typeof sessionData?.student === 'string' && sessionData.student.length === 24) return sessionData.student;
+    } else {
+      if (sessionData?.tutor?._id) return sessionData.tutor._id;
+      if (typeof sessionData?.tutor === 'string' && sessionData.tutor.length === 24) return sessionData.tutor;
+    }
+    if (roomId && roomId.includes('_')) {
+      const myId = (user?._id || user?.id || '').toString();
+      const parts = roomId.split('_');
+      const otherPart = parts.find((p) => p !== myId && p.length === 24);
+      if (otherPart) return otherPart;
+    }
+    return user?._id || user?.id;
+  };
+
+  const targetReportedUser = {
+    name: otherPartyName,
+    role: otherRoleName,
+    _id: getOtherUserId()
+  };
 
   return (
     <div
@@ -913,6 +956,27 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                 </div>
               )}
 
+              {/* If remote peer connected but turned their camera off */}
+              {peerConnected && !isRemoteCameraOn && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-slate-900 space-y-2.5">
+                  <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center border border-slate-700">
+                    <VideoOff className="w-8 h-8 text-slate-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-sm font-bold text-white">
+                      {otherPartyName}&apos;s Camera is Off
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Live voice audio is active.
+                    </p>
+                  </div>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>Voice Audio Connected</span>
+                  </span>
+                </div>
+              )}
+
               {/* Peer Name & Role Badge */}
               <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-sm text-xs font-bold text-white flex items-center gap-2 border border-white/10 z-10">
                 <span className={`w-2 h-2 rounded-full ${peerConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}`} />
@@ -936,11 +1000,22 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               />
 
               {!isCameraOn && (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900 text-slate-400 text-xs">
-                  <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center mb-2 border border-slate-700">
-                    <VideoOff className="w-8 h-8 text-slate-500" />
+                <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900 text-slate-400 text-xs space-y-2.5 p-4 text-center">
+                  <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center border border-slate-700">
+                    <VideoOff className="w-7 h-7 text-slate-400" />
                   </div>
-                  <span className="font-bold text-slate-300">Your Camera is Off</span>
+                  <div>
+                    <span className="font-bold text-slate-200 block text-xs">Your Camera is Off (Privacy Safe)</span>
+                    <span className="text-[11px] text-slate-400">Click below or use toolbar to show your video</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={toggleCamera}
+                    className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
+                  >
+                    <Video className="w-3.5 h-3.5" />
+                    <span>Turn Camera On</span>
+                  </button>
                 </div>
               )}
 

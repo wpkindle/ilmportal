@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Report = require('../models/Report');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
@@ -34,14 +35,28 @@ exports.createReport = async (req, res) => {
       chatSnapshot
     } = req.body;
 
-    if (!reportedUserId || !description) {
+    let targetUserId = reportedUserId;
+    if (typeof targetUserId === 'string' && targetUserId.includes('_')) {
+      const parts = targetUserId.split('_');
+      const myId = req.user.id || (req.user._id ? req.user._id.toString() : '');
+      targetUserId = parts.find((p) => p !== myId && p.length === 24) || parts[0];
+    }
+
+    if (!targetUserId || !description) {
       return res.status(400).json({
         success: false,
         message: 'Please provide reported user and detailed description of the issue.'
       });
     }
 
-    const reportedUser = await User.findById(reportedUserId);
+    if (!mongoose.Types.ObjectId.isValid(targetUserId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid reported user ID format.'
+      });
+    }
+
+    const reportedUser = await User.findById(targetUserId);
     if (!reportedUser) {
       return res.status(404).json({
         success: false,
@@ -51,7 +66,7 @@ exports.createReport = async (req, res) => {
 
     const report = await Report.create({
       reporter: req.user.id,
-      reportedUser: reportedUserId,
+      reportedUser: targetUserId,
       conversationId,
       category: category || 'other',
       subject: subject || `Report against ${reportedUser.name}`,

@@ -212,8 +212,10 @@ export default function LiveActivityToast() {
     };
   }, [isAdminRoute]);
 
-  // If on admin or classroom routes, do not render toast
-  if (isAdminRoute || pathname?.startsWith('/classroom')) {
+  const isChatRoute = pathname?.includes('/messages');
+
+  // If on admin, classroom, or messages chat routes, do not render toast
+  if (isAdminRoute || pathname?.startsWith('/classroom') || isChatRoute) {
     return null;
   }
 

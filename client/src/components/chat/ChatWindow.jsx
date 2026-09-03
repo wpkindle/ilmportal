@@ -23,7 +23,8 @@ import {
   Volume2,
   VolumeX,
   Bell,
-  MoreVertical
+  MoreVertical,
+  Heart
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -79,13 +80,13 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
   const partnerIdStr = partner?._id ? partner._id.toString() : '';
   const isPartnerOnline = partnerIdStr ? (onlineStatusMap?.[partnerIdStr] === true) : false;
 
-  // Scroll inner chat messages container directly to the latest message
+  // Scroll ONLY the inner chat messages container directly to the latest message (never scrolls the outer window)
   const scrollToBottom = (smooth = false) => {
     if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-    }
-    if (messagesEndRef.current) {
-      messagesEndRef.current.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'end' });
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto'
+      });
     }
   };
 
@@ -449,7 +450,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-175px)] sm:h-[84vh] min-h-[460px] sm:min-h-[560px] bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
+    <div className="flex flex-col h-[calc(100dvh-155px)] sm:h-[84vh] min-h-[460px] sm:min-h-[560px] bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
       
       {/* Top Chat Header (Responsive, Fiverr/Upwork Style Online/Offline Badge) */}
       <div className="p-3 sm:p-4 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between gap-2 sm:gap-3">
@@ -648,6 +649,20 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
                   <Flag className="w-4 h-4" />
                   <span>Report to Admin</span>
                 </button>
+
+                <div className="h-px bg-slate-100 my-1" />
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    window.dispatchEvent(new CustomEvent('ilmportal:open-support'));
+                    setMenuOpen(false);
+                  }}
+                  className="w-full px-3 py-2 text-left flex items-center gap-2 text-emerald-700 hover:bg-emerald-50 font-semibold cursor-pointer"
+                >
+                  <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
+                  <span>Support Platform</span>
+                </button>
               </div>
             )}
           </div>
@@ -766,7 +781,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
       </div>
 
       {/* Bottom Message Input Area */}
-      <div className="p-3 bg-white border-t border-slate-200/80">
+      <div className="p-2 sm:p-3 bg-white border-t border-slate-200/80 shrink-0">
         {isRecording ? (
           /* Live Voice Recording UI */
           <div className="flex items-center justify-between p-2.5 bg-rose-50 border border-rose-200 rounded-2xl animate-pulse">
@@ -812,7 +827,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
 
             <input
               type="text"
-              placeholder={`Write a message to ${partner?.name || 'user'}...`}
+              placeholder="Type a message..."
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               className="flex-1 px-4 py-3 sm:py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm text-slate-900 outline-none focus:border-emerald-500 focus:bg-white transition-all font-medium min-h-[48px]"

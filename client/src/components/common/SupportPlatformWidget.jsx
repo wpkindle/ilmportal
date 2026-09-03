@@ -87,12 +87,22 @@ export default function SupportPlatformWidget() {
     return null;
   }
 
+  useEffect(() => {
+    const handleOpenSupport = () => setIsOpen(true);
+    window.addEventListener('ilmportal:open-support', handleOpenSupport);
+    return () => window.removeEventListener('ilmportal:open-support', handleOpenSupport);
+  }, []);
+
   const selectedMethod = paymentMethods.find((m) => m.id === activeTab) || paymentMethods[0];
 
   return (
     <>
-      {/* 1. Floating Support Platform Pill Button (Consistent bottom-left on all devices) */}
-      <div className="fixed bottom-20 left-3 sm:left-6 md:bottom-5 md:left-6 z-40 transition-all">
+      {/* 1. Floating Support Platform Pill Button (Desktop always, mobile hidden on /messages to keep input bar completely clear) */}
+      <div className={`fixed z-40 transition-all ${
+        isChatRoute
+          ? 'hidden md:block md:bottom-5 md:left-6'
+          : 'bottom-20 left-3 sm:left-6 md:bottom-5 md:left-6'
+      }`}>
         <button
           onClick={() => setIsOpen(true)}
           aria-label="Support the Platform"

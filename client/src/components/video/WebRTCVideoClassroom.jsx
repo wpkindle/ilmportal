@@ -118,6 +118,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
   const [classDurationSeconds, setClassDurationSeconds] = useState(0);
   const [peerConnected, setPeerConnected] = useState(false);
   const [isConnecting, setIsConnecting] = useState(false);
+  const [facingMode, setFacingMode] = useState('user');
 
   const localVideoRef = useRef(null);
   const remoteVideoRef = useRef(null);
@@ -572,7 +573,6 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
   };
 
   // Switch mobile camera (Front / Back facing for recitation book scanning)
-  const [facingMode, setFacingMode] = useState('user');
   const switchCamera = async () => {
     const nextMode = facingMode === 'user' ? 'environment' : 'user';
     setFacingMode(nextMode);

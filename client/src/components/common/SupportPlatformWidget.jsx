@@ -87,27 +87,24 @@ export default function SupportPlatformWidget() {
     }
   };
 
-  // Listen for global open-support-platform custom event
+  // Listen for global open-support-platform custom events
   useEffect(() => {
     const handleOpen = () => setIsOpen(true);
     window.addEventListener('open-support-platform', handleOpen);
-    return () => window.removeEventListener('open-support-platform', handleOpen);
+    window.addEventListener('ilmportal:open-support', handleOpen);
+    return () => {
+      window.removeEventListener('open-support-platform', handleOpen);
+      window.removeEventListener('ilmportal:open-support', handleOpen);
+    };
   }, []);
 
   const isAdminRoute = pathname?.startsWith('/admin');
-
   const isChatRoute = pathname?.includes('/messages');
 
   // If on admin or classroom routes, do not render support widget
   if (isAdminRoute || pathname?.startsWith('/classroom')) {
     return null;
   }
-
-  useEffect(() => {
-    const handleOpenSupport = () => setIsOpen(true);
-    window.addEventListener('ilmportal:open-support', handleOpenSupport);
-    return () => window.removeEventListener('ilmportal:open-support', handleOpenSupport);
-  }, []);
 
   const selectedMethod = paymentMethods.find((m) => m.id === activeTab) || paymentMethods[0];
 

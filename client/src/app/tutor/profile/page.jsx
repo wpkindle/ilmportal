@@ -48,6 +48,7 @@ function TutorProfileContent() {
 
   // Basic Account Details
   const [name, setName] = useState('');
+  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [city, setCity] = useState('Lahore');
@@ -93,6 +94,7 @@ function TutorProfileContent() {
   useEffect(() => {
     if (user) {
       setName(user.name || '');
+      setUsername(user.username || '');
       setEmail(user.email || '');
       setPhone(user.phone || '');
       setCity(user.city || '');
@@ -222,6 +224,7 @@ function TutorProfileContent() {
     try {
       const res = await updateUserProfile({
         name: name.trim(),
+        username: username.trim().toLowerCase(),
         email: email.trim(),
         phone: phone.trim(),
         city,
@@ -372,6 +375,7 @@ function TutorProfileContent() {
 
               <div>
                 <h3 className="font-bold text-sm text-slate-900">{name || 'Tutor Name'}</h3>
+                {username && <p className="text-[11px] font-mono font-bold text-emerald-600">@{username}</p>}
                 <p className="text-xs text-slate-500">{email || 'tutor@example.com'}</p>
                 <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800">
@@ -502,18 +506,42 @@ function TutorProfileContent() {
 
               <form onSubmit={handleProfileSubmit} className="space-y-4">
                 
-                {/* Name */}
-                <div id="profile-name" className="scroll-mt-28">
-                  <label className="text-xs font-bold text-slate-700 block mb-1">
-                    Full Name *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white font-semibold"
-                  />
+                {/* Full Name & Username Row */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+                  <div id="profile-name" className="scroll-mt-28">
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Full Name *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white font-semibold"
+                    />
+                  </div>
+
+                  <div id="profile-username" className="scroll-mt-28">
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Username (Profile URL Handle)
+                    </label>
+                    <div className="relative">
+                      <span className="absolute left-3.5 top-2.5 text-xs font-bold text-slate-400 select-none">
+                        @
+                      </span>
+                      <input
+                        type="text"
+                        placeholder="e.g. qari_huzaifa"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
+                        maxLength={30}
+                        className="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white font-semibold font-mono"
+                      />
+                    </div>
+                    <p className="text-[10px] text-slate-400 mt-1 truncate">
+                      Public profile link: <span className="text-emerald-700 font-mono font-bold">/tutors/{username || user?._id || 'username'}</span>
+                    </p>
+                  </div>
                 </div>
 
                 {/* Gender & Age Row */}

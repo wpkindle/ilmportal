@@ -107,10 +107,10 @@ Guided by the timeless Hadith: *"The best of you are those who learn the Quran a
     subtitle: 'We are here to assist students, parents, and tutors across Pakistan.',
     metaDescription: 'Get in touch with IlmPortal Pakistan in Lahore.',
     contactDetails: {
-      email: 'support@pakistanlms.pk',
-      phone: '+92 300 1234567',
-      whatsapp: '+92 300 1234567',
-      address: 'Lahore, Punjab, Pakistan',
+      email: 'contact@ilmportal.org',
+      phone: '0317 1759093 / 0315 4453745',
+      whatsapp: '0317 1759093 / 0315 4453745',
+      address: 'Bedian Road, Lahore Cantt.',
       workingHours: 'Monday – Saturday: 9:00 AM – 9:00 PM PKT'
     },
     content: `### We Are Here to Support Your Learning Journey

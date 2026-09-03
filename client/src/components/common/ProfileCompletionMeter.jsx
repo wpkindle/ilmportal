@@ -173,9 +173,75 @@ export default function ProfileCompletionMeter({ user, tutorProfile, className =
   const [detailsOpen, setDetailsOpen] = useState(false);
   const { percentage, items } = calculateClientCompletion(user, tutorProfile);
 
-  // Once 100% complete, do not show on profile or portal pages (unless forced)
-  if (percentage >= 100 && !alwaysShow) {
-    return null;
+  // When 100% complete, keep visible as an empowering achievement card to motivate tutors/students
+  if (percentage >= 100) {
+    return (
+      <div className={`p-5 sm:p-6 bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 text-white rounded-3xl border border-emerald-500/40 shadow-xl space-y-4 ${className} relative overflow-hidden group`}>
+        {/* Shimmer line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500" />
+        
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5">
+                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                <span>100% Profile Strength</span>
+              </span>
+              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">
+                Ready for Students
+              </span>
+            </div>
+            <h3 className="text-base sm:text-lg font-black text-white pt-1">
+              🎉 Congratulations! Your Profile is 100% Complete
+            </h3>
+            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+              {user?.role === 'tutor'
+                ? 'Your teaching bio, verified Sanad, hourly rates, and subject preferences are fully configured. Your profile is ranked at peak search visibility across Pakistan and primed to receive direct student inquiries and trial bookings!'
+                : 'Your student profile is 100% complete. Tutors can now easily understand your learning goals and provide tailored free trial sessions!'}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap sm:flex-col gap-2 shrink-0">
+            {user?.role === 'tutor' ? (
+              <>
+                <Link
+                  href={`/tutors/${user?.username || user?._id}`}
+                  className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/30 flex items-center justify-center gap-2 transition-transform active:scale-95"
+                >
+                  <span>View Public Profile</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link
+                  href="/tutor/messages"
+                  className="px-4 py-2 bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
+                >
+                  <span>Check Inquiries</span>
+                </Link>
+              </>
+            ) : (
+              <Link
+                href="/tutors"
+                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/30 flex items-center justify-center gap-2 transition-transform active:scale-95"
+              >
+                <span>Find Tutors</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            )}
+          </div>
+        </div>
+
+        {/* 100% Filled Progress Bar */}
+        <div className="space-y-1.5 pt-1">
+          <div className="flex items-center justify-between text-xs font-bold">
+            <span className="text-emerald-400">Peak Visibility Score</span>
+            <span className="text-emerald-300 font-mono">100 / 100</span>
+          </div>
+          <div className="w-full bg-slate-800/80 h-3 rounded-full overflow-hidden p-0.5 border border-emerald-500/30">
+            <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-300 w-full shadow-lg shadow-emerald-500/50" />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   const completedCount = items.filter((i) => i.done).length;

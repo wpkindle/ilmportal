@@ -578,12 +578,36 @@ exports.updateProfile = async (req, res) => {
       qualifications,
       experienceYears,
       hourlyRate,
-      teachingMode
+      teachingMode,
+      username
     } = req.body;
 
     const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // If username is changed or set, validate format and check uniqueness
+    if (username !== undefined) {
+      const cleanUsername = username.toLowerCase().trim();
+      if (cleanUsername && cleanUsername !== user.username) {
+        if (!/^[a-z0-9_]{3,30}$/.test(cleanUsername)) {
+          return res.status(400).json({
+            success: false,
+            message: 'Username must be 3-30 characters long and contain only letters, numbers, and underscores.'
+          });
+        }
+        const usernameExists = await User.findOne({ username: cleanUsername, _id: { $ne: user._id } });
+        if (usernameExists) {
+          return res.status(400).json({
+            success: false,
+            message: 'This username is already taken. Please choose another username.'
+          });
+        }
+        user.username = cleanUsername;
+      } else if (!cleanUsername && user.username) {
+        user.username = undefined;
+      }
     }
 
     // If email is changed, check uniqueness

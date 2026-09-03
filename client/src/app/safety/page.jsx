@@ -320,16 +320,24 @@ export default function SafetyPage() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs">
             <a
-              href="mailto:safety@ilmportal.pk"
+              href="mailto:contact@ilmportal.org"
               className="px-4 py-2 rounded-xl bg-rose-900/60 hover:bg-rose-900 text-rose-200 border border-rose-500/40 font-bold transition-all"
             >
-              safety@ilmportal.pk
+              contact@ilmportal.org
             </a>
             <a
-              href="tel:+924235897860"
+              href="tel:03171759093"
               className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-bold transition-all"
             >
-              +92 (42) 3589-7860
+              0317 1759093
+            </a>
+            <a
+              href="https://wa.me/923154453745"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 font-bold transition-all"
+            >
+              WhatsApp: 0315 4453745
             </a>
           </div>
         </div>

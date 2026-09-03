@@ -141,7 +141,7 @@ const Hero = () => {
           <div className="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs font-semibold">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-emerald-500/30 text-emerald-300 shadow-xs">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>100% ID &amp; Sanad Verified</span>
+              <span>100% ID &amp; Sanad Verified Tutors</span>
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-teal-500/30 text-teal-300 shadow-xs">
               <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400" />
@@ -275,7 +275,7 @@ const Hero = () => {
             <div className="p-2 bg-emerald-500/20 text-emerald-300 w-fit mx-auto rounded-xl mb-2 shadow-inner">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-xs sm:text-sm text-white">Sanad Verified</h3>
+            <h3 className="font-bold text-xs sm:text-sm text-white">Sanad Verified Tutors</h3>
             <p className="text-[11px] text-slate-400 leading-tight">Authentic Dars-e-Nizami & degree certificates verified by admin</p>
           </div>
 

@@ -118,7 +118,7 @@ export default function HeroClassroomCard() {
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
               <span className="text-xs font-bold text-white">Qari Muhammad Huzaifa</span>
               <span className="text-[9px] px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded font-black uppercase">
-                Sanad Verified
+                Sanad Verified Tutor
               </span>
             </div>
 

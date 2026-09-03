@@ -185,15 +185,15 @@ const Footer = () => {
                 <div className="w-7 h-7 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-emerald-400 shrink-0">
                   <MapPin className="w-3.5 h-3.5" />
                 </div>
-                <span>Gulberg III / DHA Phase 5, Lahore, Pakistan</span>
+                <span>Bedian Road, Lahore Cantt.</span>
               </div>
 
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-emerald-400 shrink-0">
                   <Mail className="w-3.5 h-3.5" />
                 </div>
-                <a href="mailto:support@ilmportal.pk" className="hover:text-emerald-400 transition-colors">
-                  support@ilmportal.pk
+                <a href="mailto:contact@ilmportal.org" className="hover:text-emerald-400 transition-colors">
+                  contact@ilmportal.org
                 </a>
               </div>
 
@@ -201,7 +201,16 @@ const Footer = () => {
                 <div className="w-7 h-7 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-emerald-400 shrink-0">
                   <Phone className="w-3.5 h-3.5" />
                 </div>
-                <span>+92 (42) 3589-7860 &bull; WhatsApp: +92 300 1234567</span>
+                <div className="flex flex-wrap items-center gap-x-2">
+                  <span className="text-slate-400">Call &amp; WhatsApp:</span>
+                  <a href="https://wa.me/923171759093" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 font-semibold transition-colors">
+                    0317 1759093
+                  </a>
+                  <span className="text-slate-600">&bull;</span>
+                  <a href="https://wa.me/923154453745" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 font-semibold transition-colors">
+                    0315 4453745
+                  </a>
+                </div>
               </div>
             </div>
 
@@ -209,7 +218,7 @@ const Footer = () => {
             <div className="flex flex-wrap items-center gap-2 pt-2">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900 text-emerald-300 border border-slate-800 hover:border-emerald-500/40 transition-colors">
                 <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                <span>Sanad Verified</span>
+                <span>Sanad Verified Tutors</span>
               </span>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900 text-teal-300 border border-slate-800 hover:border-teal-500/40 transition-colors">
                 <Lock className="w-3 h-3 text-teal-400" />

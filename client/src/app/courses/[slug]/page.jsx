@@ -213,7 +213,7 @@ export default function CourseDetailPage() {
                         <span>{course.instructor.city || 'Pakistan'}</span>
                         {course.tutorProfile?.isSanadVerified && (
                           <span className="text-emerald-400 font-bold ml-1">
-                            &bull; Sanad Verified
+                            &bull; Sanad Verified Tutor
                           </span>
                         )}
                       </p>

@@ -138,7 +138,8 @@ const TutorCard = ({ tutor, tutorProfile }) => {
   };
 
   return (
-    <TiltCard>
+    <>
+      <TiltCard>
       <div className="bg-white/95 backdrop-blur-sm rounded-3xl border border-slate-200/80 p-4 sm:p-5 md:p-6 shadow-sm flex flex-col justify-between h-full gap-4 transition-colors duration-300 hover:border-emerald-300/70">
 
         {/* ── Body ── */}
@@ -281,6 +282,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
           </div>
         </div>
       </div>
+    </TiltCard>
 
       {/* Sanad Preview Modal */}
       <SanadModal
@@ -296,7 +298,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
         onClose={() => setAuthModalOpen(false)}
         tutor={data}
       />
-    </TiltCard>
+    </>
   );
 };
 

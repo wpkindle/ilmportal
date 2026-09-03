@@ -1,6 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { useRouter } from 'next/navigation';
 import {
   MessageSquare,
@@ -39,6 +40,11 @@ export default function StudentAuthModal({
 }) {
   const router = useRouter();
   const { login, verifyOtp } = useAuth();
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const [mode, setMode] = useState(initialMode); // 'login' | 'register' | 'verify_otp' | 'invitation_sent'
   const [loading, setLoading] = useState(false);
@@ -233,11 +239,13 @@ export default function StudentAuthModal({
     onClose();
   };
 
-  return (
-    <div className="fixed inset-0 z-[100] bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto">
+  if (!isOpen || !mounted) return null;
+
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto">
       
       {/* Landscape Modal Container */}
-      <div className="bg-white rounded-3xl max-w-3xl md:max-w-4xl w-full border border-slate-200 shadow-2xl relative overflow-hidden flex flex-col md:flex-row my-auto animate-in zoom-in-95 duration-150">
+      <div className="bg-white rounded-3xl max-w-3xl md:max-w-4xl w-full max-h-[92dvh] overflow-y-auto border border-slate-200 shadow-2xl relative flex flex-col md:flex-row my-auto animate-in zoom-in-95 duration-150">
         
         {/* ======================================================== */}
         {/* LEFT COLUMN: TUTOR SPOTLIGHT & BENEFITS (COMPACT)         */}
@@ -325,11 +333,11 @@ export default function StudentAuthModal({
           {/* Top Row: Mode Switcher & Close Button */}
           <div className="flex items-center justify-between gap-3">
             {(mode === 'login' || mode === 'register') && (
-              <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-xl text-xs font-bold w-full max-w-[260px]">
+              <div className="grid grid-cols-2 p-1 bg-slate-100 rounded-xl text-xs font-bold w-full max-w-[260px] shrink-0">
                 <button
                   type="button"
                   onClick={() => { setMode('login'); setError(''); setInfoMessage(''); }}
-                  className={`py-1.5 rounded-lg transition-all cursor-pointer ${
+                  className={`py-1.5 px-3 text-center whitespace-nowrap rounded-lg transition-all cursor-pointer ${
                     mode === 'login'
                       ? 'bg-white text-slate-900 shadow-xs font-extrabold'
                       : 'text-slate-500 hover:text-slate-900'
@@ -340,7 +348,7 @@ export default function StudentAuthModal({
                 <button
                   type="button"
                   onClick={() => { setMode('register'); setError(''); setInfoMessage(''); }}
-                  className={`py-1.5 rounded-lg transition-all cursor-pointer ${
+                  className={`py-1.5 px-3 text-center whitespace-nowrap rounded-lg transition-all cursor-pointer ${
                     mode === 'register'
                       ? 'bg-white text-slate-900 shadow-xs font-extrabold'
                       : 'text-slate-500 hover:text-slate-900'
@@ -688,6 +696,7 @@ export default function StudentAuthModal({
         </div>
 
       </div>
-    </div>
+    </div>,
+    document.body
   );
 }

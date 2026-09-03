@@ -24,10 +24,12 @@ import {
   CreditCard,
   Headphones,
   Heart,
-  QrCode
+  QrCode,
+  Bell
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
+import { useNotifications } from '../../context/NotificationContext';
 import { api } from '../../services/api';
 import PromotionTopBar from './PromotionTopBar';
 
@@ -41,7 +43,11 @@ const Navbar = () => {
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
   const [scrolledPastTopBar, setScrolledPastTopBar] = useState(false);
 
+  const { notifications, unreadCount: unreadNotifCount, markAsRead, markAllAsRead } = useNotifications();
+  const [notifMenuOpen, setNotifMenuOpen] = useState(false);
+
   const userMenuRef = useRef(null);
+  const notifMenuRef = useRef(null);
   const subjectsRef = useRef(null);
 
   const router = useRouter();
@@ -154,6 +160,9 @@ const Navbar = () => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setUserMenuOpen(false);
       }
+      if (notifMenuRef.current && !notifMenuRef.current.contains(event.target)) {
+        setNotifMenuOpen(false);
+      }
       if (subjectsRef.current && !subjectsRef.current.contains(event.target)) {
         setSubjectsDropdownOpen(false);
       }
@@ -166,6 +175,7 @@ const Navbar = () => {
   useEffect(() => {
     setMobileMenuOpen(false);
     setUserMenuOpen(false);
+    setNotifMenuOpen(false);
     setSubjectsDropdownOpen(false);
   }, [pathname]);
 
@@ -387,6 +397,107 @@ const Navbar = () => {
                     </span>
                   )}
                 </Link>
+
+                {/* Notifications Bell Dropdown */}
+                <div className="relative" ref={notifMenuRef}>
+                  <button
+                    onClick={() => setNotifMenuOpen(!notifMenuOpen)}
+                    className="p-2.5 rounded-xl text-slate-600 hover:text-emerald-700 hover:bg-slate-100 relative transition-colors cursor-pointer"
+                    title="Notifications & Safety Alerts"
+                  >
+                    <Bell className="w-5 h-5" />
+                    {unreadNotifCount > 0 && (
+                      <span className="absolute -top-0.5 -right-0.5 px-1 min-w-[18px] h-[18px] bg-emerald-600 text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-pulse">
+                        {unreadNotifCount > 99 ? '99+' : unreadNotifCount}
+                      </span>
+                    )}
+                  </button>
+
+                  {/* Dropdown Menu */}
+                  {notifMenuOpen && (
+                    <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in duration-150">
+                      <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/80 flex items-center justify-between">
+                        <div className="flex items-center gap-1.5">
+                          <Bell className="w-4 h-4 text-emerald-600" />
+                          <span className="text-xs font-black text-slate-900">Notifications</span>
+                          {unreadNotifCount > 0 && (
+                            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                              {unreadNotifCount} new
+                            </span>
+                          )}
+                        </div>
+                        {unreadNotifCount > 0 && (
+                          <button
+                            onClick={markAllAsRead}
+                            className="text-[11px] font-bold text-emerald-700 hover:underline cursor-pointer"
+                          >
+                            Mark all read
+                          </button>
+                        )}
+                      </div>
+
+                      <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                        {notifications.length === 0 ? (
+                          <div className="py-8 text-center text-xs text-slate-500 space-y-1">
+                            <ShieldCheck className="w-6 h-6 mx-auto text-slate-400" />
+                            <p className="font-semibold text-slate-700">All caught up!</p>
+                            <p className="text-[11px] text-slate-400">No new notifications or safety alerts.</p>
+                          </div>
+                        ) : (
+                          notifications.slice(0, 8).map((n) => (
+                            <Link
+                              key={n._id}
+                              href={n.link || '#'}
+                              onClick={() => {
+                                markAsRead(n._id);
+                                setNotifMenuOpen(false);
+                              }}
+                              className={`block p-3.5 hover:bg-slate-50 transition-colors text-xs space-y-1 ${
+                                !n.isRead ? 'bg-emerald-50/40' : ''
+                              }`}
+                            >
+                              <div className="flex items-start justify-between gap-2">
+                                <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                                  {n.type === 'safety_report' && (
+                                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                  )}
+                                  <span>{n.title}</span>
+                                </span>
+                                {!n.isRead && (
+                                  <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0 mt-1" />
+                                )}
+                              </div>
+                              <p className="text-[11px] text-slate-600 line-clamp-2 leading-relaxed">
+                                {n.message}
+                              </p>
+                              <span className="text-[10px] text-slate-400 block pt-0.5">
+                                {new Date(n.createdAt).toLocaleDateString('en-PK', {
+                                  day: 'numeric',
+                                  month: 'short',
+                                  hour: '2-digit',
+                                  minute: '2-digit'
+                                })}
+                              </span>
+                            </Link>
+                          ))
+                        )}
+                      </div>
+
+                      {user?.role && (
+                        <div className="p-2.5 bg-slate-50 border-t border-slate-100 text-center">
+                          <Link
+                            href={user.role === 'tutor' ? '/tutor/profile#safety-reports' : '/student/profile#safety-reports'}
+                            onClick={() => setNotifMenuOpen(false)}
+                            className="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 flex items-center justify-center gap-1"
+                          >
+                            <ShieldCheck className="w-3.5 h-3.5" />
+                            <span>View Safety Reports &amp; Incident Resolutions</span>
+                          </Link>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
 
                 {/* User Dropdown */}
                 <div className="relative" ref={userMenuRef}>

@@ -51,9 +51,15 @@ const reportSchema = new mongoose.Schema(
     adminNotes: {
       type: String
     },
+    adminResponse: {
+      type: String
+    },
     resolvedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User'
+    },
+    resolvedAt: {
+      type: Date
     }
   },
   {

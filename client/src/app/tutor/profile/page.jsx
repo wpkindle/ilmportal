@@ -33,6 +33,7 @@ import AccountStatusBanner from '../../../components/common/AccountStatusBanner'
 import { SanadModal } from '../../../components/common/SanadBadge';
 import DeleteAccountModal from '../../../components/common/DeleteAccountModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
+import SafetyReportsSection from '../../../components/profile/SafetyReportsSection';
 import { allPakistaniCities } from '../../../data/pakistanAreas';
 
 const pakistaniCities = allPakistaniCities;
@@ -912,7 +913,10 @@ function TutorProfileContent() {
               </form>
             </div>
 
-            {/* 4. Danger Zone / Delete Account */}
+            {/* 4. Safety Reports & Incident Resolutions */}
+            <SafetyReportsSection userRole="tutor" />
+
+            {/* 5. Danger Zone / Delete Account */}
             <div className="bg-white p-6 sm:p-7 rounded-3xl border border-rose-200 shadow-xs space-y-3.5">
               <div className="border-b border-rose-100 pb-3 flex items-center justify-between">
                 <div>

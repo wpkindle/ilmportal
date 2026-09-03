@@ -25,6 +25,8 @@ export default function AdminReportsPage() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [selectedReport, setSelectedReport] = useState(null);
   const [adminNotes, setAdminNotes] = useState('');
+  const [adminResponse, setAdminResponse] = useState('');
+  const [notifyReportedUser, setNotifyReportedUser] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [expandedSnapshotId, setExpandedSnapshotId] = useState(null);
 
@@ -53,11 +55,15 @@ export default function AdminReportsPage() {
     try {
       const res = await api.updateReportStatus(reportId, {
         status: newStatus,
-        adminNotes: adminNotes.trim()
+        adminNotes: adminNotes.trim(),
+        adminResponse: adminResponse.trim() || adminNotes.trim(),
+        notifyReportedUser
       });
       if (res.success) {
         setSelectedReport(null);
         setAdminNotes('');
+        setAdminResponse('');
+        setNotifyReportedUser(false);
         fetchReports();
       }
     } catch (err) {
@@ -237,13 +243,25 @@ export default function AdminReportsPage() {
                       </div>
                     )}
 
-                    {/* Admin Notes & Resolution Feedback */}
-                    {report.adminNotes && (
-                      <div className="p-3 bg-purple-950/40 border border-purple-800/40 rounded-2xl text-xs space-y-0.5">
-                        <span className="text-[10px] uppercase font-bold text-purple-300 block">Admin Action Notes</span>
-                        <p className="text-slate-300">{report.adminNotes}</p>
-                      </div>
-                    )}
+                    {/* Official Response to User & Internal Notes */}
+                    <div className="space-y-2">
+                      {report.adminResponse && (
+                        <div className="p-3.5 bg-emerald-950/40 border border-emerald-500/30 rounded-2xl text-xs space-y-1">
+                          <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[11px]">
+                            <ShieldCheck className="w-3.5 h-3.5" />
+                            <span>Official User Response (Displayed in Student/Tutor Profile):</span>
+                          </div>
+                          <p className="text-slate-200 leading-relaxed pl-5">{report.adminResponse}</p>
+                        </div>
+                      )}
+
+                      {report.adminNotes && report.adminNotes !== report.adminResponse && (
+                        <div className="p-3 bg-purple-950/40 border border-purple-800/40 rounded-2xl text-xs space-y-0.5">
+                          <span className="text-[10px] uppercase font-bold text-purple-300 block">Internal Admin Notes</span>
+                          <p className="text-slate-300">{report.adminNotes}</p>
+                        </div>
+                      )}
+                    </div>
 
                     {/* Action Controls */}
                     <div className="pt-2 flex flex-wrap items-center justify-between gap-2 border-t border-slate-800">
@@ -268,10 +286,12 @@ export default function AdminReportsPage() {
                             onClick={() => {
                               setSelectedReport(report);
                               setAdminNotes(report.adminNotes || '');
+                              setAdminResponse(report.adminResponse || '');
+                              setNotifyReportedUser(false);
                             }}
                             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer"
                           >
-                            Resolve & Close
+                            Resolve &amp; Notify
                           </button>
                         )}
                         {report.status !== 'dismissed' && (
@@ -298,22 +318,52 @@ export default function AdminReportsPage() {
       {/* Resolution Notes Modal */}
       {selectedReport && (
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+          <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-4">
             <h3 className="font-black text-white text-base flex items-center gap-2">
               <ShieldCheck className="w-5 h-5 text-emerald-400" />
-              <span>Resolve Incident Report</span>
+              <span>Resolve Incident &amp; Send Profile Response</span>
             </h3>
             <p className="text-xs text-slate-400">
-              Add internal administrative resolution notes before marking this incident as resolved.
+              Provide an official response message for <strong className="text-slate-200">{selectedReport.reporter?.name}</strong>. This will trigger a notification and appear in their profile.
             </p>
 
-            <textarea
-              rows={3}
-              placeholder="e.g. Warning issued to tutor; refund processed for student..."
-              value={adminNotes}
-              onChange={(e) => setAdminNotes(e.target.value)}
-              className="w-full p-3 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-white outline-none focus:border-emerald-500 resize-none"
-            />
+            <div className="space-y-3">
+              <div>
+                <label className="text-[11px] font-bold text-emerald-400 block mb-1">
+                  Official Response to User (Visible on Profile &amp; Notification) *
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="e.g. Our safety team reviewed the class recording. The tutor has been issued an official warning and account restriction has been applied."
+                  value={adminResponse}
+                  onChange={(e) => setAdminResponse(e.target.value)}
+                  className="w-full p-3 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-white outline-none focus:border-emerald-500 resize-none"
+                />
+              </div>
+
+              <div>
+                <label className="text-[11px] font-bold text-slate-400 block mb-1">
+                  Internal Staff Notes (Optional - Staff Only)
+                </label>
+                <textarea
+                  rows={2}
+                  placeholder="Internal notes, moderation ticket ID, or investigation details..."
+                  value={adminNotes}
+                  onChange={(e) => setAdminNotes(e.target.value)}
+                  className="w-full p-3 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-slate-300 outline-none focus:border-slate-700 resize-none"
+                />
+              </div>
+
+              <label className="flex items-center gap-2.5 p-3 rounded-xl bg-slate-950/60 border border-slate-800 cursor-pointer text-xs text-slate-300">
+                <input
+                  type="checkbox"
+                  checked={notifyReportedUser}
+                  onChange={(e) => setNotifyReportedUser(e.target.checked)}
+                  className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 accent-emerald-500 cursor-pointer"
+                />
+                <span>Also dispatch community guideline resolution notice to the reported user</span>
+              </label>
+            </div>
 
             <div className="flex items-center justify-end gap-2 pt-2">
               <button
@@ -325,9 +375,10 @@ export default function AdminReportsPage() {
               <button
                 onClick={() => handleUpdateStatus(selectedReport._id, 'resolved')}
                 disabled={actionLoading}
-                className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-md cursor-pointer"
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-md cursor-pointer flex items-center gap-2"
               >
-                {actionLoading ? 'Saving...' : 'Confirm Resolved'}
+                <CheckCircle2 className="w-4 h-4" />
+                <span>{actionLoading ? 'Saving...' : 'Resolve & Notify Users'}</span>
               </button>
             </div>
           </div>

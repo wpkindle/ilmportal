@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import { ShieldCheck, Lock, Mail, ArrowRight, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
-import CaptchaBox from '../../../components/common/CaptchaBox';
 
 export default function AdminLoginPage() {
   const { user, login } = useAuth();
@@ -15,7 +14,6 @@ export default function AdminLoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [captchaVerified, setCaptchaVerified] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
@@ -28,11 +26,6 @@ export default function AdminLoginPage() {
   }, [user, router]);
 
   const performLogin = async (loginEmail, loginPass) => {
-    if (!captchaVerified) {
-      setError('Please complete the security verification (CAPTCHA) below');
-      return;
-    }
-
     setLoading(true);
     setError('');
     setSuccess('');
@@ -168,15 +161,9 @@ export default function AdminLoginPage() {
               </div>
             </div>
 
-            {/* Security CAPTCHA Box */}
-            <CaptchaBox
-              isVerified={captchaVerified}
-              setIsVerified={setCaptchaVerified}
-            />
-
             <button
               type="submit"
-              disabled={loading || !captchaVerified}
+              disabled={loading}
               className="w-full py-3 bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-500/25 transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
             >
               {loading ? (

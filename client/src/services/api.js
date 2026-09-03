@@ -590,6 +590,10 @@ export const api = {
     body: JSON.stringify(body)
   }).then(handleResponse),
 
+  getMyReports: () => fetch(`${API_BASE}/reports/my-reports`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
   // CMS Pages & Policies
   getPage: (slug) => fetch(`${API_BASE}/cms/pages/${slug}`, {
     headers: getHeaders()

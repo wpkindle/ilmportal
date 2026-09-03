@@ -156,11 +156,11 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Main Footer Grid - 6 Columns Perfectly Balanced Across All Screen Sizes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-8 pb-12 border-b border-slate-800/80">
+        {/* Main Footer 5-Column Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8 lg:gap-10 pb-12 border-b border-slate-800/80">
           
           {/* Col 1: Brand, Mission & Contact Info */}
-          <div className="space-y-5">
+          <div className="lg:col-span-2 space-y-5">
             <Link href="/" className="inline-flex items-center gap-3 group">
               <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-emerald-400 flex items-center justify-center text-white shadow-xl shadow-emerald-600/30 group-hover:scale-105 transition-transform duration-300 ring-2 ring-emerald-400/20">
                 <BookOpen className="w-6 h-6" />
@@ -406,61 +406,58 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Col 6: Support Platform & Meezan Bank Barcode (Covers Right Side Empty Space) */}
-          <div className="space-y-3 bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shadow-xl flex flex-col justify-between">
-            <div>
-              <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-2">
-                <div className="flex items-center gap-2">
-                  <div className="w-1.5 h-4 rounded-full bg-cyan-500" />
-                  <h4 className="text-xs font-extrabold text-white uppercase tracking-wider flex items-center gap-1.5">
-                    <Landmark className="w-3.5 h-3.5 text-cyan-400" />
+          {/* Support Platform - Meezan Barcode & Account Info (Spans 4 columns in Row 2 to cover empty space) */}
+          <div className="md:col-span-2 lg:col-span-4 bg-slate-900/90 border border-slate-800 hover:border-emerald-500/40 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl transition-all">
+            <div className="space-y-3 flex-1 w-full sm:w-auto">
+              <div className="flex items-center gap-2">
+                <div className="p-1.5 rounded-lg bg-emerald-500/20 text-emerald-400 shrink-0">
+                  <Landmark className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-sm font-extrabold text-white flex items-center gap-2">
                     <span>Support Platform</span>
+                    <span className="text-[10px] font-black px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                      Meezan Bank
+                    </span>
                   </h4>
                 </div>
-                <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                  Meezan Bank
-                </span>
               </div>
-              <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">
-                Scan with any Pakistani banking app (Meezan, Raast, EasyPaisa, JazzCash) to support our free Quran initiative.
+
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Scan with any Pakistani banking app (Meezan, Raast, EasyPaisa, JazzCash) or transfer directly:
               </p>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 text-xs">
+                <div className="bg-slate-950/80 px-3 py-2 rounded-xl border border-slate-800">
+                  <span className="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">Meezan Bank</span>
+                  <span className="font-mono text-emerald-300 font-extrabold text-xs sm:text-sm select-all">96010105435308</span>
+                </div>
+                <div className="bg-slate-950/80 px-3 py-2 rounded-xl border border-slate-800">
+                  <span className="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">EasyPaisa, JazzCash, UPaisa</span>
+                  <span className="font-mono text-amber-300 font-extrabold text-xs sm:text-sm select-all">03171759093</span>
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-slate-400 pt-0.5">
+                <span>Account Title: <strong className="text-white">Abdul Khaliq</strong></span>
+                <span className="text-slate-600">&bull;</span>
+                <span className="text-emerald-400 font-semibold">100% Verified Platform</span>
+              </div>
             </div>
 
-            {/* Meezan Barcode Image & Account Details */}
-            <div className="flex items-center gap-3 bg-slate-950/90 p-2.5 rounded-xl border border-slate-800/90">
-              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white p-1 rounded-xl shrink-0 overflow-hidden shadow-md">
+            {/* Meezan Barcode Image */}
+            <div className="flex flex-col items-center gap-1.5 shrink-0">
+              <div className="w-28 h-28 sm:w-32 sm:h-32 bg-white p-2 rounded-2xl shadow-lg border border-slate-200">
                 <img
                   src="/images/qr-meezan.jpg"
-                  alt="Meezan Bank QR Barcode"
+                  alt="Meezan Bank Support Barcode"
                   className="w-full h-full object-contain"
                 />
               </div>
-              <div className="min-w-0 flex-1 space-y-1">
-                <span className="text-[9px] uppercase font-bold text-slate-400 block tracking-wider">
-                  Account Number
-                </span>
-                <p className="font-mono text-emerald-300 font-extrabold text-xs sm:text-sm select-all tracking-tight truncate">
-                  96010105435308
-                </p>
-                <div className="pt-0.5">
-                  <p className="text-[11px] font-bold text-white leading-tight">Abdul Khaliq</p>
-                  <p className="text-[10px] text-slate-400">Meezan Bank Ltd.</p>
-                </div>
-              </div>
+              <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">
+                Scan to Support
+              </span>
             </div>
-
-            <button
-              type="button"
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  window.dispatchEvent(new CustomEvent('open-support-platform'));
-                }
-              }}
-              className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-600/30 to-teal-600/30 hover:from-emerald-600/50 hover:to-teal-600/50 text-emerald-300 hover:text-white border border-emerald-500/40 text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
-            >
-              <span>View EasyPaisa &amp; JazzCash</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
           </div>
 
         </div>

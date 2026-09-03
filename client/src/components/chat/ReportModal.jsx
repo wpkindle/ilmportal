@@ -28,7 +28,8 @@ export default function ReportModal({
   onClose,
   reportedUser,
   conversationId,
-  messages = []
+  messages = [],
+  closeButtonText = 'Close & Return'
 }) {
   const [category, setCategory] = useState('inappropriate_behavior');
   const [description, setDescription] = useState('');
@@ -59,10 +60,10 @@ export default function ReportModal({
         : [];
 
       const payload = {
-        reportedUserId: reportedUser._id || reportedUser.id,
+        reportedUserId: reportedUser?._id || reportedUser?.id || reportedUser?.userId || 'system_incident',
         conversationId,
         category,
-        subject: `Incident Report against ${reportedUser.name} (${category})`,
+        subject: `Incident Report against ${reportedUser?.name || 'User'} (${category})`,
         description: description.trim(),
         chatSnapshot: snapshotData
       };
@@ -114,7 +115,7 @@ export default function ReportModal({
                 onClick={handleClose}
                 className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-md cursor-pointer transition-all"
               >
-                Close & Return to Chat
+                {closeButtonText}
               </button>
             </div>
           </div>

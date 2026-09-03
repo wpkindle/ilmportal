@@ -105,6 +105,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
   const [isCameraOn, setIsCameraOn] = useState(false); // Camera OFF by default for privacy
   const [isBackgroundBlurred, setIsBackgroundBlurred] = useState(false);
   const [classReportModalOpen, setClassReportModalOpen] = useState(false);
+  const [isReportingAfterLeave, setIsReportingAfterLeave] = useState(false);
   const [isSpeakerMuted, setIsSpeakerMuted] = useState(false);
   const [speakerVolume, setSpeakerVolume] = useState(0.85); // Clean balanced default volume
   const [isScreenSharing, setIsScreenSharing] = useState(false);
@@ -644,6 +645,16 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
   // Leave / End Classroom
   const handleLeaveClassroom = async () => {
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((track) => track.stop());
+    }
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+    }
+    if (socket && roomId) {
+      socket.emit('leave-classroom', { roomId });
+    }
+
     if (sessionData?._id) {
       try {
         await api.updateSessionStatus(sessionData._id, {
@@ -657,8 +668,31 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     router.push(user?.role === 'tutor' ? '/tutor/dashboard' : '/student/dashboard');
   };
 
+  // Emergency Leave & Report: Instantly cuts all media & connection, but keeps user on screen to fill report!
+  const handleEmergencyLeaveAndReport = () => {
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((track) => track.stop());
+    }
+    if (peerConnectionRef.current) {
+      peerConnectionRef.current.close();
+    }
+    if (socket && roomId) {
+      socket.emit('leave-classroom', { roomId });
+    }
+    setIsReportingAfterLeave(true);
+    setClassReportModalOpen(true);
+  };
+
   const otherRoleName = user?.role === 'tutor' ? 'Student' : 'Tutor';
   const otherPartyName = remotePeerInfo?.name || sessionData?.tutor?.name || sessionData?.student?.name || otherRoleName;
+
+  const targetReportedUser = remotePeerInfo?._id || remotePeerInfo?.id
+    ? remotePeerInfo
+    : {
+        name: otherPartyName,
+        role: otherRoleName,
+        _id: (user?.role === 'tutor' ? sessionData?.student?._id || sessionData?.student : sessionData?.tutor?._id || sessionData?.tutor) || roomId
+      };
 
   return (
     <div
@@ -787,7 +821,10 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
           {/* Always-Visible Report / Block Button */}
           <button
-            onClick={() => setClassReportModalOpen(true)}
+            onClick={() => {
+              setIsReportingAfterLeave(false);
+              setClassReportModalOpen(true);
+            }}
             className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-rose-950/80 text-slate-300 hover:text-rose-300 border border-slate-700 hover:border-rose-500/40 text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer"
             title="Report Concern or Block Participant"
           >
@@ -1183,10 +1220,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
         {/* 🚨 Emergency Leave & Report Button */}
         <button
-          onClick={() => {
-            handleLeaveClassroom();
-            setClassReportModalOpen(true);
-          }}
+          onClick={handleEmergencyLeaveAndReport}
           className="p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-bold transition-all shadow-lg shadow-amber-900/40 cursor-pointer flex items-center justify-center gap-1.5"
           title="Emergency Exit & Flag Incident to Lahore Safety Team"
         >
@@ -1208,10 +1242,16 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       {/* 🛡️ In-Classroom Report & Safety Incident Modal */}
       <ReportModal
         isOpen={classReportModalOpen}
-        onClose={() => setClassReportModalOpen(false)}
-        reportedUser={remotePeerInfo || { name: otherPartyName, role: otherRoleName }}
+        onClose={() => {
+          setClassReportModalOpen(false);
+          if (isReportingAfterLeave) {
+            handleLeaveClassroom();
+          }
+        }}
+        reportedUser={targetReportedUser}
         conversationId={roomId}
         messages={chatMessages}
+        closeButtonText={isReportingAfterLeave ? 'Done & Exit to Dashboard' : 'Return to Classroom'}
       />
 
     </div>

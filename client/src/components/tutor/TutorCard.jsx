@@ -148,6 +148,11 @@ const TutorCard = ({ tutor, tutorProfile }) => {
       return;
     }
 
+    if (user?.role === 'tutor') {
+      alert('Tutors cannot message other tutors. Messaging is reserved for student-tutor learning communication.');
+      return;
+    }
+
     if (user?.role === 'student' && isFemaleTutor) {
       const { percentage } = calculateClientCompletion(user, null);
       if (percentage < 100) {
@@ -329,14 +334,16 @@ const TutorCard = ({ tutor, tutorProfile }) => {
               Profile
             </Link>
 
-            <motion.button
-              onClick={handleStartChat}
-              whileTap={{ scale: 0.94 }}
-              className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/25 transition-colors flex items-center gap-1.5"
-            >
-              <MessageSquare className="w-3.5 h-3.5 shrink-0" />
-              <span className="whitespace-nowrap">Message Tutor</span>
-            </motion.button>
+            {user?.role !== 'tutor' && (
+              <motion.button
+                onClick={handleStartChat}
+                whileTap={{ scale: 0.94 }}
+                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/25 transition-colors flex items-center gap-1.5 cursor-pointer"
+              >
+                <MessageSquare className="w-3.5 h-3.5 shrink-0" />
+                <span className="whitespace-nowrap">Message Tutor</span>
+              </motion.button>
+            )}
           </div>
         </div>
       </div>

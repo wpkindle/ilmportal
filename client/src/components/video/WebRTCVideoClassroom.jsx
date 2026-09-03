@@ -914,12 +914,12 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       {/* Main Classroom Stage */}
       <div className="flex-1 flex overflow-hidden relative bg-slate-950">
         
-        {/* VIEW MODE 1: True Dual 50/50 Conference Grid (One Side Tutor, One Side Student) */}
+        {/* VIEW MODE 1: True Dual 50/50 Conference Grid (Desktop 50/50, Mobile: Opponent in bottom big screen) */}
         {viewMode === 'grid' && (
-          <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4 p-3 sm:p-4 h-full w-full overflow-hidden">
+          <div className="flex-1 flex flex-col md:grid md:grid-cols-2 gap-2 sm:gap-4 p-2 sm:p-4 h-full w-full overflow-hidden">
             
-            {/* Card 1 (Left): Remote Peer (Tutor or Student) */}
-            <div className="w-full h-full rounded-3xl overflow-hidden bg-slate-900 border-2 border-slate-800/90 flex items-center justify-center relative shadow-2xl">
+            {/* Card 1: Remote Peer (Opponent) - Placed in the bottom big video screen on mobile */}
+            <div className="order-2 md:order-1 flex-1 w-full h-full min-h-[56%] md:min-h-0 rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900 border-2 border-slate-800/90 flex items-center justify-center relative shadow-2xl">
               <video
                 ref={remoteVideoRef}
                 autoPlay
@@ -988,8 +988,8 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               </div>
             </div>
 
-            {/* Card 2 (Right): Local User (Self) */}
-            <div className="w-full h-full rounded-3xl overflow-hidden bg-slate-900 border-2 border-emerald-500/40 flex items-center justify-center relative shadow-2xl">
+            {/* Card 2 (Right on desktop, Top compact preview on mobile): Local User (Self) */}
+            <div className="order-1 md:order-2 w-full h-36 sm:h-48 md:h-full md:flex-1 rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900 border-2 border-emerald-500/40 flex items-center justify-center relative shadow-2xl shrink-0">
               <video
                 ref={localVideoRef}
                 autoPlay

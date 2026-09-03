@@ -292,7 +292,7 @@ const Navbar = () => {
                 <span className="text-lg sm:text-xl font-black tracking-tight text-slate-900 font-display">
                   Ilm<span className="text-emerald-700">Portal</span>
                 </span>
-                <span className="px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200/60">
+                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200/60">
                   Pakistan
                 </span>
               </div>
@@ -595,7 +595,6 @@ const Navbar = () => {
                         alt={user?.name}
                         className="w-full h-full object-cover"
                       />
-                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full" />
                     </div>
 
                     {/* Desktop: Decent, elegant, modern profile box */}
@@ -606,7 +605,6 @@ const Navbar = () => {
                           alt={user?.name}
                           className="w-full h-full object-cover"
                         />
-                        <span className="absolute bottom-0 right-0 w-2 h-2 bg-emerald-500 border border-white rounded-full" />
                       </div>
                       <div className="text-left">
                         <p className="text-xs font-bold text-slate-800 leading-tight max-w-[110px] truncate group-hover:text-emerald-700 transition-colors">

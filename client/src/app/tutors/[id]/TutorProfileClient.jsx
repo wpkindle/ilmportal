@@ -79,6 +79,11 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
       return;
     }
 
+    if (user?.role === 'tutor') {
+      alert('Tutors cannot message other tutors. Messaging is reserved for student-tutor learning communication.');
+      return;
+    }
+
     if (user?.role === 'student' && isFemaleTutor) {
       const { percentage } = calculateClientCompletion(user, null);
       if (percentage < 100) {
@@ -202,13 +207,15 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                 </Link>
               )}
 
-              <button
-                onClick={handleStartChat}
-                className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2"
-              >
-                <MessageSquare className="w-4 h-4" />
-                <span>Message & Discuss Schedule</span>
-              </button>
+              {user?.role !== 'tutor' && (
+                <button
+                  onClick={handleStartChat}
+                  className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span>Message & Discuss Schedule</span>
+                </button>
+              )}
             </div>
 
           </div>

@@ -6,7 +6,10 @@ const {
   getMyDeals,
   getDealById,
   submitPaymentProof,
-  cancelDeal
+  cancelDeal,
+  respondToTrialContinuation,
+  adminClearTutorFee,
+  adminRestrictTutorClasses
 } = require('../controllers/dealController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
@@ -15,6 +18,9 @@ router.use(protect);
 
 router.post('/offer', authorize('tutor'), createDealOffer);
 router.post('/:id/respond', authorize('student'), respondToDealOffer);
+router.post('/:id/trial-decision', authorize('student'), respondToTrialContinuation);
+router.post('/:id/clear-fee', authorize('admin'), adminClearTutorFee);
+router.post('/:id/restrict-classes', authorize('admin'), adminRestrictTutorClasses);
 router.get('/my-deals', getMyDeals);
 router.get('/:id', getDealById);
 router.post('/:id/submit-payment', authorize('student'), submitPaymentProof);

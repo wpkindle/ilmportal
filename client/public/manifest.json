@@ -1,19 +1,18 @@
 {
-  "name": "IlmPortal Pakistan - Quran & Academic LMS",
+  "name": "IlmPortal - Quran & Academic Tutoring Platform Pakistan",
   "short_name": "IlmPortal",
-  "description": "Pakistan's #1 verified Quran & academic tutoring platform",
+  "description": "Pakistan's #1 verified platform for Quran Qaris and Academic Tutors with in-platform WebRTC classroom.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#020617",
   "theme_color": "#059669",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "/icon.svg",
-      "sizes": "any",
+      "sizes": "192x192 512x512",
       "type": "image/svg+xml",
       "purpose": "any maskable"
     }
   ]
 }
-

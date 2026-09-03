@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles, CheckCircle2, XCircle, Clock, Video, MapPin, CreditCard, ShieldCheck } from 'lucide-react';
+import { Sparkles, CheckCircle2, XCircle, Clock, Video, MapPin, CreditCard, ShieldCheck, Award } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 
@@ -24,6 +24,7 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
   const { user, isStudent: authIsStudent, isTutor: authIsTutor } = useAuth();
   const [loading, setLoading] = useState(false);
   const [dealState, setDealState] = useState(deal);
+  const [certRequested, setCertRequested] = useState(false);
 
   useEffect(() => {
     if (deal) {
@@ -165,19 +166,157 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
         </div>
       )}
 
-      {/* Active Course Indicator */}
-      {isAccepted && (
+      {/* Active Trial & Continuation Decision Area */}
+      {currentStatus === 'active_trial' && isStudentUser && (
+        <div className="p-3.5 bg-emerald-950/70 border border-emerald-500/40 rounded-2xl space-y-2.5">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
+            <span className="text-xs font-bold text-emerald-300">Free Trial In Progress</span>
+          </div>
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            Are you satisfied with your trial classes? Choose whether you would like to continue regular tutoring with this teacher:
+          </p>
+          <div className="flex items-center gap-2 pt-1">
+            <button
+              type="button"
+              onClick={async () => {
+                if (!confirm('Are you sure you do not wish to continue classes after the trial?')) return;
+                setLoading(true);
+                try {
+                  const res = await api.respondToTrialContinuation(dealId, { decision: 'decline' });
+                  if (res.success) {
+                    setDealState(res.deal);
+                    if (onDealUpdated) onDealUpdated(res.deal);
+                  }
+                } catch (e) {
+                  alert(e.message);
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+              className="w-1/3 py-2 bg-slate-850 hover:bg-slate-800 text-slate-300 text-xs font-bold rounded-xl transition-colors cursor-pointer border border-slate-700"
+            >
+              Decline
+            </button>
+
+            <button
+              type="button"
+              onClick={async () => {
+                setLoading(true);
+                try {
+                  const res = await api.respondToTrialContinuation(dealId, { decision: 'continue' });
+                  if (res.success) {
+                    runConfetti();
+                    setDealState(res.deal);
+                    if (onDealUpdated) onDealUpdated(res.deal);
+                  }
+                } catch (e) {
+                  alert(e.message);
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+              className="w-2/3 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 text-slate-950 text-xs font-black rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer hover:scale-[1.02]"
+            >
+              <CheckCircle2 className="w-4 h-4 text-slate-950" />
+              <span>Continue Regular Classes</span>
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Active Trial Indicator for Tutor */}
+      {currentStatus === 'active_trial' && !isStudentUser && (
+        <div className="p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30 text-center text-xs font-bold text-emerald-300 flex items-center justify-center gap-2">
+          <Clock className="w-4 h-4 text-emerald-400" />
+          <span>Free Trial Active. Awaiting student continuation decision.</span>
+        </div>
+      )}
+
+      {/* Continuation Agreed - 3-day fee notice */}
+      {currentStatus === 'continuation_agreed' && (
+        <div className="p-3.5 bg-amber-950/60 border border-amber-500/40 rounded-2xl space-y-1.5 text-xs text-amber-200">
+          <div className="flex items-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+            <span className="font-bold text-amber-300">Continuation Confirmed by Student!</span>
+          </div>
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            {isTutorUser
+              ? `Student selected to continue! Please clear the platform fee with administration within 3 days (due: ${dealState.tutorFeeDueDate ? new Date(dealState.tutorFeeDueDate).toLocaleDateString() : '3 days'}) to keep classroom active.`
+              : 'You have chosen to continue regular classes. The administration is finalizing tutor platform clearance.'}
+          </p>
+        </div>
+      )}
+
+      {/* Active Paid Classes */}
+      {currentStatus === 'active_paid' && (
         <div className="p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30 text-center text-xs font-bold text-emerald-300 flex items-center justify-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-          <span>Course Agreement Active & Free Trial In Progress</span>
+          <span>Active Paid Classes &bull; Payment Cleared by Admin</span>
+        </div>
+      )}
+
+      {/* Tutor Certificate Recommendation Trigger */}
+      {(currentStatus === 'active_paid' || currentStatus === 'active_trial' || currentStatus === 'continuation_agreed') && isTutorUser && (
+        <div className="pt-1">
+          {certRequested ? (
+            <div className="p-2.5 bg-purple-950/60 border border-purple-500/40 rounded-xl text-center text-xs text-purple-200 font-bold flex items-center justify-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
+              <span>Certificate recommendation dispatched to Admin!</span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={async () => {
+                if (!confirm(`Recommend official completion certificate for student ${dealState.student?.name || 'this student'}?`)) return;
+                setLoading(true);
+                try {
+                  const res = await api.tutorRequestCertificate({
+                    studentId: dealState.student?._id || dealState.student,
+                    subject: dealState.subject,
+                    dealId: dealState._id,
+                    notes: 'Completed curriculum and lessons with distinction.'
+                  });
+                  if (res.success) {
+                    setCertRequested(true);
+                    alert('Certificate recommendation submitted! Admin will assign the fee invoice.');
+                  }
+                } catch (e) {
+                  alert(e.message || 'Error recommending certificate');
+                } finally {
+                  setLoading(false);
+                }
+              }}
+              disabled={loading}
+              className="w-full py-2 bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 hover:border-purple-400 text-purple-200 text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
+            >
+              <Award className="w-3.5 h-3.5 text-purple-400" />
+              <span>Recommend Official Certificate for Student</span>
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Restricted Classes */}
+      {(currentStatus === 'restricted' || dealState.accessRestricted) && (
+        <div className="p-3.5 bg-rose-950/80 rounded-2xl border border-rose-500/50 text-xs text-rose-200 space-y-1">
+          <div className="flex items-center gap-2 font-bold text-rose-300">
+            <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
+            <span>Classroom Access Suspended</span>
+          </div>
+          <p className="text-[11px] text-slate-300 leading-relaxed">
+            Classes are temporarily paused pending tutor platform fee clearance with admin.
+          </p>
         </div>
       )}
 
       {/* Declined Indicator */}
-      {isDeclined && (
+      {(isDeclined || currentStatus === 'trial_declined') && (
         <div className="p-3 bg-red-500/20 rounded-2xl border border-red-500/30 text-center text-xs font-bold text-red-300 flex items-center justify-center gap-2">
           <XCircle className="w-4 h-4 text-red-400" />
-          <span>This course offer was declined.</span>
+          <span>{currentStatus === 'trial_declined' ? 'Trial concluded without continuation.' : 'This course offer was declined.'}</span>
         </div>
       )}
 

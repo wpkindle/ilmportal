@@ -131,8 +131,8 @@ function LoginContent() {
             <div>
               <div className="flex items-center justify-between mb-1">
                 <label className="text-xs font-bold text-slate-700">Password</label>
-                <Link href="/forgot-password" className="text-[11px] font-bold text-emerald-700 hover:underline">
-                  Forgot?
+                <Link href="/forgot-password" className="text-xs font-bold text-emerald-700 hover:text-emerald-800 hover:underline">
+                  Forgot Password?
                 </Link>
               </div>
               <div className="relative">

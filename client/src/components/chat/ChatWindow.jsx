@@ -253,12 +253,30 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
       }
     };
 
+    // When messages sent by me are delivered to the recipient
+    const handleMessagesDelivered = ({ conversationId: delivConvId }) => {
+      const currentUserId = (user?._id || user?.id)?.toString();
+      if (delivConvId === conversationId) {
+        setMessages((prev) =>
+          prev.map((m) => {
+            const senderId = (m.sender?._id || m.sender)?.toString();
+            if (senderId === currentUserId && !m.isRead) {
+              return { ...m, isDelivered: true };
+            }
+            return m;
+          })
+        );
+      }
+    };
+
     socket.on('new-message', handleReceiveMessage);
     socket.on('messages-seen', handleMessagesSeen);
+    socket.on('messages-delivered', handleMessagesDelivered);
 
     return () => {
       socket.off('new-message', handleReceiveMessage);
       socket.off('messages-seen', handleMessagesSeen);
+      socket.off('messages-delivered', handleMessagesDelivered);
     };
   }, [socket, conversationId, user]);
 
@@ -735,13 +753,13 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
           <div className="p-0.5 sm:p-1 rounded bg-emerald-500/20 text-emerald-400 shrink-0">
             <Lock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
           </div>
-          <span className="font-bold text-emerald-300 truncate">End-to-End Encrypted &amp; AI Safe</span>
-          <span className="text-slate-400 hidden md:inline">&bull; Monitored for safety</span>
+          <span className="font-bold text-emerald-300 truncate">AI Protected Safe Chat</span>
+          <span className="text-slate-400 hidden sm:inline">&bull; 100% Privacy &amp; Family Safe</span>
         </div>
         <div className="text-[9.5px] sm:text-[10px] text-slate-300 font-medium shrink-0 flex items-center gap-1.5">
-          <span>DM Restricted</span>
+          <span>Protected</span>
           <Link href="/safety" className="text-emerald-400 hover:text-emerald-300 underline font-bold">
-            Safety Rules
+            Rules
           </Link>
         </div>
       </div>
@@ -842,7 +860,14 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
 
       {/* Bottom Message Input Area */}
       <div className="p-2 sm:p-3 bg-white border-t border-slate-200/80 shrink-0">
-        {user?.role === 'student' && femaleTutorRequestStatus?.isFemaleTutor && femaleTutorRequestStatus?.requestStatus !== 'accepted' ? (
+        {user?.role === 'tutor' && partner?.role === 'tutor' ? (
+          <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-center space-y-1">
+            <p className="text-xs font-bold text-amber-900">Direct Chat Disabled Between Tutors</p>
+            <p className="text-[11px] text-amber-700">
+              IlmPortal messaging is dedicated strictly to student-tutor learning communication. Tutors cannot chat with other tutors.
+            </p>
+          </div>
+        ) : user?.role === 'student' && femaleTutorRequestStatus?.isFemaleTutor && femaleTutorRequestStatus?.requestStatus !== 'accepted' ? (
           /* Female Tutor Request Status Gate Banner */
           <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 border border-emerald-500/40 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
             <div className="flex items-start gap-2.5 min-w-0">
@@ -920,15 +945,15 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
             </div>
           </div>
         ) : (
-          /* Standard Text & Voice Input */
-          <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+          /* Standard Text & Voice Input - Fully responsive on all mobile viewports */
+          <form onSubmit={handleSendMessage} className="flex items-center gap-1.5 sm:gap-2 w-full">
             <button
               type="button"
               onClick={startRecording}
-              className="p-3 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-2xl transition-colors cursor-pointer shrink-0"
+              className="p-2 sm:p-3 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl sm:rounded-2xl transition-colors cursor-pointer shrink-0"
               title="Hold to Record Voice Note"
             >
-              <Mic className="w-5 h-5" />
+              <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
             </button>
 
             <input
@@ -936,14 +961,14 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
               placeholder="Type a message..."
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              className="flex-1 px-4 py-3 sm:py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm text-slate-900 outline-none focus:border-emerald-500 focus:bg-white transition-all font-medium min-h-[48px]"
+              className="flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl text-base sm:text-sm text-slate-900 outline-none focus:border-emerald-500 focus:bg-white transition-all font-medium min-h-[42px] sm:min-h-[48px]"
             />
 
             {/* Send Text Message Button */}
             <button
               type="submit"
               disabled={!inputText.trim()}
-              className="p-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-2xl disabled:opacity-40 transition-all shadow-md cursor-pointer shrink-0"
+              className="p-2.5 sm:p-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl sm:rounded-2xl disabled:opacity-40 transition-all shadow-md cursor-pointer shrink-0"
             >
               <Send className="w-4 h-4" />
             </button>

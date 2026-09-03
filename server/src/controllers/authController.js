@@ -1,7 +1,7 @@
 const User = require('../models/User');
 const TutorProfile = require('../models/TutorProfile');
 const Notification = require('../models/Notification');
-const { sendVerificationOtpEmail, sendEmailDetailed } = require('../utils/emailService');
+const { sendVerificationOtpEmail, sendEmailDetailed, sendPasswordResetEmail } = require('../utils/emailService');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
@@ -743,12 +743,19 @@ exports.changePassword = async (req, res) => {
   }
 };
 
-// @desc    Forgot Password Request
+// @desc    Forgot Password Request - Dispatches Reset Link via Email
 // @route   POST /api/auth/forgot-password
 exports.forgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
-    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide an email address'
+      });
+    }
+
+    const user = await User.findOne({ email: email.toLowerCase().trim() });
 
     if (!user) {
       return res.status(404).json({
@@ -757,18 +764,33 @@ exports.forgotPassword = async (req, res) => {
       });
     }
 
-    const resetToken = crypto.randomBytes(20).toString('hex');
+    // Generate secure 32-byte token
+    const resetToken = crypto.randomBytes(32).toString('hex');
     user.resetPasswordToken = crypto.createHash('sha256').update(resetToken).digest('hex');
-    user.resetPasswordExpires = Date.now() + 30 * 60 * 1000; // 30 mins
+    user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 60 mins validity
     await user.save();
 
-    // In a full production setup, send reset password link via email
+    const clientUrl = process.env.CLIENT_URL || 'https://ilmportal.org';
+    const resetUrl = `${clientUrl}/reset-password?token=${resetToken}`;
+
+    // Send password reset email
+    try {
+      await sendPasswordResetEmail({
+        to: user.email,
+        name: user.name,
+        resetUrl
+      });
+    } catch (mailErr) {
+      console.error('Failed to dispatch password reset email:', mailErr);
+    }
+
     res.status(200).json({
       success: true,
-      message: 'Password reset instructions have been sent to your email.',
-      resetToken // provided for seamless frontend verification in dev/demo
+      message: 'A password reset link has been dispatched to your email address.',
+      resetToken // provided for convenience
     });
   } catch (error) {
+    console.error('Forgot password error:', error);
     res.status(500).json({
       success: false,
       message: error.message || 'Error processing forgot password request'

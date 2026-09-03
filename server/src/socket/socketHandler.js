@@ -11,7 +11,7 @@ const initSocket = (io) => {
     console.log(`🔌 Socket client connected: ${socket.id}`);
 
     // Register user socket & send current online users list
-    socket.on('register-user', (userId) => {
+    socket.on('register-user', async (userId) => {
       if (userId) {
         const idStr = userId.toString();
         socket.userId = idStr;
@@ -28,6 +28,52 @@ const initSocket = (io) => {
 
         // 2. Broadcast to everyone that this user came online
         io.emit('user-online-status', { userId: idStr, status: 'online' });
+
+        // 3. Automatically deliver pending messages sent while this user was away
+        try {
+          const undeliveredMessages = await Message.find({
+            recipient: idStr,
+            isDelivered: false
+          }).populate('sender', 'name avatar role');
+
+          if (undeliveredMessages.length > 0) {
+            await Message.updateMany(
+              { recipient: idStr, isDelivered: false },
+              { isDelivered: true, deliveredAt: new Date() }
+            );
+
+            // Notify each active conversation room and sender socket that messages are now delivered
+            const notifiedConversations = new Set();
+            undeliveredMessages.forEach((msg) => {
+              const cId = msg.conversationId;
+              if (!notifiedConversations.has(cId)) {
+                notifiedConversations.add(cId);
+                io.to(`conv_${cId}`).emit('messages-delivered', {
+                  conversationId: cId,
+                  recipientId: idStr
+                });
+                if (msg.sender?._id) {
+                  io.to(`user_${msg.sender._id.toString()}`).emit('messages-delivered', {
+                    conversationId: cId,
+                    recipientId: idStr
+                  });
+                }
+              }
+            });
+
+            // Dispatch background notification alert for the returning user
+            const senderNames = Array.from(new Set(undeliveredMessages.map(m => m.sender?.name).filter(Boolean)));
+            const nameStr = senderNames.length === 1 ? senderNames[0] : `${senderNames[0]} and others`;
+            socket.emit('notification-alert', {
+              title: `New Messages (${undeliveredMessages.length})`,
+              message: `You received ${undeliveredMessages.length} message(s) from ${nameStr} while you were away.`,
+              type: 'new_message',
+              unreadCount: undeliveredMessages.length
+            });
+          }
+        } catch (err) {
+          console.error('Error syncing undelivered messages on register-user:', err);
+        }
       }
     });
 
@@ -122,13 +168,24 @@ const initSocket = (io) => {
           conversationId = [senderIdStr, recipientIdStr].sort().join('_');
         }
 
-        // Female tutor privacy safeguard
+        // Verify sender and recipient
         const recipientUser = await User.findById(recipientIdStr);
+        const senderUser = await User.findById(senderIdStr);
+
+        // Disallow tutor to tutor chat
+        if (senderUser?.role === 'tutor' && recipientUser?.role === 'tutor') {
+          socket.emit('chat-error', {
+            message: 'Tutors cannot message other tutors. Messaging is reserved for student-tutor learning communication.',
+            code: 'TUTOR_TO_TUTOR_FORBIDDEN'
+          });
+          return;
+        }
+
+        // Female tutor privacy safeguard
         if (recipientUser && recipientUser.role === 'tutor') {
           const recipientProfile = await TutorProfile.findOne({ user: recipientUser._id });
           const isFemale = recipientUser.gender === 'female' || recipientProfile?.gender === 'female';
           if (isFemale) {
-            const senderUser = await User.findById(senderIdStr);
             if (senderUser && senderUser.role === 'student') {
               const acceptedReq = await ChatRequest.findOne({
                 student: senderUser._id,

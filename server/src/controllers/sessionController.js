@@ -143,9 +143,17 @@ exports.getSessionByRoomId = async (req, res) => {
       };
     }
 
+    const isRestricted = Boolean(
+      session?.deal?.accessRestricted ||
+      session?.deal?.status === 'restricted'
+    );
+
     res.status(200).json({
       success: true,
-      session
+      session: {
+        ...(session.toObject ? session.toObject() : session),
+        isRestricted
+      }
     });
   } catch (error) {
     res.status(500).json({

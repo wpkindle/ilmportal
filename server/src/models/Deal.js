@@ -35,7 +35,7 @@ const dealSchema = new mongoose.Schema({
   },
   status: {
     type: String,
-    enum: ['pending_offer', 'active_trial', 'active_paid', 'trial_expired', 'completed', 'cancelled', 'restricted'],
+    enum: ['pending_offer', 'active_trial', 'continuation_agreed', 'active_paid', 'trial_declined', 'trial_expired', 'completed', 'cancelled', 'restricted'],
     default: 'pending_offer'
   },
   trialStartDate: {
@@ -43,6 +43,35 @@ const dealSchema = new mongoose.Schema({
   },
   trialEndDate: {
     type: Date
+  },
+  continuationAgreed: {
+    type: Boolean,
+    default: false
+  },
+  continuationAgreedAt: {
+    type: Date
+  },
+  tutorFeeDueDate: {
+    type: Date
+  },
+  tutorFeePaid: {
+    type: Boolean,
+    default: false
+  },
+  tutorFeeClearanceAt: {
+    type: Date
+  },
+  tutorFeeClearanceBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  tutorPaymentProofReference: {
+    type: String,
+    default: ''
+  },
+  tutorPaymentProofNotes: {
+    type: String,
+    default: ''
   },
   paymentStatus: {
     type: String,

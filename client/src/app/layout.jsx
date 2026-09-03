@@ -3,6 +3,7 @@ import AppProviders from '../components/common/AppProviders';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import MobileBottomNav from '../components/common/MobileBottomNav';
+import NotificationPermissionPrompt from '../components/common/NotificationPermissionPrompt';
 
 export const viewport = {
   width: 'device-width',
@@ -56,6 +57,7 @@ export default function RootLayout({ children }) {
           </main>
           <Footer />
           <MobileBottomNav />
+          <NotificationPermissionPrompt />
         </AppProviders>
       </body>
     </html>

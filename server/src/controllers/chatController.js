@@ -115,7 +115,29 @@ exports.getMessages = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    const messages = rawMessages.reverse();
+    // Mark undelivered messages to this user as delivered
+    try {
+      const undeliveredCount = await Message.countDocuments({
+        ...query,
+        recipient: req.user.id,
+        isDelivered: false
+      });
+      if (undeliveredCount > 0) {
+        await Message.updateMany(
+          { ...query, recipient: req.user.id, isDelivered: false },
+          { isDelivered: true, deliveredAt: new Date() }
+        );
+        const io = req.app.get('io');
+        if (io) {
+          io.to(`conv_${conversationId}`).emit('messages-delivered', {
+            conversationId,
+            recipientId: req.user.id
+          });
+        }
+      }
+    } catch (deliveryErr) {
+      console.error('Error auto-delivering messages:', deliveryErr);
+    }
 
     res.status(200).json({
       success: true,
@@ -143,9 +165,24 @@ exports.sendMessage = async (req, res) => {
       });
     }
 
+    const recipientUser = await User.findById(recipientId);
+    if (!recipientUser) {
+      return res.status(404).json({
+        success: false,
+        message: 'Recipient user not found'
+      });
+    }
+
+    // Disallow tutor-to-tutor direct messaging
+    if (req.user.role === 'tutor' && recipientUser.role === 'tutor') {
+      return res.status(403).json({
+        success: false,
+        message: 'Tutors cannot message other tutors. Messaging is reserved for student-tutor learning communication.'
+      });
+    }
+
     // Safeguard: Check if recipient is a female tutor
     if (req.user.role === 'student') {
-      const recipientUser = await User.findById(recipientId);
       if (recipientUser && recipientUser.role === 'tutor') {
         const recipientProfile = await TutorProfile.findOne({ user: recipientUser._id });
         const isFemale = recipientUser.gender === 'female' || recipientProfile?.gender === 'female';

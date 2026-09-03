@@ -1197,6 +1197,172 @@ const sendChatRequestStatusEmail = async ({
       ? `${tutorName} accepted your request to chat! Open chat: ${chatUrl}`
       : `Update from ${tutorName}: Tutor is currently unable to accept new students. Browse tutors: ${findTutorsUrl}`
   });
+/**
+ * Send email to tutor when student agrees to continue classes
+ */
+const sendTrialContinuationTutorEmail = async ({
+  to,
+  tutorName,
+  studentName,
+  subject,
+  feeDueDate,
+  adminContactPhone
+}) => {
+  const emailSubject = `🎉 Great News! Student ${studentName} agreed to continue classes with you | IlmPortal`;
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"></head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px;">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td align="center">
+            <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0;">
+              <tr>
+                <td style="background: linear-gradient(135deg, #065f46 0%, #047857 100%); padding: 28px; text-align: center;">
+                  <span style="font-size: 11px; font-weight: 800; color: #a7f3d0; text-transform: uppercase; letter-spacing: 1.5px;">Trial Successfully Completed</span>
+                  <h1 style="color: #ffffff; margin: 6px 0 0 0; font-size: 22px; font-weight: 800;">Student Agreed to Continue Regular Classes</h1>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 28px;">
+                  <p style="color: #1e293b; font-size: 15px; margin: 0 0 16px 0;">Assalamu Alaikum <strong>${tutorName}</strong>,</p>
+                  <p style="color: #334155; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0;">
+                    Congratulations! Your student <strong>${studentName}</strong> has completed their trial period for <strong>${subject}</strong> and has officially selected to continue regular tutoring with you.
+                  </p>
+
+                  <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 18px; margin-bottom: 24px;">
+                    <h3 style="color: #166534; font-size: 13px; font-weight: 800; text-transform: uppercase; margin: 0 0 8px 0;">3-Day Platform Fee Clearance Notice</h3>
+                    <p style="color: #15803d; font-size: 13px; line-height: 1.5; margin: 0 0 12px 0;">
+                      To keep your live classes, scheduling, and student messaging uninterrupted, please clear the platform fee with administration within <strong>3 days (by ${feeDueDate})</strong>.
+                    </p>
+                    <p style="color: #166534; font-size: 12px; margin: 0;">
+                      Meezan Bank: <strong>96010105435308</strong> (Abdul Khaliq)<br>
+                      Raast ID / EasyPaisa / JazzCash: <strong>03171759093</strong><br>
+                      Support Hotline: <strong>${adminContactPhone || '0317 1759093'}</strong>
+                    </p>
+                  </div>
+
+                  <p style="color: #64748b; font-size: 12px; margin: 0;">
+                    Note: If payment clearance is not confirmed within 3 days, access to scheduled classroom sessions will be temporarily paused.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+  return sendEmailDetailed({ to, subject: emailSubject, html });
+};
+
+/**
+ * Send email to tutor when platform fee is verified and cleared
+ */
+const sendTutorFeeClearedEmail = async ({
+  to,
+  tutorName,
+  studentName,
+  subject
+}) => {
+  const emailSubject = `✅ Platform Fee Cleared - Regular Classes Active with ${studentName} | IlmPortal`;
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"></head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px;">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td align="center">
+            <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; border: 1px solid #e2e8f0;">
+              <tr>
+                <td style="background: #065f46; padding: 24px; text-align: center;">
+                  <h1 style="color: #ffffff; margin: 0; font-size: 20px; font-weight: 800;">Payment Clearance Verified</h1>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 24px;">
+                  <p style="color: #1e293b; font-size: 14px;">Assalamu Alaikum <strong>${tutorName}</strong>,</p>
+                  <p style="color: #334155; font-size: 13px; line-height: 1.6;">
+                    Your platform fee for teaching student <strong>${studentName}</strong> (${subject}) has been successfully verified and cleared by the IlmPortal administration.
+                  </p>
+                  <p style="color: #059669; font-size: 13px; font-weight: bold;">
+                    Your regular classes and live video sessions are 100% active with zero restrictions.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+  return sendEmailDetailed({ to, subject: emailSubject, html });
+/**
+ * Send password reset link email
+ */
+const sendPasswordResetEmail = async ({
+  to,
+  name,
+  resetUrl
+}) => {
+  const emailSubject = `🔐 Reset Your IlmPortal Password`;
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"></head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px;">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td align="center">
+            <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0;">
+              <tr>
+                <td style="background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); padding: 28px; text-align: center;">
+                  <span style="font-size: 11px; font-weight: 800; color: #6ee7b7; text-transform: uppercase; letter-spacing: 1.5px;">Account Security</span>
+                  <h1 style="color: #ffffff; margin: 6px 0 0 0; font-size: 22px; font-weight: 800;">Password Reset Request</h1>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 28px;">
+                  <p style="color: #1e293b; font-size: 15px; margin: 0 0 16px 0;">Assalamu Alaikum <strong>${name || 'Dear User'}</strong>,</p>
+                  <p style="color: #334155; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0;">
+                    We received a request to reset your password for your <strong>IlmPortal</strong> account. Click the button below to set a new password:
+                  </p>
+
+                  <div style="text-align: center; margin: 28px 0;">
+                    <a href="${resetUrl}" style="background: linear-gradient(135deg, #059669 0%, #047857 100%); color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 12px; font-weight: 800; font-size: 15px; display: inline-block; box-shadow: 0 4px 10px rgba(5, 150, 105, 0.3);">
+                      Reset My Password
+                    </a>
+                  </div>
+
+                  <p style="color: #64748b; font-size: 12px; line-height: 1.5; margin: 0 0 16px 0;">
+                    Or copy and paste this link into your browser:<br>
+                    <a href="${resetUrl}" style="color: #059669; word-break: break-all;">${resetUrl}</a>
+                  </p>
+
+                  <div style="background-color: #fef3c7; border: 1px solid #fde68a; border-radius: 10px; padding: 12px; margin-top: 20px;">
+                    <p style="color: #92400e; font-size: 12px; margin: 0; line-height: 1.5;">
+                      ⚠️ <strong>Security Note:</strong> This link is valid for <strong>60 minutes</strong> and can only be used once. If you did not request a password reset, please ignore this email; your account remains completely safe.
+                    </p>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px; text-align: center; font-size: 11px; color: #94a3b8;">
+                  IlmPortal &bull; Pakistan&apos;s Trusted Quran &amp; Academic Learning Platform &bull; Lahore, Pakistan
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+  return sendEmailDetailed({ to, subject: emailSubject, html });
 };
 
 module.exports = {
@@ -1209,6 +1375,9 @@ module.exports = {
   sendAccountWarningEmail,
   sendAccountStatusEmail,
   sendChatRequestReceivedEmail,
-  sendChatRequestStatusEmail
+  sendChatRequestStatusEmail,
+  sendTrialContinuationTutorEmail,
+  sendTutorFeeClearedEmail,
+  sendPasswordResetEmail
 };
 

@@ -39,11 +39,11 @@ const safetyHighlights = [
   },
   {
     icon: MessageSquare,
-    title: 'Safe In-App Chat',
-    badge: 'Protected Messaging',
+    title: 'AI Protected Safe Chat',
+    badge: 'AI Monitored & Protected',
     accent: 'from-blue-500/20 to-indigo-500/10 text-blue-400 border-blue-500/30',
     description:
-      'Chat directly on our website without giving out your personal phone number or WhatsApp.',
+      'Safe, respectful in-platform messaging guarded by automated AI content moderation and zero personal phone sharing.',
     link: '/safety',
     linkText: 'Chat Rules'
   },

@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
@@ -20,11 +20,14 @@ import {
   Headphones,
   Zap,
   Landmark,
-  CreditCard
+  CreditCard,
+  Chrome
 } from 'lucide-react';
+import ChromeAppInstallModal from './ChromeAppInstallModal';
 
 const Footer = () => {
   const pathname = usePathname();
+  const [chromeModalOpen, setChromeModalOpen] = useState(false);
 
   // Hide footer completely only on live video classroom
   if (pathname?.startsWith('/classroom')) {
@@ -228,6 +231,19 @@ const Footer = () => {
                 <Globe className="w-3 h-3 text-cyan-400" />
                 <span>Serving All Over Pakistan</span>
               </span>
+            </div>
+
+            {/* Chrome App Download Badge */}
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setChromeModalOpen(true)}
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2.5 px-4 py-2.5 rounded-xl bg-gradient-to-r from-slate-900 via-slate-850 to-slate-900 hover:from-emerald-950 hover:to-slate-900 text-white border border-emerald-500/40 hover:border-emerald-400 text-xs font-bold shadow-md transition-all cursor-pointer group"
+              >
+                <Chrome className="w-4 h-4 text-amber-400 group-hover:rotate-45 transition-transform" />
+                <span>Download Chrome App</span>
+                <span className="text-[10px] text-emerald-400 bg-emerald-950 px-1.5 py-0.5 rounded font-mono">PWA</span>
+              </button>
             </div>
           </div>
 
@@ -552,6 +568,12 @@ const Footer = () => {
         </div>
 
       </div>
+
+      {/* Chrome App Installation Guide Modal */}
+      <ChromeAppInstallModal
+        isOpen={chromeModalOpen}
+        onClose={() => setChromeModalOpen(false)}
+      />
     </footer>
   );
 };

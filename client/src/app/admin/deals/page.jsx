@@ -69,6 +69,21 @@ export default function DealsManagementPage() {
     }
   };
 
+  const handleClearTutorFee = async (dealId) => {
+    if (!confirm('Clear tutor platform fee for this deal and activate regular classes?')) return;
+    setActionLoading(true);
+    try {
+      const res = await api.adminClearTutorFee(dealId);
+      if (res.success) {
+        fetchDeals();
+      }
+    } catch (err) {
+      alert(err.message || 'Error clearing tutor fee');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   if (loading) return <LoadingSpinner text="Loading platform deals..." />;
 
   return (
@@ -88,13 +103,13 @@ export default function DealsManagementPage() {
                 </p>
               </div>
 
-              <div className="flex items-center gap-2 bg-slate-200/80 p-1 rounded-2xl text-xs font-bold">
-                {['all', 'active_trial', 'active_paid', 'trial_expired', 'restricted'].map((st) => (
+              <div className="flex flex-wrap items-center gap-2 bg-slate-200/80 p-1 rounded-2xl text-xs font-bold">
+                {['all', 'continuation_agreed', 'active_trial', 'active_paid', 'trial_expired', 'restricted'].map((st) => (
                   <button
                     key={st}
                     onClick={() => setStatusFilter(st)}
-                    className={`px-3 py-1.5 rounded-xl capitalize transition-all ${
-                      statusFilter === st ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600'
+                    className={`px-3 py-1.5 rounded-xl capitalize transition-all cursor-pointer ${
+                      statusFilter === st ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     {st.replace('_', ' ')}
@@ -142,12 +157,29 @@ export default function DealsManagementPage() {
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                             deal.status === 'active_paid'
                               ? 'bg-emerald-100 text-emerald-800'
+                              : deal.status === 'continuation_agreed'
+                              ? 'bg-blue-100 text-blue-800 border border-blue-300'
                               : deal.status === 'active_trial'
                               ? 'bg-amber-100 text-amber-800'
                               : 'bg-red-100 text-red-800'
                           }`}>
                             {deal.status.replace('_', ' ')}
                           </span>
+
+                          {deal.tutorFeeDueDate && deal.status === 'continuation_agreed' && (
+                            <div className="mt-1 text-[10px]">
+                              <span className="text-slate-600 font-medium">Tutor Fee Due: </span>
+                              <span className="font-bold text-slate-800">
+                                {new Date(deal.tutorFeeDueDate).toLocaleDateString()}
+                              </span>
+                              {new Date(deal.tutorFeeDueDate) < new Date() && !deal.tutorFeePaid && (
+                                <span className="block text-red-600 font-extrabold animate-pulse">
+                                  OVERDUE (3 Days Expired)
+                                </span>
+                              )}
+                            </div>
+                          )}
+
                           {deal.accessRestricted && (
                             <span className="block text-[10px] text-red-600 font-bold mt-0.5">
                               Restricted ({deal.restrictionType})
@@ -169,6 +201,14 @@ export default function DealsManagementPage() {
                           )}
                         </td>
                         <td className="p-4 text-right space-x-2">
+                          {deal.status === 'continuation_agreed' && !deal.tutorFeePaid && (
+                            <button
+                              onClick={() => handleClearTutorFee(deal._id)}
+                              className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-colors shadow-xs"
+                            >
+                              Clear Tutor Fee
+                            </button>
+                          )}
                           <button
                             onClick={() => setSelectedDealForVerify(deal)}
                             className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg border border-emerald-200"

@@ -16,10 +16,12 @@ import {
   ArrowRight,
   ChevronRight,
   Heart,
-  Lock
+  Lock,
+  Chrome
 } from 'lucide-react';
 import AnimatedHeroBackground from './AnimatedHeroBackground';
 import CustomSelect from '../common/CustomSelect';
+import ChromeAppInstallModal from '../common/ChromeAppInstallModal';
 import { api } from '../../services/api';
 
 const initialTutorCities = [
@@ -40,6 +42,7 @@ const Hero = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [availableCities, setAvailableCities] = useState(initialTutorCities);
+  const [chromeModalOpen, setChromeModalOpen] = useState(false);
 
   // Fetch active tutors and dynamically build the list of available tutor cities
   useEffect(() => {
@@ -247,6 +250,19 @@ const Hero = () => {
           </Link>
         </div>
 
+        {/* Chrome App Download Link */}
+        <div className="mt-4 flex items-center justify-center">
+          <button
+            type="button"
+            onClick={() => setChromeModalOpen(true)}
+            className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 hover:border-emerald-500/50 text-xs font-bold transition-all shadow-md cursor-pointer group"
+          >
+            <Chrome className="w-4 h-4 text-amber-400 group-hover:rotate-45 transition-transform" />
+            <span>Install / Download Chrome App</span>
+            <span className="text-[10px] text-emerald-400 font-mono bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-800/60">Free PWA</span>
+          </button>
+        </div>
+
         {/* 4 Feature Highlights Grid with 3D Depth & Hover Elevation */}
         <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-5xl mx-auto">
           <div className="group relative p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-slate-900/80 to-slate-950/80 border border-white/10 hover:border-emerald-500/50 backdrop-blur-xl space-y-1.5 text-center shadow-lg hover:shadow-2xl hover:shadow-emerald-500/20 transform-gpu hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 overflow-hidden">
@@ -287,6 +303,11 @@ const Hero = () => {
         </div>
 
       </div>
+
+      <ChromeAppInstallModal
+        isOpen={chromeModalOpen}
+        onClose={() => setChromeModalOpen(false)}
+      />
     </section>
   );
 };

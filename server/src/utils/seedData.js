@@ -450,7 +450,7 @@ const seedDatabase = async () => {
       isVerified: true,
       city: 'Lahore',
       phone: '+92 345 5566778',
-      avatar: 'https://images.unsplash.com/photo-1594824813575-b92d6e32d561?w=200'
+      avatar: '/images/dr-ayesha.jpg'
     });
 
     const tutor4Profile = await TutorProfile.create({

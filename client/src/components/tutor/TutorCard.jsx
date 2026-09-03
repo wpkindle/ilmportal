@@ -116,10 +116,14 @@ const TutorCard = ({ tutor, tutorProfile }) => {
   const tutorUser = data.user || {};
   const tutorName = tutorUser.name || data.name || 'Verified Tutor';
   const tutorCity = tutorUser.city || data.city || 'Pakistan';
+  const isAyesha = tutorName?.toLowerCase().includes('ayesha');
+  const rawAvatar = tutorUser.avatar || data.avatar;
   const tutorAvatar =
-    tutorUser.avatar ||
-    data.avatar ||
-    `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=059669&color=fff`;
+    isAyesha
+      ? '/images/dr-ayesha.jpg'
+      : (rawAvatar && !rawAvatar.includes('594824813575'))
+        ? rawAvatar
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=059669&color=fff`;
 
   // Resolve teachingModes — could be array or legacy string
   const rawModes = data.teachingModes || (data.teachingMode ? [data.teachingMode] : ['online']);
@@ -154,6 +158,14 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                 <img
                   src={tutorAvatar}
                   alt={tutorName}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    if (isAyesha) {
+                      e.currentTarget.src = '/images/dr-ayesha.jpg';
+                    } else {
+                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=059669&color=fff`;
+                    }
+                  }}
                   className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border-2 border-white shadow-md"
                 />
                 {data.isSanadVerified && (

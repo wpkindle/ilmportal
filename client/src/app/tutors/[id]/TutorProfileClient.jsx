@@ -38,7 +38,14 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
 
   const tutorUser = tutor?.user || {};
   const tutorName = tutorUser.name || 'Verified Tutor';
-  const tutorAvatar = tutorUser.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=059669&color=fff`;
+  const isAyesha = tutorName?.toLowerCase().includes('ayesha');
+  const rawAvatar = tutorUser.avatar;
+  const tutorAvatar =
+    isAyesha
+      ? '/images/dr-ayesha.jpg'
+      : (rawAvatar && !rawAvatar.includes('594824813575'))
+        ? rawAvatar
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=059669&color=fff`;
 
   React.useEffect(() => {
     const fetchCourses = async () => {
@@ -79,6 +86,14 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                 <img
                   src={tutorAvatar}
                   alt={tutorName}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    if (isAyesha) {
+                      e.currentTarget.src = '/images/dr-ayesha.jpg';
+                    } else {
+                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=059669&color=fff`;
+                    }
+                  }}
                   className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl object-cover border-2 border-slate-100 shadow-sm"
                 />
                 {tutor.isSanadVerified && (

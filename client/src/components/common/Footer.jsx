@@ -404,6 +404,44 @@ const Footer = () => {
                 </Link>
               </li>
             </ul>
+
+            {/* Support Platform - Meezan Bank Barcode Card on Right Side */}
+            <div
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('open-support-platform'));
+                }
+              }}
+              className="mt-4 p-3 bg-slate-900/90 border border-slate-800 hover:border-emerald-500/50 rounded-2xl flex flex-col items-center sm:items-start gap-2.5 cursor-pointer group transition-all shadow-md"
+              title="Click to view Support Platform details"
+            >
+              <div className="flex items-center justify-between w-full">
+                <span className="text-[11px] font-bold text-white flex items-center gap-1.5">
+                  <Landmark className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>Support Platform</span>
+                </span>
+                <span className="text-[9px] font-extrabold text-emerald-400 bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                  Meezan Bank
+                </span>
+              </div>
+              
+              <div className="flex items-center gap-3 w-full">
+                <div className="w-16 h-16 bg-white p-1 rounded-xl shrink-0 overflow-hidden shadow-sm group-hover:scale-105 transition-transform">
+                  <img
+                    src="/images/qr-meezan.jpg"
+                    alt="Meezan Bank QR Barcode"
+                    className="w-full h-full object-contain"
+                  />
+                </div>
+                <div className="min-w-0 flex-1 text-[11px]">
+                  <p className="font-mono text-emerald-300 font-bold text-xs select-all truncate">
+                    96010105435308
+                  </p>
+                  <p className="text-[10px] text-slate-300 font-medium">Abdul Khaliq</p>
+                  <p className="text-[9px] text-slate-500">Scan via Any Banking App</p>
+                </div>
+              </div>
+            </div>
           </div>
 
         </div>
@@ -485,20 +523,8 @@ const Footer = () => {
               Child Protection
             </Link>
             <Link href="/disclaimer" className="hover:text-slate-200 transition-colors">
-              Legal Disclaimer
+              Academic Disclaimer
             </Link>
-            <button
-              type="button"
-              onClick={() => {
-                if (typeof window !== 'undefined') {
-                  window.dispatchEvent(new CustomEvent('open-support-platform'));
-                }
-              }}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600/30 to-teal-600/30 hover:from-emerald-600/50 hover:to-teal-600/50 active:scale-95 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition-all shadow-xs cursor-pointer"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Support Platform</span>
-            </button>
           </div>
 
           <div className="flex items-center gap-2 text-xs text-slate-300 bg-slate-900/80 px-4 py-2.5 rounded-2xl border border-slate-800/80 shadow-xs text-center">

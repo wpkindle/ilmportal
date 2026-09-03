@@ -26,8 +26,8 @@ import {
 const Footer = () => {
   const pathname = usePathname();
 
-  // Hide footer completely on live video classroom pages for full immersion
-  if (pathname?.startsWith('/classroom')) {
+  // Hide footer completely on live video classroom and messages/chat pages for full-height chat app view
+  if (pathname?.startsWith('/classroom') || pathname?.includes('/messages')) {
     return null;
   }
 

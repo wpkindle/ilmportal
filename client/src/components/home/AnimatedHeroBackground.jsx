@@ -20,10 +20,15 @@ export default function AnimatedHeroBackground() {
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
       
-      {/* 1. Dynamic Moving Aurora Gradient Layer */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-emerald-950/90 to-teal-950/80 animate-aurora opacity-90" />
+      {/* 1. Dynamic Moving Aurora Multi-Gradient Layer */}
+      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-emerald-950/95 to-teal-950/90 animate-aurora opacity-95" />
 
-      {/* 2. Embedded HD Educational Looping Video */}
+      {/* 2. Deep 3D Radial Glow Beams */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.28),transparent_65%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_35%,rgba(20,184,166,0.22),transparent_50%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_65%,rgba(6,182,212,0.18),transparent_55%)]" />
+
+      {/* 3. Embedded HD Educational Looping Video */}
       <video
         autoPlay
         loop
@@ -31,9 +36,9 @@ export default function AnimatedHeroBackground() {
         playsInline
         onLoadedData={() => setVideoLoaded(true)}
         className={`absolute inset-0 w-full h-full object-cover mix-blend-screen transition-opacity duration-1000 ${
-          videoLoaded ? 'opacity-40' : 'opacity-25'
+          videoLoaded ? 'opacity-35' : 'opacity-20'
         }`}
-        style={{ filter: 'brightness(0.85) contrast(1.2) saturate(1.3)' }}
+        style={{ filter: 'brightness(0.85) contrast(1.25) saturate(1.35)' }}
       >
         <source
           src="https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-student-taking-notes-on-a-notebook-42880-large.mp4"
@@ -45,58 +50,62 @@ export default function AnimatedHeroBackground() {
         />
       </video>
 
-      {/* 3. Glowing Radiant Light Spheres (Ambient Aurora Orbs) */}
-      <div className="absolute -top-20 -left-20 w-[500px] h-[500px] bg-emerald-500/30 rounded-full blur-[100px] animate-pulse-glow" />
-      <div className="absolute top-1/3 -right-20 w-[550px] h-[550px] bg-teal-500/25 rounded-full blur-[120px] animate-float-reverse" />
-      <div className="absolute -bottom-20 left-1/3 w-[600px] h-[400px] bg-emerald-400/20 rounded-full blur-[110px] animate-float-slow" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[350px] bg-emerald-600/15 blur-[130px] rounded-full pointer-events-none" />
+      {/* 4. Glowing Radiant 3D Light Spheres (Ambient Aurora Orbs with Pulsing Glow) */}
+      <div className="absolute -top-24 -left-24 w-[550px] h-[550px] bg-emerald-500/25 rounded-full blur-[110px] animate-pulse-glow" />
+      <div className="absolute top-1/4 -right-24 w-[600px] h-[600px] bg-teal-400/20 rounded-full blur-[130px] animate-float-reverse" />
+      <div className="absolute -bottom-24 left-1/4 w-[650px] h-[450px] bg-emerald-400/20 rounded-full blur-[120px] animate-float-slow" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[400px] bg-gradient-to-r from-emerald-600/15 via-teal-500/15 to-cyan-500/15 blur-[140px] rounded-full pointer-events-none" />
 
-      {/* 4. Geometric Sacred & Academic Geometry Ring (Rotating slowly) */}
-      <div className="absolute -top-32 right-10 w-[600px] h-[600px] border border-emerald-500/15 rounded-full animate-spin-slow pointer-events-none flex items-center justify-center">
-        <div className="w-[450px] h-[450px] border border-teal-400/20 rounded-full border-dashed" />
-        <div className="w-[300px] h-[300px] border border-emerald-300/15 rounded-full" />
+      {/* 5. 3D Sacred Geometry Rings (Rotating Concentric Circles with Dashes) */}
+      <div className="absolute -top-36 right-4 sm:right-16 w-[620px] h-[620px] border border-emerald-500/20 rounded-full animate-spin-slow pointer-events-none flex items-center justify-center">
+        <div className="w-[480px] h-[480px] border border-teal-400/25 rounded-full border-dashed" />
+        <div className="w-[340px] h-[340px] border border-emerald-300/20 rounded-full" />
+        <div className="w-[200px] h-[200px] border border-emerald-400/15 rounded-full border-dotted" />
       </div>
 
-      <div className="absolute -bottom-40 -left-20 w-[500px] h-[500px] border border-emerald-500/15 rounded-full animate-spin-slow pointer-events-none flex items-center justify-center">
-        <div className="w-[350px] h-[350px] border border-emerald-400/20 rounded-full border-dashed" />
+      <div className="absolute -bottom-48 -left-28 w-[580px] h-[580px] border border-emerald-500/20 rounded-full animate-spin-reverse pointer-events-none flex items-center justify-center">
+        <div className="w-[420px] h-[420px] border border-teal-300/20 rounded-full border-dashed" />
+        <div className="w-[260px] h-[260px] border border-emerald-400/15 rounded-full" />
       </div>
 
-      {/* 5. Floating 3D Educational Glass Icons in Space */}
-      {/* Icon 1: Quran / Holy Scripture Book */}
-      <div className="absolute top-16 left-[8%] animate-float-slow hidden md:flex items-center justify-center p-3.5 rounded-2xl bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 shadow-xl shadow-emerald-950/80 backdrop-blur-md">
-        <BookOpen className="w-6 h-6 text-emerald-400" />
+      {/* 6. Floating 3D Educational Glass Pills with Glowing Holographic Borders */}
+      {/* Pill 1: Quran / Holy Scripture */}
+      <div className="absolute top-20 left-[6%] animate-float-slow hidden lg:flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-slate-900/70 border border-emerald-500/40 text-emerald-300 shadow-[0_8px_32px_rgba(16,185,129,0.3)] backdrop-blur-xl transform-gpu hover:scale-105 transition-transform">
+        <div className="p-1.5 bg-emerald-500/20 text-emerald-400 rounded-xl">
+          <BookOpen className="w-4 h-4" />
+        </div>
+        <span className="text-xs font-bold text-white">Quran &amp; Tajweed</span>
       </div>
 
-      {/* Icon 2: Graduation Cap / Academic Excellence */}
-      <div className="absolute top-24 right-[10%] animate-float-reverse hidden md:flex items-center justify-center p-3.5 rounded-2xl bg-teal-950/60 border border-teal-500/30 text-teal-300 shadow-xl shadow-teal-950/80 backdrop-blur-md">
-        <GraduationCap className="w-6 h-6 text-teal-300" />
+      {/* Pill 2: Cambridge & Matric Academic Excellence */}
+      <div className="absolute top-24 right-[7%] animate-float-reverse hidden lg:flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-slate-900/70 border border-teal-500/40 text-teal-300 shadow-[0_8px_32px_rgba(20,184,166,0.3)] backdrop-blur-xl transform-gpu hover:scale-105 transition-transform">
+        <div className="p-1.5 bg-teal-500/20 text-teal-400 rounded-xl">
+          <GraduationCap className="w-4 h-4" />
+        </div>
+        <span className="text-xs font-bold text-white">Cambridge &amp; Matric</span>
       </div>
 
-      {/* Icon 3: WebRTC Video Classroom */}
-      <div className="absolute bottom-28 left-[12%] animate-float-reverse hidden lg:flex items-center justify-center p-3 rounded-2xl bg-blue-950/50 border border-blue-500/30 text-blue-300 shadow-xl backdrop-blur-md">
-        <Video className="w-5 h-5 text-blue-400" />
+      {/* Pill 3: In-Platform HD Video */}
+      <div className="absolute bottom-32 left-[8%] animate-float-reverse hidden xl:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-slate-900/70 border border-blue-500/40 text-blue-300 shadow-[0_8px_32px_rgba(59,130,246,0.25)] backdrop-blur-xl transform-gpu">
+        <div className="p-1.5 bg-blue-500/20 text-blue-400 rounded-xl">
+          <Video className="w-3.5 h-3.5" />
+        </div>
+        <span className="text-[11px] font-bold text-slate-200">1:1 HD Live Class</span>
       </div>
 
-      {/* Icon 4: Sanad Trust Verification Badge */}
-      <div className="absolute bottom-24 right-[12%] animate-float-slow hidden lg:flex items-center justify-center p-3 rounded-2xl bg-emerald-950/50 border border-emerald-500/30 text-emerald-300 shadow-xl backdrop-blur-md">
-        <ShieldCheck className="w-5 h-5 text-emerald-400" />
+      {/* Pill 4: Sanad Verified Tutor */}
+      <div className="absolute bottom-28 right-[9%] animate-float-slow hidden xl:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-slate-900/70 border border-emerald-500/40 text-emerald-300 shadow-[0_8px_32px_rgba(16,185,129,0.3)] backdrop-blur-xl transform-gpu">
+        <div className="p-1.5 bg-emerald-500/20 text-emerald-400 rounded-xl">
+          <ShieldCheck className="w-3.5 h-3.5" />
+        </div>
+        <span className="text-[11px] font-bold text-slate-200">Sanad Verified Tutors</span>
       </div>
 
-      {/* Icon 5: Arabic & Tajweed Linguistics */}
-      <div className="absolute top-1/2 left-[3%] animate-float-slow hidden xl:flex items-center justify-center p-3 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-amber-300 shadow-xl backdrop-blur-md">
-        <Sparkles className="w-5 h-5 text-amber-400" />
-      </div>
+      {/* 7. Subtle 3D Depth Matrix Grid */}
+      <div className="absolute inset-0 bg-[radial-gradient(#10b981_1.25px,transparent_1.25px)] [background-size:32px_32px] opacity-25" />
 
-      {/* Icon 6: Science / STEM Academic Symbol */}
-      <div className="absolute top-1/2 right-[4%] animate-float-reverse hidden xl:flex items-center justify-center p-3 rounded-2xl bg-purple-950/40 border border-purple-500/30 text-purple-300 shadow-xl backdrop-blur-md">
-        <Atom className="w-5 h-5 text-purple-400" />
-      </div>
-
-      {/* 6. Subtle High-Tech Hex / Dot Grid */}
-      <div className="absolute inset-0 bg-[radial-gradient(#10b981_1.2px,transparent_1.2px)] [background-size:32px_32px] opacity-20" />
-
-      {/* 7. Soft Vignette Edge Blending */}
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/60" />
+      {/* 8. Soft Vignette Edge Blending */}
+      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/70" />
     </div>
   );
 }

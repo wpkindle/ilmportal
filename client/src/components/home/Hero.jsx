@@ -269,37 +269,41 @@ const Hero = () => {
           </Link>
         </div>
 
-        {/* 4 Feature Highlights Grid */}
+        {/* 4 Feature Highlights Grid with 3D Depth & Hover Elevation */}
         <div className="mt-14 grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 max-w-5xl mx-auto">
-          <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/10 backdrop-blur-xl space-y-1 text-center hover:border-emerald-500/40 transition-all">
-            <div className="p-2 bg-emerald-500/20 text-emerald-300 w-fit mx-auto rounded-xl mb-2 shadow-inner">
+          <div className="group relative p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-slate-900/80 to-slate-950/80 border border-white/10 hover:border-emerald-500/50 backdrop-blur-xl space-y-1.5 text-center shadow-lg hover:shadow-2xl hover:shadow-emerald-500/20 transform-gpu hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="p-2.5 bg-emerald-500/20 group-hover:bg-emerald-500/30 text-emerald-300 w-fit mx-auto rounded-xl mb-2 shadow-inner group-hover:scale-110 transition-transform">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-xs sm:text-sm text-white">Sanad Verified Tutors</h3>
-            <p className="text-[11px] text-slate-400 leading-tight">Authentic Dars-e-Nizami & degree certificates verified by admin</p>
+            <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-emerald-300 transition-colors">Sanad Verified Tutors</h3>
+            <p className="text-[11px] text-slate-400 leading-tight">Authentic Dars-e-Nizami &amp; degree certificates verified by admin</p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/10 backdrop-blur-xl space-y-1 text-center hover:border-blue-500/40 transition-all">
-            <div className="p-2 bg-blue-500/20 text-blue-300 w-fit mx-auto rounded-xl mb-2 shadow-inner">
+          <div className="group relative p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-slate-900/80 to-slate-950/80 border border-white/10 hover:border-blue-500/50 backdrop-blur-xl space-y-1.5 text-center shadow-lg hover:shadow-2xl hover:shadow-blue-500/20 transform-gpu hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-blue-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="p-2.5 bg-blue-500/20 group-hover:bg-blue-500/30 text-blue-300 w-fit mx-auto rounded-xl mb-2 shadow-inner group-hover:scale-110 transition-transform">
               <Video className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-xs sm:text-sm text-white">In-Platform Video</h3>
-            <p className="text-[11px] text-slate-400 leading-tight">100% on-platform WebRTC HD video, screen sharing & digital Quran viewer</p>
+            <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-blue-300 transition-colors">In-Platform Video</h3>
+            <p className="text-[11px] text-slate-400 leading-tight">100% on-platform WebRTC HD video, screen sharing &amp; digital Quran viewer</p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/10 backdrop-blur-xl space-y-1 text-center hover:border-amber-500/40 transition-all">
-            <div className="p-2 bg-amber-500/20 text-amber-300 w-fit mx-auto rounded-xl mb-2 shadow-inner">
+          <div className="group relative p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-slate-900/80 to-slate-950/80 border border-white/10 hover:border-amber-500/50 backdrop-blur-xl space-y-1.5 text-center shadow-lg hover:shadow-2xl hover:shadow-amber-500/20 transform-gpu hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="p-2.5 bg-amber-500/20 group-hover:bg-amber-500/30 text-amber-300 w-fit mx-auto rounded-xl mb-2 shadow-inner group-hover:scale-110 transition-transform">
               <Sparkles className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-xs sm:text-sm text-white">Flexible Rates</h3>
+            <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-amber-300 transition-colors">Flexible Rates</h3>
             <p className="text-[11px] text-slate-400 leading-tight">Directly coordinate custom schedules and agreed rates in 1:1 chat</p>
           </div>
 
-          <div className="p-4 rounded-2xl bg-slate-900/60 border border-white/10 backdrop-blur-xl space-y-1 text-center hover:border-purple-500/40 transition-all">
-            <div className="p-2 bg-purple-500/20 text-purple-300 w-fit mx-auto rounded-xl mb-2 shadow-inner">
+          <div className="group relative p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-slate-900/80 to-slate-950/80 border border-white/10 hover:border-purple-500/50 backdrop-blur-xl space-y-1.5 text-center shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transform-gpu hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 overflow-hidden">
+            <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-purple-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="p-2.5 bg-purple-500/20 group-hover:bg-purple-500/30 text-purple-300 w-fit mx-auto rounded-xl mb-2 shadow-inner group-hover:scale-110 transition-transform">
               <MapPin className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-xs sm:text-sm text-white">All Pakistan</h3>
+            <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-purple-300 transition-colors">All Pakistan</h3>
             <p className="text-[11px] text-slate-400 leading-tight">Online classes and verified in-person home tutoring across all provinces</p>
           </div>
         </div>

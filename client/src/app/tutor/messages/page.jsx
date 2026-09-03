@@ -138,27 +138,14 @@ function TutorMessagesContent() {
   if (loading) return <LoadingSpinner text="Loading messages..." />;
 
   return (
-    <div className="bg-slate-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-2 sm:py-3">
+    <div className="bg-slate-50 min-h-[calc(100dvh-64px)] -mb-16 md:mb-0 pb-14 md:pb-0 flex flex-col">
+      <div className="max-w-7xl mx-auto px-1.5 sm:px-4 lg:px-8 py-1.5 sm:py-3 flex-1 flex flex-col w-full">
 
-        {/* Mobile back button — visible only in chat view on small screens */}
-        {mobileView === 'chat' && activeConversation && (
-          <div className="lg:hidden flex items-center gap-3 mb-2 px-1">
-            <button
-              onClick={() => setMobileView('list')}
-              className="flex items-center gap-2 text-sm font-semibold text-emerald-700 bg-white border border-emerald-200 rounded-xl px-3 py-2 shadow-sm active:scale-95 transition-transform"
-            >
-              <ArrowLeft className="w-4 h-4" />
-              <span>All Student Messages</span>
-            </button>
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6 flex-1">
 
           {/* Left Sidebar — full screen on mobile when mobileView=list, hidden when mobileView=chat */}
           <div
-            className={`lg:col-span-4 bg-white rounded-3xl p-4 border border-slate-200 shadow-sm flex flex-col h-[calc(100dvh-140px)] lg:h-[84vh] min-h-[460px] lg:min-h-[560px]
+            className={`lg:col-span-4 bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 border border-slate-200 shadow-sm flex flex-col h-[calc(100dvh-132px)] lg:h-[84vh]
               ${mobileView === 'chat' ? 'hidden lg:flex' : 'flex'}
             `}
           >
@@ -252,6 +239,7 @@ function TutorMessagesContent() {
                 conversationId={activeConversation.conversationId}
                 partner={activeConversation.partner}
                 initialDeal={activeConversation.deal}
+                onBack={() => setMobileView('list')}
               />
             ) : (
               <div

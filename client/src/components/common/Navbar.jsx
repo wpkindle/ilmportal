@@ -585,22 +585,39 @@ const Navbar = () => {
                 <div className="relative" ref={userMenuRef}>
                   <button
                     onClick={() => setUserMenuOpen(!userMenuOpen)}
-                    className="flex items-center gap-2 p-1.5 pr-2.5 rounded-2xl border border-slate-200 hover:border-emerald-300 hover:bg-slate-50 transition-all shadow-2xs"
+                    className="p-0 border-0 bg-transparent cursor-pointer focus:outline-none flex items-center"
+                    aria-label="User account menu"
                   >
-                    <img
-                      src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=059669&color=fff`}
-                      alt={user?.name}
-                      className="w-8 h-8 rounded-xl object-cover border border-slate-100"
-                    />
-                    <div className="text-left hidden sm:block">
-                      <p className="text-xs font-bold text-slate-800 leading-tight max-w-[100px] truncate">
-                        {user?.name?.split(' ')[0]}
-                      </p>
-                      <span className="text-[9px] uppercase font-bold tracking-wider text-emerald-700">
-                        {user?.role}
-                      </span>
+                    {/* Mobile: Edge-to-edge avatar box with ZERO inner padding */}
+                    <div className="sm:hidden w-9 h-9 rounded-2xl overflow-hidden ring-2 ring-emerald-500/30 hover:ring-emerald-500 active:scale-95 transition-all shadow-xs relative shrink-0">
+                      <img
+                        src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=059669&color=fff`}
+                        alt={user?.name}
+                        className="w-full h-full object-cover"
+                      />
+                      <span className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 border-2 border-white rounded-full" />
                     </div>
-                    <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${userMenuOpen ? 'rotate-180' : ''}`} />
+
+                    {/* Desktop: Decent, elegant, modern profile box */}
+                    <div className="hidden sm:flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-2xl bg-white border border-slate-200/90 hover:border-emerald-400 hover:shadow-md transition-all shadow-2xs group">
+                      <div className="w-8 h-8 rounded-xl overflow-hidden ring-1 ring-emerald-500/25 group-hover:ring-emerald-500/50 transition-all shrink-0 relative">
+                        <img
+                          src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=059669&color=fff`}
+                          alt={user?.name}
+                          className="w-full h-full object-cover"
+                        />
+                        <span className="absolute bottom-0 right-0 w-2 h-2 bg-emerald-500 border border-white rounded-full" />
+                      </div>
+                      <div className="text-left">
+                        <p className="text-xs font-bold text-slate-800 leading-tight max-w-[110px] truncate group-hover:text-emerald-700 transition-colors">
+                          {user?.name?.split(' ')[0]}
+                        </p>
+                        <span className="inline-block text-[9px] uppercase font-black tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200/60 mt-0.5">
+                          {user?.role}
+                        </span>
+                      </div>
+                      <ChevronDown className={`w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`} />
+                    </div>
                   </button>
 
                   {/* Dropdown Menu */}

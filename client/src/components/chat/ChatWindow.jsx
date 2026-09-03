@@ -38,7 +38,7 @@ import VoiceMessagePlayer from './VoiceMessagePlayer';
 import ReportModal from './ReportModal';
 import LoadingSpinner from '../common/LoadingSpinner';
 
-const ChatWindow = ({ conversationId, partner, initialDeal }) => {
+const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
   const { user, isTutor, isStudent } = useAuth();
   const { socket, onlineUsers, onlineStatusMap, refreshUserOnlineStatus } = useSocket();
   const { soundEnabled, toggleSound, permissionStatus, requestPermission } = useNotifications();
@@ -450,16 +450,26 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-155px)] sm:h-[84vh] min-h-[460px] sm:min-h-[560px] bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
+    <div className="flex flex-col h-[calc(100dvh-132px)] lg:h-[84vh] bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
       
       {/* Top Chat Header (Responsive, Fiverr/Upwork Style Online/Offline Badge) */}
-      <div className="p-3 sm:p-4 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between gap-2 sm:gap-3">
-        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+      <div className="p-2.5 sm:p-4 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between gap-2 sm:gap-3 shrink-0">
+        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="lg:hidden p-1.5 -ml-1 text-slate-600 hover:text-emerald-700 hover:bg-slate-200/70 rounded-xl transition-colors cursor-pointer shrink-0"
+              title="Back to conversations"
+            >
+              <ArrowLeft className="w-5 h-5" />
+            </button>
+          )}
           <div className="relative shrink-0">
             <img
               src={partner?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(partner?.name || 'User')}&background=059669&color=fff`}
               alt={partner?.name}
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl object-cover border-2 border-white shadow-sm"
+              className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl object-cover border-2 border-white shadow-sm"
             />
             {isPartnerOnline ? (
               <span

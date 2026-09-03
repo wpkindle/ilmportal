@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { api } from '../../services/api';
 import {
   Sparkles,
@@ -80,6 +80,83 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+
+  const dateInputRef = useRef(null);
+  const timeInputRef = useRef(null);
+
+  // Quick Date Helpers
+  const getTodayStr = () => new Date().toISOString().split('T')[0];
+  const getTomorrowStr = () => {
+    const d = new Date();
+    d.setDate(d.getDate() + 1);
+    return d.toISOString().split('T')[0];
+  };
+  const getNextMondayStr = () => {
+    const d = new Date();
+    const day = d.getDay();
+    const diff = (1 + 7 - day) % 7 || 7;
+    d.setDate(d.getDate() + diff);
+    return d.toISOString().split('T')[0];
+  };
+
+  const getRelativeDateLabel = (dateStr) => {
+    if (!dateStr) return '';
+    const today = getTodayStr();
+    const tomorrow = getTomorrowStr();
+    if (dateStr === today) return 'Today';
+    if (dateStr === tomorrow) return 'Tomorrow';
+    try {
+      const d = new Date(dateStr + 'T00:00:00');
+      return d.toLocaleDateString('en-GB', { weekday: 'short' });
+    } catch {
+      return '';
+    }
+  };
+
+  const getTimePeriod = (time24) => {
+    if (!time24) return 'Evening';
+    const [h] = time24.split(':').map(Number);
+    if (h < 12) return 'Morning';
+    if (h < 17) return 'Afternoon';
+    if (h < 21) return 'Evening';
+    return 'Night';
+  };
+
+  const popularTimes = [
+    { label: '4:00 PM', value: '16:00' },
+    { label: '5:00 PM', value: '17:00' },
+    { label: '6:00 PM', value: '18:00' },
+    { label: '7:00 PM', value: '19:00' },
+    { label: '8:00 PM', value: '20:00' },
+    { label: '9:00 PM', value: '21:00' }
+  ];
+
+  const durationOptions = [
+    { value: '30', label: '30 Min' },
+    { value: '45', label: '45 Min (Best)' },
+    { value: '60', label: '60 Min (1h)' },
+    { value: '90', label: '90 Min (1.5h)' }
+  ];
+
+  const openDatePicker = () => {
+    if (dateInputRef.current) {
+      try {
+        dateInputRef.current.showPicker();
+      } catch {
+        dateInputRef.current.focus();
+      }
+    }
+  };
+
+  const openTimePicker = () => {
+    if (timeInputRef.current) {
+      try {
+        timeInputRef.current.showPicker();
+      } catch {
+        timeInputRef.current.focus();
+      }
+    }
+  };
 
   // Format 24h time to 12h AM/PM
   const format12Hour = (time24) => {
@@ -302,52 +379,188 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
             </div>
 
             {/* Date & Time Row */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               
-              {/* Start Date */}
-              <div>
-                <label className="text-[11px] font-bold text-slate-600 block mb-1">
-                  First Class Date
-                </label>
-                <input
-                  type="date"
-                  required
-                  min={todayStr}
-                  value={startDate}
-                  onChange={(e) => setStartDate(e.target.value)}
-                  className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-emerald-500 cursor-pointer"
-                />
+              {/* Professional Start Date Card */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-bold text-slate-700">
+                    First Class Date *
+                  </label>
+                  <span className="text-[10px] text-emerald-600 font-semibold">Click box</span>
+                </div>
+                
+                {/* Entire Clickable Box */}
+                <div
+                  onClick={openDatePicker}
+                  className="relative p-2.5 sm:p-3 bg-white border border-slate-200 hover:border-emerald-500 rounded-2xl shadow-2xs hover:shadow-md transition-all cursor-pointer group flex items-center justify-between gap-2 overflow-hidden ring-1 ring-transparent hover:ring-emerald-400/40"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[9px] uppercase font-bold text-slate-400 group-hover:text-emerald-700 transition-colors tracking-wider">
+                      Selected Date
+                    </p>
+                    <div className="flex items-baseline gap-1.5 mt-0.5">
+                      <span className="text-xs sm:text-sm font-black text-slate-900 font-mono tracking-tight truncate">
+                        {formatReadableDate(startDate)}
+                      </span>
+                      {getRelativeDateLabel(startDate) && (
+                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-emerald-100 text-emerald-800 shrink-0">
+                          {getRelativeDateLabel(startDate)}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors shrink-0">
+                    <CalendarIcon className="w-4 h-4" />
+                  </div>
+
+                  {/* Native date input covering entire box with showPicker */}
+                  <input
+                    ref={dateInputRef}
+                    type="date"
+                    required
+                    min={todayStr}
+                    value={startDate}
+                    onChange={(e) => setStartDate(e.target.value)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      try { e.currentTarget.showPicker(); } catch {}
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    aria-label="First Class Date"
+                  />
+                </div>
+
+                {/* Quick Date Presets */}
+                <div className="flex items-center gap-1 flex-wrap pt-0.5">
+                  <button
+                    type="button"
+                    onClick={() => setStartDate(getTodayStr())}
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border transition-all cursor-pointer ${
+                      startDate === getTodayStr()
+                        ? 'bg-emerald-600 text-white border-emerald-600'
+                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    Today
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStartDate(getTomorrowStr())}
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border transition-all cursor-pointer ${
+                      startDate === getTomorrowStr()
+                        ? 'bg-emerald-600 text-white border-emerald-600'
+                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    Tomorrow
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setStartDate(getNextMondayStr())}
+                    className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border transition-all cursor-pointer ${
+                      startDate === getNextMondayStr()
+                        ? 'bg-emerald-600 text-white border-emerald-600'
+                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                    }`}
+                  >
+                    Next Mon
+                  </button>
+                </div>
               </div>
 
-              {/* Class Time */}
-              <div>
-                <label className="text-[11px] font-bold text-slate-600 block mb-1">
-                  Daily Class Time
-                </label>
-                <input
-                  type="time"
-                  required
-                  value={classTime}
-                  onChange={(e) => setClassTime(e.target.value)}
-                  className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-emerald-500 cursor-pointer"
-                />
+              {/* Professional Daily Class Time Card */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-bold text-slate-700">
+                    Class Time (PKT) *
+                  </label>
+                  <span className="text-[10px] text-emerald-600 font-semibold">Click box</span>
+                </div>
+
+                {/* Entire Clickable Box */}
+                <div
+                  onClick={openTimePicker}
+                  className="relative p-2.5 sm:p-3 bg-white border border-slate-200 hover:border-emerald-500 rounded-2xl shadow-2xs hover:shadow-md transition-all cursor-pointer group flex items-center justify-between gap-2 overflow-hidden ring-1 ring-transparent hover:ring-emerald-400/40"
+                >
+                  <div className="min-w-0 flex-1">
+                    <p className="text-[9px] uppercase font-bold text-slate-400 group-hover:text-emerald-700 transition-colors tracking-wider">
+                      Selected Time
+                    </p>
+                    <div className="flex items-baseline gap-1.5 mt-0.5">
+                      <span className="text-xs sm:text-sm font-black text-slate-900 font-mono tracking-tight">
+                        {format12Hour(classTime)}
+                      </span>
+                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-teal-100 text-teal-800 shrink-0">
+                        {getTimePeriod(classTime)}
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className="p-2 rounded-xl bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-colors shrink-0">
+                    <Clock className="w-4 h-4" />
+                  </div>
+
+                  {/* Native time input covering entire box with showPicker */}
+                  <input
+                    ref={timeInputRef}
+                    type="time"
+                    required
+                    value={classTime}
+                    onChange={(e) => setClassTime(e.target.value)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      try { e.currentTarget.showPicker(); } catch {}
+                    }}
+                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+                    aria-label="Daily Class Time"
+                  />
+                </div>
+
+                {/* Quick Popular Time Slots */}
+                <div className="flex items-center gap-1 flex-wrap pt-0.5">
+                  {popularTimes.map((slot) => (
+                    <button
+                      key={slot.value}
+                      type="button"
+                      onClick={() => setClassTime(slot.value)}
+                      className={`text-[10px] font-bold px-1.5 py-0.5 rounded-lg border transition-all cursor-pointer ${
+                        classTime === slot.value
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
+                          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                      }`}
+                    >
+                      {slot.label}
+                    </button>
+                  ))}
+                </div>
               </div>
 
-              {/* Session Duration */}
-              <div>
-                <label className="text-[11px] font-bold text-slate-600 block mb-1">
+              {/* Professional Class Duration Card */}
+              <div className="space-y-1.5">
+                <label className="text-[11px] font-bold text-slate-700 block">
                   Class Duration
                 </label>
-                <select
-                  value={durationMinutes}
-                  onChange={(e) => setDurationMinutes(e.target.value)}
-                  className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-emerald-500 cursor-pointer"
-                >
-                  <option value="30">30 Minutes</option>
-                  <option value="45">45 Minutes (Recommended)</option>
-                  <option value="60">60 Minutes (1 Hour)</option>
-                  <option value="90">90 Minutes (1.5 Hours)</option>
-                </select>
+                <div className="grid grid-cols-2 gap-1.5">
+                  {durationOptions.map((opt) => (
+                    <button
+                      key={opt.value}
+                      type="button"
+                      onClick={() => setDurationMinutes(opt.value)}
+                      className={`p-2 rounded-xl border text-center font-bold text-[11px] transition-all cursor-pointer flex flex-col items-center justify-center ${
+                        durationMinutes === opt.value
+                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-1 ring-emerald-400'
+                          : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                      }`}
+                    >
+                      <span>{opt.label}</span>
+                    </button>
+                  ))}
+                </div>
+                <p className="text-[10px] text-slate-500 text-center pt-0.5">
+                  {durationMinutes} mins per live lesson
+                </p>
               </div>
 
             </div>

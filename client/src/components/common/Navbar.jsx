@@ -21,7 +21,8 @@ import {
   CheckCircle2,
   Clock,
   ArrowRight,
-  CreditCard
+  CreditCard,
+  Headphones
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
@@ -587,6 +588,14 @@ const Navbar = () => {
                 className="block px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-slate-800 hover:bg-emerald-50 transition-colors"
               >
                 How It Works
+              </Link>
+              <Link
+                href="/contact-us"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-emerald-800 bg-emerald-50/70 hover:bg-emerald-100 transition-colors"
+              >
+                <Headphones className="w-4 h-4 text-emerald-600" />
+                <span>Need Help? Contact Support</span>
               </Link>
             </div>
 

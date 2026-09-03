@@ -16,7 +16,8 @@ import {
   ArrowRight,
   Globe,
   Lock,
-  Compass
+  Compass,
+  Headphones
 } from 'lucide-react';
 
 const Footer = () => {
@@ -28,7 +29,7 @@ const Footer = () => {
   }
 
   return (
-    <footer className="relative bg-slate-950 text-slate-300 pt-20 pb-12 overflow-hidden border-t border-slate-900 selection:bg-emerald-500 selection:text-white">
+    <footer className="relative bg-slate-950 text-slate-300 pt-20 pb-36 md:pb-16 overflow-hidden border-t border-slate-900 selection:bg-emerald-500 selection:text-white">
       
       {/* 🔮 Embedded CSS Animations for High-Performance GPU Acceleration */}
       <style jsx>{`
@@ -407,16 +408,25 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* 📜 Bottom Copyright & Founder Dedication */}
-        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <p>© {new Date().getFullYear()} IlmPortal Pakistan. All rights reserved.</p>
+        {/* 📜 Bottom Copyright, Support & Founder Dedication */}
+        <div className="pt-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <p>© {new Date().getFullYear()} IlmPortal Pakistan. All rights reserved.</p>
+            </div>
+            <Link
+              href="/contact-us"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 active:scale-95 text-emerald-400 border border-emerald-500/30 text-xs font-bold transition-all shadow-xs"
+            >
+              <Headphones className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Contact Support</span>
+            </Link>
           </div>
 
-          <div className="flex items-center gap-2 text-xs text-slate-400 bg-slate-900/60 px-4 py-2 rounded-xl border border-slate-800/60">
+          <div className="flex items-center gap-2 text-xs text-slate-300 bg-slate-900/80 px-4 py-2.5 rounded-2xl border border-slate-800/80 shadow-xs text-center">
             <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 shrink-0" />
-            <span className="text-slate-300 font-medium text-[11px]">
+            <span className="text-slate-300 font-medium text-[11px] sm:text-xs">
               An initiative by <strong className="text-white">Mr. &amp; Mrs. Abdul Khaliq</strong> from Lahore, Pakistan.
             </span>
           </div>

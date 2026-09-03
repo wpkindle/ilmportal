@@ -74,17 +74,18 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
   const mediaStreamRef = useRef(null);
 
   const messagesContainerRef = useRef(null);
+  const messagesEndRef = useRef(null);
 
   const partnerIdStr = partner?._id ? partner._id.toString() : '';
   const isPartnerOnline = partnerIdStr ? (onlineStatusMap?.[partnerIdStr] === true) : false;
 
-  // Scroll ONLY the inner chat messages container (never scrolls the outer page/window)
-  const scrollToBottom = (smooth = true) => {
+  // Scroll inner chat messages container directly to the latest message
+  const scrollToBottom = (smooth = false) => {
     if (messagesContainerRef.current) {
-      messagesContainerRef.current.scrollTo({
-        top: messagesContainerRef.current.scrollHeight,
-        behavior: smooth ? 'smooth' : 'auto'
-      });
+      messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
+    }
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: smooth ? 'smooth' : 'auto', block: 'end' });
     }
   };
 
@@ -256,9 +257,28 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
     };
   }, [socket, conversationId, user]);
 
+  // Auto-scroll directly to the latest message whenever conversation loads or changes
   useEffect(() => {
-    scrollToBottom(false);
-  }, [messages]);
+    if (!loading) {
+      scrollToBottom(false);
+      const t1 = setTimeout(() => scrollToBottom(false), 20);
+      const t2 = setTimeout(() => scrollToBottom(false), 120);
+      const t3 = setTimeout(() => scrollToBottom(false), 300);
+      return () => {
+        clearTimeout(t1);
+        clearTimeout(t2);
+        clearTimeout(t3);
+      };
+    }
+  }, [loading, conversationId]);
+
+  useEffect(() => {
+    if (!loading && messages.length > 0) {
+      scrollToBottom(false);
+      const t = setTimeout(() => scrollToBottom(false), 50);
+      return () => clearTimeout(t);
+    }
+  }, [messages.length, loading]);
 
   const handleSendMessage = async (e) => {
     e.preventDefault();
@@ -742,6 +762,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
             </div>
           );
         })}
+        <div ref={messagesEndRef} className="h-0 w-full" />
       </div>
 
       {/* Bottom Message Input Area */}

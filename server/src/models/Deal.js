@@ -54,6 +54,17 @@ const dealSchema = new mongoose.Schema({
   tutorFeeDueDate: {
     type: Date
   },
+  platformFee: {
+    type: Number,
+    default: null // Admin specifies custom platform fee per deal
+  },
+  platformFeeAssignedAt: {
+    type: Date
+  },
+  platformFeeNotes: {
+    type: String,
+    default: ''
+  },
   tutorFeePaid: {
     type: Boolean,
     default: false

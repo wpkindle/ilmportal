@@ -67,20 +67,24 @@ const TrialBanner = ({ deal, onPayClick }) => {
     );
   }
 
-  // 3. Restricted or Expired
+  // 3. Restricted or Expired (after 72h overdue)
   if (deal.accessRestricted || deal.status === 'restricted' || deal.status === 'trial_expired' || isExpired) {
+    const feeText = deal.platformFee !== null && deal.platformFee !== undefined
+      ? `PKR ${deal.platformFee.toLocaleString()}`
+      : 'Contact Admin';
+
     return (
       <div className="p-3.5 bg-rose-50 rounded-2xl border border-rose-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-rose-900">
         <div className="flex items-center gap-2">
           <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
           <div>
             <p className="font-bold text-rose-900">
-              {isTutor ? 'Platform Fee Clearance Overdue' : 'Classroom Access Paused'}
+              {isTutor ? '72-Hour Platform Fee Clearance Expired' : 'Classroom Access Paused'}
             </p>
             <p className="text-[11px] text-rose-700">
               {isTutor
-                ? `Classes are paused. Please clear the platform commission (PKR ${deal.price?.toLocaleString()}) to reactivate live classes.`
-                : 'Live classes are paused pending tutor platform clearance with administration. Admin Support: 0317 1759093.'}
+                ? `The 72-hour grace period expired without payment clearance. Please submit the platform fee (${feeText}) to reactivate live classes.`
+                : 'Live classes are paused pending tutor platform clearance with administration. Admin Helpline: 0317 1759093.'}
             </p>
           </div>
         </div>
@@ -98,8 +102,12 @@ const TrialBanner = ({ deal, onPayClick }) => {
     );
   }
 
-  // 4. Continuation Agreed - Platform fee due from Tutor
+  // 4. Continuation Agreed - Platform fee due within 72 hours (Classes remain 100% active!)
   if (deal.status === 'continuation_agreed') {
+    const feeText = deal.platformFee !== null && deal.platformFee !== undefined
+      ? `PKR ${deal.platformFee.toLocaleString()}`
+      : 'Admin Fee Pending';
+
     return (
       <div className="p-3.5 bg-amber-50 rounded-2xl border border-amber-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-amber-900 shadow-2xs">
         <div className="flex items-center gap-2.5">
@@ -107,13 +115,18 @@ const TrialBanner = ({ deal, onPayClick }) => {
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <p className="font-bold text-amber-900">
-              {isTutor ? 'Student Agreed to Continue - Platform Fee Due' : 'Course Continuation Confirmed'}
-            </p>
+            <div className="flex items-center gap-2">
+              <p className="font-bold text-amber-900">
+                {isTutor ? 'Student Agreed to Continue - Platform Fee Due' : 'Course Continuation Confirmed'}
+              </p>
+              <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-[9px] rounded-full uppercase tracking-wider">
+                Video Classroom Active
+              </span>
+            </div>
             <p className="text-[11px] text-amber-800 mt-0.5">
               {isTutor
-                ? `Student agreed to continue! Please submit the platform fee (PKR ${deal.price?.toLocaleString()}) within 3 days.`
-                : `You agreed to continue learning ${deal.subject} with your tutor. Live classes are active.`}
+                ? `Student agreed to continue! Classes are active with a 72-hour grace window. Please submit the platform fee (${feeText}) within 72 hours.`
+                : `You agreed to continue regular learning for ${deal.subject}. Live video classroom is active.`}
             </p>
           </div>
         </div>

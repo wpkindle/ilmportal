@@ -742,3 +742,68 @@ exports.adminRestrictTutorClasses = async (req, res) => {
     });
   }
 };
+
+// @desc    Admin sets or updates custom platform fee for a tutor's deal
+// @route   POST /api/deals/:id/set-platform-fee
+exports.setPlatformFee = async (req, res) => {
+  try {
+    const { platformFee, notes } = req.body;
+    if (platformFee === undefined || platformFee === null || isNaN(Number(platformFee))) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid platform fee amount in PKR.'
+      });
+    }
+
+    const deal = await Deal.findById(req.params.id)
+      .populate('tutor', 'name email')
+      .populate('student', 'name email');
+
+    if (!deal) {
+      return res.status(404).json({
+        success: false,
+        message: 'Deal not found'
+      });
+    }
+
+    deal.platformFee = Number(platformFee);
+    deal.platformFeeAssignedAt = new Date();
+    if (notes !== undefined) deal.platformFeeNotes = notes;
+    await deal.save();
+
+    const conversationId = [deal.student._id.toString(), deal.tutor._id.toString()].sort().join('_');
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`conv_${conversationId}`).emit('deal-status-updated', deal);
+      io.to(`user_${deal.tutor._id}`).emit('notification-alert', {
+        title: 'Platform Fee Invoiced by Admin',
+        message: `Admin has assigned the platform fee of PKR ${deal.platformFee.toLocaleString()} for course ${deal.subject}. Please submit payment proof within 3 days.`,
+        type: 'fee_assigned',
+        conversationId
+      });
+    }
+
+    // In-app notification to tutor
+    await Notification.create({
+      recipient: deal.tutor._id,
+      sender: req.user.id,
+      title: 'Platform Fee Assigned',
+      message: `Admin has assigned the platform fee of PKR ${deal.platformFee.toLocaleString()} for course ${deal.subject}. Please submit payment proof within 3 days.`,
+      type: 'payment_pending',
+      link: `/tutor/deals`
+    });
+
+    res.status(200).json({
+      success: true,
+      message: 'Platform fee assigned successfully',
+      deal
+    });
+  } catch (error) {
+    console.error('Error setting platform fee:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error setting platform fee'
+    });
+  }
+};
+

@@ -17,6 +17,11 @@ export default function DealsManagementPage() {
   const [restrictionType, setRestrictionType] = useState('warn');
   const [actionLoading, setActionLoading] = useState(false);
 
+  // Set Platform Fee modal
+  const [feeModalDeal, setFeeModalDeal] = useState(null);
+  const [inputPlatformFee, setInputPlatformFee] = useState('');
+  const [feeNotes, setFeeNotes] = useState('');
+
   const fetchDeals = async () => {
     setLoading(true);
     try {
@@ -26,6 +31,27 @@ export default function DealsManagementPage() {
       console.error(e);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleSavePlatformFee = async (e) => {
+    e.preventDefault();
+    if (!feeModalDeal || inputPlatformFee === '') return;
+
+    setActionLoading(true);
+    try {
+      const res = await api.adminSetPlatformFee(feeModalDeal._id, {
+        platformFee: Number(inputPlatformFee),
+        notes: feeNotes.trim()
+      });
+      if (res.success) {
+        setFeeModalDeal(null);
+        fetchDeals();
+      }
+    } catch (err) {
+      alert(err.message || 'Error updating platform fee');
+    } finally {
+      setActionLoading(false);
     }
   };
 
@@ -123,8 +149,9 @@ export default function DealsManagementPage() {
                 <thead className="bg-slate-50 text-slate-500 font-bold border-b border-slate-200">
                   <tr>
                     <th className="p-4">Student & Tutor</th>
-                    <th className="p-4">Subject & Fee</th>
-                    <th className="p-4">Deal Status</th>
+                    <th className="p-4">Tuition Price</th>
+                    <th className="p-4">Platform Fee (Admin)</th>
+                    <th className="p-4">Deal Status & 72h</th>
                     <th className="p-4">Payment Proof (TID)</th>
                     <th className="p-4 text-right">Actions</th>
                   </tr>
@@ -132,7 +159,7 @@ export default function DealsManagementPage() {
                 <tbody className="divide-y divide-slate-100">
                   {deals.length === 0 ? (
                     <tr>
-                      <td colSpan={5} className="p-8 text-center text-slate-400">
+                      <td colSpan={6} className="p-8 text-center text-slate-400">
                         No deals found matching filter.
                       </td>
                     </tr>
@@ -150,8 +177,43 @@ export default function DealsManagementPage() {
                         <td className="p-4">
                           <p className="font-bold text-slate-900">{deal.subject}</p>
                           <p className="text-emerald-700 font-mono font-bold">
-                            PKR {deal.price} / {deal.priceUnit === 'per_hour' ? 'hr' : 'mo'}
+                            PKR {deal.price?.toLocaleString()} / {deal.priceUnit === 'per_hour' ? 'hr' : 'mo'}
                           </p>
+                        </td>
+                        <td className="p-4">
+                          {deal.platformFee !== null && deal.platformFee !== undefined ? (
+                            <div>
+                              <span className="font-mono font-bold text-emerald-800 text-sm">
+                                PKR {deal.platformFee.toLocaleString()}
+                              </span>
+                              <button
+                                onClick={() => {
+                                  setFeeModalDeal(deal);
+                                  setInputPlatformFee(deal.platformFee);
+                                  setFeeNotes(deal.platformFeeNotes || '');
+                                }}
+                                className="block text-[10px] text-emerald-700 hover:underline font-bold mt-0.5 cursor-pointer"
+                              >
+                                Edit Fee
+                              </button>
+                            </div>
+                          ) : (
+                            <div>
+                              <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-200">
+                                Not Decided
+                              </span>
+                              <button
+                                onClick={() => {
+                                  setFeeModalDeal(deal);
+                                  setInputPlatformFee('');
+                                  setFeeNotes('');
+                                }}
+                                className="block text-[11px] text-emerald-700 hover:underline font-bold mt-1 cursor-pointer"
+                              >
+                                + Set Fee
+                              </button>
+                            </div>
+                          )}
                         </td>
                         <td className="p-4">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
@@ -168,13 +230,17 @@ export default function DealsManagementPage() {
 
                           {deal.tutorFeeDueDate && deal.status === 'continuation_agreed' && (
                             <div className="mt-1 text-[10px]">
-                              <span className="text-slate-600 font-medium">Tutor Fee Due: </span>
+                              <span className="text-slate-600 font-medium">Fee Deadline: </span>
                               <span className="font-bold text-slate-800">
                                 {new Date(deal.tutorFeeDueDate).toLocaleDateString()}
                               </span>
-                              {new Date(deal.tutorFeeDueDate) < new Date() && !deal.tutorFeePaid && (
+                              {new Date(deal.tutorFeeDueDate) < new Date() && !deal.tutorFeePaid ? (
                                 <span className="block text-red-600 font-extrabold animate-pulse">
-                                  OVERDUE (3 Days Expired)
+                                  OVERDUE (72h Expired)
+                                </span>
+                              ) : (
+                                <span className="block text-emerald-700 font-semibold">
+                                  Within 72h Grace (Live classes active)
                                 </span>
                               )}
                             </div>
@@ -200,20 +266,30 @@ export default function DealsManagementPage() {
                             <span className="text-slate-400 italic">No TID submitted</span>
                           )}
                         </td>
-                        <td className="p-4 text-right space-x-2">
+                        <td className="p-4 text-right space-x-1.5 whitespace-nowrap">
+                          <button
+                            onClick={() => {
+                              setFeeModalDeal(deal);
+                              setInputPlatformFee(deal.platformFee !== null && deal.platformFee !== undefined ? deal.platformFee : '');
+                              setFeeNotes(deal.platformFeeNotes || '');
+                            }}
+                            className="px-2.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold rounded-lg text-xs"
+                          >
+                            {deal.platformFee !== null && deal.platformFee !== undefined ? 'Edit Fee' : 'Set Fee'}
+                          </button>
                           {deal.status === 'continuation_agreed' && !deal.tutorFeePaid && (
                             <button
                               onClick={() => handleClearTutorFee(deal._id)}
                               className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-colors shadow-xs"
                             >
-                              Clear Tutor Fee
+                              Clear Fee
                             </button>
                           )}
                           <button
                             onClick={() => setSelectedDealForVerify(deal)}
                             className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg border border-emerald-200"
                           >
-                            Verify Payment
+                            Verify
                           </button>
                           <button
                             onClick={() => setRestrictDealId(deal._id)}
@@ -317,6 +393,87 @@ export default function DealsManagementPage() {
                   className="px-4 py-2 bg-red-600 text-white font-bold text-xs rounded-xl"
                 >
                   Apply Restriction
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Set Platform Fee Modal */}
+      {feeModalDeal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div>
+                <h3 className="font-black text-slate-900 text-base">
+                  Decide Tutor Platform Fee
+                </h3>
+                <p className="text-xs text-slate-500">
+                  Tutor: <strong>{feeModalDeal.tutor?.name}</strong> &bull; {feeModalDeal.subject}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFeeModalDeal(null)}
+                className="p-1.5 text-slate-400 hover:text-slate-600 rounded-lg cursor-pointer"
+              >
+                <XCircle className="w-5 h-5" />
+              </button>
+            </div>
+
+            <form onSubmit={handleSavePlatformFee} className="space-y-4">
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-1">
+                <p className="text-slate-600">
+                  Student Tuition Rate: <strong className="text-slate-900">PKR {feeModalDeal.price?.toLocaleString()}</strong>
+                </p>
+                <p className="text-[11px] text-slate-500">
+                  Specify the exact platform commission fee for this tutor deal. This amount will be charged to the tutor.
+                </p>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Platform Fee Amount (PKR) *
+                </label>
+                <input
+                  type="number"
+                  required
+                  min="0"
+                  placeholder="e.g. 1000 or 1500"
+                  value={inputPlatformFee}
+                  onChange={(e) => setInputPlatformFee(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono font-bold text-slate-900 outline-none focus:border-emerald-500 focus:bg-white"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Admin Notes / Commission Justification (Optional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Standard 25% first month platform commission"
+                  value={feeNotes}
+                  onChange={(e) => setFeeNotes(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div className="pt-2 flex justify-end gap-2">
+                <button
+                  type="button"
+                  onClick={() => setFeeModalDeal(null)}
+                  className="px-4 py-2 text-xs font-bold rounded-xl border border-slate-200 text-slate-600 hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={actionLoading || inputPlatformFee === ''}
+                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md disabled:opacity-50 cursor-pointer"
+                >
+                  {actionLoading ? 'Saving...' : 'Save Platform Fee'}
                 </button>
               </div>
             </form>

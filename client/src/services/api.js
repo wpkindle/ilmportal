@@ -521,6 +521,12 @@ export const api = {
     body: JSON.stringify(body)
   }).then(handleResponse),
 
+  adminSetPlatformFee: (id, body) => fetch(`${API_BASE}/deals/${id}/set-platform-fee`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
   respondToTrialContinuation: (id, body) => fetch(`${API_BASE}/deals/${id}/trial-decision`, {
     method: 'POST',
     headers: getHeaders(),

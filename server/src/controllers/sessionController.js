@@ -133,12 +133,28 @@ exports.getSessionByRoomId = async (req, res) => {
           ]
         }).sort({ createdAt: -1 });
 
-        // Enforce that video call requires an accepted deal
+        // 72-hour grace period check for platform fee clearance
+        if (deal && deal.status === 'continuation_agreed' && deal.tutorFeeDueDate) {
+          const now = new Date();
+          if (new Date(deal.tutorFeeDueDate) < now && !deal.tutorFeePaid) {
+            deal.accessRestricted = true;
+            deal.status = 'restricted';
+            deal.restrictionType = 'suspend_access';
+            await deal.save();
+          } else if (!deal.tutorFeePaid) {
+            // Still within 72-hour window: live video classroom remains 100% active and unlocked!
+            deal.accessRestricted = false;
+          }
+        }
+
+        // Enforce that video call requires an accepted deal and not restricted
         if (req.user?.role !== 'admin') {
-          if (!deal || !['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status)) {
+          if (!deal || !['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) || deal.accessRestricted || deal.status === 'restricted') {
             return res.status(403).json({
               success: false,
-              message: 'Live video classroom is only available after a tuition deal offer has been accepted.'
+              message: deal?.accessRestricted || deal?.status === 'restricted'
+                ? 'Classroom access is paused. The 72-hour tutor platform fee clearance period has expired without payment verification.'
+                : 'Live video classroom is only available after a tuition deal offer has been accepted.'
             });
           }
         }

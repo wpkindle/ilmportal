@@ -1,5 +1,7 @@
 const Message = require('../models/Message');
 const User = require('../models/User');
+const ChatRequest = require('../models/ChatRequest');
+const TutorProfile = require('../models/TutorProfile');
 
 const initSocket = (io) => {
   const onlineUsers = new Map(); // userId -> Set of socketIds
@@ -118,6 +120,30 @@ const initSocket = (io) => {
         // Ensure canonical conversationId format (sorted participants)
         if (!conversationId || conversationId.includes('undefined')) {
           conversationId = [senderIdStr, recipientIdStr].sort().join('_');
+        }
+
+        // Female tutor privacy safeguard
+        const recipientUser = await User.findById(recipientIdStr);
+        if (recipientUser && recipientUser.role === 'tutor') {
+          const recipientProfile = await TutorProfile.findOne({ user: recipientUser._id });
+          const isFemale = recipientUser.gender === 'female' || recipientProfile?.gender === 'female';
+          if (isFemale) {
+            const senderUser = await User.findById(senderIdStr);
+            if (senderUser && senderUser.role === 'student') {
+              const acceptedReq = await ChatRequest.findOne({
+                student: senderUser._id,
+                tutor: recipientUser._id,
+                status: 'accepted'
+              });
+              if (!acceptedReq) {
+                socket.emit('chat-error', {
+                  message: 'A message request must be accepted by the female tutor before sending messages.',
+                  code: 'REQUEST_REQUIRED'
+                });
+                return;
+              }
+            }
+          }
         }
 
         const isRecipientOnline = recipientIdStr && onlineUsers.has(recipientIdStr) && onlineUsers.get(recipientIdStr).size > 0;

@@ -1020,6 +1020,185 @@ const sendAccountStatusEmail = async ({ to, userName, status, reason, notes }) =
   });
 };
 
+/**
+ * Send notification email to female tutor when student requests to chat
+ */
+const sendChatRequestReceivedEmail = async ({
+  to,
+  tutorName,
+  studentName,
+  studentAge,
+  studentGender,
+  studentCity,
+  details,
+  tutorRequestsUrl
+}) => {
+  const subject = `📩 New Message Request from ${studentName} (100% Verified Profile) | IlmPortal`;
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"></head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px;">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td align="center">
+            <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0;">
+              <tr>
+                <td style="background: linear-gradient(135deg, #064e3b 0%, #065f46 100%); padding: 28px; text-align: center;">
+                  <span style="font-size: 11px; font-weight: 800; color: #6ee7b7; text-transform: uppercase; letter-spacing: 1.5px;">Female Tutor Safety & Privacy</span>
+                  <h1 style="color: #ffffff; margin: 6px 0 0 0; font-size: 22px; font-weight: 800;">New Student Message Request</h1>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 28px;">
+                  <p style="font-size: 15px; color: #1e293b; margin: 0 0 16px 0;">Assalam-o-Alaikum <strong>${tutorName}</strong>,</p>
+                  <p style="font-size: 14px; color: #475569; line-height: 1.6; margin: 0 0 20px 0;">
+                    A student with a <strong>100% complete verified profile</strong> has sent you a request to connect and discuss lessons. Because your profile is safeguarded with privacy protection, the student cannot chat directly until you accept.
+                  </p>
+
+                  <!-- Student Profile Card -->
+                  <div style="background-color: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 12px; padding: 18px; margin-bottom: 20px;">
+                    <div style="font-size: 11px; font-weight: bold; color: #047857; text-transform: uppercase; margin-bottom: 8px;">Verified Student Profile</div>
+                    <p style="margin: 0 0 6px 0; font-size: 16px; font-weight: bold; color: #0f172a;">${studentName} <span style="font-size: 11px; background-color: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 999px; font-weight: 700;">100% Profile Strength</span></p>
+                    <p style="margin: 0; font-size: 13px; color: #475569;">
+                      <strong>Age:</strong> ${studentAge ? `${studentAge} Years` : 'Not specified'} &bull;
+                      <strong>Gender:</strong> ${studentGender || 'Student'} &bull;
+                      <strong>City:</strong> ${studentCity || 'Pakistan'}
+                    </p>
+                  </div>
+
+                  <!-- Details note -->
+                  <div style="background-color: #f8fafc; border-left: 4px solid #059669; border-radius: 6px; padding: 14px 16px; margin-bottom: 24px;">
+                    <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: bold; color: #334155; text-transform: uppercase;">Student's Message &amp; Learning Goals:</p>
+                    <p style="margin: 0; font-size: 14px; color: #1e293b; line-height: 1.5; font-style: italic;">&ldquo;${details}&rdquo;</p>
+                  </div>
+
+                  <div style="text-align: center; margin: 24px 0;">
+                    <a href="${tutorRequestsUrl}" style="background-color: #059669; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 10px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 4px 6px rgba(5, 150, 105, 0.25);">
+                      Review &amp; Accept Request &rarr;
+                    </a>
+                  </div>
+
+                  <p style="font-size: 12px; color: #94a3b8; text-align: center; margin: 16px 0 0 0;">
+                    You can inspect the student's full profile, accept to start chatting, or decline if your schedule is full.
+                  </p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 16px 28px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
+                  <p style="margin: 0; font-size: 11px; color: #64748b;">IlmPortal &bull; Verified Quran &amp; Academic Tutoring in Pakistan</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to,
+    subject,
+    html,
+    text: `New message request from ${studentName} (${studentAge} yrs, ${studentCity}): "${details}". Review request: ${tutorRequestsUrl}`
+  });
+};
+
+/**
+ * Send status notification email to student when female tutor accepts or declines
+ */
+const sendChatRequestStatusEmail = async ({
+  to,
+  studentName,
+  tutorName,
+  status, // 'accepted' | 'declined'
+  responseMessage,
+  chatUrl,
+  findTutorsUrl
+}) => {
+  const isAccepted = status === 'accepted';
+  const subject = isAccepted
+    ? `🎉 ${tutorName} Accepted Your Message Request! | IlmPortal`
+    : `Update Regarding Your Request to ${tutorName} | IlmPortal`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8"></head>
+    <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 20px;">
+      <table width="100%" border="0" cellspacing="0" cellpadding="0">
+        <tr>
+          <td align="center">
+            <table width="600" border="0" cellspacing="0" cellpadding="0" style="background-color: #ffffff; border-radius: 16px; overflow: hidden; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: 1px solid #e2e8f0;">
+              <tr>
+                <td style="background: ${isAccepted ? 'linear-gradient(135deg, #064e3b 0%, #059669 100%)' : 'linear-gradient(135deg, #334155 0%, #475569 100%)'}; padding: 28px; text-align: center;">
+                  <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 800;">
+                    ${isAccepted ? 'Request Accepted! 🎓' : 'Message Request Update'}
+                  </h1>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 28px;">
+                  <p style="font-size: 15px; color: #1e293b; margin: 0 0 16px 0;">Assalam-o-Alaikum <strong>${studentName}</strong>,</p>
+
+                  ${isAccepted ? `
+                    <p style="font-size: 14px; color: #475569; line-height: 1.6; margin: 0 0 16px 0;">
+                      Great news! <strong>${tutorName}</strong> has reviewed your 100% verified profile and learning goals and has <strong>accepted your request to connect</strong>.
+                    </p>
+                    ${responseMessage ? `
+                      <div style="background-color: #f0fdf4; border-left: 4px solid #059669; padding: 14px 16px; border-radius: 6px; margin-bottom: 20px;">
+                        <p style="margin: 0; font-size: 13px; color: #065f46;"><strong>Note from ${tutorName}:</strong> &ldquo;${responseMessage}&rdquo;</p>
+                      </div>
+                    ` : ''}
+                    <div style="text-align: center; margin: 24px 0;">
+                      <a href="${chatUrl}" style="background-color: #059669; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 10px; font-weight: bold; font-size: 14px; display: inline-block; box-shadow: 0 4px 6px rgba(5, 150, 105, 0.25);">
+                        Open Chat with ${tutorName} &rarr;
+                      </a>
+                    </div>
+                  ` : `
+                    <p style="font-size: 14px; color: #475569; line-height: 1.6; margin: 0 0 16px 0;">
+                      Thank you for your interest in learning with <strong>${tutorName}</strong>. The tutor is currently at full capacity and unable to take on new students at this time.
+                    </p>
+                    ${responseMessage ? `
+                      <div style="background-color: #f8fafc; border-left: 4px solid #64748b; padding: 14px 16px; border-radius: 6px; margin-bottom: 20px;">
+                        <p style="margin: 0; font-size: 13px; color: #334155;"><strong>Note from ${tutorName}:</strong> &ldquo;${responseMessage}&rdquo;</p>
+                      </div>
+                    ` : ''}
+                    <p style="font-size: 14px; color: #475569; line-height: 1.6; margin: 0 0 20px 0;">
+                      Do not worry! We have many other highly qualified, verified Quran and Academic tutors available with immediate availability for free trials.
+                    </p>
+                    <div style="text-align: center; margin: 24px 0;">
+                      <a href="${findTutorsUrl}" style="background-color: #0f172a; color: #ffffff; text-decoration: none; padding: 12px 28px; border-radius: 10px; font-weight: bold; font-size: 14px; display: inline-block;">
+                        Browse Other Verified Tutors &rarr;
+                      </a>
+                    </div>
+                  `}
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 16px 28px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
+                  <p style="margin: 0; font-size: 11px; color: #64748b;">IlmPortal &bull; Pakistan's Premier Tutoring Platform</p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  return sendEmail({
+    to,
+    subject,
+    html,
+    text: isAccepted
+      ? `${tutorName} accepted your request to chat! Open chat: ${chatUrl}`
+      : `Update from ${tutorName}: Tutor is currently unable to accept new students. Browse tutors: ${findTutorsUrl}`
+  });
+};
+
 module.exports = {
   sendEmail,
   sendEmailDetailed,
@@ -1028,6 +1207,8 @@ module.exports = {
   sendCertificateIssuedEmail,
   sendDedicatedChatInvitationEmail,
   sendAccountWarningEmail,
-  sendAccountStatusEmail
+  sendAccountStatusEmail,
+  sendChatRequestReceivedEmail,
+  sendChatRequestStatusEmail
 };
 

@@ -38,6 +38,10 @@ import DealOfferModal from '../tutor/DealOfferModal';
 import VoiceMessagePlayer from './VoiceMessagePlayer';
 import ReportModal from './ReportModal';
 import LoadingSpinner from '../common/LoadingSpinner';
+import StudentProfileModal from '../common/StudentProfileModal';
+import FemaleTutorGateModal from '../common/FemaleTutorGateModal';
+import ChatRequestModal from '../common/ChatRequestModal';
+import { calculateClientCompletion } from '../common/ProfileCompletionMeter';
 
 const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
   const { user, isTutor, isStudent } = useAuth();
@@ -52,6 +56,38 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
   const [partnerDeal, setPartnerDeal] = useState(initialDeal || null);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+
+  // Student Profile & Female Tutor Gate State
+  const [studentProfileModalOpen, setStudentProfileModalOpen] = useState(false);
+  const [femaleTutorRequestStatus, setFemaleTutorRequestStatus] = useState(null);
+  const [gateModalOpen, setGateModalOpen] = useState(false);
+  const [requestModalOpen, setRequestModalOpen] = useState(false);
+
+  // Check request status if student is viewing a tutor's chat
+  useEffect(() => {
+    const partnerId = partner?._id || partner?.id;
+    if (user?.role === 'student' && partnerId && partner?.role === 'tutor') {
+      api.getChatRequestStatus(partnerId)
+        .then(res => {
+          if (res?.success) {
+            setFemaleTutorRequestStatus(res);
+          }
+        })
+        .catch(err => console.error('Error fetching chat request status in ChatWindow:', err));
+    }
+  }, [user?.role, partner]);
+
+  // Socket listener for real-time request approval/decline
+  useEffect(() => {
+    if (!socket) return;
+    const handleRequestUpdated = (data) => {
+      if (data.conversationId === conversationId || data.requestId) {
+        setFemaleTutorRequestStatus(prev => prev ? { ...prev, requestStatus: data.status } : prev);
+      }
+    };
+    socket.on('chat-request-updated', handleRequestUpdated);
+    return () => socket.off('chat-request-updated', handleRequestUpdated);
+  }, [socket, conversationId]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -529,6 +565,19 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
             <span className="hidden sm:inline">Join Live Class</span>
           </Link>
 
+          {/* Action: Inspect Student Profile (available to all tutors) */}
+          {(isTutor || partner?.role === 'student') && (
+            <button
+              type="button"
+              onClick={() => setStudentProfileModalOpen(true)}
+              className="p-2 sm:px-3 sm:py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+              title="Inspect Student's Verified Profile"
+            >
+              <User className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-400 shrink-0" />
+              <span className="hidden sm:inline">Student Profile</span>
+            </button>
+          )}
+
           {/* Tutor Action: Send Course Offer */}
           {isTutor && (
             <button
@@ -793,7 +842,53 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
 
       {/* Bottom Message Input Area */}
       <div className="p-2 sm:p-3 bg-white border-t border-slate-200/80 shrink-0">
-        {isRecording ? (
+        {user?.role === 'student' && femaleTutorRequestStatus?.isFemaleTutor && femaleTutorRequestStatus?.requestStatus !== 'accepted' ? (
+          /* Female Tutor Request Status Gate Banner */
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 border border-emerald-500/40 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+            <div className="flex items-start gap-2.5 min-w-0">
+              <Clock className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+              <div className="space-y-0.5 text-xs">
+                <p className="font-black text-emerald-300">
+                  {femaleTutorRequestStatus?.requestStatus === 'pending'
+                    ? 'Message Request Pending Approval'
+                    : femaleTutorRequestStatus?.requestStatus === 'declined'
+                    ? 'Tutor Currently Unavailable'
+                    : '100% Profile & Intro Request Required'}
+                </p>
+                <p className="text-slate-300 text-[11px] leading-relaxed">
+                  {femaleTutorRequestStatus?.requestStatus === 'pending'
+                    ? `${partner?.name || 'The tutor'} has received your request. Once accepted, live messaging will unlock immediately. You will also be notified by email and in your Notification Center.`
+                    : femaleTutorRequestStatus?.requestStatus === 'declined'
+                    ? `${partner?.name || 'The tutor'} is currently at full capacity and unable to take on new students.`
+                    : `To chat with female tutors, your profile must be 100% complete and verified before messaging.`}
+                </p>
+              </div>
+            </div>
+
+            {femaleTutorRequestStatus?.requestStatus === 'none' && (
+              <button
+                type="button"
+                onClick={() => {
+                  const { percentage } = calculateClientCompletion(user, null);
+                  if (percentage < 100) setGateModalOpen(true);
+                  else setRequestModalOpen(true);
+                }}
+                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md shrink-0 transition-colors cursor-pointer"
+              >
+                Send Message Request
+              </button>
+            )}
+
+            {femaleTutorRequestStatus?.requestStatus === 'declined' && (
+              <Link
+                href="/tutors"
+                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shrink-0 transition-colors"
+              >
+                Browse Other Tutors
+              </Link>
+            )}
+          </div>
+        ) : isRecording ? (
           /* Live Voice Recording UI */
           <div className="flex items-center justify-between p-2.5 bg-rose-50 border border-rose-200 rounded-2xl animate-pulse">
             <div className="flex items-center gap-3">
@@ -874,6 +969,34 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
         reportedUser={partner}
         conversationId={conversationId}
         messages={messages}
+      />
+
+      {/* Student Profile Inspection Modal for Tutors */}
+      <StudentProfileModal
+        isOpen={studentProfileModalOpen}
+        onClose={() => setStudentProfileModalOpen(false)}
+        studentId={partner?._id}
+        studentData={partner?.role === 'student' ? partner : null}
+      />
+
+      {/* Female Tutor Gate Modal (<100% profile strength) */}
+      <FemaleTutorGateModal
+        isOpen={gateModalOpen}
+        onClose={() => setGateModalOpen(false)}
+        user={user}
+        tutorName={partner?.name}
+        tutorAvatar={partner?.avatar}
+      />
+
+      {/* Female Tutor Message Request Modal (100% profile strength) */}
+      <ChatRequestModal
+        isOpen={requestModalOpen}
+        onClose={() => setRequestModalOpen(false)}
+        tutor={partner}
+        studentUser={user}
+        onSuccess={() => {
+          setFemaleTutorRequestStatus(prev => ({ ...prev, requestStatus: 'pending' }));
+        }}
       />
 
     </div>

@@ -372,6 +372,27 @@ export const api = {
     body: JSON.stringify(body)
   }).then(handleResponse),
 
+  // Female Tutor Chat Requests & Student Profile
+  sendChatRequest: (body) => fetch(`${API_BASE}/chat/request`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+  getChatRequestStatus: (tutorId) => fetch(`${API_BASE}/chat/request/status/${tutorId}`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+  getChatRequests: () => fetch(`${API_BASE}/chat/requests`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+  respondToChatRequest: (requestId, body) => fetch(`${API_BASE}/chat/request/${requestId}/respond`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+  getStudentProfileForTutor: (studentId) => fetch(`${API_BASE}/chat/student-profile/${studentId}`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
   // Reviews
   createReview: (body) => fetch(`${API_BASE}/reviews`, {
     method: 'POST',

@@ -31,6 +31,9 @@ const notificationSchema = new mongoose.Schema({
       'payment_verified',
       'payment_rejected',
       'new_message',
+      'chat_request',
+      'chat_request_accepted',
+      'chat_request_declined',
       'session_reminder',
       'safety_report',
       'admin_alert'

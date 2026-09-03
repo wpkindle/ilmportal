@@ -26,6 +26,9 @@ import {
 import RatingStars from '../../../components/common/RatingStars';
 import SanadBadge, { SanadModal } from '../../../components/common/SanadBadge';
 import StudentAuthModal from '../../../components/common/StudentAuthModal';
+import FemaleTutorGateModal from '../../../components/common/FemaleTutorGateModal';
+import ChatRequestModal from '../../../components/common/ChatRequestModal';
+import { calculateClientCompletion } from '../../../components/common/ProfileCompletionMeter';
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
 
@@ -62,14 +65,49 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
     fetchCourses();
   }, [tutorUser._id, tutorUser.id]);
 
-  const handleStartChat = () => {
+  const [femaleGateModalOpen, setFemaleGateModalOpen] = useState(false);
+  const [chatRequestModalOpen, setChatRequestModalOpen] = useState(false);
+
+  const isFemaleTutor = tutor?.gender === 'female' || tutorUser?.gender === 'female';
+  const tutorTargetId = tutorUser._id || tutorUser.id || tutor._id;
+  const myId = user?.id || user?._id;
+  const conversationId = [myId, tutorTargetId].sort().join('_');
+
+  const handleStartChat = async () => {
     if (!isAuthenticated) {
       setAuthModalOpen(true);
       return;
     }
-    const myId = user?.id || user?._id;
-    const tutorId = tutorUser._id || tutorUser.id || tutor._id;
-    const conversationId = [myId, tutorId].sort().join('_');
+
+    if (user?.role === 'student' && isFemaleTutor) {
+      const { percentage } = calculateClientCompletion(user, null);
+      if (percentage < 100) {
+        setFemaleGateModalOpen(true);
+        return;
+      }
+
+      // Check existing chat request status
+      try {
+        const res = await api.getChatRequestStatus(tutorTargetId);
+        if (res?.success) {
+          if (res.requestStatus === 'accepted') {
+            router.push(`/student/messages?conversation=${conversationId}&tutorId=${tutorTargetId}`);
+            return;
+          }
+          if (res.requestStatus === 'pending') {
+            router.push(`/student/messages?conversation=${conversationId}&tutorId=${tutorTargetId}`);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('Error checking chat request status:', err);
+      }
+
+      // Open request modal
+      setChatRequestModalOpen(true);
+      return;
+    }
+
     router.push(`/student/messages?conversation=${conversationId}&tutorId=${tutor._id}`);
   };
 
@@ -361,6 +399,28 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
         tutor={tutor}
+      />
+
+      {/* Female Tutor Gate Modal (<100% profile strength) */}
+      <FemaleTutorGateModal
+        isOpen={femaleGateModalOpen}
+        onClose={() => setFemaleGateModalOpen(false)}
+        user={user}
+        tutorName={tutorName}
+        tutorAvatar={tutorAvatar}
+      />
+
+      {/* Female Tutor Message Request Modal (100% profile strength) */}
+      <ChatRequestModal
+        isOpen={chatRequestModalOpen}
+        onClose={() => setChatRequestModalOpen(false)}
+        tutor={tutor}
+        studentUser={user}
+        onSuccess={() => {
+          setTimeout(() => {
+            router.push(`/student/messages?conversation=${conversationId}&tutorId=${tutorTargetId}`);
+          }, 1200);
+        }}
       />
 
     </div>

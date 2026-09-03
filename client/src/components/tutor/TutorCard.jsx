@@ -18,7 +18,11 @@ import {
 import RatingStars from '../common/RatingStars';
 import SanadBadge, { SanadModal } from '../common/SanadBadge';
 import StudentAuthModal from '../common/StudentAuthModal';
+import FemaleTutorGateModal from '../common/FemaleTutorGateModal';
+import ChatRequestModal from '../common/ChatRequestModal';
+import { calculateClientCompletion } from '../common/ProfileCompletionMeter';
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
 
 // ─────────────────────────────────────────────
 // Mode Badge
@@ -111,6 +115,8 @@ const TutorCard = ({ tutor, tutorProfile }) => {
   const router = useRouter();
   const [sanadModalOpen, setSanadModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [femaleGateModalOpen, setFemaleGateModalOpen] = useState(false);
+  const [chatRequestModalOpen, setChatRequestModalOpen] = useState(false);
 
   const data = tutor || tutorProfile || {};
   const tutorUser = data.user || {};
@@ -131,14 +137,46 @@ const TutorCard = ({ tutor, tutorProfile }) => {
   const hasOnline = modes.includes('online');
   const hasInPerson = modes.includes('in_person');
 
-  const handleStartChat = () => {
+  const isFemaleTutor = data.gender === 'female' || tutorUser.gender === 'female';
+  const tutorTargetId = tutorUser._id || tutorUser.id || data._id;
+  const myId = user?.id || user?._id;
+  const conversationId = [myId, tutorTargetId].sort().join('_');
+
+  const handleStartChat = async () => {
     if (!isAuthenticated) {
       setAuthModalOpen(true);
       return;
     }
-    const myId = user?.id || user?._id;
-    const tutorId = tutorUser._id || tutorUser.id || data._id;
-    const conversationId = [myId, tutorId].sort().join('_');
+
+    if (user?.role === 'student' && isFemaleTutor) {
+      const { percentage } = calculateClientCompletion(user, null);
+      if (percentage < 100) {
+        setFemaleGateModalOpen(true);
+        return;
+      }
+
+      // Check existing chat request status
+      try {
+        const res = await api.getChatRequestStatus(tutorTargetId);
+        if (res?.success) {
+          if (res.requestStatus === 'accepted') {
+            router.push(`/student/messages?conversation=${conversationId}&tutorId=${tutorTargetId}`);
+            return;
+          }
+          if (res.requestStatus === 'pending') {
+            router.push(`/student/messages?conversation=${conversationId}&tutorId=${tutorTargetId}`);
+            return;
+          }
+        }
+      } catch (err) {
+        console.error('Error checking chat request status:', err);
+      }
+
+      // Student has 100% profile strength but needs to submit request
+      setChatRequestModalOpen(true);
+      return;
+    }
+
     router.push(`/student/messages?conversation=${conversationId}&tutorId=${data._id}`);
   };
 
@@ -317,6 +355,28 @@ const TutorCard = ({ tutor, tutorProfile }) => {
         isOpen={authModalOpen}
         onClose={() => setAuthModalOpen(false)}
         tutor={data}
+      />
+
+      {/* Female Tutor Gate Modal (<100% profile strength) */}
+      <FemaleTutorGateModal
+        isOpen={femaleGateModalOpen}
+        onClose={() => setFemaleGateModalOpen(false)}
+        user={user}
+        tutorName={tutorName}
+        tutorAvatar={tutorAvatar}
+      />
+
+      {/* Female Tutor Message Request Modal (100% profile strength) */}
+      <ChatRequestModal
+        isOpen={chatRequestModalOpen}
+        onClose={() => setChatRequestModalOpen(false)}
+        tutor={data}
+        studentUser={user}
+        onSuccess={() => {
+          setTimeout(() => {
+            router.push(`/student/messages?conversation=${conversationId}&tutorId=${tutorTargetId}`);
+          }, 1200);
+        }}
       />
     </>
   );

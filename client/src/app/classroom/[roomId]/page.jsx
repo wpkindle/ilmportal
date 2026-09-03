@@ -21,9 +21,14 @@ export default function VideoClassroomPage() {
     const fetchSession = async () => {
       try {
         const res = await api.getSessionByRoomId(roomId);
-        if (res.success) {
+        if (res.success && res.session && res.session._id) {
           setSessionData(res.session);
           api.updateSessionStatus(res.session._id, { status: 'live' }).catch(() => {});
+        } else {
+          setSessionData({
+            title: 'Live Tutoring Classroom Session',
+            roomId
+          });
         }
       } catch (err) {
         console.error('Error joining classroom:', err);

@@ -27,6 +27,9 @@ export const metadata = {
     statusBarStyle: 'black-translucent',
     title: 'IlmPortal',
   },
+  other: {
+    'mobile-web-app-capable': 'yes',
+  },
   openGraph: {
     title: 'IlmPortal Pakistan - Online Quran & Academic Tutoring',
     description: 'Connect with verified Pakistani Quran Qaris and Cambridge/Matric educators for live in-platform video classrooms.',

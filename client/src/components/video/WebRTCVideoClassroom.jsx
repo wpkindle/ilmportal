@@ -26,7 +26,8 @@ import {
   ShieldAlert,
   Flag,
   Lock,
-  AlertTriangle
+  AlertTriangle,
+  RotateCcw
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';

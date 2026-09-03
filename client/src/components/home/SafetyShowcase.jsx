@@ -18,7 +18,7 @@ import {
 
 const safetyHighlights = [
   {
-    icon: Heart,
+    icon: ShieldCheck,
     title: 'Female Teachers for Girls & Kids',
     badge: '100% Privacy',
     accent: 'from-emerald-500/20 to-teal-500/10 text-emerald-400 border-emerald-500/30',

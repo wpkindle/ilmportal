@@ -24,7 +24,8 @@ import {
   VolumeX,
   Bell,
   MoreVertical,
-  Heart
+  Heart,
+  ArrowLeft
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';

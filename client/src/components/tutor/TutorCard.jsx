@@ -179,9 +179,9 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                   </span>
                   <span className="text-slate-300">·</span>
                   {data.gender === 'female' ? (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.2 rounded-full border border-rose-200">
-                      <Heart className="w-2.5 h-2.5 text-rose-500 fill-rose-400" />
-                      <span>Female Educator</span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
+                      <ShieldCheck className="w-3 h-3 text-teal-600" />
+                      <span>Female Teacher</span>
                     </span>
                   ) : (
                     <span className="capitalize text-slate-600">{data.gender || 'Tutor'}</span>

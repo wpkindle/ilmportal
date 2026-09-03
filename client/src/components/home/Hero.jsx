@@ -144,7 +144,7 @@ const Hero = () => {
               <span>Verified ID &amp; Certificates</span>
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-teal-500/30 text-teal-300 shadow-xs">
-              <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400" />
+              <ShieldCheck className="w-3.5 h-3.5 text-teal-400" />
               <span>Female Teachers for Girls &amp; Kids</span>
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-blue-500/30 text-blue-300 shadow-xs">

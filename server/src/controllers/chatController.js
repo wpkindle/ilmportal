@@ -793,7 +793,33 @@ exports.uploadChatFile = async (req, res) => {
     }
 
     const convId = conversationId || [req.user.id.toString(), recipientId.toString()].sort().join('_');
-    const fileUrl = `/uploads/${req.file.filename}`;
+
+    // Upload to Cloudinary if configured, otherwise use base64 data URL (dev fallback)
+    let fileUrl;
+    if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+      const { cloudinary } = require('../config/cloudinary');
+      const isImage = req.file.mimetype.startsWith('image/');
+      const folder = isImage ? 'ilmportal/chat/images' : 'ilmportal/chat/files';
+
+      fileUrl = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          {
+            folder,
+            resource_type: 'auto',
+            public_id: `${Date.now()}-${req.file.originalname.replace(/[^a-zA-Z0-9.]/g, '_')}`
+          },
+          (error, result) => {
+            if (error) return reject(error);
+            resolve(result.secure_url);
+          }
+        );
+        stream.end(req.file.buffer);
+      });
+    } else {
+      // Development fallback: store as base64 data URL (not for production!)
+      const base64 = req.file.buffer.toString('base64');
+      fileUrl = `data:${req.file.mimetype};base64,${base64}`;
+    }
 
     const message = await Message.create({
       conversationId: convId,

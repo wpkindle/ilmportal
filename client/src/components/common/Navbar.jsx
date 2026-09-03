@@ -132,7 +132,7 @@ const Navbar = () => {
           showNativeNotification({
             title: `${msg?.sender?.name || 'New Message'} (${msg?.sender?.role || 'User'})`,
             body: msg?.text || (msg?.voiceData ? 'Sent a voice note' : 'Sent an update'),
-            icon: msg?.sender?.avatar || '/icon.svg',
+            icon: msg?.sender?.avatar || '/icon.png',
             url: isTutor 
               ? `/tutor/messages?conversation=${msg?.conversationId}` 
               : isStudent 

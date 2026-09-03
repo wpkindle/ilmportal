@@ -25,40 +25,10 @@ const initSocket = (io) => {
       }
     });
 
-    // Join 1:1 Chat Conversation Room & automatically mark messages as seen
-    socket.on('join-conversation', async (conversationId) => {
+    // Join 1:1 Chat Conversation Room (Does NOT mark as seen until user actively views)
+    socket.on('join-conversation', (conversationId) => {
       socket.join(`conv_${conversationId}`);
       console.log(`💬 Socket ${socket.id} joined conversation: conv_${conversationId}`);
-
-      if (socket.userId) {
-        try {
-          const updateResult = await Message.updateMany(
-            { conversationId, recipient: socket.userId, isRead: false },
-            { isRead: true, isDelivered: true, readAt: new Date() }
-          );
-
-          if (updateResult.modifiedCount > 0) {
-            // Notify other party in the conversation that messages were seen
-            io.to(`conv_${conversationId}`).emit('messages-seen', {
-              conversationId,
-              readerId: socket.userId,
-              seenAt: new Date()
-            });
-
-            // Update recipient's unread badge count
-            const remainingUnread = await Message.countDocuments({
-              recipient: socket.userId,
-              isRead: false
-            });
-            io.to(`user_${socket.userId}`).emit('unread-count-updated', {
-              totalUnread: remainingUnread,
-              conversationId
-            });
-          }
-        } catch (err) {
-          console.error('Error auto-marking messages as seen:', err);
-        }
-      }
     });
 
     // Explicit Mark Messages Seen Event from Client
@@ -135,15 +105,23 @@ const initSocket = (io) => {
           link: targetChatLink
         };
 
+        const senderIdStr = (senderId?._id || senderId)?.toString();
+
         // 1. Broadcast to active conversation room
         io.to(`conv_${conversationId}`).emit('new-message', populatedMsg);
 
-        // 2. Broadcast to recipient's personal user room (for users on dashboard, home, courses, etc.)
+        // 2. Guarantee sender's own socket & user room receives the populated message
+        socket.emit('new-message', populatedMsg);
+        if (senderIdStr) {
+          io.to(`user_${senderIdStr}`).emit('new-message', populatedMsg);
+        }
+
+        // 3. Broadcast to recipient's personal user room (for users on dashboard, home, courses, etc.)
         if (recipientIdStr) {
           io.to(`user_${recipientIdStr}`).emit('new-message', populatedMsg);
           io.to(`user_${recipientIdStr}`).emit('notification-alert', alertPayload);
 
-          // 3. Direct socket emission fallback
+          // Direct socket emission fallback
           const directSocketId = onlineUsers.get(recipientIdStr);
           if (directSocketId && directSocketId !== socket.id) {
             io.to(directSocketId).emit('new-message', populatedMsg);

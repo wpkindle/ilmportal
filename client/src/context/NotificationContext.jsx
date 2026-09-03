@@ -92,7 +92,7 @@ export const NotificationProvider = ({ children }) => {
       showNativeNotification({
         title: alertData?.title || 'IlmPortal Notification',
         body: alertData?.message || 'New update on your IlmPortal account',
-        icon: alertData?.senderAvatar || '/icon.svg',
+        icon: alertData?.senderAvatar || '/icon.png',
         url: alertData?.link || defaultUrl,
         tag: `ilmportal-${alertData?.type || 'general'}-${Date.now()}`,
         soundType: isMessageAlert ? 'message' : 'alert'

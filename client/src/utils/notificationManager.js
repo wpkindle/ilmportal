@@ -56,9 +56,23 @@ export async function showNativeNotification({
   }
 
   // 3. Check browser OS notification permission
-  if (!('Notification' in window) || Notification.permission !== 'granted') {
+  if (!('Notification' in window)) return null;
+
+  if (Notification.permission === 'default') {
+    try {
+      const res = await Notification.requestPermission();
+      if (res !== 'granted') return null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  if (Notification.permission !== 'granted') {
     return null;
   }
+
+  // Windows 10/11 Action Center requires raster PNG images, not SVG
+  const validIcon = (!icon || icon.endsWith('.svg')) ? '/icon.png' : icon;
 
   // 4. On mobile devices, prefer Service Worker showNotification
   const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
@@ -69,8 +83,8 @@ export async function showNativeNotification({
       if (registration && registration.showNotification) {
         return registration.showNotification(title, {
           body: body || '',
-          icon: icon || '/icon.svg',
-          badge: '/icon.svg',
+          icon: validIcon,
+          badge: '/icon.png',
           vibrate: [150, 80, 150],
           tag: tag || undefined,
           renotify: true,
@@ -82,13 +96,14 @@ export async function showNativeNotification({
     }
   }
 
-  // 5. Desktop browser native Notification (Direct window focus, zero reload)
+  // 5. Desktop browser native Notification (Direct window focus, zero reload, always popup)
   try {
     const notification = new Notification(title, {
       body: body || '',
-      icon: icon || '/icon.svg',
-      badge: '/icon.svg',
+      icon: validIcon,
+      badge: '/icon.png',
       tag: tag || undefined,
+      renotify: true,
       data: { url }
     });
 

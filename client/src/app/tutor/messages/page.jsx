@@ -70,8 +70,8 @@ function TutorMessagesContent() {
           showNativeNotification({
             title: `${msg?.sender?.name || 'New Message'}`,
             body: msg?.text || (msg?.voiceData ? 'Sent a voice note' : 'Sent an update'),
-            icon: msg?.sender?.avatar || '/icon.svg',
-            url: '/tutor/messages',
+            icon: msg?.sender?.avatar || '/icon.png',
+            url: `/tutor/messages?conversation=${msg?.conversationId}`,
             tag: `msg-${msg?._id}`,
             soundType: 'none'
           });

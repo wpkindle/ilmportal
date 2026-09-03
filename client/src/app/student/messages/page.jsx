@@ -81,8 +81,8 @@ function StudentMessagesContent() {
           showNativeNotification({
             title: `${msg?.sender?.name || 'New Message'}`,
             body: msg?.text || (msg?.voiceData ? 'Sent a voice note' : 'Sent an update'),
-            icon: msg?.sender?.avatar || '/icon.svg',
-            url: '/student/messages',
+            icon: msg?.sender?.avatar || '/icon.png',
+            url: `/student/messages?conversation=${msg?.conversationId}`,
             tag: `msg-${msg?._id}`,
             soundType: 'none'
           });

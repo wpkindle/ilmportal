@@ -121,6 +121,10 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
       if (msg.conversationId === conversationId) {
         setMessages((prev) => {
           if (prev.some((m) => m._id === msg._id)) return prev;
+          const hasTemp = prev.some((m) => m._id?.startsWith?.('temp_') && m.text === msg.text);
+          if (hasTemp) {
+            return prev.map((m) => (m._id?.startsWith?.('temp_') && m.text === msg.text ? msg : m));
+          }
           return [...prev, msg];
         });
 
@@ -138,7 +142,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
             showNativeNotification({
               title: `${msg.sender?.name || partner?.name || 'New Message'}`,
               body: msg.text || (msg.voiceData ? 'Sent a voice note' : 'Sent an offer update'),
-              icon: msg.sender?.avatar || partner?.avatar || '/icon.svg',
+              icon: msg.sender?.avatar || partner?.avatar || '/icon.png',
               url: isTutor 
                 ? `/tutor/messages?conversation=${conversationId}` 
                 : `/student/messages?conversation=${conversationId}`,
@@ -147,7 +151,13 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
             });
           }
 
-          if (recipientId === currentUserId) {
+          // ONLY mark as seen if the recipient is ACTUALLY viewing and focused on this window right now
+          const isActivelyFocused = 
+            typeof document !== 'undefined' && 
+            document.visibilityState === 'visible' && 
+            document.hasFocus();
+
+          if (recipientId === currentUserId && isActivelyFocused) {
             socket.emit('mark-messages-seen', {
               conversationId,
               readerId: currentUserId
@@ -182,6 +192,39 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
     };
   }, [socket, conversationId, user]);
 
+  // Mark messages as seen ONLY when this chat window is actively in the user's viewport with browser focus
+  useEffect(() => {
+    if (!socket || !conversationId || !user) return;
+
+    const currentUserId = (user._id || user.id)?.toString();
+
+    const markSeenIfActive = () => {
+      if (
+        typeof document !== 'undefined' &&
+        document.visibilityState === 'visible' &&
+        document.hasFocus() &&
+        socket.connected
+      ) {
+        socket.emit('mark-messages-seen', {
+          conversationId,
+          readerId: currentUserId
+        });
+      }
+    };
+
+    // Check once on mount (only if active)
+    markSeenIfActive();
+
+    // Re-check whenever the user switches back to this browser tab
+    window.addEventListener('focus', markSeenIfActive);
+    document.addEventListener('visibilitychange', markSeenIfActive);
+
+    return () => {
+      window.removeEventListener('focus', markSeenIfActive);
+      document.removeEventListener('visibilitychange', markSeenIfActive);
+    };
+  }, [socket, conversationId, user]);
+
   useEffect(() => {
     scrollToBottom(false);
   }, [messages]);
@@ -190,15 +233,39 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
     e.preventDefault();
     if (!inputText.trim() || !user || !partner?._id) return;
 
-    const payload = {
+    const currentUserId = (user._id || user.id)?.toString();
+    const textToSend = inputText.trim();
+    const tempId = `temp_${Date.now()}`;
+
+    // Optimistic UI update: show immediately on sender's screen
+    const optimisticMsg = {
+      _id: tempId,
       conversationId,
-      senderId: user._id || user.id,
-      recipientId: partner._id,
-      text: inputText.trim(),
-      messageType: 'text'
+      sender: {
+        _id: currentUserId,
+        name: user.name,
+        avatar: user.avatar,
+        role: user.role
+      },
+      recipient: partner,
+      text: textToSend,
+      messageType: 'text',
+      createdAt: new Date().toISOString(),
+      isDelivered: false,
+      isRead: false
     };
 
+    setMessages((prev) => [...prev, optimisticMsg]);
     setInputText('');
+
+    const payload = {
+      conversationId,
+      senderId: currentUserId,
+      recipientId: partner._id,
+      text: textToSend,
+      messageType: 'text',
+      tempId
+    };
 
     if (socket && socket.connected) {
       socket.emit('send-message', payload);
@@ -206,10 +273,9 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
       try {
         const res = await api.sendChatMessage(payload);
         if (res.success && res.chatMessage) {
-          setMessages((prev) => {
-            if (prev.some((m) => m._id === res.chatMessage._id)) return prev;
-            return [...prev, res.chatMessage];
-          });
+          setMessages((prev) =>
+            prev.map((m) => (m._id === tempId ? res.chatMessage : m))
+          );
         }
       } catch (err) {
         console.error('Error sending message fallback:', err);

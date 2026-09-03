@@ -8,7 +8,10 @@ import {
   X,
   Sparkles,
   ShieldCheck,
-  CheckCircle2
+  CheckCircle2,
+  Copy,
+  Check,
+  CreditCard
 } from 'lucide-react';
 
 const paymentMethods = [
@@ -18,12 +21,13 @@ const paymentMethods = [
     shortName: 'Meezan Bank',
     category: 'Islamic Banking',
     accountTitle: 'Abdul Khaliq',
+    accountNumber: '96010105435308',
     qrImage: '/images/qr-meezan.jpg',
     color: 'from-purple-600 to-emerald-600',
     borderColor: 'border-purple-500',
     textColor: 'text-purple-400',
     bgColor: 'bg-purple-500/10',
-    instructions: 'Scan with Meezan Bank Mobile App or any Raast-enabled banking scanner.'
+    instructions: 'Scan with Meezan Bank Mobile App or transfer directly to account number 96010105435308.'
   },
   {
     id: 'easypaisa',
@@ -31,12 +35,13 @@ const paymentMethods = [
     shortName: 'EasyPaisa',
     category: 'Mobile Wallet',
     accountTitle: 'Abdul Khaliq',
+    accountNumber: '03171759093',
     qrImage: '/images/qr-easypaisa.jpg',
     color: 'from-emerald-600 to-green-600',
     borderColor: 'border-emerald-500',
     textColor: 'text-emerald-400',
     bgColor: 'bg-emerald-500/10',
-    instructions: 'Scan with EasyPaisa App or any Raast-enabled QR scanner.'
+    instructions: 'Scan with EasyPaisa App or send money directly to 03171759093.'
   },
   {
     id: 'jazzcash',
@@ -44,12 +49,13 @@ const paymentMethods = [
     shortName: 'JazzCash',
     category: 'Mobile Wallet',
     accountTitle: 'Abdul Khaliq',
+    accountNumber: '03171759093',
     qrImage: '/images/qr-jazzcash.jpg',
     color: 'from-red-600 to-amber-600',
     borderColor: 'border-red-500',
     textColor: 'text-red-400',
     bgColor: 'bg-red-500/10',
-    instructions: 'Scan with JazzCash App or any 1Link/Raast QR scanner.'
+    instructions: 'Scan with JazzCash App or transfer directly to 03171759093.'
   },
   {
     id: 'upaisa',
@@ -57,12 +63,13 @@ const paymentMethods = [
     shortName: 'UPaisa',
     category: 'Microfinance Bank',
     accountTitle: 'Abdul Khaliq',
+    accountNumber: '03171759093',
     qrImage: '/images/qr-upaisa.jpg',
     color: 'from-blue-600 to-cyan-600',
     borderColor: 'border-blue-500',
     textColor: 'text-blue-400',
     bgColor: 'bg-blue-500/10',
-    instructions: 'Scan with UPaisa / UBank App or any Raast QR scanner.'
+    instructions: 'Scan with UPaisa App or transfer directly to 03171759093.'
   }
 ];
 
@@ -70,6 +77,15 @@ export default function SupportPlatformWidget() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('meezan');
+  const [copiedText, setCopiedText] = useState(null);
+
+  const handleCopy = (text, id) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedText(id);
+      setTimeout(() => setCopiedText(null), 2200);
+    }
+  };
 
   // Listen for global open-support-platform custom event
   useEffect(() => {
@@ -206,8 +222,8 @@ export default function SupportPlatformWidget() {
                   <div className="absolute bottom-1.5 right-1.5 w-3 h-3 border-b-2 border-r-2 border-emerald-600 pointer-events-none" />
                 </div>
 
-                {/* Details & Clean Account Title Display */}
-                <div className="flex-1 text-center sm:text-left space-y-3">
+                {/* Details & Account Title + Number Display */}
+                <div className="flex-1 text-center sm:text-left space-y-3 w-full">
                   
                   {/* Bank Header Badge */}
                   <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-white/10 border border-white/10 text-white">
@@ -216,13 +232,43 @@ export default function SupportPlatformWidget() {
                   </div>
 
                   {/* Clean Static Account Title */}
-                  <div className="p-3.5 rounded-2xl bg-emerald-950/70 border border-emerald-500/40 text-left shadow-inner">
+                  <div className="p-3 rounded-2xl bg-emerald-950/70 border border-emerald-500/40 text-left shadow-inner">
                     <p className="text-[10px] uppercase tracking-wider font-bold text-emerald-400">
                       Account Title
                     </p>
-                    <p className="text-base font-black text-white mt-0.5 tracking-wide">
+                    <p className="text-sm sm:text-base font-black text-white mt-0.5 tracking-wide">
                       {selectedMethod.accountTitle}
                     </p>
+                  </div>
+
+                  {/* Account Number with 1-Click Copy */}
+                  <div className="p-3 rounded-2xl bg-slate-900/95 border border-emerald-500/50 text-left shadow-inner flex items-center justify-between gap-2">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-[10px] uppercase tracking-wider font-bold text-emerald-400">
+                        Account / Mobile Number
+                      </p>
+                      <p className="text-sm sm:text-base font-black text-emerald-200 mt-0.5 font-mono tracking-wider truncate">
+                        {selectedMethod.accountNumber}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(selectedMethod.accountNumber, `active-${selectedMethod.id}`)}
+                      className="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:scale-95 text-white text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer shadow-md"
+                      title="Copy Account Number"
+                    >
+                      {copiedText === `active-${selectedMethod.id}` ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-200" />
+                          <span>Copied</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5 text-emerald-200" />
+                          <span>Copy</span>
+                        </>
+                      )}
+                    </button>
                   </div>
 
                   {/* Instructions */}
@@ -233,11 +279,64 @@ export default function SupportPlatformWidget() {
 
               </div>
 
+              {/* Direct Account Numbers Quick Summary */}
+              <div className="p-4 rounded-2xl bg-slate-950/90 border border-emerald-500/30 space-y-2.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <CreditCard className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-bold uppercase tracking-wider text-emerald-300">Direct Transfer Account Numbers</span>
+                  </div>
+                  <span className="text-[10px] text-slate-400 font-semibold">Title: Abdul Khaliq</span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                  {/* Meezan Bank */}
+                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-2 hover:border-purple-500/40 transition-colors">
+                    <div>
+                      <span className="text-slate-400 text-[10px] font-bold block uppercase tracking-wide">Meezan Bank</span>
+                      <span className="font-mono font-black text-white text-xs sm:text-sm">96010105435308</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy('96010105435308', 'summary-meezan')}
+                      className="p-1.5 hover:bg-white/10 rounded-lg text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer shrink-0"
+                      title="Copy Meezan Bank Account Number"
+                    >
+                      {copiedText === 'summary-meezan' ? (
+                        <Check className="w-4 h-4 text-emerald-300" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+
+                  {/* EasyPaisa, JazzCash, UPaisa */}
+                  <div className="p-2.5 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-2 hover:border-emerald-500/40 transition-colors">
+                    <div>
+                      <span className="text-slate-400 text-[10px] font-bold block uppercase tracking-wide">EasyPaisa / JazzCash / UPaisa</span>
+                      <span className="font-mono font-black text-white text-xs sm:text-sm">03171759093</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy('03171759093', 'summary-wallets')}
+                      className="p-1.5 hover:bg-white/10 rounded-lg text-emerald-400 hover:text-emerald-300 transition-colors cursor-pointer shrink-0"
+                      title="Copy Mobile Wallet Number"
+                    >
+                      {copiedText === 'summary-wallets' ? (
+                        <Check className="w-4 h-4 text-emerald-300" />
+                      ) : (
+                        <Copy className="w-4 h-4" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </div>
+
               {/* Thank You Note */}
               <div className="p-3 rounded-xl bg-emerald-950/60 border border-emerald-500/30 text-xs text-slate-300 flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>
-                  JazakAllah Khair for supporting verified Quran & academic tutoring across Pakistan.
+                  JazakAllah Khair for supporting verified Quran &amp; academic tutoring across Pakistan.
                 </span>
               </div>
 

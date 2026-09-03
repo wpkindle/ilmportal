@@ -399,6 +399,11 @@ export const api = {
     headers: getHeaders(),
     body: JSON.stringify(body)
   }).then(handleResponse),
+  uploadChatFile: (formData) => fetch(`${API_BASE}/chat/upload`, {
+    method: 'POST',
+    headers: getHeaders(true),
+    body: formData
+  }).then(handleResponse),
   sendChatInvitationEmail: (body) => fetch(`${API_BASE}/chat/send-invitation-email`, {
     method: 'POST',
     headers: getHeaders(),

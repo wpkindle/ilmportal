@@ -731,4 +731,67 @@ exports.getStudentProfileForTutor = async (req, res) => {
   }
 };
 
+// @desc    Upload file attachment in chat (images, PDFs, documents)
+// @route   POST /api/chat/upload
+exports.uploadChatFile = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No file was uploaded.'
+      });
+    }
+
+    const { recipientId, conversationId, caption } = req.body;
+    if (!recipientId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Recipient ID is required for chat attachments.'
+      });
+    }
+
+    const convId = conversationId || [req.user.id.toString(), recipientId.toString()].sort().join('_');
+    const fileUrl = `/uploads/${req.file.filename}`;
+
+    const message = await Message.create({
+      conversationId: convId,
+      sender: req.user.id,
+      recipient: recipientId,
+      messageType: 'file',
+      text: caption || req.file.originalname,
+      fileUrl,
+      fileName: req.file.originalname,
+      fileSize: req.file.size,
+      fileType: req.file.mimetype,
+      isDelivered: true,
+      deliveredAt: new Date()
+    });
+
+    const populatedMsg = await Message.findById(message._id)
+      .populate('sender', 'name avatar role')
+      .populate('recipient', 'name avatar role')
+      .populate('deal');
+
+    // Broadcast via Socket.IO to conversation room and user rooms
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`conv_${convId}`).emit('new-message', populatedMsg);
+      io.to(`user_${recipientId}`).emit('new-message', populatedMsg);
+      io.to(`user_${req.user.id}`).emit('new-message', populatedMsg);
+    }
+
+    res.status(201).json({
+      success: true,
+      message: populatedMsg
+    });
+  } catch (error) {
+    console.error('Error uploading chat file:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error uploading file'
+    });
+  }
+};
+
+
 

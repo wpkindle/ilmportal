@@ -9,15 +9,18 @@ const {
   getChatRequestStatus,
   getChatRequests,
   respondChatRequest,
-  getStudentProfileForTutor
+  getStudentProfileForTutor,
+  uploadChatFile
 } = require('../controllers/chatController');
 const { protect } = require('../middleware/authMiddleware');
+const upload = require('../middleware/uploadMiddleware');
 
 router.use(protect);
 
 router.get('/conversations', getConversations);
 router.get('/:conversationId/messages', getMessages);
 router.post('/send', sendMessage);
+router.post('/upload', upload.single('file'), uploadChatFile);
 router.post('/send-invitation-email', sendChatInvitationEmail);
 
 // Chat Request workflow for Female Tutors

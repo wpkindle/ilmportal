@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '../../../services/api';
 import TrialBanner from '../../../components/common/TrialBanner';
+import TutorPaymentModal from '../../../components/tutor/TutorPaymentModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import { BookOpen, MessageSquare, Plus, Video } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
@@ -12,18 +13,20 @@ export default function TutorDealsPage() {
   const { user } = useAuth();
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDealForPay, setSelectedDealForPay] = useState(null);
+
+  const fetchDeals = async () => {
+    try {
+      const res = await api.getMyDeals();
+      if (res.success) setDeals(res.deals);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchDeals = async () => {
-      try {
-        const res = await api.getMyDeals();
-        if (res.success) setDeals(res.deals);
-      } catch (e) {
-        console.error(e);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchDeals();
   }, []);
 
@@ -93,13 +96,26 @@ export default function TutorDealsPage() {
                   </div>
                 </div>
 
-                <TrialBanner deal={deal} onPayClick={() => {}} />
+                <TrialBanner
+                  deal={deal}
+                  onPayClick={() => setSelectedDealForPay(deal)}
+                />
               </div>
             ))}
           </div>
         )}
 
       </div>
+
+      {/* Tutor Platform Fee Payment Proof Modal */}
+      {selectedDealForPay && (
+        <TutorPaymentModal
+          deal={selectedDealForPay}
+          isOpen={!!selectedDealForPay}
+          onClose={() => setSelectedDealForPay(null)}
+          onSuccess={fetchDeals}
+        />
+      )}
     </div>
   );
 }

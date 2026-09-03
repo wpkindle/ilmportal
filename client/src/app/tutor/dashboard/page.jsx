@@ -19,6 +19,7 @@ import {
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import TrialBanner from '../../../components/common/TrialBanner';
+import TutorPaymentModal from '../../../components/tutor/TutorPaymentModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import AccountStatusBanner from '../../../components/common/AccountStatusBanner';
 
@@ -27,6 +28,7 @@ export default function TutorDashboardPage() {
   const [deals, setDeals] = useState([]);
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [selectedDealForPay, setSelectedDealForPay] = useState(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -248,7 +250,10 @@ export default function TutorDashboardPage() {
                     </div>
                   </div>
 
-                  <TrialBanner deal={deal} onPayClick={() => {}} />
+                  <TrialBanner
+                    deal={deal}
+                    onPayClick={() => setSelectedDealForPay(deal)}
+                  />
                 </div>
               ))}
             </div>
@@ -256,6 +261,16 @@ export default function TutorDashboardPage() {
         </div>
 
       </div>
+
+      {/* Tutor Platform Fee Payment Proof Modal */}
+      {selectedDealForPay && (
+        <TutorPaymentModal
+          deal={selectedDealForPay}
+          isOpen={!!selectedDealForPay}
+          onClose={() => setSelectedDealForPay(null)}
+          onSuccess={fetchData}
+        />
+      )}
     </div>
   );
 }

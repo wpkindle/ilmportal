@@ -23,7 +23,7 @@ router.post('/:id/clear-fee', authorize('admin'), adminClearTutorFee);
 router.post('/:id/restrict-classes', authorize('admin'), adminRestrictTutorClasses);
 router.get('/my-deals', getMyDeals);
 router.get('/:id', getDealById);
-router.post('/:id/submit-payment', authorize('student'), submitPaymentProof);
+router.post('/:id/submit-payment', authorize('tutor', 'student'), submitPaymentProof);
 router.put('/:id/cancel', cancelDeal);
 
 module.exports = router;

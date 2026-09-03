@@ -37,6 +37,22 @@ const messageSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  fileUrl: {
+    type: String,
+    default: ''
+  },
+  fileName: {
+    type: String,
+    default: ''
+  },
+  fileSize: {
+    type: Number,
+    default: 0
+  },
+  fileType: {
+    type: String,
+    default: ''
+  },
   dealOfferData: {
     subject: String,
     price: Number,

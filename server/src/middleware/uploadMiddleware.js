@@ -24,13 +24,17 @@ const fileFilter = (req, file, cb) => {
     'image/jpg',
     'image/png',
     'image/webp',
-    'application/pdf'
+    'image/gif',
+    'application/pdf',
+    'application/msword',
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+    'text/plain'
   ];
 
   if (allowedMimeTypes.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error('Invalid file type. Only JPEG, PNG, WEBP images and PDF documents are allowed!'), false);
+    cb(new Error('Invalid file type. Supported formats: JPG, PNG, WEBP, GIF, PDF, DOC, DOCX, and TXT.'), false);
   }
 };
 

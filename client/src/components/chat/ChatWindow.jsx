@@ -25,7 +25,12 @@ import {
   Bell,
   MoreVertical,
   Heart,
-  ArrowLeft
+  ArrowLeft,
+  FileText,
+  Download,
+  ExternalLink,
+  X,
+  File
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -43,6 +48,22 @@ import FemaleTutorGateModal from '../common/FemaleTutorGateModal';
 import ChatRequestModal from '../common/ChatRequestModal';
 import { calculateClientCompletion } from '../common/ProfileCompletionMeter';
 
+const getFileUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('blob:') || path.startsWith('data:') || path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+  const base = (process.env.NEXT_PUBLIC_API_URL || 'https://ilmportal-backend.onrender.com/api').replace(/\/api\/?$/, '');
+  return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
+};
+
+const formatFileSize = (bytes) => {
+  if (!bytes) return '';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
+
 const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
   const { user, isTutor, isStudent } = useAuth();
   const isTutorToTutor = (isTutor || user?.role === 'tutor') && partner?.role === 'tutor';
@@ -57,6 +78,12 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
   const [partnerDeal, setPartnerDeal] = useState(initialDeal || null);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
+
+  // File upload state
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     if (initialDeal) {
@@ -386,9 +413,102 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
     }
   }, [messages.length, loading]);
 
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size exceeds the 10MB limit. Please choose a smaller file.');
+      e.target.value = '';
+      return;
+    }
+
+    setSelectedFile(file);
+    if (file.type.startsWith('image/')) {
+      const previewUrl = URL.createObjectURL(file);
+      setFilePreview(previewUrl);
+    } else {
+      setFilePreview(null);
+    }
+  };
+
+  const handleClearSelectedFile = () => {
+    if (filePreview) {
+      URL.revokeObjectURL(filePreview);
+    }
+    setSelectedFile(null);
+    setFilePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleSendMessage = async (e) => {
     e.preventDefault();
-    if (!inputText.trim() || !user || !partner?._id) return;
+    if (!user || !partner?._id) return;
+
+    // Handle file upload if a file is selected
+    if (selectedFile) {
+      const fileToUpload = selectedFile;
+      const previewUrl = filePreview;
+      const captionText = inputText.trim();
+      const currentUserId = (user._id || user.id)?.toString();
+      const tempId = `temp_file_${Date.now()}`;
+
+      // Optimistic file message
+      const optimisticFileMsg = {
+        _id: tempId,
+        conversationId,
+        sender: {
+          _id: currentUserId,
+          name: user.name,
+          avatar: user.avatar,
+          role: user.role
+        },
+        recipient: partner,
+        messageType: 'file',
+        text: captionText || fileToUpload.name,
+        fileName: fileToUpload.name,
+        fileSize: fileToUpload.size,
+        fileType: fileToUpload.type,
+        fileUrl: previewUrl || '',
+        createdAt: new Date().toISOString(),
+        isDelivered: isPartnerOnline,
+        isRead: false
+      };
+
+      setMessages((prev) => [...prev, optimisticFileMsg]);
+      handleClearSelectedFile();
+      setInputText('');
+      setUploadingFile(true);
+      setTimeout(() => scrollToBottom(true), 50);
+
+      try {
+        const formData = new FormData();
+        formData.append('file', fileToUpload);
+        formData.append('recipientId', partner._id);
+        formData.append('conversationId', conversationId);
+        if (captionText) {
+          formData.append('caption', captionText);
+        }
+
+        const res = await api.uploadChatFile(formData);
+        if (res.success && res.message) {
+          setMessages((prev) =>
+            prev.map((m) => (m._id === tempId ? res.message : m))
+          );
+        }
+      } catch (err) {
+        console.error('Error uploading file attachment:', err);
+        alert(err.message || 'Failed to send file attachment. Please try again.');
+        setMessages((prev) => prev.filter((m) => m._id !== tempId));
+      } finally {
+        setUploadingFile(false);
+      }
+      return;
+    }
+
+    if (!inputText.trim()) return;
 
     const currentUserId = (user._id || user.id)?.toString();
     const textToSend = inputText.trim();
@@ -837,6 +957,11 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
           const msgSenderId = (msg.sender?._id || msg.sender)?.toString();
           const isMe = msgSenderId === currentUserId;
           const isVoiceMsg = msg.messageType === 'voice' || !!msg.voiceData;
+          const isFileMsg = msg.messageType === 'file' || !!msg.fileUrl;
+          const isImg =
+            isFileMsg &&
+            (msg.fileType?.startsWith('image/') ||
+              /\.(jpg|jpeg|png|webp|gif)$/i.test(msg.fileUrl || msg.fileName || ''));
 
           return (
             <div
@@ -854,7 +979,119 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                   duration={msg.voiceDuration || 0}
                   isMe={isMe}
                 />
+              ) : isFileMsg && isImg ? (
+                /* Image Attachment Bubble */
+                <div className="flex items-center gap-1.5 group/msg relative">
+                  <div
+                    className={`max-w-xs sm:max-w-sm rounded-2xl overflow-hidden shadow-2xs ${
+                      isMe
+                        ? 'bg-emerald-700 text-white rounded-br-none'
+                        : 'bg-white border border-slate-200/90 text-slate-800 rounded-bl-none'
+                    }`}
+                  >
+                    <a
+                      href={getFileUrl(msg.fileUrl)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block relative group/img overflow-hidden cursor-pointer bg-slate-950/5"
+                    >
+                      <img
+                        src={getFileUrl(msg.fileUrl)}
+                        alt={msg.fileName || 'Image Attachment'}
+                        className="w-full max-h-64 object-cover hover:scale-105 transition-transform duration-200"
+                      />
+                      <div className="absolute inset-0 bg-black/40 opacity-0 group-hover/img:opacity-100 flex items-center justify-center text-white transition-opacity text-xs font-bold gap-1.5">
+                        <ExternalLink className="w-4 h-4" />
+                        <span>View Full Image</span>
+                      </div>
+                    </a>
+                    {msg.text && msg.text !== msg.fileName && (
+                      <div className="p-2.5 text-xs font-medium leading-relaxed">
+                        {msg.text}
+                      </div>
+                    )}
+                    <div
+                      className={`px-3 py-1.5 text-[10px] flex items-center justify-between border-t ${
+                        isMe ? 'border-emerald-600/50 text-emerald-100' : 'border-slate-100 text-slate-500'
+                      }`}
+                    >
+                      <span className="truncate max-w-[180px] font-medium">{msg.fileName || 'Photo'}</span>
+                      {msg.fileSize ? <span>{formatFileSize(msg.fileSize)}</span> : null}
+                    </div>
+                  </div>
+
+                  {!isMe && (
+                    <button
+                      type="button"
+                      onClick={() => setReportModalOpen(true)}
+                      className="opacity-0 group-hover/msg:opacity-100 p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
+                      title="Report this file"
+                    >
+                      <Flag className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
+              ) : isFileMsg ? (
+                /* Document Attachment Bubble (PDF / DOC / TXT) */
+                <div className="flex items-center gap-1.5 group/msg relative">
+                  <div
+                    className={`max-w-xs sm:max-w-sm p-3.5 rounded-2xl shadow-2xs space-y-2.5 ${
+                      isMe
+                        ? 'bg-emerald-700 text-white rounded-br-none'
+                        : 'bg-white border border-slate-200/90 text-slate-800 rounded-bl-none'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <div
+                        className={`p-2.5 rounded-xl shrink-0 ${
+                          isMe ? 'bg-emerald-800 text-white' : 'bg-emerald-50 text-emerald-700'
+                        }`}
+                      >
+                        <FileText className="w-5 h-5" />
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-xs font-bold truncate" title={msg.fileName}>
+                          {msg.fileName || 'Document Attachment'}
+                        </p>
+                        <p className={`text-[10px] ${isMe ? 'text-emerald-200' : 'text-slate-500'}`}>
+                          {formatFileSize(msg.fileSize)} &bull; {msg.fileName?.split('.').pop()?.toUpperCase() || 'FILE'}
+                        </p>
+                      </div>
+                    </div>
+                    {msg.text && msg.text !== msg.fileName && (
+                      <p className="text-xs font-medium leading-relaxed">
+                        {msg.text}
+                      </p>
+                    )}
+                    <a
+                      href={getFileUrl(msg.fileUrl)}
+                      target="_blank"
+                      download={msg.fileName}
+                      rel="noopener noreferrer"
+                      className={`w-full py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
+                        isMe
+                          ? 'bg-emerald-800/90 hover:bg-emerald-900 text-white'
+                          : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800'
+                      }`}
+                    >
+                      <Download className="w-3.5 h-3.5" />
+                      <span>Download / Open File</span>
+                    </a>
+                  </div>
+
+                  {!isMe && (
+                    <button
+                      type="button"
+                      onClick={() => setReportModalOpen(true)}
+                      className="opacity-0 group-hover/msg:opacity-100 p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
+                      title="Report this file"
+                    >
+                      <Flag className="w-3 h-3" />
+                    </button>
+                  )}
+                </div>
               ) : (
+                /* Standard Text Message */
                 <div className="flex items-center gap-1.5 group/msg relative">
                   <div
                     className={`max-w-md p-3 rounded-2xl text-xs leading-relaxed ${
@@ -999,34 +1236,99 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
             </div>
           </div>
         ) : (
-          /* Standard Text & Voice Input - Fully responsive on all mobile viewports */
-          <form onSubmit={handleSendMessage} className="flex items-center gap-1.5 sm:gap-2 w-full">
-            <button
-              type="button"
-              onClick={startRecording}
-              className="p-2 sm:p-3 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl sm:rounded-2xl transition-colors cursor-pointer shrink-0"
-              title="Hold to Record Voice Note"
-            >
-              <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
-            </button>
+          /* Standard Text, File Attachment & Voice Input */
+          <div className="w-full space-y-2">
+            {/* File attachment preview chip before sending */}
+            {selectedFile && (
+              <div className="p-2 sm:p-2.5 bg-slate-50 border border-emerald-200 rounded-xl sm:rounded-2xl flex items-center justify-between gap-2 animate-in fade-in duration-150">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  {filePreview ? (
+                    <img
+                      src={filePreview}
+                      alt="Upload Preview"
+                      className="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0"
+                    />
+                  ) : (
+                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                      <FileText className="w-5 h-5" />
+                    </div>
+                  )}
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-slate-800 truncate">{selectedFile.name}</p>
+                    <p className="text-[10px] text-slate-500 font-medium">
+                      {formatFileSize(selectedFile.size)} &bull; Ready to send
+                    </p>
+                  </div>
+                </div>
 
-            <input
-              type="text"
-              placeholder="Type a message..."
-              value={inputText}
-              onChange={(e) => setInputText(e.target.value)}
-              className="flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl text-base sm:text-sm text-slate-900 outline-none focus:border-emerald-500 focus:bg-white transition-all font-medium min-h-[42px] sm:min-h-[48px]"
-            />
+                <button
+                  type="button"
+                  onClick={handleClearSelectedFile}
+                  disabled={uploadingFile}
+                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer shrink-0"
+                  title="Remove Attachment"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            )}
 
-            {/* Send Text Message Button */}
-            <button
-              type="submit"
-              disabled={!inputText.trim()}
-              className="p-2.5 sm:p-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl sm:rounded-2xl disabled:opacity-40 transition-all shadow-md cursor-pointer shrink-0"
-            >
-              <Send className="w-4 h-4" />
-            </button>
-          </form>
+            <form onSubmit={handleSendMessage} className="flex items-center gap-1 sm:gap-1.5 w-full">
+              {/* File Attachment Input (hidden) */}
+              <input
+                type="file"
+                ref={fileInputRef}
+                onChange={handleFileSelect}
+                className="hidden"
+                accept="image/*,.pdf,.doc,.docx,.txt"
+              />
+
+              {/* File Attachment Button */}
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingFile}
+                className="p-2 sm:p-2.5 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl sm:rounded-2xl transition-colors cursor-pointer shrink-0"
+                title="Attach Document or Image"
+              >
+                <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+
+              {/* Voice Recording Button */}
+              <button
+                type="button"
+                onClick={startRecording}
+                disabled={uploadingFile || !!selectedFile}
+                className="p-2 sm:p-2.5 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl sm:rounded-2xl transition-colors cursor-pointer shrink-0 disabled:opacity-30"
+                title="Hold to Record Voice Note"
+              >
+                <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
+              </button>
+
+              {/* Text / Caption Input */}
+              <input
+                type="text"
+                placeholder={selectedFile ? 'Add a caption / note (optional)...' : 'Type a message...'}
+                value={inputText}
+                onChange={(e) => setInputText(e.target.value)}
+                disabled={uploadingFile}
+                className="flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl text-sm sm:text-sm text-slate-900 outline-none focus:border-emerald-500 focus:bg-white transition-all font-medium min-h-[40px] sm:min-h-[44px]"
+              />
+
+              {/* Send Button */}
+              <button
+                type="submit"
+                disabled={uploadingFile || (!inputText.trim() && !selectedFile)}
+                className="p-2.5 sm:p-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl sm:rounded-2xl disabled:opacity-40 transition-all shadow-md cursor-pointer shrink-0 flex items-center justify-center"
+              >
+                {uploadingFile ? (
+                  <Clock className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Send className="w-4 h-4" />
+                )}
+              </button>
+            </form>
+          </div>
         )}
       </div>
 

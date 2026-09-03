@@ -126,7 +126,7 @@ const initSocket = (io) => {
         // Also push notification event to recipient's personal room
         io.to(`user_${recipientId}`).emit('notification-alert', {
           title: 'New Message',
-          message: `${populatedMsg.sender.name}: ${voiceData ? '🎙️ Sent a voice message' : (text ? text.slice(0, 50) : 'Sent an offer')}`,
+          message: `${populatedMsg.sender.name}: ${voiceData ? 'Sent a voice message' : (text ? text.slice(0, 50) : 'Sent an offer')}`,
           type: 'new_message',
           conversationId
         });

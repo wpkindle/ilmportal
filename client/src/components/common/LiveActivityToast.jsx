@@ -69,7 +69,7 @@ const activities = [
     id: 5,
     studentName: 'Ali Raza',
     city: 'Quetta',
-    action: 'left a ⭐⭐⭐⭐⭐ 5-Star Review on',
+    action: 'left a 5-Star Verified Review on',
     subject: 'Cambridge A-Level Mathematics',
     tutor: 'Engr. Bilal Ahmad',
     avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=120&q=80',

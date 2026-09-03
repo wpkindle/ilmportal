@@ -346,7 +346,7 @@ exports.verifyToken = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: '🎉 Email verified successfully! Welcome to IlmPortal Pakistan.',
+      message: 'Email verified successfully! Welcome to IlmPortal Pakistan.',
       token: jwtToken,
       user: {
         id: user._id,

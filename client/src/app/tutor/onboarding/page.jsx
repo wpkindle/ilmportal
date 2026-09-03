@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
-import { BookOpen, ShieldCheck, Award, CheckCircle2, ArrowRight, Sparkles } from 'lucide-react';
+import { BookOpen, ShieldCheck, Award, CheckCircle2, ArrowRight, Sparkles, Video, Home, Check } from 'lucide-react';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import CustomSelect from '../../../components/common/CustomSelect';
 
@@ -241,10 +241,11 @@ export default function TutorOnboardingPage() {
                 <label className="text-xs font-bold text-slate-700 block mb-2">Teaching Mode</label>
                 <div className="grid grid-cols-2 gap-2">
                   {[
-                    { value: 'online', label: 'Online', sub: 'Live WebRTC Classroom', icon: '🌐' },
-                    { value: 'in_person', label: 'In-Person', sub: 'Home / Centre Tutoring', icon: '🏠' }
+                    { value: 'online', label: 'Online', sub: 'Live WebRTC Classroom', icon: Video },
+                    { value: 'in_person', label: 'In-Person', sub: 'Home / Centre Tutoring', icon: Home }
                   ].map((m) => {
                     const active = teachingModes.includes(m.value);
+                    const IconComp = m.icon;
                     return (
                       <button
                         key={m.value}
@@ -258,18 +259,21 @@ export default function TutorOnboardingPage() {
                               : [...prev, m.value]
                           )
                         }
-                        className={`flex flex-col items-start gap-0.5 p-3 rounded-2xl border-2 text-left transition-all ${
+                        className={`flex flex-col items-start gap-0.5 p-3 rounded-2xl border-2 text-left transition-all cursor-pointer ${
                           active
                             ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
                             : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
                         }`}
                       >
-                        <span className="text-base leading-none">{m.icon}</span>
+                        <div className={`p-1.5 rounded-xl ${active ? 'bg-emerald-200/60 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>
+                          <IconComp className="w-4 h-4" />
+                        </div>
                         <span className="text-xs font-bold mt-1">{m.label}</span>
                         <span className="text-[10px] opacity-70">{m.sub}</span>
                         {active && (
-                          <span className="text-[9px] font-bold bg-emerald-600 text-white px-1.5 py-0.5 rounded-full mt-1">
-                            ✓ Selected
+                          <span className="text-[9px] font-bold bg-emerald-600 text-white px-1.5 py-0.5 rounded-full mt-1 flex items-center gap-1">
+                            <Check className="w-2.5 h-2.5" />
+                            <span>Selected</span>
                           </span>
                         )}
                       </button>

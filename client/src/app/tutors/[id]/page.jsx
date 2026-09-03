@@ -30,7 +30,7 @@ export async function generateMetadata({ params }) {
       const tutorName = tutor.user?.name || 'Verified Tutor';
       return {
         title: `${tutorName} - Verified Tutor Profile | IlmPortal Pakistan`,
-        description: `${tutorName} (${tutor.user?.city || 'Pakistan'}) specializes in ${tutor.qualifications || 'Quran & Academic Tutoring'}. Rating: ${tutor.averageRating?.toFixed(1) || '5.0'}★. In-platform live video classes available.`,
+        description: `${tutorName} (${tutor.user?.city || 'Pakistan'}) specializes in ${tutor.qualifications || 'Quran & Academic Tutoring'}. Rating: ${tutor.averageRating?.toFixed(1) || '5.0'}/5. In-platform live video classes available.`,
         openGraph: {
           title: `${tutorName} - Certified Tutor | IlmPortal`,
           description: tutor.bio?.slice(0, 160) || 'Verified Quran & Academic Tutor on IlmPortal Pakistan.',

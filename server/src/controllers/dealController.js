@@ -155,7 +155,7 @@ exports.respondToDealOffer = async (req, res) => {
         recipient: deal.tutor._id,
         deal: deal._id,
         messageType: 'deal_accept',
-        text: `Deal Accepted! 🎉 Free ${trialDays}-day trial started. Both parties can now start scheduling live sessions.`,
+        text: `Deal Accepted! Free ${trialDays}-day trial started. Both parties can now start scheduling live sessions.`,
         dealOfferData: {
           _id: deal._id,
           dealId: deal._id,
@@ -178,7 +178,7 @@ exports.respondToDealOffer = async (req, res) => {
         io.to(`conv_${conversationId}`).emit('new-message', populatedAcceptMsg);
         io.to(`conv_${conversationId}`).emit('deal-status-updated', deal);
         io.to(`user_${deal.tutor._id}`).emit('notification-alert', {
-          title: 'Deal Offer Accepted! 🎉',
+          title: 'Deal Offer Accepted!',
           message: `${req.user.name} accepted your tutoring offer for ${deal.subject}.`,
           type: 'deal_accepted',
           conversationId
@@ -189,7 +189,7 @@ exports.respondToDealOffer = async (req, res) => {
       await Notification.create({
         recipient: deal.tutor._id,
         sender: req.user.id,
-        title: 'Deal Offer Accepted! 🎉',
+        title: 'Deal Offer Accepted!',
         message: `${req.user.name} accepted your tutoring offer for ${deal.subject}. Your ${trialDays}-day free trial is now active!`,
         type: 'deal_accepted',
         link: `/tutor/deals`

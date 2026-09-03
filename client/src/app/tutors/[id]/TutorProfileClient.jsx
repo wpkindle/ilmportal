@@ -19,7 +19,9 @@ import {
   BookOpen,
   ArrowRight,
   Baby,
-  Layers
+  Layers,
+  Search,
+  AlertTriangle
 } from 'lucide-react';
 import RatingStars from '../../../components/common/RatingStars';
 import SanadBadge, { SanadModal } from '../../../components/common/SanadBadge';
@@ -93,16 +95,19 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                     {tutor.gender || 'Teacher'}
                   </span>
                   {tutorUser.status === 'under_review' ? (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-orange-100 text-orange-800 border border-orange-200">
-                      🔍 Under Review
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-orange-100 text-orange-800 border border-orange-200">
+                      <Search className="w-3 h-3" />
+                      <span>Under Review</span>
                     </span>
                   ) : tutorUser.status === 'warned' ? (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-100 text-amber-800 border border-amber-200">
-                      ⚠️ Policy Warning
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-100 text-amber-800 border border-amber-200">
+                      <AlertTriangle className="w-3 h-3" />
+                      <span>Policy Warning</span>
                     </span>
                   ) : (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      ✅ Verified Faculty
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
+                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                      <span>Verified Faculty</span>
                     </span>
                   )}
                 </div>

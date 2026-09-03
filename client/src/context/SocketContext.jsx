@@ -32,7 +32,7 @@ export const SocketProvider = ({ children }) => {
     if (typeof window === 'undefined') return;
 
     const socketUrl = getSocketUrl();
-    console.log('🔌 Connecting WebSocket to:', socketUrl);
+    console.log('[WebSocket] Connecting to:', socketUrl);
 
     const newSocket = io(socketUrl, {
       transports: ['websocket', 'polling'],
@@ -46,7 +46,7 @@ export const SocketProvider = ({ children }) => {
 
     newSocket.on('connect', () => {
       setIsConnected(true);
-      console.log('✅ WebSocket Connected successfully!');
+      console.log('[WebSocket] Connected successfully!');
       if (user?._id || user?.id) {
         newSocket.emit('register-user', user._id || user.id);
       }

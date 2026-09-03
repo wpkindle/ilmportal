@@ -85,7 +85,7 @@ exports.createReport = async (req, res) => {
       await Notification.create({
         recipient: admin._id,
         sender: req.user.id,
-        title: '⚠️ New Incident Report Filed',
+        title: 'New Incident Report Filed',
         message: `${req.user.name} (${req.user.role}) reported ${reportedUser.name} (${reportedUser.role}): "${category || 'Issue'}".`,
         type: 'safety_report',
         link: `/admin/reports`
@@ -97,7 +97,7 @@ exports.createReport = async (req, res) => {
     if (io) {
       for (const admin of admins) {
         io.to(`user_${admin._id}`).emit('notification-alert', {
-          title: '⚠️ New Incident Report',
+          title: 'New Incident Report',
           message: `${req.user.name} filed a report against ${reportedUser.name}`,
           type: 'safety_report',
           reportId: report._id
@@ -197,7 +197,7 @@ exports.updateReportStatus = async (req, res) => {
       await Notification.create({
         recipient: reporter._id,
         sender: req.user.id,
-        title: `🛡️ Safety Report: ${report.status.toUpperCase().replace('_', ' ')}`,
+        title: `Safety Report: ${report.status.toUpperCase().replace('_', ' ')}`,
         message: `Your incident report regarding "${report.category.replace('_', ' ')}" ${statusText}.${responseSnippet}`,
         type: 'safety_report',
         link: `${profilePath}#safety-reports`
@@ -206,7 +206,7 @@ exports.updateReportStatus = async (req, res) => {
       const io = req.app.get('io');
       if (io) {
         io.to(`user_${reporter._id}`).emit('notification-alert', {
-          title: `🛡️ Safety Report: ${report.status.toUpperCase().replace('_', ' ')}`,
+          title: `Safety Report: ${report.status.toUpperCase().replace('_', ' ')}`,
           message: `Your safety report ${statusText}. Check your profile for details.`,
           type: 'safety_report',
           reportId: report._id,
@@ -224,7 +224,7 @@ exports.updateReportStatus = async (req, res) => {
       await Notification.create({
         recipient: reported._id,
         sender: req.user.id,
-        title: `🛡️ Community Safety & Conduct Update`,
+        title: `Community Safety & Conduct Update`,
         message: `A conduct inquiry concerning community standards has been updated to "${report.status.toUpperCase()}".${userResponseSnippet}`,
         type: 'safety_report',
         link: `${profilePath}#safety-reports`
@@ -233,7 +233,7 @@ exports.updateReportStatus = async (req, res) => {
       const io = req.app.get('io');
       if (io) {
         io.to(`user_${reported._id}`).emit('notification-alert', {
-          title: `🛡️ Conduct Review Update`,
+          title: `Community Safety & Conduct Update`,
           message: `Your conduct review status has been updated. Check your profile for details.`,
           type: 'safety_report',
           reportId: report._id,

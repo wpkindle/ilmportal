@@ -475,11 +475,10 @@ export default function CourseDetailPage() {
                         </div>
                       </div>
 
-                      {lesson.approach && (
-                        <div className="sm:text-right text-left bg-emerald-100/60 text-emerald-900 border border-emerald-200/80 px-3 py-1.5 rounded-xl text-[11px] font-semibold shrink-0">
-                          💡 <span className="font-bold">Kid-Friendly Approach:</span> {lesson.approach}
+                        <div className="sm:text-right text-left bg-emerald-100/60 text-emerald-900 border border-emerald-200/80 px-3 py-1.5 rounded-xl text-[11px] font-semibold shrink-0 flex items-center gap-1.5">
+                          <Sparkles className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                          <span><strong className="font-bold">Kid-Friendly Approach:</strong> {lesson.approach}</span>
                         </div>
-                      )}
                     </div>
                   ))}
                 </div>

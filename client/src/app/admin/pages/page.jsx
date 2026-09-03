@@ -17,7 +17,8 @@ import {
   Mail,
   MapPin,
   Clock,
-  Heart
+  Heart,
+  Info
 } from 'lucide-react';
 
 export default function AdminCMSPagesPage() {
@@ -441,8 +442,9 @@ export default function AdminCMSPagesPage() {
                     className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-mono text-slate-900 leading-relaxed focus:outline-hidden focus:border-emerald-500 focus:bg-white resize-y"
                     placeholder="Enter formatted content with headings (###), bold (**text**), bullet points (* item), etc."
                   />
-                  <p className="text-[11px] text-slate-500">
-                    💡 Tip: Use <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px]">### Section Title</code> for headings, <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px]">* point</code> for bullet lists, and <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px]">---</code> for horizontal dividers.
+                  <p className="text-[11px] text-slate-500 flex items-center gap-1">
+                    <Info className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span><strong>Tip:</strong> Use <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px]">### Section Title</code> for headings, <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px]">* point</code> for bullet lists, and <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px]">---</code> for horizontal dividers.</span>
                   </p>
                 </div>
 

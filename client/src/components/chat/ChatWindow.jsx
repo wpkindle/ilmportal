@@ -354,8 +354,10 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
 
               <span className="text-slate-300">&bull;</span>
               <span className="text-slate-500 text-[11px] truncate">{partner?.city || 'Pakistan'}</span>
-              <span className="text-slate-300 hidden sm:inline">&bull;</span>
-              <span className="text-[10px] text-emerald-700 font-medium hidden sm:inline">Voice Notes 🎙️</span>
+              <span className="text-[10px] text-emerald-700 font-medium hidden sm:inline-flex items-center gap-1">
+                <Mic className="w-3 h-3 text-emerald-600" />
+                <span>Voice Notes</span>
+              </span>
             </div>
           </div>
         </div>
@@ -417,7 +419,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
         </div>
       </div>
 
-      {/* 🔒 End-to-End Encrypted & AI Moderation Safe Banner */}
+      {/* End-to-End Encrypted & AI Moderation Safe Banner */}
       <div className="px-4 py-2 bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 text-white border-b border-emerald-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
         <div className="flex items-center gap-2 text-[11px]">
           <div className="p-1 rounded bg-emerald-500/20 text-emerald-400 shrink-0">

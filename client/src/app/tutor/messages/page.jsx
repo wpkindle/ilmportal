@@ -177,7 +177,7 @@ function TutorMessagesContent() {
                         </div>
 
                         <p className="text-[11px] text-slate-500 truncate mt-0.5">
-                          {conv.lastMessage?.text || (conv.lastMessage?.voiceData ? '🎙️ Voice note' : 'Offer sent')}
+                          {conv.lastMessage?.text || (conv.lastMessage?.voiceData ? 'Voice note' : 'Offer sent')}
                         </p>
                       </div>
                     </button>

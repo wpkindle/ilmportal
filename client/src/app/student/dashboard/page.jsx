@@ -109,7 +109,7 @@ export default function StudentDashboardPage() {
               Student Learning Portal
             </span>
             <h1 className="text-2xl sm:text-3xl font-black text-white">
-              Assalam-o-Alaikum, {user?.name}! 👋
+              Assalam-o-Alaikum, {user?.name}!
             </h1>
             <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
               Track your enrolled Quran & academic courses, join in-platform live video classrooms, and manage fee payments.

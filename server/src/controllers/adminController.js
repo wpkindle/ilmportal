@@ -178,7 +178,7 @@ exports.approveTutor = async (req, res) => {
     await Notification.create({
       recipient: tutor.user._id,
       sender: req.user.id,
-      title: 'Tutor Profile Approved! 🎉',
+      title: 'Tutor Profile Approved!',
       message: 'Congratulations! Your tutor application and credentials have been verified and approved. Your profile is now live.',
       type: 'verification_status',
       link: '/tutor/dashboard'
@@ -405,7 +405,7 @@ exports.issueUserWarning = async (req, res) => {
     await Notification.create({
       recipient: user._id,
       sender: req.user.id,
-      title: `⚠️ Policy Warning Notice (Strike #${user.warningCount})`,
+      title: `Policy Warning Notice (Strike #${user.warningCount})`,
       message: `Violation: ${reason}. Message: "${message}". Please adhere to community guidelines.`,
       type: 'admin_alert',
       link: user.role === 'tutor' ? '/tutor/dashboard' : '/student/dashboard'
@@ -415,7 +415,7 @@ exports.issueUserWarning = async (req, res) => {
     const io = req.app.get('io');
     if (io) {
       io.to(`user_${user._id}`).emit('notification-alert', {
-        title: `⚠️ Policy Warning Notice (Strike #${user.warningCount})`,
+        title: `Policy Warning Notice (Strike #${user.warningCount})`,
         message: `Violation: ${reason}. "${message}"`,
         type: 'admin_alert'
       });
@@ -500,13 +500,13 @@ exports.updateUserStatus = async (req, res) => {
     let notifTitle = 'Account Status Notice';
     let notifMsg = `Your account status has been set to: ${status.replace('_', ' ').toUpperCase()}.`;
     if (status === 'active') {
-      notifTitle = '✅ Account Reinstated & Active';
+      notifTitle = 'Account Reinstated & Active';
       notifMsg = 'Your account has been fully verified and is active on IlmPortal.';
     } else if (status === 'under_review') {
-      notifTitle = '🔍 Account Placed Under Administrative Review';
+      notifTitle = 'Account Placed Under Administrative Review';
       notifMsg = `Your account is temporarily under review. Reason: ${reason || 'Standard safety audit'}.`;
     } else if (status === 'suspended') {
-      notifTitle = '⛔ Account Suspended';
+      notifTitle = 'Account Suspended';
       notifMsg = `Your account access has been suspended by administration. Reason: ${reason || 'Policy violation'}.`;
     }
 

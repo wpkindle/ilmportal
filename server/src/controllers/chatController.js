@@ -134,7 +134,7 @@ exports.sendMessage = async (req, res) => {
       io.to(`conv_${conversationId}`).emit('new-message', populatedMsg);
       io.to(`user_${recipientId}`).emit('notification-alert', {
         title: 'New Message',
-        message: `${req.user.name}: ${voiceData ? '🎙️ Sent a voice message' : (text ? text.slice(0, 50) : 'Sent an offer')}`,
+        message: `${req.user.name}: ${voiceData ? 'Sent a voice message' : (text ? text.slice(0, 50) : 'Sent an offer')}`,
         type: 'new_message',
         conversationId
       });

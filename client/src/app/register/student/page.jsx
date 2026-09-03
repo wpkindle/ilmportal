@@ -14,7 +14,8 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
-  BookOpen
+  BookOpen,
+  Info
 } from 'lucide-react';
 import { api } from '../../../services/api';
 export default function StudentRegisterPage() {
@@ -204,8 +205,9 @@ export default function StudentRegisterPage() {
             </div>
 
             {/* Profile note */}
-            <p className="text-[11px] text-slate-400 bg-slate-50 p-2.5 rounded-xl border border-slate-100 leading-relaxed">
-              💡 Additional details like Gender, Age, City, and Grade can be customized anytime from your Student Profile after signing up.
+            <p className="text-[11px] text-slate-500 bg-slate-50 p-2.5 rounded-xl border border-slate-100 leading-relaxed flex items-start gap-1.5">
+              <Info className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+              <span>Additional details like Gender, Age, City, and Grade can be customized anytime from your Student Profile after signing up.</span>
             </p>
 
             {/* Submit Button */}

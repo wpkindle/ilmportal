@@ -27,7 +27,8 @@ import {
   Flag,
   Lock,
   AlertTriangle,
-  RotateCcw
+  RotateCcw,
+  X
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
@@ -166,7 +167,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       } catch (e) {}
     }
 
-    console.log('🔧 Creating in-platform RTCPeerConnection for:', targetSocketId || roomId);
+    console.log('[WebRTC] Creating RTCPeerConnection for:', targetSocketId || roomId);
     const pc = new RTCPeerConnection(ICE_SERVERS);
     peerConnectionRef.current = pc;
     iceCandidateQueue.current = [];
@@ -177,7 +178,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       localStreamRef.current.getTracks().forEach((track) => {
         const alreadyAdded = existingSenders.some((s) => s.track && s.track.kind === track.kind);
         if (!alreadyAdded) {
-          console.log('➕ Adding unique local track to PC:', track.kind);
+          console.log('[WebRTC] Adding local track to PC:', track.kind);
           pc.addTrack(track, localStreamRef.current);
         }
       });
@@ -185,7 +186,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
     // When remote track arrives
     pc.ontrack = (event) => {
-      console.log('🎉 Received remote track:', event.track.kind, event.streams);
+      console.log('[WebRTC] Received remote track:', event.track.kind, event.streams);
       let stream = event.streams && event.streams[0];
       if (!stream) {
         stream = new MediaStream([event.track]);
@@ -194,7 +195,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       setPeerConnected(true);
       setIsConnecting(false);
 
-      // ⚠️ IMPORTANT FOR NOISE SUPPRESSION:
+      // IMPORTANT FOR NOISE SUPPRESSION:
       // Keep all <video> elements MUTED to prevent double-audio decoding and howling loops!
       if (remoteVideoRef.current) {
         remoteVideoRef.current.srcObject = stream;
@@ -240,7 +241,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     };
 
     pc.oniceconnectionstatechange = () => {
-      console.log('📡 WebRTC ICE state:', pc.iceConnectionState);
+      console.log('[WebRTC] ICE state:', pc.iceConnectionState);
       if (['connected', 'completed'].includes(pc.iceConnectionState)) {
         setPeerConnected(true);
         setIsConnecting(false);
@@ -283,7 +284,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       }
       await pc.setLocalDescription(offer);
 
-      console.log('📤 Sending WebRTC Offer to partner');
+      console.log('[WebRTC] Sending Offer to partner');
       socket.emit('webrtc-signal', {
         roomId,
         targetSocketId,
@@ -369,14 +370,14 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           if (Array.isArray(peers) && peers.length > 0) {
             const peerSocketId = peers[0];
             targetPeerSocketIdRef.current = peerSocketId;
-            console.log('👀 Existing peer in room detected:', peerSocketId);
+            console.log('[WebRTC] Existing peer in room detected:', peerSocketId);
             // We wait for the existing peer to initiate the offer to prevent double-offer glare
           }
         });
 
         // When a new peer joins after me (I am the existing peer, so I send the offer)
         socket.on('peer-joined', ({ socketId, user: joinedUser }) => {
-          console.log('👋 Peer joined, initiating offer to:', joinedUser?.name, socketId);
+          console.log('[WebRTC] Peer joined, initiating offer to:', joinedUser?.name, socketId);
           setRemotePeerInfo(joinedUser);
           targetPeerSocketIdRef.current = socketId;
           sendOffer(socketId);
@@ -399,7 +400,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
           // 1. Handle Offer
           if (signalData.type === 'offer' && signalData.offer) {
-            console.log('📥 Received WebRTC Offer from:', callerSocketId);
+            console.log('[WebRTC] Received Offer from:', callerSocketId);
             const pc = peerConnectionRef.current || createPeerConnection(callerSocketId);
 
             try {
@@ -426,7 +427,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               }
               await pc.setLocalDescription(answer);
 
-              console.log('📤 Sending WebRTC Answer');
+              console.log('[WebRTC] Sending Answer');
               socket.emit('webrtc-signal', {
                 roomId,
                 targetSocketId: callerSocketId,
@@ -440,7 +441,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
           // 2. Handle Answer
           if (signalData.type === 'answer' && signalData.answer) {
-            console.log('📥 Received WebRTC Answer');
+            console.log('[WebRTC] Received Answer');
             const pc = peerConnectionRef.current;
             if (pc && pc.signalingState !== 'stable') {
               try {
@@ -472,7 +473,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
         });
 
         socket.on('peer-left', () => {
-          console.log('👋 Peer left');
+          console.log('[WebRTC] Peer left');
           setPeerConnected(false);
           setRemoteStream(null);
           setRemotePeerInfo(null);
@@ -742,10 +743,10 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       ref={containerRef}
       className="flex flex-col h-screen w-screen bg-slate-950 text-white overflow-hidden fixed inset-0 z-50 select-none font-sans"
     >
-      {/* ⚠️ Single dedicated remote audio element for crystal-clear voice without echo loops */}
+      {/* Single dedicated remote audio element for crystal-clear voice without echo loops */}
       <audio ref={remoteAudioRef} autoPlay playsInline />
 
-      {/* 🛡️ Pre-Join Safety, Privacy & Camera Check Modal */}
+      {/* Pre-Join Safety, Privacy & Camera Check Modal */}
       {safetyModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
           <div className="bg-slate-900 border border-slate-700/90 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 relative overflow-hidden text-center">
@@ -856,7 +857,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
         {/* Center/Right Timer, Modes & Security Badges */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* 🔒 End-to-End Encrypted Label */}
+          {/* End-to-End Encrypted Label */}
           <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold">
             <Lock className="w-3 h-3 text-emerald-400" />
             <span>E2EE 1:1 Safe Room</span>
@@ -1142,9 +1143,9 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               </div>
               <button
                 onClick={() => setChatOpen(false)}
-                className="text-slate-400 hover:text-white text-xs font-bold px-2 py-0.5 rounded-lg hover:bg-slate-800 cursor-pointer"
+                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 cursor-pointer"
               >
-                ✕
+                <X className="w-4 h-4" />
               </button>
             </div>
 
@@ -1293,7 +1294,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           )}
         </button>
 
-        {/* 🚨 Emergency Leave & Report Button */}
+        {/* Emergency Leave & Report Button */}
         <button
           onClick={handleEmergencyLeaveAndReport}
           className="p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-bold transition-all shadow-lg shadow-amber-900/40 cursor-pointer flex items-center justify-center gap-1.5"
@@ -1314,7 +1315,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
         </button>
       </div>
 
-      {/* 🛡️ In-Classroom Report & Safety Incident Modal */}
+      {/* In-Classroom Report & Safety Incident Modal */}
       <ReportModal
         isOpen={classReportModalOpen}
         onClose={() => {

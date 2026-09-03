@@ -14,7 +14,8 @@ import {
   AlertCircle,
   Eye,
   EyeOff,
-  BookOpen
+  BookOpen,
+  Info
 } from 'lucide-react';
 import { api } from '../../../services/api';
 export default function TutorRegisterPage() {
@@ -204,8 +205,9 @@ export default function TutorRegisterPage() {
             </div>
 
             {/* Profile Setup Notice */}
-            <p className="text-[11px] text-slate-500 bg-emerald-50/70 p-3 rounded-xl border border-emerald-100 leading-relaxed">
-              💡 <strong>Profile Details:</strong> You can upload your degree / Sanad certificates, set your subjects, hourly rates, bio, and profile photo directly from your Tutor Dashboard after signing up.
+            <p className="text-[11px] text-slate-500 bg-emerald-50/70 p-3 rounded-xl border border-emerald-100 leading-relaxed flex items-start gap-1.5">
+              <Info className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+              <span><strong>Profile Details:</strong> You can upload your degree / Sanad certificates, set your subjects, hourly rates, bio, and profile photo directly from your Tutor Dashboard after signing up.</span>
             </p>
 
             {/* Submit Button */}

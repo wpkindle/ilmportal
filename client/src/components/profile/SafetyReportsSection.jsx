@@ -359,3 +359,4 @@ export default function SafetyReportsSection({ userRole = 'student' }) {
     </section>
   );
 }
+

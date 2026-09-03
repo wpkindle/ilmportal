@@ -460,7 +460,10 @@ export default function AdminDashboardPage() {
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
-                    ⚠️ Warned ({userCounts.warned})
+                    <span className="flex items-center gap-1.5">
+                      <AlertTriangle className="w-3.5 h-3.5" />
+                      <span>Warned ({userCounts.warned})</span>
+                    </span>
                   </button>
                   <button
                     onClick={() => setActiveTab('under_review')}
@@ -470,7 +473,10 @@ export default function AdminDashboardPage() {
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
-                    🔍 Under Review ({userCounts.underReview})
+                    <span className="flex items-center gap-1.5">
+                      <Search className="w-3.5 h-3.5" />
+                      <span>Under Review ({userCounts.underReview})</span>
+                    </span>
                   </button>
                   <button
                     onClick={() => setActiveTab('suspended')}
@@ -480,7 +486,10 @@ export default function AdminDashboardPage() {
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
-                    ⛔ Suspended ({userCounts.suspended})
+                    <span className="flex items-center gap-1.5">
+                      <Ban className="w-3.5 h-3.5" />
+                      <span>Suspended ({userCounts.suspended})</span>
+                    </span>
                   </button>
                 </div>
               </div>
@@ -548,8 +557,9 @@ export default function AdminDashboardPage() {
 
                             {/* Warning Strike Badge */}
                             {(u.warningCount || 0) > 0 && (
-                              <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500 text-white shadow-2xs">
-                                ⚠️ {u.warningCount} Strike{u.warningCount > 1 ? 's' : ''}
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500 text-white shadow-2xs">
+                                <AlertTriangle className="w-3 h-3" />
+                                <span>{u.warningCount} Strike{u.warningCount > 1 ? 's' : ''}</span>
                               </span>
                             )}
                           </div>
@@ -943,8 +953,9 @@ export default function AdminDashboardPage() {
               <p className="text-xs text-slate-600 leading-relaxed">
                 Are you sure you want to permanently delete the <strong>{selectedUser.role}</strong> account for <strong>{selectedUser.name}</strong> ({selectedUser.email})?
               </p>
-              <div className="p-3 bg-rose-50/80 rounded-2xl border border-rose-200 text-[11px] text-rose-900 font-medium">
-                ⚠️ This will permanently remove their profile, Sanad credentials, cancel pending deals, and purge login access. This action cannot be undone.
+              <div className="p-3 bg-rose-50/80 rounded-2xl border border-rose-200 text-[11px] text-rose-900 font-medium flex items-start gap-1.5">
+                <AlertCircle className="w-4 h-4 text-rose-600 shrink-0 mt-0.5" />
+                <span>This will permanently remove their profile, Sanad credentials, cancel pending deals, and purge login access. This action cannot be undone.</span>
               </div>
 
               <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">

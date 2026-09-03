@@ -119,7 +119,7 @@ export default function ReviewsManagementPage() {
                       <td className="p-4">
                         {rev.adminEdited ? (
                           <span className="px-2 py-0.5 bg-amber-100 text-amber-900 font-bold rounded">
-                            Yes (Original: {rev.originalRating}★)
+                            Yes (Original: {rev.originalRating}/5)
                           </span>
                         ) : (
                           <span className="text-slate-400">No</span>

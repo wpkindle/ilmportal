@@ -111,7 +111,7 @@ export default function TutorDashboardPage() {
                 Verified & Live on IlmPortal Pakistan
               </span>
               <h1 className="text-2xl sm:text-3xl font-black text-white">
-                Assalam-o-Alaikum, {user?.name}! 👋
+                Assalam-o-Alaikum, {user?.name}!
               </h1>
               <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
                 Your profile is active across all Pakistani regions. Manage ongoing student courses, monitor trial status, and conduct live WebRTC classes.

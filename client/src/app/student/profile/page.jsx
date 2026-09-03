@@ -218,7 +218,7 @@ function StudentProfileContent() {
             </div>
             <div className="space-y-1">
               <h3 className="text-sm font-bold text-emerald-950 flex items-center gap-2">
-                <span>🎉 Email Verified Successfully!</span>
+                <span>Email Verified Successfully!</span>
                 <span className="text-[10px] bg-emerald-600 text-white font-extrabold px-2 py-0.5 rounded-full">ACTIVE</span>
               </h3>
               <p className="text-xs text-emerald-900 leading-relaxed font-medium">

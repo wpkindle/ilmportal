@@ -98,7 +98,7 @@ export default function SafetyPage() {
   return (
     <div className="bg-slate-950 text-slate-100 min-h-screen selection:bg-emerald-500 selection:text-white pb-24">
       
-      {/* 🛡️ Hero Section */}
+      {/* Hero Section */}
       <section className="relative pt-20 pb-24 overflow-hidden border-b border-emerald-950/80">
         {/* Ambient Aurora Glows */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-emerald-500/10 rounded-full blur-[140px] pointer-events-none" />
@@ -159,7 +159,7 @@ export default function SafetyPage() {
         </div>
       </section>
 
-      {/* 🏛️ 4 Pillars of Protection */}
+      {/* 4 Pillars of Protection */}
       <section className="py-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-16">
         <div className="text-center space-y-2.5 max-w-2xl mx-auto">
           <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/80 px-3.5 py-1 rounded-full border border-emerald-800 inline-block">
@@ -221,7 +221,7 @@ export default function SafetyPage() {
         </div>
       </section>
 
-      {/* 📹 Live Video Classroom Safe-Room Protocol Breakdown */}
+      {/* Live Video Classroom Safe-Room Protocol Breakdown */}
       <section className="py-16 bg-slate-900/60 border-y border-slate-800">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
           
@@ -272,7 +272,7 @@ export default function SafetyPage() {
         </div>
       </section>
 
-      {/* 📜 Legal & PECA 2016 Compliance */}
+      {/* Legal & PECA 2016 Compliance */}
       <section className="py-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="p-8 rounded-3xl bg-gradient-to-r from-slate-900 via-emerald-950/40 to-slate-900 border border-slate-800 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2 max-w-xl">
@@ -305,7 +305,7 @@ export default function SafetyPage() {
         </div>
       </section>
 
-      {/* 🚨 Emergency Escalation Banner */}
+      {/* Emergency Escalation Banner */}
       <section className="max-w-4xl mx-auto px-4 text-center space-y-4">
         <div className="p-6 rounded-2xl bg-rose-950/30 border border-rose-500/30 space-y-3">
           <div className="inline-flex items-center gap-1.5 text-rose-400 font-bold text-xs">

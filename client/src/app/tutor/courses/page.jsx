@@ -20,7 +20,9 @@ import {
   ChevronRight,
   ChevronDown,
   X,
-  AlertCircle
+  AlertCircle,
+  Users,
+  CreditCard
 } from 'lucide-react';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
@@ -573,7 +575,7 @@ export default function TutorCoursesPage() {
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>{message}</span>
             </div>
-            <button onClick={() => setMessage('')} className="text-emerald-700 hover:text-emerald-950 font-bold text-xs">✕</button>
+            <button onClick={() => setMessage('')} className="p-1 text-emerald-700 hover:text-emerald-950 font-bold text-xs"><X className="w-4 h-4" /></button>
           </div>
         )}
         {error && (
@@ -582,7 +584,7 @@ export default function TutorCoursesPage() {
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
               <span>{error}</span>
             </div>
-            <button onClick={() => setError('')} className="text-rose-700 hover:text-rose-950 font-bold text-xs">✕</button>
+            <button onClick={() => setError('')} className="p-1 text-rose-700 hover:text-rose-950 font-bold text-xs"><X className="w-4 h-4" /></button>
           </div>
         )}
 
@@ -680,9 +682,18 @@ export default function TutorCoursesPage() {
                         {selectedCourse.subtitle}
                       </p>
                       <div className="flex items-center flex-wrap gap-2.5 mt-2 text-xs text-slate-600 font-semibold">
-                        <span className="bg-slate-100 px-2 py-0.5 rounded-md">💰 PKR {selectedCourse.priceSuggested?.amount || 3500}/mo</span>
-                        <span className="bg-slate-100 px-2 py-0.5 rounded-md">⏱️ {selectedCourse.sessionDuration || '20–30 mins'}</span>
-                        <span className="bg-slate-100 px-2 py-0.5 rounded-md">👥 {selectedCourse.targetAudience || 'All Ages'}</span>
+                        <span className="bg-slate-100 px-2 py-1 rounded-md flex items-center gap-1.5">
+                          <CreditCard className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>PKR {selectedCourse.priceSuggested?.amount || 3500}/mo</span>
+                        </span>
+                        <span className="bg-slate-100 px-2 py-1 rounded-md flex items-center gap-1.5">
+                          <Clock className="w-3.5 h-3.5 text-indigo-600" />
+                          <span>{selectedCourse.sessionDuration || '20–30 mins'}</span>
+                        </span>
+                        <span className="bg-slate-100 px-2 py-1 rounded-md flex items-center gap-1.5">
+                          <Users className="w-3.5 h-3.5 text-teal-600" />
+                          <span>{selectedCourse.targetAudience || 'All Ages'}</span>
+                        </span>
                       </div>
                     </div>
 

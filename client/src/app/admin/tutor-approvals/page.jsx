@@ -217,7 +217,7 @@ export default function TutorApprovalPage() {
                         <div className="flex items-center justify-between text-xs">
                           <span className="font-bold text-slate-700">Profile Strength & Completion:</span>
                           <span className={`font-black ${tutor.completion.percentage >= 100 ? 'text-emerald-700' : 'text-amber-700'}`}>
-                            {tutor.completion.percentage}% {tutor.completion.percentage >= 100 ? '✓ 100% Ready for Approval' : '(Incomplete)'}
+                            {tutor.completion.percentage}% {tutor.completion.percentage >= 100 ? '(100% Ready for Approval)' : '(Incomplete)'}
                           </span>
                         </div>
                         <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">

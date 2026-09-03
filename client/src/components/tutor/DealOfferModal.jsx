@@ -36,7 +36,7 @@ const subjectOptions = [
   { value: 'English Grammar, Composition & IELTS', label: 'English Grammar, Composition & IELTS', sublabel: 'Spoken & Academic English', badge: 'Language' },
   { value: 'Urdu Literature & Grammar (Adab)', label: 'Urdu Literature & Grammar (Adab)', sublabel: 'School & College Urdu', badge: 'Language' },
   { value: 'Junior / Primary All Subjects (Grade 1-8)', label: 'Junior / Primary All Subjects (Grade 1-8)', sublabel: 'School Foundation', badge: 'School' },
-  { value: 'custom', label: '✍️ Other / Custom Subject Title...', sublabel: 'Type custom title' }
+  { value: 'custom', label: 'Other / Custom Subject Title...', sublabel: 'Type custom title' }
 ];
 
 const billingOptions = [

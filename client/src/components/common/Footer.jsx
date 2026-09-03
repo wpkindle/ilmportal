@@ -17,7 +17,10 @@ import {
   Globe,
   Lock,
   Compass,
-  Headphones
+  Headphones,
+  Zap,
+  Landmark,
+  CreditCard
 } from 'lucide-react';
 
 const Footer = () => {
@@ -31,7 +34,7 @@ const Footer = () => {
   return (
     <footer className="relative bg-slate-950 text-slate-300 pt-20 pb-36 md:pb-16 overflow-hidden border-t border-slate-900 selection:bg-emerald-500 selection:text-white">
       
-      {/* 🔮 Embedded CSS Animations for High-Performance GPU Acceleration */}
+      {/* Embedded CSS Animations for High-Performance GPU Acceleration */}
       <style jsx>{`
         @keyframes floatSlow1 {
           0%, 100% { transform: translate(0px, 0px) scale(1); }
@@ -43,33 +46,35 @@ const Footer = () => {
         }
         @keyframes floatSlow3 {
           0%, 100% { transform: translate(0px, 0px) scale(0.98); }
-          50% { transform: translate(25px, 20px) scale(1.08); }
+          50% { transform: translate(25px, -35px) scale(1.08); }
+        }
+        @keyframes shimmerSlow {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
         }
         @keyframes beamScan {
-          0% { transform: translateX(-100%); opacity: 0; }
-          20% { opacity: 1; }
-          80% { opacity: 1; }
-          100% { transform: translateX(200%); opacity: 0; }
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
         }
         @keyframes starDrift1 {
-          0% { transform: translateY(0) rotate(0deg); opacity: 0.15; }
-          50% { transform: translateY(-40px) rotate(45deg); opacity: 0.4; }
-          100% { transform: translateY(-80px) rotate(90deg); opacity: 0.1; }
+          0%, 100% { transform: rotate(0deg) scale(1); opacity: 0.25; }
+          50% { transform: rotate(180deg) scale(1.25); opacity: 0.45; }
         }
         @keyframes starDrift2 {
-          0% { transform: translateY(0) rotate(0deg); opacity: 0.2; }
-          50% { transform: translateY(-50px) rotate(-60deg); opacity: 0.45; }
-          100% { transform: translateY(-100px) rotate(-120deg); opacity: 0.1; }
+          0%, 100% { transform: rotate(0deg) scale(1); opacity: 0.2; }
+          50% { transform: rotate(-180deg) scale(1.3); opacity: 0.5; }
         }
-        .anim-orb-1 { animation: floatSlow1 14s ease-in-out infinite; }
-        .anim-orb-2 { animation: floatSlow2 18s ease-in-out infinite; }
-        .anim-orb-3 { animation: floatSlow3 16s ease-in-out infinite; }
+
+        .anim-orb-1 { animation: floatSlow1 22s ease-in-out infinite alternate; }
+        .anim-orb-2 { animation: floatSlow2 26s ease-in-out infinite alternate; }
+        .anim-orb-3 { animation: floatSlow3 30s ease-in-out infinite alternate; }
+        .anim-shimmer { animation: shimmerSlow 6s ease-in-out infinite; background-size: 200% 100%; }
         .anim-beam { animation: beamScan 7s cubic-bezier(0.4, 0, 0.2, 1) infinite; }
         .anim-star-1 { animation: starDrift1 12s ease-in-out infinite; }
         .anim-star-2 { animation: starDrift2 15s ease-in-out infinite 2s; }
       `}</style>
 
-      {/* 🌌 Animated Background Ambient Glows & Floating Stars */}
+      {/* Animated Background Ambient Glows & Floating Stars */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
         
         {/* Top Sweeping Animated Laser Beam */}
@@ -113,7 +118,7 @@ const Footer = () => {
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-16">
 
-        {/* 🌟 Pre-Footer Callout Banner with Animated Shimmer Glow */}
+        {/* Pre-Footer Callout Banner with Animated Shimmer Glow */}
         <div className="relative rounded-3xl bg-gradient-to-r from-slate-900 via-emerald-950/50 to-slate-900 border border-emerald-500/30 p-6 sm:p-10 shadow-2xl backdrop-blur-md overflow-hidden group">
           <div className="absolute -right-10 -bottom-10 w-72 h-72 bg-emerald-500/15 rounded-full blur-3xl group-hover:bg-emerald-500/25 transition-all duration-700 pointer-events-none anim-orb-2" />
           <div className="absolute -left-10 -top-10 w-72 h-72 bg-teal-500/10 rounded-full blur-3xl group-hover:bg-teal-500/20 transition-all duration-700 pointer-events-none anim-orb-1" />
@@ -151,7 +156,7 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* 🏛️ Main Footer 5-Column Grid */}
+        {/* Main Footer 5-Column Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pb-12 border-b border-slate-800/80">
           
           {/* Col 1: Brand, Mission & Contact Info */}
@@ -394,7 +399,7 @@ const Footer = () => {
 
         </div>
 
-        {/* 💳 Payment Method Trust Bar with Soft Shimmer */}
+        {/* Payment Method Trust Bar with Soft Shimmer */}
         <div className="py-6 px-6 rounded-2xl bg-slate-900/80 border border-slate-800/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs shadow-inner">
           <div className="flex items-center gap-2 text-slate-300">
             <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
@@ -402,25 +407,30 @@ const Footer = () => {
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
-            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-amber-300 hover:border-amber-500/40 transition-colors">
-              ⚡ JazzCash
+            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-amber-300 hover:border-amber-500/40 transition-colors flex items-center gap-1.5">
+              <Zap className="w-3.5 h-3.5 text-amber-400" />
+              <span>JazzCash</span>
             </span>
-            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-emerald-300 hover:border-emerald-500/40 transition-colors">
-              🟢 EasyPaisa
+            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-emerald-300 hover:border-emerald-500/40 transition-colors flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block" />
+              <span>EasyPaisa</span>
             </span>
-            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-cyan-300 hover:border-cyan-500/40 transition-colors">
-              🏦 Meezan Islamic Bank
+            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-cyan-300 hover:border-cyan-500/40 transition-colors flex items-center gap-1.5">
+              <Landmark className="w-3.5 h-3.5 text-cyan-400" />
+              <span>Meezan Islamic Bank</span>
             </span>
-            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-purple-300 hover:border-purple-500/40 transition-colors">
-              ✨ Raast Instant ID
+            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-purple-300 hover:border-purple-500/40 transition-colors flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-purple-400" />
+              <span>Raast Instant ID</span>
             </span>
-            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-slate-200 hover:border-slate-600 transition-colors">
-              💳 1Link ATM
+            <span className="px-3 py-1 rounded-lg bg-slate-800 border border-slate-700 font-bold text-[11px] text-slate-200 hover:border-slate-600 transition-colors flex items-center gap-1.5">
+              <CreditCard className="w-3.5 h-3.5 text-slate-400" />
+              <span>1Link ATM</span>
             </span>
           </div>
         </div>
 
-        {/* 🔒 Security & Data Compliance Trust Bar */}
+        {/* Security & Data Compliance Trust Bar */}
         <div className="py-4 px-6 rounded-2xl bg-slate-900/60 border border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
           <div className="flex flex-wrap items-center justify-center sm:justify-start gap-4 text-slate-400 text-[11px]">
             <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
@@ -450,7 +460,7 @@ const Footer = () => {
           </Link>
         </div>
 
-        {/* 📜 Bottom Copyright, Support & Founder Dedication */}
+        {/* Bottom Copyright, Support & Founder Dedication */}
         <div className="pt-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
           <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
             <div className="flex items-center gap-2">

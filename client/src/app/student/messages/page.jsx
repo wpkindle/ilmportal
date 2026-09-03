@@ -188,7 +188,7 @@ function StudentMessagesContent() {
                         </div>
 
                         <p className="text-[11px] text-slate-500 truncate mt-0.5">
-                          {conv.lastMessage?.text || (conv.lastMessage?.voiceData ? '🎙️ Voice note' : 'Sent an offer')}
+                          {conv.lastMessage?.text || (conv.lastMessage?.voiceData ? 'Voice note' : 'Sent an offer')}
                         </p>
                       </div>
                     </button>

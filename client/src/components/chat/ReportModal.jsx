@@ -14,13 +14,13 @@ import {
 import { api } from '../../services/api';
 
 const incidentCategories = [
-  { value: 'inappropriate_behavior', label: '⚠️ Inappropriate Behavior / Unprofessional Conduct' },
-  { value: 'off_platform_contact', label: '🚫 Off-Platform Contact Request (Phone/WhatsApp/Direct Pay)' },
-  { value: 'harassment', label: '🛡️ Harassment or Safety Concern' },
-  { value: 'attendance_dispute', label: '🕒 Class Missed / Attendance Dispute' },
-  { value: 'financial_dispute', label: '💳 Fee or Payment Dispute' },
-  { value: 'technical_issue', label: '⚙️ Audio/Video or Technical Malfunction' },
-  { value: 'other', label: '📝 Other Concern' }
+  { value: 'inappropriate_behavior', label: 'Inappropriate Behavior / Unprofessional Conduct' },
+  { value: 'off_platform_contact', label: 'Off-Platform Contact Request (Phone/WhatsApp/Direct Pay)' },
+  { value: 'harassment', label: 'Harassment or Safety Concern' },
+  { value: 'attendance_dispute', label: 'Class Missed / Attendance Dispute' },
+  { value: 'financial_dispute', label: 'Fee or Payment Dispute' },
+  { value: 'technical_issue', label: 'Audio/Video or Technical Malfunction' },
+  { value: 'other', label: 'Other Concern' }
 ];
 
 export default function ReportModal({

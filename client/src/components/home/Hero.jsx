@@ -205,7 +205,7 @@ const Hero = () => {
               className="px-3.5 py-1.5 rounded-full bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 font-bold border border-emerald-400/50 shadow-sm transition-all flex items-center gap-1.5"
             >
               <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400" />
-              <span>🌸 Female Tutors &amp; Alimahs</span>
+              <span>Female Tutors &amp; Alimahs</span>
             </Link>
             <span className="text-slate-400 text-xs font-semibold mr-1">Popular:</span>
             {quickSubjects.map((sub) => (

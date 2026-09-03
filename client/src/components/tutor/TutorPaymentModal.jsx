@@ -296,3 +296,4 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
     </div>
   );
 }
+

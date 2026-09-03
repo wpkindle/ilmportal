@@ -43,7 +43,7 @@ const safetyHighlights = [
     badge: 'AI Monitored & Protected',
     accent: 'from-blue-500/20 to-indigo-500/10 text-blue-400 border-blue-500/30',
     description:
-      'Safe, respectful in-platform messaging guarded by automated AI content moderation and zero personal phone sharing.',
+      'Safe, respectful in-platform messaging guarded by automated AI content moderation.',
     link: '/safety',
     linkText: 'Chat Rules'
   },

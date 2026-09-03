@@ -156,11 +156,11 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Main Footer 5-Column Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-10 lg:gap-8 pb-12 border-b border-slate-800/80">
+        {/* Main Footer Grid - 6 Columns Perfectly Balanced Across All Screen Sizes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-8 pb-12 border-b border-slate-800/80">
           
           {/* Col 1: Brand, Mission & Contact Info */}
-          <div className="lg:col-span-2 space-y-5">
+          <div className="space-y-5">
             <Link href="/" className="inline-flex items-center gap-3 group">
               <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-emerald-400 flex items-center justify-center text-white shadow-xl shadow-emerald-600/30 group-hover:scale-105 transition-transform duration-300 ring-2 ring-emerald-400/20">
                 <BookOpen className="w-6 h-6" />
@@ -404,44 +404,63 @@ const Footer = () => {
                 </Link>
               </li>
             </ul>
+          </div>
 
-            {/* Support Platform - Meezan Bank Barcode Card on Right Side */}
-            <div
+          {/* Col 6: Support Platform & Meezan Bank Barcode (Covers Right Side Empty Space) */}
+          <div className="space-y-3 bg-slate-900/90 border border-slate-800 p-4 rounded-2xl shadow-xl flex flex-col justify-between">
+            <div>
+              <div className="flex items-center justify-between gap-2 border-b border-slate-800 pb-2">
+                <div className="flex items-center gap-2">
+                  <div className="w-1.5 h-4 rounded-full bg-cyan-500" />
+                  <h4 className="text-xs font-extrabold text-white uppercase tracking-wider flex items-center gap-1.5">
+                    <Landmark className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Support Platform</span>
+                  </h4>
+                </div>
+                <span className="text-[10px] font-black px-1.5 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                  Meezan Bank
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                Scan with any Pakistani banking app (Meezan, Raast, EasyPaisa, JazzCash) to support our free Quran initiative.
+              </p>
+            </div>
+
+            {/* Meezan Barcode Image & Account Details */}
+            <div className="flex items-center gap-3 bg-slate-950/90 p-2.5 rounded-xl border border-slate-800/90">
+              <div className="w-20 h-20 sm:w-24 sm:h-24 bg-white p-1 rounded-xl shrink-0 overflow-hidden shadow-md">
+                <img
+                  src="/images/qr-meezan.jpg"
+                  alt="Meezan Bank QR Barcode"
+                  className="w-full h-full object-contain"
+                />
+              </div>
+              <div className="min-w-0 flex-1 space-y-1">
+                <span className="text-[9px] uppercase font-bold text-slate-400 block tracking-wider">
+                  Account Number
+                </span>
+                <p className="font-mono text-emerald-300 font-extrabold text-xs sm:text-sm select-all tracking-tight truncate">
+                  96010105435308
+                </p>
+                <div className="pt-0.5">
+                  <p className="text-[11px] font-bold text-white leading-tight">Abdul Khaliq</p>
+                  <p className="text-[10px] text-slate-400">Meezan Bank Ltd.</p>
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
               onClick={() => {
                 if (typeof window !== 'undefined') {
                   window.dispatchEvent(new CustomEvent('open-support-platform'));
                 }
               }}
-              className="mt-4 p-3 bg-slate-900/90 border border-slate-800 hover:border-emerald-500/50 rounded-2xl flex flex-col items-center sm:items-start gap-2.5 cursor-pointer group transition-all shadow-md"
-              title="Click to view Support Platform details"
+              className="w-full py-2 px-3 rounded-xl bg-gradient-to-r from-emerald-600/30 to-teal-600/30 hover:from-emerald-600/50 hover:to-teal-600/50 text-emerald-300 hover:text-white border border-emerald-500/40 text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer active:scale-98"
             >
-              <div className="flex items-center justify-between w-full">
-                <span className="text-[11px] font-bold text-white flex items-center gap-1.5">
-                  <Landmark className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>Support Platform</span>
-                </span>
-                <span className="text-[9px] font-extrabold text-emerald-400 bg-emerald-950/80 px-1.5 py-0.5 rounded border border-emerald-500/30">
-                  Meezan Bank
-                </span>
-              </div>
-              
-              <div className="flex items-center gap-3 w-full">
-                <div className="w-16 h-16 bg-white p-1 rounded-xl shrink-0 overflow-hidden shadow-sm group-hover:scale-105 transition-transform">
-                  <img
-                    src="/images/qr-meezan.jpg"
-                    alt="Meezan Bank QR Barcode"
-                    className="w-full h-full object-contain"
-                  />
-                </div>
-                <div className="min-w-0 flex-1 text-[11px]">
-                  <p className="font-mono text-emerald-300 font-bold text-xs select-all truncate">
-                    96010105435308
-                  </p>
-                  <p className="text-[10px] text-slate-300 font-medium">Abdul Khaliq</p>
-                  <p className="text-[9px] text-slate-500">Scan via Any Banking App</p>
-                </div>
-              </div>
-            </div>
+              <span>View EasyPaisa &amp; JazzCash</span>
+              <ArrowRight className="w-3 h-3" />
+            </button>
           </div>
 
         </div>

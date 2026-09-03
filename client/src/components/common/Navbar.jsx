@@ -485,8 +485,8 @@ const Navbar = () => {
                 </div>
               </div>
             ) : (
-              /* Unauthenticated Dual Portal Buttons (Student & Tutor) */
-              <div className="flex items-center gap-1.5 sm:gap-2">
+              /* Unauthenticated Dual Portal Buttons (Student & Tutor) - Desktop Only, shown inside mobile drawer on small screens */
+              <div className="hidden lg:flex items-center gap-1.5 sm:gap-2">
                 <Link
                   href="/login?role=student"
                   className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-bold rounded-xl shadow-xs transition-all"
@@ -519,7 +519,28 @@ const Navbar = () => {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-200 py-4 px-2 space-y-3 animate-in slide-in-from-top-2 duration-150 bg-white/95 backdrop-blur-md">
+          <div className="lg:hidden border-t border-slate-200 py-4 px-3 space-y-3 animate-in slide-in-from-top-2 duration-150 bg-white/95 backdrop-blur-md">
+            {!isAuthenticated && (
+              <div className="grid grid-cols-2 gap-2 pb-3 border-b border-slate-100">
+                <Link
+                  href="/login?role=student"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 py-3 min-h-[44px] bg-slate-900 active:bg-slate-950 text-white rounded-2xl text-xs font-bold text-center transition-transform active:scale-95 shadow-sm"
+                >
+                  <GraduationCap className="w-4 h-4 text-emerald-400" />
+                  <span>Student Portal</span>
+                </Link>
+                <Link
+                  href="/login?role=tutor"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-center gap-2 py-3 min-h-[44px] bg-emerald-600 active:bg-emerald-700 text-white rounded-2xl text-xs font-bold text-center transition-transform active:scale-95 shadow-sm"
+                >
+                  <ShieldCheck className="w-4 h-4 text-emerald-200" />
+                  <span>Tutor Portal</span>
+                </Link>
+              </div>
+            )}
+
             <div className="space-y-1">
               <Link
                 href="/courses"
@@ -609,26 +630,7 @@ const Navbar = () => {
                   <span>Sign Out</span>
                 </button>
               </div>
-            ) : (
-              <div className="pt-3 border-t border-slate-100 grid grid-cols-2 gap-2">
-                <Link
-                  href="/login?role=student"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-1.5 py-3 min-h-[44px] bg-slate-900 active:bg-slate-950 text-white rounded-xl text-xs font-bold text-center transition-transform active:scale-95"
-                >
-                  <GraduationCap className="w-4 h-4 text-emerald-400" />
-                  <span>Student Portal</span>
-                </Link>
-                <Link
-                  href="/login?role=tutor"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-1.5 py-3 min-h-[44px] bg-emerald-600 active:bg-emerald-700 text-white rounded-xl text-xs font-bold text-center transition-transform active:scale-95"
-                >
-                  <ShieldCheck className="w-4 h-4 text-emerald-200" />
-                  <span>Tutor Portal</span>
-                </Link>
-              </div>
-            )}
+            ) : null}
           </div>
         )}
 

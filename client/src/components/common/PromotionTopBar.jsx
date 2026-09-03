@@ -45,7 +45,7 @@ export default function PromotionTopBar() {
   const formatUnit = (n) => String(n).padStart(2, '0');
 
   return (
-    <aside aria-label="Special Promotion" className="relative z-50 bg-gradient-to-r from-slate-950 via-emerald-950 to-slate-950 text-white text-xs border-b border-emerald-500/30 shadow-xs">
+    <aside aria-label="Special Promotion" className="hidden md:block relative z-50 bg-gradient-to-r from-slate-950 via-emerald-950 to-slate-950 text-white text-xs border-b border-emerald-500/30 shadow-xs">
       <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 py-1 sm:py-1.5 flex flex-col sm:flex-row items-center justify-between gap-1.5 sm:gap-2.5 text-center sm:text-left">
         
         {/* Notice Message */}

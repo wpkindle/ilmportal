@@ -125,10 +125,12 @@ const initSocket = (io) => {
 
         // Also push notification event to recipient's personal room
         io.to(`user_${recipientId}`).emit('notification-alert', {
-          title: 'New Message',
-          message: `${populatedMsg.sender.name}: ${voiceData ? 'Sent a voice message' : (text ? text.slice(0, 50) : 'Sent an offer')}`,
+          title: `New Message from ${populatedMsg.sender.name}`,
+          message: `${voiceData ? 'Voice message' : (text ? text.slice(0, 70) : 'Sent a course offer')}`,
           type: 'new_message',
-          conversationId
+          conversationId,
+          senderAvatar: populatedMsg.sender.avatar || '/icon.svg',
+          link: populatedMsg.recipient?.role === 'tutor' ? '/tutor/messages' : '/student/messages'
         });
       } catch (err) {
         console.error('Socket send-message error:', err);

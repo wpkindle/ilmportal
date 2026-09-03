@@ -475,7 +475,7 @@ export default function AdminDashboardPage() {
                   >
                     <span className="flex items-center gap-1.5">
                       <Search className="w-3.5 h-3.5" />
-                      <span>Under Review ({userCounts.underReview})</span>
+                      <span>Under Review ({userCounts.under_review})</span>
                     </span>
                   </button>
                   <button
@@ -562,9 +562,6 @@ export default function AdminDashboardPage() {
                                 <span>{u.warningCount} Strike{u.warningCount > 1 ? 's' : ''}</span>
                               </span>
                             )}
-                          </div>
-
-                          <div className="flex flex-wrap items-center gap-3 text-[11px] text-slate-500">
                             <span className="flex items-center gap-1 font-mono">
                               <Mail className="w-3.5 h-3.5 text-slate-400" />
                               <span>{u.email}</span>
@@ -960,6 +957,7 @@ export default function AdminDashboardPage() {
 
               <div className="flex justify-end gap-2 pt-3 border-t border-slate-100">
                 <button
+                  type="button"
                   onClick={() => setDeleteModalOpen(false)}
                   className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors cursor-pointer"
                 >

@@ -133,10 +133,12 @@ exports.sendMessage = async (req, res) => {
     if (io) {
       io.to(`conv_${conversationId}`).emit('new-message', populatedMsg);
       io.to(`user_${recipientId}`).emit('notification-alert', {
-        title: 'New Message',
-        message: `${req.user.name}: ${voiceData ? 'Sent a voice message' : (text ? text.slice(0, 50) : 'Sent an offer')}`,
+        title: `New Message from ${req.user.name}`,
+        message: `${voiceData ? 'Voice message' : (text ? text.slice(0, 70) : 'Sent a course offer')}`,
         type: 'new_message',
-        conversationId
+        conversationId,
+        senderAvatar: req.user.avatar || '/icon.svg',
+        link: populatedMsg.recipient?.role === 'tutor' ? '/tutor/messages' : '/student/messages'
       });
     }
 

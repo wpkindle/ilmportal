@@ -8,6 +8,8 @@ import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import { MessageSquare } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { useSocket } from '../../../context/SocketContext';
+import { soundEngine } from '../../../utils/soundEffects';
+import { showNativeNotification } from '../../../utils/notificationManager';
 
 function StudentMessagesContent() {
   const { user } = useAuth();
@@ -71,6 +73,21 @@ function StudentMessagesContent() {
 
     const handleNewMessage = (msg) => {
       fetchConversations();
+      const currentUserId = (user?._id || user?.id)?.toString();
+      const senderId = (msg?.sender?._id || msg?.sender)?.toString();
+      if (currentUserId && senderId && senderId !== currentUserId) {
+        if (msg?.conversationId !== activeConversation?.conversationId) {
+          soundEngine.playMessageSound();
+          showNativeNotification({
+            title: `${msg?.sender?.name || 'New Message'}`,
+            body: msg?.text || (msg?.voiceData ? 'Sent a voice note' : 'Sent an update'),
+            icon: msg?.sender?.avatar || '/icon.svg',
+            url: '/student/messages',
+            tag: `msg-${msg?._id}`,
+            soundType: 'none'
+          });
+        }
+      }
     };
 
     socket.on('unread-count-updated', handleUnreadUpdate);

@@ -4,15 +4,58 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import { api } from '../services/api';
 import { useAuth } from './AuthContext';
 import { useSocket } from './SocketContext';
+import { soundEngine } from '../utils/soundEffects';
+import {
+  showNativeNotification,
+  requestNotificationPermission,
+  getNotificationPermission
+} from '../utils/notificationManager';
 
 const NotificationContext = createContext();
 
 export const NotificationProvider = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
   const { socket } = useSocket();
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [toastAlert, setToastAlert] = useState(null);
+  const [permissionStatus, setPermissionStatus] = useState('default');
+  const [soundEnabled, setSoundEnabledState] = useState(true);
+
+  // Sync initial sound and notification permissions
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      setPermissionStatus(getNotificationPermission());
+      setSoundEnabledState(soundEngine.isSoundEnabled());
+    }
+  }, []);
+
+  const toggleSound = (enabled) => {
+    const nextVal = typeof enabled === 'boolean' ? enabled : !soundEnabled;
+    soundEngine.setSoundEnabled(nextVal);
+    setSoundEnabledState(nextVal);
+    if (nextVal) {
+      soundEngine.playMessageSound();
+    }
+  };
+
+  const requestPermission = async () => {
+    const status = await requestNotificationPermission();
+    setPermissionStatus(status);
+    if (status === 'granted') {
+      showNativeNotification({
+        title: 'IlmPortal Alerts Enabled',
+        body: 'You will now receive instant desktop & mobile alerts with sound for messages & classroom updates.',
+        url: '/',
+        soundType: 'message'
+      });
+    }
+    return status;
+  };
+
+  const testChime = () => {
+    soundEngine.playMessageSound();
+  };
 
   const fetchNotifications = async () => {
     if (!isAuthenticated) return;
@@ -39,6 +82,22 @@ export const NotificationProvider = ({ children }) => {
     const handleNotification = (alertData) => {
       setToastAlert(alertData);
       fetchNotifications();
+
+      // Trigger OS desktop/mobile push notification banner with sound & vibration
+      const isMessageAlert = alertData?.type === 'new_message';
+      const defaultUrl = isMessageAlert
+        ? (user?.role === 'tutor' ? '/tutor/messages' : '/student/messages')
+        : (alertData?.link || '/');
+
+      showNativeNotification({
+        title: alertData?.title || 'IlmPortal Notification',
+        body: alertData?.message || 'New update on your IlmPortal account',
+        icon: alertData?.senderAvatar || '/icon.svg',
+        url: alertData?.link || defaultUrl,
+        tag: `ilmportal-${alertData?.type || 'general'}-${Date.now()}`,
+        soundType: isMessageAlert ? 'message' : 'alert'
+      });
+
       setTimeout(() => {
         setToastAlert(null);
       }, 5000);
@@ -49,7 +108,7 @@ export const NotificationProvider = ({ children }) => {
     return () => {
       socket.off('notification-alert', handleNotification);
     };
-  }, [socket]);
+  }, [socket, user]);
 
   const markAsRead = async (id) => {
     try {
@@ -79,6 +138,11 @@ export const NotificationProvider = ({ children }) => {
         notifications,
         unreadCount,
         toastAlert,
+        permissionStatus,
+        soundEnabled,
+        requestPermission,
+        toggleSound,
+        testChime,
         markAsRead,
         markAllAsRead,
         refreshNotifications: fetchNotifications
@@ -93,6 +157,11 @@ export const useNotifications = () => useContext(NotificationContext) || {
   notifications: [],
   unreadCount: 0,
   toastAlert: null,
+  permissionStatus: 'default',
+  soundEnabled: true,
+  requestPermission: async () => {},
+  toggleSound: () => {},
+  testChime: () => {},
   markAsRead: () => {},
   markAllAsRead: () => {},
   refreshNotifications: () => {}

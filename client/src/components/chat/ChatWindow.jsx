@@ -20,11 +20,17 @@ import {
   Check,
   CheckCheck,
   Lock,
-  Ban
+  Ban,
+  Volume2,
+  VolumeX,
+  Bell
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
+import { useNotifications } from '../../context/NotificationContext';
+import { soundEngine } from '../../utils/soundEffects';
+import { showNativeNotification } from '../../utils/notificationManager';
 import DealOfferCard from './DealOfferCard';
 import DealOfferModal from '../tutor/DealOfferModal';
 import VoiceMessagePlayer from './VoiceMessagePlayer';
@@ -34,6 +40,7 @@ import LoadingSpinner from '../common/LoadingSpinner';
 const ChatWindow = ({ conversationId, partner, initialDeal }) => {
   const { user, isTutor, isStudent } = useAuth();
   const { socket, onlineUsers } = useSocket();
+  const { soundEnabled, toggleSound, permissionStatus, requestPermission } = useNotifications();
 
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
@@ -117,14 +124,33 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
           return [...prev, msg];
         });
 
-        // If I am the recipient of this new message, mark it as seen immediately
         const currentUserId = (user?._id || user?.id)?.toString();
+        const senderId = (msg.sender?._id || msg.sender)?.toString();
         const recipientId = (msg.recipient?._id || msg.recipient)?.toString();
-        if (currentUserId && recipientId === currentUserId) {
-          socket.emit('mark-messages-seen', {
-            conversationId,
-            readerId: currentUserId
-          });
+
+        // If I received this message from my counterpart
+        if (currentUserId && senderId !== currentUserId) {
+          // Play WhatsApp/Messenger style double-chime
+          soundEngine.playMessageSound();
+
+          // If document is not currently focused/visible, show native desktop/mobile OS notification banner
+          if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
+            showNativeNotification({
+              title: `${msg.sender?.name || partner?.name || 'New Message'}`,
+              body: msg.text || (msg.voiceData ? 'Sent a voice note' : 'Sent an offer update'),
+              icon: msg.sender?.avatar || partner?.avatar || '/icon.svg',
+              url: isTutor ? '/tutor/messages' : '/student/messages',
+              tag: `msg-${msg._id}`,
+              soundType: 'none'
+            });
+          }
+
+          if (recipientId === currentUserId) {
+            socket.emit('mark-messages-seen', {
+              conversationId,
+              readerId: currentUserId
+            });
+          }
         }
       }
     };
@@ -363,6 +389,32 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
+          {/* Sound & Notification Alerts Controls */}
+          {permissionStatus !== 'granted' && (
+            <button
+              type="button"
+              onClick={requestPermission}
+              className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+              title="Turn on desktop & mobile notifications with audio chime"
+            >
+              <Bell className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+              <span className="hidden md:inline">Enable Alerts</span>
+            </button>
+          )}
+
+          <button
+            type="button"
+            onClick={() => toggleSound()}
+            className={`p-2 rounded-xl border text-xs transition-all cursor-pointer ${
+              soundEnabled
+                ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                : 'bg-slate-100 border-slate-200 text-slate-400 hover:bg-slate-200'
+            }`}
+            title={soundEnabled ? 'Sound alert is ON (Click to mute chime)' : 'Sound alert is MUTED (Click to enable chime)'}
+          >
+            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+          </button>
+
           {/* Live In-Platform Video Classroom Button (Identical deterministic room for Student & Tutor) */}
           <Link
             href={`/classroom/${conversationId}`}

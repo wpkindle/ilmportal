@@ -142,7 +142,7 @@ export default function SafetyPage() {
               href="/tutors?gender=female"
               className="w-full sm:w-auto px-6 py-3.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-xl shadow-emerald-700/30 transition-all flex items-center justify-center gap-2"
             >
-              <Heart className="w-4 h-4 text-rose-300 fill-rose-400" />
+              <ShieldCheck className="w-4 h-4 text-emerald-200" />
               <span>Browse Verified Female Tutors &amp; Alimahs</span>
               <ArrowRight className="w-4 h-4" />
             </Link>

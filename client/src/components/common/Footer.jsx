@@ -266,8 +266,8 @@ const Footer = () => {
               </li>
               <li>
                 <Link href="/tutors?gender=female" className="hover:text-emerald-400 transition-colors flex items-center gap-2 group">
-                  <Heart className="w-3.5 h-3.5 text-rose-400 group-hover:scale-110 transition-transform" />
-                  <span>Female Alimah Faculty</span>
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
+                  <span>Female Teachers &amp; Alimahs</span>
                 </Link>
               </li>
               <li>
@@ -450,9 +450,9 @@ const Footer = () => {
               <Lock className="w-3.5 h-3.5" />
               <span>PECA 2016 Law Compliant</span>
             </span>
-            <span className="flex items-center gap-1.5 text-rose-400 font-semibold">
-              <Heart className="w-3.5 h-3.5 fill-rose-400" />
-              <span>Female Safe-Room Verified</span>
+            <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Female Teachers &amp; Privacy Verified</span>
             </span>
             <span className="flex items-center gap-1.5 text-amber-400 font-semibold">
               <CheckCircle2 className="w-3.5 h-3.5" />
@@ -469,19 +469,23 @@ const Footer = () => {
           </Link>
         </div>
 
-        {/* Bottom Copyright, Support & Founder Dedication */}
-        <div className="pt-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-              <p>© {new Date().getFullYear()} IlmPortal Pakistan. All rights reserved.</p>
-            </div>
-            <Link
-              href="/contact-us"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-500/10 hover:bg-emerald-500/20 active:scale-95 text-emerald-400 border border-emerald-500/30 text-xs font-bold transition-all shadow-xs"
-            >
-              <Headphones className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Contact Support</span>
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-slate-800/80 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-400">
+          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 sm:gap-6">
+            <p className="text-slate-400 font-medium">
+              &copy; {new Date().getFullYear()} IlmPortal. All rights reserved.
+            </p>
+            <Link href="/terms" className="hover:text-slate-200 transition-colors">
+              Terms of Service
+            </Link>
+            <Link href="/privacy-policy" className="hover:text-slate-200 transition-colors">
+              Privacy Policy
+            </Link>
+            <Link href="/safety" className="hover:text-slate-200 transition-colors">
+              Child Protection
+            </Link>
+            <Link href="/disclaimer" className="hover:text-slate-200 transition-colors">
+              Legal Disclaimer
             </Link>
             <button
               type="button"
@@ -492,7 +496,7 @@ const Footer = () => {
               }}
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600/30 to-teal-600/30 hover:from-emerald-600/50 hover:to-teal-600/50 active:scale-95 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition-all shadow-xs cursor-pointer"
             >
-              <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400" />
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
               <span>Support Platform</span>
             </button>
           </div>

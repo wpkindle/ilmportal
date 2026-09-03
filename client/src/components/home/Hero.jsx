@@ -202,9 +202,9 @@ const Hero = () => {
           <div className="mt-4 flex flex-wrap items-center justify-center gap-2 text-xs">
             <Link
               href="/tutors?gender=female"
-              className="px-3.5 py-1.5 rounded-full bg-emerald-600/30 hover:bg-emerald-600/50 text-emerald-300 font-bold border border-emerald-400/50 shadow-sm transition-all flex items-center gap-1.5"
+              className="px-3.5 py-1.5 rounded-full bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 font-bold border border-emerald-500/40 shadow-sm transition-all flex items-center gap-1.5"
             >
-              <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400" />
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
               <span>Female Tutors &amp; Alimahs</span>
             </Link>
             <span className="text-slate-400 text-xs font-semibold mr-1">Popular:</span>
@@ -220,52 +220,50 @@ const Hero = () => {
           </div>
         </div>
 
-        {/* Dual Role Gateway Action Cards */}
-        <div className="mt-8 flex flex-col sm:flex-row items-stretch justify-center gap-3.5 max-w-2xl mx-auto">
-          {/* Student Portal Card */}
+        {/* Dual Role Gateway Action Buttons - Modern & High-Contrast */}
+        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-3.5 max-w-xl mx-auto">
+          {/* Student Button (Vibrant Primary CTA) */}
           <Link
-            href="/register/student"
-            className="w-full sm:w-1/2 group relative p-4 rounded-2xl bg-gradient-to-r from-emerald-950/80 via-slate-900/90 to-slate-950/90 hover:from-emerald-900/90 hover:to-slate-900 border border-emerald-500/40 hover:border-emerald-400 shadow-xl shadow-emerald-950/40 transition-all duration-200 flex items-center gap-3.5 text-left backdrop-blur-xl hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+            href="/tutors"
+            className="w-full sm:w-1/2 group relative p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-500 via-teal-500 to-emerald-600 hover:from-emerald-400 hover:to-teal-400 text-white shadow-xl shadow-emerald-950/70 hover:shadow-emerald-500/30 transition-all duration-300 flex items-center justify-between gap-3 text-left border border-emerald-300/40 hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
           >
-            <div className="w-11 h-11 rounded-xl bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 flex items-center justify-center shrink-0 group-hover:bg-emerald-500 group-hover:text-white transition-all shadow-inner">
-              <GraduationCap className="w-5 h-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400">Students &amp; Parents</span>
-                <span className="text-[9px] font-bold px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded border border-emerald-500/30">Free Trial</span>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-white/20 border border-white/30 flex items-center justify-center text-white shrink-0 group-hover:scale-110 transition-transform">
+                <GraduationCap className="w-5 h-5" />
               </div>
-              <p className="text-xs sm:text-sm font-extrabold text-white group-hover:text-emerald-100 transition-colors truncate">
-                Find a Tutor &amp; Learn
-              </p>
-              <p className="text-[10px] text-slate-400 truncate">1:1 Live Video or Home Tutoring</p>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-100">Students &amp; Parents</span>
+                  <span className="text-[9px] font-bold px-1.5 py-0.2 bg-white/25 text-white rounded-full">Free Trial</span>
+                </div>
+                <p className="text-sm sm:text-base font-black text-white leading-tight mt-0.5">
+                  Find a Tutor
+                </p>
+              </div>
             </div>
-            <div className="w-7 h-7 rounded-lg bg-white/5 group-hover:bg-emerald-500/20 flex items-center justify-center text-slate-400 group-hover:text-emerald-300 transition-colors shrink-0">
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </div>
+            <ArrowRight className="w-4 h-4 text-emerald-100 group-hover:translate-x-1 transition-transform shrink-0" />
           </Link>
 
-          {/* Tutor Portal Card */}
+          {/* Tutor Button (Sleek Glass Secondary CTA) */}
           <Link
             href="/register/tutor"
-            className="w-full sm:w-1/2 group relative p-4 rounded-2xl bg-gradient-to-r from-slate-900/90 via-slate-900/90 to-teal-950/70 hover:from-slate-850 hover:to-teal-900/80 border border-slate-700/80 hover:border-teal-400/60 shadow-xl shadow-slate-950/50 transition-all duration-200 flex items-center gap-3.5 text-left backdrop-blur-xl hover:scale-[1.02] active:scale-[0.98] cursor-pointer"
+            className="w-full sm:w-1/2 group relative p-3.5 sm:p-4 rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 text-white shadow-xl shadow-slate-950/70 hover:shadow-emerald-900/30 transition-all duration-300 flex items-center justify-between gap-3 text-left border border-white/20 hover:border-emerald-400/50 backdrop-blur-xl hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
           >
-            <div className="w-11 h-11 rounded-xl bg-teal-500/20 border border-teal-400/40 text-teal-300 flex items-center justify-center shrink-0 group-hover:bg-teal-500 group-hover:text-white transition-all shadow-inner">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-black uppercase tracking-wider text-teal-400">Qaris &amp; Teachers</span>
-                <span className="text-[9px] font-bold px-1.5 py-0.2 bg-teal-500/20 text-teal-300 rounded border border-teal-500/30">Sanad</span>
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center text-emerald-300 shrink-0 group-hover:scale-110 transition-transform">
+                <ShieldCheck className="w-5 h-5" />
               </div>
-              <p className="text-xs sm:text-sm font-extrabold text-white group-hover:text-teal-100 transition-colors truncate">
-                Join as Verified Tutor
-              </p>
-              <p className="text-[10px] text-slate-400 truncate">Teach Students &amp; Earn Online</p>
+              <div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400">Teachers</span>
+                  <span className="text-[9px] font-bold px-1.5 py-0.2 bg-emerald-500/20 text-emerald-300 rounded-full border border-emerald-500/30">Verified</span>
+                </div>
+                <p className="text-sm sm:text-base font-black text-white leading-tight mt-0.5">
+                  Join as Tutor
+                </p>
+              </div>
             </div>
-            <div className="w-7 h-7 rounded-lg bg-white/5 group-hover:bg-teal-500/20 flex items-center justify-center text-slate-400 group-hover:text-teal-300 transition-colors shrink-0">
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-            </div>
+            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-300 group-hover:translate-x-1 transition-transform shrink-0" />
           </Link>
         </div>
 

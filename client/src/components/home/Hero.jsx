@@ -134,7 +134,7 @@ const Hero = () => {
             Learn Safely from Home with <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-200">Verified Pakistani Tutors</span>
           </h1>
           <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed drop-shadow-sm font-normal">
-            Find trusted Quran teachers and school tutors across Pakistan. Safe 1-on-1 live video classes for children, girls, and families with complete privacy.
+            Find trusted Quran tutors and school tutors across Pakistan. Safe 1-on-1 live video classes for children, girls, and families with complete privacy.
           </p>
 
           {/* Trust & Security Signals */}
@@ -145,7 +145,7 @@ const Hero = () => {
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-teal-500/30 text-teal-300 shadow-xs">
               <ShieldCheck className="w-3.5 h-3.5 text-teal-400" />
-              <span>Female Teachers for Girls &amp; Kids</span>
+              <span>Female Tutors for Girls &amp; Kids</span>
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-blue-500/30 text-blue-300 shadow-xs">
               <Lock className="w-3.5 h-3.5 text-blue-400" />
@@ -234,14 +234,14 @@ const Hero = () => {
             <ArrowRight className="w-4 h-4 text-emerald-100 group-hover:translate-x-1 transition-transform shrink-0" />
           </Link>
 
-          {/* Join as a Teacher Button */}
+          {/* Join as a Tutor Button */}
           <Link
             href="/register/tutor"
             className="w-full sm:w-1/2 group relative px-5 py-3.5 rounded-2xl bg-slate-900/90 hover:bg-slate-800/90 text-white shadow-xl shadow-slate-950/70 hover:shadow-emerald-900/30 transition-all duration-300 flex items-center justify-center gap-3 border border-white/20 hover:border-emerald-400/50 backdrop-blur-xl hover:scale-[1.03] active:scale-[0.98] cursor-pointer"
           >
             <ShieldCheck className="w-5 h-5 text-emerald-400 group-hover:scale-110 transition-transform shrink-0" />
             <span className="text-sm sm:text-base font-extrabold text-white tracking-wide">
-              Join as a Teacher
+              Join as a Tutor
             </span>
             <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-emerald-300 group-hover:translate-x-1 transition-transform shrink-0" />
           </Link>
@@ -254,8 +254,8 @@ const Hero = () => {
             <div className="p-2.5 bg-emerald-500/20 group-hover:bg-emerald-500/30 text-emerald-300 w-fit mx-auto rounded-xl mb-2 shadow-inner group-hover:scale-110 transition-transform">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-emerald-300 transition-colors">Verified Teachers</h3>
-            <p className="text-[11px] text-slate-400 leading-tight">We check every teacher&apos;s ID, degrees, and Quran certificates.</p>
+            <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-emerald-300 transition-colors">Verified Tutors</h3>
+            <p className="text-[11px] text-slate-400 leading-tight">We check every tutor&apos;s ID, degrees, and Quran certificates.</p>
           </div>
 
           <div className="group relative p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-slate-900/80 to-slate-950/80 border border-white/10 hover:border-blue-500/50 backdrop-blur-xl space-y-1.5 text-center shadow-lg hover:shadow-2xl hover:shadow-blue-500/20 transform-gpu hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 overflow-hidden">

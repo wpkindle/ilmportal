@@ -26,8 +26,8 @@ import {
 const Footer = () => {
   const pathname = usePathname();
 
-  // Hide footer completely on live video classroom and messages/chat pages for full-height chat app view
-  if (pathname?.startsWith('/classroom') || pathname?.includes('/messages')) {
+  // Hide footer completely only on live video classroom
+  if (pathname?.startsWith('/classroom')) {
     return null;
   }
 
@@ -133,7 +133,7 @@ const Footer = () => {
                 Ready to start learning Quran and school subjects?
               </h3>
               <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
-                Learn Quran and school subjects with verified Pakistani teachers. Safe 1-on-1 online classes and home tutoring.
+                Learn Quran and school subjects with verified Pakistani tutors. Safe 1-on-1 online classes and home tutoring.
               </p>
             </div>
 
@@ -176,7 +176,7 @@ const Footer = () => {
             </Link>
 
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
-              Pakistan&apos;s trusted Quran and school tutoring platform. Helping families find verified Quran teachers and qualified school tutors with complete safety and privacy.
+              Pakistan&apos;s trusted Quran and school tutoring platform. Helping families find verified Quran tutors and qualified school tutors with complete safety and privacy.
             </p>
 
             {/* Quick Contact Micro-Cards */}
@@ -267,7 +267,7 @@ const Footer = () => {
               <li>
                 <Link href="/tutors?gender=female" className="hover:text-emerald-400 transition-colors flex items-center gap-2 group">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 group-hover:scale-110 transition-transform" />
-                  <span>Female Teachers &amp; Alimahs</span>
+                  <span>Female Tutors &amp; Alimahs</span>
                 </Link>
               </li>
               <li>
@@ -490,7 +490,7 @@ const Footer = () => {
             </span>
             <span className="flex items-center gap-1.5 text-emerald-400 font-semibold">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Female Teachers &amp; Privacy Verified</span>
+              <span>Female Tutors &amp; Privacy Verified</span>
             </span>
             <span className="flex items-center gap-1.5 text-amber-400 font-semibold">
               <CheckCircle2 className="w-3.5 h-3.5" />

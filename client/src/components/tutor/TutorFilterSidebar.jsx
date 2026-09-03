@@ -92,7 +92,7 @@ const TutorFilterSidebar = ({
       >
         <div className="flex items-center gap-2">
           <ShieldCheck className={`w-4 h-4 ${filters.gender === 'female' ? 'text-white' : 'text-emerald-700'}`} />
-          <span>Female Teachers Only</span>
+          <span>Female Tutors Only</span>
         </div>
         <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold uppercase tracking-wider ${
           filters.gender === 'female' ? 'bg-white/20 text-white' : 'bg-emerald-200/80 text-emerald-900'

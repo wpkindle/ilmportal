@@ -19,13 +19,13 @@ import {
 const safetyHighlights = [
   {
     icon: ShieldCheck,
-    title: 'Female Teachers for Girls & Kids',
+    title: 'Female Tutors for Girls & Kids',
     badge: '100% Privacy',
     accent: 'from-emerald-500/20 to-teal-500/10 text-emerald-400 border-emerald-500/30',
     description:
-      'Qualified female teachers for girls and young children, so your family can learn comfortably and privately.',
+      'Qualified female tutors for girls and young children, so your family can learn comfortably and privately.',
     link: '/tutors?gender=female',
-    linkText: 'Find Female Teachers'
+    linkText: 'Find Female Tutors'
   },
   {
     icon: Video,

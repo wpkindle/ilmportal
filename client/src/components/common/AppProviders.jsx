@@ -25,10 +25,11 @@ export default function AppProviders({ children }) {
       
       const currentPathWithSearch = window.location.pathname + window.location.search;
       // If user is already on this exact page or conversation, simply bring window to focus
-      if (currentPathWithSearch === targetUrl || window.location.pathname === targetUrl) {
+      if (currentPathWithSearch === targetUrl) {
         window.focus();
         return;
       }
+      window.focus();
       
       // Perform seamless Next.js SPA route transition without reloading
       router.push(targetUrl);

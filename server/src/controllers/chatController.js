@@ -131,15 +131,23 @@ exports.sendMessage = async (req, res) => {
     // Broadcast via Socket.IO to real-time participants
     const io = req.app.get('io');
     if (io) {
+      const recipientIdStr = (recipientId?._id || recipientId)?.toString();
+      const targetChatLink = populatedMsg.recipient?.role === 'tutor' 
+        ? `/tutor/messages?conversation=${conversationId}` 
+        : `/student/messages?conversation=${conversationId}`;
+
       io.to(`conv_${conversationId}`).emit('new-message', populatedMsg);
-      io.to(`user_${recipientId}`).emit('notification-alert', {
-        title: `New Message from ${req.user.name}`,
-        message: `${voiceData ? 'Voice message' : (text ? text.slice(0, 70) : 'Sent a course offer')}`,
-        type: 'new_message',
-        conversationId,
-        senderAvatar: req.user.avatar || '/icon.svg',
-        link: populatedMsg.recipient?.role === 'tutor' ? '/tutor/messages' : '/student/messages'
-      });
+      if (recipientIdStr) {
+        io.to(`user_${recipientIdStr}`).emit('new-message', populatedMsg);
+        io.to(`user_${recipientIdStr}`).emit('notification-alert', {
+          title: `New Message from ${req.user.name}`,
+          message: `${voiceData ? 'Voice message' : (text ? text.slice(0, 70) : 'Sent a course offer')}`,
+          type: 'new_message',
+          conversationId,
+          senderAvatar: req.user.avatar || '/icon.svg',
+          link: targetChatLink
+        });
+      }
     }
 
     res.status(201).json({

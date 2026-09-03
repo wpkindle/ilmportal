@@ -28,6 +28,15 @@ export const SocketProvider = ({ children }) => {
   const [onlineStatusMap, setOnlineStatusMap] = useState({});
   const socketRef = useRef(null);
 
+  const userRef = useRef(user);
+  useEffect(() => {
+    userRef.current = user;
+    if (socketRef.current && (user?._id || user?.id)) {
+      const uId = (user._id || user.id).toString();
+      socketRef.current.emit('register-user', uId);
+    }
+  }, [user]);
+
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
@@ -36,7 +45,7 @@ export const SocketProvider = ({ children }) => {
 
     const newSocket = io(socketUrl, {
       transports: ['websocket', 'polling'],
-      reconnectionAttempts: 10,
+      reconnectionAttempts: 15,
       reconnectionDelay: 1500,
       timeout: 20000
     });
@@ -47,8 +56,19 @@ export const SocketProvider = ({ children }) => {
     newSocket.on('connect', () => {
       setIsConnected(true);
       console.log('[WebSocket] Connected successfully!');
-      if (user?._id || user?.id) {
-        newSocket.emit('register-user', user._id || user.id);
+      const u = userRef.current;
+      if (u?._id || u?.id) {
+        const uId = (u._id || u.id).toString();
+        newSocket.emit('register-user', uId);
+      }
+    });
+
+    newSocket.io.on('reconnect', () => {
+      console.log('[WebSocket] Reconnected to server');
+      const u = userRef.current;
+      if (u?._id || u?.id) {
+        const uId = (u._id || u.id).toString();
+        newSocket.emit('register-user', uId);
       }
     });
 
@@ -84,13 +104,6 @@ export const SocketProvider = ({ children }) => {
       newSocket.disconnect();
     };
   }, []);
-
-  // Re-register user whenever auth state changes
-  useEffect(() => {
-    if (socket && isAuthenticated && user) {
-      socket.emit('register-user', user._id || user.id);
-    }
-  }, [socket, isAuthenticated, user]);
 
   const onlineUsers = Object.keys(onlineStatusMap).filter(k => onlineStatusMap[k]);
 

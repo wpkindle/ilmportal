@@ -1,4 +1,4 @@
-// IlmPortal Service Worker - Smooth SPA Notification Handling without Reloading
+// IlmPortal Service Worker - Handles Desktop & Mobile Push Notifications & Smooth Focusing
 const CACHE_NAME = 'ilmportal-cache-v1';
 
 self.addEventListener('install', (event) => {
@@ -9,28 +9,35 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-// Handle notification click on Desktop & Mobile OS without reloading the app
+// Handle notification click on Desktop & Mobile OS without unnecessary reloading
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
-  const targetUrl = (event.notification.data && event.notification.data.url) || '/';
+  const urlToOpen = (event.notification.data && event.notification.data.url) || '/';
+  const targetFullUrl = new URL(urlToOpen, self.location.origin).href;
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // 1. If an IlmPortal window is already open, focus it and navigate via SPA postMessage
+      // 1. If an IlmPortal window is already open, focus it
       for (const client of clientList) {
-        if ('focus' in client && client.url.includes(self.location.origin)) {
-          client.focus();
-          client.postMessage({
-            type: 'ILMPORTAL_NOTIFICATION_NAVIGATE',
-            url: targetUrl
+        if (client.url.startsWith(self.location.origin) && 'focus' in client) {
+          return client.focus().then((focusedClient) => {
+            const cl = focusedClient || client;
+            // If already on the exact target URL, simply focusing is enough (no reload)
+            if (cl.url === targetFullUrl) {
+              return cl;
+            }
+            // If on another page, navigate to the target conversation
+            if ('navigate' in cl) {
+              return cl.navigate(targetFullUrl);
+            }
+            return cl;
           });
-          return client;
         }
       }
 
-      // 2. If no window is open at all, launch a fresh browser window
+      // 2. If no window is open at all, open a new window
       if (self.clients.openWindow) {
-        return self.clients.openWindow(targetUrl);
+        return self.clients.openWindow(targetFullUrl);
       }
     })
   );

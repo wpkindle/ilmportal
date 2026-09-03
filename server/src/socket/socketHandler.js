@@ -120,18 +120,36 @@ const initSocket = (io) => {
           .populate('recipient', 'name avatar role city')
           .populate('deal');
 
-        // Broadcast to both participants in room
-        io.to(`conv_${conversationId}`).emit('new-message', populatedMsg);
+        const recipientIdStr = (recipientId?._id || recipientId)?.toString();
+        const recipientRole = populatedMsg.recipient?.role || 'student';
+        const targetChatLink = recipientRole === 'tutor' 
+          ? `/tutor/messages?conversation=${conversationId}` 
+          : `/student/messages?conversation=${conversationId}`;
 
-        // Also push notification event to recipient's personal room
-        io.to(`user_${recipientId}`).emit('notification-alert', {
+        const alertPayload = {
           title: `New Message from ${populatedMsg.sender.name}`,
-          message: `${voiceData ? 'Voice message' : (text ? text.slice(0, 70) : 'Sent a course offer')}`,
+          message: voiceData ? 'Sent a voice message' : (text ? text.slice(0, 70) : 'Sent a course offer'),
           type: 'new_message',
           conversationId,
           senderAvatar: populatedMsg.sender.avatar || '/icon.svg',
-          link: populatedMsg.recipient?.role === 'tutor' ? '/tutor/messages' : '/student/messages'
-        });
+          link: targetChatLink
+        };
+
+        // 1. Broadcast to active conversation room
+        io.to(`conv_${conversationId}`).emit('new-message', populatedMsg);
+
+        // 2. Broadcast to recipient's personal user room (for users on dashboard, home, courses, etc.)
+        if (recipientIdStr) {
+          io.to(`user_${recipientIdStr}`).emit('new-message', populatedMsg);
+          io.to(`user_${recipientIdStr}`).emit('notification-alert', alertPayload);
+
+          // 3. Direct socket emission fallback
+          const directSocketId = onlineUsers.get(recipientIdStr);
+          if (directSocketId && directSocketId !== socket.id) {
+            io.to(directSocketId).emit('new-message', populatedMsg);
+            io.to(directSocketId).emit('notification-alert', alertPayload);
+          }
+        }
       } catch (err) {
         console.error('Socket send-message error:', err);
         socket.emit('error', { message: 'Failed to send message' });

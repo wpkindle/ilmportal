@@ -133,7 +133,11 @@ const Navbar = () => {
             title: `${msg?.sender?.name || 'New Message'} (${msg?.sender?.role || 'User'})`,
             body: msg?.text || (msg?.voiceData ? 'Sent a voice note' : 'Sent an update'),
             icon: msg?.sender?.avatar || '/icon.svg',
-            url: isTutor ? '/tutor/messages' : isStudent ? '/student/messages' : '/admin/chats',
+            url: isTutor 
+              ? `/tutor/messages?conversation=${msg?.conversationId}` 
+              : isStudent 
+              ? `/student/messages?conversation=${msg?.conversationId}` 
+              : '/admin/chats',
             tag: `chat-${msg?.conversationId || 'new'}`,
             soundType: 'none'
           });

@@ -139,7 +139,9 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
               title: `${msg.sender?.name || partner?.name || 'New Message'}`,
               body: msg.text || (msg.voiceData ? 'Sent a voice note' : 'Sent an offer update'),
               icon: msg.sender?.avatar || partner?.avatar || '/icon.svg',
-              url: isTutor ? '/tutor/messages' : '/student/messages',
+              url: isTutor 
+                ? `/tutor/messages?conversation=${conversationId}` 
+                : `/student/messages?conversation=${conversationId}`,
               tag: `msg-${msg._id}`,
               soundType: 'none'
             });

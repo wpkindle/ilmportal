@@ -60,8 +60,10 @@ export async function showNativeNotification({
     return null;
   }
 
-  // 4. Try Service Worker first for mobile/PWA background notifications
-  if ('serviceWorker' in navigator) {
+  // 4. On mobile devices, prefer Service Worker showNotification
+  const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+  if (isMobile && 'serviceWorker' in navigator && navigator.serviceWorker.controller) {
     try {
       const registration = await navigator.serviceWorker.ready;
       if (registration && registration.showNotification) {
@@ -76,11 +78,11 @@ export async function showNativeNotification({
         });
       }
     } catch (swErr) {
-      console.warn('Service worker notification fallback:', swErr);
+      console.warn('Service worker mobile notification fallback:', swErr);
     }
   }
 
-  // 5. Desktop browser native Notification fallback
+  // 5. Desktop browser native Notification (Direct window focus, zero reload)
   try {
     const notification = new Notification(title, {
       body: body || '',
@@ -95,8 +97,11 @@ export async function showNativeNotification({
         event.preventDefault();
         window.focus();
         notification.close();
-        if (url && url !== '#') {
-          window.dispatchEvent(new CustomEvent('ilmportal:navigate', { detail: { url } }));
+        if (url && url !== '#' && url !== '/') {
+          const currentUrl = window.location.pathname + window.location.search;
+          if (currentUrl !== url) {
+            window.dispatchEvent(new CustomEvent('ilmportal:navigate', { detail: { url } }));
+          }
         }
       } catch (err) {
         console.warn('Notification click handling error:', err);
@@ -105,7 +110,23 @@ export async function showNativeNotification({
 
     return notification;
   } catch (err) {
-    console.warn('Native notification display error:', err);
+    // If desktop throws (e.g. Android Chrome constructor restriction), fallback to service worker
+    if ('serviceWorker' in navigator) {
+      try {
+        const registration = await navigator.serviceWorker.ready;
+        if (registration && registration.showNotification) {
+          return registration.showNotification(title, {
+            body: body || '',
+            icon: icon || '/icon.svg',
+            badge: '/icon.svg',
+            vibrate: [150, 80, 150],
+            tag: tag || undefined,
+            renotify: true,
+            data: { url }
+          });
+        }
+      } catch (e) {}
+    }
     return null;
   }
 }

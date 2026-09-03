@@ -4,26 +4,26 @@ import { Search, MessageSquare, Video, CreditCard, ShieldCheck } from 'lucide-re
 const steps = [
   {
     step: '01',
-    title: 'Find Verified Tutors',
-    description: 'Browse certified Qaris, Alimahs, and Cambridge subject teachers. Inspect verified Sanad/degree credentials online.',
+    title: 'Find a Tutor',
+    description: 'Search verified Quran teachers and school tutors for your subject, class, and city.',
     icon: Search
   },
   {
     step: '02',
-    title: 'Chat & Agree on Custom Rate',
-    description: 'Directly discuss your learning goals, preferred timing, and agree on a flexible rate (per hour or monthly) via 1:1 chat.',
+    title: 'Chat & Agree on Fee',
+    description: 'Message tutors for free to discuss class timings and agree on a fair hourly or monthly fee.',
     icon: MessageSquare
   },
   {
     step: '03',
-    title: 'Join Live Video Classroom',
-    description: 'Attend interactive 1:1 sessions inside our browser classroom with screen sharing, digital Quran viewer, and live chat.',
+    title: 'Start Live Classes',
+    description: 'Join 1-on-1 video lessons right in your browser with screen sharing and digital Quran.',
     icon: Video
   },
   {
     step: '04',
-    title: 'Simple Pakistani Payments',
-    description: 'Pay securely using JazzCash, EasyPaisa, or Online Bank Transfer (Meezan Bank/Raast) with instant admin verification.',
+    title: 'Easy Payments',
+    description: 'Pay easily using EasyPaisa, JazzCash, or bank transfer with quick confirmation.',
     icon: CreditCard
   }
 ];
@@ -63,13 +63,13 @@ const HowItWorks = () => {
         <div className="text-center max-w-2xl mx-auto space-y-2.5">
           <span className="text-xs font-bold uppercase tracking-wider text-emerald-400 bg-emerald-950/90 px-4 py-1.5 rounded-full border border-emerald-800 shadow-lg inline-flex items-center gap-1.5">
             <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Simple 4-Step Process</span>
+            <span>Simple 4 Steps</span>
           </span>
           <h2 className="text-2xl sm:text-4xl font-black text-white tracking-tight">
-            How IlmPortal Works for Students & Tutors
+            How It Works
           </h2>
           <p className="text-xs sm:text-sm text-slate-400">
-            Pakistan’s trusted LMS connecting learners with verified educators for in-platform live video classes.
+            Start learning with a verified teacher in 4 simple steps.
           </p>
         </div>
 

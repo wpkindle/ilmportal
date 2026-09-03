@@ -121,9 +121,9 @@ const Hero = () => {
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
             </span>
-            <span>Pakistan’s #1 Protected Quran &amp; Academic LMS</span>
+            <span>Pakistan&apos;s Trusted Quran &amp; School Platform</span>
             <span className="hidden sm:inline text-emerald-500">&bull;</span>
-            <span className="hidden sm:inline text-white font-medium">SSL Encrypted &amp; Female Privacy Guaranteed</span>
+            <span className="hidden sm:inline text-white font-medium">Safe &amp; Private for Families</span>
             <ChevronRight className="w-3.5 h-3.5 text-emerald-400 hidden sm:inline" />
           </Link>
         </div>
@@ -131,25 +131,25 @@ const Hero = () => {
         {/* Main Heading */}
         <div className="max-w-3xl mx-auto space-y-4">
           <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight sm:leading-tight drop-shadow-md">
-            Learn Safely, Learn Confidently with <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-200">Verified Pakistani Tutors</span>
+            Learn Safely from Home with <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-200">Verified Pakistani Tutors</span>
           </h1>
           <p className="text-sm sm:text-base text-slate-300 max-w-2xl mx-auto leading-relaxed drop-shadow-sm font-normal">
-            A protected learning sanctuary for Pakistani families. Connect with Sanad-certified Quran teachers, verified female Alimahs, and Cambridge/Matric academic coaches with camera privacy and encrypted 1:1 live classrooms.
+            Find trusted Quran teachers and school tutors across Pakistan. Safe 1-on-1 live video classes for children, girls, and families with complete privacy.
           </p>
 
           {/* Trust & Security Signals */}
           <div className="pt-2 flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs font-semibold">
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-emerald-500/30 text-emerald-300 shadow-xs">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-              <span>100% ID &amp; Sanad Verified Tutors</span>
+              <span>Verified ID &amp; Certificates</span>
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-teal-500/30 text-teal-300 shadow-xs">
               <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400" />
-              <span>Female Safe-Room Verified</span>
+              <span>Female Teachers for Girls &amp; Kids</span>
             </span>
             <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-900/90 border border-blue-500/30 text-blue-300 shadow-xs">
               <Lock className="w-3.5 h-3.5 text-blue-400" />
-              <span>256-Bit E2EE Classroom</span>
+              <span>Safe &amp; Private Video Classes</span>
             </span>
           </div>
         </div>
@@ -165,7 +165,7 @@ const Hero = () => {
               <Search className="w-4 h-4 text-slate-400 shrink-0" />
               <input
                 type="text"
-                placeholder="Search subject, e.g. Tajweed, Noorani Qaida, Physics, O-Level..."
+                placeholder="Search by subject, e.g. Quran, Noorani Qaida, Math, English..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="w-full bg-transparent text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 font-medium outline-none"
@@ -276,8 +276,8 @@ const Hero = () => {
             <div className="p-2.5 bg-emerald-500/20 group-hover:bg-emerald-500/30 text-emerald-300 w-fit mx-auto rounded-xl mb-2 shadow-inner group-hover:scale-110 transition-transform">
               <ShieldCheck className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-emerald-300 transition-colors">Sanad Verified Tutors</h3>
-            <p className="text-[11px] text-slate-400 leading-tight">Authentic Dars-e-Nizami &amp; degree certificates verified by admin</p>
+            <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-emerald-300 transition-colors">Verified Teachers</h3>
+            <p className="text-[11px] text-slate-400 leading-tight">We check every teacher&apos;s ID, degrees, and Quran certificates.</p>
           </div>
 
           <div className="group relative p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-slate-900/80 to-slate-950/80 border border-white/10 hover:border-blue-500/50 backdrop-blur-xl space-y-1.5 text-center shadow-lg hover:shadow-2xl hover:shadow-blue-500/20 transform-gpu hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 overflow-hidden">
@@ -285,8 +285,8 @@ const Hero = () => {
             <div className="p-2.5 bg-blue-500/20 group-hover:bg-blue-500/30 text-blue-300 w-fit mx-auto rounded-xl mb-2 shadow-inner group-hover:scale-110 transition-transform">
               <Video className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-blue-300 transition-colors">In-Platform Video</h3>
-            <p className="text-[11px] text-slate-400 leading-tight">100% on-platform WebRTC HD video, screen sharing &amp; digital Quran viewer</p>
+            <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-blue-300 transition-colors">Live Video Classes</h3>
+            <p className="text-[11px] text-slate-400 leading-tight">Easy 1-on-1 video lessons with screen sharing and digital Quran.</p>
           </div>
 
           <div className="group relative p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-slate-900/80 to-slate-950/80 border border-white/10 hover:border-amber-500/50 backdrop-blur-xl space-y-1.5 text-center shadow-lg hover:shadow-2xl hover:shadow-amber-500/20 transform-gpu hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 overflow-hidden">
@@ -294,8 +294,8 @@ const Hero = () => {
             <div className="p-2.5 bg-amber-500/20 group-hover:bg-amber-500/30 text-amber-300 w-fit mx-auto rounded-xl mb-2 shadow-inner group-hover:scale-110 transition-transform">
               <Sparkles className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-amber-300 transition-colors">Flexible Rates</h3>
-            <p className="text-[11px] text-slate-400 leading-tight">Directly coordinate custom schedules and agreed rates in 1:1 chat</p>
+            <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-amber-300 transition-colors">Fair &amp; Agreed Rates</h3>
+            <p className="text-[11px] text-slate-400 leading-tight">Chat for free with tutors and agree on a monthly or hourly fee.</p>
           </div>
 
           <div className="group relative p-4 sm:p-5 rounded-2xl bg-gradient-to-b from-slate-900/80 to-slate-950/80 border border-white/10 hover:border-purple-500/50 backdrop-blur-xl space-y-1.5 text-center shadow-lg hover:shadow-2xl hover:shadow-purple-500/20 transform-gpu hover:-translate-y-2 hover:scale-[1.03] transition-all duration-300 overflow-hidden">
@@ -303,8 +303,8 @@ const Hero = () => {
             <div className="p-2.5 bg-purple-500/20 group-hover:bg-purple-500/30 text-purple-300 w-fit mx-auto rounded-xl mb-2 shadow-inner group-hover:scale-110 transition-transform">
               <MapPin className="w-5 h-5" />
             </div>
-            <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-purple-300 transition-colors">All Pakistan</h3>
-            <p className="text-[11px] text-slate-400 leading-tight">Online classes and verified in-person home tutoring across all provinces</p>
+            <h3 className="font-bold text-xs sm:text-sm text-white group-hover:text-purple-300 transition-colors">All Over Pakistan</h3>
+            <p className="text-[11px] text-slate-400 leading-tight">Online classes anywhere, plus verified home tutors in major cities.</p>
           </div>
         </div>
 

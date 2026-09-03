@@ -56,13 +56,13 @@ const CityGrid = () => {
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-3.5 py-1.5 rounded-full border border-emerald-300 inline-flex items-center gap-1.5 shadow-2xs">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-              <span>Nationwide Coverage</span>
+              <span>All Cities in Pakistan</span>
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Verified Tutors Across Pakistan
+              Find Tutors in Your City
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 max-w-xl">
-              Connect with certified tutors for live video sessions and physical home tutoring across Punjab, Sindh, KPK, Balochistan, ICT, AJK, and Gilgit-Baltistan.
+              Find verified teachers for online classes anywhere in Pakistan, or home tutors in your city.
             </p>
           </div>
 
@@ -70,7 +70,7 @@ const CityGrid = () => {
             href="/tutors"
             className="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1 self-start sm:self-auto group"
           >
-            <span>View All Pakistani Cities</span>
+            <span>View All Cities</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>

@@ -369,13 +369,13 @@ const Navbar = () => {
                     </div>
                   ))}
                   <div className="col-span-1 md:col-span-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
-                    <span className="text-slate-500 font-medium">Over 20+ disciplines & structured courses</span>
+                    <span className="text-slate-500 font-medium">Over 20+ subjects &amp; courses</span>
                     <Link
                       href="/courses"
                       onClick={() => setSubjectsDropdownOpen(false)}
                       className="font-bold text-emerald-700 hover:underline flex items-center gap-1"
                     >
-                      <span>Explore Course Catalog</span>
+                      <span>View All Courses</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>
@@ -508,12 +508,12 @@ const Navbar = () => {
                             className="text-[11px] font-bold text-amber-700 hover:text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-lg border border-amber-200 cursor-pointer flex items-center gap-1"
                           >
                             <Bell className="w-3 h-3 text-amber-600 animate-pulse" />
-                            <span>Enable OS Alerts</span>
+                            <span>Turn on Notifications</span>
                           </button>
                         ) : (
                           <span className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
                             <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                            <span>OS Alerts Active</span>
+                            <span>Notifications On</span>
                           </span>
                         )}
                       </div>

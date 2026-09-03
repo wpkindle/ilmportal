@@ -5,24 +5,24 @@ import { ChevronDown } from 'lucide-react';
 
 const faqs = [
   {
-    q: 'How does tutoring work on IlmPortal Pakistan?',
-    a: 'Students can search for verified Quran teachers and academic coaches across Pakistan. Once you find a tutor, you can chat 1:1, discuss your syllabus, agree on custom flexible rates, and attend live classes directly in our browser-based video classroom.'
+    q: 'How does tutoring work on IlmPortal?',
+    a: 'You can search for verified Quran teachers and school tutors. Once you choose a tutor, you can chat for free, set your schedule and monthly fee, and take 1-on-1 video classes right on our website.'
   },
   {
-    q: 'Do I need Zoom or Google Meet to attend classes?',
-    a: 'No! IlmPortal features a 100% in-platform HD live video classroom with audio/video, screen sharing, an interactive digital Quran reader tab, and in-call live chat. You simply click "Join Live Class" from your portal.'
+    q: 'Do I need Zoom or any other app to join classes?',
+    a: 'No! You do not need to download Zoom or any app. Classes happen directly in your internet browser with clear video, screen sharing, and an online Quran.'
   },
   {
-    q: 'How do tutors verify their Sanad / Credentials?',
-    a: 'Tutors upload their authentic Dars-e-Nizami, Shahadat-ul-Alimiyya, Hifz certificates, or academic university degrees during onboarding. Our administrative team verifies the documents before approving the tutor with a verified Sanad trust badge.'
+    q: 'How are teachers verified?',
+    a: 'Every teacher uploads their government ID card, university degrees, and Quran certificates. Our team checks each document carefully before approving the teacher.'
   },
   {
-    q: 'What payment methods are supported in Pakistan?',
-    a: 'We support standard Pakistani payment channels including JazzCash Mobile Account, EasyPaisa, and Online Bank Transfers (e.g., Meezan Bank, Raast). Students simply enter their Transaction ID (TID) for rapid admin verification.'
+    q: 'How do I pay my teacher\'s fee?',
+    a: 'You can pay easily using EasyPaisa, JazzCash, or online bank transfer (like Meezan Bank or Raast). Simply enter your payment confirmation number for instant verification.'
   },
   {
-    q: 'Can female students request female Quran teachers (Alimahs)?',
-    a: 'Yes! Our search filters include a gender preference filter so female students and young children can connect specifically with certified female Alimahs and Quran teachers.'
+    q: 'Can female students learn from female teachers?',
+    a: 'Yes! You can filter your search to find qualified female teachers (Alimahs) for girls and young children with complete privacy.'
   }
 ];
 

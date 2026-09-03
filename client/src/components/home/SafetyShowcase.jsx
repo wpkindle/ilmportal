@@ -19,43 +19,43 @@ import {
 const safetyHighlights = [
   {
     icon: Heart,
-    title: 'Female Student & Family Safe Room',
-    badge: 'Same-Gender Mentorship',
+    title: 'Female Teachers for Girls & Kids',
+    badge: '100% Privacy',
     accent: 'from-emerald-500/20 to-teal-500/10 text-emerald-400 border-emerald-500/30',
     description:
-      'Verified Alimahs and female educators available for girls and young children. Zero outside contact sharing guarantees complete family privacy.',
+      'Qualified female teachers for girls and young children, so your family can learn comfortably and privately.',
     link: '/tutors?gender=female',
-    linkText: 'Explore Female Alimahs'
+    linkText: 'Find Female Teachers'
   },
   {
     icon: Video,
-    title: 'Defensive Classroom Controls',
+    title: 'Camera Privacy Control',
     badge: 'Camera Off by Default',
     accent: 'from-teal-500/20 to-cyan-500/10 text-teal-400 border-teal-500/30',
     description:
-      'Camera defaults to OFF when joining. Equipped with background blur, instant "Leave & Report" emergency shield, and peer-to-peer encryption.',
+      'Your camera stays OFF when you join a class. You choose whether to turn your video on or off at any time.',
     link: '/safety',
-    linkText: 'Classroom Privacy Specs'
+    linkText: 'Learn About Privacy'
   },
   {
     icon: MessageSquare,
-    title: 'AI-Moderated Safe Messaging',
-    badge: 'Anti-Harassment Shield',
+    title: 'Safe In-App Chat',
+    badge: 'Protected Messaging',
     accent: 'from-blue-500/20 to-indigo-500/10 text-blue-400 border-blue-500/30',
     description:
-      'Automated intelligence monitors in-platform chats against harassment and prohibited outside contact sharing. 1-tap message reporting and blocking.',
+      'Chat directly on our website without giving out your personal phone number or WhatsApp.',
     link: '/safety',
-    linkText: 'Messaging Safety Rules'
+    linkText: 'Chat Rules'
   },
   {
     icon: Award,
-    title: 'Sanad Degree & CNIC Verified',
-    badge: '100% Background Checked',
+    title: 'Verified ID & Qualifications',
+    badge: 'Background Checked',
     accent: 'from-amber-500/20 to-orange-500/10 text-amber-400 border-amber-500/30',
     description:
-      'Every scholar is verified via Wifaq-ul-Madaris degrees, Cambridge credentials, and Government CNIC. Stored in 256-bit encrypted vaults under PECA 2016.',
+      'We check national ID cards, university degrees, and Quran certificates before approving any teacher.',
     link: '/safety',
-    linkText: 'Verification Protocols'
+    linkText: 'How We Verify'
   }
 ];
 
@@ -76,15 +76,15 @@ export default function SafetyShowcase() {
         <div className="text-center max-w-3xl mx-auto space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold shadow-lg backdrop-blur-md">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Built on Uncompromised Safety &amp; Trust</span>
+            <span>Safe &amp; Trusted Learning</span>
           </div>
 
           <h2 className="text-2xl sm:text-4xl lg:text-5xl font-black text-white tracking-tight">
-            A Safe Learning Sanctuary for Every Pakistani Home
+            Safe and Private Learning for Every Family
           </h2>
 
           <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto leading-relaxed font-normal">
-            We believe safety is not an afterthought or compliance checkbox — it is the bedrock of honorable education. Discover the four layers protecting our students, tutors, and families nationwide.
+            Your family&apos;s safety and privacy come first. Here is how we protect our students and teachers:
           </p>
         </div>
 

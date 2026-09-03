@@ -8,21 +8,21 @@ const testimonials = [
     city: 'Lahore, Punjab',
     role: 'Parent of 2 Quran Students',
     rating: 5,
-    review: 'Finding a certified Hafiz with authentic Tajweed credentials was tough. On IlmPortal, we verified Qari Sahab’s Sanad online, agreed on a convenient evening schedule, and my son loves the interactive Quran reader in the classroom!'
+    review: 'Finding a qualified Quran teacher with proper certificates was difficult. On IlmPortal, we easily checked the teacher\'s certificates, chose our evening timing, and my son loves the online Quran classes!'
   },
   {
     name: 'Ayesha Siddiqui (Student)',
     city: 'Karachi, Sindh',
-    role: 'CAIE A-Level Physics Student',
+    role: 'A-Level Physics Student',
     rating: 5,
-    review: 'My tutor Sir Bilal helped me solve past papers with screen sharing and step-by-step whiteboard derivations. Having everything inside one platform without third-party links made studying so much easier.'
+    review: 'My tutor Sir Bilal helped me practice exam questions using screen sharing and the online whiteboard. Having video classes and messaging all in one place made learning so simple.'
   },
   {
     name: 'Qari Huzaifa ur Rehman',
     city: 'Islamabad, ICT',
-    role: 'Verified Tajweed & Hifz Tutor',
+    role: 'Verified Quran Teacher',
     rating: 5,
-    review: 'As a teacher, IlmPortal provided the exact tools I needed: Sanad verification badge, direct student chat, deal agreements, and a crystal-clear HD WebRTC classroom with built-in Quran reader.'
+    review: 'As a teacher, IlmPortal gives me everything I need: a verified teacher profile, direct messaging with students, and clear video classes with a built-in Quran.'
   }
 ];
 
@@ -55,13 +55,13 @@ const Testimonials = () => {
         <div className="text-center max-w-2xl mx-auto space-y-2.5">
           <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-3.5 py-1.5 rounded-full border border-emerald-300 shadow-2xs inline-flex items-center gap-1.5">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping" />
-            <span>User Testimonials</span>
+            <span>What People Say</span>
           </span>
           <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-            Trusted by Families & Teachers Nationwide
+            Trusted by Families &amp; Teachers
           </h2>
           <p className="text-xs sm:text-sm text-slate-500">
-            Real feedback from Pakistani students, parents, and certified educators.
+            Honest reviews from students, parents, and teachers across Pakistan.
           </p>
         </div>
 

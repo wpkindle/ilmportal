@@ -79,13 +79,13 @@ const SubjectExplorer = () => {
           <div className="space-y-2">
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-3.5 py-1.5 rounded-full border border-emerald-300 shadow-2xs inline-flex items-center gap-1.5">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-              <span>Explore Disciplines</span>
+              <span>Explore Subjects</span>
             </span>
             <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Quranic Sciences & Academic Coaching
+              Quran &amp; School Subjects
             </h2>
             <p className="text-xs sm:text-sm text-slate-500 max-w-xl">
-              Browse certified disciplines taught by verified tutors across Pakistan with flexible schedules.
+              Find verified tutors for Quran and school classes with flexible timings.
             </p>
           </div>
 
@@ -99,7 +99,7 @@ const SubjectExplorer = () => {
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Quran & Islamic Studies
+              Quran &amp; Islamic Subjects
             </button>
             <button
               onClick={() => setActiveTab('academic')}
@@ -109,7 +109,7 @@ const SubjectExplorer = () => {
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              School & Academic Tutoring
+              School &amp; College Subjects
             </button>
           </div>
         </div>
@@ -123,13 +123,13 @@ const SubjectExplorer = () => {
               </div>
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/30">
-                  FLAGSHIP KIDS CURRICULUM
+                  POPULAR FOR KIDS
                 </span>
                 <h4 className="text-base sm:text-lg font-black text-white mt-1">
-                  Quran Recitation Course for Kids (Ages ~5–12)
+                  Quran Reading for Kids (Ages 5–12)
                 </h4>
                 <p className="text-xs text-slate-300">
-                  38 micro-lessons in 4 stages with letter tracing, rhythm chants, gamified badges & 3-day trial.
+                  Fun, step-by-step lessons for children with Quran letters, correct pronunciation, and a free trial.
                 </p>
               </div>
             </div>
@@ -138,7 +138,7 @@ const SubjectExplorer = () => {
               href="/courses/nazra-quran-kids"
               className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-md shrink-0 flex items-center gap-2 hover:scale-105 transition-all cursor-pointer"
             >
-              <span>Explore Course Syllabus</span>
+              <span>View Course Details</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>

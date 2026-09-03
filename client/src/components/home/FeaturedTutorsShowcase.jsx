@@ -70,13 +70,13 @@ export default function FeaturedTutorsShowcase({ initialTutors = [] }) {
           <div>
             <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100/80 px-3.5 py-1.5 rounded-full border border-emerald-300/60 inline-flex items-center gap-1.5 shadow-2xs">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping" />
-              <span>Top Rated Scholars & Educators</span>
+              <span>Top Rated Teachers</span>
             </span>
             <h2 className="text-3xl sm:text-4xl font-black text-slate-900 mt-2.5 tracking-tight">
-              Featured Verified Tutors
+              Featured Tutors
             </h2>
             <p className="text-slate-500 text-xs sm:text-sm mt-1 max-w-xl">
-              Sanad-certified Quran Qaris and top university graduates ready for online & in-person tutoring across Pakistan.
+              Verified Quran teachers and school tutors ready for online and home classes.
             </p>
           </div>
 
@@ -84,7 +84,7 @@ export default function FeaturedTutorsShowcase({ initialTutors = [] }) {
             href="/tutors"
             className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all self-start md:self-auto shadow-md hover:scale-105 cursor-pointer"
           >
-            <span>View All Faculty</span>
+            <span>View All Teachers</span>
             <ArrowRight className="w-4 h-4" />
           </Link>
         </div>

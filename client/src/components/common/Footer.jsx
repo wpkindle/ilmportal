@@ -130,10 +130,10 @@ const Footer = () => {
                 <span>3-Day Free Trial Available on All Subjects</span>
               </div>
               <h3 className="text-xl sm:text-2xl font-black text-white tracking-tight">
-                Ready to begin your Quranic &amp; Academic journey?
+                Ready to start learning Quran and school subjects?
               </h3>
               <p className="text-xs sm:text-sm text-slate-400 max-w-xl">
-                Connect with verified Qaris, Alimahs, and Cambridge subject specialists for 1:1 live in-platform classes and home tutoring across Pakistan.
+                Learn Quran and school subjects with verified Pakistani teachers. Safe 1-on-1 online classes and home tutoring.
               </p>
             </div>
 
@@ -170,13 +170,13 @@ const Footer = () => {
                   Ilm<span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-400 to-teal-300">Portal</span>
                 </span>
                 <span className="text-[10px] uppercase font-bold tracking-widest text-emerald-400/90 block -mt-1">
-                  Pakistan&apos;s National LMS
+                  Pakistan&apos;s Online Learning Platform
                 </span>
               </div>
             </Link>
 
             <p className="text-xs text-slate-400 leading-relaxed max-w-sm">
-              Pakistan&apos;s premier dedicated Islamic &amp; academic tutoring platform. Empowering families nationwide with Sanad-verified Qaris, certified Alimahs, and Cambridge/Matric exam specialists.
+              Pakistan&apos;s trusted Quran and school tutoring platform. Helping families find verified Quran teachers and qualified school tutors with complete safety and privacy.
             </p>
 
             {/* Quick Contact Micro-Cards */}
@@ -222,7 +222,7 @@ const Footer = () => {
               </span>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900 text-teal-300 border border-slate-800 hover:border-teal-500/40 transition-colors">
                 <Lock className="w-3 h-3 text-teal-400" />
-                <span>PECA 2016 Compliant</span>
+                <span>100% Safe &amp; Private</span>
               </span>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-slate-900 text-cyan-300 border border-slate-800 hover:border-cyan-500/40 transition-colors">
                 <Globe className="w-3 h-3 text-cyan-400" />
@@ -231,12 +231,12 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Col 2: Portals & Learning Hub */}
+          {/* Col 2: Quick Links */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
               <div className="w-1.5 h-4 rounded-full bg-emerald-500" />
               <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">
-                Portals &amp; Hub
+                Quick Links
               </h4>
             </div>
             <ul className="space-y-2.5 text-xs text-slate-400">

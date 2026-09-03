@@ -66,10 +66,19 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
 
   // Video call / Live class option is ONLY visible when deal has been accepted!
   const isDealAccepted = Boolean(
-    partnerDeal &&
-    ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) &&
-    !partnerDeal.accessRestricted &&
-    partnerDeal.status !== 'restricted'
+    (partnerDeal &&
+      ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) &&
+      !partnerDeal.accessRestricted &&
+      partnerDeal.status !== 'restricted') ||
+    messages.some(
+      (m) =>
+        m.messageType === 'deal_accept' ||
+        m.dealOfferData?.status === 'active_trial' ||
+        m.deal?.status === 'active_trial' ||
+        (m.deal &&
+          ['active_trial', 'continuation_agreed', 'active_paid'].includes(m.deal.status) &&
+          !m.deal.accessRestricted)
+    )
   );
 
   // Student Profile & Female Tutor Gate State
@@ -156,14 +165,19 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
         }
 
         // Fetch active/pending deal if available
-        if (partner?._id) {
+        const pId = (partner?._id || partner?.id)?.toString();
+        const myId = (user?._id || user?.id)?.toString();
+        if (pId) {
           const dealsRes = await api.getMyDeals();
           if (dealsRes.success && dealsRes.deals) {
-            const currentDeal = dealsRes.deals.find(
-              (d) =>
-                (d.tutor?._id === partner._id || d.tutor === partner._id || d.student?._id === partner._id || d.student === partner._id) &&
-                ['pending_offer', 'active_trial', 'continuation_agreed', 'active_paid'].includes(d.status)
-            );
+            const currentDeal = dealsRes.deals.find((d) => {
+              const tId = (d.tutor?._id || d.tutor)?.toString();
+              const sId = (d.student?._id || d.student)?.toString();
+              return (
+                ((tId === myId && sId === pId) || (tId === pId && sId === myId)) &&
+                ['active_trial', 'continuation_agreed', 'active_paid', 'pending_offer'].includes(d.status)
+              );
+            });
             if (currentDeal) setPartnerDeal(currentDeal);
           }
         }
@@ -210,6 +224,15 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
         (senderId === currentUserId && recipientId === pId);
 
       if (isMatch) {
+        if (
+          msg.messageType === 'deal_accept' ||
+          msg.dealOfferData?.status === 'active_trial' ||
+          msg.deal?.status === 'active_trial'
+        ) {
+          const incomingDeal = msg.deal || msg.dealOfferData || { status: 'active_trial' };
+          setPartnerDeal((prev) => ({ ...(prev || {}), ...incomingDeal, status: 'active_trial' }));
+        }
+
         setMessages((prev) => {
           if (prev.some((m) => m._id === msg._id)) return prev;
           const hasTemp = prev.some((m) => m._id?.startsWith?.('temp_') && m.text === msg.text);
@@ -287,14 +310,23 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
       }
     };
 
+    // Real-time deal status update from counterpart or admin
+    const handleDealStatusUpdated = (updatedDeal) => {
+      if (updatedDeal) {
+        setPartnerDeal((prev) => ({ ...(prev || {}), ...updatedDeal }));
+      }
+    };
+
     socket.on('new-message', handleReceiveMessage);
     socket.on('messages-seen', handleMessagesSeen);
     socket.on('messages-delivered', handleMessagesDelivered);
+    socket.on('deal-status-updated', handleDealStatusUpdated);
 
     return () => {
       socket.off('new-message', handleReceiveMessage);
       socket.off('messages-seen', handleMessagesSeen);
       socket.off('messages-delivered', handleMessagesDelivered);
+      socket.off('deal-status-updated', handleDealStatusUpdated);
     };
   }, [socket, conversationId, user]);
 

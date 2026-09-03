@@ -185,14 +185,24 @@ function TutorMessagesContent() {
       });
     };
 
+    const handleDealUpdated = (updatedDeal) => {
+      fetchConversations().then((convs) => {
+        if (updatedDeal) {
+          setActiveConversation((curr) => (curr ? { ...curr, deal: updatedDeal } : curr));
+        }
+      });
+    };
+
     socket.on('unread-count-updated', handleUnreadUpdate);
     socket.on('new-message', handleNewMessage);
     socket.on('chat-request-received', handleNewChatRequest);
+    socket.on('deal-status-updated', handleDealUpdated);
 
     return () => {
       socket.off('unread-count-updated', handleUnreadUpdate);
       socket.off('new-message', handleNewMessage);
       socket.off('chat-request-received', handleNewChatRequest);
+      socket.off('deal-status-updated', handleDealUpdated);
     };
   }, [socket, fetchConversations, fetchRequests, activeConversation]);
 

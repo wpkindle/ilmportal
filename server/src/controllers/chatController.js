@@ -54,12 +54,30 @@ exports.getConversations = async (req, res) => {
           isRead: false
         });
 
+        // Find latest active/accepted deal for this user and otherUser
+        let deal = await Deal.findOne({
+          $or: [
+            { student: userId, tutor: otherUser._id },
+            { student: otherUser._id, tutor: userId }
+          ],
+          status: { $in: ['active_trial', 'continuation_agreed', 'active_paid'] }
+        }).sort({ updatedAt: -1, createdAt: -1 });
+
+        if (!deal) {
+          deal = await Deal.findOne({
+            $or: [
+              { student: userId, tutor: otherUser._id },
+              { student: otherUser._id, tutor: userId }
+            ]
+          }).sort({ updatedAt: -1, createdAt: -1 });
+        }
+
         conversationMap.set(key, {
           conversationId: msg.conversationId,
           partner: otherUser,
           lastMessage: msg,
           unreadCount,
-          deal: msg.deal
+          deal: deal || msg.deal
         });
       }
     }
@@ -140,13 +158,23 @@ exports.getMessages = async (req, res) => {
     }
 
     let latestDeal = null;
-    if (parts.length === 2 && parts[0] && parts[1]) {
+    if (parts.length === 2 && mongoose.Types.ObjectId.isValid(parts[0]) && mongoose.Types.ObjectId.isValid(parts[1])) {
       latestDeal = await Deal.findOne({
         $or: [
           { student: parts[0], tutor: parts[1] },
           { student: parts[1], tutor: parts[0] }
-        ]
-      }).sort({ createdAt: -1 });
+        ],
+        status: { $in: ['active_trial', 'continuation_agreed', 'active_paid'] }
+      }).sort({ updatedAt: -1, createdAt: -1 });
+
+      if (!latestDeal) {
+        latestDeal = await Deal.findOne({
+          $or: [
+            { student: parts[0], tutor: parts[1] },
+            { student: parts[1], tutor: parts[0] }
+          ]
+        }).sort({ updatedAt: -1, createdAt: -1 });
+      }
     }
 
     res.status(200).json({

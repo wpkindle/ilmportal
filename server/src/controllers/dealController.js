@@ -280,7 +280,7 @@ exports.getMyDeals = async (req, res) => {
       : {};
 
     const deals = await Deal.find(filter)
-      .populate('student', 'name email phone avatar city')
+      .populate('student', req.user.role === 'tutor' ? 'name avatar city' : 'name email phone avatar city')
       .populate('tutor', 'name email phone avatar city')
       .sort({ createdAt: -1 });
 

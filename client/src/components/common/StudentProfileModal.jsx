@@ -6,8 +6,7 @@ import {
   ShieldCheck,
   MapPin,
   Calendar,
-  Phone,
-  Mail,
+  Lock,
   X,
   Sparkles,
   CheckCircle2,
@@ -71,8 +70,6 @@ export default function StudentProfileModal({
   const studentAge = profile?.age;
   const studentGender = profile?.gender;
   const studentCity = profile?.city || 'Pakistan';
-  const studentPhone = profile?.phone || profile?.guardianPhone;
-  const guardianPhone = profile?.guardianPhone;
   const joinedDate = profile?.createdAt
     ? new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
     : null;
@@ -88,7 +85,7 @@ export default function StudentProfileModal({
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full hover:bg-white/10 transition-colors"
+            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full hover:bg-white/10 transition-colors cursor-pointer"
             title="Close"
           >
             <X className="w-5 h-5" />
@@ -136,37 +133,31 @@ export default function StudentProfileModal({
                     </h3>
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
                       <ShieldCheck className="w-3 h-3 text-emerald-600" />
-                      <span>100% Verified Profile</span>
+                      <span>100% Profile Strength</span>
                     </span>
                   </div>
-
-                  {profile?.username && (
-                    <p className="text-xs font-medium text-slate-500 font-mono">
-                      @{profile.username}
-                    </p>
-                  )}
 
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-600 pt-0.5">
                     <span className="flex items-center gap-1">
                       <MapPin className="w-3.5 h-3.5 text-emerald-600" />
-                      {studentCity}
+                      <span>{studentCity}</span>
                     </span>
                     {joinedDate && (
                       <span className="flex items-center gap-1 text-slate-400">
                         <Calendar className="w-3.5 h-3.5" />
-                        Member since {joinedDate}
+                        <span>Member since {joinedDate}</span>
                       </span>
                     )}
                   </div>
                 </div>
               </div>
 
-              {/* Student Details Grid */}
+              {/* Student Personal & Academic Details Grid (Age, Gender, City, Status) */}
               <div className="grid grid-cols-2 gap-3">
                 <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Student Age</span>
                   <span className="text-xs sm:text-sm font-black text-slate-800 mt-0.5 block">
-                    {studentAge ? `${studentAge} Years Old` : 'Age Provided'}
+                    {studentAge ? `${studentAge} Years Old` : 'Age Not Specified'}
                   </span>
                 </div>
 
@@ -178,28 +169,37 @@ export default function StudentProfileModal({
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Verified Email</span>
-                  <span className="text-xs font-semibold text-slate-800 mt-0.5 block truncate">
-                    {profile?.email || 'Verified on platform'}
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">City / Location</span>
+                  <span className="text-xs sm:text-sm font-black text-slate-800 mt-0.5 block">
+                    {studentCity}
                   </span>
                 </div>
 
                 <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Mobile / WhatsApp</span>
-                  <span className="text-xs font-mono font-bold text-slate-800 mt-0.5 block truncate">
-                    {studentPhone || 'Available upon connection'}
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Account Status</span>
+                  <span className="text-xs sm:text-sm font-black text-emerald-700 mt-0.5 flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Active &amp; Verified</span>
                   </span>
                 </div>
               </div>
 
-              {guardianPhone && guardianPhone !== studentPhone && (
-                <div className="p-3 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between text-xs">
-                  <span className="text-slate-500 font-medium">Parent / Guardian Contact:</span>
-                  <span className="font-mono font-bold text-slate-800">{guardianPhone}</span>
+              {/* Safe Platform Notice: Contact Details Kept Confidential */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs flex items-start gap-2.5">
+                <div className="p-1.5 bg-slate-200 rounded-lg text-slate-700 shrink-0 mt-0.5">
+                  <Lock className="w-4 h-4" />
                 </div>
-              )}
+                <div className="space-y-0.5">
+                  <span className="font-black text-slate-800 block text-[11px]">
+                    Contact Privacy &amp; Child Safety Protection
+                  </span>
+                  <p className="text-slate-500 text-[11px] leading-relaxed">
+                    Personal contact details (email address, username, password, and mobile/WhatsApp number) are private and kept strictly confidential by IlmPortal for student safety. Please conduct all conversations, tuition agreements, and classes inside IlmPortal.
+                  </p>
+                </div>
+              </div>
 
-              {/* Message Request Context (if any) */}
+              {/* Message Request Inquiry & Learning Goals (if any) */}
               {profile?.latestRequest?.details && (
                 <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 space-y-1.5 text-xs">
                   <div className="flex items-center gap-1.5 font-bold text-emerald-900">

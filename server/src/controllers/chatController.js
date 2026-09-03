@@ -516,7 +516,7 @@ exports.getChatRequestStatus = async (req, res) => {
 exports.getChatRequests = async (req, res) => {
   try {
     const requests = await ChatRequest.find({ tutor: req.user.id })
-      .populate('student', 'name username email avatar phone guardianPhone age gender city createdAt isVerified role')
+      .populate('student', 'name avatar age gender city createdAt isVerified role')
       .sort({ createdAt: -1 });
 
     res.status(200).json({
@@ -649,25 +649,38 @@ exports.getStudentProfileForTutor = async (req, res) => {
   try {
     const { studentId } = req.params;
 
-    const student = await User.findById(studentId).select(
-      'name username email avatar phone guardianPhone age gender city createdAt isVerified role'
-    );
+    const studentDoc = await User.findById(studentId);
 
-    if (!student || student.role !== 'student') {
+    if (!studentDoc || studentDoc.role !== 'student') {
       return res.status(404).json({ success: false, message: 'Student not found' });
     }
 
-    const is100Percent = isStudentProfile100Percent(student);
+    const is100Percent = isStudentProfile100Percent(studentDoc);
+
+    // Sanitize student profile: Never expose contact details (email, username, password, phone) to tutors
+    const sanitizedStudent = {
+      _id: studentDoc._id,
+      id: studentDoc._id,
+      name: studentDoc.name,
+      avatar: studentDoc.avatar,
+      age: studentDoc.age,
+      gender: studentDoc.gender,
+      city: studentDoc.city,
+      createdAt: studentDoc.createdAt,
+      isVerified: studentDoc.isVerified,
+      role: studentDoc.role,
+      status: studentDoc.status
+    };
 
     // Also fetch any recent request or deal between this tutor and student
     const [latestRequest, latestDeal] = await Promise.all([
-      ChatRequest.findOne({ student: student._id, tutor: req.user.id }).sort({ createdAt: -1 }),
-      Deal.findOne({ student: student._id, tutor: req.user.id }).sort({ createdAt: -1 })
+      ChatRequest.findOne({ student: studentDoc._id, tutor: req.user.id }).sort({ createdAt: -1 }),
+      Deal.findOne({ student: studentDoc._id, tutor: req.user.id }).sort({ createdAt: -1 })
     ]);
 
     res.status(200).json({
       success: true,
-      student,
+      student: sanitizedStudent,
       is100Percent,
       profileStrength: is100Percent ? 100 : 85,
       latestRequest,

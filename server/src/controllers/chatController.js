@@ -77,12 +77,6 @@ exports.getMessages = async (req, res) => {
       .skip(skip)
       .limit(limit);
 
-    // Mark messages sent to this user as read
-    await Message.updateMany(
-      { conversationId, recipient: req.user.id, isRead: false },
-      { isRead: true }
-    );
-
     res.status(200).json({
       success: true,
       count: messages.length,

@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { api } from '../../../services/api';
 import ChatWindow from '../../../components/chat/ChatWindow';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { useSocket } from '../../../context/SocketContext';
 import { soundEngine } from '../../../utils/soundEffects';
@@ -13,7 +13,7 @@ import { showNativeNotification } from '../../../utils/notificationManager';
 
 function StudentMessagesContent() {
   const { user } = useAuth();
-  const { socket, onlineUsers, onlineStatusMap } = useSocket();
+  const { socket, onlineStatusMap } = useSocket();
   const searchParams = useSearchParams();
   const activeConvParam = searchParams.get('conversation');
   const tutorIdParam = searchParams.get('tutorId');
@@ -21,6 +21,8 @@ function StudentMessagesContent() {
   const [conversations, setConversations] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Mobile navigation: 'list' shows sidebar, 'chat' shows chat window
+  const [mobileView, setMobileView] = useState('list');
 
   const fetchConversations = useCallback(async () => {
     try {
@@ -42,6 +44,7 @@ function StudentMessagesContent() {
         const found = convs.find(c => c.conversationId === activeConvParam);
         if (found) {
           setActiveConversation(found);
+          setMobileView('chat');
         } else if (tutorIdParam) {
           const tutorRes = await api.getTutorById(tutorIdParam).catch(() => null);
           if (tutorRes?.success) {
@@ -49,11 +52,11 @@ function StudentMessagesContent() {
               conversationId: activeConvParam,
               partner: tutorRes.tutor.user
             });
+            setMobileView('chat');
           }
         }
-      } else if (convs.length > 0) {
-        setActiveConversation(convs[0]);
       }
+      // Do NOT auto-select any conversation — wait for explicit user click
       setLoading(false);
     };
     init();
@@ -63,7 +66,7 @@ function StudentMessagesContent() {
   useEffect(() => {
     if (!socket) return;
 
-    const handleUnreadUpdate = ({ totalUnread, conversationId: updatedConvId }) => {
+    const handleUnreadUpdate = ({ conversationId: updatedConvId }) => {
       setConversations(prev =>
         prev.map(c =>
           c.conversationId === updatedConvId ? { ...c, unreadCount: 0 } : c
@@ -81,7 +84,8 @@ function StudentMessagesContent() {
           showNativeNotification({
             title: `${msg?.sender?.name || 'New Message'}`,
             body: msg?.text || (msg?.voiceData ? 'Sent a voice note' : 'Sent an update'),
-            icon: msg?.sender?.avatar || '/icon.png',
+            // Always use local PNG — external avatar URLs are CORS-blocked as notification icons on Windows 11
+            icon: '/icon.png',
             url: `/student/messages?conversation=${msg?.conversationId}`,
             tag: `msg-${msg?._id}`,
             soundType: 'none'
@@ -97,9 +101,9 @@ function StudentMessagesContent() {
       socket.off('unread-count-updated', handleUnreadUpdate);
       socket.off('new-message', handleNewMessage);
     };
-  }, [socket, fetchConversations]);
+  }, [socket, fetchConversations, activeConversation]);
 
-  // Select conversation and mark as seen
+  // Explicit user click — mark seen ONLY if window is actually focused at that moment
   const handleSelectConversation = (conv) => {
     setConversations(prev =>
       prev.map(c =>
@@ -107,7 +111,15 @@ function StudentMessagesContent() {
       )
     );
     setActiveConversation(conv);
-    if (socket && user) {
+    setMobileView('chat');
+
+    if (
+      socket &&
+      user &&
+      typeof document !== 'undefined' &&
+      document.visibilityState === 'visible' &&
+      document.hasFocus()
+    ) {
       socket.emit('mark-messages-seen', {
         conversationId: conv.conversationId,
         readerId: user._id || user.id
@@ -119,13 +131,32 @@ function StudentMessagesContent() {
   if (loading) return <LoadingSpinner text="Loading messages..." />;
 
   return (
-    <div className="py-8 bg-slate-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div className="bg-slate-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
 
-          {/* Left Sidebar: Conversations Threads List */}
-          <div className="lg:col-span-4 bg-white rounded-3xl p-4 border border-slate-200 shadow-sm h-[75vh] flex flex-col">
-            <h2 className="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center justify-between">
+        {/* Mobile back button — visible only in chat view on small screens */}
+        {mobileView === 'chat' && activeConversation && (
+          <div className="lg:hidden flex items-center gap-3 mb-3 px-1">
+            <button
+              onClick={() => setMobileView('list')}
+              className="flex items-center gap-2 text-sm font-semibold text-emerald-700 bg-white border border-emerald-200 rounded-xl px-3 py-2 shadow-sm active:scale-95 transition-transform"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>All Messages</span>
+            </button>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6">
+
+          {/* Left Sidebar — full screen on mobile when mobileView=list, hidden when mobileView=chat */}
+          <div
+            className={`lg:col-span-4 bg-white rounded-3xl p-4 border border-slate-200 shadow-sm flex flex-col
+              ${mobileView === 'chat' ? 'hidden lg:flex' : 'flex'}
+            `}
+            style={{ height: 'calc(100vh - 160px)', minHeight: '420px', maxHeight: '82vh' }}
+          >
+            <h2 className="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-emerald-600" />
                 <span>Messages &amp; Tutors</span>
@@ -136,7 +167,7 @@ function StudentMessagesContent() {
             </h2>
 
             <div className="flex-1 overflow-y-auto space-y-1.5 mt-3">
-              {conversations.length === 0 && !activeConversation ? (
+              {conversations.length === 0 ? (
                 <div className="text-center py-12 text-xs text-slate-400">
                   No chat conversations yet.
                 </div>
@@ -156,24 +187,18 @@ function StudentMessagesContent() {
                           : 'hover:bg-slate-50 border border-transparent'
                       }`}
                     >
-                      {/* Avatar with Fiverr / Upwork style indicator */}
                       <div className="relative shrink-0">
                         <img
                           src={conv.partner?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.partner?.name || 'T')}&background=059669&color=fff`}
                           alt={conv.partner?.name}
                           className="w-11 h-11 rounded-2xl object-cover border border-slate-200"
                         />
-                        {isTutorOnline ? (
-                          <span
-                            className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full ring-2 ring-emerald-500/20"
-                            title="Online"
-                          />
-                        ) : (
-                          <span
-                            className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-slate-300 border-2 border-white rounded-full"
-                            title="Offline"
-                          />
-                        )}
+                        <span
+                          className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-white rounded-full ${
+                            isTutorOnline ? 'bg-emerald-500 ring-2 ring-emerald-500/20' : 'bg-slate-300'
+                          }`}
+                          title={isTutorOnline ? 'Online' : 'Offline'}
+                        />
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -181,21 +206,18 @@ function StudentMessagesContent() {
                           <h4 className="text-xs font-bold text-slate-900 truncate">
                             {conv.partner?.name}
                           </h4>
-
                           <div className="flex items-center gap-1.5 shrink-0">
-                            {/* Fiverr / Upwork Presence Badge */}
                             {isTutorOnline ? (
-                              <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-700 bg-emerald-100/90 px-2 py-0.2 rounded-full border border-emerald-300">
+                              <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-                                <span>Online</span>
+                                Online
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 text-[9.5px] font-medium text-slate-400 bg-slate-100 px-1.5 py-0.2 rounded-full border border-slate-200">
+                              <span className="inline-flex items-center gap-1 text-[9.5px] font-medium text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full border border-slate-200">
                                 <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
-                                <span>Offline</span>
+                                Offline
                               </span>
                             )}
-
                             {conv.unreadCount > 0 && (
                               <span className="min-w-[18px] h-4 px-1.5 bg-emerald-600 text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs">
                                 {conv.unreadCount}
@@ -203,7 +225,6 @@ function StudentMessagesContent() {
                             )}
                           </div>
                         </div>
-
                         <p className="text-[11px] text-slate-500 truncate mt-0.5">
                           {conv.lastMessage?.text || (conv.lastMessage?.voiceData ? 'Voice note' : 'Sent an offer')}
                         </p>
@@ -215,8 +236,8 @@ function StudentMessagesContent() {
             </div>
           </div>
 
-          {/* Right Main Chat Window */}
-          <div className="lg:col-span-8">
+          {/* Right Chat Window — full screen on mobile when mobileView=chat, hidden when mobileView=list */}
+          <div className={`lg:col-span-8 ${mobileView === 'list' ? 'hidden lg:block' : 'block'}`}>
             {activeConversation ? (
               <ChatWindow
                 conversationId={activeConversation.conversationId}
@@ -224,7 +245,10 @@ function StudentMessagesContent() {
                 initialDeal={activeConversation.deal}
               />
             ) : (
-              <div className="h-[75vh] bg-white rounded-3xl border border-slate-200 flex flex-col items-center justify-center p-8 text-center text-slate-400">
+              <div
+                className="hidden lg:flex bg-white rounded-3xl border border-slate-200 flex-col items-center justify-center p-8 text-center"
+                style={{ height: 'calc(100vh - 160px)', minHeight: '420px', maxHeight: '82vh' }}
+              >
                 <MessageSquare className="w-12 h-12 text-slate-200 mb-2" />
                 <p className="font-bold text-slate-700 text-sm">Select a conversation</p>
                 <p className="text-xs text-slate-400">Choose a tutor from the list to start messaging.</p>

@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { api } from '../../../services/api';
 import ChatWindow from '../../../components/chat/ChatWindow';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
-import { MessageSquare } from 'lucide-react';
+import { MessageSquare, ArrowLeft } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { useSocket } from '../../../context/SocketContext';
 import { soundEngine } from '../../../utils/soundEffects';
@@ -13,13 +13,15 @@ import { showNativeNotification } from '../../../utils/notificationManager';
 
 function TutorMessagesContent() {
   const { user } = useAuth();
-  const { socket, onlineUsers, onlineStatusMap } = useSocket();
+  const { socket, onlineStatusMap } = useSocket();
   const searchParams = useSearchParams();
   const activeConvParam = searchParams.get('conversation');
 
   const [conversations, setConversations] = useState([]);
   const [activeConversation, setActiveConversation] = useState(null);
   const [loading, setLoading] = useState(true);
+  // Mobile navigation: 'list' shows sidebar, 'chat' shows chat window
+  const [mobileView, setMobileView] = useState('list');
 
   const fetchConversations = useCallback(async () => {
     try {
@@ -39,9 +41,10 @@ function TutorMessagesContent() {
       const convs = await fetchConversations();
       if (activeConvParam) {
         const found = convs.find(c => c.conversationId === activeConvParam);
-        if (found) setActiveConversation(found);
-      } else if (convs.length > 0) {
-        setActiveConversation(convs[0]);
+        if (found) {
+          setActiveConversation(found);
+          setMobileView('chat');
+        }
       }
       setLoading(false);
     };
@@ -52,7 +55,7 @@ function TutorMessagesContent() {
   useEffect(() => {
     if (!socket) return;
 
-    const handleUnreadUpdate = ({ totalUnread, conversationId: updatedConvId }) => {
+    const handleUnreadUpdate = ({ conversationId: updatedConvId }) => {
       setConversations(prev =>
         prev.map(c =>
           c.conversationId === updatedConvId ? { ...c, unreadCount: 0 } : c
@@ -70,7 +73,7 @@ function TutorMessagesContent() {
           showNativeNotification({
             title: `${msg?.sender?.name || 'New Message'}`,
             body: msg?.text || (msg?.voiceData ? 'Sent a voice note' : 'Sent an update'),
-            icon: msg?.sender?.avatar || '/icon.png',
+            icon: '/icon.png',
             url: `/tutor/messages?conversation=${msg?.conversationId}`,
             tag: `msg-${msg?._id}`,
             soundType: 'none'
@@ -86,7 +89,7 @@ function TutorMessagesContent() {
       socket.off('unread-count-updated', handleUnreadUpdate);
       socket.off('new-message', handleNewMessage);
     };
-  }, [socket, fetchConversations]);
+  }, [socket, fetchConversations, activeConversation]);
 
   // Optimistically clear unread, emit seen event, then re-fetch
   const handleSelectConversation = async (conv) => {
@@ -96,7 +99,15 @@ function TutorMessagesContent() {
       )
     );
     setActiveConversation(conv);
-    if (socket && user) {
+    setMobileView('chat');
+
+    if (
+      socket &&
+      user &&
+      typeof document !== 'undefined' &&
+      document.visibilityState === 'visible' &&
+      document.hasFocus()
+    ) {
       socket.emit('mark-messages-seen', {
         conversationId: conv.conversationId,
         readerId: user._id || user.id
@@ -108,13 +119,32 @@ function TutorMessagesContent() {
   if (loading) return <LoadingSpinner text="Loading messages..." />;
 
   return (
-    <div className="py-8 bg-slate-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div className="bg-slate-50 min-h-screen">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
 
-          {/* Sidebar */}
-          <div className="lg:col-span-4 bg-white rounded-3xl p-4 border border-slate-200 shadow-sm h-[75vh] flex flex-col">
-            <h2 className="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center justify-between">
+        {/* Mobile back button — visible only in chat view on small screens */}
+        {mobileView === 'chat' && activeConversation && (
+          <div className="lg:hidden flex items-center gap-3 mb-3 px-1">
+            <button
+              onClick={() => setMobileView('list')}
+              className="flex items-center gap-2 text-sm font-semibold text-emerald-700 bg-white border border-emerald-200 rounded-xl px-3 py-2 shadow-sm active:scale-95 transition-transform"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>All Student Messages</span>
+            </button>
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6">
+
+          {/* Left Sidebar — full screen on mobile when mobileView=list, hidden when mobileView=chat */}
+          <div
+            className={`lg:col-span-4 bg-white rounded-3xl p-4 border border-slate-200 shadow-sm flex flex-col
+              ${mobileView === 'chat' ? 'hidden lg:flex' : 'flex'}
+            `}
+            style={{ height: 'calc(100vh - 160px)', minHeight: '420px', maxHeight: '82vh' }}
+          >
+            <h2 className="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4 text-emerald-600" />
                 <span>Student Inquiries &amp; Deals</span>
@@ -145,24 +175,18 @@ function TutorMessagesContent() {
                           : 'hover:bg-slate-50 border border-transparent'
                       }`}
                     >
-                      {/* Avatar with Fiverr / Upwork style status dot */}
                       <div className="relative shrink-0">
                         <img
                           src={conv.partner?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.partner?.name || 'S')}&background=059669&color=fff`}
                           alt={conv.partner?.name}
                           className="w-11 h-11 rounded-2xl object-cover border border-slate-200"
                         />
-                        {isStudentOnline ? (
-                          <span
-                            className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full ring-2 ring-emerald-500/20"
-                            title="Online"
-                          />
-                        ) : (
-                          <span
-                            className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-slate-300 border-2 border-white rounded-full"
-                            title="Offline"
-                          />
-                        )}
+                        <span
+                          className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-white rounded-full ${
+                            isStudentOnline ? 'bg-emerald-500 ring-2 ring-emerald-500/20' : 'bg-slate-300'
+                          }`}
+                          title={isStudentOnline ? 'Online' : 'Offline'}
+                        />
                       </div>
 
                       <div className="flex-1 min-w-0">
@@ -172,14 +196,13 @@ function TutorMessagesContent() {
                           </h4>
 
                           <div className="flex items-center gap-1.5 shrink-0">
-                            {/* Fiverr / Upwork Presence Badge */}
                             {isStudentOnline ? (
-                              <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-700 bg-emerald-100/90 px-2 py-0.2 rounded-full border border-emerald-300">
+                              <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300">
                                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
                                 <span>Online</span>
                               </span>
                             ) : (
-                              <span className="inline-flex items-center gap-1 text-[9.5px] font-medium text-slate-400 bg-slate-100 px-1.5 py-0.2 rounded-full border border-slate-200">
+                              <span className="inline-flex items-center gap-1 text-[9.5px] font-medium text-slate-400 bg-slate-100 px-1.5 py-0.5 rounded-full border border-slate-200">
                                 <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                                 <span>Offline</span>
                               </span>
@@ -204,8 +227,8 @@ function TutorMessagesContent() {
             </div>
           </div>
 
-          {/* Chat Panel */}
-          <div className="lg:col-span-8">
+          {/* Right Chat Panel */}
+          <div className={`lg:col-span-8 ${mobileView === 'list' ? 'hidden lg:block' : 'block'}`}>
             {activeConversation ? (
               <ChatWindow
                 conversationId={activeConversation.conversationId}
@@ -213,7 +236,10 @@ function TutorMessagesContent() {
                 initialDeal={activeConversation.deal}
               />
             ) : (
-              <div className="h-[75vh] bg-white rounded-3xl border border-slate-200 flex flex-col items-center justify-center p-8 text-center text-slate-400">
+              <div
+                className="hidden lg:flex bg-white rounded-3xl border border-slate-200 flex-col items-center justify-center p-8 text-center"
+                style={{ height: 'calc(100vh - 160px)', minHeight: '420px', maxHeight: '82vh' }}
+              >
                 <MessageSquare className="w-12 h-12 text-slate-200 mb-2" />
                 <p className="font-bold text-slate-700 text-sm">No conversation selected</p>
                 <p className="text-xs text-slate-400">Select a student inquiry to respond or send a deal offer.</p>

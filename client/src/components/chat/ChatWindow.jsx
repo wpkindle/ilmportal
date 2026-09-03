@@ -23,7 +23,8 @@ import {
   Ban,
   Volume2,
   VolumeX,
-  Bell
+  Bell,
+  MoreVertical
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -48,6 +49,22 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
   const [dealModalOpen, setDealModalOpen] = useState(false);
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [partnerDeal, setPartnerDeal] = useState(initialDeal || null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setMenuOpen(false);
+      }
+    };
+    if (menuOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [menuOpen]);
 
   // Voice Note Recording State
   const [isRecording, setIsRecording] = useState(false);
@@ -72,7 +89,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
     }
   };
 
-  // Fetch initial messages and active deal
+  // Fetch initial messages and active deal (Seen is ONLY emitted when tab has active focus)
   useEffect(() => {
     const fetchMessages = async () => {
       setLoading(true);
@@ -80,13 +97,6 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
         const res = await api.getChatMessages(conversationId);
         if (res.success) {
           setMessages(res.messages || []);
-          // Emit socket event to notify other party that messages are seen
-          if (socket && user) {
-            socket.emit('mark-messages-seen', {
-              conversationId,
-              readerId: user._id || user.id
-            });
-          }
         }
 
         // Fetch active/pending deal if available
@@ -398,57 +408,56 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
   }
 
   return (
-    <div className="flex flex-col h-[75vh] bg-white rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
+    <div className="flex flex-col h-[calc(100dvh-170px)] sm:h-[75vh] min-h-[440px] bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
       
-      {/* Top Chat Header (Fiverr / Upwork Style Online/Offline Badge) */}
-      <div className="p-4 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3 min-w-0">
+      {/* Top Chat Header (Responsive, Fiverr/Upwork Style Online/Offline Badge) */}
+      <div className="p-3 sm:p-4 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between gap-2 sm:gap-3">
+        <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
           <div className="relative shrink-0">
             <img
               src={partner?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(partner?.name || 'User')}&background=059669&color=fff`}
               alt={partner?.name}
-              className="w-11 h-11 rounded-2xl object-cover border-2 border-white shadow-sm"
+              className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl object-cover border-2 border-white shadow-sm"
             />
             {isPartnerOnline ? (
               <span
-                className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-emerald-500 border-2 border-white rounded-full ring-2 ring-emerald-500/20 shadow-xs"
+                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-emerald-500 border-2 border-white rounded-full ring-2 ring-emerald-500/20 shadow-xs"
                 title="Online Now"
               />
             ) : (
               <span
-                className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 bg-slate-300 border-2 border-white rounded-full"
+                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-slate-300 border-2 border-white rounded-full"
                 title="Offline"
               />
             )}
           </div>
 
-          <div className="min-w-0">
-            <div className="flex items-center gap-2">
+          <div className="min-w-0 flex-1">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               <h3 className="font-black text-xs sm:text-sm text-slate-900 truncate">
                 {partner?.name || 'Tutoring Chat'}
               </h3>
-              <span className="text-[9px] uppercase font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 shrink-0">
+              <span className="text-[8.5px] sm:text-[9px] uppercase font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 shrink-0">
                 {partner?.role}
               </span>
             </div>
 
-            <div className="flex items-center gap-2 mt-0.5 text-[11px] flex-wrap">
-              {/* Fiverr/Upwork style active presence badge */}
+            <div className="flex items-center gap-1.5 mt-0.5 text-[10.5px] sm:text-[11px] truncate">
               {isPartnerOnline ? (
-                <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full border border-emerald-300/70 text-[10px]">
+                <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full border border-emerald-300/70 text-[9.5px] sm:text-[10px] shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
                   <span>Online</span>
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200 text-[10px]">
+                <span className="inline-flex items-center gap-1 font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200 text-[9.5px] sm:text-[10px] shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
                   <span>Offline</span>
                 </span>
               )}
 
-              <span className="text-slate-300">&bull;</span>
-              <span className="text-slate-500 text-[11px] truncate">{partner?.city || 'Pakistan'}</span>
-              <span className="text-[10px] text-emerald-700 font-medium hidden sm:inline-flex items-center gap-1">
+              <span className="text-slate-300 shrink-0">&bull;</span>
+              <span className="text-slate-500 truncate">{partner?.city || 'Pakistan'}</span>
+              <span className="text-[10px] text-emerald-700 font-medium hidden sm:inline-flex items-center gap-1 shrink-0">
                 <Mic className="w-3 h-3 text-emerald-600" />
                 <span>Voice Notes</span>
               </span>
@@ -456,37 +465,11 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
           </div>
         </div>
 
-        <div className="flex items-center gap-2 shrink-0">
-          {/* Sound & Notification Alerts Controls */}
-          {permissionStatus !== 'granted' && (
-            <button
-              type="button"
-              onClick={requestPermission}
-              className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
-              title="Turn on desktop & mobile notifications with audio chime"
-            >
-              <Bell className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
-              <span className="hidden md:inline">Enable Alerts</span>
-            </button>
-          )}
-
-          <button
-            type="button"
-            onClick={() => toggleSound()}
-            className={`p-2 rounded-xl border text-xs transition-all cursor-pointer ${
-              soundEnabled
-                ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
-                : 'bg-slate-100 border-slate-200 text-slate-400 hover:bg-slate-200'
-            }`}
-            title={soundEnabled ? 'Sound alert is ON (Click to mute chime)' : 'Sound alert is MUTED (Click to enable chime)'}
-          >
-            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
-          </button>
-
-          {/* Live In-Platform Video Classroom Button (Identical deterministic room for Student & Tutor) */}
+        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+          {/* Live In-Platform Video Classroom Button */}
           <Link
             href={`/classroom/${conversationId}`}
-            className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all cursor-pointer"
+            className="px-2.5 sm:px-3 py-1.5 sm:py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all cursor-pointer"
             title="Start or Join In-Platform HD Video Class"
           >
             <Video className="w-3.5 h-3.5 text-white shrink-0" />
@@ -494,63 +477,162 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
             <span className="sm:hidden">Class</span>
           </Link>
 
-          {/* Report to Admin Button for both Student & Tutor */}
-          {partner && (
-            <button
-              type="button"
-              onClick={() => setReportModalOpen(true)}
-              className="px-2.5 py-2 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 text-rose-700 border border-rose-200/80 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
-              title="Report an issue or safety concern with this user to platform admin"
-            >
-              <Flag className="w-3.5 h-3.5 text-rose-500" />
-              <span className="hidden md:inline">Report</span>
-            </button>
-          )}
-
-          {/* Block / Restrict User Control */}
-          {partner && (
-            <button
-              type="button"
-              onClick={() => {
-                if (window.confirm(`Block and restrict ${partner?.name || 'this user'}? They will no longer be able to message or initiate live classroom calls with you.`)) {
-                  alert(`${partner?.name || 'User'} has been blocked.`);
-                }
-              }}
-              className="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
-              title="Block and restrict this user"
-            >
-              <Ban className="w-3.5 h-3.5 text-slate-500" />
-              <span className="hidden lg:inline">Block</span>
-            </button>
-          )}
-
           {/* Tutor Action: Send Course Offer */}
           {isTutor && (
             <button
               type="button"
               onClick={() => setDealModalOpen(true)}
-              className="px-3 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+              className="px-2.5 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
             >
               <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
               <span className="hidden sm:inline">Send Course Offer</span>
               <span className="sm:hidden">Offer</span>
             </button>
           )}
+
+          {/* Desktop Inline Actions: Sound, Alerts, Report, Block */}
+          <div className="hidden md:flex items-center gap-1.5">
+            {permissionStatus !== 'granted' && (
+              <button
+                type="button"
+                onClick={requestPermission}
+                className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                title="Turn on desktop notifications"
+              >
+                <Bell className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                <span>Enable Alerts</span>
+              </button>
+            )}
+
+            <button
+              type="button"
+              onClick={() => toggleSound()}
+              className={`p-2 rounded-xl border text-xs transition-all cursor-pointer ${
+                soundEnabled
+                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
+                  : 'bg-slate-100 border-slate-200 text-slate-400 hover:bg-slate-200'
+              }`}
+              title={soundEnabled ? 'Mute chime' : 'Enable chime'}
+            >
+              {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+            </button>
+
+            {partner && (
+              <button
+                type="button"
+                onClick={() => setReportModalOpen(true)}
+                className="px-2.5 py-2 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 text-rose-700 border border-rose-200/80 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
+                title="Report user to platform admin"
+              >
+                <Flag className="w-3.5 h-3.5 text-rose-500" />
+                <span>Report</span>
+              </button>
+            )}
+
+            {partner && (
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm(`Block and restrict ${partner?.name || 'this user'}?`)) {
+                    alert(`${partner?.name || 'User'} has been blocked.`);
+                  }
+                }}
+                className="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
+                title="Block user"
+              >
+                <Ban className="w-3.5 h-3.5 text-slate-500" />
+                <span>Block</span>
+              </button>
+            )}
+          </div>
+
+          {/* Mobile Secondary Actions Dropdown (3-Dots Menu) */}
+          <div className="relative md:hidden" ref={menuRef}>
+            <button
+              type="button"
+              onClick={() => setMenuOpen((prev) => !prev)}
+              className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+              title="More Options"
+              aria-label="More Options"
+            >
+              <MoreVertical className="w-4 h-4" />
+            </button>
+
+            {menuOpen && (
+              <div className="absolute right-0 mt-1.5 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 py-1.5 text-xs text-slate-700 animate-in fade-in zoom-in-95 duration-150">
+                <button
+                  type="button"
+                  onClick={() => {
+                    toggleSound();
+                    setMenuOpen(false);
+                  }}
+                  className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 cursor-pointer"
+                >
+                  {soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-600" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
+                  <span>{soundEnabled ? 'Mute Sound' : 'Enable Sound'}</span>
+                </button>
+
+                {permissionStatus !== 'granted' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      requestPermission();
+                      setMenuOpen(false);
+                    }}
+                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-amber-50 text-amber-900 font-semibold cursor-pointer"
+                  >
+                    <Bell className="w-4 h-4 text-amber-600" />
+                    <span>Enable Alerts</span>
+                  </button>
+                )}
+
+                <div className="h-px bg-slate-100 my-1" />
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReportModalOpen(true);
+                    setMenuOpen(false);
+                  }}
+                  className="w-full px-3 py-2 text-left flex items-center gap-2 text-rose-600 hover:bg-rose-50 font-semibold cursor-pointer"
+                >
+                  <Flag className="w-4 h-4" />
+                  <span>Report to Admin</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    if (window.confirm(`Block ${partner?.name || 'this user'}?`)) {
+                      alert(`${partner?.name || 'User'} has been blocked.`);
+                    }
+                  }}
+                  className="w-full px-3 py-2 text-left flex items-center gap-2 text-slate-600 hover:bg-slate-50 cursor-pointer"
+                >
+                  <Ban className="w-4 h-4" />
+                  <span>Block User</span>
+                </button>
+              </div>
+            )}
+          </div>
         </div>
       </div>
 
       {/* End-to-End Encrypted & AI Moderation Safe Banner */}
-      <div className="px-4 py-2 bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 text-white border-b border-emerald-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-xs">
-        <div className="flex items-center gap-2 text-[11px]">
-          <div className="p-1 rounded bg-emerald-500/20 text-emerald-400 shrink-0">
-            <Lock className="w-3.5 h-3.5" />
+      <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 text-white border-b border-emerald-800/60 flex items-center justify-between gap-1.5 text-[10px] sm:text-xs shrink-0">
+        <div className="flex items-center gap-1.5 sm:gap-2 truncate">
+          <div className="p-0.5 sm:p-1 rounded bg-emerald-500/20 text-emerald-400 shrink-0">
+            <Lock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
           </div>
-          <span className="font-bold text-emerald-300">End-to-End Encrypted &amp; AI Safety Protected</span>
-          <span className="text-slate-400 hidden md:inline">&bull; Monitored for harassment &amp; contact sharing</span>
+          <span className="font-bold text-emerald-300 truncate">End-to-End Encrypted &amp; AI Safe</span>
+          <span className="text-slate-400 hidden md:inline">&bull; Monitored for safety</span>
         </div>
-        <div className="text-[10px] text-slate-300 font-medium flex items-center gap-2">
-          <span>DM Restricted to Enrolled Partners</span>
-          <Link href="/safety" className="text-emerald-400 hover:text-emerald-300 underline font-bold">Safety Rules</Link>
+        <div className="text-[9.5px] sm:text-[10px] text-slate-300 font-medium shrink-0 flex items-center gap-1.5">
+          <span>DM Restricted</span>
+          <Link href="/safety" className="text-emerald-400 hover:text-emerald-300 underline font-bold">
+            Safety Rules
+          </Link>
         </div>
       </div>
 

@@ -80,8 +80,8 @@ export default function SupportPlatformWidget() {
 
   const isAdminRoute = pathname?.startsWith('/admin');
 
-  // If on admin or classroom routes, do not render support widget
-  if (isAdminRoute || pathname?.startsWith('/classroom')) {
+  // If on admin, classroom, or messages routes, do not render support widget (avoids overlapping chat input)
+  if (isAdminRoute || pathname?.startsWith('/classroom') || pathname?.includes('/messages')) {
     return null;
   }
 

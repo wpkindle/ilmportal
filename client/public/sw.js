@@ -51,8 +51,8 @@ self.addEventListener('push', (event) => {
     const title = payload.title || 'IlmPortal Notification';
     const options = {
       body: payload.body || 'You have a new update.',
-      icon: payload.icon || '/icon.svg',
-      badge: '/icon.svg',
+      icon: payload.icon || '/icon.png',
+      badge: '/icon.png',
       vibrate: [200, 100, 200],
       data: {
         url: payload.url || '/'

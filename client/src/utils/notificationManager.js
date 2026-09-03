@@ -71,41 +71,38 @@ export async function showNativeNotification({
     return null;
   }
 
-  // Windows 10/11 Action Center requires raster PNG images, not SVG
-  const validIcon = (!icon || icon.endsWith('.svg')) ? '/icon.png' : icon;
+  // Windows 10/11 and Android OS require absolute raster image URLs for native notification toasts
+  const origin = typeof window !== 'undefined' ? window.location.origin : '';
+  const validIcon = `${origin}/icon.png`;
+  const validBadge = `${origin}/icon.png`;
 
-  // 4. On mobile devices, prefer Service Worker showNotification
-  const isMobile = typeof navigator !== 'undefined' && /Mobi|Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const notificationOptions = {
+    body: body || '',
+    icon: validIcon,
+    badge: validBadge,
+    vibrate: [150, 80, 150],
+    tag: tag || undefined,
+    renotify: true,
+    silent: false,
+    data: { url }
+  };
 
-  if (isMobile && 'serviceWorker' in navigator && navigator.serviceWorker.controller) {
+  // 4. Prefer Service Worker showNotification (Ensures native toasts in Windows 11 Action Center & Android)
+  if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
     try {
       const registration = await navigator.serviceWorker.ready;
       if (registration && registration.showNotification) {
-        return registration.showNotification(title, {
-          body: body || '',
-          icon: validIcon,
-          badge: '/icon.png',
-          vibrate: [150, 80, 150],
-          tag: tag || undefined,
-          renotify: true,
-          data: { url }
-        });
+        await registration.showNotification(title, notificationOptions);
+        return true;
       }
     } catch (swErr) {
-      console.warn('Service worker mobile notification fallback:', swErr);
+      console.warn('Service worker showNotification notice:', swErr);
     }
   }
 
-  // 5. Desktop browser native Notification (Direct window focus, zero reload, always popup)
+  // 5. Fallback to desktop window Notification constructor (Chromebook, macOS, Linux)
   try {
-    const notification = new Notification(title, {
-      body: body || '',
-      icon: validIcon,
-      badge: '/icon.png',
-      tag: tag || undefined,
-      renotify: true,
-      data: { url }
-    });
+    const notification = new Notification(title, notificationOptions);
 
     notification.onclick = function (event) {
       try {
@@ -125,23 +122,7 @@ export async function showNativeNotification({
 
     return notification;
   } catch (err) {
-    // If desktop throws (e.g. Android Chrome constructor restriction), fallback to service worker
-    if ('serviceWorker' in navigator) {
-      try {
-        const registration = await navigator.serviceWorker.ready;
-        if (registration && registration.showNotification) {
-          return registration.showNotification(title, {
-            body: body || '',
-            icon: icon || '/icon.svg',
-            badge: '/icon.svg',
-            vibrate: [150, 80, 150],
-            tag: tag || undefined,
-            renotify: true,
-            data: { url }
-          });
-        }
-      } catch (e) {}
-    }
+    console.warn('Desktop Notification constructor fallback error:', err);
     return null;
   }
 }

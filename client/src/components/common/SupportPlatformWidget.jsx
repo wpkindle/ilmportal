@@ -70,6 +70,20 @@ const paymentMethods = [
     textColor: 'text-blue-400',
     bgColor: 'bg-blue-500/10',
     instructions: 'Scan with UPaisa App or transfer directly to 03171759093.'
+  },
+  {
+    id: 'raast',
+    name: 'Raast Instant ID',
+    shortName: 'Raast ID',
+    category: 'State Bank of Pakistan',
+    accountTitle: 'Abdul Khaliq',
+    accountNumber: '03171759093',
+    qrImage: '/images/qr-meezan.jpg',
+    color: 'from-amber-600 to-emerald-600',
+    borderColor: 'border-amber-500',
+    textColor: 'text-amber-400',
+    bgColor: 'bg-amber-500/10',
+    instructions: 'Send money instantly with 0% fee via Raast ID directly to mobile number 03171759093 from any Pakistani banking app.'
   }
 ];
 
@@ -314,7 +328,7 @@ export default function SupportPlatformWidget() {
                   {/* EasyPaisa, JazzCash, UPaisa */}
                   <div className="p-2 rounded-xl bg-white/5 border border-white/10 flex items-center justify-between gap-2 hover:border-emerald-500/40 transition-colors">
                     <div>
-                      <span className="text-slate-400 text-[9px] font-bold block uppercase tracking-wide">EasyPaisa / JazzCash / UPaisa</span>
+                      <span className="text-slate-400 text-[9px] font-bold block uppercase tracking-wide">Raast / EasyPaisa / JazzCash / UPaisa</span>
                       <span className="font-mono font-black text-white text-xs">03171759093</span>
                     </div>
                     <button

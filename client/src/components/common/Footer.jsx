@@ -433,7 +433,7 @@ const Footer = () => {
                   <span className="font-mono text-emerald-300 font-extrabold text-xs sm:text-sm select-all">96010105435308</span>
                 </div>
                 <div className="bg-slate-950/80 px-3 py-2 rounded-xl border border-slate-800">
-                  <span className="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">EasyPaisa, JazzCash, UPaisa</span>
+                  <span className="text-[10px] text-slate-400 block uppercase font-bold tracking-wider">Raast, EasyPaisa, JazzCash, UPaisa</span>
                   <span className="font-mono text-amber-300 font-extrabold text-xs sm:text-sm select-all">03171759093</span>
                 </div>
               </div>

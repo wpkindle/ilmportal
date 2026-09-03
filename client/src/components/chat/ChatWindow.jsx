@@ -58,6 +58,20 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
+  useEffect(() => {
+    if (initialDeal) {
+      setPartnerDeal(initialDeal);
+    }
+  }, [initialDeal]);
+
+  // Video call / Live class option is ONLY visible when deal has been accepted!
+  const isDealAccepted = Boolean(
+    partnerDeal &&
+    ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) &&
+    !partnerDeal.accessRestricted &&
+    partnerDeal.status !== 'restricted'
+  );
+
   // Student Profile & Female Tutor Gate State
   const [studentProfileModalOpen, setStudentProfileModalOpen] = useState(false);
   const [femaleTutorRequestStatus, setFemaleTutorRequestStatus] = useState(null);
@@ -136,6 +150,9 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
         const res = await api.getChatMessages(conversationId);
         if (res.success) {
           setMessages(res.messages || []);
+          if (res.deal) {
+            setPartnerDeal(res.deal);
+          }
         }
 
         // Fetch active/pending deal if available
@@ -145,7 +162,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
             const currentDeal = dealsRes.deals.find(
               (d) =>
                 (d.tutor?._id === partner._id || d.tutor === partner._id || d.student?._id === partner._id || d.student === partner._id) &&
-                ['pending_offer', 'active_trial', 'active_paid'].includes(d.status)
+                ['pending_offer', 'active_trial', 'continuation_agreed', 'active_paid'].includes(d.status)
             );
             if (currentDeal) setPartnerDeal(currentDeal);
           }
@@ -574,8 +591,8 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Live In-Platform Video Classroom Button (hidden for tutor-to-tutor) */}
-          {!isTutorToTutor && (
+          {/* Live In-Platform Video Classroom Button (only visible after deal is accepted) */}
+          {!isTutorToTutor && isDealAccepted && (
             <Link
               href={`/classroom/${conversationId}`}
               className="p-2 sm:px-3 sm:py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all cursor-pointer"
@@ -666,7 +683,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
 
             {menuOpen && (
               <div className="absolute right-0 mt-1.5 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 py-1.5 text-xs text-slate-700 animate-in fade-in zoom-in-95 duration-150">
-                {!isTutorToTutor && (
+                {!isTutorToTutor && isDealAccepted && (
                   <Link
                     href={`/classroom/${conversationId}`}
                     onClick={() => setMenuOpen(false)}

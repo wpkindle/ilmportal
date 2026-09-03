@@ -74,7 +74,7 @@ export default function TutorDealsPage() {
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
-                    {deal.mode !== 'in_person' && (
+                    {deal.mode !== 'in_person' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && !deal.accessRestricted && (
                       <Link
                         href={`/classroom/${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
                         className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all"

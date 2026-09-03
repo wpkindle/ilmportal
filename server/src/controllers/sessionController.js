@@ -125,13 +125,23 @@ exports.getSessionByRoomId = async (req, res) => {
         const tutor = users.find(u => u.role === 'tutor') || users[0];
         const student = users.find(u => u.role === 'student') || users[1];
 
-        // Find any active or recent deal
+        // Find active deal between this tutor and student
         const deal = await Deal.findOne({
           $or: [
             { tutor: tutor?._id, student: student?._id },
             { tutor: student?._id, student: tutor?._id }
           ]
         }).sort({ createdAt: -1 });
+
+        // Enforce that video call requires an accepted deal
+        if (req.user?.role !== 'admin') {
+          if (!deal || !['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status)) {
+            return res.status(403).json({
+              success: false,
+              message: 'Live video classroom is only available after a tuition deal offer has been accepted.'
+            });
+          }
+        }
 
         session = {
           roomId,

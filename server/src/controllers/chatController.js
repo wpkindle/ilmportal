@@ -139,10 +139,21 @@ exports.getMessages = async (req, res) => {
       console.error('Error auto-delivering messages:', deliveryErr);
     }
 
+    let latestDeal = null;
+    if (parts.length === 2 && parts[0] && parts[1]) {
+      latestDeal = await Deal.findOne({
+        $or: [
+          { student: parts[0], tutor: parts[1] },
+          { student: parts[1], tutor: parts[0] }
+        ]
+      }).sort({ createdAt: -1 });
+    }
+
     res.status(200).json({
       success: true,
       count: messages.length,
-      messages
+      messages,
+      deal: latestDeal
     });
   } catch (error) {
     res.status(500).json({

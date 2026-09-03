@@ -16,10 +16,11 @@ export default function Tutor72HourClock({ deal, onPayClick, className = '' }) {
     if (!deal) return;
 
     // Calculate due date (72 hours from deal start)
-    const startDate = deal.trialStartDate || deal.continuationAgreedAt || deal.createdAt;
     const dueDate = deal.tutorFeeDueDate
       ? new Date(deal.tutorFeeDueDate)
-      : new Date(new Date(startDate || Date.now()).getTime() + 72 * 60 * 60 * 1000);
+      : deal.trialEndDate
+      ? new Date(deal.trialEndDate)
+      : new Date(new Date(deal.trialStartDate || deal.continuationAgreedAt || deal.createdAt || Date.now()).getTime() + 72 * 60 * 60 * 1000);
 
     const updateTimer = () => {
       const now = new Date();
@@ -101,7 +102,7 @@ export default function Tutor72HourClock({ deal, onPayClick, className = '' }) {
   }
 
   // Case 3: Overdue (72 Hours Passed without payment) -> RESTRICTION ACTIVE!
-  if (timeLeft.isOverdue || deal.accessRestricted || deal.status === 'restricted') {
+  if (timeLeft.isOverdue && !deal.tutorFeePaid) {
     const feeDisplay = deal.platformFee ? `PKR ${deal.platformFee.toLocaleString()}` : 'Admin Custom Fee';
 
     return (
@@ -175,3 +176,4 @@ export default function Tutor72HourClock({ deal, onPayClick, className = '' }) {
     </div>
   );
 }
+

@@ -232,8 +232,10 @@ exports.sendMessage = async (req, res) => {
       if (deal) {
         const now = new Date();
         if (!deal.tutorFeeDueDate && ['active_trial', 'continuation_agreed', 'active_paid', 'restricted'].includes(deal.status)) {
-          const start = deal.trialStartDate || deal.continuationAgreedAt || deal.createdAt || now;
-          deal.tutorFeeDueDate = new Date(new Date(start).getTime() + 72 * 60 * 60 * 1000);
+          deal.tutorFeeDueDate = deal.trialEndDate
+            || (deal.trialStartDate ? new Date(new Date(deal.trialStartDate).getTime() + 72 * 60 * 60 * 1000) : null)
+            || (deal.continuationAgreedAt ? new Date(new Date(deal.continuationAgreedAt).getTime() + 72 * 60 * 60 * 1000) : null)
+            || new Date(now.getTime() + 72 * 60 * 60 * 1000);
         }
 
         if (deal.tutorFeeDueDate && new Date(deal.tutorFeeDueDate) < now && !deal.tutorFeePaid) {
@@ -247,6 +249,15 @@ exports.sendMessage = async (req, res) => {
             code: 'TUTOR_FEE_OVERDUE',
             message: 'Chat access restricted: The 72-hour grace period for platform fee clearance has expired without payment verification. Please clear the platform fee with admin to resume chatting.'
           });
+        } else if (!deal.tutorFeePaid && new Date(deal.tutorFeeDueDate) >= now) {
+          if (deal.accessRestricted || deal.status === 'restricted') {
+            deal.accessRestricted = false;
+            deal.restrictionType = 'none';
+            if (deal.status === 'restricted') {
+              deal.status = deal.continuationAgreed ? 'continuation_agreed' : 'active_trial';
+            }
+            await deal.save();
+          }
         }
       }
     }

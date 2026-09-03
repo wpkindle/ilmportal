@@ -292,10 +292,13 @@ exports.getMyDeals = async (req, res) => {
     const now = new Date();
     for (const deal of deals) {
       if (['active_trial', 'continuation_agreed', 'active_paid', 'restricted'].includes(deal.status)) {
-        // Ensure tutorFeeDueDate is initialized to 72h from deal start
+        // Accurately resolve 72-hour due date:
+        // Priority: existing tutorFeeDueDate -> trialEndDate -> trialStartDate+72h -> continuationAgreedAt+72h -> now+72h
         if (!deal.tutorFeeDueDate) {
-          const startTime = deal.trialStartDate || deal.continuationAgreedAt || deal.createdAt || now;
-          deal.tutorFeeDueDate = new Date(new Date(startTime).getTime() + 72 * 60 * 60 * 1000);
+          deal.tutorFeeDueDate = deal.trialEndDate
+            || (deal.trialStartDate ? new Date(new Date(deal.trialStartDate).getTime() + 72 * 60 * 60 * 1000) : null)
+            || (deal.continuationAgreedAt ? new Date(new Date(deal.continuationAgreedAt).getTime() + 72 * 60 * 60 * 1000) : null)
+            || new Date(now.getTime() + 72 * 60 * 60 * 1000);
         }
 
         // Check if 72-hour window passed without payment verification
@@ -305,9 +308,10 @@ exports.getMyDeals = async (req, res) => {
           deal.status = 'restricted';
           await deal.save();
         } else if (!deal.tutorFeePaid && new Date(deal.tutorFeeDueDate) >= now) {
-          // Within 72-hour window: full access granted to chat and video
+          // Within 72-hour window: full access MUST be granted to chat and video!
           if (deal.accessRestricted || deal.status === 'restricted') {
             deal.accessRestricted = false;
+            deal.restrictionType = 'none';
             deal.status = deal.continuationAgreed ? 'continuation_agreed' : 'active_trial';
             await deal.save();
           }

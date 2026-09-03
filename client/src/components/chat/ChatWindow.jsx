@@ -97,10 +97,10 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
   const isTutorFeeOverdue = Boolean(
     isTutor &&
     partnerDeal &&
+    !partnerDeal.tutorFeePaid &&
     (
-      partnerDeal.accessRestricted ||
-      partnerDeal.status === 'restricted' ||
-      (partnerDeal.tutorFeeDueDate && new Date(partnerDeal.tutorFeeDueDate) < new Date() && !partnerDeal.tutorFeePaid)
+      (partnerDeal.tutorFeeDueDate && new Date(partnerDeal.tutorFeeDueDate) < new Date()) ||
+      (!partnerDeal.tutorFeeDueDate && partnerDeal.trialEndDate && new Date(partnerDeal.trialEndDate) < new Date())
     )
   );
 
@@ -110,7 +110,6 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
     (
       (partnerDeal &&
         ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) &&
-        !partnerDeal.accessRestricted &&
         partnerDeal.status !== 'restricted') ||
       messages.some(
         (m) =>
@@ -119,7 +118,6 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
           m.deal?.status === 'active_trial' ||
           (m.deal &&
             ['active_trial', 'continuation_agreed', 'active_paid'].includes(m.deal.status) &&
-            !m.deal.accessRestricted &&
             m.deal.status !== 'restricted')
       )
     )

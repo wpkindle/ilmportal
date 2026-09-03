@@ -29,10 +29,10 @@ const steps = [
 ];
 
 const stepColors = [
-  { glow: 'from-emerald-500/20 to-transparent', border: 'border-emerald-500/30', iconBg: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30' },
-  { glow: 'from-teal-500/20 to-transparent', border: 'border-teal-500/30', iconBg: 'bg-teal-500/20 text-teal-400 border-teal-500/30' },
-  { glow: 'from-purple-500/20 to-transparent', border: 'border-purple-500/30', iconBg: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
-  { glow: 'from-amber-500/20 to-transparent', border: 'border-amber-500/30', iconBg: 'bg-amber-500/20 text-amber-400 border-amber-500/30' }
+  { glow: 'from-emerald-500/20 to-transparent', border: 'border-emerald-500/30', iconBg: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30', numText: 'text-emerald-400/80 group-hover:text-emerald-300' },
+  { glow: 'from-teal-500/20 to-transparent', border: 'border-teal-500/30', iconBg: 'bg-teal-500/20 text-teal-400 border-teal-500/30', numText: 'text-teal-400/80 group-hover:text-teal-300' },
+  { glow: 'from-purple-500/20 to-transparent', border: 'border-purple-500/30', iconBg: 'bg-purple-500/20 text-purple-400 border-purple-500/30', numText: 'text-purple-400/80 group-hover:text-purple-300' },
+  { glow: 'from-amber-500/20 to-transparent', border: 'border-amber-500/30', iconBg: 'bg-amber-500/20 text-amber-400 border-amber-500/30', numText: 'text-amber-400/80 group-hover:text-amber-300' }
 ];
 
 const HowItWorks = () => {
@@ -84,7 +84,7 @@ const HowItWorks = () => {
                 {/* Radial Glow on Top of Card */}
                 <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${styling.glow} rounded-bl-full pointer-events-none group-hover:scale-125 transition-transform`} />
 
-                <span className="absolute top-4 right-4 text-3xl font-black text-slate-800 select-none group-hover:text-slate-700 transition-colors">
+                <span className={`absolute top-4 right-4 text-3xl font-black font-mono select-none transition-colors duration-200 ${styling.numText}`}>
                   {s.step}
                 </span>
                 <div className={`p-3.5 w-fit rounded-2xl border ${styling.iconBg} shadow-inner`}>

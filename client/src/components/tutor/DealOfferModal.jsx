@@ -74,7 +74,9 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
   // Calendar & Schedule Selection
   const todayStr = new Date().toISOString().split('T')[0];
   const [startDate, setStartDate] = useState(todayStr);
-  const [classTime, setClassTime] = useState('18:00'); // 6:00 PM default
+  const [hour, setHour] = useState('06');
+  const [minute, setMinute] = useState('00');
+  const [period, setPeriod] = useState('PM');
   const [selectedDays, setSelectedDays] = useState(['Mon', 'Wed', 'Fri']);
   const [durationMinutes, setDurationMinutes] = useState('45');
 
@@ -82,92 +84,11 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
   const [error, setError] = useState('');
 
   const dateInputRef = useRef(null);
-  const timeInputRef = useRef(null);
 
-  // Quick Date Helpers
-  const getTodayStr = () => new Date().toISOString().split('T')[0];
-  const getTomorrowStr = () => {
-    const d = new Date();
-    d.setDate(d.getDate() + 1);
-    return d.toISOString().split('T')[0];
-  };
-  const getNextMondayStr = () => {
-    const d = new Date();
-    const day = d.getDay();
-    const diff = (1 + 7 - day) % 7 || 7;
-    d.setDate(d.getDate() + diff);
-    return d.toISOString().split('T')[0];
-  };
+  // Formatted display time in 12-hour AM/PM format
+  const formattedDisplayTime = `${parseInt(hour, 10)}:${minute} ${period}`;
 
-  const getRelativeDateLabel = (dateStr) => {
-    if (!dateStr) return '';
-    const today = getTodayStr();
-    const tomorrow = getTomorrowStr();
-    if (dateStr === today) return 'Today';
-    if (dateStr === tomorrow) return 'Tomorrow';
-    try {
-      const d = new Date(dateStr + 'T00:00:00');
-      return d.toLocaleDateString('en-GB', { weekday: 'short' });
-    } catch {
-      return '';
-    }
-  };
-
-  const getTimePeriod = (time24) => {
-    if (!time24) return 'Evening';
-    const [h] = time24.split(':').map(Number);
-    if (h < 12) return 'Morning';
-    if (h < 17) return 'Afternoon';
-    if (h < 21) return 'Evening';
-    return 'Night';
-  };
-
-  const popularTimes = [
-    { label: '4:00 PM', value: '16:00' },
-    { label: '5:00 PM', value: '17:00' },
-    { label: '6:00 PM', value: '18:00' },
-    { label: '7:00 PM', value: '19:00' },
-    { label: '8:00 PM', value: '20:00' },
-    { label: '9:00 PM', value: '21:00' }
-  ];
-
-  const durationOptions = [
-    { value: '30', label: '30 Min' },
-    { value: '45', label: '45 Min (Best)' },
-    { value: '60', label: '60 Min (1h)' },
-    { value: '90', label: '90 Min (1.5h)' }
-  ];
-
-  const openDatePicker = () => {
-    if (dateInputRef.current) {
-      try {
-        dateInputRef.current.showPicker();
-      } catch {
-        dateInputRef.current.focus();
-      }
-    }
-  };
-
-  const openTimePicker = () => {
-    if (timeInputRef.current) {
-      try {
-        timeInputRef.current.showPicker();
-      } catch {
-        timeInputRef.current.focus();
-      }
-    }
-  };
-
-  // Format 24h time to 12h AM/PM
-  const format12Hour = (time24) => {
-    if (!time24) return '6:00 PM';
-    const [h, m] = time24.split(':').map(Number);
-    const period = h >= 12 ? 'PM' : 'AM';
-    const h12 = h % 12 || 12;
-    return `${h12}:${m < 10 ? '0' : ''}${m} ${period}`;
-  };
-
-  // Format Date to readable string
+  // Format Date to readable string (e.g. 4 Sep 2026)
   const formatReadableDate = (dateStr) => {
     if (!dateStr) return 'Immediately';
     try {
@@ -194,7 +115,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
   };
 
   // Computed schedule details string
-  const computedSchedule = `Starts ${formatReadableDate(startDate)} • ${selectedDays.join(', ')} at ${format12Hour(classTime)} PKT (${durationMinutes} min/class)`;
+  const computedSchedule = `Starts ${formatReadableDate(startDate)} • ${selectedDays.join(', ')} at ${formattedDisplayTime} PKT (${durationMinutes} min/class)`;
 
   const finalSubject = selectedSubject === 'custom' ? customSubjectText.trim() || 'Custom Quran / Academic Tuition' : selectedSubject;
 
@@ -378,44 +299,27 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
               </span>
             </div>
 
-            {/* Date & Time Row */}
+            {/* Date & Time Row (Simple, Straightforward with AM/PM) */}
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               
-              {/* Professional Start Date Card */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-[11px] font-bold text-slate-700">
-                    First Class Date *
-                  </label>
-                  <span className="text-[10px] text-emerald-600 font-semibold">Click box</span>
-                </div>
+              {/* 1. First Class Date */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <CalendarIcon className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>First Class Date *</span>
+                </label>
                 
-                {/* Entire Clickable Box */}
+                {/* Entire Box Opens Calendar Picker */}
                 <div
-                  onClick={openDatePicker}
-                  className="relative p-2.5 sm:p-3 bg-white border border-slate-200 hover:border-emerald-500 rounded-2xl shadow-2xs hover:shadow-md transition-all cursor-pointer group flex items-center justify-between gap-2 overflow-hidden ring-1 ring-transparent hover:ring-emerald-400/40"
+                  onClick={() => {
+                    try {
+                      dateInputRef.current?.showPicker();
+                    } catch {
+                      dateInputRef.current?.focus();
+                    }
+                  }}
+                  className="relative flex items-center bg-white border border-slate-200 hover:border-emerald-500 focus-within:border-emerald-500 rounded-xl p-2 cursor-pointer transition-colors shadow-2xs group"
                 >
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[9px] uppercase font-bold text-slate-400 group-hover:text-emerald-700 transition-colors tracking-wider">
-                      Selected Date
-                    </p>
-                    <div className="flex items-baseline gap-1.5 mt-0.5">
-                      <span className="text-xs sm:text-sm font-black text-slate-900 font-mono tracking-tight truncate">
-                        {formatReadableDate(startDate)}
-                      </span>
-                      {getRelativeDateLabel(startDate) && (
-                        <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-emerald-100 text-emerald-800 shrink-0">
-                          {getRelativeDateLabel(startDate)}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-
-                  <div className="p-2 rounded-xl bg-emerald-50 text-emerald-600 group-hover:bg-emerald-600 group-hover:text-white transition-colors shrink-0">
-                    <CalendarIcon className="w-4 h-4" />
-                  </div>
-
-                  {/* Native date input covering entire box with showPicker */}
                   <input
                     ref={dateInputRef}
                     type="date"
@@ -424,143 +328,90 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                     value={startDate}
                     onChange={(e) => setStartDate(e.target.value)}
                     onClick={(e) => {
-                      e.stopPropagation();
                       try { e.currentTarget.showPicker(); } catch {}
                     }}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    aria-label="First Class Date"
+                    className="w-full bg-transparent text-xs font-bold text-slate-800 outline-none cursor-pointer"
                   />
-                </div>
-
-                {/* Quick Date Presets */}
-                <div className="flex items-center gap-1 flex-wrap pt-0.5">
-                  <button
-                    type="button"
-                    onClick={() => setStartDate(getTodayStr())}
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border transition-all cursor-pointer ${
-                      startDate === getTodayStr()
-                        ? 'bg-emerald-600 text-white border-emerald-600'
-                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    Today
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setStartDate(getTomorrowStr())}
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border transition-all cursor-pointer ${
-                      startDate === getTomorrowStr()
-                        ? 'bg-emerald-600 text-white border-emerald-600'
-                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    Tomorrow
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setStartDate(getNextMondayStr())}
-                    className={`text-[10px] font-bold px-2 py-0.5 rounded-lg border transition-all cursor-pointer ${
-                      startDate === getNextMondayStr()
-                        ? 'bg-emerald-600 text-white border-emerald-600'
-                        : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
-                    }`}
-                  >
-                    Next Mon
-                  </button>
                 </div>
               </div>
 
-              {/* Professional Daily Class Time Card */}
-              <div className="space-y-1.5">
-                <div className="flex items-center justify-between">
-                  <label className="text-[11px] font-bold text-slate-700">
-                    Class Time (PKT) *
-                  </label>
-                  <span className="text-[10px] text-emerald-600 font-semibold">Click box</span>
-                </div>
+              {/* 2. Daily Class Time with Clear 12-Hour AM/PM */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Class Time (AM/PM) *</span>
+                </label>
+                
+                <div className="flex items-center gap-1.5 bg-white border border-slate-200 focus-within:border-emerald-500 rounded-xl p-1.5 shadow-2xs">
+                  {/* Hour */}
+                  <select
+                    value={hour}
+                    onChange={(e) => setHour(e.target.value)}
+                    className="w-14 bg-slate-50 border border-slate-200 rounded-lg py-1 px-1 text-xs font-bold text-slate-800 outline-none cursor-pointer text-center"
+                    aria-label="Select Hour"
+                  >
+                    {['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12'].map((h) => (
+                      <option key={h} value={h}>{h}</option>
+                    ))}
+                  </select>
+                  
+                  <span className="font-bold text-slate-400 text-xs">:</span>
 
-                {/* Entire Clickable Box */}
-                <div
-                  onClick={openTimePicker}
-                  className="relative p-2.5 sm:p-3 bg-white border border-slate-200 hover:border-emerald-500 rounded-2xl shadow-2xs hover:shadow-md transition-all cursor-pointer group flex items-center justify-between gap-2 overflow-hidden ring-1 ring-transparent hover:ring-emerald-400/40"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="text-[9px] uppercase font-bold text-slate-400 group-hover:text-emerald-700 transition-colors tracking-wider">
-                      Selected Time
-                    </p>
-                    <div className="flex items-baseline gap-1.5 mt-0.5">
-                      <span className="text-xs sm:text-sm font-black text-slate-900 font-mono tracking-tight">
-                        {format12Hour(classTime)}
-                      </span>
-                      <span className="text-[10px] font-bold px-1.5 py-0.2 rounded-md bg-teal-100 text-teal-800 shrink-0">
-                        {getTimePeriod(classTime)}
-                      </span>
-                    </div>
-                  </div>
+                  {/* Minute */}
+                  <select
+                    value={minute}
+                    onChange={(e) => setMinute(e.target.value)}
+                    className="w-14 bg-slate-50 border border-slate-200 rounded-lg py-1 px-1 text-xs font-bold text-slate-800 outline-none cursor-pointer text-center"
+                    aria-label="Select Minute"
+                  >
+                    {['00', '15', '30', '45'].map((m) => (
+                      <option key={m} value={m}>{m}</option>
+                    ))}
+                  </select>
 
-                  <div className="p-2 rounded-xl bg-teal-50 text-teal-600 group-hover:bg-teal-600 group-hover:text-white transition-colors shrink-0">
-                    <Clock className="w-4 h-4" />
-                  </div>
-
-                  {/* Native time input covering entire box with showPicker */}
-                  <input
-                    ref={timeInputRef}
-                    type="time"
-                    required
-                    value={classTime}
-                    onChange={(e) => setClassTime(e.target.value)}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      try { e.currentTarget.showPicker(); } catch {}
-                    }}
-                    className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
-                    aria-label="Daily Class Time"
-                  />
-                </div>
-
-                {/* Quick Popular Time Slots */}
-                <div className="flex items-center gap-1 flex-wrap pt-0.5">
-                  {popularTimes.map((slot) => (
+                  {/* AM / PM Toggle Buttons */}
+                  <div className="flex rounded-lg overflow-hidden border border-slate-200 text-xs font-bold ml-auto">
                     <button
-                      key={slot.value}
                       type="button"
-                      onClick={() => setClassTime(slot.value)}
-                      className={`text-[10px] font-bold px-1.5 py-0.5 rounded-lg border transition-all cursor-pointer ${
-                        classTime === slot.value
-                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-2xs'
-                          : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'
+                      onClick={() => setPeriod('AM')}
+                      className={`px-2.5 py-1 transition-colors cursor-pointer ${
+                        period === 'AM'
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-white text-slate-600 hover:bg-slate-100'
                       }`}
                     >
-                      {slot.label}
+                      AM
                     </button>
-                  ))}
+                    <button
+                      type="button"
+                      onClick={() => setPeriod('PM')}
+                      className={`px-2.5 py-1 transition-colors cursor-pointer ${
+                        period === 'PM'
+                          ? 'bg-emerald-600 text-white'
+                          : 'bg-white text-slate-600 hover:bg-slate-100'
+                      }`}
+                    >
+                      PM
+                    </button>
+                  </div>
                 </div>
               </div>
 
-              {/* Professional Class Duration Card */}
-              <div className="space-y-1.5">
-                <label className="text-[11px] font-bold text-slate-700 block">
+              {/* 3. Session Duration */}
+              <div className="space-y-1">
+                <label className="text-xs font-bold text-slate-800">
                   Class Duration
                 </label>
-                <div className="grid grid-cols-2 gap-1.5">
-                  {durationOptions.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => setDurationMinutes(opt.value)}
-                      className={`p-2 rounded-xl border text-center font-bold text-[11px] transition-all cursor-pointer flex flex-col items-center justify-center ${
-                        durationMinutes === opt.value
-                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs ring-1 ring-emerald-400'
-                          : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-                      }`}
-                    >
-                      <span>{opt.label}</span>
-                    </button>
-                  ))}
-                </div>
-                <p className="text-[10px] text-slate-500 text-center pt-0.5">
-                  {durationMinutes} mins per live lesson
-                </p>
+                <select
+                  value={durationMinutes}
+                  onChange={(e) => setDurationMinutes(e.target.value)}
+                  className="w-full p-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-emerald-500 cursor-pointer shadow-2xs"
+                >
+                  <option value="30">30 Minutes</option>
+                  <option value="45">45 Minutes (Recommended)</option>
+                  <option value="60">60 Minutes (1 Hour)</option>
+                  <option value="90">90 Minutes (1.5 Hours)</option>
+                </select>
               </div>
 
             </div>

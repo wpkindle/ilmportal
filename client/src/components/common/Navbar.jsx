@@ -453,7 +453,7 @@ const Navbar = () => {
 
                   {/* Dropdown Menu */}
                   {notifMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in duration-150">
+                    <div className="fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 w-auto sm:w-96 max-w-[calc(100vw-1.5rem)] sm:max-w-none bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in duration-150">
                       <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/80 flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           <Bell className="w-4 h-4 text-emerald-600" />
@@ -605,7 +605,7 @@ const Navbar = () => {
 
                   {/* Dropdown Menu */}
                   {userMenuOpen && (
-                    <div className="absolute right-0 mt-2 w-64 bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in duration-150">
+                    <div className="fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 w-auto sm:w-72 max-w-[calc(100vw-1.5rem)] sm:max-w-none bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in duration-150">
                       <div className="px-5 py-3.5 border-b border-slate-100 bg-gradient-to-b from-slate-50/80 to-white">
                         <p className="text-xs font-bold text-slate-900 truncate">{user?.name}</p>
                         <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>

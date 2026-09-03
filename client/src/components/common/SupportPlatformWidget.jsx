@@ -91,12 +91,8 @@ export default function SupportPlatformWidget() {
 
   return (
     <>
-      {/* 1. Floating Support Platform Pill Button */}
-      <div className={`fixed z-40 transition-all ${
-        isChatRoute 
-          ? 'bottom-28 right-3 sm:right-6 md:bottom-5 md:left-6' 
-          : 'bottom-20 left-3 sm:left-6 md:bottom-5 md:left-6'
-      }`}>
+      {/* 1. Floating Support Platform Pill Button (Consistent bottom-left on all devices) */}
+      <div className="fixed bottom-20 left-3 sm:left-6 md:bottom-5 md:left-6 z-40 transition-all">
         <button
           onClick={() => setIsOpen(true)}
           aria-label="Support the Platform"

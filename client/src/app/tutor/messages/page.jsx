@@ -158,10 +158,9 @@ function TutorMessagesContent() {
 
           {/* Left Sidebar — full screen on mobile when mobileView=list, hidden when mobileView=chat */}
           <div
-            className={`lg:col-span-4 bg-white rounded-3xl p-4 border border-slate-200 shadow-sm flex flex-col
+            className={`lg:col-span-4 bg-white rounded-3xl p-4 border border-slate-200 shadow-sm flex flex-col h-[calc(100dvh-140px)] lg:h-[84vh] min-h-[460px] lg:min-h-[560px]
               ${mobileView === 'chat' ? 'hidden lg:flex' : 'flex'}
             `}
-            style={{ height: 'calc(100vh - 115px)', minHeight: '560px', maxHeight: '88vh' }}
           >
             <h2 className="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
@@ -256,8 +255,7 @@ function TutorMessagesContent() {
               />
             ) : (
               <div
-                className="hidden lg:flex bg-white rounded-3xl border border-slate-200 flex-col items-center justify-center p-8 text-center"
-                style={{ height: 'calc(100vh - 115px)', minHeight: '560px', maxHeight: '88vh' }}
+                className="hidden lg:flex bg-white rounded-3xl border border-slate-200 flex-col items-center justify-center p-8 text-center h-[84vh] min-h-[560px]"
               >
                 <MessageSquare className="w-12 h-12 text-slate-200 mb-2" />
                 <p className="font-bold text-slate-700 text-sm">No conversation selected</p>

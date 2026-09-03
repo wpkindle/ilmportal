@@ -240,7 +240,7 @@ export default function LiveActivityToast() {
   return (
     <aside
       aria-label="Live Community Activity"
-      className={`fixed bottom-20 left-4 sm:left-6 z-40 max-w-[320px] sm:max-w-sm w-[calc(100%-2rem)] sm:w-auto pointer-events-auto transition-all duration-500 ease-out transform ${
+      className={`fixed bottom-36 left-3 sm:left-6 md:bottom-20 md:left-6 z-40 max-w-[320px] sm:max-w-sm w-[calc(100%-2rem)] sm:w-auto pointer-events-auto transition-all duration-500 ease-out transform ${
         isVisible
           ? 'translate-y-0 opacity-100 scale-100'
           : 'translate-y-6 opacity-0 pointer-events-none scale-95'

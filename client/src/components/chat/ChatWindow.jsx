@@ -429,7 +429,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-115px)] sm:h-[84vh] min-h-[560px] bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
+    <div className="flex flex-col h-[calc(100dvh-175px)] sm:h-[84vh] min-h-[460px] sm:min-h-[560px] bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
       
       {/* Top Chat Header (Responsive, Fiverr/Upwork Style Online/Offline Badge) */}
       <div className="p-3 sm:p-4 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between gap-2 sm:gap-3">
@@ -490,12 +490,11 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
           {/* Live In-Platform Video Classroom Button */}
           <Link
             href={`/classroom/${conversationId}`}
-            className="px-2.5 sm:px-3 py-1.5 sm:py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all cursor-pointer"
+            className="p-2 sm:px-3 sm:py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all cursor-pointer"
             title="Start or Join In-Platform HD Video Class"
           >
-            <Video className="w-3.5 h-3.5 text-white shrink-0" />
+            <Video className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" />
             <span className="hidden sm:inline">Join Live Class</span>
-            <span className="sm:hidden">Class</span>
           </Link>
 
           {/* Tutor Action: Send Course Offer */}
@@ -503,11 +502,11 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
             <button
               type="button"
               onClick={() => setDealModalOpen(true)}
-              className="px-2.5 sm:px-3 py-1.5 sm:py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+              className="p-2 sm:px-3 sm:py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+              title="Send Course Offer"
             >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
+              <Sparkles className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-200 shrink-0" />
               <span className="hidden sm:inline">Send Course Offer</span>
-              <span className="sm:hidden">Offer</span>
             </button>
           )}
 
@@ -565,6 +564,31 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
 
             {menuOpen && (
               <div className="absolute right-0 mt-1.5 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 py-1.5 text-xs text-slate-700 animate-in fade-in zoom-in-95 duration-150">
+                <Link
+                  href={`/classroom/${conversationId}`}
+                  onClick={() => setMenuOpen(false)}
+                  className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-emerald-700 font-semibold cursor-pointer"
+                >
+                  <Video className="w-4 h-4 text-emerald-600" />
+                  <span>Join Live Class</span>
+                </Link>
+
+                {isTutor && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDealModalOpen(true);
+                      setMenuOpen(false);
+                    }}
+                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-emerald-700 font-semibold cursor-pointer"
+                  >
+                    <Sparkles className="w-4 h-4 text-emerald-600" />
+                    <span>Send Course Offer</span>
+                  </button>
+                )}
+
+                <div className="h-px bg-slate-100 my-1" />
+
                 <button
                   type="button"
                   onClick={() => {

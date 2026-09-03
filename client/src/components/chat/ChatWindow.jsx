@@ -20,7 +20,6 @@ import {
   Check,
   CheckCheck,
   Lock,
-  Ban,
   Volume2,
   VolumeX,
   Bell,
@@ -40,7 +39,7 @@ import LoadingSpinner from '../common/LoadingSpinner';
 
 const ChatWindow = ({ conversationId, partner, initialDeal }) => {
   const { user, isTutor, isStudent } = useAuth();
-  const { socket, onlineUsers, onlineStatusMap } = useSocket();
+  const { socket, onlineUsers, onlineStatusMap, refreshUserOnlineStatus } = useSocket();
   const { soundEnabled, toggleSound, permissionStatus, requestPermission } = useNotifications();
 
   const [messages, setMessages] = useState([]);
@@ -125,10 +124,35 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
   useEffect(() => {
     if (!socket || !conversationId) return;
 
+    // Join conversation rooms
     socket.emit('join-conversation', conversationId);
+    const partnerIdStr = partner?._id ? partner._id.toString() : '';
+    const myIdStr = (user?._id || user?.id)?.toString();
+    if (myIdStr && partnerIdStr) {
+      const canonId = [myIdStr, partnerIdStr].sort().join('_');
+      if (canonId !== conversationId) {
+        socket.emit('join-conversation', canonId);
+      }
+    }
+
+    // Immediately verify partner's online status
+    if (partnerIdStr && refreshUserOnlineStatus) {
+      refreshUserOnlineStatus(partnerIdStr);
+    }
 
     const handleReceiveMessage = (msg) => {
-      if (msg.conversationId === conversationId) {
+      const currentUserId = (user?._id || user?.id)?.toString();
+      const senderId = (msg.sender?._id || msg.sender)?.toString();
+      const recipientId = (msg.recipient?._id || msg.recipient)?.toString();
+      const pId = (partner?._id || partner?.id)?.toString();
+
+      // Reliable match: exact conversationId OR messages between current user & this partner
+      const isMatch =
+        (msg.conversationId && conversationId && msg.conversationId.toString() === conversationId.toString()) ||
+        (senderId === pId && recipientId === currentUserId) ||
+        (senderId === currentUserId && recipientId === pId);
+
+      if (isMatch) {
         setMessages((prev) => {
           if (prev.some((m) => m._id === msg._id)) return prev;
           const hasTemp = prev.some((m) => m._id?.startsWith?.('temp_') && m.text === msg.text);
@@ -137,10 +161,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
           }
           return [...prev, msg];
         });
-
-        const currentUserId = (user?._id || user?.id)?.toString();
-        const senderId = (msg.sender?._id || msg.sender)?.toString();
-        const recipientId = (msg.recipient?._id || msg.recipient)?.toString();
+        setTimeout(() => scrollToBottom(true), 50);
 
         // If I received this message from my counterpart
         if (currentUserId && senderId !== currentUserId) {
@@ -528,22 +549,6 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
                 <span>Report</span>
               </button>
             )}
-
-            {partner && (
-              <button
-                type="button"
-                onClick={() => {
-                  if (window.confirm(`Block and restrict ${partner?.name || 'this user'}?`)) {
-                    alert(`${partner?.name || 'User'} has been blocked.`);
-                  }
-                }}
-                className="px-2.5 py-2 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
-                title="Block user"
-              >
-                <Ban className="w-3.5 h-3.5 text-slate-500" />
-                <span>Block</span>
-              </button>
-            )}
           </div>
 
           {/* Mobile Secondary Actions Dropdown (3-Dots Menu) */}
@@ -598,20 +603,6 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
                 >
                   <Flag className="w-4 h-4" />
                   <span>Report to Admin</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setMenuOpen(false);
-                    if (window.confirm(`Block ${partner?.name || 'this user'}?`)) {
-                      alert(`${partner?.name || 'User'} has been blocked.`);
-                    }
-                  }}
-                  className="w-full px-3 py-2 text-left flex items-center gap-2 text-slate-600 hover:bg-slate-50 cursor-pointer"
-                >
-                  <Ban className="w-4 h-4" />
-                  <span>Block User</span>
                 </button>
               </div>
             )}

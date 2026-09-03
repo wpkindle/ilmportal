@@ -13,7 +13,7 @@ import { showNativeNotification } from '../../../utils/notificationManager';
 
 function TutorMessagesContent() {
   const { user } = useAuth();
-  const { socket, onlineStatusMap } = useSocket();
+  const { socket, onlineStatusMap, refreshUserOnlineStatus } = useSocket();
   const searchParams = useSearchParams();
   const activeConvParam = searchParams.get('conversation');
 
@@ -45,11 +45,21 @@ function TutorMessagesContent() {
           setActiveConversation(found);
           setMobileView('chat');
         }
+      } else if (convs.length > 0 && typeof window !== 'undefined' && window.innerWidth >= 1024) {
+        setActiveConversation(convs[0]);
       }
       setLoading(false);
     };
     init();
   }, [activeConvParam, fetchConversations]);
+
+  // Real-time verification of online status for all conversation partners
+  useEffect(() => {
+    if (conversations.length > 0 && refreshUserOnlineStatus) {
+      const partnerIds = conversations.map(c => c.partner?._id).filter(Boolean);
+      if (partnerIds.length > 0) refreshUserOnlineStatus(partnerIds);
+    }
+  }, [conversations.length, refreshUserOnlineStatus]);
 
   // Real-time socket sync for unread badges and new messages
   useEffect(() => {
@@ -64,7 +74,16 @@ function TutorMessagesContent() {
     };
 
     const handleNewMessage = (msg) => {
-      fetchConversations();
+      fetchConversations().then(convs => {
+        setActiveConversation(curr => {
+          if (!curr && convs && convs.length > 0) {
+            const found = convs.find(c => c.conversationId === msg?.conversationId);
+            return found || convs[0];
+          }
+          return curr;
+        });
+      });
+
       const currentUserId = (user?._id || user?.id)?.toString();
       const senderId = (msg?.sender?._id || msg?.sender)?.toString();
       if (currentUserId && senderId && senderId !== currentUserId) {

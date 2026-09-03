@@ -89,7 +89,7 @@ export const SocketProvider = ({ children }) => {
         usersList.forEach((id) => {
           if (id) map[id.toString()] = true;
         });
-        setOnlineStatusMap(prev => ({ ...prev, ...map }));
+        setOnlineStatusMap(map);
       }
     });
 
@@ -117,10 +117,20 @@ export const SocketProvider = ({ children }) => {
     };
   }, []);
 
+  const refreshUserOnlineStatus = (userIds) => {
+    if (!socketRef.current || !socketRef.current.connected) return;
+    const ids = Array.isArray(userIds) ? userIds : [userIds];
+    socketRef.current.emit('get-online-status', ids, (statusMap) => {
+      if (statusMap && typeof statusMap === 'object') {
+        setOnlineStatusMap(prev => ({ ...prev, ...statusMap }));
+      }
+    });
+  };
+
   const onlineUsers = Object.keys(onlineStatusMap).filter(k => onlineStatusMap[k]);
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected, onlineStatusMap, onlineUsers }}>
+    <SocketContext.Provider value={{ socket, isConnected, onlineStatusMap, onlineUsers, refreshUserOnlineStatus }}>
       {children}
     </SocketContext.Provider>
   );

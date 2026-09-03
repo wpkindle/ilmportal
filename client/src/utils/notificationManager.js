@@ -87,20 +87,18 @@ export async function showNativeNotification({
     data: { url }
   };
 
-  // 4. Prefer Service Worker showNotification (Ensures native toasts in Windows 11 Action Center & Android)
+  // 4. Trigger Service Worker showNotification if active (for Android PWA / Windows Action Center)
   if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
     try {
-      const registration = await navigator.serviceWorker.ready;
-      if (registration && registration.showNotification) {
-        await registration.showNotification(title, notificationOptions);
-        return true;
-      }
-    } catch (swErr) {
-      console.warn('Service worker showNotification notice:', swErr);
-    }
+      navigator.serviceWorker.getRegistration().then((reg) => {
+        if (reg && reg.showNotification) {
+          reg.showNotification(title, notificationOptions);
+        }
+      }).catch(() => {});
+    } catch (swErr) {}
   }
 
-  // 5. Fallback to desktop window Notification constructor (Chromebook, macOS, Linux)
+  // 5. Desktop browser Notification (Fires instantly on Windows 11, Chromebook, macOS, Linux)
   try {
     const notification = new Notification(title, notificationOptions);
 
@@ -122,7 +120,7 @@ export async function showNativeNotification({
 
     return notification;
   } catch (err) {
-    console.warn('Desktop Notification constructor fallback error:', err);
+    console.warn('Desktop Notification constructor note:', err);
     return null;
   }
 }

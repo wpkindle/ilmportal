@@ -2,7 +2,7 @@ const Message = require('../models/Message');
 const User = require('../models/User');
 
 const initSocket = (io) => {
-  const onlineUsers = new Map(); // userId -> socketId
+  const onlineUsers = new Map(); // userId -> Set of socketIds
   const roomParticipants = new Map(); // roomId -> Set of user socketIds
 
   io.on('connection', (socket) => {
@@ -12,16 +12,32 @@ const initSocket = (io) => {
     socket.on('register-user', (userId) => {
       if (userId) {
         const idStr = userId.toString();
-        onlineUsers.set(idStr, socket.id);
         socket.userId = idStr;
         socket.join(`user_${idStr}`);
-        console.log(`👤 User registered on socket: ${idStr} (${socket.id})`);
+
+        if (!onlineUsers.has(idStr)) {
+          onlineUsers.set(idStr, new Set());
+        }
+        onlineUsers.get(idStr).add(socket.id);
+        console.log(`👤 User registered on socket: ${idStr} (${socket.id}) - total connections: ${onlineUsers.get(idStr).size}`);
 
         // 1. Send all currently online user IDs to the newly connected user
         socket.emit('initial-online-users', Array.from(onlineUsers.keys()));
 
         // 2. Broadcast to everyone that this user came online
         io.emit('user-online-status', { userId: idStr, status: 'online' });
+      }
+    });
+
+    // Query online status on-demand for instant UI precision
+    socket.on('get-online-status', (userIds, callback) => {
+      if (Array.isArray(userIds) && typeof callback === 'function') {
+        const statusMap = {};
+        userIds.forEach((id) => {
+          const idStr = id?.toString();
+          statusMap[idStr] = onlineUsers.has(idStr) && onlineUsers.get(idStr).size > 0;
+        });
+        callback(statusMap);
       }
     });
 
@@ -64,9 +80,11 @@ const initSocket = (io) => {
             for (const sId of senderIds) {
               if (sId !== rId) {
                 io.to(`user_${sId}`).emit('messages-seen', seenPayload);
-                const senderSocketId = onlineUsers.get(sId);
-                if (senderSocketId) {
-                  io.to(senderSocketId).emit('messages-seen', seenPayload);
+                const senderSockets = onlineUsers.get(sId);
+                if (senderSockets && senderSockets.size > 0) {
+                  for (const sSockId of senderSockets) {
+                    io.to(sSockId).emit('messages-seen', seenPayload);
+                  }
                 }
               }
             }
@@ -92,9 +110,17 @@ const initSocket = (io) => {
     // Send 1:1 Chat Message
     socket.on('send-message', async (data) => {
       try {
-        const { conversationId, senderId, recipientId, text, messageType, dealId, dealOfferData, voiceData, voiceDuration } = data;
+        let { conversationId, senderId, recipientId, text, messageType, dealId, dealOfferData, voiceData, voiceDuration } = data;
         
-        const isRecipientOnline = recipientId && onlineUsers.has(recipientId.toString());
+        const recipientIdStr = (recipientId?._id || recipientId)?.toString();
+        const senderIdStr = (senderId?._id || senderId)?.toString();
+
+        // Ensure canonical conversationId format (sorted participants)
+        if (!conversationId || conversationId.includes('undefined')) {
+          conversationId = [senderIdStr, recipientIdStr].sort().join('_');
+        }
+
+        const isRecipientOnline = recipientIdStr && onlineUsers.has(recipientIdStr) && onlineUsers.get(recipientIdStr).size > 0;
 
         const message = await Message.create({
           conversationId,
@@ -116,7 +142,6 @@ const initSocket = (io) => {
           .populate('recipient', 'name avatar role city')
           .populate('deal');
 
-        const recipientIdStr = (recipientId?._id || recipientId)?.toString();
         const recipientRole = populatedMsg.recipient?.role || 'student';
         const targetChatLink = recipientRole === 'tutor' 
           ? `/tutor/messages?conversation=${conversationId}` 
@@ -127,14 +152,18 @@ const initSocket = (io) => {
           message: voiceData ? 'Sent a voice message' : (text ? text.slice(0, 70) : 'Sent a course offer'),
           type: 'new_message',
           conversationId,
-          senderAvatar: populatedMsg.sender.avatar || '/icon.svg',
+          senderAvatar: populatedMsg.sender.avatar || '/icon.png',
           link: targetChatLink
         };
 
-        const senderIdStr = (senderId?._id || senderId)?.toString();
-
         // 1. Broadcast to active conversation room
         io.to(`conv_${conversationId}`).emit('new-message', populatedMsg);
+
+        // Also broadcast to alternate canonical conversation room if needed
+        const altConvId = [recipientIdStr, senderIdStr].sort().join('_');
+        if (altConvId !== conversationId) {
+          io.to(`conv_${altConvId}`).emit('new-message', populatedMsg);
+        }
 
         // 2. Guarantee sender's own socket & user room receives the populated message
         socket.emit('new-message', populatedMsg);
@@ -147,11 +176,15 @@ const initSocket = (io) => {
           io.to(`user_${recipientIdStr}`).emit('new-message', populatedMsg);
           io.to(`user_${recipientIdStr}`).emit('notification-alert', alertPayload);
 
-          // Direct socket emission fallback
-          const directSocketId = onlineUsers.get(recipientIdStr);
-          if (directSocketId && directSocketId !== socket.id) {
-            io.to(directSocketId).emit('new-message', populatedMsg);
-            io.to(directSocketId).emit('notification-alert', alertPayload);
+          // Direct socket emission fallback for all active sockets of the recipient
+          const directSockets = onlineUsers.get(recipientIdStr);
+          if (directSockets && directSockets.size > 0) {
+            for (const dsId of directSockets) {
+              if (dsId !== socket.id) {
+                io.to(dsId).emit('new-message', populatedMsg);
+                io.to(dsId).emit('notification-alert', alertPayload);
+              }
+            }
           }
         }
       } catch (err) {
@@ -249,9 +282,16 @@ const initSocket = (io) => {
 
     // Disconnect handler
     socket.on('disconnect', () => {
-      if (socket.userId) {
-        onlineUsers.delete(socket.userId);
-        io.emit('user-online-status', { userId: socket.userId, status: 'offline' });
+      if (socket.userId && onlineUsers.has(socket.userId)) {
+        const userSockets = onlineUsers.get(socket.userId);
+        userSockets.delete(socket.id);
+        if (userSockets.size === 0) {
+          onlineUsers.delete(socket.userId);
+          io.emit('user-online-status', { userId: socket.userId, status: 'offline' });
+          console.log(`👤 User went offline: ${socket.userId}`);
+        } else {
+          console.log(`👤 User socket closed: ${socket.userId} (${userSockets.size} remaining)`);
+        }
       }
       if (socket.roomId && roomParticipants.has(socket.roomId)) {
         roomParticipants.get(socket.roomId).delete(socket.id);

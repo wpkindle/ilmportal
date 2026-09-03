@@ -13,7 +13,7 @@ import { showNativeNotification } from '../../../utils/notificationManager';
 
 function StudentMessagesContent() {
   const { user } = useAuth();
-  const { socket, onlineStatusMap } = useSocket();
+  const { socket, onlineStatusMap, refreshUserOnlineStatus } = useSocket();
   const searchParams = useSearchParams();
   const activeConvParam = searchParams.get('conversation');
   const tutorIdParam = searchParams.get('tutorId');
@@ -55,12 +55,21 @@ function StudentMessagesContent() {
             setMobileView('chat');
           }
         }
+      } else if (convs.length > 0 && typeof window !== 'undefined' && window.innerWidth >= 1024) {
+        setActiveConversation(convs[0]);
       }
-      // Do NOT auto-select any conversation — wait for explicit user click
       setLoading(false);
     };
     init();
   }, [activeConvParam, tutorIdParam, fetchConversations]);
+
+  // Real-time verification of online status for all conversation partners
+  useEffect(() => {
+    if (conversations.length > 0 && refreshUserOnlineStatus) {
+      const partnerIds = conversations.map(c => c.partner?._id).filter(Boolean);
+      if (partnerIds.length > 0) refreshUserOnlineStatus(partnerIds);
+    }
+  }, [conversations.length, refreshUserOnlineStatus]);
 
   // Real-time socket sync for unread badges and new messages
   useEffect(() => {
@@ -75,7 +84,16 @@ function StudentMessagesContent() {
     };
 
     const handleNewMessage = (msg) => {
-      fetchConversations();
+      fetchConversations().then(convs => {
+        setActiveConversation(curr => {
+          if (!curr && convs && convs.length > 0) {
+            const found = convs.find(c => c.conversationId === msg?.conversationId);
+            return found || convs[0];
+          }
+          return curr;
+        });
+      });
+
       const currentUserId = (user?._id || user?.id)?.toString();
       const senderId = (msg?.sender?._id || msg?.sender)?.toString();
       if (currentUserId && senderId && senderId !== currentUserId) {
@@ -84,7 +102,6 @@ function StudentMessagesContent() {
           showNativeNotification({
             title: `${msg?.sender?.name || 'New Message'}`,
             body: msg?.text || (msg?.voiceData ? 'Sent a voice note' : 'Sent an update'),
-            // Always use local PNG — external avatar URLs are CORS-blocked as notification icons on Windows 11
             icon: '/icon.png',
             url: `/student/messages?conversation=${msg?.conversationId}`,
             tag: `msg-${msg?._id}`,

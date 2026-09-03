@@ -80,8 +80,10 @@ export default function SupportPlatformWidget() {
 
   const isAdminRoute = pathname?.startsWith('/admin');
 
-  // If on admin, classroom, or messages routes, do not render support widget (avoids overlapping chat input)
-  if (isAdminRoute || pathname?.startsWith('/classroom') || pathname?.includes('/messages')) {
+  const isChatRoute = pathname?.includes('/messages');
+
+  // If on admin or classroom routes, do not render support widget
+  if (isAdminRoute || pathname?.startsWith('/classroom')) {
     return null;
   }
 
@@ -89,8 +91,12 @@ export default function SupportPlatformWidget() {
 
   return (
     <>
-      {/* 1. Floating Support Platform Pill Button (Bottom-Left: above MobileBottomNav on mobile, bottom-5 on desktop) */}
-      <div className="fixed bottom-20 left-3 sm:left-6 md:bottom-5 md:left-6 z-40">
+      {/* 1. Floating Support Platform Pill Button */}
+      <div className={`fixed z-40 transition-all ${
+        isChatRoute 
+          ? 'bottom-28 right-3 sm:right-6 md:bottom-5 md:left-6' 
+          : 'bottom-20 left-3 sm:left-6 md:bottom-5 md:left-6'
+      }`}>
         <button
           onClick={() => setIsOpen(true)}
           aria-label="Support the Platform"

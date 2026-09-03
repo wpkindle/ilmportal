@@ -46,7 +46,7 @@ export const NotificationProvider = ({ children }) => {
       showNativeNotification({
         title: 'IlmPortal Alerts Enabled',
         body: 'You will now receive instant desktop & mobile alerts with sound for messages & classroom updates.',
-        url: '/',
+        url: '#',
         soundType: 'message'
       });
     }

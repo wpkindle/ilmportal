@@ -1,4 +1,4 @@
-// IlmPortal Service Worker - Handles Desktop & Mobile Push Notifications & Deep Linking
+// IlmPortal Service Worker - Smooth SPA Notification Handling without Reloading
 const CACHE_NAME = 'ilmportal-cache-v1';
 
 self.addEventListener('install', (event) => {
@@ -9,26 +9,26 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(self.clients.claim());
 });
 
-// Handle notification click on Desktop & Mobile OS
+// Handle notification click on Desktop & Mobile OS without reloading the app
 self.addEventListener('notificationclick', (event) => {
   event.notification.close();
   const targetUrl = (event.notification.data && event.notification.data.url) || '/';
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // If a window is already open, focus it and navigate
+      // 1. If an IlmPortal window is already open, focus it and navigate via SPA postMessage
       for (const client of clientList) {
-        if ('focus' in client) {
-          if (client.url.includes(self.location.origin)) {
-            client.focus();
-            if ('navigate' in client && targetUrl !== '/') {
-              return client.navigate(targetUrl);
-            }
-            return client;
-          }
+        if ('focus' in client && client.url.includes(self.location.origin)) {
+          client.focus();
+          client.postMessage({
+            type: 'ILMPORTAL_NOTIFICATION_NAVIGATE',
+            url: targetUrl
+          });
+          return client;
         }
       }
-      // If no window is open, open a new one
+
+      // 2. If no window is open at all, launch a fresh browser window
       if (self.clients.openWindow) {
         return self.clients.openWindow(targetUrl);
       }

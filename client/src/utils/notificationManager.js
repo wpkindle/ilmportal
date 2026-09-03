@@ -91,12 +91,16 @@ export async function showNativeNotification({
     });
 
     notification.onclick = function (event) {
-      event.preventDefault();
-      window.focus();
-      if (url && url !== '/') {
-        window.location.href = url;
+      try {
+        event.preventDefault();
+        window.focus();
+        notification.close();
+        if (url && url !== '#') {
+          window.dispatchEvent(new CustomEvent('ilmportal:navigate', { detail: { url } }));
+        }
+      } catch (err) {
+        console.warn('Notification click handling error:', err);
       }
-      notification.close();
     };
 
     return notification;

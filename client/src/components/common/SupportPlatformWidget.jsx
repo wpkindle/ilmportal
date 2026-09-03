@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePathname } from 'next/navigation';
 import {
   Heart,
@@ -71,6 +71,13 @@ export default function SupportPlatformWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState('meezan');
 
+  // Listen for global open-support-platform custom event
+  useEffect(() => {
+    const handleOpen = () => setIsOpen(true);
+    window.addEventListener('open-support-platform', handleOpen);
+    return () => window.removeEventListener('open-support-platform', handleOpen);
+  }, []);
+
   const isAdminRoute = pathname?.startsWith('/admin');
 
   // If on admin or classroom routes, do not render support widget
@@ -82,30 +89,30 @@ export default function SupportPlatformWidget() {
 
   return (
     <>
-      {/* 1. Floating Support Platform Pill Button (Bottom-Left) */}
-      <div className="fixed bottom-5 left-4 sm:left-6 z-40">
+      {/* 1. Floating Support Platform Pill Button (Bottom-Left: above MobileBottomNav on mobile, bottom-5 on desktop) */}
+      <div className="fixed bottom-20 left-3 sm:left-6 md:bottom-5 md:left-6 z-40">
         <button
           onClick={() => setIsOpen(true)}
           aria-label="Support the Platform"
-          className="flex items-center gap-2.5 px-4 py-2.5 rounded-full shadow-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white border border-emerald-400/40 hover:scale-105 active:scale-95 transition-all duration-300 backdrop-blur-xl cursor-pointer"
+          className="flex items-center gap-2 px-3 py-2.5 sm:px-4 sm:py-2.5 min-h-[44px] rounded-full shadow-[0_4px_20px_rgba(5,150,105,0.45)] bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white border border-emerald-400/40 hover:scale-105 active:scale-95 transition-all duration-300 backdrop-blur-xl cursor-pointer"
         >
           <span className="flex h-2.5 w-2.5 relative">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-300"></span>
           </span>
           <QrCode className="w-4 h-4 text-emerald-200" />
-          <span className="text-xs font-bold">Support Platform</span>
+          <span className="text-xs font-bold tracking-tight">Support Platform</span>
           <Heart className="w-3.5 h-3.5 text-rose-300 fill-rose-400" />
         </button>
       </div>
 
       {/* 2. Full Modal Dialog with All 4 Payment Barcodes */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
           
           {/* Modal Container */}
           <div
-            className="w-full max-w-lg rounded-3xl bg-slate-900/95 border border-emerald-500/40 shadow-2xl shadow-emerald-950/80 text-white overflow-hidden relative animate-in zoom-in-95 duration-200"
+            className="w-full max-w-lg max-h-[92dvh] overflow-y-auto rounded-3xl bg-slate-900/95 border border-emerald-500/40 shadow-2xl shadow-emerald-950/80 text-white relative animate-in zoom-in-95 duration-200"
             role="dialog"
             aria-modal="true"
           >

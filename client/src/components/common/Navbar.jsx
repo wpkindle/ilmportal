@@ -22,7 +22,9 @@ import {
   Clock,
   ArrowRight,
   CreditCard,
-  Headphones
+  Headphones,
+  Heart,
+  QrCode
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
@@ -597,6 +599,22 @@ const Navbar = () => {
                 <Headphones className="w-4 h-4 text-emerald-600" />
                 <span>Need Help? Contact Support</span>
               </Link>
+              <button
+                type="button"
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  if (typeof window !== 'undefined') {
+                    window.dispatchEvent(new CustomEvent('open-support-platform'));
+                  }
+                }}
+                className="w-full flex items-center justify-between px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-emerald-900 bg-emerald-100/70 hover:bg-emerald-100 active:scale-98 transition-all cursor-pointer"
+              >
+                <div className="flex items-center gap-2">
+                  <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
+                  <span>Support Platform</span>
+                </div>
+                <QrCode className="w-4 h-4 text-emerald-700" />
+              </button>
             </div>
 
             {isAuthenticated ? (

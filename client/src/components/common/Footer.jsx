@@ -422,6 +422,18 @@ const Footer = () => {
               <Headphones className="w-3.5 h-3.5 text-emerald-400" />
               <span>Contact Support</span>
             </Link>
+            <button
+              type="button"
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.dispatchEvent(new CustomEvent('open-support-platform'));
+                }
+              }}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600/30 to-teal-600/30 hover:from-emerald-600/50 hover:to-teal-600/50 active:scale-95 text-emerald-300 border border-emerald-500/40 text-xs font-bold transition-all shadow-xs cursor-pointer"
+            >
+              <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400" />
+              <span>Support Platform</span>
+            </button>
           </div>
 
           <div className="flex items-center gap-2 text-xs text-slate-300 bg-slate-900/80 px-4 py-2.5 rounded-2xl border border-slate-800/80 shadow-xs text-center">

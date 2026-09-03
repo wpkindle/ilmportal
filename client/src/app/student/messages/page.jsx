@@ -149,11 +149,11 @@ function StudentMessagesContent() {
 
   return (
     <div className="bg-slate-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-8">
+      <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8 py-2 sm:py-3">
 
         {/* Mobile back button — visible only in chat view on small screens */}
         {mobileView === 'chat' && activeConversation && (
-          <div className="lg:hidden flex items-center gap-3 mb-3 px-1">
+          <div className="lg:hidden flex items-center gap-3 mb-2 px-1">
             <button
               onClick={() => setMobileView('list')}
               className="flex items-center gap-2 text-sm font-semibold text-emerald-700 bg-white border border-emerald-200 rounded-xl px-3 py-2 shadow-sm active:scale-95 transition-transform"
@@ -171,7 +171,7 @@ function StudentMessagesContent() {
             className={`lg:col-span-4 bg-white rounded-3xl p-4 border border-slate-200 shadow-sm flex flex-col
               ${mobileView === 'chat' ? 'hidden lg:flex' : 'flex'}
             `}
-            style={{ height: 'calc(100vh - 160px)', minHeight: '420px', maxHeight: '82vh' }}
+            style={{ height: 'calc(100vh - 115px)', minHeight: '560px', maxHeight: '88vh' }}
           >
             <h2 className="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
@@ -264,7 +264,7 @@ function StudentMessagesContent() {
             ) : (
               <div
                 className="hidden lg:flex bg-white rounded-3xl border border-slate-200 flex-col items-center justify-center p-8 text-center"
-                style={{ height: 'calc(100vh - 160px)', minHeight: '420px', maxHeight: '82vh' }}
+                style={{ height: 'calc(100vh - 115px)', minHeight: '560px', maxHeight: '88vh' }}
               >
                 <MessageSquare className="w-12 h-12 text-slate-200 mb-2" />
                 <p className="font-bold text-slate-700 text-sm">Select a conversation</p>

@@ -28,9 +28,9 @@ exports.getConversations = async (req, res) => {
       
       const key = otherUser._id.toString();
       if (!conversationMap.has(key)) {
-        // Count unread messages
+        // Count unread messages accurately
         const unreadCount = await Message.countDocuments({
-          conversationId: msg.conversationId,
+          sender: otherUser._id,
           recipient: userId,
           isRead: false
         });
@@ -66,16 +66,37 @@ exports.getMessages = async (req, res) => {
   try {
     const { conversationId } = req.params;
     const page = parseInt(req.query.page, 10) || 1;
-    const limit = parseInt(req.query.limit, 10) || 50;
+    const limit = parseInt(req.query.limit, 10) || 200;
     const skip = (page - 1) * limit;
 
-    const messages = await Message.find({ conversationId })
-      .populate('sender', 'name avatar role')
-      .populate('recipient', 'name avatar role')
+    const parts = (conversationId || '').split('_');
+    let query = { conversationId };
+
+    if (parts.length === 2 && parts[0] && parts[1]) {
+      const p0 = parts[0];
+      const p1 = parts[1];
+      const altConvId = `${p1}_${p0}`;
+      query = {
+        $or: [
+          { conversationId },
+          { conversationId: altConvId },
+          { sender: p0, recipient: p1 },
+          { sender: p1, recipient: p0 }
+        ]
+      };
+    }
+
+    // Sort newest first ({ createdAt: -1 }) with limit 200, then reverse to chronological order.
+    // Guarantees newest messages are always retrieved on reload and not truncated by oldest-first limit.
+    const rawMessages = await Message.find(query)
+      .populate('sender', 'name avatar role city')
+      .populate('recipient', 'name avatar role city')
       .populate('deal')
-      .sort({ createdAt: 1 })
+      .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
+
+    const messages = rawMessages.reverse();
 
     res.status(200).json({
       success: true,

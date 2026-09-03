@@ -429,7 +429,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-170px)] sm:h-[75vh] min-h-[440px] bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
+    <div className="flex flex-col h-[calc(100dvh-115px)] sm:h-[84vh] min-h-[560px] bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
       
       {/* Top Chat Header (Responsive, Fiverr/Upwork Style Online/Offline Badge) */}
       <div className="p-3 sm:p-4 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between gap-2 sm:gap-3">
@@ -759,7 +759,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
             <button
               type="button"
               onClick={startRecording}
-              className="p-2.5 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-2xl transition-colors cursor-pointer"
+              className="p-3 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-2xl transition-colors cursor-pointer shrink-0"
               title="Hold to Record Voice Note"
             >
               <Mic className="w-5 h-5" />
@@ -770,14 +770,14 @@ const ChatWindow = ({ conversationId, partner, initialDeal }) => {
               placeholder={`Write a message to ${partner?.name || 'user'}...`}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
-              className="flex-1 px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white transition-all font-medium"
+              className="flex-1 px-4 py-3 sm:py-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-sm text-slate-900 outline-none focus:border-emerald-500 focus:bg-white transition-all font-medium min-h-[48px]"
             />
 
             {/* Send Text Message Button */}
             <button
               type="submit"
               disabled={!inputText.trim()}
-              className="p-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-2xl disabled:opacity-40 transition-all shadow-md cursor-pointer"
+              className="p-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-2xl disabled:opacity-40 transition-all shadow-md cursor-pointer shrink-0"
             >
               <Send className="w-4 h-4" />
             </button>

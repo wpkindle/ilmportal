@@ -197,7 +197,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                 onClick={() => setSanadModalOpen(true)}
               />
 
-              {isAuthenticated && (user?.id || user?._id) !== (tutorUser._id || tutorUser.id || tutor._id) && (
+              {isAuthenticated && user?.role !== 'tutor' && (user?.id || user?._id) !== (tutorUser._id || tutorUser.id || tutor._id) && (
                 <Link
                   href={`/classroom/${[user?.id || user?._id, tutorUser._id || tutorUser.id || tutor._id].sort().join('_')}`}
                   className="px-5 py-3 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md flex items-center justify-center gap-2 transition-all"

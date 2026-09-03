@@ -113,6 +113,15 @@ exports.getSessionByRoomId = async (req, res) => {
       const parts = roomId.split('_');
       if (parts.length === 2 && mongoose.Types.ObjectId.isValid(parts[0]) && mongoose.Types.ObjectId.isValid(parts[1])) {
         const users = await User.find({ _id: { $in: parts } });
+
+        // Block live classroom between two tutors
+        if (users.length === 2 && users[0].role === 'tutor' && users[1].role === 'tutor') {
+          return res.status(403).json({
+            success: false,
+            message: 'Live video classrooms are strictly for student-tutor learning. Classes between tutors are not permitted.'
+          });
+        }
+
         const tutor = users.find(u => u.role === 'tutor') || users[0];
         const student = users.find(u => u.role === 'student') || users[1];
 

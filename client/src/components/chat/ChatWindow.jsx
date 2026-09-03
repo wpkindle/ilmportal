@@ -45,6 +45,7 @@ import { calculateClientCompletion } from '../common/ProfileCompletionMeter';
 
 const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
   const { user, isTutor, isStudent } = useAuth();
+  const isTutorToTutor = (isTutor || user?.role === 'tutor') && partner?.role === 'tutor';
   const { socket, onlineUsers, onlineStatusMap, refreshUserOnlineStatus } = useSocket();
   const { soundEnabled, toggleSound, permissionStatus, requestPermission } = useNotifications();
 
@@ -573,15 +574,17 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Live In-Platform Video Classroom Button */}
-          <Link
-            href={`/classroom/${conversationId}`}
-            className="p-2 sm:px-3 sm:py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all cursor-pointer"
-            title="Start or Join In-Platform HD Video Class"
-          >
-            <Video className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" />
-            <span className="hidden sm:inline">Join Live Class</span>
-          </Link>
+          {/* Live In-Platform Video Classroom Button (hidden for tutor-to-tutor) */}
+          {!isTutorToTutor && (
+            <Link
+              href={`/classroom/${conversationId}`}
+              className="p-2 sm:px-3 sm:py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all cursor-pointer"
+              title="Start or Join In-Platform HD Video Class"
+            >
+              <Video className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" />
+              <span className="hidden sm:inline">Join Live Class</span>
+            </Link>
+          )}
 
           {/* Action: Inspect Student Profile (available to all tutors) */}
           {(isTutor || partner?.role === 'student') && (
@@ -663,14 +666,16 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
 
             {menuOpen && (
               <div className="absolute right-0 mt-1.5 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 py-1.5 text-xs text-slate-700 animate-in fade-in zoom-in-95 duration-150">
-                <Link
-                  href={`/classroom/${conversationId}`}
-                  onClick={() => setMenuOpen(false)}
-                  className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-emerald-700 font-semibold cursor-pointer"
-                >
-                  <Video className="w-4 h-4 text-emerald-600" />
-                  <span>Join Live Class</span>
-                </Link>
+                {!isTutorToTutor && (
+                  <Link
+                    href={`/classroom/${conversationId}`}
+                    onClick={() => setMenuOpen(false)}
+                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-emerald-700 font-semibold cursor-pointer"
+                  >
+                    <Video className="w-4 h-4 text-emerald-600" />
+                    <span>Join Live Class</span>
+                  </Link>
+                )}
 
                 {isTutor && (
                   <button

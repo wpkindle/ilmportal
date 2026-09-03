@@ -47,22 +47,40 @@ const CertificateSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   },
+  marks: {
+    type: String,
+    default: '' // e.g. "95%" or "95/100"
+  },
   completionGrade: {
     type: String,
     default: 'Distinction (Sanad Verified)'
   },
   totalLessonsCompleted: {
     type: Number,
-    default: 38
+    default: 30
   },
   verificationCode: {
     type: String,
     required: true
   },
+  studentNotes: {
+    type: String,
+    default: ''
+  },
+  tutorNotes: {
+    type: String,
+    default: ''
+  },
+  tutorEvaluatedAt: {
+    type: Date
+  },
   // Admin Pricing & Student Payment Proof Workflow
   price: {
     type: Number,
     default: 0 // In PKR, set manually by admin
+  },
+  adminPricedAt: {
+    type: Date
   },
   paymentStatus: {
     type: String,
@@ -96,18 +114,14 @@ const CertificateSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'
   },
-  tutorNotes: {
-    type: String,
-    default: ''
-  },
   adminNotes: {
     type: String,
     default: ''
   },
   status: {
     type: String,
-    enum: ['pending_admin_pricing', 'awaiting_payment', 'payment_submitted', 'issued', 'revoked'],
-    default: 'issued'
+    enum: ['pending_tutor_review', 'pending_admin_pricing', 'awaiting_payment', 'payment_submitted', 'issued', 'revoked'],
+    default: 'pending_tutor_review'
   }
 }, {
   timestamps: true

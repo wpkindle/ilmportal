@@ -12,28 +12,28 @@ const generateCertId = () => {
   return `ILM-CERT-${year}-${rand}`;
 };
 
-// @desc    Tutor requests/recommends a certificate for a student
+// @desc    Student requests completion certificate directly for a course/tutor
 // @route   POST /api/certificates/request
-exports.tutorRequestCertificate = async (req, res) => {
+exports.studentRequestCertificate = async (req, res) => {
   try {
-    const { studentId, courseId, dealId, subject, notes, grade } = req.body;
+    const { tutorId, courseId, dealId, subject, studentName, notes } = req.body;
 
-    if (!studentId) {
+    if (!tutorId) {
       return res.status(400).json({
         success: false,
-        message: 'Student ID is required'
+        message: 'Tutor ID is required for certificate request'
       });
     }
 
-    const student = await User.findById(studentId);
-    if (!student) {
+    const tutor = await User.findById(tutorId);
+    if (!tutor || tutor.role !== 'tutor') {
       return res.status(404).json({
         success: false,
-        message: 'Student not found'
+        message: 'Assigned tutor not found'
       });
     }
 
-    let courseTitle = subject || 'Verified Quran & Academic Course';
+    let courseTitle = subject || 'Quran & Academic Course';
     let courseObj = null;
     if (courseId) {
       courseObj = await Course.findById(courseId);
@@ -45,57 +45,134 @@ exports.tutorRequestCertificate = async (req, res) => {
 
     const cert = await Certificate.create({
       certificateId,
-      student: student._id,
-      studentName: student.name,
-      studentEmail: student.email,
+      student: req.user.id,
+      studentName: (studentName && studentName.trim()) || req.user.name,
+      studentEmail: req.user.email,
       course: courseObj ? courseObj._id : undefined,
       courseTitle,
       deal: dealId || undefined,
-      instructor: req.user.id,
-      instructorName: req.user.name,
-      completionGrade: grade || 'Distinction (Sanad Verified)',
+      instructor: tutor._id,
+      instructorName: tutor.name,
       verificationCode,
-      tutorNotes: notes || '',
-      status: 'pending_admin_pricing',
+      studentNotes: notes || '',
+      status: 'pending_tutor_review',
       paymentStatus: 'unpaid',
       price: 0
     });
 
-    // Notify all admins that tutor requested a certificate
-    const admins = await User.find({ role: 'admin' });
-    for (const admin of admins) {
-      await Notification.create({
-        recipient: admin._id,
-        sender: req.user.id,
-        title: 'New Certificate Request: Price Assignment Required',
-        message: `Tutor ${req.user.name} recommended a completion certificate for student ${student.name} (${courseTitle}). Please assign a fee in Admin Center.`,
-        type: 'deal_offer',
-        link: `/admin/certificates`
-      });
-    }
+    // Notify the Tutor via in-app notification
+    await Notification.create({
+      recipient: tutor._id,
+      sender: req.user.id,
+      title: '🎓 Student Requested Course Certificate!',
+      message: `Your student ${cert.studentName} has requested an official completion certificate for "${courseTitle}". Please evaluate and enter marks/grades.`,
+      type: 'deal_offer',
+      link: `/tutor/certificates`
+    });
 
-    // Real-time socket notification to admin
+    // Real-time socket alert to Tutor
     const io = req.app.get('io');
     if (io) {
-      admins.forEach(admin => {
-        io.to(`user_${admin._id}`).emit('notification-alert', {
-          title: 'New Certificate Request',
-          message: `Tutor ${req.user.name} requested a certificate for ${student.name}.`,
-          type: 'certificate_request'
-        });
+      io.to(`user_${tutor._id}`).emit('notification-alert', {
+        title: 'New Certificate Request from Student',
+        message: `${cert.studentName} requested a certificate for "${courseTitle}". Please evaluate marks/grade.`,
+        type: 'certificate_request'
       });
     }
 
     res.status(201).json({
       success: true,
-      message: 'Certificate recommendation submitted! Admin will assign the invoice fee shortly.',
+      message: 'Certificate request submitted! Your tutor will evaluate your coursework and enter marks/grades.',
       certificate: cert
     });
   } catch (error) {
-    console.error('Error in tutorRequestCertificate:', error);
+    console.error('Error in studentRequestCertificate:', error);
     res.status(500).json({
       success: false,
       message: error.message || 'Server error requesting certificate'
+    });
+  }
+};
+
+// @desc    Tutor reviews student certificate request, enters marks/grades, and sends to admin for pricing
+// @route   PUT /api/certificates/:id/tutor-evaluate
+exports.tutorEvaluateCertificate = async (req, res) => {
+  try {
+    const { marks, grade, totalLessonsCompleted, tutorNotes } = req.body;
+    const cert = await Certificate.findById(req.params.id)
+      .populate('student', 'name email')
+      .populate('instructor', 'name email');
+
+    if (!cert) {
+      return res.status(404).json({
+        success: false,
+        message: 'Certificate request not found'
+      });
+    }
+
+    // Verify requesting user is the assigned instructor or admin
+    if (cert.instructor._id.toString() !== req.user.id.toString() && req.user.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Only the assigned tutor can evaluate and submit marks for this certificate.'
+      });
+    }
+
+    if (!marks && !grade) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide the student marks and completion grade.'
+      });
+    }
+
+    cert.marks = marks || cert.marks || '';
+    cert.completionGrade = grade || cert.completionGrade || 'Distinction (Sanad Verified)';
+    if (totalLessonsCompleted) cert.totalLessonsCompleted = Number(totalLessonsCompleted);
+    if (tutorNotes) cert.tutorNotes = tutorNotes;
+    cert.tutorEvaluatedAt = new Date();
+    cert.status = 'pending_admin_pricing';
+    await cert.save();
+
+    // Notify Admins to assign pricing
+    const admins = await User.find({ role: 'admin' });
+    for (const admin of admins) {
+      await Notification.create({
+        recipient: admin._id,
+        sender: req.user.id,
+        title: 'Tutor Evaluated Certificate: Fee Assignment Required',
+        message: `Tutor ${cert.instructor.name} graded student ${cert.studentName} for "${cert.courseTitle}" (Marks: ${cert.marks || cert.completionGrade}). Please assign certificate fee.`,
+        type: 'deal_offer',
+        link: `/admin/certificates`
+      });
+    }
+
+    const io = req.app.get('io');
+    if (io) {
+      admins.forEach(admin => {
+        io.to(`user_${admin._id}`).emit('notification-alert', {
+          title: 'Certificate Evaluated by Tutor',
+          message: `Tutor ${cert.instructor.name} graded student ${cert.studentName} for "${cert.courseTitle}". Please assign payment fee.`,
+          type: 'certificate_evaluated'
+        });
+      });
+      // Also notify student that tutor graded their certificate
+      io.to(`user_${cert.student._id}`).emit('notification-alert', {
+        title: 'Tutor Graded Your Certificate!',
+        message: `Tutor ${cert.instructor.name} entered your marks (${cert.marks || cert.completionGrade}). Admin is now reviewing payment fee.`,
+        type: 'certificate_graded'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Marks and evaluation submitted! Admin will now assign the certificate payment amount.',
+      certificate: cert
+    });
+  } catch (error) {
+    console.error('Error in tutorEvaluateCertificate:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Server error evaluating certificate'
     });
   }
 };

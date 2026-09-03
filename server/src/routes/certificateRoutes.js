@@ -4,7 +4,8 @@ const {
   issueCertificate,
   getCertificateById,
   getMyCertificates,
-  tutorRequestCertificate,
+  studentRequestCertificate,
+  tutorEvaluateCertificate,
   tutorGetCertificateRequests,
   adminGetCertificateRequests,
   adminSetCertificatePrice,
@@ -16,15 +17,14 @@ const {
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 
-// Student earned & pending certificates
+// Student requests certificate & views certificates
 router.get('/student/my-certificates', protect, authorize('student'), getMyCertificates);
-
-// Tutor endpoints
-router.post('/request', protect, authorize('tutor'), tutorRequestCertificate);
-router.get('/tutor/my-requests', protect, authorize('tutor'), tutorGetCertificateRequests);
-
-// Student submits payment proof
+router.post('/request', protect, authorize('student'), studentRequestCertificate);
 router.post('/:id/submit-payment', protect, authorize('student'), studentSubmitCertificatePayment);
+
+// Tutor endpoints (review requests & evaluate marks/grade)
+router.get('/tutor/my-requests', protect, authorize('tutor'), tutorGetCertificateRequests);
+router.put('/:id/tutor-evaluate', protect, authorize('tutor'), tutorEvaluateCertificate);
 
 // Admin endpoints
 router.get('/admin/requests', protect, authorize('admin'), adminGetCertificateRequests);

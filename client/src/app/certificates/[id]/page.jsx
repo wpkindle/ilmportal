@@ -70,6 +70,21 @@ export default function CertificateViewPage() {
     );
   }
 
+  if (certificate.status !== 'issued') {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center p-6 bg-slate-50 text-center">
+        <Award className="w-16 h-16 text-amber-500 mb-4 animate-pulse" />
+        <h2 className="text-2xl font-black text-slate-900">Certificate Awaiting Official Release</h2>
+        <p className="text-xs text-slate-500 max-w-md mt-1 mb-6">
+          This completion certificate for <strong>{certificate.studentName}</strong> ({certificate.courseTitle}) is currently in status: <span className="font-bold text-slate-800 uppercase">{certificate.status.replace(/_/g, ' ')}</span>. Official download will unlock once administration verifies the payment and issues the credential.
+        </p>
+        <Link href="/student/certificates" className="px-5 py-2.5 bg-emerald-600 text-white rounded-xl text-xs font-bold shadow-md">
+          Go to Student Certificates
+        </Link>
+      </div>
+    );
+  }
+
   const issueDateFormatted = new Date(certificate.issueDate).toLocaleDateString('en-GB', {
     day: 'numeric',
     month: 'long',
@@ -166,7 +181,9 @@ export default function CertificateViewPage() {
                 {certificate.courseTitle}
               </h3>
               <p className="text-xs font-bold text-emerald-800 mt-1">
-                Completed Lessons: {certificate.totalLessonsCompleted || 38} &bull; Rating / Standing: {certificate.completionGrade}
+                Completed Lessons: {certificate.totalLessonsCompleted || 30}
+                {certificate.marks ? ` • Marks: ${certificate.marks}` : ''}
+                {` • Standing: ${certificate.completionGrade}`}
               </p>
             </div>
           </div>

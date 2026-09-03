@@ -687,6 +687,14 @@ const Navbar = () => {
                               <span>Student Deals & Trials</span>
                             </Link>
                             <Link
+                              href="/tutor/certificates"
+                              onClick={() => setUserMenuOpen(false)}
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
+                            >
+                              <Award className="w-4 h-4 text-emerald-600" />
+                              <span>Student Certificates</span>
+                            </Link>
+                            <Link
                               href="/tutor/profile"
                               onClick={() => setUserMenuOpen(false)}
                               className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"

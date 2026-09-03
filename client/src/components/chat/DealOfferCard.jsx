@@ -24,7 +24,6 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
   const { user, isStudent: authIsStudent, isTutor: authIsTutor } = useAuth();
   const [loading, setLoading] = useState(false);
   const [dealState, setDealState] = useState(deal);
-  const [certRequested, setCertRequested] = useState(false);
 
   useEffect(() => {
     if (deal) {
@@ -255,47 +254,6 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
         <div className="p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30 text-center text-xs font-bold text-emerald-300 flex items-center justify-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-emerald-400" />
           <span>Active Paid Classes &bull; Payment Cleared by Admin</span>
-        </div>
-      )}
-
-      {/* Tutor Certificate Recommendation Trigger */}
-      {(currentStatus === 'active_paid' || currentStatus === 'active_trial' || currentStatus === 'continuation_agreed') && isTutorUser && (
-        <div className="pt-1">
-          {certRequested ? (
-            <div className="p-2.5 bg-purple-950/60 border border-purple-500/40 rounded-xl text-center text-xs text-purple-200 font-bold flex items-center justify-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-purple-400" />
-              <span>Certificate recommendation dispatched to Admin!</span>
-            </div>
-          ) : (
-            <button
-              type="button"
-              onClick={async () => {
-                if (!confirm(`Recommend official completion certificate for student ${dealState.student?.name || 'this student'}?`)) return;
-                setLoading(true);
-                try {
-                  const res = await api.tutorRequestCertificate({
-                    studentId: dealState.student?._id || dealState.student,
-                    subject: dealState.subject,
-                    dealId: dealState._id,
-                    notes: 'Completed curriculum and lessons with distinction.'
-                  });
-                  if (res.success) {
-                    setCertRequested(true);
-                    alert('Certificate recommendation submitted! Admin will assign the fee invoice.');
-                  }
-                } catch (e) {
-                  alert(e.message || 'Error recommending certificate');
-                } finally {
-                  setLoading(false);
-                }
-              }}
-              disabled={loading}
-              className="w-full py-2 bg-purple-950/80 hover:bg-purple-900 border border-purple-500/40 hover:border-purple-400 text-purple-200 text-xs font-bold rounded-xl flex items-center justify-center gap-2 transition-all cursor-pointer"
-            >
-              <Award className="w-3.5 h-3.5 text-purple-400" />
-              <span>Recommend Official Certificate for Student</span>
-            </button>
-          )}
         </div>
       )}
 

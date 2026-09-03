@@ -163,7 +163,8 @@ export default function AdminCertificatesPage() {
               <div className="flex flex-wrap items-center gap-1.5 bg-slate-200/80 p-1 rounded-2xl text-xs font-bold w-full sm:w-auto">
                 {[
                   { key: 'all', label: 'All Requests' },
-                  { key: 'pending_admin_pricing', label: 'Needs Pricing' },
+                  { key: 'pending_tutor_review', label: 'With Tutor' },
+                  { key: 'pending_admin_pricing', label: 'Needs Fee' },
                   { key: 'awaiting_payment', label: 'Awaiting Payment' },
                   { key: 'payment_submitted', label: 'Review Proof' },
                   { key: 'issued', label: 'Issued / Verified' }
@@ -210,6 +211,7 @@ export default function AdminCertificatesPage() {
                       <tr>
                         <th className="p-4">Certificate ID & Subject</th>
                         <th className="p-4">Student & Tutor</th>
+                        <th className="p-4">Tutor Marks & Grade</th>
                         <th className="p-4">Fee (PKR)</th>
                         <th className="p-4">Workflow Status</th>
                         <th className="p-4">Payment Proof</th>
@@ -218,6 +220,7 @@ export default function AdminCertificatesPage() {
                     </thead>
                     <tbody className="divide-y divide-slate-100">
                       {filteredCerts.map((cert) => {
+                        const isPendingTutor = cert.status === 'pending_tutor_review';
                         const isPendingPrice = cert.status === 'pending_admin_pricing';
                         const isAwaitingPayment = cert.status === 'awaiting_payment';
                         const isProofSubmitted = cert.status === 'payment_submitted';
@@ -246,6 +249,21 @@ export default function AdminCertificatesPage() {
                               </p>
                               {cert.studentEmail && (
                                 <p className="text-[10px] text-slate-400">{cert.studentEmail}</p>
+                              )}
+                            </td>
+
+                            <td className="p-4">
+                              {cert.marks || cert.completionGrade ? (
+                                <div className="space-y-0.5">
+                                  <span className="font-bold text-emerald-800 font-mono text-xs block">
+                                    {cert.marks ? `Marks: ${cert.marks}` : 'Marks Pending'}
+                                  </span>
+                                  <span className="text-[11px] text-slate-600 block">
+                                    {cert.completionGrade}
+                                  </span>
+                                </div>
+                              ) : (
+                                <span className="text-amber-700 italic text-[11px]">Awaiting Tutor</span>
                               )}
                             </td>
 
@@ -358,10 +376,28 @@ export default function AdminCertificatesPage() {
               </button>
             </div>
 
-            <div className="p-3 bg-purple-50 border border-purple-200 rounded-2xl text-xs space-y-1">
-              <p className="text-purple-900 font-bold">{pricingModalCert.courseTitle}</p>
-              <p className="text-slate-600">Student: <strong>{pricingModalCert.studentName}</strong></p>
-              <p className="text-slate-600">Tutor: <strong>{pricingModalCert.instructorName}</strong></p>
+            <div className="p-3 bg-purple-50 border border-purple-200 rounded-2xl text-xs space-y-1.5">
+              <p className="text-purple-900 font-bold text-sm">{pricingModalCert.courseTitle}</p>
+              <div className="flex items-center justify-between text-slate-700">
+                <span>Student: <strong>{pricingModalCert.studentName}</strong></span>
+                <span>Tutor: <strong>{pricingModalCert.instructorName}</strong></span>
+              </div>
+              <div className="pt-1.5 border-t border-purple-200 grid grid-cols-2 gap-2 text-slate-700">
+                <div>
+                  <span className="text-[10px] text-purple-700 font-bold uppercase block">Tutor Marks:</span>
+                  <strong className="text-emerald-800 font-mono text-xs">{pricingModalCert.marks || 'N/A'}</strong>
+                </div>
+                <div>
+                  <span className="text-[10px] text-purple-700 font-bold uppercase block">Sanad Grade:</span>
+                  <strong className="text-slate-800 text-xs">{pricingModalCert.completionGrade}</strong>
+                </div>
+              </div>
+              {pricingModalCert.tutorNotes && (
+                <div className="pt-1 border-t border-purple-200 text-[11px] text-slate-600">
+                  <span className="font-bold text-slate-700">Tutor Remarks: </span>
+                  <span className="italic">"{pricingModalCert.tutorNotes}"</span>
+                </div>
+              )}
             </div>
 
             <form onSubmit={handleSetPriceSubmit} className="space-y-4">

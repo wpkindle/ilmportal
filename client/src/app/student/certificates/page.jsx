@@ -17,11 +17,23 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { api } from '../../../services/api';
+import { useAuth } from '../../../context/AuthContext';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
+import { Plus } from 'lucide-react';
 
 export default function StudentCertificatesPage() {
+  const { user } = useAuth();
   const [certificates, setCertificates] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Request Certificate Modal State
+  const [requestModalOpen, setRequestModalOpen] = useState(false);
+  const [deals, setDeals] = useState([]);
+  const [selectedDealId, setSelectedDealId] = useState('');
+  const [studentCertName, setStudentCertName] = useState(user?.name || '');
+  const [courseSubject, setCourseSubject] = useState('');
+  const [requestNotes, setRequestNotes] = useState('');
+  const [requesting, setRequesting] = useState(false);
 
   // Payment Proof Modal State
   const [selectedCertForPay, setSelectedCertForPay] = useState(null);
@@ -47,7 +59,53 @@ export default function StudentCertificatesPage() {
 
   useEffect(() => {
     fetchCerts();
+    api.getMyDeals().then(res => {
+      if (res.success && res.deals) {
+        setDeals(res.deals);
+        if (res.deals.length > 0) {
+          setSelectedDealId(res.deals[0]._id);
+          setCourseSubject(res.deals[0].subject);
+        }
+      }
+    }).catch(console.error);
   }, []);
+
+  useEffect(() => {
+    if (user?.name && !studentCertName) {
+      setStudentCertName(user.name);
+    }
+  }, [user]);
+
+  const handleRequestSubmit = async (e) => {
+    e.preventDefault();
+    const deal = deals.find(d => d._id === selectedDealId);
+    if (!deal) {
+      alert('Please select a course deal with your tutor.');
+      return;
+    }
+
+    setRequesting(true);
+    try {
+      const res = await api.studentRequestCertificate({
+        tutorId: deal.tutor?._id || deal.tutor,
+        dealId: deal._id,
+        subject: courseSubject || deal.subject,
+        studentName: studentCertName.trim() || user?.name,
+        notes: requestNotes.trim()
+      });
+
+      if (res.success) {
+        alert('Certificate request sent directly to your tutor! Your tutor will now evaluate your coursework and enter your marks.');
+        setRequestModalOpen(false);
+        setRequestNotes('');
+        fetchCerts();
+      }
+    } catch (err) {
+      alert(err.message || 'Error submitting certificate request');
+    } finally {
+      setRequesting(false);
+    }
+  };
 
   const handleFileUpload = (e) => {
     const file = e.target.files?.[0];
@@ -111,33 +169,43 @@ export default function StudentCertificatesPage() {
               My Course Completion Certificates
             </h1>
             <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Manage your certificate requests, submit fee payment proofs, and download verifiable PDF certificates.
+              Request official completion certificates directly from your tutor, track grading, and download verified PDFs.
             </p>
           </div>
 
-          <Link
-            href="/courses"
-            className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer shrink-0"
-          >
-            <span>Browse More Courses</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <button
+              onClick={() => setRequestModalOpen(true)}
+              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Request Certificate</span>
+            </button>
+            <Link
+              href="/courses"
+              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer"
+            >
+              <span>Browse Courses</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
         </div>
 
         {/* Certificates Grid */}
         {certificates.length === 0 ? (
           <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 shadow-sm space-y-3">
             <Award className="w-12 h-12 text-slate-300 mx-auto" />
-            <h3 className="text-lg font-bold text-slate-800">No Certificates Earned Yet</h3>
+            <h3 className="text-lg font-bold text-slate-800">No Certificates Requested Yet</h3>
             <p className="text-xs text-slate-500 max-w-md mx-auto">
-              Ask your tutor to recommend a completion certificate once you finish your Quranic studies or academic syllabus, or complete your online curriculum chapters.
+              Completed your lessons? Request an official completion certificate directly. Your tutor will evaluate your marks, admin will assign the fee, and your certificate will be issued.
             </p>
-            <Link
-              href="/student/messages"
-              className="inline-block mt-2 px-5 py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-sm hover:bg-emerald-500 transition-all"
+            <button
+              onClick={() => setRequestModalOpen(true)}
+              className="inline-flex items-center gap-2 mt-2 px-5 py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-sm hover:bg-emerald-500 transition-all cursor-pointer"
             >
-              Go to Messages with Tutor
-            </Link>
+              <Plus className="w-4 h-4" />
+              <span>Request Your Certificate Now</span>
+            </button>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -181,8 +249,10 @@ export default function StudentCertificatesPage() {
 
                     <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1 text-slate-600">
                       <div className="flex items-center justify-between">
-                        <span>Sanad Status:</span>
-                        <strong className="text-emerald-800">{cert.completionGrade}</strong>
+                        <span>Grade / Marks:</span>
+                        <strong className="text-emerald-800">
+                          {cert.marks ? `${cert.marks} • ${cert.completionGrade}` : cert.completionGrade || 'Pending Evaluation'}
+                        </strong>
                       </div>
                       <div className="flex items-center justify-between text-[11px] text-slate-400">
                         <span>Cert ID:</span>
@@ -191,44 +261,56 @@ export default function StudentCertificatesPage() {
                       {cert.price > 0 && (
                         <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200">
                           <span>Certificate Fee:</span>
-                          <strong className="font-mono text-emerald-700 font-black">PKR {cert.price}</strong>
+                          <strong className="font-mono text-emerald-700 font-black">PKR {cert.price.toLocaleString()}</strong>
                         </div>
                       )}
                     </div>
 
                     {/* Status Notice Details */}
-                    {isPendingPricing && (
-                      <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl text-xs text-purple-800 space-y-1">
+                    {cert.status === 'pending_tutor_review' && (
+                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 space-y-1">
                         <div className="flex items-center gap-1.5 font-bold">
                           <Clock className="w-3.5 h-3.5" />
-                          <span>Tutor Recommended Certificate</span>
+                          <span>Awaiting Tutor Evaluation</span>
                         </div>
-                        <p className="text-[11px] text-purple-700">
-                          Administration is currently reviewing your study records and pricing your certificate.
+                        <p className="text-[11px] text-amber-700">
+                          Request sent to tutor {cert.instructorName}. The tutor will review your coursework and enter your marks and grade.
+                        </p>
+                      </div>
+                    )}
+
+                    {isPendingPricing && (
+                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-800 space-y-1">
+                        <div className="flex items-center gap-1.5 font-bold">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-blue-600" />
+                          <span>Tutor Graded: {cert.marks || cert.completionGrade}</span>
+                        </div>
+                        <p className="text-[11px] text-blue-700">
+                          Your tutor has submitted your marks! Administration is now assigning the payment fee for this certificate.
                         </p>
                       </div>
                     )}
 
                     {isAwaitingPayment && (
-                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 space-y-1">
-                        <div className="flex items-center gap-1.5 font-bold">
+                      <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 space-y-1">
+                        <div className="flex items-center gap-1.5 font-bold text-emerald-800">
                           <CreditCard className="w-3.5 h-3.5" />
-                          <span>Fee Invoiced: PKR {cert.price}</span>
+                          <span>Fee Invoiced: PKR {cert.price?.toLocaleString()}</span>
                         </div>
-                        <p className="text-[11px] text-amber-700">
-                          Please send fee and submit payment proof (receipt/TID) to unlock instant PDF download.
+                        <p className="text-[11px] text-emerald-700">
+                          Marks: <strong>{cert.marks || cert.completionGrade}</strong>. Please transfer the fee and submit proof to unlock instant PDF download.
                         </p>
                       </div>
                     )}
 
                     {isProofSubmitted && (
-                      <div className="p-3 bg-blue-50 border border-blue-200 rounded-xl text-xs text-blue-800 space-y-1">
+                      <div className="p-3 bg-purple-50 border border-purple-200 rounded-xl text-xs text-purple-800 space-y-1">
                         <div className="flex items-center gap-1.5 font-bold">
-                          <ShieldCheck className="w-3.5 h-3.5 text-blue-600" />
+                          <ShieldCheck className="w-3.5 h-3.5 text-purple-600" />
                           <span>Payment Proof Submitted</span>
                         </div>
-                        <p className="text-[11px] text-blue-700">
-                          Admin is reviewing your transaction (TID: {cert.paymentProofReference || 'Attached'}). You will receive an email as soon as it is approved.
+                        <p className="text-[11px] text-purple-700">
+                          Admin is reviewing your transaction (TID: {cert.paymentProofReference || 'Attached'}). Your certificate download will unlock once verified.
                         </p>
                       </div>
                     )}
@@ -247,10 +329,10 @@ export default function StudentCertificatesPage() {
                     ) : isAwaitingPayment ? (
                       <button
                         onClick={() => setSelectedCertForPay(cert)}
-                        className="w-full py-2.5 bg-gradient-to-r from-amber-500 to-emerald-600 hover:from-amber-400 hover:to-emerald-500 text-slate-950 font-black text-xs rounded-xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+                        className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs rounded-xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
                       >
                         <CreditCard className="w-3.5 h-3.5" />
-                        <span>Submit Payment Proof (PKR {cert.price})</span>
+                        <span>Submit Payment Proof (PKR {cert.price?.toLocaleString()})</span>
                       </button>
                     ) : (
                       <button
@@ -258,7 +340,13 @@ export default function StudentCertificatesPage() {
                         className="w-full py-2.5 bg-slate-100 text-slate-400 font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-not-allowed"
                       >
                         <Clock className="w-3.5 h-3.5" />
-                        <span>{isPendingPricing ? 'Awaiting Fee Assignment' : 'Proof Under Verification'}</span>
+                        <span>
+                          {cert.status === 'pending_tutor_review'
+                            ? 'Awaiting Tutor Evaluation'
+                            : isPendingPricing
+                            ? 'Awaiting Admin Fee Assignment'
+                            : 'Proof Under Verification'}
+                        </span>
                       </button>
                     )}
                   </div>
@@ -269,6 +357,130 @@ export default function StudentCertificatesPage() {
         )}
 
       </div>
+
+      {/* Request Certificate Modal */}
+      {requestModalOpen && (
+        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-200 max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="p-2 bg-emerald-100 text-emerald-800 rounded-xl">
+                  <Award className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-slate-900 text-base">Request Course Certificate</h3>
+                  <p className="text-xs text-slate-500">Request goes directly to your tutor for evaluation</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setRequestModalOpen(false)}
+                className="text-slate-400 hover:text-slate-600 cursor-pointer text-xl font-bold"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form onSubmit={handleRequestSubmit} className="space-y-4 text-xs">
+              <div>
+                <label className="block font-bold text-slate-800 mb-1">
+                  Select Tutor &amp; Course *
+                </label>
+                {deals.length === 0 ? (
+                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs">
+                    No active course deals found. You need an active or completed tuition deal with a tutor to request a certificate.
+                  </div>
+                ) : (
+                  <select
+                    value={selectedDealId}
+                    onChange={(e) => {
+                      setSelectedDealId(e.target.value);
+                      const d = deals.find(x => x._id === e.target.value);
+                      if (d) setCourseSubject(d.subject);
+                    }}
+                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium outline-none focus:border-emerald-500"
+                    required
+                  >
+                    {deals.map((d) => (
+                      <option key={d._id} value={d._id}>
+                        {d.subject} &bull; Tutor: {d.tutor?.name || 'Tutor'} ({d.status.replace('_', ' ')})
+                      </option>
+                    ))}
+                  </select>
+                )}
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-800 mb-1">
+                  Full Name on Certificate *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Your full legal name as it should appear on certificate"
+                  value={studentCertName}
+                  onChange={(e) => setStudentCertName(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500 font-medium"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-800 mb-1">
+                  Course Title / Subject *
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="e.g. Nazra Quran with Tajweed, Hifz Surah Al-Baqarah"
+                  value={courseSubject}
+                  onChange={(e) => setCourseSubject(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500 font-medium"
+                />
+              </div>
+
+              <div>
+                <label className="block font-bold text-slate-800 mb-1">
+                  Message / Study Notes for Tutor (Optional)
+                </label>
+                <textarea
+                  rows={3}
+                  placeholder="e.g. Completed all chapters of Tajweed and Makharij rules with Ustadh."
+                  value={requestNotes}
+                  onChange={(e) => setRequestNotes(e.target.value)}
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500 resize-none font-medium"
+                />
+              </div>
+
+              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1 text-[11px] text-slate-600">
+                <p className="font-bold text-slate-800">Certificate Process Flow:</p>
+                <ol className="list-decimal list-inside space-y-0.5 text-slate-500">
+                  <li>Your tutor receives your request and assigns your marks and grade.</li>
+                  <li>Administration sets the official certificate fee.</li>
+                  <li>You review the grade, pay the fee, and submit Transaction ID (TID).</li>
+                  <li>Admin verifies your payment and unlocks instant PDF download.</li>
+                </ol>
+              </div>
+
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => setRequestModalOpen(false)}
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={requesting || deals.length === 0}
+                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs shadow-md transition-all disabled:opacity-50 cursor-pointer"
+                >
+                  {requesting ? 'Submitting Request...' : 'Submit Certificate Request'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Submit Payment Proof Modal */}
       {selectedCertForPay && (

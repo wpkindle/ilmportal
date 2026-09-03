@@ -279,8 +279,13 @@ export const api = {
   getMyCertificates: () => fetch(`${API_BASE}/certificates/student/my-certificates`, {
     headers: getHeaders()
   }).then(handleResponse),
-  tutorRequestCertificate: (body) => fetch(`${API_BASE}/certificates/request`, {
+  studentRequestCertificate: (body) => fetch(`${API_BASE}/certificates/request`, {
     method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+  tutorEvaluateCertificate: (id, body) => fetch(`${API_BASE}/certificates/${id}/tutor-evaluate`, {
+    method: 'PUT',
     headers: getHeaders(),
     body: JSON.stringify(body)
   }).then(handleResponse),

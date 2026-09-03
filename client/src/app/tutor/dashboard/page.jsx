@@ -162,6 +162,26 @@ export default function TutorDashboardPage() {
           </Link>
         </div>
 
+        {/* Certificate Evaluations Quick Link */}
+        <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
+              <Award className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="font-black text-sm text-slate-900">Student Course Certificates</h4>
+              <p className="text-xs text-slate-500">Review completion requests submitted by your students and enter marks &amp; grades.</p>
+            </div>
+          </div>
+          <Link
+            href="/tutor/certificates"
+            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shrink-0 shadow-sm"
+          >
+            <span>Evaluate Certificates</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
         {/* 4 Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
           <div className="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-2xs">

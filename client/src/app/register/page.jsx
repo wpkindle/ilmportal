@@ -167,33 +167,37 @@ function RegisterContent() {
   };
 
   return (
-    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 bg-slate-50 flex items-center justify-center">
+    <div className="min-h-screen py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative z-10">
       <div className="max-w-md w-full space-y-6">
         
         {/* Top Header */}
         <div className="text-center space-y-2">
-          <Link href="/" className="inline-flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-emerald-800 to-teal-500 flex items-center justify-center text-white shadow-lg shadow-emerald-700/20">
+          <Link href="/" className="inline-flex items-center gap-3 group">
+            <div className="w-12 h-12 rounded-2xl bg-[#0c2217] border border-[#d4a359]/40 flex items-center justify-center text-[#d4a359] shadow-md shadow-[#0c2217]/20 group-hover:scale-105 transition-transform">
               <BookOpen className="w-6 h-6" />
             </div>
           </Link>
-          <h2 className="text-2xl sm:text-3xl font-black text-slate-900">
-            Create Account
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b] text-[#d4a359] border border-[#2b6e51]/60 text-xs font-bold mx-auto shadow-xs">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
+            <span>{role === 'tutor' ? 'Faculty Onboarding' : 'Student Enrollment'}</span>
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-serif font-bold text-[#0c2217] tracking-tight">
+            Create an Account
           </h2>
-          <p className="text-xs sm:text-sm text-slate-600">
+          <p className="text-xs text-stone-600 max-w-sm mx-auto leading-relaxed">
             Join Pakistan's premier Quran & Academic Tutoring Platform
           </p>
         </div>
 
         {/* Role Switcher Tabs */}
-        <div className="bg-white p-1 rounded-2xl border border-slate-200 shadow-xs flex">
+        <div className="bg-[#f4efe8] p-1.5 rounded-2xl border border-[#e6dfd5] shadow-xs flex gap-1">
           <button
             type="button"
             onClick={() => { setRole('student'); setError(''); }}
             className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
               role === 'student'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#0c2217] text-[#d4a359] shadow-sm'
+                : 'text-stone-600 hover:text-[#0c2217]'
             }`}
           >
             <User className="w-4 h-4" />
@@ -205,8 +209,8 @@ function RegisterContent() {
             onClick={() => { setRole('tutor'); setError(''); }}
             className={`flex-1 py-2.5 rounded-xl text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all cursor-pointer ${
               role === 'tutor'
-                ? 'bg-emerald-600 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-[#0c2217] text-[#d4a359] shadow-sm'
+                : 'text-stone-600 hover:text-[#0c2217]'
             }`}
           >
             <GraduationCap className="w-4 h-4" />
@@ -215,23 +219,23 @@ function RegisterContent() {
         </div>
 
         {/* Card Form */}
-        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-md">
+        <div className="bg-white/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-[#e6dfd5] shadow-xl shadow-[#0c2217]/5">
           {error && (
-            <div className="mb-5 p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+            <div className="mb-5 p-3.5 bg-[#b85d34]/10 border border-[#b85d34]/30 text-[#b85d34] text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
+              <AlertCircle className="w-4 h-4 shrink-0 text-[#b85d34]" />
               <span>{error}</span>
             </div>
           )}
 
           {/* Tutor Verification Policy Alert */}
           {role === 'tutor' && (
-            <div className="mb-5 p-3.5 bg-amber-50 border border-amber-200 rounded-2xl space-y-1.5 animate-in fade-in">
-              <div className="flex items-center gap-2 text-amber-900 font-bold text-xs">
-                <Clock className="w-4 h-4 text-amber-600 shrink-0" />
-                <span>Degree Verification Required</span>
+            <div className="mb-5 p-3.5 bg-[#d4a359]/10 border border-[#d4a359]/30 rounded-2xl space-y-1.5 animate-in fade-in">
+              <div className="flex items-center gap-2 text-[#0c2217] font-bold text-xs">
+                <Clock className="w-4 h-4 text-[#b85d34] shrink-0" />
+                <span className="font-serif">Degree &amp; Sanad Verification Required</span>
               </div>
-              <p className="text-[11px] text-amber-800 leading-relaxed">
-                Tutor profiles remain in a <strong>pending</strong> state until an administrator reviews and approves your educational degree/Sanad. Once verified, you will appear in the public search directory.
+              <p className="text-[11px] text-stone-700 leading-relaxed">
+                Tutor profiles remain in a <strong>pending verification</strong> status until our academic faculty reviews your educational degree or Sanad. Once approved, you are listed in the verified search directory.
               </p>
             </div>
           )}
@@ -240,17 +244,17 @@ function RegisterContent() {
             
             {/* Tutor Profile Picture Upload (Required for Tutor, Optional for Student) */}
             {role === 'tutor' && (
-              <div className="p-4 bg-slate-50/80 rounded-2xl border border-slate-200 text-center space-y-2">
-                <label className="text-xs font-bold text-slate-800 block">
-                  Profile Picture *
+              <div className="p-4 bg-[#faf8f5] rounded-2xl border border-[#e6dfd5] text-center space-y-2">
+                <label className="text-xs font-bold text-[#0c2217] block font-serif">
+                  Faculty Profile Picture *
                 </label>
                 <div className="relative inline-block mx-auto">
                   <img
-                    src={avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Tutor')}&background=047857&color=fff&size=150`}
+                    src={avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Tutor')}&background=0c2217&color=d4a359&size=150`}
                     alt="Avatar Preview"
-                    className="w-20 h-20 rounded-full object-cover border-2 border-emerald-300 shadow-xs mx-auto"
+                    className="w-20 h-20 rounded-full object-cover border-2 border-[#d4a359] shadow-md mx-auto"
                   />
-                  <label className="absolute bottom-0 right-0 p-1.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full cursor-pointer shadow-md">
+                  <label className="absolute bottom-0 right-0 p-1.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40 rounded-full cursor-pointer shadow-md transition-transform hover:scale-105">
                     <Camera className="w-3.5 h-3.5" />
                     <input
                       type="file"
@@ -260,26 +264,26 @@ function RegisterContent() {
                     />
                   </label>
                 </div>
-                <p className="text-[10px] text-slate-500">
-                  Upload a clear, professional photo for verification
+                <p className="text-[10px] text-stone-500">
+                  Upload a clear, respectful portrait for identity verification
                 </p>
               </div>
             )}
 
             {/* Full Name */}
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
+              <label className="text-xs font-bold text-[#0c2217] block mb-1 font-serif">
                 {role === 'tutor' ? 'Full Name (As on Degree/CNIC) *' : 'Student Full Name *'}
               </label>
               <div className="relative">
-                <User className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="text"
                   required
                   placeholder={role === 'tutor' ? 'e.g. Qari Huzaifa Ahmed' : 'e.g. Hamza Khan'}
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-800 outline-none focus:border-emerald-500 focus:bg-white font-medium"
+                  className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white focus:ring-1 focus:ring-[#0c2217] font-medium"
                 />
               </div>
             </div>
@@ -287,17 +291,17 @@ function RegisterContent() {
             {/* Gender and Age Row */}
             <div className="grid grid-cols-2 gap-3 items-start">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
+                <label className="text-xs font-bold text-[#0c2217] block mb-1 font-serif">
                   Gender *
                 </label>
-                <div className="grid grid-cols-2 gap-1 p-1 bg-slate-100 rounded-2xl border border-slate-200/80">
+                <div className="grid grid-cols-2 gap-1 p-1 bg-[#f4efe8] rounded-2xl border border-[#e6dfd5]">
                   <button
                     type="button"
                     onClick={() => setGender('male')}
                     className={`py-2 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer text-center ${
                       gender === 'male'
-                        ? 'bg-emerald-600 text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 bg-transparent'
+                        ? 'bg-[#0c2217] text-[#d4a359] shadow-xs'
+                        : 'text-stone-600 hover:text-[#0c2217] bg-transparent'
                     }`}
                   >
                     Male
@@ -307,8 +311,8 @@ function RegisterContent() {
                     onClick={() => setGender('female')}
                     className={`py-2 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer text-center ${
                       gender === 'female'
-                        ? 'bg-emerald-600 text-white shadow-xs'
-                        : 'text-slate-600 hover:text-slate-900 bg-transparent'
+                        ? 'bg-[#0c2217] text-[#d4a359] shadow-xs'
+                        : 'text-stone-600 hover:text-[#0c2217] bg-transparent'
                     }`}
                   >
                     Female
@@ -317,7 +321,7 @@ function RegisterContent() {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
+                <label className="text-xs font-bold text-[#0c2217] block mb-1 font-serif">
                   {role === 'tutor' ? 'Tutor Age (Years) *' : 'Age (Years) *'}
                 </label>
                 <input
@@ -328,48 +332,48 @@ function RegisterContent() {
                   placeholder={role === 'tutor' ? 'e.g. 28' : 'e.g. 8'}
                   value={age}
                   onChange={(e) => setAge(e.target.value)}
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-800 outline-none focus:border-emerald-500 focus:bg-white font-bold h-[42px]"
+                  className="w-full px-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white focus:ring-1 focus:ring-[#0c2217] font-bold h-[42px]"
                 />
               </div>
             </div>
 
             {/* Email Address */}
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
+              <label className="text-xs font-bold text-[#0c2217] block mb-1 font-serif">
                 Email Address *
               </label>
               <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Mail className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type="email"
                   required
                   placeholder="name@example.com"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-800 outline-none focus:border-emerald-500 focus:bg-white font-medium"
+                  className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white focus:ring-1 focus:ring-[#0c2217] font-medium"
                 />
               </div>
             </div>
 
             {/* Password */}
             <div>
-              <label className="text-xs font-bold text-slate-700 block mb-1">
+              <label className="text-xs font-bold text-[#0c2217] block mb-1 font-serif">
                 Password *
               </label>
               <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
                   placeholder="Create a strong password (min 6 chars)"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-800 outline-none focus:border-emerald-500 focus:bg-white font-medium"
+                  className="w-full pl-10 pr-10 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white focus:ring-1 focus:ring-[#0c2217] font-medium"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
+                  className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 cursor-pointer p-1"
                   title={showPassword ? 'Hide password' : 'Show password'}
                 >
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
@@ -380,7 +384,7 @@ function RegisterContent() {
             {/* City & Mobile Row */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
+                <label className="text-xs font-bold text-[#0c2217] block mb-1 font-serif">
                   City *
                 </label>
                 <CustomSelect
@@ -394,19 +398,19 @@ function RegisterContent() {
               </div>
 
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1 flex items-center justify-between">
+                <label className="text-xs font-bold text-[#0c2217] block mb-1 font-serif flex items-center justify-between">
                   <span>{role === 'tutor' ? 'Mobile Number (WhatsApp) *' : 'Mobile Number'}</span>
-                  {role === 'student' && <span className="text-[10px] text-slate-400 font-normal">Optional</span>}
+                  {role === 'student' && <span className="text-[10px] text-stone-400 font-sans font-normal">Optional</span>}
                 </label>
                 <div className="relative">
-                  <Phone className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                  <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="tel"
                     required={role === 'tutor'}
                     placeholder="0300-1234567"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-800 outline-none focus:border-emerald-500 focus:bg-white"
+                    className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white focus:ring-1 focus:ring-[#0c2217]"
                   />
                 </div>
               </div>
@@ -414,16 +418,16 @@ function RegisterContent() {
 
             {/* Tutor Sanad / Degree Document Upload Section (Required for Tutor) */}
             {role === 'tutor' && (
-              <div className="p-4 bg-emerald-50/50 rounded-2xl border border-emerald-200/80 space-y-3">
+              <div className="p-4 bg-[#faf8f5] rounded-2xl border border-[#d4a359]/40 space-y-3">
                 <div className="flex items-center gap-2">
-                  <Award className="w-4 h-4 text-emerald-700 shrink-0" />
-                  <h4 className="text-xs font-bold text-emerald-950">
+                  <Award className="w-4 h-4 text-[#d4a359] shrink-0" />
+                  <h4 className="text-xs font-serif font-bold text-[#0c2217]">
                     Sanad / Educational Degree Document *
                   </h4>
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                  <label className="text-[11px] font-bold text-stone-700 block mb-1">
                     Degree / Sanad Title *
                   </label>
                   <input
@@ -432,12 +436,12 @@ function RegisterContent() {
                     placeholder="e.g. Dars-e-Nizami (Shahadat-ul-Almiya), BS Islamic Studies"
                     value={sanadTitle}
                     onChange={(e) => setSanadTitle(e.target.value)}
-                    className="w-full px-3.5 py-2 bg-white border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:border-emerald-500 font-medium"
+                    className="w-full px-3.5 py-2 bg-white border border-[#e6dfd5] rounded-xl text-xs text-[#0c2217] outline-none focus:border-[#0c2217] font-medium"
                   />
                 </div>
 
                 <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                  <label className="text-[11px] font-bold text-stone-700 block mb-1">
                     Upload Degree / Certificate (JPG, PNG, PDF) *
                   </label>
                   <input
@@ -445,14 +449,14 @@ function RegisterContent() {
                     accept="image/*,application/pdf"
                     required
                     onChange={handleSanadSelect}
-                    className="w-full text-xs text-slate-600 file:mr-2.5 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-600 file:text-white hover:file:bg-emerald-500 cursor-pointer"
+                    className="w-full text-xs text-stone-600 file:mr-2.5 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#0c2217] file:text-[#d4a359] hover:file:bg-[#143d2b] cursor-pointer"
                   />
                 </div>
 
                 {sanadFileUrl && (
-                  <div className="p-2 bg-emerald-100/60 rounded-xl text-[11px] text-emerald-900 flex items-center gap-1.5 font-semibold">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
-                    <span>Degree document attached for admin verification.</span>
+                  <div className="p-2 bg-[#d4a359]/15 border border-[#d4a359]/30 rounded-xl text-[11px] text-[#0c2217] flex items-center gap-1.5 font-semibold">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#0c2217] shrink-0" />
+                    <span>Degree document attached for faculty verification.</span>
                   </div>
                 )}
               </div>
@@ -462,14 +466,18 @@ function RegisterContent() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-700/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 mt-2"
+              className={`w-full py-3.5 ${
+                role === 'tutor'
+                  ? 'bg-[#b85d34] hover:bg-[#a04e28] text-white shadow-lg shadow-[#b85d34]/20'
+                  : 'bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] shadow-lg shadow-[#0c2217]/20'
+              } font-bold text-xs sm:text-sm rounded-2xl transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 mt-2`}
             >
               {loading ? (
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
                   <span>Continue to Email Verification</span>
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 text-[#d4a359]" />
                 </>
               )}
             </button>
@@ -477,11 +485,11 @@ function RegisterContent() {
 
           {/* Login Link */}
           <div className="text-center pt-2">
-            <p className="text-xs text-slate-600">
+            <p className="text-xs text-stone-600">
               Already have an account?{' '}
               <Link
-                href="/login"
-                className="font-bold text-emerald-700 hover:text-emerald-800"
+                href={role === 'tutor' ? '/login?role=tutor' : '/login?role=student'}
+                className="font-bold text-[#b85d34] hover:text-[#a04e28] transition-colors"
               >
                 Sign In here
               </Link>

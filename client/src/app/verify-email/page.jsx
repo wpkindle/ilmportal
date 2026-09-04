@@ -69,17 +69,17 @@ function VerifyEmailContent() {
   };
 
   return (
-    <div className="min-h-screen py-12 px-4 bg-slate-50 flex items-center justify-center">
-      <div className="max-w-md w-full bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-sm space-y-6">
+    <div className="min-h-screen py-12 px-4 flex items-center justify-center relative z-10">
+      <div className="max-w-md w-full bg-white/95 backdrop-blur-md p-6 sm:p-8 rounded-3xl border border-[#e6dfd5] shadow-xl shadow-[#0c2217]/5 space-y-6">
         
         {autoVerifying ? (
           <div className="text-center py-6 space-y-4">
-            <div className="w-16 h-16 rounded-3xl bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-sm animate-pulse">
-              <ShieldCheck className="w-8 h-8" />
+            <div className="w-16 h-16 rounded-3xl bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/40 flex items-center justify-center mx-auto shadow-md shadow-[#0c2217]/20 animate-pulse">
+              <ShieldCheck className="w-8 h-8 text-[#d4a359]" />
             </div>
             <div className="space-y-1">
-              <h2 className="text-xl sm:text-2xl font-black text-slate-900">Verifying Your Account...</h2>
-              <p className="text-xs text-slate-500 max-w-xs mx-auto">
+              <h2 className="text-xl sm:text-2xl font-serif font-bold text-[#0c2217]">Verifying Your Account...</h2>
+              <p className="text-xs text-stone-600 max-w-xs mx-auto">
                 Please wait a moment while we verify your email and activate your profile.
               </p>
             </div>
@@ -91,46 +91,46 @@ function VerifyEmailContent() {
           <>
             {/* Check Your Email Notice Header */}
             <div className="text-center space-y-3">
-              <div className="w-16 h-16 rounded-3xl bg-gradient-to-tr from-emerald-600 to-teal-500 text-white flex items-center justify-center mx-auto shadow-lg shadow-emerald-600/20">
-                <Mail className="w-8 h-8" />
+              <div className="w-16 h-16 rounded-3xl bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/40 flex items-center justify-center mx-auto shadow-md shadow-[#0c2217]/20">
+                <Mail className="w-8 h-8 text-[#d4a359]" />
               </div>
               <div className="space-y-1">
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-100 px-2.5 py-0.5 rounded-full uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#d4a359] bg-[#143d2b] border border-[#2b6e51]/60 px-3 py-1 rounded-full uppercase tracking-wider">
                   Verification Required
                 </span>
-                <h2 className="text-2xl font-black text-slate-900">Check Your Email</h2>
+                <h2 className="text-2xl font-serif font-bold text-[#0c2217]">Check Your Email</h2>
               </div>
-              <p className="text-xs text-slate-600 max-w-xs mx-auto leading-relaxed">
+              <p className="text-xs text-stone-600 max-w-xs mx-auto leading-relaxed">
                 We sent a 1-click verification link to:
               </p>
-              <div className="inline-block px-3.5 py-1.5 bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-900 font-mono break-all">
+              <div className="inline-block px-3.5 py-1.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs font-bold text-[#0c2217] font-mono break-all">
                 {email || 'your registered email'}
               </div>
             </div>
 
             {error && (
-              <div className="p-3.5 bg-red-50 text-red-700 rounded-2xl text-xs font-semibold text-center border border-red-200">
+              <div className="p-3.5 bg-[#b85d34]/10 text-[#b85d34] rounded-2xl text-xs font-semibold text-center border border-[#b85d34]/30">
                 {error}
               </div>
             )}
 
             {message && (
-              <div className="p-3.5 bg-emerald-50 text-emerald-800 rounded-2xl text-xs font-semibold text-center flex items-center justify-center gap-1.5 border border-emerald-200">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <div className="p-3.5 bg-[#d4a359]/15 text-[#0c2217] rounded-2xl text-xs font-semibold text-center flex items-center justify-center gap-1.5 border border-[#d4a359]/30">
+                <CheckCircle2 className="w-4 h-4 text-[#0c2217] shrink-0" />
                 <span>{message}</span>
               </div>
             )}
 
             {/* Instruction Card */}
-            <div className="p-4 bg-emerald-50/70 border border-emerald-200/80 rounded-2xl space-y-2 text-left">
-              <div className="flex items-center gap-2 text-xs font-bold text-emerald-950">
-                <Sparkles className="w-4 h-4 text-emerald-700 shrink-0" />
+            <div className="p-4 bg-[#faf8f5] border border-[#d4a359]/40 rounded-2xl space-y-2 text-left">
+              <div className="flex items-center gap-2 text-xs font-serif font-bold text-[#0c2217]">
+                <Sparkles className="w-4 h-4 text-[#d4a359] shrink-0" />
                 <span>How to verify your account:</span>
               </div>
-              <ol className="text-[11px] text-emerald-900 space-y-1.5 pl-4 list-decimal font-medium leading-relaxed">
+              <ol className="text-[11px] text-stone-700 space-y-1.5 pl-4 list-decimal font-medium leading-relaxed">
                 <li>Open your email inbox (and check <strong>Spam / Junk</strong> folder).</li>
                 <li>Open the email from <strong>IlmPortal Pakistan</strong>.</li>
-                <li>Click the green <strong>&ldquo;Verify Account &amp; Go to Profile&rdquo;</strong> button.</li>
+                <li>Click the <strong>&ldquo;Verify Account &amp; Go to Profile&rdquo;</strong> button.</li>
               </ol>
             </div>
 
@@ -140,9 +140,9 @@ function VerifyEmailContent() {
                 href="https://mail.google.com"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                className="w-full py-3.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-[#0c2217]/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
               >
-                <Mail className="w-4 h-4" />
+                <Mail className="w-4 h-4 text-[#d4a359]" />
                 <span>Open Gmail Inbox</span>
                 <ExternalLink className="w-3.5 h-3.5 opacity-80" />
               </a>
@@ -151,7 +151,7 @@ function VerifyEmailContent() {
                 type="button"
                 onClick={handleResend}
                 disabled={resending}
-                className="w-full py-2.5 bg-slate-100 hover:bg-slate-200 active:bg-slate-300 text-slate-700 font-bold text-xs rounded-2xl transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                className="w-full py-2.5 bg-[#f4efe8] hover:bg-[#eae3d8] text-[#0c2217] border border-[#e6dfd5] font-bold text-xs rounded-2xl transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
               >
                 <RotateCcw className={`w-3.5 h-3.5 ${resending ? 'animate-spin' : ''}`} />
                 <span>{resending ? 'Sending Link...' : "Didn't receive email? Resend Link"}</span>
@@ -161,7 +161,7 @@ function VerifyEmailContent() {
             <div className="text-center pt-2">
               <Link
                 href="/login"
-                className="text-xs font-bold text-slate-500 hover:text-slate-800 flex items-center justify-center gap-1 transition-colors"
+                className="text-xs font-bold text-stone-500 hover:text-[#0c2217] flex items-center justify-center gap-1 transition-colors"
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
                 <span>Return to Login</span>

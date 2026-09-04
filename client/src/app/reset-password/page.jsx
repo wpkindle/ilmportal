@@ -22,19 +22,19 @@ function ResetPasswordForm() {
   if (!token) {
     return (
       <div className="text-center space-y-4 py-4">
-        <div className="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 border border-amber-200 flex items-center justify-center mx-auto">
-          <AlertCircle className="w-7 h-7" />
+        <div className="w-14 h-14 rounded-2xl bg-[#d4a359]/15 text-[#0c2217] border border-[#d4a359]/40 flex items-center justify-center mx-auto shadow-sm">
+          <AlertCircle className="w-7 h-7 text-[#b85d34]" />
         </div>
-        <h2 className="text-xl font-black text-slate-900">Invalid or Missing Link</h2>
-        <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
+        <h2 className="text-xl font-serif font-bold text-[#0c2217]">Invalid or Missing Link</h2>
+        <p className="text-xs text-stone-600 max-w-sm mx-auto leading-relaxed">
           No valid security token was detected. Please request a fresh password reset link from our portal.
         </p>
         <Link
           href="/forgot-password"
-          className="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-md transition-all"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer"
         >
           <span>Request New Reset Link</span>
-          <ArrowRight className="w-3.5 h-3.5" />
+          <ArrowRight className="w-3.5 h-3.5 text-[#d4a359]" />
         </Link>
       </div>
     );
@@ -76,20 +76,20 @@ function ResetPasswordForm() {
   if (success) {
     return (
       <div className="text-center space-y-4 py-4 animate-in fade-in zoom-in-95 duration-200">
-        <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-200 flex items-center justify-center mx-auto shadow-xs">
-          <CheckCircle2 className="w-8 h-8" />
+        <div className="w-14 h-14 rounded-2xl bg-[#faf8f5] text-[#0c2217] border border-[#d4a359]/40 flex items-center justify-center mx-auto shadow-sm">
+          <CheckCircle2 className="w-8 h-8 text-[#0c2217]" />
         </div>
-        <h2 className="text-2xl font-black text-slate-900">Password Updated!</h2>
-        <p className="text-xs text-slate-500 max-w-xs mx-auto leading-relaxed">
+        <h2 className="text-2xl font-serif font-bold text-[#0c2217]">Password Updated!</h2>
+        <p className="text-xs text-stone-600 max-w-xs mx-auto leading-relaxed">
           Your new password has been securely saved. You can now log into your IlmPortal account.
         </p>
         <div className="pt-2">
           <Link
             href="/login"
-            className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm rounded-2xl shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer"
+            className="w-full py-3 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-[#0c2217]/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
           >
             <span>Sign In to Account</span>
-            <ArrowRight className="w-4 h-4" />
+            <ArrowRight className="w-4 h-4 text-[#d4a359]" />
           </Link>
         </div>
       </div>
@@ -99,29 +99,29 @@ function ResetPasswordForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       {error && (
-        <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded-2xl text-xs font-semibold text-center">
+        <div className="p-3 bg-[#b85d34]/10 border border-[#b85d34]/30 text-[#b85d34] rounded-2xl text-xs font-semibold text-center">
           {error}
         </div>
       )}
 
       <div>
-        <label className="text-xs font-bold text-slate-700 block mb-1.5">
+        <label className="text-xs font-serif font-bold text-[#0c2217] block mb-1.5">
           New Password (min 6 characters)
         </label>
         <div className="relative">
-          <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type={showPassword ? 'text' : 'password'}
             required
             placeholder="••••••••"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
-            className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-800 outline-none focus:border-emerald-500 focus:bg-white font-medium"
+            className="w-full pl-10 pr-10 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white focus:ring-1 focus:ring-[#0c2217] font-medium"
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 cursor-pointer p-1"
           >
             {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
@@ -129,23 +129,23 @@ function ResetPasswordForm() {
       </div>
 
       <div>
-        <label className="text-xs font-bold text-slate-700 block mb-1.5">
+        <label className="text-xs font-serif font-bold text-[#0c2217] block mb-1.5">
           Confirm New Password
         </label>
         <div className="relative">
-          <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type={showConfirm ? 'text' : 'password'}
             required
             placeholder="••••••••"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full pl-10 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs sm:text-sm text-slate-800 outline-none focus:border-emerald-500 focus:bg-white font-medium"
+            className="w-full pl-10 pr-10 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white focus:ring-1 focus:ring-[#0c2217] font-medium"
           />
           <button
             type="button"
             onClick={() => setShowConfirm(!showConfirm)}
-            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer p-1"
+            className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-600 cursor-pointer p-1"
           >
             {showConfirm ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
           </button>
@@ -155,10 +155,10 @@ function ResetPasswordForm() {
       <button
         type="submit"
         disabled={loading}
-        className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-xs sm:text-sm rounded-2xl shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
+        className="w-full py-3.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-[#0c2217]/20 flex items-center justify-center gap-2 transition-all cursor-pointer disabled:opacity-50"
       >
         <span>{loading ? 'Saving New Password...' : 'Save New Password & Continue'}</span>
-        <ArrowRight className="w-4 h-4" />
+        <ArrowRight className="w-4 h-4 text-[#d4a359]" />
       </button>
     </form>
   );
@@ -166,18 +166,18 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <div className="min-h-screen py-16 px-4 bg-slate-50 flex items-center justify-center">
-      <div className="max-w-md w-full bg-white p-8 rounded-3xl border border-slate-200 shadow-xl space-y-6">
+    <div className="min-h-screen py-16 px-4 flex items-center justify-center relative z-10">
+      <div className="max-w-md w-full bg-white/95 backdrop-blur-md p-8 rounded-3xl border border-[#e6dfd5] shadow-xl shadow-[#0c2217]/5 space-y-6">
         
         {/* Header */}
         <div className="text-center space-y-2">
-          <div className="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 border border-emerald-100 flex items-center justify-center mx-auto shadow-xs">
+          <div className="w-14 h-14 rounded-2xl bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/40 flex items-center justify-center mx-auto shadow-md shadow-[#0c2217]/20">
             <ShieldCheck className="w-7 h-7" />
           </div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-serif font-bold text-[#0c2217] tracking-tight">
             Create New Password
           </h1>
-          <p className="text-xs text-slate-500 leading-relaxed max-w-sm mx-auto">
+          <p className="text-xs text-stone-600 leading-relaxed max-w-sm mx-auto">
             Choose a strong password to protect your IlmPortal account
           </p>
         </div>

@@ -30,6 +30,76 @@ const GLOBAL_PARTICLES = [
   { top: '39%', left: '38%', size: 7, color: '#10b981', delay: '1.6s', duration: '9.9s' }
 ];
 
+// Educational watermarks & motifs drifting across the entire app
+const EDUCATIONAL_GLYPHS = [
+  { type: 'book', top: '14%', left: '6%', size: 38, delay: '0s', duration: '13s', color: '#d4a359', label: 'Quran & Ilm' },
+  { type: 'cap', top: '24%', left: '91%', size: 40, delay: '2s', duration: '15s', color: '#10b981', label: 'Academic Excellence' },
+  { type: 'qalam', top: '46%', left: '4%', size: 34, delay: '3.5s', duration: '12s', color: '#f59e0b', label: 'Qalam (Pen)' },
+  { type: 'award', top: '60%', left: '92%', size: 38, delay: '1.2s', duration: '14s', color: '#d4a359', label: 'Sanad Verification' },
+  { type: 'atom', top: '78%', left: '8%', size: 42, delay: '4s', duration: '16s', color: '#34d399', label: 'Science & Logic' },
+  { type: 'book', top: '85%', left: '86%', size: 36, delay: '2.5s', duration: '13s', color: '#f59e0b', label: 'Tajweed' },
+  { type: 'cap', top: '36%', left: '48%', size: 32, delay: '1.8s', duration: '14s', color: '#d4a359', label: 'Matric & Cambridge' },
+  { type: 'qalam', top: '68%', left: '46%', size: 30, delay: '3s', duration: '11s', color: '#10b981', label: 'Arabic Calligraphy' }
+];
+
+function RenderEducationalIcon({ type, size, color }) {
+  if (type === 'book') {
+    // Open Quran / Holy Scripture book with spine and curved pages
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z" />
+        <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z" />
+        <path d="M6 8h2" strokeWidth="1.5" />
+        <path d="M16 8h2" strokeWidth="1.5" />
+        <path d="M6 12h2" strokeWidth="1.5" />
+        <path d="M16 12h2" strokeWidth="1.5" />
+      </svg>
+    );
+  }
+  if (type === 'cap') {
+    // Graduation Mortarboard / Academic degree cap
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M22 10v6M2 10l10-5 10 5-10 5z" />
+        <path d="M6 12v5c3 3 9 3 12 0v-5" />
+      </svg>
+    );
+  }
+  if (type === 'qalam') {
+    // Traditional Islamic Calligraphy Reed Pen (Qalam)
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m12 19 7-7 3 3-7 7-3-3z" />
+        <path d="m18 13-1.5-7.5L2 2l3.5 14.5L13 18" />
+        <path d="m2 2 7.586 7.586" />
+        <circle cx="11" cy="11" r="2" />
+      </svg>
+    );
+  }
+  if (type === 'award') {
+    // Sanad / Certified Degree Rosette Seal with Ribbons
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="8" r="6" />
+        <path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11" />
+        <circle cx="12" cy="8" r="2" strokeWidth="1.25" />
+      </svg>
+    );
+  }
+  if (type === 'atom') {
+    // Science / Physics orbital structure
+    return (
+      <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="2" />
+        <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2" strokeDasharray="2 3" strokeWidth="1" />
+        <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(30 12 12)" />
+        <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-30 12 12)" />
+      </svg>
+    );
+  }
+  return null;
+}
+
 export default function GlobalSiteBackground() {
   const containerRef = useRef(null);
 
@@ -62,9 +132,9 @@ export default function GlobalSiteBackground() {
       {/* 1. Base Fixed Canvas Layer: Sacred Geometry & Ambient Light (Behind Content) */}
       <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
         {/* Soft atmospheric ambient glow orbs */}
-        <div className="absolute -top-24 right-0 w-[550px] h-[550px] bg-[#d4a359]/12 rounded-full blur-[130px] animate-pulse-glow pointer-events-none" />
-        <div className="absolute -bottom-24 left-0 w-[520px] h-[520px] bg-[#143d2b]/15 rounded-full blur-[140px] animate-float-slow pointer-events-none" />
-        <div className="absolute top-1/2 left-1/4 w-[420px] h-[420px] bg-[#f59e0b]/8 rounded-full blur-[160px] animate-float-reverse pointer-events-none" />
+        <div className="absolute -top-24 right-0 w-[550px] h-[550px] bg-[#d4a359]/15 rounded-full blur-[130px] animate-pulse-glow pointer-events-none" />
+        <div className="absolute -bottom-24 left-0 w-[520px] h-[520px] bg-[#143d2b]/20 rounded-full blur-[140px] animate-float-slow pointer-events-none" />
+        <div className="absolute top-1/2 left-1/4 w-[420px] h-[420px] bg-[#f59e0b]/10 rounded-full blur-[160px] animate-float-reverse pointer-events-none" />
 
         {/* Sacred Islamic Geometry Wireframe (Top-Right Astrolabe & Rub el Hizb) */}
         <div className="absolute -top-16 -right-16 w-[480px] h-[480px] sm:w-[580px] sm:h-[580px] pointer-events-none opacity-45 sm:opacity-55 animate-spin-slow">
@@ -139,7 +209,28 @@ export default function GlobalSiteBackground() {
         }}
       />
 
-      {/* 3. Foreground Drifting Stardust Particles Layer (Visible on Entire Site) */}
+      {/* 3. Floating Educational Motifs Layer (Visible Across Entire App) */}
+      <div className="fixed inset-0 pointer-events-none z-15 overflow-hidden">
+        {EDUCATIONAL_GLYPHS.map((g, idx) => (
+          <div
+            key={`edu-${idx}`}
+            className="absolute animate-float-slow pointer-events-none flex items-center justify-center opacity-45 hover:opacity-75 transition-opacity"
+            style={{
+              top: g.top,
+              left: g.left,
+              animationDelay: g.delay,
+              animationDuration: g.duration,
+              filter: `drop-shadow(0 0 10px ${g.color}55)`
+            }}
+          >
+            <div className="p-2 rounded-2xl bg-white/40 border border-[#d4a359]/30 backdrop-blur-xs shadow-xs flex items-center gap-1.5">
+              <RenderEducationalIcon type={g.type} size={g.size} color={g.color} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* 4. Foreground Drifting Stardust Particles Layer (Visible on Entire Site) */}
       <div className="fixed inset-0 pointer-events-none z-20 overflow-hidden">
         {GLOBAL_PARTICLES.map((p, idx) => (
           <span
@@ -164,4 +255,3 @@ export default function GlobalSiteBackground() {
     </div>
   );
 }
-

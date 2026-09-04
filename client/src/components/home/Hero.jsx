@@ -148,13 +148,13 @@ export default function Hero() {
 
             {/* Main Editorial Headline with Dramatic Contrast */}
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-black tracking-tight text-white leading-[1.12]">
-              Verified Qaris, Alimahs &amp; Academic Tutors,{' '}
-              <span className="hand-drawn-underline text-[#faf8f5]">safe at home.</span>
+              Verified Qaris, Alimahs &amp; Academic Tutors{' '}
+              <span className="hand-drawn-underline text-[#faf8f5]">from Pakistan.</span>
             </h1>
 
             {/* Humanized, Colloquial Pakistani Copy */}
             <p className="text-sm sm:text-base text-[#d1dbd6] max-w-xl leading-relaxed font-normal">
-              Designed specifically so female learners, daughters, and mothers feel 100% comfortable and protected. Verified female Alimahs from Wafaq-ul-Madaris, certified Qaris, and top school tutors. 1-on-1 classes with camera-off privacy by default, zero personal phone number sharing, and agreed fees directly with your educator.
+              Designed specifically for female learners, daughters, and mothers feel 100% comfortable and protected. Verified female Alimahs from Wafaq-ul-Madaris, certified Qaris, and top school tutors. 1-on-1 classes with camera-off privacy by default, zero personal contact sharing, and agreed fees directly with your tutor.
             </p>
 
             {/* Key Assurance Signals */}

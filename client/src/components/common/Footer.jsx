@@ -20,13 +20,23 @@ import {
   CreditCard,
   Chrome,
   Zap,
-  Check
+  Check,
+  Copy
 } from 'lucide-react';
 import ChromeAppInstallModal from './ChromeAppInstallModal';
 
 const Footer = () => {
   const pathname = usePathname();
   const [chromeModalOpen, setChromeModalOpen] = useState(false);
+  const [copiedKey, setCopiedKey] = useState(null);
+
+  const handleCopy = (text, key) => {
+    if (typeof navigator !== 'undefined' && navigator.clipboard) {
+      navigator.clipboard.writeText(text);
+      setCopiedKey(key);
+      setTimeout(() => setCopiedKey(null), 2000);
+    }
+  };
 
   // Hide footer completely on live video classroom
   if (pathname?.startsWith('/classroom')) {
@@ -303,13 +313,55 @@ const Footer = () => {
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 text-xs">
-              <div className="bg-[#07150e] px-3.5 py-2 rounded-xl border border-[#143d2b]">
-                <span className="text-[10px] text-[#a3b8b0] block uppercase font-bold tracking-wider">Account Number (Meezan Bank)</span>
-                <span className="font-mono text-[#d4a359] font-extrabold text-xs sm:text-sm select-all">96010105435308</span>
+              <div className="bg-[#07150e] px-3.5 py-2.5 rounded-xl border border-[#143d2b] flex items-center justify-between gap-2.5">
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] text-[#a3b8b0] block uppercase font-bold tracking-wider truncate">Account Number (Meezan Bank)</span>
+                  <span className="font-mono text-[#d4a359] font-extrabold text-xs sm:text-sm select-all block mt-0.5">96010105435308</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleCopy('96010105435308', 'meezan')}
+                  className="px-2.5 py-1.5 rounded-lg bg-[#143d2b] hover:bg-[#1a4f38] active:scale-95 text-[#d4a359] hover:text-white text-[11px] font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer border border-[#d4a359]/30 shadow-xs"
+                  title="Copy Meezan Bank Account Number"
+                >
+                  {copiedKey === 'meezan' ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      <span className="text-emerald-300 font-semibold">Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
               </div>
-              <div className="bg-[#07150e] px-3.5 py-2 rounded-xl border border-[#143d2b]">
-                <span className="text-[10px] text-[#a3b8b0] block uppercase font-bold tracking-wider">Raast ID (Mobile Number)</span>
-                <span className="font-mono text-[#d4a359] font-extrabold text-xs sm:text-sm select-all">03171759093</span>
+              <div className="bg-[#07150e] px-3.5 py-2.5 rounded-xl border border-[#143d2b] flex items-center justify-between gap-2.5">
+                <div className="min-w-0 flex-1">
+                  <span className="text-[10px] text-[#a3b8b0] block uppercase font-bold tracking-wider truncate" title="Raast ID, EasyPaisa, JazzCash, UPaisa">
+                    Raast ID, EasyPaisa, JazzCash, UPaisa
+                  </span>
+                  <span className="font-mono text-[#d4a359] font-extrabold text-xs sm:text-sm select-all block mt-0.5">03171759093</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => handleCopy('03171759093', 'wallets')}
+                  className="px-2.5 py-1.5 rounded-lg bg-[#143d2b] hover:bg-[#1a4f38] active:scale-95 text-[#d4a359] hover:text-white text-[11px] font-bold transition-all flex items-center gap-1.5 shrink-0 cursor-pointer border border-[#d4a359]/30 shadow-xs"
+                  title="Copy Mobile / Raast ID Number"
+                >
+                  {copiedKey === 'wallets' ? (
+                    <>
+                      <Check className="w-3.5 h-3.5 text-emerald-400" />
+                      <span className="text-emerald-300 font-semibold">Copied!</span>
+                    </>
+                  ) : (
+                    <>
+                      <Copy className="w-3.5 h-3.5" />
+                      <span>Copy</span>
+                    </>
+                  )}
+                </button>
               </div>
             </div>
 

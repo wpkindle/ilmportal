@@ -718,7 +718,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100dvh-132px)] lg:h-[84vh] bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
+    <div className="flex flex-col h-[calc(100dvh-132px)] lg:h-[calc(100dvh-125px)] bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
       
       {/* Top Chat Header (Responsive, Fiverr/Upwork Style Online/Offline Badge) */}
       <div className="p-2.5 sm:p-4 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between gap-2 sm:gap-3 shrink-0">

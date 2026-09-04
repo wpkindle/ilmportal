@@ -171,14 +171,14 @@ function StudentMessagesContent() {
   if (loading) return <LoadingSpinner text="Loading messages..." />;
 
   return (
-    <div className="bg-white flex flex-col flex-1 min-h-[calc(100vh-130px)] -mb-16 md:mb-0">
-      <div className="max-w-7xl mx-auto px-1.5 sm:px-4 lg:px-8 pt-2 sm:pt-3 pb-0 w-full flex-1 flex flex-col">
+    <div className="bg-[#faf8f5] flex flex-col flex-1">
+      <div className="max-w-7xl mx-auto px-1.5 sm:px-4 lg:px-8 py-2 sm:py-3 w-full flex-1 flex flex-col">
 
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6 flex-1">
 
           {/* Left Sidebar — full screen on mobile when mobileView=list, hidden when mobileView=chat */}
           <div
-            className={`lg:col-span-4 bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 border border-slate-200 shadow-sm flex flex-col h-[calc(100dvh-132px)] lg:h-[84vh]
+            className={`lg:col-span-4 bg-white rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 border border-slate-200 shadow-sm flex flex-col h-[calc(100dvh-132px)] lg:h-[calc(100dvh-125px)]
               ${mobileView === 'chat' ? 'hidden lg:flex' : 'flex'}
             `}
           >
@@ -273,7 +273,7 @@ function StudentMessagesContent() {
               />
             ) : (
               <div
-                className="hidden lg:flex bg-white rounded-3xl border border-slate-200 flex-col items-center justify-center p-8 text-center h-[84vh] min-h-[560px]"
+                className="hidden lg:flex bg-white rounded-3xl border border-slate-200 flex-col items-center justify-center p-8 text-center h-[calc(100dvh-125px)] min-h-[560px]"
               >
                 <MessageSquare className="w-12 h-12 text-slate-200 mb-2" />
                 <p className="font-bold text-slate-700 text-sm">Select a conversation</p>

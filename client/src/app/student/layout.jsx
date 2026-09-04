@@ -13,7 +13,7 @@ export default function StudentLayout({ children }) {
   const isChatPage = pathname?.startsWith('/student/messages');
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] text-stone-900 flex flex-col font-sans selection:bg-[#d4a359]/30">
+    <div className={`${isChatPage ? 'flex-1 flex flex-col' : 'min-h-screen flex flex-col'} bg-[#faf8f5] text-stone-900 font-sans selection:bg-[#d4a359]/30`}>
 
       {/* Profile Completion Meter & Greeting Tab */}
       {!isProfilePage && !isChatPage && user && (
@@ -23,7 +23,7 @@ export default function StudentLayout({ children }) {
       )}
 
       {/* Main Page Content */}
-      <div className="flex-1">
+      <div className="flex-1 flex flex-col">
         {children}
       </div>
     </div>

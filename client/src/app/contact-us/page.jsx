@@ -78,9 +78,6 @@ export default function ContactUsPage() {
 
   const contact = page?.contactDetails || {
     email: 'contact@ilmportal.org',
-    phone: '0317 1759093 / 0315 4453745',
-    whatsapp: '0317 1759093 / 0315 4453745',
-    address: 'Bedian Road, Lahore Cantt.',
     workingHours: 'Monday – Saturday: 9:00 AM – 9:00 PM PKT'
   };
 
@@ -100,7 +97,7 @@ export default function ContactUsPage() {
 
           <div className="flex items-center gap-2.5">
             <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
-              <Phone className="w-3.5 h-3.5" />
+              <Mail className="w-3.5 h-3.5" />
               <span>We're Here to Help</span>
             </span>
           </div>
@@ -117,57 +114,30 @@ export default function ContactUsPage() {
       {/* Contact Cards Grid */}
       <section className="py-8 -mt-6">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             
-            {/* Phone & WhatsApp */}
+            {/* Email Support */}
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
               <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-                <Phone className="w-4 h-4" />
-              </div>
-              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Call &amp; WhatsApp</h4>
-              <div className="space-y-1">
-                <div className="flex items-center gap-2">
-                  <a href="tel:03171759093" className="text-sm font-black text-slate-900 hover:text-emerald-600 transition-colors">
-                    0317 1759093
-                  </a>
-                  <a href="https://wa.me/923171759093" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded-md hover:bg-emerald-200">
-                    WhatsApp
-                  </a>
-                </div>
-                <div className="flex items-center gap-2">
-                  <a href="tel:03154453745" className="text-sm font-black text-slate-900 hover:text-emerald-600 transition-colors">
-                    0315 4453745
-                  </a>
-                  <a href="https://wa.me/923154453745" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-emerald-700 bg-emerald-100/80 px-1.5 py-0.5 rounded-md hover:bg-emerald-200">
-                    WhatsApp
-                  </a>
-                </div>
-              </div>
-              <p className="text-[11px] text-slate-500 pt-0.5">Available for calls &amp; WhatsApp inquiries</p>
-            </div>
-
-            {/* Email */}
-            <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
                 <Mail className="w-4 h-4" />
               </div>
               <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Email Support</h4>
               <p className="text-sm font-black text-slate-900">
-                <a href="mailto:contact@ilmportal.org" className="hover:text-blue-600 transition-colors">
+                <a href="mailto:contact@ilmportal.org" className="hover:text-emerald-600 transition-colors">
                   contact@ilmportal.org
                 </a>
               </p>
               <p className="text-[11px] text-slate-500">Official support &amp; Sanad verified tutor inquiries</p>
             </div>
 
-            {/* Location */}
+            {/* Online Inquiries */}
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center">
-                <MapPin className="w-4 h-4" />
+              <div className="w-9 h-9 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center">
+                <Send className="w-4 h-4" />
               </div>
-              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Head Office</h4>
-              <p className="text-sm font-black text-slate-900">Bedian Road, Lahore Cantt.</p>
-              <p className="text-[11px] text-slate-500">Lahore, Punjab, Pakistan</p>
+              <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Online Inquiry</h4>
+              <p className="text-sm font-black text-slate-900">24/7 Portal Ticketing</p>
+              <p className="text-[11px] text-slate-500">Send an inquiry via form below for instant assistance</p>
             </div>
 
             {/* Hours */}

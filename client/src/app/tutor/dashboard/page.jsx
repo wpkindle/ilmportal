@@ -14,7 +14,11 @@ import {
   Sparkles,
   AlertTriangle,
   FileText,
-  ArrowRight
+  ArrowRight,
+  CheckCircle2,
+  Check,
+  X,
+  Loader2
 } from 'lucide-react';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
@@ -30,6 +34,10 @@ export default function TutorDashboardPage() {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDealForPay, setSelectedDealForPay] = useState(null);
+  const [dealToComplete, setDealToComplete] = useState(null);
+  const [completionNotes, setCompletionNotes] = useState('');
+  const [completing, setCompleting] = useState(false);
+  const [feedback, setFeedback] = useState(null);
 
   const fetchData = async () => {
     try {
@@ -43,6 +51,33 @@ export default function TutorDashboardPage() {
       console.error('Error fetching tutor dashboard:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCompleteDeal = async (e) => {
+    e.preventDefault();
+    if (!dealToComplete) return;
+
+    setCompleting(true);
+    setFeedback(null);
+    try {
+      const res = await api.completeDeal(dealToComplete._id, { notes: completionNotes.trim() });
+      if (res.success) {
+        setFeedback({
+          type: 'success',
+          message: res.message || 'Deal completed successfully. Messages deleted to free storage.'
+        });
+        setDealToComplete(null);
+        setCompletionNotes('');
+        await fetchData();
+        setTimeout(() => setFeedback(null), 6000);
+      } else {
+        alert(res.message || 'Failed to complete deal');
+      }
+    } catch (err) {
+      alert(err.message || 'Error completing deal');
+    } finally {
+      setCompleting(false);
     }
   };
 
@@ -65,6 +100,26 @@ export default function TutorDashboardPage() {
         
         {/* Account Status / Warning Notice / Audit Banner */}
         <AccountStatusBanner user={user} role="tutor" />
+
+        {/* Feedback / Alert Banner */}
+        {feedback && (
+          <div className={`p-4 rounded-2xl flex items-center justify-between text-xs font-bold border ${
+            feedback.type === 'success'
+              ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
+              : 'bg-rose-50 border-rose-300 text-rose-900'
+          }`}>
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <span>{feedback.message}</span>
+            </div>
+            <button
+              onClick={() => setFeedback(null)}
+              className="p-1 hover:bg-black/5 rounded-lg transition-colors cursor-pointer"
+            >
+              <X className="w-3.5 h-3.5" />
+            </button>
+          </div>
+        )}
 
         {/* Verification Status Banner */}
         {isPending && (
@@ -253,7 +308,7 @@ export default function TutorDashboardPage() {
 
                     <div className="flex items-center gap-2 flex-wrap">
                       {/* Join Live Classroom (Available within 72h or when paid) */}
-                      {deal.mode !== 'in_person' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && (deal.tutorFeePaid || !deal.tutorFeeDueDate || new Date(deal.tutorFeeDueDate) >= new Date() || (deal.trialEndDate && new Date(deal.trialEndDate) >= new Date())) && (
+                      {deal.status !== 'completed' && deal.mode !== 'in_person' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && (deal.tutorFeePaid || !deal.tutorFeeDueDate || new Date(deal.tutorFeeDueDate) >= new Date() || (deal.trialEndDate && new Date(deal.trialEndDate) >= new Date())) && (
                         <Link
                           href={`/classroom/${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
                           className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all cursor-pointer"
@@ -262,20 +317,45 @@ export default function TutorDashboardPage() {
                           <span>Join Live Class</span>
                         </Link>
                       )}
-                      <Link
-                        href={`/tutor/messages?conversation=${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
-                        className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <MessageSquare className="w-4 h-4 text-emerald-600" />
-                        <span>Chat</span>
-                      </Link>
+
+                      {deal.status !== 'completed' && (
+                        <Link
+                          href={`/tutor/messages?conversation=${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
+                          className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <MessageSquare className="w-4 h-4 text-emerald-600" />
+                          <span>Chat</span>
+                        </Link>
+                      )}
+
+                      {/* Mark Completed Button */}
+                      {deal.status !== 'completed' && deal.status !== 'cancelled' && (
+                        <button
+                          type="button"
+                          onClick={() => setDealToComplete(deal)}
+                          className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer hover:scale-[1.02]"
+                          title="Mark deal completed and clear chat messages to save storage"
+                        >
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Mark Completed</span>
+                        </button>
+                      )}
+
+                      {deal.status === 'completed' && (
+                        <div className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 font-semibold flex items-center gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Completed &bull; Storage Cleared</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  <Tutor72HourClock
-                    deal={deal}
-                    onPayClick={() => setSelectedDealForPay(deal)}
-                  />
+                  {deal.status !== 'completed' && (
+                    <Tutor72HourClock
+                      deal={deal}
+                      onPayClick={() => setSelectedDealForPay(deal)}
+                    />
+                  )}
                 </div>
               ))}
             </div>
@@ -292,6 +372,106 @@ export default function TutorDashboardPage() {
           onClose={() => setSelectedDealForPay(null)}
           onSuccess={fetchData}
         />
+      )}
+
+      {/* Mark Deal Completed Confirmation Modal */}
+      {dealToComplete && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-xs animate-in fade-in duration-200">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="font-black text-slate-900 text-base">Mark Deal as Completed</h3>
+                  <p className="text-xs text-slate-500">Course: {dealToComplete.subject}</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setDealToComplete(null)}
+                className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-xl cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="space-y-3 text-xs">
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-2xl space-y-1">
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Student:</span>
+                  <strong className="text-slate-900">{dealToComplete.student?.name}</strong>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Subject:</span>
+                  <strong className="text-slate-900">{dealToComplete.subject}</strong>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-slate-500">Agreed Fee:</span>
+                  <strong className="text-emerald-700 font-mono">PKR {dealToComplete.price?.toLocaleString()}</strong>
+                </div>
+              </div>
+
+              {/* Database Storage Notice Callout */}
+              <div className="p-4 bg-amber-50 border border-amber-300/80 rounded-2xl space-y-1.5 text-amber-950">
+                <div className="flex items-center gap-2 font-black text-amber-900 text-xs">
+                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>Important: Chat Conversation Cleanup</span>
+                </div>
+                <p className="text-[11px] text-amber-800 leading-relaxed">
+                  Marking this deal as completed will close the course. To optimize database storage, <strong>all chat messages, audio recordings, and file attachments between you and this student will be permanently deleted</strong>.
+                </p>
+                <p className="text-[10.5px] text-amber-700">
+                  This action cannot be undone. Please ensure you have concluded your correspondence.
+                </p>
+              </div>
+
+              <form onSubmit={handleCompleteDeal} className="space-y-3 pt-1">
+                <div>
+                  <label className="block font-bold text-slate-700 mb-1 text-[11px]">
+                    Completion Notes / Feedback (Optional)
+                  </label>
+                  <textarea
+                    rows={2}
+                    value={completionNotes}
+                    onChange={(e) => setCompletionNotes(e.target.value)}
+                    placeholder="e.g. Student successfully completed Quran Tajweed syllabus..."
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500 text-xs resize-none"
+                  />
+                </div>
+
+                <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={() => setDealToComplete(null)}
+                    disabled={completing}
+                    className="px-4 py-2.5 rounded-xl border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-100 cursor-pointer disabled:opacity-50"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={completing}
+                    className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black flex items-center gap-1.5 shadow-md shadow-emerald-600/20 cursor-pointer disabled:opacity-50"
+                  >
+                    {completing ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Completing Deal &amp; Cleaning Storage...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Check className="w-3.5 h-3.5" />
+                        <span>Confirm &amp; Complete Deal</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

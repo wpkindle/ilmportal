@@ -511,7 +511,7 @@ export default function StudentCertificatesPage() {
               <div className="space-y-1 text-[11px] bg-slate-900/60 p-2.5 rounded-xl border border-emerald-500/30">
                 <p><strong>Meezan Bank:</strong> 96010105435308 (Title: Abdul Khaliq)</p>
                 <p><strong>Raast ID / EasyPaisa / JazzCash / UPaisa:</strong> 03171759093</p>
-                <p className="text-emerald-400">Support Hotline: 0317 1759093 &bull; 0315 4453745</p>
+                <p className="text-emerald-400">Official Support: <a href="mailto:contact@ilmportal.org" className="underline font-bold">contact@ilmportal.org</a></p>
               </div>
             </div>
 

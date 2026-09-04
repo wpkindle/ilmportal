@@ -391,6 +391,12 @@ export const api = {
     headers: getHeaders()
   }).then(handleResponse),
 
+  completeDeal: (id, body = {}) => fetch(`${API_BASE}/deals/${id}/complete`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
   // Chat
   getConversations: () => fetch(`${API_BASE}/chat/conversations`, {
     headers: getHeaders()

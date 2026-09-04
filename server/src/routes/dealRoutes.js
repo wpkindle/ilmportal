@@ -11,7 +11,8 @@ const {
   respondToTrialContinuation,
   adminClearTutorFee,
   adminRestrictTutorClasses,
-  setPlatformFee
+  setPlatformFee,
+  completeDeal
 } = require('../controllers/dealController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
@@ -41,5 +42,7 @@ router.get('/my-deals', getMyDeals);
 router.get('/:id', getDealById);
 router.post('/:id/submit-payment', authorize('tutor', 'student'), proofUpload.single('proofImage'), submitPaymentProof);
 router.put('/:id/cancel', cancelDeal);
+router.put('/:id/complete', authorize('tutor', 'admin'), completeDeal);
+router.post('/:id/complete', authorize('tutor', 'admin'), completeDeal);
 
 module.exports = router;

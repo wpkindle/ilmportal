@@ -592,7 +592,7 @@ exports.respondToTrialContinuation = async (req, res) => {
           studentName: deal.student.name,
           subject: deal.subject,
           feeDueDate: dueDateStr,
-          adminContactPhone: '0317 1759093 / 0315 4453745'
+          adminContactEmail: 'contact@ilmportal.org'
         });
       } catch (mailErr) {
         console.error('Failed to send tutor continuation email:', mailErr);
@@ -851,4 +851,107 @@ exports.setPlatformFee = async (req, res) => {
     });
   }
 };
+
+// @desc    Tutor (or Admin) marks deal as completed/closed, and permanently deletes all conversation messages to free storage
+// @route   PUT /api/deals/:id/complete
+exports.completeDeal = async (req, res) => {
+  try {
+    const deal = await Deal.findById(req.params.id)
+      .populate('tutor', 'name email avatar')
+      .populate('student', 'name email avatar');
+
+    if (!deal) {
+      return res.status(404).json({
+        success: false,
+        message: 'Deal not found'
+      });
+    }
+
+    if (
+      req.user.role !== 'admin' &&
+      deal.tutor._id.toString() !== req.user.id.toString()
+    ) {
+      return res.status(403).json({
+        success: false,
+        message: 'Only the assigned tutor or administrator can mark this deal as completed.'
+      });
+    }
+
+    if (deal.status === 'completed') {
+      return res.status(400).json({
+        success: false,
+        message: 'This deal has already been marked as completed.'
+      });
+    }
+
+    deal.status = 'completed';
+    deal.completedAt = new Date();
+    deal.completedBy = req.user.id;
+    if (req.body && req.body.notes) {
+      deal.completionNotes = req.body.notes;
+    }
+    await deal.save();
+
+    const tutorId = deal.tutor._id || deal.tutor;
+    const studentId = deal.student._id || deal.student;
+
+    // Delete all conversation messages between this tutor and student to free up database storage
+    const convId1 = [tutorId.toString(), studentId.toString()].sort().join('_');
+    const convId2 = `${tutorId}_${studentId}`;
+    const convId3 = `${studentId}_${tutorId}`;
+
+    const deleteResult = await Message.deleteMany({
+      $or: [
+        { conversationId: convId1 },
+        { conversationId: convId2 },
+        { conversationId: convId3 },
+        { sender: tutorId, recipient: studentId },
+        { sender: studentId, recipient: tutorId },
+        { deal: deal._id }
+      ]
+    });
+
+    console.log(`[completeDeal] Deal ${deal._id} marked completed. Deleted ${deleteResult.deletedCount} messages between tutor ${tutorId} and student ${studentId}.`);
+
+    // Notify connected clients via Socket.IO
+    const io = req.app.get('io');
+    if (io) {
+      io.to(tutorId.toString()).emit('deal-completed', { dealId: deal._id, status: 'completed' });
+      io.to(studentId.toString()).emit('deal-completed', { dealId: deal._id, status: 'completed' });
+      io.to(`user_${tutorId}`).emit('deal-completed', { dealId: deal._id, status: 'completed' });
+      io.to(`user_${studentId}`).emit('deal-completed', { dealId: deal._id, status: 'completed' });
+
+      io.to(convId1).emit('conversation-cleared', { conversationId: convId1, dealId: deal._id });
+      io.to(convId2).emit('conversation-cleared', { conversationId: convId2, dealId: deal._id });
+      io.to(`conv_${convId1}`).emit('conversation-cleared', { conversationId: convId1, dealId: deal._id });
+      io.to(`conv_${convId2}`).emit('conversation-cleared', { conversationId: convId2, dealId: deal._id });
+      io.to(`conv_${convId1}`).emit('deal-status-updated', deal);
+      io.to(`conv_${convId2}`).emit('deal-status-updated', deal);
+    }
+
+    // In-app notification to the student
+    await Notification.create({
+      recipient: studentId,
+      sender: req.user.id,
+      title: 'Course Deal Completed! 🎉',
+      message: `Tutor ${deal.tutor.name || 'Your tutor'} marked the course for "${deal.subject}" as completed. Thank you for learning on IlmPortal!`,
+      type: 'deal_completed',
+      link: '/student/deals'
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `Deal marked as completed successfully. ${deleteResult.deletedCount} chat messages were permanently deleted to free database storage.`,
+      deal,
+      deletedMessagesCount: deleteResult.deletedCount
+    });
+  } catch (error) {
+    console.error('Error completing deal:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Error completing deal'
+    });
+  }
+};
+
 

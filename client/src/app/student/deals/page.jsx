@@ -81,16 +81,16 @@ export default function MyDealsPage() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2 bg-slate-200/80 p-1 rounded-2xl text-xs font-bold">
-            {['all', 'active_trial', 'active_paid', 'restricted'].map((f) => (
+          <div className="flex items-center gap-2 bg-slate-200/80 p-1 rounded-2xl text-xs font-bold overflow-x-auto">
+            {['all', 'active_trial', 'active_paid', 'completed', 'restricted'].map((f) => (
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-3 py-1.5 rounded-xl capitalize transition-all ${
+                className={`px-3 py-1.5 rounded-xl capitalize transition-all whitespace-nowrap ${
                   filter === f ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600'
                 }`}
               >
-                {f === 'active_trial' ? 'Active' : f.replace('_', ' ')}
+                {f === 'active_trial' ? 'Active Trial' : f.replace('_', ' ')}
               </button>
             ))}
           </div>
@@ -112,7 +112,14 @@ export default function MyDealsPage() {
                       className="w-12 h-12 rounded-2xl object-cover border border-slate-200"
                     />
                     <div>
-                      <h3 className="font-bold text-sm text-slate-900">{deal.subject}</h3>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <h3 className="font-bold text-sm text-slate-900">{deal.subject}</h3>
+                        {deal.status === 'completed' && (
+                          <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full text-[10px] font-black uppercase tracking-wider">
+                            Course Completed
+                          </span>
+                        )}
+                      </div>
                       <p className="text-xs text-slate-500">
                         Tutor: <strong>{deal.tutor?.name}</strong> &bull; Mode: <span className="capitalize">{deal.mode}</span>
                       </p>
@@ -120,7 +127,7 @@ export default function MyDealsPage() {
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
-                    {deal.mode !== 'in_person' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && !deal.accessRestricted && (
+                    {deal.status !== 'completed' && deal.mode !== 'in_person' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && !deal.accessRestricted && (
                       <Link
                         href={`/classroom/${[user?.id || user?._id, deal.tutor?._id].sort().join('_')}`}
                         className="px-3 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all"
@@ -132,23 +139,39 @@ export default function MyDealsPage() {
 
                     <button
                       onClick={() => setReviewModalDeal(deal)}
-                      className="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs rounded-xl border border-amber-200 transition-colors flex items-center gap-1.5"
+                      className="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-amber-800 font-bold text-xs rounded-xl border border-amber-200 transition-colors flex items-center gap-1.5 cursor-pointer"
                     >
                       <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
-                      <span>Rate & Review</span>
+                      <span>Rate &amp; Review</span>
                     </button>
 
-                    <Link
-                      href={`/student/messages?conversation=${[user?.id || user?._id, deal.tutor?._id].sort().join('_')}`}
-                      className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5"
-                    >
-                      <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Chat</span>
-                    </Link>
+                    {deal.status !== 'completed' && (
+                      <Link
+                        href={`/student/messages?conversation=${[user?.id || user?._id, deal.tutor?._id].sort().join('_')}`}
+                        className="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5"
+                      >
+                        <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Chat</span>
+                      </Link>
+                    )}
                   </div>
                 </div>
 
-                <TrialBanner deal={deal} onPayClick={() => {}} />
+                {deal.status === 'completed' ? (
+                  <div className="p-3.5 bg-emerald-50 border border-emerald-200/90 rounded-2xl flex items-center justify-between text-xs text-emerald-950">
+                    <div className="space-y-0.5">
+                      <span className="font-bold flex items-center gap-1.5">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <span>Course Completed Successfully! 🎉</span>
+                      </span>
+                      <p className="text-[11px] text-emerald-700">
+                        Tutoring sessions for this course have concluded. Please leave a review for your teacher.
+                      </p>
+                    </div>
+                  </div>
+                ) : (
+                  <TrialBanner deal={deal} onPayClick={() => {}} />
+                )}
               </div>
             ))}
           </div>

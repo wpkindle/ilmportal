@@ -21,7 +21,8 @@ import {
   UserCheck,
   HelpCircle,
   Camera,
-  Ban
+  Ban,
+  Mail
 } from 'lucide-react';
 
 export default function SafetyPage() {
@@ -147,13 +148,13 @@ export default function SafetyPage() {
               <ArrowRight className="w-4 h-4" />
             </Link>
 
-            <Link
-              href="/contact-us"
+            <a
+              href="mailto:contact@ilmportal.org"
               className="w-full sm:w-auto px-6 py-3.5 bg-slate-900 hover:bg-slate-800 text-slate-200 hover:text-white font-bold text-xs sm:text-sm rounded-2xl border border-slate-800 transition-all flex items-center justify-center gap-2"
             >
-              <Phone className="w-4 h-4 text-emerald-400" />
-              <span>Contact Lahore Safety Helpline</span>
-            </Link>
+              <Mail className="w-4 h-4 text-emerald-400" />
+              <span>Contact Safety Team: contact@ilmportal.org</span>
+            </a>
           </div>
 
         </div>
@@ -321,23 +322,9 @@ export default function SafetyPage() {
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs">
             <a
               href="mailto:contact@ilmportal.org"
-              className="px-4 py-2 rounded-xl bg-rose-900/60 hover:bg-rose-900 text-rose-200 border border-rose-500/40 font-bold transition-all"
+              className="px-5 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold transition-all shadow-md"
             >
-              contact@ilmportal.org
-            </a>
-            <a
-              href="tel:03171759093"
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 font-bold transition-all"
-            >
-              0317 1759093
-            </a>
-            <a
-              href="https://wa.me/923154453745"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 font-bold transition-all"
-            >
-              WhatsApp: 0315 4453745
+              Email Safety Team: contact@ilmportal.org
             </a>
           </div>
         </div>

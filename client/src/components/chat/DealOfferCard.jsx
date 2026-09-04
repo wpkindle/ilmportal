@@ -70,6 +70,30 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
     }
   };
 
+  const handleComplete = async () => {
+    if (!dealId) return;
+    const ok = window.confirm(
+      'Are you sure you want to mark this deal as completed?\n\nNotice: This will finalize the course and permanently delete all conversation messages between you and this student to free database storage.'
+    );
+    if (!ok) return;
+
+    setLoading(true);
+    try {
+      const res = await api.completeDeal(dealId);
+      if (res.success) {
+        setDealState(res.deal);
+        if (onDealUpdated) onDealUpdated(res.deal);
+        alert(res.message || 'Deal marked as completed! Conversation messages have been deleted to save storage.');
+      } else {
+        alert(res.message || 'Failed to complete deal');
+      }
+    } catch (err) {
+      alert(err.message || 'Error completing deal');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="my-3 max-w-md w-full bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 text-white rounded-3xl p-5 border border-emerald-500/30 shadow-xl space-y-4">
       
@@ -266,6 +290,31 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
           <p className="text-[11px] text-slate-300 leading-relaxed">
             Classes are temporarily paused pending tutor platform fee clearance with admin.
           </p>
+        </div>
+      )}
+
+      {/* Course Completed / Deal Closed Indicator */}
+      {currentStatus === 'completed' && (
+        <div className="p-3 bg-emerald-500/20 rounded-2xl border border-emerald-500/30 text-center text-xs font-bold text-emerald-300 flex items-center justify-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+          <span>Course Completed &bull; Deal Closed</span>
+        </div>
+      )}
+
+      {/* Tutor Action: Mark Deal Completed / Closed */}
+      {isTutorUser && ['active_trial', 'continuation_agreed', 'active_paid'].includes(currentStatus) && (
+        <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-3">
+          <span className="text-[10.5px] text-slate-400">Course completed?</span>
+          <button
+            type="button"
+            onClick={handleComplete}
+            disabled={loading}
+            className="px-3.5 py-2 bg-emerald-700/80 hover:bg-emerald-600 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
+            title="Mark this deal as completed and permanently delete chat to free storage"
+          >
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
+            <span>Mark Completed</span>
+          </button>
         </div>
       )}
 

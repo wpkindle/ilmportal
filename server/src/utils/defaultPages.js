@@ -111,22 +111,21 @@ Guided by the timeless Hadith: *"The best of you are those who learn the Quran a
     slug: 'contact-us',
     title: 'Contact IlmPortal Pakistan',
     subtitle: 'We are here to assist students, parents, and tutors across Pakistan.',
-    metaDescription: 'Get in touch with IlmPortal Pakistan. Contact our Lahore administration via WhatsApp, phone, or direct online inquiry.',
+    metaDescription: 'Get in touch with IlmPortal Pakistan.',
     contactDetails: {
       email: 'contact@ilmportal.org',
-      phone: '0317 1759093 / 0315 4453745',
-      whatsapp: '0317 1759093 / 0315 4453745',
-      address: 'Bedian Road, Lahore Cantt.',
+      phone: '',
+      whatsapp: '',
+      address: 'Lahore, Punjab, Pakistan',
       workingHours: 'Monday – Saturday: 9:00 AM – 9:00 PM PKT'
     },
     content: `### We Are Here to Support Your Learning Journey
-Have questions about finding a verified Qari, scheduling 3-day free trials, requesting a female Alimah, or joining our faculty? Our dedicated administrative team in Lahore is ready to assist you.
+Have questions about finding a verified Qari, scheduling 3-day free trials, requesting a female Alimah, or joining our faculty? Our dedicated administrative team is ready to assist you.
 
 ---
 
 ### Our Communication Channels
-* **WhatsApp Helpline**: Fast, direct assistance for student enrollment and tutor onboarding.
-* **Email Support**: For formal verification inquiries, institutional partnerships, and Sanad submissions.
+* **Email Support**: Official assistance for student enrollment, tutor onboarding, and Sanad submissions at [contact@ilmportal.org](mailto:contact@ilmportal.org).
 * **Headquarters**: Lahore, Punjab, Pakistan, serving students across 31+ Pakistani cities.`
   }
 };

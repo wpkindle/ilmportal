@@ -121,6 +121,17 @@ const dealSchema = new mongoose.Schema({
     type: String,
     enum: ['none', 'warn', 'limit_chat', 'suspend_access'],
     default: 'none'
+  },
+  completedAt: {
+    type: Date
+  },
+  completedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  completionNotes: {
+    type: String,
+    default: ''
   }
 }, {
   timestamps: true

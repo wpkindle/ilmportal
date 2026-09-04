@@ -1241,7 +1241,7 @@ const sendTrialContinuationTutorEmail = async ({
                     <p style="color: #166534; font-size: 12px; margin: 0;">
                       Meezan Bank: <strong>96010105435308</strong> (Abdul Khaliq)<br>
                       Raast ID / EasyPaisa / JazzCash: <strong>03171759093</strong><br>
-                      Support Hotline: <strong>${adminContactPhone || '0317 1759093'}</strong>
+                      Official Support: <strong>contact@ilmportal.org</strong>
                     </p>
                   </div>
 

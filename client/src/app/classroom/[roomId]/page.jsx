@@ -87,7 +87,7 @@ export default function VideoClassroomPage() {
             {sessionData.error || 'Access to this live video classroom is paused. The 72-hour grace period for platform fee clearance has expired without payment verification.'}
           </p>
           <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 text-xs text-emerald-400 font-semibold space-y-1">
-            <p>Admin Helpline: 0317 1759093 &bull; 0315 4453745</p>
+            <p>Official Support: <a href="mailto:contact@ilmportal.org" className="underline hover:text-emerald-300">contact@ilmportal.org</a></p>
             <p className="text-[11px] text-slate-400">Meezan Bank &bull; Raast &bull; JazzCash &bull; EasyPaisa</p>
           </div>
           <button

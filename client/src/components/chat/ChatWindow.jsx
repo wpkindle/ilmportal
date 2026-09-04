@@ -360,16 +360,30 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
       }
     };
 
+    const handleDealCompleted = (data) => {
+      setPartnerDeal((prev) => prev ? { ...prev, status: 'completed' } : { status: 'completed' });
+      setMessages([]);
+    };
+
+    const handleConversationCleared = (data) => {
+      setMessages([]);
+      setPartnerDeal((prev) => prev ? { ...prev, status: 'completed' } : { status: 'completed' });
+    };
+
     socket.on('new-message', handleReceiveMessage);
     socket.on('messages-seen', handleMessagesSeen);
     socket.on('messages-delivered', handleMessagesDelivered);
     socket.on('deal-status-updated', handleDealStatusUpdated);
+    socket.on('deal-completed', handleDealCompleted);
+    socket.on('conversation-cleared', handleConversationCleared);
 
     return () => {
       socket.off('new-message', handleReceiveMessage);
       socket.off('messages-seen', handleMessagesSeen);
       socket.off('messages-delivered', handleMessagesDelivered);
       socket.off('deal-status-updated', handleDealStatusUpdated);
+      socket.off('deal-completed', handleDealCompleted);
+      socket.off('conversation-cleared', handleConversationCleared);
     };
   }, [socket, conversationId, user]);
 
@@ -784,8 +798,38 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
             </button>
           )}
 
+          {/* Tutor Action: Mark Deal Completed */}
+          {isTutor && partnerDeal && ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) && (
+            <button
+              type="button"
+              onClick={async () => {
+                const ok = window.confirm(
+                  'Are you sure you want to mark this deal as completed?\n\nNotice: This will close the course and permanently delete all conversation messages between you and this student to free up database storage.'
+                );
+                if (!ok) return;
+                try {
+                  const res = await api.completeDeal(partnerDeal._id);
+                  if (res.success) {
+                    setPartnerDeal({ ...partnerDeal, status: 'completed' });
+                    setMessages([]);
+                    alert(res.message || 'Deal completed! Chat history deleted to optimize database storage.');
+                  } else {
+                    alert(res.message || 'Error completing deal');
+                  }
+                } catch (err) {
+                  alert(err.message || 'Error completing deal');
+                }
+              }}
+              className="p-2 sm:px-3 sm:py-2 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+              title="Mark this deal as completed and clear chat storage"
+            >
+              <CheckCircle2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-400 shrink-0" />
+              <span className="hidden sm:inline">Complete Deal</span>
+            </button>
+          )}
+
           {/* Tutor Action: Send Course Offer */}
-          {isTutor && (
+          {isTutor && (!partnerDeal || !['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status)) && (
             <button
               type="button"
               onClick={() => setDealModalOpen(true)}
@@ -956,7 +1000,17 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
 
       {/* Messages List Area */}
       <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/40">
-        {messages.length === 0 && (
+        {messages.length === 0 && partnerDeal?.status === 'completed' ? (
+          <div className="text-center py-12 space-y-2.5 max-w-sm mx-auto animate-in fade-in">
+            <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-xs">
+              <CheckCircle2 className="w-6 h-6" />
+            </div>
+            <p className="text-xs font-black text-slate-800">Course Deal Completed 🎉</p>
+            <p className="text-[11px] text-slate-500 leading-relaxed">
+              This course has been marked as completed. To optimize database storage, the conversation messages between you and this user have been cleared.
+            </p>
+          </div>
+        ) : messages.length === 0 ? (
           <div className="text-center py-12 space-y-2">
             <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
               <Sparkles className="w-6 h-6" />
@@ -966,7 +1020,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
               Discuss trial timings, learning goals, or send a course agreement offer.
             </p>
           </div>
-        )}
+        ) : null}
 
         {messages.map((msg) => {
           const currentUserId = (user?._id || user?.id)?.toString();

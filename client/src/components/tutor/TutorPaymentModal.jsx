@@ -258,48 +258,83 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
               </div>
 
               {/* ── Prominent Barcode / QR Image Display ── */}
-              <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-center space-y-3">
-                <div className="flex items-center justify-between pb-2 border-b border-slate-200/80">
-                  <div className="text-left">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-black text-xs text-slate-900">{activeAccount.fullTitle}</span>
-                      {activeAccount.badge && (
-                        <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 text-[8.5px] font-bold rounded">
-                          {activeAccount.badge}
-                        </span>
-                      )}
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3.5">
+                {/* Clear Account Details Card for Manual Transfer & Easy Copy */}
+                <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-2.5 shadow-2xs">
+                  <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">
+                        Account Title
+                      </span>
+                      <span className="text-sm font-black text-slate-900 select-all">
+                        {activeAccount.accountTitle}
+                      </span>
                     </div>
-                    <p className="text-[10px] text-slate-500">Account Title: <strong className="text-slate-700">{activeAccount.accountTitle}</strong></p>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(activeAccount.accountTitle, 'acc-title')}
+                      className="px-2.5 py-1.5 bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg text-xs font-bold text-slate-700 hover:text-emerald-800 flex items-center gap-1 transition-all cursor-pointer shadow-2xs shrink-0"
+                    >
+                      {copiedId === 'acc-title' ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <span className="text-emerald-700">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5 text-slate-400" />
+                          <span>Copy Title</span>
+                        </>
+                      )}
+                    </button>
                   </div>
-                  <button
-                    type="button"
-                    onClick={() => handleCopy(activeAccount.accountNumber, activeAccount.id)}
-                    className="px-2.5 py-1.5 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg text-xs font-mono font-bold text-emerald-800 flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
-                  >
-                    <span>{activeAccount.accountNumber}</span>
-                    {copiedId === activeAccount.id ? (
-                      <Check className="w-3.5 h-3.5 text-emerald-600" />
-                    ) : (
-                      <Copy className="w-3.5 h-3.5 text-slate-400" />
-                    )}
-                  </button>
+
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">
+                        {activeAccount.type}
+                      </span>
+                      <span className="font-mono text-sm sm:text-base font-black text-emerald-800 select-all">
+                        {activeAccount.accountNumber}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(activeAccount.accountNumber, activeAccount.id)}
+                      className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 border border-emerald-300 rounded-lg text-xs font-mono font-black text-emerald-800 flex items-center gap-1 transition-all cursor-pointer shadow-2xs shrink-0"
+                    >
+                      {copiedId === activeAccount.id ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <span className="text-emerald-700 font-sans">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5 text-emerald-600" />
+                          <span className="font-sans">Copy Number</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
 
-                {/* The Barcode Image */}
-                <div className="relative mx-auto w-48 sm:w-52 h-48 sm:h-52 bg-white rounded-2xl border-2 border-emerald-500/40 p-2.5 shadow-md flex items-center justify-center overflow-hidden group">
+                {/* The Barcode Image (Unobstructed, NO overlay on top) */}
+                <div className="mx-auto w-52 sm:w-56 h-52 sm:h-56 bg-white rounded-2xl border-2 border-emerald-500/40 p-2 shadow-md flex items-center justify-center">
                   <img
                     src={activeAccount.qrImage}
                     alt={`${activeAccount.name} Barcode / QR Code`}
                     className="w-full h-full object-contain rounded-xl"
                   />
-                  <div className="absolute inset-x-0 bottom-0 bg-emerald-950/80 text-emerald-200 text-[9.5px] py-1 font-semibold flex items-center justify-center gap-1">
-                    <ScanLine className="w-3 h-3 text-emerald-400" />
-                    <span>Scan with {activeAccount.name} App</span>
-                  </div>
                 </div>
 
-                <p className="text-[10.5px] text-slate-500 leading-tight">
-                  Open your mobile banking or wallet app, scan this barcode, or transfer directly to account number above.
+                {/* Scan Notice Below Image */}
+                <div className="inline-flex items-center justify-center gap-1.5 px-3 py-1 bg-emerald-100/80 text-emerald-800 rounded-full text-[11px] font-bold mx-auto border border-emerald-300/80">
+                  <ScanLine className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Scan barcode with your {activeAccount.name} app</span>
+                </div>
+
+                <p className="text-[10.5px] text-slate-500 leading-tight text-center">
+                  Open your banking/wallet app to scan this barcode, or copy the account title &amp; number above to transfer directly.
                 </p>
               </div>
 
@@ -381,8 +416,8 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                 </div>
               )}
 
-              <p className="text-[10px] text-slate-400 text-center">
-                Need urgent help? Admin Helpline: 0317 1759093 &bull; 0315 4453745
+              <p className="text-[10.5px] text-slate-400 text-center">
+                Need assistance? Official Support: <a href="mailto:contact@ilmportal.org" className="text-emerald-700 underline font-semibold">contact@ilmportal.org</a>
               </p>
 
             </form>

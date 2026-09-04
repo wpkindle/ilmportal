@@ -186,34 +186,11 @@ const Footer = () => {
             <div className="space-y-2.5 pt-2 text-xs text-slate-300">
               <div className="flex items-center gap-2.5">
                 <div className="w-7 h-7 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-emerald-400 shrink-0">
-                  <MapPin className="w-3.5 h-3.5" />
-                </div>
-                <span>Bedian Road, Lahore Cantt.</span>
-              </div>
-
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-emerald-400 shrink-0">
                   <Mail className="w-3.5 h-3.5" />
                 </div>
-                <a href="mailto:contact@ilmportal.org" className="hover:text-emerald-400 transition-colors">
+                <a href="mailto:contact@ilmportal.org" className="hover:text-emerald-400 font-semibold transition-colors">
                   contact@ilmportal.org
                 </a>
-              </div>
-
-              <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-center text-emerald-400 shrink-0">
-                  <Phone className="w-3.5 h-3.5" />
-                </div>
-                <div className="flex flex-wrap items-center gap-x-2">
-                  <span className="text-slate-400">Call &amp; WhatsApp:</span>
-                  <a href="https://wa.me/923171759093" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 font-semibold transition-colors">
-                    0317 1759093
-                  </a>
-                  <span className="text-slate-600">&bull;</span>
-                  <a href="https://wa.me/923154453745" target="_blank" rel="noopener noreferrer" className="hover:text-emerald-400 font-semibold transition-colors">
-                    0315 4453745
-                  </a>
-                </div>
               </div>
             </div>
 

@@ -1197,6 +1197,8 @@ const sendChatRequestStatusEmail = async ({
       ? `${tutorName} accepted your request to chat! Open chat: ${chatUrl}`
       : `Update from ${tutorName}: Tutor is currently unable to accept new students. Browse tutors: ${findTutorsUrl}`
   });
+};
+
 /**
  * Send email to tutor when student agrees to continue classes
  */
@@ -1301,6 +1303,8 @@ const sendTutorFeeClearedEmail = async ({
     </html>
   `;
   return sendEmailDetailed({ to, subject: emailSubject, html });
+};
+
 /**
  * Send password reset link email
  */

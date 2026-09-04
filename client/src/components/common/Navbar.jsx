@@ -65,6 +65,20 @@ const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
 
+  const [isScrolled, setIsScrolled] = useState(false);
+  const isHomePage = pathname === '/';
+  const isTransparent = isHomePage && !isScrolled && !mobileMenuOpen;
+
+  // Track window scroll for transparent header on frontpage
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   // Fetch unread messages count on load and route change
   useEffect(() => {
     if (!isAuthenticated) {
@@ -261,8 +275,18 @@ const Navbar = () => {
 
   return (
     <>
-      <PromotionTopBar />
-      <header className="sticky top-0 z-40 bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e6ded1] shadow-2xs">
+      {!isHomePage && <PromotionTopBar />}
+      <header
+        className={`transition-all duration-300 z-40 ${
+          isHomePage
+            ? `fixed top-0 left-0 right-0 ${
+                isTransparent
+                  ? 'bg-transparent border-b border-transparent shadow-none'
+                  : 'bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e6ded1] shadow-2xs'
+              }`
+            : 'sticky top-0 bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e6ded1] shadow-2xs'
+        }`}
+      >
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
           
@@ -273,14 +297,18 @@ const Navbar = () => {
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-lg sm:text-xl font-serif font-black tracking-tight text-slate-900">
-                  Ilm<span className="text-[#0c2217]">Portal</span>
+                <span className={`text-lg sm:text-xl font-serif font-black tracking-tight transition-colors ${
+                  isTransparent ? 'text-white' : 'text-slate-900'
+                }`}>
+                  Ilm<span className={isTransparent ? 'text-[#d4a359]' : 'text-[#0c2217]'}>Portal</span>
                 </span>
                 <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-extrabold uppercase bg-[#143d2b] text-[#f5f0e6] border border-[#d4a359]/40">
                   Pakistan
                 </span>
               </div>
-              <p className="text-[9.5px] font-medium text-slate-500 -mt-0.5 hidden sm:block">
+              <p className={`text-[9.5px] font-medium transition-colors -mt-0.5 hidden sm:block ${
+                isTransparent ? 'text-[#d1dbd6]' : 'text-slate-500'
+              }`}>
                 Quran &amp; Academic Tutoring • Female-Safe
               </p>
             </div>
@@ -292,7 +320,9 @@ const Navbar = () => {
               href="/courses"
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                 pathname.startsWith('/courses')
-                  ? 'text-[#0c2217] bg-[#ede6db]'
+                  ? isTransparent ? 'text-white bg-white/20' : 'text-[#0c2217] bg-[#ede6db]'
+                  : isTransparent
+                  ? 'text-[#f5f0e6]/90 hover:text-white hover:bg-white/10'
                   : 'text-slate-700 hover:text-[#0c2217] hover:bg-[#f3ece2]'
               }`}
             >
@@ -306,7 +336,9 @@ const Navbar = () => {
               href="/tutors"
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 pathname === '/tutors'
-                  ? 'text-[#0c2217] bg-[#ede6db]'
+                  ? isTransparent ? 'text-white bg-white/20' : 'text-[#0c2217] bg-[#ede6db]'
+                  : isTransparent
+                  ? 'text-[#f5f0e6]/90 hover:text-white hover:bg-white/10'
                   : 'text-slate-700 hover:text-[#0c2217] hover:bg-[#f3ece2]'
               }`}
             >
@@ -319,12 +351,16 @@ const Navbar = () => {
                 onClick={() => setSubjectsDropdownOpen(!subjectsDropdownOpen)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   subjectsDropdownOpen || pathname.includes('/tutors')
-                    ? 'text-[#0c2217] bg-[#ede6db]'
+                    ? isTransparent ? 'text-white bg-white/20' : 'text-[#0c2217] bg-[#ede6db]'
+                    : isTransparent
+                    ? 'text-[#f5f0e6]/90 hover:text-white hover:bg-white/10'
                     : 'text-slate-700 hover:text-[#0c2217] hover:bg-[#f3ece2]'
                 }`}
               >
                 <span>Subjects</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${subjectsDropdownOpen ? 'rotate-180 text-[#0c2217]' : 'text-slate-400'}`} />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                  subjectsDropdownOpen ? 'rotate-180 text-[#0c2217]' : isTransparent ? 'text-[#d4a359]' : 'text-slate-400'
+                }`} />
               </button>
 
               {subjectsDropdownOpen && (
@@ -371,7 +407,9 @@ const Navbar = () => {
               href="/how-it-works"
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 pathname === '/how-it-works'
-                  ? 'text-[#0c2217] bg-[#ede6db]'
+                  ? isTransparent ? 'text-white bg-white/20' : 'text-[#0c2217] bg-[#ede6db]'
+                  : isTransparent
+                  ? 'text-[#f5f0e6]/90 hover:text-white hover:bg-white/10'
                   : 'text-slate-700 hover:text-[#0c2217] hover:bg-[#f3ece2]'
               }`}
             >
@@ -381,12 +419,14 @@ const Navbar = () => {
             <Link
               href="/safety"
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
-                pathname === '/safety'
+                isTransparent
+                  ? 'text-[#d4a359] bg-[#143d2b]/80 border border-[#d4a359]/30 hover:bg-[#143d2b]'
+                  : pathname === '/safety'
                   ? 'text-[#b85d34] bg-[#f5ebe6] border border-[#b85d34]/30'
                   : 'text-[#0c2217] hover:text-[#b85d34] hover:bg-[#f5ebe6]'
               }`}
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
+              <ShieldCheck className={`w-3.5 h-3.5 ${isTransparent ? 'text-[#d4a359]' : 'text-[#b85d34]'}`} />
               <span>Female Safety &amp; Privacy</span>
             </Link>
           </nav>
@@ -409,7 +449,11 @@ const Navbar = () => {
                 {/* Messages Link with Counter Badge */}
                 <Link
                   href={isTutor ? '/tutor/messages' : isStudent ? '/student/messages' : '/admin/chats'}
-                  className="p-2.5 rounded-xl text-stone-700 hover:text-[#0c2217] hover:bg-[#faf8f5] relative transition-colors"
+                  className={`p-2.5 rounded-xl relative transition-colors ${
+                    isTransparent
+                      ? 'text-[#f5f0e6] hover:text-white hover:bg-white/10'
+                      : 'text-stone-700 hover:text-[#0c2217] hover:bg-[#faf8f5]'
+                  }`}
                   title="Messages & Discussions"
                 >
                   <MessageSquare className="w-5 h-5" />
@@ -424,7 +468,11 @@ const Navbar = () => {
                 <div className="relative" ref={notifMenuRef}>
                   <button
                     onClick={() => setNotifMenuOpen(!notifMenuOpen)}
-                    className="p-2.5 rounded-xl text-stone-700 hover:text-[#0c2217] hover:bg-[#faf8f5] relative transition-colors cursor-pointer"
+                    className={`p-2.5 rounded-xl relative transition-colors cursor-pointer ${
+                      isTransparent
+                        ? 'text-[#f5f0e6] hover:text-white hover:bg-white/10'
+                        : 'text-stone-700 hover:text-[#0c2217] hover:bg-[#faf8f5]'
+                    }`}
                     title="Notifications & Safety Alerts"
                   >
                     <Bell className="w-5 h-5" />
@@ -582,7 +630,11 @@ const Navbar = () => {
                     </div>
 
                     {/* Desktop: Decent, elegant, modern profile box */}
-                    <div className="hidden sm:flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-2xl bg-white border border-stone-200 hover:border-[#0c2217] hover:shadow-md transition-all shadow-2xs group">
+                    <div className={`hidden sm:flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-2xl transition-all shadow-2xs group ${
+                      isTransparent
+                        ? 'bg-[#143d2b]/80 border border-[#d4a359]/40 hover:bg-[#143d2b] hover:border-[#d4a359]'
+                        : 'bg-white border border-stone-200 hover:border-[#0c2217] hover:shadow-md'
+                    }`}>
                       <div className="w-8 h-8 rounded-xl overflow-hidden ring-1 ring-[#d4a359]/30 group-hover:ring-[#d4a359]/60 transition-all shrink-0 relative">
                         <img
                           src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=0c2217&color=d4a359`}
@@ -591,14 +643,24 @@ const Navbar = () => {
                         />
                       </div>
                       <div className="text-left">
-                        <p className="text-xs font-bold text-stone-800 leading-tight max-w-[110px] truncate group-hover:text-[#0c2217] transition-colors">
+                        <p className={`text-xs font-bold leading-tight max-w-[110px] truncate transition-colors ${
+                          isTransparent ? 'text-white group-hover:text-[#d4a359]' : 'text-stone-800 group-hover:text-[#0c2217]'
+                        }`}>
                           {user?.name?.split(' ')[0]}
                         </p>
-                        <span className="inline-block text-[9px] uppercase font-black tracking-wider text-[#0c2217] bg-[#f0ece1] px-1.5 py-0.2 rounded border border-[#d4a359]/30 mt-0.5">
+                        <span className={`inline-block text-[9px] uppercase font-black tracking-wider px-1.5 py-0.2 rounded border mt-0.5 ${
+                          isTransparent
+                            ? 'text-[#d4a359] bg-[#0c2217] border-[#d4a359]/30'
+                            : 'text-[#0c2217] bg-[#f0ece1] border-[#d4a359]/30'
+                        }`}>
                           {user?.role}
                         </span>
                       </div>
-                      <ChevronDown className={`w-3.5 h-3.5 text-stone-400 group-hover:text-[#0c2217] transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                        userMenuOpen ? 'rotate-180 ' : ''
+                      }${
+                        isTransparent ? 'text-[#d4a359]' : 'text-stone-400 group-hover:text-[#0c2217]'
+                      }`} />
                     </div>
                   </button>
 
@@ -738,10 +800,16 @@ const Navbar = () => {
             {/* Mobile Menu Toggle Button (44x44px touch target) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-700 hover:bg-[#f0eae1] active:scale-95 transition-all"
+              className={`lg:hidden p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl transition-all active:scale-95 ${
+                isTransparent ? 'text-[#f5f0e6] hover:bg-white/10' : 'text-slate-700 hover:bg-[#f0eae1]'
+              }`}
               aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
             >
-              {mobileMenuOpen ? <X className="w-6 h-6 text-[#0c2217]" /> : <Menu className="w-6 h-6 text-[#0c2217]" />}
+              {mobileMenuOpen ? (
+                <X className={`w-6 h-6 ${isTransparent ? 'text-white' : 'text-[#0c2217]'}`} />
+              ) : (
+                <Menu className={`w-6 h-6 ${isTransparent ? 'text-white' : 'text-[#0c2217]'}`} />
+              )}
             </button>
           </div>
 

@@ -155,20 +155,20 @@ export default function StudentCertificatesPage() {
   if (loading) return <LoadingSpinner text="Loading your certificates..." />;
 
   return (
-    <div className="py-8 bg-slate-50 min-h-screen">
+    <div className="py-8 bg-[#faf8f5] min-h-screen text-stone-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Top Header */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e6dfd5] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">
-              <Award className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-[11px] font-bold text-[#143d2b] uppercase tracking-wider mb-1">
+              <Award className="w-4 h-4 text-[#d4a359]" />
               <span>Official Sanad Accreditations</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
+            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-stone-900">
               My Course Completion Certificates
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            <p className="text-xs sm:text-sm text-stone-500 mt-1">
               Request official completion certificates directly from your tutor, track grading, and download verified PDFs.
             </p>
           </div>
@@ -176,14 +176,14 @@ export default function StudentCertificatesPage() {
           <div className="flex items-center gap-2.5 flex-wrap">
             <button
               onClick={() => setRequestModalOpen(true)}
-              className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-black text-xs rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all hover:scale-105"
+              className="px-5 py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-2 cursor-pointer transition-all border border-[#d4a359]/30 hover:scale-105"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 text-[#d4a359]" />
               <span>Request Certificate</span>
             </button>
             <Link
               href="/courses"
-              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer"
+              className="px-4 py-2.5 bg-[#faf8f5] hover:bg-[#f3ede2] text-stone-700 font-semibold text-xs rounded-xl flex items-center justify-center gap-2 cursor-pointer border border-[#e6dfd5]"
             >
               <span>Browse Courses</span>
               <ArrowRight className="w-4 h-4" />
@@ -193,17 +193,17 @@ export default function StudentCertificatesPage() {
 
         {/* Certificates Grid */}
         {certificates.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 shadow-sm space-y-3">
-            <Award className="w-12 h-12 text-slate-300 mx-auto" />
-            <h3 className="text-lg font-bold text-slate-800">No Certificates Requested Yet</h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
+          <div className="bg-white rounded-3xl p-12 text-center border border-[#e6dfd5] shadow-xs space-y-3">
+            <Award className="w-12 h-12 text-stone-300 mx-auto" />
+            <h3 className="text-lg font-serif font-bold text-stone-800">No Certificates Requested Yet</h3>
+            <p className="text-xs text-stone-500 max-w-md mx-auto">
               Completed your lessons? Request an official completion certificate directly. Your tutor will evaluate your marks, admin will assign the fee, and your certificate will be issued.
             </p>
             <button
               onClick={() => setRequestModalOpen(true)}
-              className="inline-flex items-center gap-2 mt-2 px-5 py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-xl shadow-sm hover:bg-emerald-500 transition-all cursor-pointer"
+              className="inline-flex items-center gap-2 mt-2 px-5 py-2.5 bg-[#0c2217] text-[#faf8f5] text-xs font-bold rounded-xl shadow-xs hover:bg-[#143d2b] transition-all cursor-pointer border border-[#d4a359]/30"
             >
-              <Plus className="w-4 h-4" />
+              <Plus className="w-4 h-4 text-[#d4a359]" />
               <span>Request Your Certificate Now</span>
             </button>
           </div>
@@ -218,62 +218,62 @@ export default function StudentCertificatesPage() {
               return (
                 <div
                   key={cert._id}
-                  className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:border-emerald-500 transition-all flex flex-col justify-between"
+                  className="bg-white rounded-3xl border border-[#e6dfd5] overflow-hidden shadow-xs hover:border-[#d4a359]/60 transition-all flex flex-col justify-between"
                 >
                   <div className="p-6 space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="p-2.5 bg-emerald-50 text-emerald-700 rounded-2xl border border-emerald-200">
-                        <Award className="w-6 h-6" />
+                      <span className="p-2.5 bg-[#eef5f0] text-[#143d2b] rounded-2xl border border-[#c3dfcb]">
+                        <Award className="w-6 h-6 text-[#d4a359]" />
                       </span>
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${
                         isIssued
-                          ? 'bg-emerald-100 text-emerald-800'
+                          ? 'bg-[#eef5f0] text-[#143d2b] border border-[#c3dfcb]'
                           : isProofSubmitted
-                          ? 'bg-blue-100 text-blue-800 animate-pulse'
+                          ? 'bg-blue-50 text-blue-800 border border-blue-200 animate-pulse'
                           : isAwaitingPayment
-                          ? 'bg-amber-100 text-amber-800'
-                          : 'bg-purple-100 text-purple-800'
+                          ? 'bg-[#fdf6ec] text-[#b8863b] border border-[#f2dfbe]'
+                          : 'bg-purple-50 text-purple-800 border border-purple-200'
                       }`}>
                         {isIssued ? 'Official Verified' : cert.status.replace(/_/g, ' ')}
                       </span>
                     </div>
 
                     <div>
-                      <h3 className="font-black text-base text-slate-900 leading-snug">
+                      <h3 className="font-serif font-bold text-base text-stone-900 leading-snug">
                         {cert.courseTitle}
                       </h3>
-                      <p className="text-xs text-slate-500 mt-1">
-                        Instructor: <strong className="text-slate-800">{cert.instructorName}</strong>
+                      <p className="text-xs text-stone-500 mt-1">
+                        Instructor: <strong className="text-stone-800">{cert.instructorName}</strong>
                       </p>
                     </div>
 
-                    <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1 text-slate-600">
+                    <div className="p-3 bg-[#faf8f5] rounded-xl border border-[#e6dfd5] text-xs space-y-1 text-stone-600">
                       <div className="flex items-center justify-between">
                         <span>Grade / Marks:</span>
-                        <strong className="text-emerald-800">
+                        <strong className="text-[#143d2b]">
                           {cert.marks ? `${cert.marks} • ${cert.completionGrade}` : cert.completionGrade || 'Pending Evaluation'}
                         </strong>
                       </div>
-                      <div className="flex items-center justify-between text-[11px] text-slate-400">
+                      <div className="flex items-center justify-between text-[11px] text-stone-400">
                         <span>Cert ID:</span>
-                        <strong className="font-mono text-slate-600">{cert.certificateId}</strong>
+                        <strong className="font-mono text-stone-600">{cert.certificateId}</strong>
                       </div>
                       {cert.price > 0 && (
-                        <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200">
+                        <div className="flex items-center justify-between text-xs pt-1 border-t border-[#e6dfd5]">
                           <span>Certificate Fee:</span>
-                          <strong className="font-mono text-emerald-700 font-black">PKR {cert.price.toLocaleString()}</strong>
+                          <strong className="font-mono text-[#143d2b] font-bold">PKR {cert.price.toLocaleString()}</strong>
                         </div>
                       )}
                     </div>
 
                     {/* Status Notice Details */}
                     {cert.status === 'pending_tutor_review' && (
-                      <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-xs text-amber-800 space-y-1">
+                      <div className="p-3 bg-[#fdf6ec] border border-[#f2dfbe] rounded-xl text-xs text-[#b8863b] space-y-1">
                         <div className="flex items-center gap-1.5 font-bold">
                           <Clock className="w-3.5 h-3.5" />
                           <span>Awaiting Tutor Evaluation</span>
                         </div>
-                        <p className="text-[11px] text-amber-700">
+                        <p className="text-[11px] text-stone-600">
                           Request sent to tutor {cert.instructorName}. The tutor will review your coursework and enter your marks and grade.
                         </p>
                       </div>
@@ -292,12 +292,12 @@ export default function StudentCertificatesPage() {
                     )}
 
                     {isAwaitingPayment && (
-                      <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl text-xs text-emerald-900 space-y-1">
-                        <div className="flex items-center gap-1.5 font-bold text-emerald-800">
+                      <div className="p-3 bg-[#eef5f0] border border-[#c3dfcb] rounded-xl text-xs text-[#143d2b] space-y-1">
+                        <div className="flex items-center gap-1.5 font-bold text-[#0c2217]">
                           <CreditCard className="w-3.5 h-3.5" />
                           <span>Fee Invoiced: PKR {cert.price?.toLocaleString()}</span>
                         </div>
-                        <p className="text-[11px] text-emerald-700">
+                        <p className="text-[11px] text-stone-600">
                           Marks: <strong>{cert.marks || cert.completionGrade}</strong>. Please transfer the fee and submit proof to unlock instant PDF download.
                         </p>
                       </div>
@@ -321,15 +321,15 @@ export default function StudentCertificatesPage() {
                       <Link
                         href={`/certificates/${cert.certificateId}`}
                         target="_blank"
-                        className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+                        className="w-full py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer border border-[#d4a359]/30"
                       >
-                        <Printer className="w-3.5 h-3.5" />
+                        <Printer className="w-3.5 h-3.5 text-[#d4a359]" />
                         <span>View &amp; Download PDF</span>
                       </Link>
                     ) : isAwaitingPayment ? (
                       <button
                         onClick={() => setSelectedCertForPay(cert)}
-                        className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs rounded-xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+                        className="w-full py-2.5 bg-[#b8863b] hover:bg-[#a5742e] text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
                       >
                         <CreditCard className="w-3.5 h-3.5" />
                         <span>Submit Payment Proof (PKR {cert.price?.toLocaleString()})</span>
@@ -337,7 +337,7 @@ export default function StudentCertificatesPage() {
                     ) : (
                       <button
                         disabled
-                        className="w-full py-2.5 bg-slate-100 text-slate-400 font-bold text-xs rounded-xl flex items-center justify-center gap-2 cursor-not-allowed"
+                        className="w-full py-2.5 bg-[#faf8f5] text-stone-400 font-semibold text-xs rounded-xl flex items-center justify-center gap-2 cursor-not-allowed border border-[#e6dfd5]"
                       >
                         <Clock className="w-3.5 h-3.5" />
                         <span>
@@ -360,22 +360,22 @@ export default function StudentCertificatesPage() {
 
       {/* Request Certificate Modal */}
       {requestModalOpen && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-200 max-h-[92vh] overflow-y-auto">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4 animate-in fade-in duration-150">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-[#e6dfd5] max-h-[92vh] overflow-y-auto">
+            <div className="flex items-center justify-between pb-3 border-b border-[#f3ede2]">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-emerald-100 text-emerald-800 rounded-xl">
-                  <Award className="w-5 h-5" />
+                <div className="p-2 bg-[#eef5f0] text-[#143d2b] rounded-xl border border-[#c3dfcb]">
+                  <Award className="w-5 h-5 text-[#d4a359]" />
                 </div>
                 <div>
-                  <h3 className="font-black text-slate-900 text-base">Request Course Certificate</h3>
-                  <p className="text-xs text-slate-500">Request goes directly to your tutor for evaluation</p>
+                  <h3 className="font-serif font-bold text-stone-900 text-base">Request Course Certificate</h3>
+                  <p className="text-xs text-stone-500">Request goes directly to your tutor for evaluation</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setRequestModalOpen(false)}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer text-xl font-bold"
+                className="text-stone-400 hover:text-stone-700 cursor-pointer text-xl font-bold p-1"
               >
                 &times;
               </button>
@@ -383,11 +383,11 @@ export default function StudentCertificatesPage() {
 
             <form onSubmit={handleRequestSubmit} className="space-y-4 text-xs">
               <div>
-                <label className="block font-bold text-slate-800 mb-1">
+                <label className="block font-bold text-stone-800 mb-1">
                   Select Tutor &amp; Course *
                 </label>
                 {deals.length === 0 ? (
-                  <div className="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs">
+                  <div className="p-3 bg-[#fdf6ec] border border-[#f2dfbe] rounded-xl text-[#b8863b] text-xs">
                     No active course deals found. You need an active or completed tuition deal with a tutor to request a certificate.
                   </div>
                 ) : (
@@ -398,7 +398,7 @@ export default function StudentCertificatesPage() {
                       const d = deals.find(x => x._id === e.target.value);
                       if (d) setCourseSubject(d.subject);
                     }}
-                    className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium outline-none focus:border-emerald-500"
+                    className="w-full p-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl font-medium outline-none focus:border-[#0c2217]"
                     required
                   >
                     {deals.map((d) => (
@@ -411,7 +411,7 @@ export default function StudentCertificatesPage() {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-1">
+                <label className="block font-bold text-stone-800 mb-1">
                   Full Name on Certificate *
                 </label>
                 <input
@@ -420,12 +420,12 @@ export default function StudentCertificatesPage() {
                   placeholder="Your full legal name as it should appear on certificate"
                   value={studentCertName}
                   onChange={(e) => setStudentCertName(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500 font-medium"
+                  className="w-full p-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl outline-none focus:border-[#0c2217] font-medium"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-1">
+                <label className="block font-bold text-stone-800 mb-1">
                   Course Title / Subject *
                 </label>
                 <input
@@ -434,12 +434,12 @@ export default function StudentCertificatesPage() {
                   placeholder="e.g. Nazra Quran with Tajweed, Hifz Surah Al-Baqarah"
                   value={courseSubject}
                   onChange={(e) => setCourseSubject(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500 font-medium"
+                  className="w-full p-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl outline-none focus:border-[#0c2217] font-medium"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-800 mb-1">
+                <label className="block font-bold text-stone-800 mb-1">
                   Message / Study Notes for Tutor (Optional)
                 </label>
                 <textarea
@@ -447,13 +447,13 @@ export default function StudentCertificatesPage() {
                   placeholder="e.g. Completed all chapters of Tajweed and Makharij rules with Ustadh."
                   value={requestNotes}
                   onChange={(e) => setRequestNotes(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500 resize-none font-medium"
+                  className="w-full p-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl outline-none focus:border-[#0c2217] resize-none font-medium"
                 />
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 space-y-1 text-[11px] text-slate-600">
-                <p className="font-bold text-slate-800">Certificate Process Flow:</p>
-                <ol className="list-decimal list-inside space-y-0.5 text-slate-500">
+              <div className="p-3 bg-[#faf8f5] rounded-xl border border-[#e6dfd5] space-y-1 text-[11px] text-stone-600">
+                <p className="font-bold text-stone-800">Certificate Process Flow:</p>
+                <ol className="list-decimal list-inside space-y-0.5 text-stone-500">
                   <li>Your tutor receives your request and assigns your marks and grade.</li>
                   <li>Administration sets the official certificate fee.</li>
                   <li>You review the grade, pay the fee, and submit Transaction ID (TID).</li>
@@ -461,18 +461,18 @@ export default function StudentCertificatesPage() {
                 </ol>
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#f3ede2]">
                 <button
                   type="button"
                   onClick={() => setRequestModalOpen(false)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-[#faf8f5] hover:bg-[#f3ede2] text-stone-700 font-semibold rounded-xl text-xs transition-colors cursor-pointer border border-[#e6dfd5]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={requesting || deals.length === 0}
-                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs shadow-md transition-all disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold rounded-xl text-xs shadow-xs transition-all disabled:opacity-50 cursor-pointer border border-[#d4a359]/30"
                 >
                   {requesting ? 'Submitting Request...' : 'Submit Certificate Request'}
                 </button>
@@ -484,44 +484,44 @@ export default function StudentCertificatesPage() {
 
       {/* Submit Payment Proof Modal */}
       {selectedCertForPay && (
-        <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-200 max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+        <div className="fixed inset-0 z-50 bg-stone-950/70 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-[#e6dfd5] max-h-[90vh] overflow-y-auto animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between pb-3 border-b border-[#f3ede2]">
               <div className="flex items-center gap-2">
-                <CreditCard className="w-5 h-5 text-emerald-600" />
-                <h3 className="font-black text-slate-900 text-base">Submit Certificate Fee Proof</h3>
+                <CreditCard className="w-5 h-5 text-[#d4a359]" />
+                <h3 className="font-serif font-bold text-stone-900 text-base">Submit Certificate Fee Proof</h3>
               </div>
               <button
                 onClick={() => setSelectedCertForPay(null)}
-                className="text-slate-400 hover:text-slate-600 cursor-pointer text-lg font-bold"
+                className="text-stone-400 hover:text-stone-700 cursor-pointer text-lg font-bold p-1"
               >
                 &times;
               </button>
             </div>
 
             {/* Price & Official Bank Accounts */}
-            <div className="bg-emerald-950 text-white p-4 rounded-2xl space-y-2 text-xs">
-              <div className="flex items-center justify-between pb-2 border-b border-emerald-800">
-                <span className="text-emerald-300 font-bold uppercase text-[10px]">Certificate Amount Due</span>
-                <span className="text-base font-black text-emerald-400 font-mono">PKR {selectedCertForPay.price}</span>
+            <div className="bg-[#0c2217] text-[#faf8f5] p-4 rounded-2xl space-y-2 text-xs border border-[#d4a359]/30">
+              <div className="flex items-center justify-between pb-2 border-b border-white/10">
+                <span className="text-[#d4a359] font-bold uppercase text-[10px]">Certificate Amount Due</span>
+                <span className="text-base font-bold text-[#faf8f5] font-mono">PKR {selectedCertForPay.price}</span>
               </div>
-              <p className="text-[11px] text-emerald-200 font-medium">
+              <p className="text-[11px] text-stone-300 font-medium">
                 Please transfer PKR {selectedCertForPay.price} to any of our official verified accounts:
               </p>
-              <div className="space-y-1 text-[11px] bg-slate-900/60 p-2.5 rounded-xl border border-emerald-500/30">
+              <div className="space-y-1 text-[11px] bg-white/5 p-2.5 rounded-xl border border-white/10">
                 <p><strong>Meezan Bank:</strong> 96010105435308 (Title: Abdul Khaliq)</p>
                 <p><strong>Raast ID / EasyPaisa / JazzCash / UPaisa:</strong> 03171759093</p>
-                <p className="text-emerald-400">Official Support: <a href="mailto:contact@ilmportal.org" className="underline font-bold">contact@ilmportal.org</a></p>
+                <p className="text-[#d4a359]">Official Support: <a href="mailto:contact@ilmportal.org" className="underline font-bold">contact@ilmportal.org</a></p>
               </div>
             </div>
 
             <form onSubmit={handlePaymentProofSubmit} className="space-y-3 text-xs">
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Select Payment Method *</label>
+                <label className="block font-bold text-stone-700 mb-1">Select Payment Method *</label>
                 <select
                   value={paymentMethod}
                   onChange={(e) => setPaymentMethod(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500"
+                  className="w-full p-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl outline-none focus:border-[#0c2217]"
                 >
                   <option value="meezan_bank">Meezan Bank Transfer (Account: 96010105435308)</option>
                   <option value="raast">Raast Instant Transfer (03171759093)</option>
@@ -532,7 +532,7 @@ export default function StudentCertificatesPage() {
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">
+                <label className="block font-bold text-stone-700 mb-1">
                   Transaction ID / Reference Number (Trx ID) *
                 </label>
                 <input
@@ -541,50 +541,50 @@ export default function StudentCertificatesPage() {
                   placeholder="e.g. 19284719284 or Bank Trx Ref"
                   value={trxId}
                   onChange={(e) => setTrxId(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs outline-none focus:border-emerald-500 font-bold"
+                  className="w-full p-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl font-mono text-xs outline-none focus:border-[#0c2217] font-bold"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">
+                <label className="block font-bold text-stone-700 mb-1">
                   Attach Payment Screenshot / Receipt (Optional but recommended)
                 </label>
                 <input
                   type="file"
                   accept="image/*"
                   onChange={handleFileUpload}
-                  className="w-full text-xs text-slate-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-700 hover:file:bg-emerald-100"
+                  className="w-full text-xs text-stone-500 file:mr-2 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-[#eef5f0] file:text-[#143d2b] hover:file:bg-[#e0ede4]"
                 />
                 {receiptUrl && (
-                  <div className="mt-2 p-1 border border-emerald-200 rounded-xl bg-emerald-50 max-w-xs">
+                  <div className="mt-2 p-1 border border-[#e6dfd5] rounded-xl bg-[#faf8f5] max-w-xs">
                     <img src={receiptUrl} alt="Receipt Preview" className="h-24 object-contain rounded-lg mx-auto" />
                   </div>
                 )}
               </div>
 
               <div>
-                <label className="block font-bold text-slate-700 mb-1">Notes / Sender Name</label>
+                <label className="block font-bold text-stone-700 mb-1">Notes / Sender Name</label>
                 <input
                   type="text"
                   placeholder="e.g. Sent from account title Muhammad Ali"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-emerald-500"
+                  className="w-full p-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs outline-none focus:border-[#0c2217]"
                 />
               </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2 border-t border-slate-100">
+              <div className="flex items-center justify-end gap-2 pt-2 border-t border-[#f3ede2]">
                 <button
                   type="button"
                   onClick={() => setSelectedCertForPay(null)}
-                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-[#faf8f5] hover:bg-[#f3ede2] text-stone-700 font-semibold rounded-xl text-xs transition-colors cursor-pointer border border-[#e6dfd5]"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={submittingProof}
-                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs transition-all shadow-md disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold rounded-xl text-xs transition-all shadow-xs disabled:opacity-50 cursor-pointer border border-[#d4a359]/30"
                 >
                   {submittingProof ? 'Submitting...' : 'Submit Payment Proof'}
                 </button>

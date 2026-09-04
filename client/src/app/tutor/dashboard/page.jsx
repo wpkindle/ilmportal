@@ -95,7 +95,7 @@ export default function TutorDashboardPage() {
   const activePaidDeals = deals.filter(d => d.status === 'active_paid');
 
   return (
-    <div className="py-6 md:py-8 pb-24 md:pb-8 bg-slate-50 min-h-screen">
+    <div className="py-6 md:py-8 pb-24 md:pb-12 bg-[#faf8f5] min-h-screen text-stone-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         
         {/* Account Status / Warning Notice / Audit Banner */}
@@ -105,8 +105,8 @@ export default function TutorDashboardPage() {
         {feedback && (
           <div className={`p-4 rounded-2xl flex items-center justify-between text-xs font-bold border ${
             feedback.type === 'success'
-              ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
-              : 'bg-rose-50 border-rose-300 text-rose-900'
+              ? 'bg-[#eef5f0] border-[#c3dfcb] text-[#0c2217]'
+              : 'bg-[#fdf2f0] border-[#f5d6cf] text-[#b85d34]'
           }`}>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -123,19 +123,19 @@ export default function TutorDashboardPage() {
 
         {/* Verification Status Banner */}
         {isPending && (
-          <div className="p-5 bg-amber-50 border border-amber-200 rounded-3xl flex items-center justify-between gap-4 text-amber-900 shadow-2xs">
+          <div className="p-5 bg-[#fdf6ec] border border-[#f2dfbe] rounded-3xl flex items-center justify-between gap-4 text-[#8a5b14] shadow-xs">
             <div className="flex items-center gap-3">
-              <Clock className="w-6 h-6 text-amber-600 animate-spin" />
+              <Clock className="w-6 h-6 text-[#b8863b] animate-spin" />
               <div>
-                <h4 className="font-bold text-sm">Account Status: Pending Admin Verification</h4>
-                <p className="text-xs text-amber-700">
+                <h4 className="font-serif font-bold text-sm text-[#0c2217]">Account Status: Pending Admin Verification</h4>
+                <p className="text-xs text-stone-600">
                   Your Sanad credentials have been submitted and are being reviewed by the IlmPortal administrative team.
                 </p>
               </div>
             </div>
             <Link
               href="/tutor/profile"
-              className="px-3.5 py-1.5 bg-amber-600 text-white font-bold text-xs rounded-xl shadow-sm hover:bg-amber-700 whitespace-nowrap"
+              className="px-4 py-2 bg-[#b8863b] text-white font-bold text-xs rounded-xl shadow-xs hover:bg-[#a5742e] whitespace-nowrap"
             >
               Review Sanad Documents
             </Link>
@@ -143,19 +143,19 @@ export default function TutorDashboardPage() {
         )}
 
         {isContactNeeded && (
-          <div className="p-5 bg-orange-50 border border-orange-200 rounded-3xl flex items-center justify-between gap-4 text-orange-900 shadow-2xs">
+          <div className="p-5 bg-[#fdf2f0] border border-[#f5d6cf] rounded-3xl flex items-center justify-between gap-4 text-[#b85d34] shadow-xs">
             <div className="flex items-center gap-3">
-              <AlertTriangle className="w-6 h-6 text-orange-600" />
+              <AlertTriangle className="w-6 h-6 text-[#b85d34]" />
               <div>
-                <h4 className="font-bold text-sm">Clarification Required on Your Application</h4>
-                <p className="text-xs text-orange-700">
+                <h4 className="font-serif font-bold text-sm text-[#0c2217]">Clarification Required on Your Application</h4>
+                <p className="text-xs text-stone-600">
                   Admin Note: {tutorProfile?.contactNotes || 'Please upload a clearer scan of your Sanad.'}
                 </p>
               </div>
             </div>
             <Link
               href="/tutor/profile"
-              className="px-3.5 py-1.5 bg-orange-600 text-white font-bold text-xs rounded-xl shadow-sm hover:bg-orange-700"
+              className="px-4 py-2 bg-[#b85d34] text-white font-bold text-xs rounded-xl shadow-xs hover:bg-[#a04e28]"
             >
               Update Credentials
             </Link>
@@ -163,56 +163,64 @@ export default function TutorDashboardPage() {
         )}
 
         {isApproved && (
-          <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 text-white rounded-3xl p-6 sm:p-8 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="space-y-2">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-emerald-400 text-slate-950 shadow-sm">
-                <ShieldCheck className="w-4 h-4" />
-                Verified & Live on IlmPortal Pakistan
-              </span>
-              <h1 className="text-2xl sm:text-3xl font-black text-white">
+          <div className="bg-[#0c2217] text-[#faf8f5] rounded-3xl p-6 sm:p-9 border border-[#d4a359]/30 shadow-[0_8px_30px_rgba(12,34,23,0.12)] relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+            <div className="absolute -right-16 -bottom-16 w-64 h-64 rounded-full bg-[#143d2b]/40 blur-3xl pointer-events-none" />
+            <div className="absolute top-0 right-1/4 w-32 h-32 rounded-full bg-[#d4a359]/10 blur-2xl pointer-events-none" />
+
+            <div className="space-y-2.5 z-10">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#d4a359] text-[#0c2217] shadow-xs">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Verified Sanad Teacher &bull; IlmPortal Pakistan
+                </span>
+                <span className="text-[11px] font-semibold text-emerald-300 bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-500/30">
+                  Female Safety Compliant
+                </span>
+              </div>
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-[#faf8f5] tracking-tight">
                 Assalam-o-Alaikum, {user?.name}!
               </h1>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-xl">
-                Your profile is active across all Pakistani regions. Manage ongoing student courses, monitor trial status, and conduct live WebRTC classes.
+              <p className="text-xs sm:text-sm text-stone-300 max-w-xl leading-relaxed">
+                Your teaching profile is active across Pakistan. Manage student course deals, track the 72-hour fee timer, and conduct live WebRTC classes.
               </p>
             </div>
 
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap gap-2.5 z-10">
               <Link
                 href="/tutor/messages"
-                className="px-4 py-2.5 bg-white text-slate-950 font-bold text-xs rounded-xl shadow-md hover:bg-slate-100 transition-all flex items-center gap-2"
+                className="px-4 py-2.5 bg-[#d4a359] hover:bg-[#c39248] text-[#0c2217] font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2"
               >
-                <MessageSquare className="w-4 h-4 text-emerald-600" />
-                <span>Chat & Send Offers</span>
+                <MessageSquare className="w-4 h-4" />
+                <span>Chat &amp; Send Offers</span>
               </Link>
               <Link
                 href="/tutor/profile"
-                className="px-4 py-2.5 bg-emerald-700 text-white font-bold text-xs rounded-xl hover:bg-emerald-600 transition-all flex items-center gap-2 border border-emerald-600"
+                className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-[#faf8f5] font-semibold text-xs rounded-xl transition-all flex items-center gap-2 border border-white/20"
               >
-                <Award className="w-4 h-4" />
-                <span>Edit Profile & Sanad</span>
+                <Award className="w-4 h-4 text-[#d4a359]" />
+                <span>Edit Profile &amp; Sanad</span>
               </Link>
             </div>
           </div>
         )}
 
         {/* Course Studio Banner */}
-        <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 rounded-3xl p-6 text-white border border-emerald-500/30 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#0c2217] rounded-3xl p-6 sm:p-7 text-white border border-[#d4a359]/30 shadow-md flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0">
-              <BookOpen className="w-6 h-6 text-emerald-400" />
+            <div className="w-12 h-12 rounded-2xl bg-[#d4a359]/20 border border-[#d4a359]/40 flex items-center justify-center shrink-0">
+              <BookOpen className="w-6 h-6 text-[#d4a359]" />
             </div>
             <div>
-              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/30">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-white/10 px-2.5 py-0.5 rounded border border-[#d4a359]/30">
                 COURSE STUDIO
               </span>
-              <h3 className="text-lg font-black text-white mt-0.5">Author & Manage Your Curriculum Courses</h3>
-              <p className="text-xs text-slate-300">Add chapters, lessons, diagnostic tests, and homework assignments.</p>
+              <h3 className="text-lg font-serif font-bold text-white mt-1">Author &amp; Manage Your Curriculum Courses</h3>
+              <p className="text-xs text-stone-300">Add chapters, lessons, diagnostic tests, and homework assignments.</p>
             </div>
           </div>
           <Link
             href="/tutor/courses"
-            className="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs rounded-xl shadow-md flex items-center justify-center gap-2 shrink-0 hover:scale-105 transition-all cursor-pointer"
+            className="px-5 py-2.5 bg-[#d4a359] hover:bg-[#c39248] text-[#0c2217] font-bold text-xs rounded-xl shadow-sm flex items-center justify-center gap-2 shrink-0 hover:scale-105 transition-all cursor-pointer"
           >
             <span>Open Course Studio</span>
             <ArrowRight className="w-4 h-4" />
@@ -220,100 +228,105 @@ export default function TutorDashboardPage() {
         </div>
 
         {/* Certificate Evaluations Quick Link */}
-        <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-2xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-white rounded-3xl p-5 border border-[#e6dfd5] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:border-[#d4a359]/40 transition-all">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-amber-100 text-amber-800 flex items-center justify-center shrink-0">
-              <Award className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-2xl bg-[#fdf6ec] text-[#b8863b] flex items-center justify-center shrink-0 border border-[#f2dfbe]">
+              <Award className="w-5 h-5 text-[#d4a359]" />
             </div>
             <div>
-              <h4 className="font-black text-sm text-slate-900">Student Course Certificates</h4>
-              <p className="text-xs text-slate-500">Review completion requests submitted by your students and enter marks &amp; grades.</p>
+              <h4 className="font-serif font-bold text-sm text-stone-900">Student Course Certificates</h4>
+              <p className="text-xs text-stone-500">Review completion requests submitted by your students and enter marks &amp; grades.</p>
             </div>
           </div>
           <Link
             href="/tutor/certificates"
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shrink-0 shadow-sm"
+            className="px-4 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl flex items-center justify-center gap-1.5 shrink-0 shadow-xs border border-[#d4a359]/30"
           >
             <span>Evaluate Certificates</span>
-            <ArrowRight className="w-3.5 h-3.5" />
+            <ArrowRight className="w-3.5 h-3.5 text-[#d4a359]" />
           </Link>
         </div>
 
         {/* 4 Stats Cards */}
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-2xs">
-            <div className="p-2 bg-emerald-100 text-emerald-700 w-fit rounded-xl mb-3">
+          <div className="bg-white p-5 rounded-3xl border border-[#e6dfd5] shadow-xs hover:border-[#d4a359]/50 transition-all">
+            <div className="p-2.5 bg-[#eef5f0] text-[#143d2b] w-fit rounded-2xl mb-3 border border-[#c3dfcb]">
               <Users className="w-5 h-5" />
             </div>
-            <p className="text-2xl font-black text-slate-900">{deals.length}</p>
-            <p className="text-xs text-slate-500 font-medium">Total Student Deals</p>
+            <p className="text-2xl sm:text-3xl font-serif font-bold text-[#0c2217]">{deals.length}</p>
+            <p className="text-[11px] text-stone-500 uppercase font-bold tracking-wider mt-0.5">Total Student Deals</p>
           </div>
 
-          <div className="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-2xs">
-            <div className="p-2 bg-amber-100 text-amber-700 w-fit rounded-xl mb-3">
+          <div className="bg-white p-5 rounded-3xl border border-[#e6dfd5] shadow-xs hover:border-[#d4a359]/50 transition-all">
+            <div className="p-2.5 bg-[#fdf6ec] text-[#b8863b] w-fit rounded-2xl mb-3 border border-[#f2dfbe]">
               <Clock className="w-5 h-5" />
             </div>
-            <p className="text-2xl font-black text-amber-600">{activeTrialDeals.length}</p>
-            <p className="text-xs text-slate-500 font-medium">Active Trials (Tutor View)</p>
+            <p className="text-2xl sm:text-3xl font-serif font-bold text-[#b8863b]">{activeTrialDeals.length}</p>
+            <p className="text-[11px] text-stone-500 uppercase font-bold tracking-wider mt-0.5">Active Trials</p>
           </div>
 
-          <div className="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-2xs">
-            <div className="p-2 bg-blue-100 text-blue-700 w-fit rounded-xl mb-3">
+          <div className="bg-white p-5 rounded-3xl border border-[#e6dfd5] shadow-xs hover:border-[#d4a359]/50 transition-all">
+            <div className="p-2.5 bg-[#eef3fb] text-[#2563eb] w-fit rounded-2xl mb-3 border border-[#dbe6fa]">
               <CreditCard className="w-5 h-5" />
             </div>
-            <p className="text-2xl font-black text-blue-600">{activePaidDeals.length}</p>
-            <p className="text-xs text-slate-500 font-medium">Paid Subscriptions</p>
+            <p className="text-2xl sm:text-3xl font-serif font-bold text-[#2563eb]">{activePaidDeals.length}</p>
+            <p className="text-[11px] text-stone-500 uppercase font-bold tracking-wider mt-0.5">Paid Subscriptions</p>
           </div>
 
-          <div className="bg-white p-5 rounded-3xl border border-slate-200/90 shadow-2xs">
-            <div className="p-2 bg-purple-100 text-purple-700 w-fit rounded-xl mb-3">
+          <div className="bg-white p-5 rounded-3xl border border-[#e6dfd5] shadow-xs hover:border-[#d4a359]/50 transition-all">
+            <div className="p-2.5 bg-[#f5eff9] text-[#7c3aed] w-fit rounded-2xl mb-3 border border-[#e2d4f2]">
               <Video className="w-5 h-5" />
             </div>
-            <p className="text-2xl font-black text-purple-600">{sessions.length}</p>
-            <p className="text-xs text-slate-500 font-medium">Classes Conducted</p>
+            <p className="text-2xl sm:text-3xl font-serif font-bold text-[#7c3aed]">{sessions.length}</p>
+            <p className="text-[11px] text-stone-500 uppercase font-bold tracking-wider mt-0.5">Classes Conducted</p>
           </div>
         </div>
 
         {/* Ongoing Deals & Courses */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base sm:text-lg font-black text-slate-900">Ongoing Student Course Deals</h2>
-            <Link href="/tutor/deals" className="text-xs font-bold text-emerald-700 hover:underline">
-              View All
+            <div>
+              <h2 className="text-lg sm:text-xl font-serif font-bold text-stone-900">Ongoing Student Course Deals</h2>
+              <p className="text-xs text-stone-500">Active agreements and 72-hour fee timers</p>
+            </div>
+            <Link href="/tutor/deals" className="text-xs font-bold text-[#143d2b] hover:text-[#0c2217] flex items-center gap-1 group">
+              <span>View All Deals</span>
+              <span className="group-hover:translate-x-0.5 transition-transform">&rarr;</span>
             </Link>
           </div>
 
           {deals.length === 0 ? (
-            <div className="bg-white p-8 rounded-3xl border border-slate-200/90 text-center text-xs text-slate-400">
-              No active student deals yet. Message interested students to send your course deal offer.
+            <div className="bg-white p-8 sm:p-12 rounded-3xl border border-[#e6dfd5] text-center text-xs text-stone-500 shadow-xs space-y-2">
+              <Users className="w-8 h-8 text-stone-300 mx-auto" />
+              <p>No active student deals yet. Message interested students to send your course deal offer.</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 gap-4">
               {deals.map((deal) => (
-                <div key={deal._id} className="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-2xs space-y-4">
+                <div key={deal._id} className="bg-white p-6 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-4 hover:border-[#d4a359]/40 transition-all">
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-3.5">
                       <img
-                        src={deal.student?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(deal.student?.name || 'S')}&background=059669&color=fff`}
+                        src={deal.student?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(deal.student?.name || 'S')}&background=0c2217&color=faf8f5`}
                         alt="Student"
-                        className="w-12 h-12 rounded-2xl object-cover border border-slate-200"
+                        className="w-12 h-12 rounded-2xl object-cover border border-[#e6dfd5]"
                       />
                       <div>
-                        <h3 className="font-bold text-sm text-slate-900">{deal.subject}</h3>
-                        <p className="text-xs text-slate-500">
-                          Student: <strong>{deal.student?.name}</strong> ({deal.student?.city || 'Pakistan'})
+                        <h3 className="font-serif font-bold text-base text-stone-900">{deal.subject}</h3>
+                        <p className="text-xs text-stone-500 mt-0.5">
+                          Student: <strong className="text-stone-800">{deal.student?.name}</strong> ({deal.student?.city || 'Pakistan'})
                         </p>
                       </div>
                     </div>
 
                     <div className="flex items-center gap-2 flex-wrap">
-                      {/* Join Live Classroom (Available within 72h or when paid) */}
+                      {/* Join Live Classroom */}
                       {deal.status !== 'completed' && deal.mode !== 'in_person' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && (deal.tutorFeePaid || !deal.tutorFeeDueDate || new Date(deal.tutorFeeDueDate) >= new Date() || (deal.trialEndDate && new Date(deal.trialEndDate) >= new Date())) && (
                         <Link
                           href={`/classroom/${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
-                          className="px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all cursor-pointer"
+                          className="px-3.5 py-2 rounded-xl bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] text-xs font-bold flex items-center gap-1.5 shadow-xs border border-[#d4a359]/30 transition-all cursor-pointer"
                         >
-                          <Video className="w-4 h-4" />
+                          <Video className="w-4 h-4 text-[#d4a359]" />
                           <span>Join Live Class</span>
                         </Link>
                       )}
@@ -321,9 +334,9 @@ export default function TutorDashboardPage() {
                       {deal.status !== 'completed' && (
                         <Link
                           href={`/tutor/messages?conversation=${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
-                          className="px-3.5 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                          className="px-3.5 py-2 rounded-xl bg-[#faf8f5] hover:bg-[#f3ede2] text-stone-700 text-xs font-semibold flex items-center gap-1.5 border border-[#e6dfd5] cursor-pointer"
                         >
-                          <MessageSquare className="w-4 h-4 text-emerald-600" />
+                          <MessageSquare className="w-4 h-4 text-[#143d2b]" />
                           <span>Chat</span>
                         </Link>
                       )}
@@ -333,7 +346,7 @@ export default function TutorDashboardPage() {
                         <button
                           type="button"
                           onClick={() => setDealToComplete(deal)}
-                          className="px-3.5 py-2 rounded-xl bg-slate-900 hover:bg-black text-white text-xs font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer hover:scale-[1.02]"
+                          className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-black text-[#faf8f5] text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer hover:scale-[1.02]"
                           title="Mark deal completed and clear chat messages to save storage"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
@@ -342,7 +355,7 @@ export default function TutorDashboardPage() {
                       )}
 
                       {deal.status === 'completed' && (
-                        <div className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 font-semibold flex items-center gap-1.5">
+                        <div className="px-3 py-1.5 bg-[#eef5f0] border border-[#c3dfcb] rounded-xl text-xs text-[#143d2b] font-semibold flex items-center gap-1.5">
                           <Check className="w-3.5 h-3.5 text-emerald-600" />
                           <span>Completed &bull; Storage Cleared</span>
                         </div>

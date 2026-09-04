@@ -541,64 +541,64 @@ export default function TutorCoursesPage() {
   if (loading) return <LoadingSpinner text="Loading your course studio..." />;
 
   return (
-    <div className="py-8 bg-slate-50 min-h-screen">
+    <div className="py-8 bg-[#faf8f5] min-h-screen text-stone-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Top Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white rounded-3xl p-6 sm:p-8 border border-[#e6dfd5] shadow-xs">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">
-              <BookOpen className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-[11px] font-bold text-[#143d2b] uppercase tracking-wider mb-1">
+              <BookOpen className="w-4 h-4 text-[#d4a359]" />
               <span>Tutor Curriculum Studio</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
-              Manage Courses, Chapters & Outlines
+            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-stone-900">
+              Manage Courses, Chapters &amp; Outlines
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            <p className="text-xs sm:text-sm text-stone-500 mt-1">
               Publish and edit structured courses, customize lesson plans, diagnostic quizzes, and student homework.
             </p>
           </div>
 
           <button
             onClick={() => setCreateModalOpen(true)}
-            className="px-5 py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md hover:scale-105 transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0"
+            className="px-5 py-3 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs sm:text-sm rounded-2xl shadow-xs hover:scale-105 transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0 border border-[#d4a359]/30"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 text-[#d4a359]" />
             <span>Create New Course</span>
           </button>
         </div>
 
         {/* Global Feedback Banners */}
         {message && (
-          <div className="p-4 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl text-xs font-bold flex items-center justify-between gap-2 animate-in fade-in">
+          <div className="p-4 bg-[#eef5f0] border border-[#c3dfcb] text-[#0c2217] rounded-2xl text-xs font-bold flex items-center justify-between gap-2 animate-in fade-in">
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               <span>{message}</span>
             </div>
-            <button onClick={() => setMessage('')} className="p-1 text-emerald-700 hover:text-emerald-950 font-bold text-xs"><X className="w-4 h-4" /></button>
+            <button onClick={() => setMessage('')} className="p-1 text-stone-700 hover:text-stone-950 font-bold text-xs"><X className="w-4 h-4" /></button>
           </div>
         )}
         {error && (
-          <div className="p-4 bg-rose-50 border border-rose-200 text-rose-900 rounded-2xl text-xs font-bold flex items-center justify-between gap-2 animate-in fade-in">
+          <div className="p-4 bg-[#fdf2f0] border border-[#f5d6cf] text-[#b85d34] rounded-2xl text-xs font-bold flex items-center justify-between gap-2 animate-in fade-in">
             <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
+              <AlertCircle className="w-4 h-4 text-[#b85d34] shrink-0" />
               <span>{error}</span>
             </div>
-            <button onClick={() => setError('')} className="p-1 text-rose-700 hover:text-rose-950 font-bold text-xs"><X className="w-4 h-4" /></button>
+            <button onClick={() => setError('')} className="p-1 text-[#b85d34] hover:text-stone-950 font-bold text-xs"><X className="w-4 h-4" /></button>
           </div>
         )}
 
         {/* Studio Workspace Grid */}
         {courses.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 shadow-sm space-y-4">
-            <Layers className="w-12 h-12 text-slate-300 mx-auto" />
-            <h3 className="text-lg font-bold text-slate-800">You haven&apos;t created any courses yet</h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
+          <div className="bg-white rounded-3xl p-12 text-center border border-[#e6dfd5] shadow-xs space-y-4">
+            <Layers className="w-12 h-12 text-stone-300 mx-auto" />
+            <h3 className="text-lg font-serif font-bold text-stone-800">You haven&apos;t created any courses yet</h3>
+            <p className="text-xs text-stone-500 max-w-md mx-auto">
               Create your first structured course with custom chapters, lessons, diagnostic tests, and student homework assignments.
             </p>
             <button
               onClick={() => setCreateModalOpen(true)}
-              className="px-6 py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-500 transition-all cursor-pointer"
+              className="px-6 py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] text-xs font-bold rounded-xl transition-all cursor-pointer border border-[#d4a359]/30"
             >
               Start Course Builder
             </button>
@@ -609,10 +609,10 @@ export default function TutorCoursesPage() {
             {/* Left Column: Courses Selector */}
             <div className="lg:col-span-4 space-y-4">
               <div className="flex items-center justify-between px-1">
-                <span className="text-xs font-black uppercase tracking-wider text-slate-500">
+                <span className="text-xs font-bold uppercase tracking-wider text-stone-500">
                   Your Courses ({courses.length})
                 </span>
-                <span className="text-[11px] text-slate-400">Select to manage</span>
+                <span className="text-[11px] text-stone-400">Select to manage</span>
               </div>
 
               <div className="space-y-3">

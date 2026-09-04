@@ -65,22 +65,28 @@ export default function TutorDealsPage() {
   if (loading) return <LoadingSpinner text="Loading deals..." />;
 
   return (
-    <div className="py-8 bg-slate-50 min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div className="py-8 bg-[#faf8f5] min-h-screen text-stone-900">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-black text-slate-900">Student Deals & Trial Monitoring</h1>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Review active student courses, trial durations, and verified fee payments.
+            <div className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-wider text-[#143d2b] mb-1">
+              <BookOpen className="w-3.5 h-3.5 text-[#d4a359]" />
+              <span>Deal Agreements &amp; 72h Monitor</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-stone-900">
+              Student Deals &amp; Trial Monitoring
+            </h1>
+            <p className="text-xs text-stone-500 mt-0.5">
+              Review active student courses, trial durations, 72-hour platform fee timers, and verified fee payments.
             </p>
           </div>
 
           <Link
             href="/tutor/messages"
-            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 self-start sm:self-auto"
+            className="px-4 py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 self-start sm:self-auto border border-[#d4a359]/30 transition-all"
           >
-            <Plus className="w-4 h-4" />
+            <Plus className="w-4 h-4 text-[#d4a359]" />
             <span>Send New Course Offer</span>
           </Link>
         </div>
@@ -89,8 +95,8 @@ export default function TutorDealsPage() {
         {feedback && (
           <div className={`p-4 rounded-2xl flex items-center justify-between text-xs font-bold border ${
             feedback.type === 'success'
-              ? 'bg-emerald-50 border-emerald-300 text-emerald-900'
-              : 'bg-rose-50 border-rose-300 text-rose-900'
+              ? 'bg-[#eef5f0] border-[#c3dfcb] text-[#0c2217]'
+              : 'bg-[#fdf2f0] border-[#f5d6cf] text-[#b85d34]'
           }`}>
             <div className="flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
@@ -106,42 +112,44 @@ export default function TutorDealsPage() {
         )}
 
         {deals.length === 0 ? (
-          <div className="bg-white p-12 rounded-3xl border border-slate-200/90 text-center text-xs text-slate-400">
-            No deals currently active. Open messages to compose a course offer for an interested student.
+          <div className="bg-white p-12 rounded-3xl border border-[#e6dfd5] text-center text-xs text-stone-500 shadow-xs space-y-2">
+            <BookOpen className="w-8 h-8 text-stone-300 mx-auto" />
+            <p>No deals currently active. Open messages to compose a course offer for an interested student.</p>
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4">
             {deals.map((deal) => (
-              <div key={deal._id} className="bg-white p-6 rounded-3xl border border-slate-200/90 shadow-2xs space-y-4">
+              <div key={deal._id} className="bg-white p-6 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-4 hover:border-[#d4a359]/40 transition-all">
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-3.5">
                     <img
-                      src={deal.student?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(deal.student?.name || 'S')}&background=059669&color=fff`}
+                      src={deal.student?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(deal.student?.name || 'S')}&background=0c2217&color=faf8f5`}
                       alt="Student"
-                      className="w-12 h-12 rounded-2xl object-cover border border-slate-200"
+                      className="w-12 h-12 rounded-2xl object-cover border border-[#e6dfd5]"
                     />
                     <div>
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h3 className="font-bold text-sm text-slate-900">{deal.subject}</h3>
+                        <h3 className="font-serif font-bold text-base text-stone-900">{deal.subject}</h3>
                         {deal.status === 'completed' && (
-                          <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-full text-[10px] font-black uppercase tracking-wider">
+                          <span className="px-2.5 py-0.5 bg-[#eef5f0] text-[#143d2b] border border-[#c3dfcb] rounded-full text-[10px] font-bold uppercase tracking-wider">
                             Completed &bull; Closed
                           </span>
                         )}
                       </div>
-                      <p className="text-xs text-slate-500">
-                        Student: <strong>{deal.student?.name}</strong> ({deal.student?.city || 'Pakistan'}) &bull; PKR {deal.price?.toLocaleString()} / {deal.priceUnit === 'per_hour' ? 'hr' : 'mo'}
+                      <p className="text-xs text-stone-500 mt-0.5">
+                        Student: <strong className="text-stone-800">{deal.student?.name}</strong> ({deal.student?.city || 'Pakistan'}) &bull; PKR {deal.price?.toLocaleString()} / {deal.priceUnit === 'per_hour' ? 'hr' : 'mo'}
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
+                    {/* Join Live Classroom */}
                     {deal.status !== 'completed' && deal.mode !== 'in_person' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && (deal.tutorFeePaid || !deal.tutorFeeDueDate || new Date(deal.tutorFeeDueDate) >= new Date() || (deal.trialEndDate && new Date(deal.trialEndDate) >= new Date())) && (
                       <Link
                         href={`/classroom/${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
-                        className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-md shadow-emerald-600/20 transition-all cursor-pointer"
+                        className="px-3.5 py-2 rounded-xl bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] text-xs font-bold flex items-center gap-1.5 shadow-xs border border-[#d4a359]/30 transition-all cursor-pointer"
                       >
-                        <Video className="w-3.5 h-3.5" />
+                        <Video className="w-4 h-4 text-[#d4a359]" />
                         <span>Join Live Class</span>
                       </Link>
                     )}
@@ -149,30 +157,30 @@ export default function TutorDealsPage() {
                     {deal.status !== 'completed' && (
                       <Link
                         href={`/tutor/messages?conversation=${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
-                        className="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl flex items-center gap-1.5 cursor-pointer"
+                        className="px-3.5 py-2 rounded-xl bg-[#faf8f5] hover:bg-[#f3ede2] text-stone-700 text-xs font-semibold flex items-center gap-1.5 border border-[#e6dfd5] cursor-pointer"
                       >
-                        <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Open Chat</span>
+                        <MessageSquare className="w-4 h-4 text-[#143d2b]" />
+                        <span>Chat</span>
                       </Link>
                     )}
 
-                    {/* Mark Deal Closed / Completed Action */}
+                    {/* Mark Completed Button */}
                     {deal.status !== 'completed' && deal.status !== 'cancelled' && (
                       <button
                         type="button"
                         onClick={() => setDealToComplete(deal)}
-                        className="px-3.5 py-2 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-sm transition-all cursor-pointer hover:scale-[1.02]"
-                        title="Mark this deal as closed and clear chat to free storage"
+                        className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-black text-[#faf8f5] text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer hover:scale-[1.02]"
+                        title="Mark deal completed and clear chat messages to save storage"
                       >
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Mark Deal Completed</span>
+                        <span>Mark Completed</span>
                       </button>
                     )}
 
                     {deal.status === 'completed' && (
-                      <div className="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-500 font-semibold flex items-center gap-1.5">
+                      <div className="px-3 py-1.5 bg-[#eef5f0] border border-[#c3dfcb] rounded-xl text-xs text-[#143d2b] font-semibold flex items-center gap-1.5">
                         <Check className="w-3.5 h-3.5 text-emerald-600" />
-                        <span>Storage Cleared</span>
+                        <span>Completed &bull; Storage Cleared</span>
                       </div>
                     )}
                   </div>

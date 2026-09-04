@@ -106,34 +106,34 @@ export default function TutorCertificatesPage() {
   if (loading) return <LoadingSpinner text="Loading certificate requests..." />;
 
   return (
-    <div className="py-8 bg-slate-50 min-h-screen">
+    <div className="py-8 bg-[#faf8f5] min-h-screen text-stone-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Header */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e6dfd5] shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">
-              <GraduationCap className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-[11px] font-bold text-[#143d2b] uppercase tracking-wider mb-1">
+              <GraduationCap className="w-4 h-4 text-[#d4a359]" />
               <span>Tutor Academic Portal</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-black text-slate-900">
+            <h1 className="text-2xl sm:text-3xl font-serif font-bold text-stone-900">
               Student Certificate Evaluations
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            <p className="text-xs sm:text-sm text-stone-500 mt-1">
               Review completion requests directly submitted by your students, enter their marks &amp; grades, and forward to admin.
             </p>
           </div>
 
           <div className="flex items-center gap-3">
             {pendingCount > 0 && (
-              <span className="px-3.5 py-1.5 bg-amber-100 text-amber-900 border border-amber-300 font-black text-xs rounded-full flex items-center gap-1.5 animate-pulse">
-                <Clock className="w-3.5 h-3.5 text-amber-700" />
+              <span className="px-3.5 py-1.5 bg-[#fdf6ec] text-[#8a5b14] border border-[#f2dfbe] font-bold text-xs rounded-full flex items-center gap-1.5 animate-pulse">
+                <Clock className="w-3.5 h-3.5 text-[#b8863b]" />
                 <span>{pendingCount} Pending Evaluation{pendingCount > 1 ? 's' : ''}</span>
               </span>
             )}
             <Link
               href="/tutor/dashboard"
-              className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold text-xs rounded-xl flex items-center gap-1.5"
+              className="px-4 py-2.5 bg-[#faf8f5] hover:bg-[#f3ede2] text-stone-700 font-semibold text-xs rounded-xl flex items-center gap-1.5 border border-[#e6dfd5]"
             >
               <span>Back to Dashboard</span>
               <ArrowRight className="w-4 h-4" />
@@ -142,7 +142,7 @@ export default function TutorCertificatesPage() {
         </div>
 
         {/* Filter Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-1">
+        <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-none">
           {[
             { id: 'all', label: `All Requests (${certificates.length})` },
             { id: 'pending', label: `Pending My Evaluation (${pendingCount})` },
@@ -152,10 +152,10 @@ export default function TutorCertificatesPage() {
             <button
               key={tab.id}
               onClick={() => setFilter(tab.id)}
-              className={`px-4 py-2 text-xs font-bold rounded-xl whitespace-nowrap transition-all cursor-pointer ${
+              className={`px-4 py-2 text-xs font-semibold rounded-xl whitespace-nowrap transition-all cursor-pointer ${
                 filter === tab.id
-                  ? 'bg-emerald-600 text-white shadow-sm'
-                  : 'bg-white text-slate-600 hover:bg-slate-100 border border-slate-200'
+                  ? 'bg-[#0c2217] text-[#faf8f5] font-bold shadow-xs border border-[#d4a359]/30'
+                  : 'bg-white text-stone-600 hover:text-stone-900 border border-[#e6dfd5] hover:bg-[#faf8f5]'
               }`}
             >
               {tab.label}
@@ -165,10 +165,10 @@ export default function TutorCertificatesPage() {
 
         {/* Certificates Grid */}
         {filteredCerts.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-slate-200 shadow-sm space-y-3">
-            <Award className="w-12 h-12 text-slate-300 mx-auto" />
-            <h3 className="text-lg font-bold text-slate-800">No Certificate Requests Found</h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
+          <div className="bg-white rounded-3xl p-12 text-center border border-[#e6dfd5] shadow-xs space-y-3">
+            <Award className="w-12 h-12 text-stone-300 mx-auto" />
+            <h3 className="text-lg font-serif font-bold text-stone-800">No Certificate Requests Found</h3>
+            <p className="text-xs text-stone-500 max-w-md mx-auto">
               {filter === 'pending'
                 ? 'Great job! You have evaluated all certificate requests from your students.'
                 : 'When students request course completion certificates, they will appear here for your academic review and marks assignment.'}
@@ -186,7 +186,7 @@ export default function TutorCertificatesPage() {
               return (
                 <div
                   key={cert._id}
-                  className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-sm hover:border-emerald-500 transition-all flex flex-col justify-between"
+                  className="bg-white rounded-3xl border border-[#e6dfd5] overflow-hidden shadow-xs hover:border-[#d4a359]/50 transition-all flex flex-col justify-between"
                 >
                   <div className="p-6 space-y-4">
                     {/* Top Status */}

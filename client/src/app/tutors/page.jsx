@@ -7,7 +7,7 @@ import TutorFilterSidebar from '../../components/tutor/TutorFilterSidebar';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import CustomSelect from '../../components/common/CustomSelect';
 import { api } from '../../services/api';
-import { Search, Users, ArrowUpDown } from 'lucide-react';
+import { Search, Users, ArrowUpDown, Heart } from 'lucide-react';
 
 const sortOptions = [
   { value: 'popular', label: 'Most Popular', sublabel: 'Top Enrolled & Active' },

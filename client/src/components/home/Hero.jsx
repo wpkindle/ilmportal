@@ -279,9 +279,9 @@ export default function Hero() {
               {/* Main Editorial Card with Contextual Image */}
               <div className="relative rounded-3xl overflow-hidden border-2 border-[#2b6e51]/50 bg-[#07150e] shadow-2xl">
                 <img
-                  src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&auto=format&fit=crop&q=80"
-                  alt="Verified Pakistani tutor and student engaged in 1:1 online tutoring session with complete family privacy"
-                  className="w-full h-72 sm:h-80 object-cover opacity-90 filter brightness-[0.92] contrast-[1.05]"
+                  src="/images/hero-alimah-student.jpg"
+                  alt="Verified Pakistani female Alimah teaching a young girl student at home with complete family privacy and comfort"
+                  className="w-full h-72 sm:h-80 object-cover opacity-95 filter contrast-[1.02]"
                   loading="eager"
                   fetchPriority="high"
                 />
@@ -294,14 +294,14 @@ export default function Hero() {
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-white flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                      <span>1:1 Tutor &amp; Student Learning</span>
+                      <span>1:1 Female Alimah &amp; Student</span>
                     </span>
                     <span className="text-[10px] font-mono text-[#d4a359] bg-[#143d2b] px-2 py-0.5 rounded border border-[#2b6e51]/50">
                       Camera-Off Option
                     </span>
                   </div>
                   <p className="text-[11px] text-[#a3b8b0] leading-snug">
-                    Safe, personalized classes with verified Qaris, Alimahs, and Cambridge/Matric specialists.
+                    Safe, personalized 1-on-1 classes with verified Alimahs, Qaris, and academic tutors with total privacy.
                   </p>
                 </div>
               </div>

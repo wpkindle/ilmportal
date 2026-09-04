@@ -295,7 +295,7 @@ export default function Hero() {
                 }`}
               >
                 <Home className="w-3.5 h-3.5" />
-                <span>Home Tutoring</span>
+                <span>Home Tuition</span>
               </button>
               <button
                 type="button"
@@ -331,7 +331,7 @@ export default function Hero() {
                 >
                   <img
                     src="/images/hero-home-tutoring.jpg"
-                    alt="Young Pakistani female Alimah teaching a young schoolgirl student at home with study books and notebooks"
+                    alt="Pakistani male tutor in traditional shalwar kameez teaching a young boy student at home with study books and notebooks"
                     className="w-full h-full object-cover filter contrast-[1.02]"
                     loading="eager"
                     fetchPriority="high"
@@ -359,7 +359,7 @@ export default function Hero() {
                   {currentSlide === 0 ? (
                     <>
                       <Home className="w-3.5 h-3.5 text-[#d4a359]" />
-                      <span>In-Home 1:1 Tutoring</span>
+                      <span>In-Home 1:1 Tuition</span>
                     </>
                   ) : (
                     <>
@@ -375,7 +375,7 @@ export default function Hero() {
                     type="button"
                     onClick={() => setCurrentSlide(0)}
                     className={`h-2 rounded-full transition-all ${currentSlide === 0 ? 'w-5 bg-[#d4a359]' : 'w-2 bg-white/40'}`}
-                    aria-label="Slide 1: In-Home Tutoring"
+                    aria-label="Slide 1: In-Home Tuition"
                   />
                   <button
                     type="button"
@@ -410,14 +410,14 @@ export default function Hero() {
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-white flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                          <span>1:1 Young Female Alimah &amp; Student</span>
+                          <span>1:1 Male Tutor &amp; Boy Student</span>
                         </span>
                         <span className="text-[10px] font-mono text-[#d4a359] bg-[#143d2b] px-2 py-0.5 rounded border border-[#2b6e51]/50">
-                          Home Tutoring
+                          Home Tuition
                         </span>
                       </div>
                       <p className="text-[11px] text-[#a3b8b0] leading-snug">
-                        Young certified Alimahs visiting your home for comfortable 1-on-1 Quran, Tajweed &amp; school studies with complete family trust.
+                        Verified male Qaris &amp; academic tutors visiting your home for focused 1-on-1 Quran, Tajweed &amp; school curriculum tuition.
                       </p>
                     </>
                   ) : (
@@ -443,10 +443,12 @@ export default function Hero() {
               <div className="absolute -top-4 -right-3 sm:-right-4 bg-white text-slate-900 p-3 rounded-2xl shadow-xl border border-slate-200 space-y-1 max-w-[210px] transform rotate-1 z-30">
                 <div className="flex items-center gap-1.5 text-emerald-800 font-extrabold text-xs">
                   <Award className="w-4 h-4 text-amber-500 shrink-0" />
-                  <span>Verified Young Alimahs</span>
+                  <span>{currentSlide === 0 ? 'Verified Qaris & Tutors' : 'Verified Alimahs in Naqab'}</span>
                 </div>
                 <p className="text-[10px] text-slate-600 leading-tight">
-                  Wafaq-ul-Madaris Sanad &amp; Government CNIC verified for family trust.
+                  {currentSlide === 0
+                    ? 'CNIC & degree verified male faculty for safe home visits across Pakistan.'
+                    : 'Wafaq-ul-Madaris Sanad & CNIC verified for safe online study.'}
                 </p>
               </div>
 
@@ -454,11 +456,11 @@ export default function Hero() {
               <div className="absolute -bottom-4 -left-3 sm:-left-4 bg-[#07150e] text-[#f5f0e6] p-3 rounded-2xl shadow-2xl border-2 border-[#2b6e51] space-y-1 max-w-[220px] transform -rotate-1 z-30">
                 <div className="flex items-center gap-1.5 text-[#d4a359] font-bold text-xs">
                   <Heart className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                  <span>Female Safety &amp; Naqab</span>
+                  <span>{currentSlide === 0 ? 'Safe Home Tuition' : 'Female Safety & Naqab'}</span>
                 </div>
                 <p className="text-[10px] text-[#a3b8b0] leading-tight">
                   {currentSlide === 0
-                    ? 'In-person home visits strictly screened with zero third-party harassment.'
+                    ? 'In-person visits strictly screened with direct agreed fees and zero broker harassment.'
                     : 'Encrypted WebRTC, Alimah in Naqab, and zero personal phone numbers shared.'}
                 </p>
               </div>

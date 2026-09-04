@@ -40,6 +40,65 @@ const initialTutorCities = [
   { value: 'Faisalabad', label: 'Faisalabad', sublabel: 'Punjab' }
 ];
 
+const heroSlides = [
+  {
+    id: 0,
+    tabLabel: 'Home Tuition',
+    tabIcon: Home,
+    badgeText: 'In-Home 1:1 Tuition',
+    badgeIcon: Home,
+    badgeColor: 'text-[#d4a359]',
+    dotColor: 'bg-[#d4a359]',
+    tag: 'Home Tuition',
+    title: '1:1 Male Tutor & Boy Student',
+    desc: 'Verified male Qaris & academic tutors visiting your home for focused 1-on-1 Quran, Tajweed & school curriculum tuition.',
+    image: '/images/hero-home-tutoring.jpg',
+    alt: 'Pakistani male tutor in traditional shalwar kameez teaching a young boy student at home with study books and notebooks'
+  },
+  {
+    id: 1,
+    tabLabel: 'WebRTC Video',
+    tabIcon: Video,
+    badgeText: '1:1 WebRTC Video',
+    badgeIcon: Video,
+    badgeColor: 'text-[#faf8f5]',
+    dotColor: 'bg-[#b85d34]',
+    tag: 'Privacy & Safety',
+    title: '1:1 WebRTC Video Call • Female Alimah & Tutor',
+    desc: 'Direct in-browser WebRTC encrypted classroom with female Alimah & tutor. Camera-off comfort & interactive digital Quran & academic learning.',
+    image: '/images/hero-online-webrtc.jpg',
+    alt: 'Pakistani girl student attending 1:1 online WebRTC video call with female Alimah in Naqab'
+  },
+  {
+    id: 2,
+    tabLabel: 'Alimah 1:1',
+    tabIcon: ShieldCheck,
+    badgeText: 'Female Alimah Home Tuition',
+    badgeIcon: ShieldCheck,
+    badgeColor: 'text-[#d4a359]',
+    dotColor: 'bg-[#d4a359]',
+    tag: 'Female First',
+    title: 'Certified Female Alimah & Girl Student',
+    desc: 'Wafaq-ul-Madaris certified female Alimahs visiting your residence for Tajweed, Noorani Qaida, and Islamic studies in complete comfort.',
+    image: '/images/hero-alimah-home.jpg',
+    alt: 'Young certified Pakistani female Alimah teaching a young girl student at a home study desk with Noorani Qaida and books'
+  },
+  {
+    id: 3,
+    tabLabel: 'Cambridge Prep',
+    tabIcon: GraduationCap,
+    badgeText: 'Cambridge & Matric Academic',
+    badgeIcon: GraduationCap,
+    badgeColor: 'text-[#faf8f5]',
+    dotColor: 'bg-[#b85d34]',
+    tag: 'O/A Level & STEM',
+    title: '1:1 Cambridge & Matric Academic Mentorship',
+    desc: 'Expert subject specialists for O/A Level, FSc, and Matric exams in Mathematics, Physics, Chemistry, Biology & English.',
+    image: '/images/hero-academic-tutoring.jpg',
+    alt: 'Pakistani female Cambridge academic tutor guiding student through O/A Level physics and mathematics at study desk'
+  }
+];
+
 export default function Hero() {
   const router = useRouter();
   const [searchQuery, setSearchQuery] = useState('');
@@ -49,12 +108,12 @@ export default function Hero() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  // Auto-advance hero tutoring slider every 5.5s (pauses on hover)
+  // Auto-advance hero tutoring slider every 3.0s (pauses on hover)
   useEffect(() => {
     if (isPaused) return;
     const interval = setInterval(() => {
-      setCurrentSlide((prev) => (prev === 0 ? 1 : 0));
-    }, 5500);
+      setCurrentSlide((prev) => (prev + 1) % heroSlides.length);
+    }, 3000);
     return () => clearInterval(interval);
   }, [isPaused]);
 
@@ -280,31 +339,26 @@ export default function Hero() {
           <div className="lg:col-span-5 relative mt-4 lg:mt-0">
             
             {/* Quick Segmented Mode Switcher Tabs */}
-            <div className="flex items-center justify-center p-1 mb-3.5 bg-[#0c2217]/90 backdrop-blur-md rounded-2xl border border-[#d4a359]/30 max-w-sm mx-auto shadow-md">
-              <button
-                type="button"
-                onClick={() => setCurrentSlide(0)}
-                className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                  currentSlide === 0
-                    ? 'bg-[#143d2b] text-[#d4a359] shadow-sm border border-[#d4a359]/40'
-                    : 'text-[#a3b8b0] hover:text-white'
-                }`}
-              >
-                <Home className="w-3.5 h-3.5" />
-                <span>Home Tuition</span>
-              </button>
-              <button
-                type="button"
-                onClick={() => setCurrentSlide(1)}
-                className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
-                  currentSlide === 1
-                    ? 'bg-[#143d2b] text-[#d4a359] shadow-sm border border-[#d4a359]/40'
-                    : 'text-[#a3b8b0] hover:text-white'
-                }`}
-              >
-                <Video className="w-3.5 h-3.5" />
-                <span>WebRTC Video Call</span>
-              </button>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 p-1 mb-3.5 bg-[#0c2217]/90 backdrop-blur-md rounded-2xl border border-[#d4a359]/30 max-w-lg mx-auto shadow-md">
+              {heroSlides.map((slide, idx) => {
+                const Icon = slide.tabIcon;
+                const isActive = currentSlide === idx;
+                return (
+                  <button
+                    key={slide.id}
+                    type="button"
+                    onClick={() => setCurrentSlide(idx)}
+                    className={`py-1.5 px-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                      isActive
+                        ? 'bg-[#143d2b] text-[#d4a359] shadow-sm border border-[#d4a359]/40'
+                        : 'text-[#a3b8b0] hover:text-white'
+                    }`}
+                  >
+                    <Icon className="w-3.5 h-3.5 shrink-0" />
+                    <span className="truncate">{slide.tabLabel}</span>
+                  </button>
+                );
+              })}
             </div>
 
             {/* Outer Decorative Frame */}
@@ -313,125 +367,86 @@ export default function Hero() {
               {/* Backing warm tone shape */}
               <div className="absolute -inset-2 bg-gradient-to-tr from-[#143d2b]/40 via-[#d4a359]/20 to-transparent rounded-3xl blur-xl" />
 
-              {/* Main Editorial Card with Dual-Slide Tutoring Carousel */}
+              {/* Main Editorial Card with Multi-Slide Tutoring Carousel */}
               <div
                 className="relative rounded-3xl overflow-hidden border-2 border-[#d4a359]/40 bg-[#07150e] shadow-2xl h-80 sm:h-96 group"
                 onMouseEnter={() => setIsPaused(true)}
                 onMouseLeave={() => setIsPaused(false)}
               >
-                {/* Slide 0: Young Female Alimah In-Home Tutoring */}
-                <div
-                  className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-                    currentSlide === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
-                  }`}
-                >
-                  <img
-                    src="/images/hero-home-tutoring.jpg"
-                    alt="Pakistani male tutor in traditional shalwar kameez teaching a young boy student at home with study books and notebooks"
-                    className="w-full h-full object-cover filter contrast-[1.02]"
-                    loading="eager"
-                    fetchPriority="high"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0c2217] via-transparent to-transparent opacity-85" />
-                </div>
-
-                {/* Slide 1: WebRTC Video Call Tutoring with Alimah in Naqab */}
-                <div
-                  className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
-                    currentSlide === 1 ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
-                  }`}
-                >
-                  <img
-                    src="/images/hero-online-webrtc.jpg"
-                    alt="Pakistani girl student attending 1:1 online WebRTC video call with female Alimah in Naqab"
-                    className="w-full h-full object-cover filter contrast-[1.02]"
-                    loading="eager"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-[#0c2217] via-transparent to-transparent opacity-85" />
-                </div>
+                {/* Slides */}
+                {heroSlides.map((slide, idx) => (
+                  <div
+                    key={slide.id}
+                    className={`absolute inset-0 transition-opacity duration-500 ease-in-out ${
+                      currentSlide === idx ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                    }`}
+                  >
+                    <img
+                      src={slide.image}
+                      alt={slide.alt}
+                      className="w-full h-full object-cover filter contrast-[1.02]"
+                      loading={idx === 0 ? 'eager' : 'lazy'}
+                      fetchPriority={idx === 0 ? 'high' : 'auto'}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0c2217] via-transparent to-transparent opacity-85" />
+                  </div>
+                ))}
 
                 {/* Top Left Badge: Mode Tag */}
                 <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0c2217]/90 backdrop-blur-md border border-[#d4a359]/40 text-[11px] font-bold text-[#d4a359]">
-                  {currentSlide === 0 ? (
-                    <>
-                      <Home className="w-3.5 h-3.5 text-[#d4a359]" />
-                      <span>In-Home 1:1 Tuition</span>
-                    </>
-                  ) : (
-                    <>
-                      <Video className="w-3.5 h-3.5 text-[#d4a359]" />
-                      <span className="text-[#faf8f5]">1:1 WebRTC Video</span>
-                    </>
-                  )}
+                  {React.createElement(heroSlides[currentSlide].badgeIcon, {
+                    className: 'w-3.5 h-3.5 text-[#d4a359]'
+                  })}
+                  <span>{heroSlides[currentSlide].badgeText}</span>
                 </div>
 
                 {/* Top Right: Progress Indicator Dots */}
                 <div className="absolute top-3.5 right-3 z-20 flex items-center gap-1.5 bg-black/50 backdrop-blur-md px-2 py-1 rounded-full border border-white/15">
-                  <button
-                    type="button"
-                    onClick={() => setCurrentSlide(0)}
-                    className={`h-2 rounded-full transition-all ${currentSlide === 0 ? 'w-5 bg-[#d4a359]' : 'w-2 bg-white/40'}`}
-                    aria-label="Slide 1: In-Home Tuition"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setCurrentSlide(1)}
-                    className={`h-2 rounded-full transition-all ${currentSlide === 1 ? 'w-5 bg-[#b85d34]' : 'w-2 bg-white/40'}`}
-                    aria-label="Slide 2: WebRTC Video Call with Female Alimah &amp; Tutor"
-                  />
+                  {heroSlides.map((slide, idx) => (
+                    <button
+                      key={slide.id}
+                      type="button"
+                      onClick={() => setCurrentSlide(idx)}
+                      className={`h-2 rounded-full transition-all ${
+                        currentSlide === idx ? 'w-5 bg-[#d4a359]' : 'w-2 bg-white/40 hover:bg-white/70'
+                      }`}
+                      aria-label={`Slide ${idx + 1}: ${slide.tabLabel}`}
+                    />
+                  ))}
                 </div>
 
                 {/* Interactive Navigation Arrows */}
                 <button
                   type="button"
-                  onClick={() => setCurrentSlide((prev) => (prev === 0 ? 1 : 0))}
-                  className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/75 backdrop-blur-md text-white flex items-center justify-center border border-white/20 transition-all opacity-80 group-hover:opacity-100 z-20"
+                  onClick={() => setCurrentSlide((prev) => (prev - 1 + heroSlides.length) % heroSlides.length)}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/75 backdrop-blur-md text-white flex items-center justify-center border border-white/20 transition-all opacity-80 group-hover:opacity-100 z-20 cursor-pointer"
                   aria-label="Previous slide"
                 >
                   <ChevronLeft className="w-4 h-4" />
                 </button>
                 <button
                   type="button"
-                  onClick={() => setCurrentSlide((prev) => (prev === 0 ? 1 : 0))}
-                  className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/75 backdrop-blur-md text-white flex items-center justify-center border border-white/20 transition-all opacity-80 group-hover:opacity-100 z-20"
+                  onClick={() => setCurrentSlide((prev) => (prev + 1) % heroSlides.length)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/75 backdrop-blur-md text-white flex items-center justify-center border border-white/20 transition-all opacity-80 group-hover:opacity-100 z-20 cursor-pointer"
                   aria-label="Next slide"
                 >
                   <ChevronRight className="w-4 h-4" />
                 </button>
 
                 {/* Bottom Dynamic Caption */}
-                <div className="absolute bottom-3 left-3 right-3 p-3 rounded-2xl bg-[#0c2217]/90 backdrop-blur-md border border-[#d4a359]/40 text-xs space-y-1 z-20">
-                  {currentSlide === 0 ? (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-white flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-[#d4a359] animate-pulse" />
-                          <span>1:1 Male Tutor &amp; Boy Student</span>
-                        </span>
-                        <span className="text-[10px] font-mono text-[#d4a359] bg-[#143d2b] px-2 py-0.5 rounded border border-[#d4a359]/30">
-                          Home Tuition
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-[#a3b8b0] leading-snug">
-                        Verified male Qaris &amp; academic tutors visiting your home for focused 1-on-1 Quran, Tajweed &amp; school curriculum tuition.
-                      </p>
-                    </>
-                  ) : (
-                    <>
-                      <div className="flex items-center justify-between">
-                        <span className="font-bold text-white flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-[#b85d34] animate-pulse" />
-                          <span>1:1 WebRTC Video Call • Female Alimah &amp; Tutor</span>
-                        </span>
-                        <span className="text-[10px] font-mono text-[#d4a359] bg-[#143d2b] px-2 py-0.5 rounded border border-[#d4a359]/30">
-                          Privacy &amp; Safety
-                        </span>
-                      </div>
-                      <p className="text-[11px] text-[#a3b8b0] leading-snug">
-                        Direct in-browser WebRTC encrypted classroom with female Alimah &amp; tutor. Camera-off comfort &amp; interactive digital Quran &amp; academic learning.
-                      </p>
-                    </>
-                  )}
+                <div className="absolute bottom-3 left-3 right-3 p-3 rounded-2xl bg-[#0c2217]/90 backdrop-blur-md border border-[#d4a359]/40 text-xs space-y-1 z-20 transition-all duration-300">
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-bold text-white flex items-center gap-1.5 truncate">
+                      <span className={`w-2 h-2 rounded-full ${heroSlides[currentSlide].dotColor} animate-pulse shrink-0`} />
+                      <span className="truncate">{heroSlides[currentSlide].title}</span>
+                    </span>
+                    <span className="text-[10px] font-mono text-[#d4a359] bg-[#143d2b] px-2 py-0.5 rounded border border-[#d4a359]/30 shrink-0">
+                      {heroSlides[currentSlide].tag}
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-[#a3b8b0] leading-snug">
+                    {heroSlides[currentSlide].desc}
+                  </p>
                 </div>
               </div>
 

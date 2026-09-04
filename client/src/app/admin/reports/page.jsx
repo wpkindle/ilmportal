@@ -86,7 +86,7 @@ export default function AdminReportsPage() {
       case 'attendance_dispute':
         return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/30">Attendance Dispute</span>;
       case 'technical_issue':
-        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">Technical Issue</span>;
+        return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#d4a359]/20 text-[#d4a359] border border-[#d4a359]/40">Technical Issue</span>;
       default:
         return <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-slate-500/20 text-slate-300 border border-slate-500/30">General Issue</span>;
     }
@@ -137,7 +137,7 @@ export default function AdminReportsPage() {
           ) : reports.length === 0 ? (
             <div className="bg-slate-900 border border-slate-800 rounded-3xl p-12 text-center space-y-3">
               <div className="w-12 h-12 bg-slate-800 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">
-                <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+                <CheckCircle2 className="w-6 h-6 text-[#d4a359]" />
               </div>
               <h3 className="font-bold text-white text-base">No Reports Found</h3>
               <p className="text-xs text-slate-400 max-w-sm mx-auto">
@@ -174,7 +174,7 @@ export default function AdminReportsPage() {
                           : report.status === 'under_review'
                           ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                           : report.status === 'resolved'
-                          ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-500/40'
+                          ? 'bg-[#d4a359]/20 text-[#d4a359] border border-[#d4a359]/40'
                           : 'bg-slate-700 text-slate-400'
                       }`}>
                         {report.status?.replace('_', ' ')}
@@ -186,12 +186,12 @@ export default function AdminReportsPage() {
                       {/* Reporter Box */}
                       <div className="p-3 bg-slate-950/70 border border-slate-800/80 rounded-2xl flex items-center gap-3">
                         <img
-                          src={report.reporter?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(report.reporter?.name || 'Reporter')}&background=059669&color=fff`}
+                          src={report.reporter?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(report.reporter?.name || 'Reporter')}&background=0c2217&color=d4a359`}
                           alt="Reporter"
                           className="w-10 h-10 rounded-xl object-cover border border-slate-700"
                         />
                         <div className="text-xs">
-                          <span className="text-[10px] uppercase font-bold text-emerald-400 block">Reported By</span>
+                          <span className="text-[10px] uppercase font-bold text-[#d4a359] block">Reported By</span>
                           <p className="font-bold text-white">{report.reporter?.name || 'Unknown'}</p>
                           <p className="text-slate-400 capitalize">{report.reporter?.role} • {report.reporter?.email}</p>
                         </div>
@@ -246,8 +246,8 @@ export default function AdminReportsPage() {
                     {/* Official Response to User & Internal Notes */}
                     <div className="space-y-2">
                       {report.adminResponse && (
-                        <div className="p-3.5 bg-emerald-950/40 border border-emerald-500/30 rounded-2xl text-xs space-y-1">
-                          <div className="flex items-center gap-1.5 text-emerald-400 font-bold text-[11px]">
+                        <div className="p-3.5 bg-[#0c2217]/60 border border-[#d4a359]/40 rounded-2xl text-xs space-y-1">
+                          <div className="flex items-center gap-1.5 text-[#d4a359] font-bold text-[11px]">
                             <ShieldCheck className="w-3.5 h-3.5" />
                             <span>Official User Response (Displayed in Student/Tutor Profile):</span>
                           </div>
@@ -289,7 +289,7 @@ export default function AdminReportsPage() {
                               setAdminResponse(report.adminResponse || '');
                               setNotifyReportedUser(false);
                             }}
-                            className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer"
+                            className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-xl text-xs font-bold shadow-md transition-all cursor-pointer"
                           >
                             Resolve &amp; Notify
                           </button>
@@ -320,7 +320,7 @@ export default function AdminReportsPage() {
         <div className="fixed inset-0 z-50 bg-slate-950/80 backdrop-blur-xs flex items-center justify-center p-4">
           <div className="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-4">
             <h3 className="font-black text-white text-base flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-emerald-400" />
+              <ShieldCheck className="w-5 h-5 text-[#d4a359]" />
               <span>Resolve Incident &amp; Send Profile Response</span>
             </h3>
             <p className="text-xs text-slate-400">
@@ -329,7 +329,7 @@ export default function AdminReportsPage() {
 
             <div className="space-y-3">
               <div>
-                <label className="text-[11px] font-bold text-emerald-400 block mb-1">
+                <label className="text-[11px] font-bold text-[#d4a359] block mb-1">
                   Official Response to User (Visible on Profile &amp; Notification) *
                 </label>
                 <textarea
@@ -337,7 +337,7 @@ export default function AdminReportsPage() {
                   placeholder="e.g. Our safety team reviewed the class recording. The tutor has been issued an official warning and account restriction has been applied."
                   value={adminResponse}
                   onChange={(e) => setAdminResponse(e.target.value)}
-                  className="w-full p-3 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-white outline-none focus:border-emerald-500 resize-none"
+                  className="w-full p-3 bg-slate-950 border border-slate-800 rounded-2xl text-xs text-white outline-none focus:border-[#d4a359] resize-none"
                 />
               </div>
 
@@ -359,7 +359,7 @@ export default function AdminReportsPage() {
                   type="checkbox"
                   checked={notifyReportedUser}
                   onChange={(e) => setNotifyReportedUser(e.target.checked)}
-                  className="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500 accent-emerald-500 cursor-pointer"
+                  className="w-4 h-4 rounded text-[#b85d34] focus:ring-[#b85d34] accent-[#b85d34] cursor-pointer"
                 />
                 <span>Also dispatch community guideline resolution notice to the reported user</span>
               </label>
@@ -375,7 +375,7 @@ export default function AdminReportsPage() {
               <button
                 onClick={() => handleUpdateStatus(selectedReport._id, 'resolved')}
                 disabled={actionLoading}
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl shadow-md cursor-pointer flex items-center gap-2"
+                className="px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-bold rounded-xl shadow-md cursor-pointer flex items-center gap-2"
               >
                 <CheckCircle2 className="w-4 h-4" />
                 <span>{actionLoading ? 'Saving...' : 'Resolve & Notify Users'}</span>

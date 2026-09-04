@@ -52,8 +52,8 @@ export default function FeaturedTutorsShowcase({ initialTutors = [] }) {
         {/* Editorial Section Header */}
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-12">
           <div className="space-y-3 max-w-2xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5f0e6] border border-[#ebe3d3] text-[#143d2b] text-xs font-bold shadow-2xs">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#2b6e51]" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5f0e6] border border-[#ebe3d3] text-[#0c2217] text-xs font-bold shadow-2xs">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
               <span>Audited Faculty &amp; Quran Qaris</span>
             </div>
 
@@ -69,13 +69,13 @@ export default function FeaturedTutorsShowcase({ initialTutors = [] }) {
           <div className="flex items-center gap-3 shrink-0">
             <Link
               href="/tutors?gender=female"
-              className="px-4 py-2.5 bg-[#f5f0e6] hover:bg-[#ebe3d3] text-[#143d2b] border border-[#ebe3d3] font-bold text-xs rounded-xl transition-all"
+              className="px-4 py-2.5 bg-[#f5f0e6] hover:bg-[#ebe3d3] text-[#0c2217] border border-[#ebe3d3] font-bold text-xs rounded-xl transition-all"
             >
               Female Teachers
             </Link>
             <Link
               href="/tutors"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#143d2b] hover:bg-[#1e543c] text-white font-bold text-xs rounded-xl transition-all shadow-sm group"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl transition-all shadow-md group"
             >
               <span>View All Teachers</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
@@ -112,7 +112,7 @@ export default function FeaturedTutorsShowcase({ initialTutors = [] }) {
             </p>
             <Link
               href="/tutors"
-              className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] text-xs font-bold rounded-xl shadow-sm transition-all"
             >
               <span>Explore All Tutors</span>
               <ArrowRight className="w-3.5 h-3.5" />

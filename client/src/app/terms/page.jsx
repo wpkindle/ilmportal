@@ -36,9 +36,9 @@ export default function TermsPage() {
           
           {/* Breadcrumbs */}
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-            <Link href="/" className="hover:text-emerald-400 transition-colors">Home</Link>
+            <Link href="/" className="hover:text-[#d4a359] transition-colors">Home</Link>
             <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
-            <span className="text-emerald-400">Terms of Service</span>
+            <span className="text-[#d4a359]">Terms of Service</span>
           </div>
 
           <div className="flex items-center gap-2.5">
@@ -81,10 +81,10 @@ export default function TermsPage() {
 
             <div className="mt-12 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
               <div className="flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                <CheckCircle2 className="w-4 h-4 text-[#d4a359]" />
                 <span>Legally binding terms under Islamic adab & Pakistani law</span>
               </div>
-              <Link href="/contact-us" className="text-emerald-700 font-bold hover:underline">
+              <Link href="/contact-us" className="text-[#b85d34] font-bold hover:underline">
                 Contact Legal Support &rarr;
               </Link>
             </div>

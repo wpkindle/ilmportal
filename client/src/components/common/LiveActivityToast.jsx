@@ -27,7 +27,7 @@ const activities = [
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80',
     timeAgo: 'Just now',
     typeLabel: 'Free Trial',
-    badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+    badgeClass: 'bg-[#d4a359]/20 text-[#d4a359] border-[#d4a359]/30'
   },
   {
     id: 2,
@@ -39,7 +39,7 @@ const activities = [
     avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&q=80',
     timeAgo: '1 min ago',
     typeLabel: 'Enrolled',
-    badgeClass: 'bg-teal-500/20 text-teal-300 border-teal-500/30'
+    badgeClass: 'bg-[#b85d34]/20 text-[#e07a4a] border-[#b85d34]/30'
   },
   {
     id: 3,
@@ -87,7 +87,7 @@ const activities = [
     avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80',
     timeAgo: '1 min ago',
     typeLabel: 'Free Trial',
-    badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+    badgeClass: 'bg-[#d4a359]/20 text-[#d4a359] border-[#d4a359]/30'
   },
   {
     id: 7,
@@ -111,7 +111,7 @@ const activities = [
     avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&q=80',
     timeAgo: 'Just now',
     typeLabel: 'Live Session Done',
-    badgeClass: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+    badgeClass: 'bg-[#d4a359]/20 text-[#d4a359] border-[#d4a359]/30'
   },
   {
     id: 9,
@@ -123,7 +123,7 @@ const activities = [
     avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&q=80',
     timeAgo: '1 min ago',
     typeLabel: 'Female Qaria',
-    badgeClass: 'bg-teal-500/20 text-teal-300 border-teal-500/30'
+    badgeClass: 'bg-[#b85d34]/20 text-[#e07a4a] border-[#b85d34]/30'
   },
   {
     id: 10,
@@ -248,27 +248,27 @@ export default function LiveActivityToast() {
           : 'translate-y-6 opacity-0 pointer-events-none scale-95'
       }`}
     >
-      <div className="p-3.5 sm:p-4 rounded-3xl bg-slate-950/95 border border-emerald-500/50 shadow-2xl shadow-black/80 backdrop-blur-2xl text-white relative group overflow-hidden">
+      <div className="p-3.5 sm:p-4 rounded-3xl bg-slate-950/95 border border-[#d4a359]/40 shadow-2xl shadow-black/80 backdrop-blur-2xl text-white relative group overflow-hidden">
         
         {/* Animated Shimmer Bar Across Top */}
         <div 
           key={currentIndex} 
-          className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300 animate-pulse" 
+          className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#d4a359] via-[#fde047] to-[#d4a359] animate-pulse" 
         />
 
         <div className="flex items-start gap-3">
           
-          {/* Avatar with Live Green Radar Dot */}
+          {/* Avatar with Live Gold Radar Dot */}
           <div className="relative shrink-0 mt-0.5">
             <img
               key={current.id}
               src={current.avatar}
               alt={current.studentName}
-              className="w-10 h-10 rounded-2xl object-cover border border-emerald-500/50 shadow-md animate-in fade-in duration-300"
+              className="w-10 h-10 rounded-2xl object-cover border border-[#d4a359]/40 shadow-md animate-in fade-in duration-300"
             />
             <span className="absolute -top-1 -right-1 flex h-3 w-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-slate-950"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#d4a359] opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-[#d4a359] border-2 border-slate-950"></span>
             </span>
           </div>
 
@@ -276,7 +276,7 @@ export default function LiveActivityToast() {
           <div className="flex-1 min-w-0 pr-4">
             <div className="flex items-center gap-1.5 text-[11px] font-bold text-slate-300">
               <span className="text-white font-extrabold truncate">{current.studentName}</span>
-              <span className="flex items-center gap-0.5 text-emerald-400 text-[10px] shrink-0 font-bold">
+              <span className="flex items-center gap-0.5 text-[#d4a359] text-[10px] shrink-0 font-bold">
                 <MapPin className="w-2.5 h-2.5" />
                 {current.city}
               </span>
@@ -286,7 +286,7 @@ export default function LiveActivityToast() {
 
             <p className="text-xs text-slate-200 mt-0.5 leading-snug">
               <span className="text-slate-400">{current.action} </span>
-              <span className="font-bold text-emerald-300">{current.subject}</span>
+              <span className="font-bold text-[#d4a359]">{current.subject}</span>
             </p>
 
             <div className="mt-1.5 flex items-center gap-2">

@@ -38,18 +38,18 @@ const Footer = () => {
       
       {/* Subtle Ambient Background Gradients */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <div className="absolute top-0 right-1/4 w-[500px] h-[350px] bg-[#1e543c]/15 rounded-full blur-[130px]" />
+        <div className="absolute top-0 right-1/4 w-[500px] h-[350px] bg-[#0c2217]/15 rounded-full blur-[130px]" />
         <div className="absolute bottom-10 left-10 w-[400px] h-[400px] bg-[#d4a359]/8 rounded-full blur-[120px]" />
-        <div className="absolute inset-0 bg-[radial-gradient(#2b6e51_0.6px,transparent_0.6px)] [background-size:32px_32px] opacity-20" />
+        <div className="absolute inset-0 bg-[radial-gradient(#d4a359_0.6px,transparent_0.6px)] [background-size:32px_32px] opacity-20" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-14">
 
         {/* Pre-Footer Callout Banner with Editorial Warmth */}
-        <div className="relative rounded-3xl bg-[#0c2217] border-2 border-[#2b6e51]/50 p-6 sm:p-10 shadow-2xl overflow-hidden">
+        <div className="relative rounded-3xl bg-[#0c2217] border-2 border-[#d4a359]/40 p-6 sm:p-10 shadow-2xl overflow-hidden">
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6 relative z-10">
             <div className="space-y-2 text-center lg:text-left">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-[#143d2b] text-[#d4a359] border border-[#2b6e51]/60">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40">
                 <Heart className="w-3.5 h-3.5 text-rose-400" />
                 <span>Female Safety &amp; Complete Family Privacy Guaranteed</span>
               </div>
@@ -71,7 +71,7 @@ const Footer = () => {
               </Link>
               <Link
                 href="/register/tutor"
-                className="px-5 py-3.5 bg-[#143d2b] hover:bg-[#1e543c] text-[#f5f0e6] font-bold text-xs sm:text-sm rounded-xl border border-[#2b6e51] transition-all flex items-center gap-2 cursor-pointer"
+                className="px-5 py-3.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#f5f0e6] font-bold text-xs sm:text-sm rounded-xl border border-[#d4a359]/40 transition-all flex items-center gap-2 cursor-pointer"
               >
                 <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
                 <span>Apply as Tutor</span>
@@ -86,7 +86,7 @@ const Footer = () => {
           {/* Col 1: Brand, Mission & Female Safety Focus */}
           <div className="lg:col-span-2 space-y-4">
             <Link href="/" className="inline-flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-[#143d2b] flex items-center justify-center text-white shadow-md border border-[#2b6e51]/50 group-hover:scale-105 transition-transform">
+              <div className="w-10 h-10 rounded-xl bg-[#143d2b] flex items-center justify-center text-white shadow-md border border-[#d4a359]/40 group-hover:scale-105 transition-transform">
                 <BookOpen className="w-5 h-5 text-[#d4a359]" />
               </div>
               <div>
@@ -106,7 +106,7 @@ const Footer = () => {
             {/* Official Support Email */}
             <div className="space-y-2 text-xs text-[#d1dbd6]">
               <div className="flex items-center gap-2.5">
-                <div className="w-7 h-7 rounded-lg bg-[#143d2b] border border-[#2b6e51]/60 flex items-center justify-center text-[#d4a359] shrink-0">
+                <div className="w-7 h-7 rounded-lg bg-[#143d2b] border border-[#d4a359]/40 flex items-center justify-center text-[#d4a359] shrink-0">
                   <Mail className="w-3.5 h-3.5" />
                 </div>
                 <a href="mailto:contact@ilmportal.org" className="hover:text-white font-semibold transition-colors">
@@ -121,15 +121,15 @@ const Footer = () => {
 
             {/* Trust Badges Pill Bar */}
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#143d2b]/70 text-[#d4a359] border border-[#2b6e51]/50">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#143d2b]/70 text-[#d4a359] border border-[#d4a359]/30">
                 <Heart className="w-3 h-3 text-rose-400" />
                 <span>100% Female Privacy</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#143d2b]/70 text-[#f5f0e6] border border-[#2b6e51]/50">
-                <ShieldCheck className="w-3 h-3 text-emerald-400" />
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#143d2b]/70 text-[#f5f0e6] border border-[#d4a359]/30">
+                <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
                 <span>Sanad Verified</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#143d2b]/70 text-[#f5f0e6] border border-[#2b6e51]/50">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#143d2b]/70 text-[#f5f0e6] border border-[#d4a359]/30">
                 <Lock className="w-3 h-3 text-amber-300" />
                 <span>Camera-Off Default</span>
               </span>
@@ -140,7 +140,7 @@ const Footer = () => {
               <button
                 type="button"
                 onClick={() => setChromeModalOpen(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#143d2b] hover:bg-[#1e543c] text-[#f5f0e6] border border-[#2b6e51] text-xs font-bold shadow-sm transition-all cursor-pointer group"
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#143d2b] hover:bg-[#1e543c] text-[#f5f0e6] border border-[#d4a359]/40 text-xs font-bold shadow-sm transition-all cursor-pointer group"
               >
                 <Chrome className="w-3.5 h-3.5 text-[#d4a359]" />
                 <span>Install Chrome App (PWA)</span>
@@ -165,7 +165,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link href="/register/tutor" className="hover:text-white transition-colors flex items-center gap-2">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
                   <span>Tutor Registration</span>
                 </Link>
               </li>
@@ -189,7 +189,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link href="/how-it-works" className="hover:text-white transition-colors flex items-center gap-2">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
                   <span>How It Works</span>
                 </Link>
               </li>
@@ -199,7 +199,7 @@ const Footer = () => {
           {/* Col 3: Quran Disciplines */}
           <div className="space-y-3.5">
             <div className="flex items-center gap-2">
-              <div className="w-1.5 h-3.5 rounded-full bg-emerald-500" />
+              <div className="w-1.5 h-3.5 rounded-full bg-[#d4a359]" />
               <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">
                 Quran Studies
               </h4>
@@ -241,7 +241,7 @@ const Footer = () => {
           {/* Col 4: School & College Academics */}
           <div className="space-y-3.5">
             <div className="flex items-center gap-2">
-              <div className="w-1.5 h-3.5 rounded-full bg-teal-400" />
+              <div className="w-1.5 h-3.5 rounded-full bg-[#b85d34]" />
               <h4 className="text-xs font-extrabold text-white uppercase tracking-wider">
                 Academics
               </h4>
@@ -284,15 +284,15 @@ const Footer = () => {
         </div>
 
         {/* Support Platform - Meezan Barcode & Direct Transfer Card */}
-        <div className="bg-[#0c2217] border border-[#2b6e51]/50 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
+        <div className="bg-[#0c2217] border border-[#d4a359]/40 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-xl">
           <div className="space-y-3 flex-1 w-full sm:w-auto">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 rounded-lg bg-[#143d2b] text-[#d4a359] border border-[#2b6e51]/50 shrink-0">
+              <div className="p-1.5 rounded-lg bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40 shrink-0">
                 <Landmark className="w-4 h-4" />
               </div>
               <h4 className="text-sm font-extrabold text-white flex items-center gap-2">
                 <span>Support Platform (IlmPortal)</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#143d2b] text-[#d4a359] border border-[#2b6e51]/50">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40">
                   Meezan Bank &amp; Raast
                 </span>
               </h4>
@@ -309,14 +309,14 @@ const Footer = () => {
               </div>
               <div className="bg-[#07150e] px-3.5 py-2 rounded-xl border border-[#143d2b]">
                 <span className="text-[10px] text-[#a3b8b0] block uppercase font-bold tracking-wider">Raast ID (Mobile Number)</span>
-                <span className="font-mono text-emerald-300 font-extrabold text-xs sm:text-sm select-all">03171759093</span>
+                <span className="font-mono text-[#d4a359] font-extrabold text-xs sm:text-sm select-all">03171759093</span>
               </div>
             </div>
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-[11px] text-[#a3b8b0] pt-0.5">
               <span>Account Title: <strong className="text-white">Abdul Khaliq</strong></span>
               <span>&bull;</span>
-              <span className="text-emerald-400 font-semibold">100% Verified Education Platform</span>
+              <span className="text-[#d4a359] font-semibold">100% Verified Education Platform</span>
             </div>
           </div>
 

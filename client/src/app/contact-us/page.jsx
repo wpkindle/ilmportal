@@ -90,13 +90,13 @@ export default function ContactUsPage() {
           
           {/* Breadcrumbs */}
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-            <Link href="/" className="hover:text-emerald-400 transition-colors">Home</Link>
+            <Link href="/" className="hover:text-[#d4a359] transition-colors">Home</Link>
             <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
-            <span className="text-emerald-400">Contact Us</span>
+            <span className="text-[#d4a359]">Contact Us</span>
           </div>
 
           <div className="flex items-center gap-2.5">
-            <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+            <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#d4a359]/20 text-[#d4a359] border border-[#d4a359]/30 flex items-center gap-1.5">
               <Mail className="w-3.5 h-3.5" />
               <span>We're Here to Help</span>
             </span>
@@ -118,12 +118,12 @@ export default function ContactUsPage() {
             
             {/* Email Support */}
             <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-2xs space-y-2">
-              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center">
-                <Mail className="w-4 h-4" />
+              <div className="w-9 h-9 rounded-xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center">
+                <Mail className="w-4 h-4 text-[#d4a359]" />
               </div>
               <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Email Support</h4>
               <p className="text-sm font-black text-slate-900">
-                <a href="mailto:contact@ilmportal.org" className="hover:text-emerald-600 transition-colors">
+                <a href="mailto:contact@ilmportal.org" className="hover:text-[#b85d34] transition-colors">
                   contact@ilmportal.org
                 </a>
               </p>
@@ -181,7 +181,7 @@ export default function ContactUsPage() {
             <div className="lg:col-span-6 bg-white p-6 sm:p-10 rounded-3xl border border-slate-200/90 shadow-xs space-y-6">
               <div>
                 <h3 className="text-xl font-black text-slate-900 flex items-center gap-2">
-                  <MessageSquare className="w-5 h-5 text-emerald-600" />
+                  <MessageSquare className="w-5 h-5 text-[#b85d34]" />
                   <span>Send a Direct Message</span>
                 </h3>
                 <p className="text-xs text-slate-500 mt-1">
@@ -190,8 +190,8 @@ export default function ContactUsPage() {
               </div>
 
               {formSuccess && (
-                <div className="p-4 bg-emerald-50 text-emerald-900 border border-emerald-300 rounded-2xl text-xs font-bold flex items-center gap-2.5 shadow-2xs animate-in fade-in">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="p-4 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 rounded-2xl text-xs font-bold flex items-center gap-2.5 shadow-2xs animate-in fade-in">
+                  <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
                   <span>{formSuccess}</span>
                 </div>
               )}
@@ -211,7 +211,7 @@ export default function ContactUsPage() {
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-emerald-500 focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#b85d34] focus:bg-white"
                     placeholder="e.g. Muhammad Usman"
                   />
                 </div>
@@ -224,7 +224,7 @@ export default function ContactUsPage() {
                       required
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-emerald-500 focus:bg-white"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#b85d34] focus:bg-white"
                       placeholder="e.g. usman@example.com"
                     />
                   </div>
@@ -235,7 +235,7 @@ export default function ContactUsPage() {
                       type="text"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-emerald-500 focus:bg-white"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#b85d34] focus:bg-white"
                       placeholder="e.g. 0300 1234567"
                     />
                   </div>
@@ -247,7 +247,7 @@ export default function ContactUsPage() {
                     type="text"
                     value={subject}
                     onChange={(e) => setSubject(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-emerald-500 focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#b85d34] focus:bg-white"
                     placeholder="e.g. Inquiry about Quran Tutor for 8-year-old child"
                   />
                 </div>
@@ -259,7 +259,7 @@ export default function ContactUsPage() {
                     required
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-emerald-500 focus:bg-white resize-y"
+                    className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#b85d34] focus:bg-white resize-y"
                     placeholder="Tell us what subject, city, or question you have..."
                   />
                 </div>
@@ -267,7 +267,7 @@ export default function ContactUsPage() {
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-md shadow-emerald-600/20 flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                  className="w-full py-3 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-black text-xs rounded-xl shadow-md flex items-center justify-center gap-2 cursor-pointer transition-all disabled:opacity-50"
                 >
                   <Send className="w-4 h-4" />
                   <span>{submitting ? 'Sending Message...' : 'Send Inquiry Message'}</span>

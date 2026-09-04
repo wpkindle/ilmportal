@@ -101,7 +101,7 @@ export default function CMSLocationsPage() {
 
               <button
                 onClick={openCreateModal}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5"
+                className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add City</span>
@@ -127,7 +127,7 @@ export default function CMSLocationsPage() {
                       <td className="p-4 font-semibold text-slate-700">{loc.province}</td>
                       <td className="p-4">
                         {loc.isMajorCity ? (
-                          <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded font-bold">Yes</span>
+                          <span className="px-2 py-0.5 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 rounded font-bold">Yes</span>
                         ) : (
                           <span className="text-slate-400">No</span>
                         )}
@@ -200,7 +200,7 @@ export default function CMSLocationsPage() {
                   type="checkbox"
                   checked={isMajorCity}
                   onChange={(e) => setIsMajorCity(e.target.checked)}
-                  className="accent-emerald-600"
+                  className="accent-[#b85d34]"
                 />
                 <span>Highlight on Homepage as Major City</span>
               </label>
@@ -215,7 +215,7 @@ export default function CMSLocationsPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-md"
+                  className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-md cursor-pointer"
                 >
                   Save City
                 </button>

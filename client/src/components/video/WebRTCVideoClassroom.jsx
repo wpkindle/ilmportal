@@ -746,41 +746,41 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       {/* Single dedicated remote audio element for crystal-clear voice without echo loops */}
       <audio ref={remoteAudioRef} autoPlay playsInline />
 
-      {/* Pre-Join Safety, Privacy & Camera Check Modal */}
+      {/* Pre-Class Safety Guarantee Modal */}
       {safetyModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/90 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="bg-slate-900 border border-slate-700/90 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 relative overflow-hidden text-center">
+          <div className="bg-[#0c2217] border border-[#d4a359]/40 rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 relative overflow-hidden text-center">
             
-            <div className="w-14 h-14 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center mx-auto text-emerald-400 shadow-inner">
-              <ShieldCheck className="w-7 h-7 text-emerald-400" />
+            <div className="w-14 h-14 rounded-2xl bg-[#143d2b] border border-[#d4a359]/40 flex items-center justify-center mx-auto text-[#d4a359] shadow-inner">
+              <ShieldCheck className="w-7 h-7 text-[#d4a359]" />
             </div>
 
             <div className="space-y-1.5">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                <Lock className="w-3 h-3 text-emerald-400" />
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40">
+                <Lock className="w-3 h-3 text-[#d4a359]" />
                 <span>End-to-End Encrypted Safe-Room</span>
               </div>
-              <h3 className="text-lg sm:text-xl font-black text-white">
+              <h3 className="text-lg sm:text-xl font-serif font-black text-white">
                 Pre-Class Privacy &amp; Safety Check
               </h3>
-              <p className="text-xs text-slate-300 leading-relaxed pt-1">
+              <p className="text-xs text-[#d1dbd6] leading-relaxed pt-1">
                 Your privacy and dignity are protected. Verify your audio/video preferences before entering the classroom.
               </p>
             </div>
 
             {/* Privacy Toggles Strip */}
-            <div className="grid grid-cols-3 gap-2.5 p-3 rounded-2xl bg-slate-950/80 border border-slate-800 text-xs">
+            <div className="grid grid-cols-3 gap-2.5 p-3 rounded-2xl bg-[#07150e] border border-[#d4a359]/20 text-xs">
               {/* Camera State */}
               <button
                 type="button"
                 onClick={toggleCamera}
                 className={`p-2.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
                   isCameraOn
-                    ? 'bg-emerald-600/20 border-emerald-500/40 text-emerald-300'
+                    ? 'bg-[#143d2b] border-[#d4a359]/40 text-[#d4a359]'
                     : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
                 }`}
               >
-                {isCameraOn ? <Video className="w-4 h-4 text-emerald-400" /> : <VideoOff className="w-4 h-4 text-rose-400" />}
+                {isCameraOn ? <Video className="w-4 h-4 text-[#d4a359]" /> : <VideoOff className="w-4 h-4 text-rose-400" />}
                 <span className="text-[10px] font-bold">Camera: {isCameraOn ? 'ON' : 'OFF'}</span>
               </button>
 
@@ -790,11 +790,11 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                 onClick={toggleMic}
                 className={`p-2.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
                   isMicOn
-                    ? 'bg-emerald-600/20 border-emerald-500/40 text-emerald-300'
+                    ? 'bg-[#143d2b] border-[#d4a359]/40 text-[#d4a359]'
                     : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
                 }`}
               >
-                {isMicOn ? <Mic className="w-4 h-4 text-emerald-400" /> : <MicOff className="w-4 h-4 text-rose-400" />}
+                {isMicOn ? <Mic className="w-4 h-4 text-[#d4a359]" /> : <MicOff className="w-4 h-4 text-rose-400" />}
                 <span className="text-[10px] font-bold">Mic: {isMicOn ? 'ON' : 'MUTE'}</span>
               </button>
 
@@ -804,22 +804,22 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                 onClick={() => setIsBackgroundBlurred(!isBackgroundBlurred)}
                 className={`p-2.5 rounded-xl border flex flex-col items-center gap-1.5 transition-all cursor-pointer ${
                   isBackgroundBlurred
-                    ? 'bg-teal-600/20 border-teal-500/40 text-teal-300'
+                    ? 'bg-[#143d2b] border-[#d4a359]/40 text-[#d4a359]'
                     : 'bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700'
                 }`}
               >
-                <Sparkles className="w-4 h-4 text-teal-400" />
+                <Sparkles className="w-4 h-4 text-[#d4a359]" />
                 <span className="text-[10px] font-bold">Blur: {isBackgroundBlurred ? 'ON' : 'OFF'}</span>
               </button>
             </div>
 
             {/* Reassurance Message */}
-            <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 text-[11px] text-slate-300 text-left space-y-1">
-              <div className="flex items-center gap-1.5 text-emerald-400 font-bold">
+            <div className="p-3 rounded-xl bg-[#07150e] border border-[#d4a359]/20 text-[11px] text-[#d1dbd6] text-left space-y-1">
+              <div className="flex items-center gap-1.5 text-[#d4a359] font-bold">
                 <CheckCircle2 className="w-3.5 h-3.5" />
                 <span>Female &amp; Family Privacy Priority</span>
               </div>
-              <p className="text-slate-400 leading-snug">
+              <p className="text-[#a3b8b0] leading-snug">
                 Camera is OFF by default. Unauthorized recording or outside contact solicitation is strictly prohibited under PECA 2016.
               </p>
             </div>
@@ -832,7 +832,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                   remoteAudioRef.current.play().catch(() => {});
                 }
               }}
-              className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full py-3 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <ShieldCheck className="w-4 h-4" />
               <span>Enter Safe Classroom</span>
@@ -842,13 +842,13 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       )}
 
       {/* Top Classroom Bar */}
-      <div className="px-4 py-3 bg-slate-900/95 backdrop-blur-md border-b border-slate-800/90 flex items-center justify-between z-20 shrink-0">
+      <div className="px-4 py-3 bg-[#0c2217]/95 backdrop-blur-md border-b border-[#143d2b] flex items-center justify-between z-20 shrink-0">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-ping shrink-0" />
+          <div className="w-2.5 h-2.5 rounded-full bg-[#d4a359] animate-ping shrink-0" />
           <div className="min-w-0">
             <h2 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2 truncate">
               <span>{sessionData?.title || 'Live Tutoring Class'}</span>
-              <span className="text-[9px] font-bold px-1.5 py-0.2 bg-emerald-950/80 text-emerald-300 rounded border border-emerald-800 shrink-0">
+              <span className="text-[9px] font-bold px-1.5 py-0.2 bg-[#143d2b] text-[#d4a359] rounded border border-[#d4a359]/40 shrink-0">
                 LIVE • 1:1 Class
               </span>
             </h2>
@@ -858,8 +858,8 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
         {/* Center/Right Timer, Modes & Security Badges */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* End-to-End Encrypted Label */}
-          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-[11px] font-bold">
-            <Lock className="w-3 h-3 text-emerald-400" />
+          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#143d2b] border border-[#d4a359]/40 text-[#d4a359] text-[11px] font-bold">
+            <Lock className="w-3 h-3 text-[#d4a359]" />
             <span>E2EE 1:1 Safe Room</span>
           </div>
 
@@ -877,8 +877,8 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           </button>
 
           {/* Duration Timer */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/90 border border-slate-700 text-xs font-mono font-bold text-amber-400">
-            <Clock className="w-3.5 h-3.5 text-amber-400" />
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/50 border border-[#d4a359]/30 text-xs font-mono font-bold text-[#d4a359]">
+            <Clock className="w-3.5 h-3.5 text-[#d4a359]" />
             <span>{formatTime(classDurationSeconds)}</span>
           </div>
 
@@ -887,7 +887,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             onClick={() => setViewMode(viewMode === 'grid' ? 'spotlight' : 'grid')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border cursor-pointer ${
               viewMode === 'grid'
-                ? 'bg-emerald-600/90 text-white border-emerald-500 shadow-xs'
+                ? 'bg-[#143d2b] text-[#d4a359] border-[#d4a359]/40 shadow-xs'
                 : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
             }`}
             title="Toggle Conference Grid View"
@@ -901,11 +901,11 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             onClick={() => setViewMode(viewMode === 'quran' ? 'grid' : 'quran')}
             className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border cursor-pointer ${
               viewMode === 'quran'
-                ? 'bg-emerald-600 text-white border-emerald-500 shadow-xs'
+                ? 'bg-[#143d2b] text-[#d4a359] border-[#d4a359]/40 shadow-xs'
                 : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
             }`}
           >
-            <BookOpen className="w-3.5 h-3.5 text-emerald-300" />
+            <BookOpen className="w-3.5 h-3.5 text-[#d4a359]" />
             <span className="hidden sm:inline">Quran Reader</span>
           </button>
         </div>
@@ -932,10 +932,10 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               {!peerConnected && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-gradient-to-b from-slate-900 to-slate-950 space-y-3">
                   <div className="relative">
-                    <div className="w-20 h-20 rounded-3xl bg-emerald-950 text-emerald-400 flex items-center justify-center border border-emerald-800/80 shadow-lg">
+                    <div className="w-20 h-20 rounded-3xl bg-[#0c2217] text-[#d4a359] flex items-center justify-center border border-[#d4a359]/40 shadow-lg">
                       <Users className="w-10 h-10 animate-pulse" />
                     </div>
-                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full animate-ping" />
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#d4a359] rounded-full animate-ping" />
                   </div>
 
                   <div>
@@ -949,7 +949,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
                   <button
                     onClick={handleManualReconnect}
-                    className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
+                    className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
                   >
                     <RefreshCw className={`w-3.5 h-3.5 ${isConnecting ? 'animate-spin' : ''}`} />
                     <span>{isConnecting ? 'Connecting Stream...' : 'Connect Video & Voice Now'}</span>
@@ -971,8 +971,8 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                       Live voice audio is active.
                     </p>
                   </div>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#d4a359] animate-pulse" />
                     <span>Voice Audio Connected</span>
                   </span>
                 </div>
@@ -980,7 +980,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
               {/* Peer Name & Role Badge */}
               <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-sm text-xs font-bold text-white flex items-center gap-2 border border-white/10 z-10">
-                <span className={`w-2 h-2 rounded-full ${peerConnected ? 'bg-emerald-500 animate-pulse' : 'bg-amber-400'}`} />
+                <span className={`w-2 h-2 rounded-full ${peerConnected ? 'bg-[#d4a359] animate-pulse' : 'bg-amber-400'}`} />
                 <span>{otherPartyName}</span>
                 <span className="text-[10px] font-normal text-slate-300 bg-white/10 px-1.5 py-0.2 rounded">
                   {otherRoleName}
@@ -989,7 +989,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             </div>
 
             {/* Card 2 (Right on desktop, Top compact preview on mobile): Local User (Self) */}
-            <div className="order-1 md:order-2 w-full h-36 sm:h-48 md:h-full md:flex-1 rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900 border-2 border-emerald-500/40 flex items-center justify-center relative shadow-2xl shrink-0">
+            <div className="order-1 md:order-2 w-full h-36 sm:h-48 md:h-full md:flex-1 rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900 border-2 border-[#d4a359]/40 flex items-center justify-center relative shadow-2xl shrink-0">
               <video
                 ref={localVideoRef}
                 autoPlay
@@ -1012,7 +1012,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                   <button
                     type="button"
                     onClick={toggleCamera}
-                    className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white font-bold text-xs flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
+                    className="px-3.5 py-1.5 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white font-bold text-xs flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
                   >
                     <Video className="w-3.5 h-3.5" />
                     <span>Turn Camera On</span>
@@ -1022,14 +1022,14 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
               {/* Local User Badge */}
               <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-sm text-xs font-bold text-white flex items-center gap-2 border border-white/10 z-10">
-                <span className={`w-2 h-2 rounded-full ${isCameraOn ? 'bg-emerald-500' : 'bg-slate-500'}`} />
+                <span className={`w-2 h-2 rounded-full ${isCameraOn ? 'bg-[#d4a359]' : 'bg-slate-500'}`} />
                 <span>You ({user?.name || 'Self'})</span>
-                <span className="text-[10px] font-normal text-emerald-300 bg-emerald-950/80 px-1.5 py-0.2 rounded border border-emerald-700/50">
+                <span className="text-[10px] font-normal text-[#d4a359] bg-[#143d2b] px-1.5 py-0.2 rounded border border-[#d4a359]/40">
                   {user?.role || 'Active'}
                 </span>
                 {isBackgroundBlurred && (
-                  <span className="text-[9px] font-bold text-teal-300 bg-teal-950/80 px-1.5 py-0.2 rounded border border-teal-700/50 flex items-center gap-1">
-                    <Sparkles className="w-2.5 h-2.5 text-teal-400" />
+                  <span className="text-[9px] font-bold text-[#faf8f5] bg-[#143d2b] px-1.5 py-0.2 rounded border border-[#d4a359]/40 flex items-center gap-1">
+                    <Sparkles className="w-2.5 h-2.5 text-[#d4a359]" />
                     <span>Blur</span>
                   </span>
                 )}
@@ -1053,7 +1053,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
               {!peerConnected && (
                 <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-slate-900/90 backdrop-blur-xs">
-                  <div className="w-16 h-16 rounded-full bg-emerald-950 text-emerald-400 flex items-center justify-center mb-3 border border-emerald-800 animate-pulse">
+                  <div className="w-16 h-16 rounded-full bg-[#0c2217] text-[#d4a359] flex items-center justify-center mb-3 border border-[#d4a359]/40 animate-pulse">
                     <Users className="w-8 h-8" />
                   </div>
                   <h3 className="text-base font-bold text-white">
@@ -1064,7 +1064,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             </div>
 
             {/* Floating Local PiP */}
-            <div className="absolute bottom-6 right-6 w-40 sm:w-56 aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border-2 border-emerald-500/70 bg-slate-900 z-20">
+            <div className="absolute bottom-6 right-6 w-40 sm:w-56 aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border-2 border-[#d4a359]/70 bg-slate-900 z-20">
               <video
                 ref={localVideoRef}
                 autoPlay
@@ -1083,12 +1083,12 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
         {viewMode === 'quran' && (
           <div className="flex-1 flex flex-col md:flex-row gap-3 p-3 sm:p-4 h-full w-full overflow-hidden">
             {/* Quran Text Viewer */}
-            <div className="flex-1 bg-amber-50 text-slate-900 rounded-3xl p-6 sm:p-8 overflow-y-auto border-4 border-amber-200 shadow-2xl flex flex-col items-center justify-center">
+            <div className="flex-1 bg-[#faf8f5] text-stone-900 rounded-3xl p-6 sm:p-8 overflow-y-auto border-4 border-[#e6dfd5] shadow-2xl flex flex-col items-center justify-center">
               <div className="max-w-2xl text-center space-y-6">
-                <span className="text-xs font-bold uppercase tracking-widest text-emerald-900 bg-emerald-100 px-4 py-1.5 rounded-full border border-emerald-200">
+                <span className="text-xs font-bold uppercase tracking-widest text-[#0c2217] bg-[#f0ece1] px-4 py-1.5 rounded-full border border-[#d4a359]/40">
                   Surah Al-Fatihah (سورة الفاتحة) &bull; Live Tajweed Reference
                 </span>
-                <div className="font-arabic text-2xl sm:text-4xl text-emerald-950 leading-[2.2] text-center select-none" dir="rtl">
+                <div className="font-arabic text-2xl sm:text-4xl text-[#0c2217] leading-[2.2] text-center select-none" dir="rtl">
                   بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ ﴿١﴾<br />
                   الْحَمْدُ لِلَّهِ رَبِّ الْعَالَمِينَ ﴿٢﴾<br />
                   الرَّحْمَٰنِ الرَّحِيمِ ﴿٣﴾<br />
@@ -1097,7 +1097,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                   اهْدِنَا الصِّرَاطَ الْمُسْتَقِيمَ ﴿٦﴾<br />
                   صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ ﴿٧﴾
                 </div>
-                <p className="text-xs text-slate-500 italic">
+                <p className="text-xs text-stone-500 italic">
                   Interactive reference mode for Tajweed articulation, Qira'at rules, and Makharij correction.
                 </p>
               </div>
@@ -1117,7 +1117,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                   {otherPartyName}
                 </span>
               </div>
-              <div className="flex-1 aspect-[4/3] rounded-2xl overflow-hidden bg-slate-900 border border-emerald-500/50 relative">
+              <div className="flex-1 aspect-[4/3] rounded-2xl overflow-hidden bg-slate-900 border border-[#d4a359]/50 relative">
                 <video
                   ref={localVideoRef}
                   autoPlay
@@ -1136,7 +1136,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
         {/* In-Call Live Chat Sidebar */}
         {chatOpen && (
           <div className="w-80 bg-slate-900/95 border-l border-slate-800 flex flex-col z-30 animate-in slide-in-from-right duration-200">
-            <div className="p-3.5 border-b border-slate-800 font-bold text-xs text-emerald-400 flex items-center justify-between">
+            <div className="p-3.5 border-b border-slate-800 font-bold text-xs text-[#d4a359] flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4" />
                 <span>In-Class Live Chat</span>
@@ -1157,7 +1157,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               ) : (
                 chatMessages.map((msg, i) => (
                   <div key={i} className="p-2.5 rounded-xl bg-slate-800/80 border border-slate-700/80">
-                    <span className="font-bold text-emerald-400 text-[11px] block">
+                    <span className="font-bold text-[#d4a359] text-[11px] block">
                       {msg.sender}
                     </span>
                     <p className="text-slate-200 mt-0.5 leading-relaxed">{msg.message}</p>
@@ -1172,11 +1172,11 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                 placeholder="Type in-call message..."
                 value={chatInput}
                 onChange={(e) => setChatInput(e.target.value)}
-                className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-emerald-500 font-medium"
+                className="flex-1 bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white outline-none focus:border-[#d4a359] font-medium"
               />
               <button
                 type="submit"
-                className="p-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl cursor-pointer"
+                className="p-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white rounded-xl cursor-pointer"
               >
                 <Send className="w-3.5 h-3.5" />
               </button>
@@ -1219,7 +1219,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           onClick={() => setIsBackgroundBlurred(!isBackgroundBlurred)}
           className={`p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl transition-all shadow-md cursor-pointer flex items-center justify-center ${
             isBackgroundBlurred
-              ? 'bg-teal-600 hover:bg-teal-500 text-white ring-2 ring-teal-300'
+              ? 'bg-[#143d2b] hover:bg-[#0c2217] text-[#d4a359] ring-2 ring-[#d4a359]'
               : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white'
           }`}
           title={isBackgroundBlurred ? 'Turn Blur Off' : 'Turn Privacy Background Blur On'}
@@ -1233,7 +1233,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           className="md:hidden p-3 min-h-[44px] min-w-[44px] rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white shadow-md cursor-pointer flex items-center justify-center"
           title="Flip Camera (Front / Back for Quran scanning)"
         >
-          <RotateCcw className="w-5 h-5 text-emerald-400" />
+          <RotateCcw className="w-5 h-5 text-[#d4a359]" />
         </button>
 
         {/* Speaker Volume & Mute Toggle */}
@@ -1241,12 +1241,12 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           <button
             onClick={() => setIsSpeakerMuted(!isSpeakerMuted)}
             className="text-slate-300 hover:text-white p-1 rounded-lg cursor-pointer"
-            title={isSpeakerMuted ? 'Unmute Remote Speaker' : 'Mute Remote Speaker'}
+            title={isSpeakerMuted || speakerVolume === 0 ? 'Unmute Remote Speaker' : 'Mute Remote Speaker'}
           >
             {isSpeakerMuted || speakerVolume === 0 ? (
               <VolumeX className="w-4 h-4 text-red-400" />
             ) : (
-              <Volume2 className="w-4 h-4 text-emerald-400" />
+              <Volume2 className="w-4 h-4 text-[#d4a359]" />
             )}
           </button>
           <input
@@ -1260,7 +1260,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               setSpeakerVolume(val);
               if (val > 0 && isSpeakerMuted) setIsSpeakerMuted(false);
             }}
-            className="w-14 sm:w-20 accent-emerald-500 h-1.5 bg-slate-700 rounded-lg cursor-pointer"
+            className="w-14 sm:w-20 accent-[#d4a359] h-1.5 bg-slate-700 rounded-lg cursor-pointer"
             title="Classroom Speaker Volume"
           />
         </div>
@@ -1270,7 +1270,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           onClick={toggleScreenShare}
           className={`hidden md:flex p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl transition-all shadow-md cursor-pointer items-center justify-center ${
             isScreenSharing
-              ? 'bg-emerald-600 hover:bg-emerald-500 text-white ring-2 ring-emerald-300'
+              ? 'bg-[#143d2b] hover:bg-[#0c2217] text-[#d4a359] ring-2 ring-[#d4a359]'
               : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white'
           }`}
           title={isScreenSharing ? 'Stop Screen Share' : 'Share Screen with Student'}
@@ -1283,14 +1283,14 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           onClick={() => setChatOpen(!chatOpen)}
           className={`relative p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl transition-all shadow-md cursor-pointer flex items-center justify-center ${
             chatOpen
-              ? 'bg-emerald-600 text-white'
+              ? 'bg-[#143d2b] text-[#d4a359]'
               : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white'
           }`}
           title="Open Classroom Live Chat"
         >
           <MessageSquare className="w-5 h-5" />
           {chatMessages.length > 0 && !chatOpen && (
-            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-emerald-500 rounded-full animate-ping" />
+            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#d4a359] rounded-full animate-ping" />
           )}
         </button>
 

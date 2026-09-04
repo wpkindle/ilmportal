@@ -43,15 +43,15 @@ const TrialBanner = ({ deal, onPayClick }) => {
   // 1. Paid & Verified status
   if (deal.status === 'active_paid' || deal.paymentStatus === 'verified') {
     return (
-      <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-200/80 flex items-center justify-between text-xs text-emerald-900 shadow-2xs">
+      <div className="p-3 bg-[#f0ece1] rounded-2xl border border-[#d4a359]/40 flex items-center justify-between text-xs text-[#0c2217] shadow-2xs">
         <div className="flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+          <CheckCircle2 className="w-4 h-4 text-[#0c2217] shrink-0" />
           <div>
             <span className="font-bold">Active Course Subscription</span>
-            <span className="text-emerald-700 ml-1.5">&bull; Payment Verified</span>
+            <span className="text-[#0c2217]/80 ml-1.5">&bull; Payment Verified</span>
           </div>
         </div>
-        <span className="font-mono font-bold text-emerald-800 text-[11px]">
+        <span className="font-mono font-bold text-[#0c2217] text-[11px]">
           PKR {deal.price?.toLocaleString()} / {deal.priceUnit === 'per_hour' ? 'hr' : 'mo'}
         </span>
       </div>
@@ -125,7 +125,7 @@ const TrialBanner = ({ deal, onPayClick }) => {
               <p className="font-bold text-amber-900">
                 {isTutor ? 'Student Agreed to Continue - Platform Fee Due' : 'Course Continuation Confirmed'}
               </p>
-              <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 border border-emerald-300 font-bold text-[9px] rounded-full uppercase tracking-wider">
+              <span className="px-2 py-0.5 bg-[#0c2217] text-[#d4a359] border border-[#0c2217] font-bold text-[9px] rounded-full uppercase tracking-wider">
                 Video Classroom Active
               </span>
             </div>
@@ -153,24 +153,24 @@ const TrialBanner = ({ deal, onPayClick }) => {
   // 5. Active Trial
   if (deal.status === 'active_trial') {
     return (
-      <div className="p-3.5 bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-2xs">
+      <div className="p-3.5 bg-[#faf8f5] rounded-2xl border border-[#d4a359]/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-2xs">
         <div className="flex items-center gap-2.5">
-          <div className="p-1.5 bg-emerald-100 text-emerald-700 rounded-xl">
+          <div className="p-1.5 bg-[#0c2217] text-[#d4a359] rounded-xl">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-slate-900">
+              <span className="font-bold text-stone-900">
                 {isStudent ? 'Complimentary 3-Day Free Trial' : `Active Course Trial: ${deal.subject}`}
               </span>
               {timeLeft && (
-                <span className="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-900 font-bold text-[10px] flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-emerald-700" />
+                <span className="px-2 py-0.5 rounded-full bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 font-bold text-[10px] flex items-center gap-1">
+                  <Clock className="w-3 h-3 text-[#0c2217]" />
                   <span>{timeLeft}</span>
                 </span>
               )}
             </div>
-            <p className="text-[11px] text-slate-600 mt-0.5">
+            <p className="text-[11px] text-stone-600 mt-0.5">
               {isStudent
                 ? `Free trial classes active. Decide whether to continue anytime during your trial.`
                 : `Agreed Fee: PKR ${deal.price?.toLocaleString()} / ${deal.priceUnit === 'per_hour' ? 'hr' : 'mo'} &bull; ${deal.mode === 'online' ? 'Live WebRTC' : 'In-Person'}`}

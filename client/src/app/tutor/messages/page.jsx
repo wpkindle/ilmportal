@@ -280,7 +280,7 @@ function TutorMessagesContent() {
                       : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
-                  <MessageSquare className="w-3.5 h-3.5 text-emerald-600" />
+                  <MessageSquare className="w-3.5 h-3.5 text-[#d4a359]" />
                   <span>Chats</span>
                   <span className="text-[10px] font-mono px-1.5 py-0.2 bg-slate-200 text-slate-700 rounded-full">
                     {conversations.length}
@@ -296,7 +296,7 @@ function TutorMessagesContent() {
                       : 'text-slate-500 hover:text-slate-900'
                   }`}
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
                   <span>Requests</span>
                   {requests.filter(r => r.status === 'pending').length > 0 && (
                     <span className="min-w-[16px] h-4 px-1 bg-amber-500 text-white rounded-full text-[9.5px] font-black flex items-center justify-center animate-pulse">
@@ -323,7 +323,7 @@ function TutorMessagesContent() {
                     const student = req.student || {};
                     const snapshot = req.studentProfileSnapshot || {};
                     const name = student.name || snapshot.name || 'Verified Student';
-                    const avatar = student.avatar || snapshot.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=059669&color=fff`;
+                    const avatar = student.avatar || snapshot.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0c2217&color=d4a359`;
                     const age = student.age || snapshot.age;
                     const gender = student.gender || snapshot.gender;
                     const city = student.city || snapshot.city || 'Pakistan';
@@ -332,7 +332,7 @@ function TutorMessagesContent() {
                     return (
                       <div
                         key={req._id}
-                        className="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-2.5 transition-all hover:border-emerald-300"
+                        className="p-3.5 rounded-2xl bg-white border border-slate-200/90 shadow-2xs space-y-2.5 transition-all hover:border-[#d4a359]/60"
                       >
                         <div className="flex items-start gap-3">
                           <img
@@ -348,7 +348,7 @@ function TutorMessagesContent() {
                               <span
                                 className={`text-[9.5px] font-black uppercase px-2 py-0.5 rounded-full ${
                                   req.status === 'accepted'
-                                    ? 'bg-emerald-100 text-emerald-800'
+                                    ? 'bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40'
                                     : req.status === 'declined'
                                     ? 'bg-rose-100 text-rose-800'
                                     : 'bg-amber-100 text-amber-900 animate-pulse'
@@ -366,8 +366,8 @@ function TutorMessagesContent() {
                               <span>{city}</span>
                             </div>
 
-                            <div className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md">
-                              <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                            <div className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold text-[#0c2217] bg-[#f0ece1] px-2 py-0.5 rounded-md border border-[#d4a359]/40">
+                              <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
                               <span>100% Profile Strength</span>
                             </div>
                           </div>
@@ -403,7 +403,7 @@ function TutorMessagesContent() {
                                 type="button"
                                 disabled={isResponding}
                                 onClick={() => handleRespondRequest(req._id, 'accepted')}
-                                className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-[11px] font-bold shadow-xs flex items-center gap-1 transition-colors cursor-pointer"
+                                className="px-3 py-1.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-xl text-[11px] font-bold shadow-xs flex items-center gap-1 transition-colors cursor-pointer"
                               >
                                 <Check className="w-3 h-3" />
                                 <span>Accept</span>
@@ -422,9 +422,9 @@ function TutorMessagesContent() {
                                   handleSelectConversation(match);
                                 }
                               }}
-                              className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 rounded-xl text-[11px] font-bold flex items-center gap-1 cursor-pointer"
+                              className="px-3 py-1.5 bg-[#f0ece1] hover:bg-[#e6ded1] text-[#0c2217] border border-[#d4a359]/40 rounded-xl text-[11px] font-bold flex items-center gap-1 cursor-pointer"
                             >
-                              <MessageSquare className="w-3 h-3" />
+                              <MessageSquare className="w-3 h-3 text-[#d4a359]" />
                               <span>Open Chat</span>
                             </button>
                           ) : null}
@@ -451,19 +451,19 @@ function TutorMessagesContent() {
                         onClick={() => handleSelectConversation(conv)}
                         className={`w-full p-3 rounded-2xl text-left transition-all flex items-center gap-3 ${
                           isSelected
-                            ? 'bg-emerald-50/90 border border-emerald-300/80 shadow-2xs'
+                            ? 'bg-[#f0ece1]/80 border border-[#d4a359]/50 shadow-2xs'
                             : 'hover:bg-slate-50 border border-transparent'
                         }`}
                       >
                         <div className="relative shrink-0">
                           <img
-                            src={conv.partner?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.partner?.name || 'S')}&background=059669&color=fff`}
+                            src={conv.partner?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.partner?.name || 'S')}&background=0c2217&color=d4a359`}
                             alt={conv.partner?.name}
                             className="w-11 h-11 rounded-2xl object-cover border border-slate-200"
                           />
                           <span
                             className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-white rounded-full ${
-                              isStudentOnline ? 'bg-emerald-500 ring-2 ring-emerald-500/20' : 'bg-slate-300'
+                              isStudentOnline ? 'bg-amber-500 ring-2 ring-amber-500/20' : 'bg-slate-300'
                             }`}
                             title={isStudentOnline ? 'Online' : 'Offline'}
                           />
@@ -477,8 +477,8 @@ function TutorMessagesContent() {
 
                             <div className="flex items-center gap-1.5 shrink-0">
                               {isStudentOnline ? (
-                                <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300">
-                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                                <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-[#0c2217] bg-[#f0ece1] px-2 py-0.5 rounded-full border border-[#d4a359]/40">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-[#d4a359] animate-pulse" />
                                   <span>Online</span>
                                 </span>
                               ) : (
@@ -489,7 +489,7 @@ function TutorMessagesContent() {
                               )}
 
                               {conv.unreadCount > 0 && (
-                                <span className="min-w-[18px] h-4 px-1.5 bg-emerald-600 text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs">
+                                <span className="min-w-[18px] h-4 px-1.5 bg-[#b85d34] text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs">
                                   {conv.unreadCount}
                                 </span>
                               )}

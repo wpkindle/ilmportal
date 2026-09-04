@@ -158,7 +158,7 @@ export default async function CityTutorsPage({ params }) {
 
         {/* City Hero Header */}
         <div className="bg-[#0c2217] text-white rounded-3xl p-6 sm:p-10 shadow-xl space-y-4 border border-[#143d2b]">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#143d2b] text-[#d4a359] text-xs font-bold border border-[#2b6e51]/60">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#143d2b] text-[#d4a359] text-xs font-bold border border-[#d4a359]/40">
             <MapPin className="w-3.5 h-3.5" />
             <span>{formattedCity}, Pakistan &bull; Online &amp; Home Tutoring</span>
           </div>
@@ -188,9 +188,9 @@ export default async function CityTutorsPage({ params }) {
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <Link
             href={`/tutors?city=${formattedCity}&gender=female`}
-            className="px-3.5 py-1.5 rounded-full bg-[#f5f0e6] hover:bg-[#ebe3d3] text-[#143d2b] border border-[#ebe3d3] font-bold transition-all inline-flex items-center gap-1.5"
+            className="px-3.5 py-1.5 rounded-full bg-[#f5f0e6] hover:bg-[#ebe3d3] text-[#0c2217] border border-[#ebe3d3] font-bold transition-all inline-flex items-center gap-1.5"
           >
-            <ShieldCheck className="w-3.5 h-3.5 text-[#2b6e51]" />
+            <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
             <span>Female Alimahs in {formattedCity}</span>
           </Link>
           <Link

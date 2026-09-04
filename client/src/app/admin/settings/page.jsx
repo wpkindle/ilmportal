@@ -91,8 +91,8 @@ export default function SystemSettingsPage() {
             </div>
 
             {message && (
-              <div className="p-3 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-2xl text-xs font-bold flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+              <div className="p-3 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 rounded-2xl text-xs font-bold flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-[#d4a359]" />
                 <span>{message}</span>
               </div>
             )}
@@ -200,7 +200,7 @@ export default function SystemSettingsPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md"
+                  className="px-6 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-md cursor-pointer disabled:opacity-50"
                 >
                   {saving ? 'Saving Settings...' : 'Save Configuration'}
                 </button>

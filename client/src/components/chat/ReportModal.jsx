@@ -102,7 +102,7 @@ export default function ReportModal({
 
         {submitted ? (
           <div className="text-center py-6 space-y-4">
-            <div className="w-14 h-14 bg-emerald-100 text-emerald-700 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+            <div className="w-14 h-14 bg-[#d4a359]/20 text-[#d4a359] border border-[#d4a359]/40 rounded-2xl flex items-center justify-center mx-auto shadow-sm">
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <h3 className="text-lg font-black text-slate-900">Report Submitted to Admin</h3>

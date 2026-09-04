@@ -106,22 +106,22 @@ const MobileBottomNav = () => {
               href={item.href}
               className={`relative flex flex-col items-center justify-center h-full min-h-[44px] min-w-[44px] py-1 transition-all rounded-xl active:scale-90 ${
                 isActive 
-                  ? 'text-emerald-400 font-bold' 
+                  ? 'text-[#d4a359] font-bold' 
                   : item.highlight 
-                    ? 'text-teal-300 font-semibold' 
+                    ? 'text-[#faf8f5] font-semibold' 
                     : 'text-slate-400 hover:text-slate-200'
               }`}
             >
               {/* Active Indicator Top Dot */}
               {isActive && (
-                <span className="absolute top-1 w-1.5 h-1.5 bg-emerald-400 rounded-full shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                <span className="absolute top-1 w-1.5 h-1.5 bg-[#d4a359] rounded-full shadow-[0_0_8px_rgba(212,163,89,0.8)]" />
               )}
 
               {/* Icon Container with Badge */}
               <div className="relative mt-0.5">
-                <Icon className={`w-5 h-5 ${isActive ? 'text-emerald-400 stroke-[2.5]' : ''}`} />
+                <Icon className={`w-5 h-5 ${isActive ? 'text-[#d4a359] stroke-[2.5]' : ''}`} />
                 {item.badge && (
-                  <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 rounded-full bg-emerald-500 text-[9px] font-black text-white flex items-center justify-center shadow-md animate-pulse">
+                  <span className="absolute -top-1.5 -right-2.5 min-w-[16px] h-4 px-1 rounded-full bg-[#b85d34] text-[9px] font-black text-white flex items-center justify-center shadow-md animate-pulse">
                     {item.badge}
                   </span>
                 )}
@@ -129,7 +129,7 @@ const MobileBottomNav = () => {
 
               {/* Label */}
               <span className={`text-[10px] mt-0.5 leading-tight truncate max-w-[60px] ${
-                isActive ? 'text-emerald-400 font-bold' : 'text-slate-400'
+                isActive ? 'text-[#d4a359] font-bold' : 'text-slate-400'
               }`}>
                 {item.label}
               </span>

@@ -134,7 +134,7 @@ export default function HowItWorks() {
         {/* Editorial Section Header */}
         <div className="max-w-3xl space-y-3 text-left">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ebe3d3] text-[#143d2b] text-xs font-bold shadow-2xs">
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#2b6e51]" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
             <span>Transparent 4-Step Process</span>
           </div>
 
@@ -240,7 +240,7 @@ export default function HowItWorks() {
                   {activeModalStep.step}
                 </span>
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-[#143d2b] border border-[#2b6e51]/60 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-[#143d2b] border border-[#d4a359]/40 px-2 py-0.5 rounded-full">
                     {activeModalStep.highlight}
                   </span>
                   <h3 className="text-base sm:text-lg font-serif font-bold text-[#0c2217] mt-0.5 leading-snug">

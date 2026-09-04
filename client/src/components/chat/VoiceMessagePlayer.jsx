@@ -78,8 +78,8 @@ export default function VoiceMessagePlayer({
     <div
       className={`flex items-center gap-3 p-3 rounded-2xl min-w-[240px] max-w-sm ${
         isMe
-          ? 'bg-emerald-800/90 text-white'
-          : 'bg-white border border-slate-200 text-slate-800 shadow-2xs'
+          ? 'bg-[#0c2217] text-white border border-[#0c2217]'
+          : 'bg-white border border-stone-200 text-stone-800 shadow-2xs'
       }`}
     >
       {/* Play / Pause Toggle Button */}
@@ -88,8 +88,8 @@ export default function VoiceMessagePlayer({
         onClick={togglePlay}
         className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 transition-transform active:scale-95 cursor-pointer shadow-md ${
           isMe
-            ? 'bg-emerald-500 hover:bg-emerald-400 text-white'
-            : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+            ? 'bg-[#d4a359] hover:bg-[#c49247] text-[#0c2217]'
+            : 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
         }`}
       >
         {isPlaying ? (
@@ -103,7 +103,7 @@ export default function VoiceMessagePlayer({
       <div className="flex-1 space-y-1.5 min-w-0">
         <div className="flex items-center justify-between text-[10px] font-bold opacity-85">
           <span className="flex items-center gap-1">
-            <Mic className="w-3 h-3 text-emerald-400" />
+            <Mic className="w-3 h-3 text-[#d4a359]" />
             <span>Voice Note</span>
           </span>
           <span className="font-mono">
@@ -119,7 +119,7 @@ export default function VoiceMessagePlayer({
             max={totalDuration || duration || 1}
             value={currentTime}
             onChange={handleSeek}
-            className="w-full h-1.5 bg-slate-200/50 rounded-lg appearance-none cursor-pointer accent-emerald-400"
+            className="w-full h-1.5 bg-stone-200/50 rounded-lg appearance-none cursor-pointer accent-[#d4a359]"
           />
         </div>
 
@@ -133,7 +133,7 @@ export default function VoiceMessagePlayer({
                 transition: 'height 0.15s ease'
               }}
               className={`w-1 rounded-full ${
-                isMe ? 'bg-emerald-300/70' : 'bg-emerald-600/70'
+                isMe ? 'bg-[#d4a359]/80' : 'bg-[#0c2217]/70'
               }`}
             />
           ))}

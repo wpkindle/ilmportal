@@ -71,11 +71,11 @@ export default function StudentDashboardPage() {
             <svg viewBox="0 0 200 200" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
               <circle cx="100" cy="100" r="90" stroke="#d4a359" strokeWidth="1" strokeDasharray="4 6" />
               <rect x="55" y="55" width="90" height="90" stroke="#d4a359" strokeWidth="1" />
-              <rect x="55" y="55" width="90" height="90" transform="rotate(45 100 100)" stroke="#388e6a" strokeWidth="1" />
+              <rect x="55" y="55" width="90" height="90" transform="rotate(45 100 100)" stroke="#d4a359" strokeWidth="1" />
             </svg>
           </div>
           <span className="absolute top-6 right-20 w-1.5 h-1.5 rounded-full bg-[#d4a359] shadow-[0_0_8px_#d4a359] animate-particle-drift pointer-events-none" style={{ animationDelay: '0.8s', animationDuration: '7s' }} />
-          <span className="absolute bottom-8 right-1/3 w-1 h-1 rounded-full bg-[#388e6a] shadow-[0_0_6px_#388e6a] animate-particle-drift pointer-events-none" style={{ animationDelay: '2.1s', animationDuration: '9s' }} />
+          <span className="absolute bottom-8 right-1/3 w-1 h-1 rounded-full bg-[#b85d34] shadow-[0_0_6px_#b85d34] animate-particle-drift pointer-events-none" style={{ animationDelay: '2.1s', animationDuration: '9s' }} />
 
           <div className="space-y-2.5 z-10">
             <div className="flex items-center gap-2 flex-wrap">
@@ -83,7 +83,7 @@ export default function StudentDashboardPage() {
                 <GraduationCap className="w-3.5 h-3.5" />
                 Talib-e-Ilm &bull; Learning Space
               </span>
-              <span className="text-[11px] font-semibold text-emerald-300 bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-500/30">
+              <span className="text-[11px] font-semibold text-[#d4a359] bg-[#143d2b] px-2.5 py-1 rounded-full border border-[#d4a359]/40">
                 Female Privacy Protected
               </span>
             </div>

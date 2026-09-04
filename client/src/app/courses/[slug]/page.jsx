@@ -81,6 +81,7 @@ export default function CourseDetailPage() {
         <h2 className="text-2xl font-bold text-slate-800">Course Not Found</h2>
         <p className="text-slate-500 mt-2">The requested curriculum could not be located.</p>
         <Link href="/courses" className="mt-4 px-6 py-2.5 bg-emerald-600 text-white rounded-xl font-bold text-xs">
+        <Link href="/courses" className="mt-4 px-6 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-xl font-bold text-xs shadow-md">
           Return to Courses
         </Link>
       </div>
@@ -165,14 +166,17 @@ export default function CourseDetailPage() {
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
           <Link href="/" className="hover:text-emerald-700">Home</Link>
+          <Link href="/" className="hover:text-[#b85d34]">Home</Link>
           <ChevronRight className="w-3.5 h-3.5" />
           <Link href="/courses" className="hover:text-emerald-700">Courses</Link>
+          <Link href="/courses" className="hover:text-[#b85d34]">Courses</Link>
           <ChevronRight className="w-3.5 h-3.5" />
           <span className="text-slate-900 font-bold truncate">{course.title}</span>
         </div>
 
         {/* Hero Section Banner */}
         <div className="bg-gradient-to-br from-slate-900 via-emerald-950 to-slate-950 rounded-3xl p-6 sm:p-12 text-white border border-emerald-500/30 shadow-2xl relative overflow-hidden">
+        <div className="bg-gradient-to-br from-[#0c2217] via-[#143d2b] to-[#07150e] rounded-3xl p-6 sm:p-12 text-white border border-[#d4a359]/30 shadow-2xl relative overflow-hidden">
           
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center relative z-10">
             
@@ -180,12 +184,15 @@ export default function CourseDetailPage() {
             <div className="lg:col-span-8 space-y-5">
               <div className="flex flex-wrap gap-2">
                 <span className="px-3.5 py-1 rounded-full text-xs font-extrabold bg-emerald-600 text-white flex items-center gap-1.5 shadow-md">
+                <span className="px-3.5 py-1 rounded-full text-xs font-extrabold bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40 flex items-center gap-1.5 shadow-md">
                   <Baby className="w-3.5 h-3.5" />
                   <span>{course.targetAudience}</span>
                 </span>
                 
                 <span className="px-3.5 py-1 rounded-full text-xs font-extrabold bg-white/10 text-emerald-300 border border-emerald-500/30 flex items-center gap-1.5">
                   <Clock className="w-3.5 h-3.5" />
+                <span className="px-3.5 py-1 rounded-full text-xs font-extrabold bg-white/10 text-[#faf8f5] border border-[#d4a359]/30 flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-[#d4a359]" />
                   <span>{course.sessionDuration} per class</span>
                 </span>
 
@@ -196,10 +203,12 @@ export default function CourseDetailPage() {
               </div>
 
               <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black tracking-tight leading-tight">
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-black tracking-tight leading-tight">
                 {course.title}
               </h1>
 
               <p className="text-sm sm:text-base text-slate-300 leading-relaxed max-w-3xl">
+              <p className="text-sm sm:text-base text-[#d1dbd6] leading-relaxed max-w-3xl">
                 {course.description}
               </p>
 
@@ -208,14 +217,20 @@ export default function CourseDetailPage() {
                 <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
                   <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold block">Attention Span</span>
                   <span className="text-sm font-extrabold text-emerald-300">15–20 Min Micro-Lessons</span>
+                  <span className="text-[10px] uppercase tracking-wider text-[#a3b8b0] font-bold block">Attention Span</span>
+                  <span className="text-sm font-extrabold text-[#d4a359]">15–20 Min Micro-Lessons</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
                   <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold block">Free Trial</span>
                   <span className="text-sm font-extrabold text-emerald-300">3 Days (Stage 1, L1–2)</span>
+                  <span className="text-[10px] uppercase tracking-wider text-[#a3b8b0] font-bold block">Free Trial</span>
+                  <span className="text-sm font-extrabold text-[#d4a359]">3 Days (Stage 1, L1–2)</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
                   <span className="text-[10px] uppercase tracking-wider text-slate-400 font-bold block">Parent Updates</span>
                   <span className="text-sm font-extrabold text-emerald-300">Post-Class Summaries</span>
+                  <span className="text-[10px] uppercase tracking-wider text-[#a3b8b0] font-bold block">Parent Updates</span>
+                  <span className="text-sm font-extrabold text-[#d4a359]">Post-Class Summaries</span>
                 </div>
               </div>
 
@@ -224,6 +239,7 @@ export default function CourseDetailPage() {
                 <Link
                   href="/tutors?category=nazra-quran"
                   className="px-8 py-3.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-sm rounded-2xl shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="px-8 py-3.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-black text-sm rounded-2xl shadow-xl hover:scale-105 transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#b85d34]/40"
                 >
                   <span>Book 3-Day Free Trial for Child</span>
                   <ArrowRight className="w-4 h-4" />
@@ -234,6 +250,7 @@ export default function CourseDetailPage() {
                   className="px-6 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold text-sm rounded-2xl border border-white/10 transition-all flex items-center justify-center gap-2"
                 >
                   <span>View 4 Stages & Lessons</span>
+                  <span>View 4 Stages &amp; Lessons</span>
                   <ChevronDown className="w-4 h-4" />
                 </a>
               </div>
@@ -245,10 +262,16 @@ export default function CourseDetailPage() {
                 <div className="p-3 bg-emerald-950/60 rounded-2xl border border-emerald-500/30 text-center">
                   <span className="text-[11px] font-bold text-emerald-300 uppercase tracking-wider block">Recommended Tuition</span>
                   <span className="text-2xl font-black text-white">
+              <div className="bg-[#0c2217]/90 rounded-3xl border border-[#d4a359]/40 p-6 sm:p-7 space-y-4 shadow-xl backdrop-blur-xl">
+                <div className="p-3 bg-[#143d2b]/70 rounded-2xl border border-[#d4a359]/30 text-center">
+                  <span className="text-[11px] font-bold text-[#d4a359] uppercase tracking-wider block">Recommended Tuition</span>
+                  <span className="text-2xl font-serif font-black text-white">
                     PKR {course.priceSuggested?.amount?.toLocaleString() || '3,500'}
                     <span className="text-xs font-normal text-slate-400"> / {course.priceSuggested?.unit || 'month'}</span>
+                    <span className="text-xs font-normal text-[#a3b8b0]"> / {course.priceSuggested?.unit || 'month'}</span>
                   </span>
                   <p className="text-[10px] text-slate-400 mt-0.5">Direct tutor agreement with flexible scheduling</p>
+                  <p className="text-[10px] text-[#a3b8b0] mt-0.5">Direct tutor agreement with flexible scheduling</p>
                 </div>
 
                 {/* Course Instructor Attribution */}
@@ -258,14 +281,18 @@ export default function CourseDetailPage() {
                       src={course.instructor.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100'}
                       alt={course.instructor.name}
                       className="w-12 h-12 rounded-xl object-cover border border-emerald-400/40 shrink-0"
+                      className="w-12 h-12 rounded-xl object-cover border border-[#d4a359]/40 shrink-0"
                     />
                     <div className="min-w-0">
                       <span className="text-[10px] uppercase font-bold text-emerald-400 block">Course Instructor</span>
+                      <span className="text-[10px] uppercase font-bold text-[#d4a359] block">Course Instructor</span>
                       <h4 className="font-extrabold text-sm text-white truncate">{course.instructor.name}</h4>
                       <p className="text-[11px] text-slate-300">
+                      <p className="text-[11px] text-[#d1dbd6]">
                         <span>{course.instructor.city || 'Pakistan'}</span>
                         {course.tutorProfile?.isSanadVerified && (
                           <span className="text-emerald-400 font-bold ml-1">
+                          <span className="text-[#d4a359] font-bold ml-1">
                             &bull; Sanad Verified Tutor
                           </span>
                         )}
@@ -275,20 +302,26 @@ export default function CourseDetailPage() {
                 )}
 
                 <div className="space-y-2.5 text-xs text-slate-300">
+                <div className="space-y-2.5 text-xs text-[#d1dbd6]">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
                     <span>1-on-1 Dedicated Sanad-Certified Teacher</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
                     <span>Interactive WebRTC Video Classroom</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Digital Stage Badges & Certificate</span>
+                    <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
+                    <span>Digital Stage Badges &amp; Certificate</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
                     <span>No credit card required for 3-day trial</span>
                   </div>
                 </div>
@@ -296,6 +329,7 @@ export default function CourseDetailPage() {
                 <Link
                   href="/login?role=student"
                   className="block w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl text-center shadow-lg transition-all"
+                  className="block w-full py-3 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl text-center shadow-lg transition-all"
                 >
                   Start with Free Trial
                 </Link>
@@ -311,6 +345,8 @@ export default function CourseDetailPage() {
           <div className="space-y-1">
             <h2 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
               <Sparkles className="w-6 h-6 text-emerald-600" />
+            <h2 className="text-2xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2">
+              <Sparkles className="w-6 h-6 text-[#d4a359]" />
               <span>Design Principles for Kids&apos; Lessons</span>
             </h2>
             <p className="text-xs sm:text-sm text-slate-500">
@@ -323,8 +359,10 @@ export default function CourseDetailPage() {
               <div
                 key={idx}
                 className="bg-white rounded-3xl p-5 border border-slate-200 shadow-xs hover:border-emerald-500/40 hover:shadow-md transition-all space-y-2"
+                className="bg-white rounded-3xl p-5 border border-[#e6dfd5] shadow-xs hover:border-[#d4a359]/60 hover:shadow-md transition-all space-y-2"
               >
                 <div className="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold text-xs">
+                <div className="w-9 h-9 rounded-2xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center font-bold text-xs border border-[#d4a359]/30">
                   {idx + 1}
                 </div>
                 <h3 className="font-extrabold text-sm text-slate-900">{dp.title}</h3>
@@ -341,6 +379,9 @@ export default function CourseDetailPage() {
               <h2 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
                 <Award className="w-6 h-6 text-emerald-600" />
                 <span>Curriculum, Chapters, Tests & Homework</span>
+              <h2 className="text-2xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2">
+                <Award className="w-6 h-6 text-[#d4a359]" />
+                <span>Curriculum, Chapters, Tests &amp; Homework</span>
               </h2>
               <p className="text-xs sm:text-sm text-slate-500">
                 Explore the complete modular syllabus crafted by the instructor tutor.
@@ -355,6 +396,7 @@ export default function CourseDetailPage() {
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     curriculumTab === 'stages'
                       ? 'bg-white text-slate-900 shadow-xs'
+                      ? 'bg-[#0c2217] text-[#d4a359] shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -368,10 +410,12 @@ export default function CourseDetailPage() {
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     curriculumTab === 'chapters'
                       ? 'bg-white text-slate-900 shadow-xs'
+                      ? 'bg-[#0c2217] text-[#d4a359] shadow-xs'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
                   Chapters & Lessons ({course.chapters.length})
+                  Chapters &amp; Lessons ({course.chapters.length})
                 </button>
               )}
 
@@ -381,10 +425,12 @@ export default function CourseDetailPage() {
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     curriculumTab === 'tests'
                       ? 'bg-white text-purple-900 shadow-xs'
+                      ? 'bg-[#0c2217] text-[#d4a359] shadow-xs'
                       : 'text-slate-600 hover:text-purple-800'
                   }`}
                 >
                   Tests & Quizzes ({allTests.length})
+                  Tests &amp; Quizzes ({allTests.length})
                 </button>
               )}
 
@@ -394,6 +440,7 @@ export default function CourseDetailPage() {
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     curriculumTab === 'assignments'
                       ? 'bg-white text-blue-900 shadow-xs'
+                      ? 'bg-[#0c2217] text-[#d4a359] shadow-xs'
                       : 'text-slate-600 hover:text-blue-800'
                   }`}
                 >
@@ -405,12 +452,16 @@ export default function CourseDetailPage() {
 
           {/* Public & Registered Metric Summary Banner */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 p-4 sm:p-5 bg-gradient-to-r from-emerald-950 via-slate-950 to-teal-950 text-white rounded-3xl border border-emerald-500/30 shadow-lg">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5 p-4 sm:p-5 bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#07150e] text-white rounded-3xl border border-[#d4a359]/30 shadow-lg">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-2xl bg-emerald-800/80 border border-emerald-500/40 text-emerald-200 flex items-center justify-center font-black shrink-0">
                 <BookOpen className="w-5 h-5 text-emerald-300" />
+              <div className="w-10 h-10 rounded-2xl bg-[#143d2b] border border-[#d4a359]/40 text-[#d4a359] flex items-center justify-center font-black shrink-0">
+                <BookOpen className="w-5 h-5 text-[#d4a359]" />
               </div>
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 block">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#d4a359] block">
                   Course Outline
                 </span>
                 <span className="text-sm font-black text-white">
@@ -440,6 +491,7 @@ export default function CourseDetailPage() {
               <div>
                 <span className="text-[10px] font-black uppercase tracking-wider text-blue-400 block">
                   Homework & Recitation
+                  Homework &amp; Recitation
                 </span>
                 <span className="text-sm font-black text-white">
                   {allAssignments.length} Assignments
@@ -463,10 +515,13 @@ export default function CourseDetailPage() {
                         isSelected
                           ? 'bg-slate-900 border-emerald-500 text-white shadow-xl ring-2 ring-emerald-400/40 scale-[1.02]'
                           : 'bg-white border-slate-200 text-slate-800 hover:border-slate-300'
+                          ? 'bg-[#0c2217] border-[#d4a359] text-white shadow-xl ring-2 ring-[#d4a359]/40 scale-[1.02]'
+                          : 'bg-white border-[#e6dfd5] text-slate-800 hover:border-[#d4a359]/60'
                       }`}
                     >
                       <div>
                         <span className={`text-[10px] font-black uppercase tracking-wider block ${isSelected ? 'text-emerald-400' : 'text-slate-400'}`}>
+                        <span className={`text-[10px] font-black uppercase tracking-wider block ${isSelected ? 'text-[#d4a359]' : 'text-slate-400'}`}>
                           Stage {stage.stageNumber}
                         </span>
                         <h4 className="font-extrabold text-xs sm:text-sm mt-0.5 leading-snug">
@@ -479,6 +534,7 @@ export default function CourseDetailPage() {
                           {stage.lessonCount} Lessons
                         </span>
                         <span className="text-emerald-500 font-bold truncate ml-1">
+                        <span className="text-[#d4a359] font-bold truncate ml-1">
                           {stage.badgeReward}
                         </span>
                       </div>
@@ -489,12 +545,15 @@ export default function CourseDetailPage() {
 
               {/* Active Stage Detailed Lesson Cards */}
               <div className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-6">
+              <div className="bg-white rounded-3xl border border-[#e6dfd5] p-6 sm:p-8 shadow-sm space-y-6">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-slate-100">
                   <div>
                     <span className="text-xs font-bold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200 inline-block mb-1">
+                    <span className="text-xs font-bold text-[#0c2217] bg-[#f0ece1] px-3 py-1 rounded-full border border-[#d4a359]/40 inline-block mb-1">
                       Active View: Stage {activeStage.stageNumber} of {course.stages?.length}
                     </span>
                     <h3 className="text-xl sm:text-2xl font-black text-slate-900">
+                    <h3 className="text-xl sm:text-2xl font-serif font-black text-slate-900">
                       {activeStage.name}
                     </h3>
                     <p className="text-xs text-slate-500 mt-0.5">
@@ -503,8 +562,10 @@ export default function CourseDetailPage() {
                   </div>
 
                   <div className="p-3 bg-slate-50 rounded-2xl border border-slate-200 text-right shrink-0">
+                  <div className="p-3 bg-[#faf8f5] rounded-2xl border border-[#e6dfd5] text-right shrink-0">
                     <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Milestone Reward</span>
                     <span className="text-xs font-black text-emerald-800">{activeStage.badgeReward}</span>
+                    <span className="text-xs font-black text-[#0c2217]">{activeStage.badgeReward}</span>
                   </div>
                 </div>
 
@@ -516,6 +577,7 @@ export default function CourseDetailPage() {
                     >
                       <div className="flex items-start sm:items-center gap-3">
                         <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white font-black text-xs flex items-center justify-center shrink-0 shadow-xs">
+                        <div className="w-8 h-8 rounded-xl bg-[#0c2217] text-[#d4a359] font-black text-xs flex items-center justify-center shrink-0 shadow-xs border border-[#d4a359]/30">
                           {lesson.lessonNumber}
                         </div>
                         <div>
@@ -529,6 +591,7 @@ export default function CourseDetailPage() {
                       </div>
 
                         <div className="sm:text-right text-left bg-emerald-100/60 text-emerald-900 border border-emerald-200/80 px-3 py-1.5 rounded-xl text-[11px] font-semibold shrink-0 flex items-center gap-1.5">
+                        <div className="sm:text-right text-left bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 px-3 py-1.5 rounded-xl text-[11px] font-semibold shrink-0 flex items-center gap-1.5">
                           <Sparkles className="w-3.5 h-3.5 text-amber-600 shrink-0" />
                           <span><strong className="font-bold">Kid-Friendly Approach:</strong> {lesson.approach}</span>
                         </div>
@@ -544,12 +607,15 @@ export default function CourseDetailPage() {
             <div className="space-y-6">
               {course.chapters?.map((chapter) => (
                 <div key={chapter._id} className="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm space-y-4">
+                <div key={chapter._id} className="bg-white rounded-3xl border border-[#e6dfd5] p-6 sm:p-8 shadow-sm space-y-4">
                   <div className="flex items-center gap-3 pb-3 border-b border-slate-100">
                     <span className="w-9 h-9 rounded-2xl bg-emerald-600 text-white font-black text-sm flex items-center justify-center shadow-sm shrink-0">
+                    <span className="w-9 h-9 rounded-2xl bg-[#0c2217] text-[#d4a359] font-black text-sm flex items-center justify-center shadow-sm shrink-0 border border-[#d4a359]/30">
                       {chapter.chapterNumber}
                     </span>
                     <div>
                       <h3 className="font-extrabold text-base sm:text-lg text-slate-900">{chapter.title}</h3>
+                      <h3 className="font-serif font-black text-base sm:text-lg text-slate-900">{chapter.title}</h3>
                       {chapter.description && <p className="text-xs text-slate-500">{chapter.description}</p>}
                     </div>
                   </div>
@@ -559,6 +625,7 @@ export default function CourseDetailPage() {
                       <div key={l._id} className="p-3.5 bg-slate-50 rounded-2xl border border-slate-200/80 flex items-center justify-between gap-3 text-xs">
                         <div className="flex items-center gap-2.5">
                           <FileText className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <FileText className="w-4 h-4 text-[#b85d34] shrink-0" />
                           <div>
                             <h5 className="font-bold text-slate-900">{l.title}</h5>
                             <p className="text-[11px] text-slate-500">{l.content}</p>
@@ -568,6 +635,7 @@ export default function CourseDetailPage() {
                           <span className="text-[10px] font-semibold text-slate-500">{l.duration}</span>
                           {l.videoUrl && (
                             <span className="text-[10px] bg-teal-50 text-teal-700 border border-teal-200 px-2 py-0.5 rounded-md font-bold flex items-center gap-1">
+                            <span className="text-[10px] bg-[#faf0eb] text-[#b85d34] border border-[#b85d34]/30 px-2 py-0.5 rounded-md font-bold flex items-center gap-1">
                               <Video className="w-3 h-3" />
                               <span>Lecture</span>
                             </span>
@@ -737,6 +805,7 @@ export default function CourseDetailPage() {
                         <div className="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-slate-100">
                           <span>Submission Window: <strong>{asg.dueDateDays} Days</strong></span>
                           <span className="text-emerald-700 font-bold">Evaluated by Tutor</span>
+                          <span className="text-[#0c2217] font-bold">Evaluated by Tutor</span>
                         </div>
                       </>
                     ) : (
@@ -747,6 +816,7 @@ export default function CourseDetailPage() {
                         <div>
                           <p className="text-xs font-black text-slate-800">
                             Submission Guidelines & Tutor Review Portal
+                            Submission Guidelines &amp; Tutor Review Portal
                           </p>
                           <p className="text-[11px] text-slate-500 mt-0.5 max-w-sm mx-auto">
                             Assignment submission prompts and audio upload channels are unlocked for registered students.
@@ -778,13 +848,17 @@ export default function CourseDetailPage() {
 
         {/* Tutor Pediatric Teaching Tips */}
         <section className="bg-emerald-900 text-white rounded-3xl p-6 sm:p-8 border border-emerald-700 shadow-xl space-y-4">
+        <section className="bg-[#0c2217] text-[#faf8f5] rounded-3xl p-6 sm:p-8 border border-[#d4a359]/30 shadow-xl space-y-4">
           <div className="flex items-center gap-2.5">
             <ShieldCheck className="w-6 h-6 text-emerald-300" />
             <h3 className="font-black text-lg sm:text-xl">
+            <ShieldCheck className="w-6 h-6 text-[#d4a359]" />
+            <h3 className="font-serif font-black text-lg sm:text-xl text-white">
               Faculty Pediatric Teaching Guidelines
             </h3>
           </div>
           <p className="text-xs sm:text-sm text-emerald-100 leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#d1dbd6] leading-relaxed">
             All teachers assigned to this track adhere to positive psychological and pedagogical practices:
           </p>
 
@@ -792,6 +866,7 @@ export default function CourseDetailPage() {
             {course.tutorTips?.map((tip, idx) => (
               <div key={idx} className="p-3.5 rounded-2xl bg-white/10 border border-white/10 text-xs font-medium flex items-start gap-2.5">
                 <Check className="w-4 h-4 text-emerald-300 shrink-0 mt-0.5" />
+                <Check className="w-4 h-4 text-[#d4a359] shrink-0 mt-0.5" />
                 <span>{tip}</span>
               </div>
             ))}
@@ -805,6 +880,8 @@ export default function CourseDetailPage() {
               <div>
                 <h2 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
                   <Users className="w-6 h-6 text-emerald-600" />
+                <h2 className="text-2xl font-serif font-black text-slate-900 tracking-tight flex items-center gap-2">
+                  <Users className="w-6 h-6 text-[#d4a359]" />
                   <span>Available Certified Tutors for this Course</span>
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-500">
@@ -815,6 +892,7 @@ export default function CourseDetailPage() {
               <Link
                 href="/tutors?category=nazra-quran"
                 className="text-xs font-bold text-emerald-700 hover:underline flex items-center gap-1"
+                className="text-xs font-bold text-[#b85d34] hover:underline flex items-center gap-1"
               >
                 <span>View all verified teachers</span>
                 <ChevronRight className="w-3.5 h-3.5" />

@@ -108,7 +108,7 @@ export default function CMSCategoriesPage() {
 
               <button
                 onClick={openCreateModal}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5"
+                className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5"
               >
                 <Plus className="w-4 h-4" />
                 <span>Add Category</span>
@@ -231,7 +231,7 @@ export default function CMSCategoriesPage() {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-md"
+                  className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-md cursor-pointer"
                 >
                   Save Category
                 </button>

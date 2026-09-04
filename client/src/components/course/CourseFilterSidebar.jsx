@@ -68,17 +68,17 @@ export default function CourseFilterSidebar({
   ];
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-sm space-y-6">
+    <div className="bg-white rounded-3xl border border-[#e6ded1] p-5 shadow-sm space-y-6">
       
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+      <div className="flex items-center justify-between pb-3 border-b border-[#e6ded1]">
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-emerald-600" />
-          <h3 className="font-bold text-xs sm:text-sm text-slate-900">Filter & Sort Courses</h3>
+          <Filter className="w-4 h-4 text-[#0c2217]" />
+          <h3 className="font-bold text-xs sm:text-sm text-slate-900 font-serif">Filter &amp; Sort Courses</h3>
         </div>
         <button
           onClick={onReset}
-          className="text-[11px] font-bold text-slate-500 hover:text-emerald-700 flex items-center gap-1 transition-colors cursor-pointer"
+          className="text-[11px] font-bold text-slate-500 hover:text-[#b85d34] flex items-center gap-1 transition-colors cursor-pointer"
         >
           <RotateCcw className="w-3 h-3" />
           <span>Reset</span>
@@ -88,7 +88,7 @@ export default function CourseFilterSidebar({
       {/* 1. Sort Courses By */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-          <ArrowUpDown className="w-3.5 h-3.5 text-emerald-600" />
+          <ArrowUpDown className="w-3.5 h-3.5 text-[#0c2217]" />
           <span>Sort Courses By</span>
         </label>
         <CustomSelect
@@ -104,11 +104,11 @@ export default function CourseFilterSidebar({
             onClick={() => onFilterChange('sortBy', 'popular')}
             className={`py-1.5 px-2 rounded-xl text-center text-[11px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-1 border ${
               filters.sortBy === 'popular'
-                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold shadow-2xs'
-                : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217] font-bold shadow-xs'
+                : 'bg-[#f4efe8] text-stone-700 border-[#e6dfd5] hover:bg-[#eae3d8]'
             }`}
           >
-            <Sparkles className="w-3 h-3 text-amber-500" />
+            <Sparkles className="w-3 h-3 text-[#d4a359]" />
             <span>Most Popular</span>
           </button>
 
@@ -117,11 +117,11 @@ export default function CourseFilterSidebar({
             onClick={() => onFilterChange('sortBy', 'newest')}
             className={`py-1.5 px-2 rounded-xl text-center text-[11px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-1 border ${
               filters.sortBy === 'newest'
-                ? 'bg-emerald-50 text-emerald-800 border-emerald-300 font-bold shadow-2xs'
-                : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217] font-bold shadow-xs'
+                : 'bg-[#f4efe8] text-stone-700 border-[#e6dfd5] hover:bg-[#eae3d8]'
             }`}
           >
-            <Clock className="w-3 h-3 text-emerald-600" />
+            <Clock className="w-3 h-3 text-[#d4a359]" />
             <span>Newly Added</span>
           </button>
         </div>
@@ -130,7 +130,7 @@ export default function CourseFilterSidebar({
       {/* 2. Discipline / Category Filter */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-          <BookOpen className="w-3.5 h-3.5 text-emerald-600" />
+          <BookOpen className="w-3.5 h-3.5 text-[#0c2217]" />
           <span>Subject Discipline</span>
         </label>
         <CustomSelect
@@ -146,7 +146,7 @@ export default function CourseFilterSidebar({
       {/* 3. Track Filter */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-          <Layers className="w-3.5 h-3.5 text-emerald-600" />
+          <Layers className="w-3.5 h-3.5 text-[#0c2217]" />
           <span>Curriculum Track</span>
         </label>
         <CustomSelect
@@ -161,7 +161,7 @@ export default function CourseFilterSidebar({
       {/* 4. Target Audience */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-          <Users className="w-3.5 h-3.5 text-emerald-600" />
+          <Users className="w-3.5 h-3.5 text-[#0c2217]" />
           <span>Target Audience</span>
         </label>
         <CustomSelect
@@ -176,7 +176,7 @@ export default function CourseFilterSidebar({
       {/* 5. Session Duration */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-          <Clock className="w-3.5 h-3.5 text-emerald-600" />
+          <Clock className="w-3.5 h-3.5 text-[#0c2217]" />
           <span>Session Duration</span>
         </label>
         <CustomSelect
@@ -191,7 +191,7 @@ export default function CourseFilterSidebar({
       {/* 6. Tuition Range */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-          <CreditCard className="w-3.5 h-3.5 text-emerald-600" />
+          <CreditCard className="w-3.5 h-3.5 text-[#0c2217]" />
           <span>Monthly Tuition (PKR)</span>
         </label>
         <CustomSelect

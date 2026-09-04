@@ -81,7 +81,7 @@ export default function TutorRegisterPage() {
               <BookOpen className="w-6 h-6" />
             </div>
           </Link>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b] text-[#d4a359] border border-[#2b6e51]/60 text-xs font-bold shadow-xs">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40 text-xs font-bold shadow-xs">
             <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
             <span>Tutor Faculty Registration</span>
           </div>

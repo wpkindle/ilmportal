@@ -159,13 +159,13 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
         {/* Modal Header (Pinned at Top) */}
         <div className="p-3.5 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
           <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-            <div className="p-2 sm:p-2.5 bg-gradient-to-br from-emerald-500 to-teal-600 text-white rounded-xl sm:rounded-2xl shadow-md shrink-0">
+            <div className="p-2 sm:p-2.5 bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/40 rounded-xl sm:rounded-2xl shadow-md shrink-0">
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="min-w-0">
               <h3 className="font-bold text-sm sm:text-base text-slate-900 flex flex-wrap items-center gap-1.5 leading-tight">
                 <span>Send Course Agreement Offer</span>
-                <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full border border-emerald-200 shrink-0">
+                <span className="text-[10px] font-bold px-2 py-0.5 bg-[#f0ece1] text-[#0c2217] rounded-full border border-[#d4a359]/40 shrink-0">
                   3-Day Free Trial
                 </span>
               </h3>
@@ -196,7 +196,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
           {/* 1. Subject Selection Dropdown */}
           <div className="space-y-1.5">
             <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-              <BookOpen className="w-3.5 h-3.5 text-emerald-600" />
+              <BookOpen className="w-3.5 h-3.5 text-[#d4a359]" />
               <span>Select Subject / Curriculum *</span>
             </label>
             
@@ -217,7 +217,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                 placeholder="Enter custom course or subject name (e.g. Advanced Arabic Sarf, Cambridge O-Level Accounting)..."
                 value={customSubjectText}
                 onChange={(e) => setCustomSubjectText(e.target.value)}
-                className="w-full mt-2 p-2.5 bg-slate-50 border border-emerald-400 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:bg-white animate-in fade-in"
+                className="w-full mt-2 p-2.5 bg-slate-50 border border-[#d4a359]/60 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:bg-white animate-in fade-in"
               />
             )}
           </div>
@@ -226,7 +226,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <div className="space-y-1">
               <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                <CreditCard className="w-3.5 h-3.5 text-emerald-600" />
+                <CreditCard className="w-3.5 h-3.5 text-[#d4a359]" />
                 <span>Agreed Tuition Fee (PKR) *</span>
               </label>
               <input
@@ -237,7 +237,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                 placeholder="4000"
                 value={price}
                 onChange={(e) => setPrice(e.target.value)}
-                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900 outline-none focus:border-emerald-500 focus:bg-white"
+                className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-bold text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white"
               />
             </div>
 
@@ -265,8 +265,8 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                 onClick={() => setMode('online')}
                 className={`py-2.5 px-3 rounded-2xl text-center border transition-all cursor-pointer flex items-center justify-center gap-2 ${
                   mode === 'online'
-                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-md font-bold'
-                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                    ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217] shadow-sm font-bold'
+                    : 'bg-[#f4efe8] border-[#e6dfd5] text-stone-700 hover:bg-[#eae3d8]'
                 }`}
               >
                 <Video className="w-4 h-4" />
@@ -277,8 +277,8 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                 onClick={() => setMode('physical')}
                 className={`py-2.5 px-3 rounded-2xl text-center border transition-all cursor-pointer flex items-center justify-center gap-2 ${
                   mode === 'physical'
-                    ? 'bg-emerald-600 text-white border-emerald-600 shadow-md font-bold'
-                    : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                    ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217] shadow-sm font-bold'
+                    : 'bg-[#f4efe8] border-[#e6dfd5] text-stone-700 hover:bg-[#eae3d8]'
                 }`}
               >
                 <Home className="w-4 h-4" />
@@ -288,13 +288,13 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
           </div>
 
           {/* 4. Calendar & Time Selection Box */}
-          <div className="p-4 bg-slate-50/80 border border-slate-200/90 rounded-2xl space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+          <div className="p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl space-y-3">
+            <div className="flex items-center justify-between border-b border-[#e6ded1] pb-2">
               <div className="flex items-center gap-2 font-bold text-xs text-slate-900">
-                <CalendarIcon className="w-4 h-4 text-emerald-600" />
-                <span>Class Schedule & Calendar Timings</span>
+                <CalendarIcon className="w-4 h-4 text-[#0c2217]" />
+                <span>Class Schedule &amp; Calendar Timings</span>
               </div>
-              <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100 px-2 py-0.5 rounded-md">
+              <span className="text-[10px] font-bold text-[#0c2217] bg-[#f0ece1] border border-[#d4a359]/30 px-2 py-0.5 rounded-md">
                 Pakistan Standard Time (PKT)
               </span>
             </div>
@@ -305,7 +305,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
               {/* 1. First Class Date */}
               <div className="sm:col-span-5 space-y-1">
                 <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <CalendarIcon className="w-3.5 h-3.5 text-emerald-600" />
+                  <CalendarIcon className="w-3.5 h-3.5 text-[#0c2217]" />
                   <span>First Class Date *</span>
                 </label>
                 
@@ -318,7 +318,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                       dateInputRef.current?.focus();
                     }
                   }}
-                  className="relative flex items-center bg-white border border-slate-200 hover:border-emerald-500 focus-within:border-emerald-500 rounded-xl p-2 cursor-pointer transition-colors shadow-2xs group h-[42px]"
+                  className="relative flex items-center bg-white border border-slate-200 hover:border-[#0c2217] focus-within:border-[#0c2217] rounded-xl p-2 cursor-pointer transition-colors shadow-2xs group h-[42px]"
                 >
                   <input
                     ref={dateInputRef}
@@ -338,11 +338,11 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
               {/* 2. Daily Class Time with Fully Visible AM/PM */}
               <div className="sm:col-span-4 space-y-1">
                 <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <Clock className="w-3.5 h-3.5 text-emerald-600" />
+                  <Clock className="w-3.5 h-3.5 text-[#0c2217]" />
                   <span>Class Time (PKT) *</span>
                 </label>
                 
-                <div className="flex items-center justify-between gap-1 bg-white border border-slate-200 focus-within:border-emerald-500 rounded-xl px-2 py-1 shadow-2xs h-[42px]">
+                <div className="flex items-center justify-between gap-1 bg-white border border-slate-200 focus-within:border-[#0c2217] rounded-xl px-2 py-1 shadow-2xs h-[42px]">
                   <div className="flex items-center gap-1 min-w-0">
                     {/* Hour */}
                     <select
@@ -378,7 +378,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                       onClick={() => setPeriod('AM')}
                       className={`px-2 py-1 transition-colors cursor-pointer text-[11px] font-extrabold ${
                         period === 'AM'
-                          ? 'bg-emerald-600 text-white'
+                          ? 'bg-[#0c2217] text-[#d4a359]'
                           : 'bg-white text-slate-600 hover:bg-slate-100'
                       }`}
                     >
@@ -389,7 +389,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                       onClick={() => setPeriod('PM')}
                       className={`px-2 py-1 transition-colors cursor-pointer text-[11px] font-extrabold ${
                         period === 'PM'
-                          ? 'bg-emerald-600 text-white'
+                          ? 'bg-[#0c2217] text-[#d4a359]'
                           : 'bg-white text-slate-600 hover:bg-slate-100'
                       }`}
                     >
@@ -407,7 +407,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                 <select
                   value={durationMinutes}
                   onChange={(e) => setDurationMinutes(e.target.value)}
-                  className="w-full px-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-emerald-500 cursor-pointer shadow-2xs h-[42px]"
+                  className="w-full px-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-[#0c2217] cursor-pointer shadow-2xs h-[42px]"
                 >
                   <option value="30">30 Min</option>
                   <option value="45">45 Min (Best)</option>
@@ -432,7 +432,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                       key={preset.label}
                       type="button"
                       onClick={() => applyPreset(preset.days)}
-                      className="text-[10px] font-bold text-emerald-700 hover:text-emerald-900 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200/80 px-1.5 py-0.5 rounded-lg cursor-pointer transition-colors"
+                      className="text-[10px] font-bold text-[#0c2217] hover:text-black bg-[#f0ece1] hover:bg-[#e6ded1] border border-[#d4a359]/30 px-1.5 py-0.5 rounded-lg cursor-pointer transition-colors"
                     >
                       {preset.label}
                     </button>
@@ -450,7 +450,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                       onClick={() => toggleDay(day.key)}
                       className={`py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold rounded-lg sm:rounded-xl border transition-all cursor-pointer ${
                         isSelected
-                          ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
+                          ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217] shadow-xs'
                           : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
                       }`}
                     >
@@ -462,19 +462,19 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
             </div>
 
             {/* Live Schedule Summary Pill */}
-            <div className="p-2.5 bg-emerald-50/70 border border-emerald-200/80 rounded-xl text-[11px] text-emerald-900 flex items-start gap-2">
-              <Clock className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+            <div className="p-2.5 bg-[#f0ece1] border border-[#d4a359]/30 rounded-xl text-[11px] text-[#0c2217] flex items-start gap-2">
+              <Clock className="w-3.5 h-3.5 text-[#0c2217] shrink-0 mt-0.5" />
               <div className="space-y-0.5">
-                <span className="font-bold text-emerald-950">Agreed Schedule Summary:</span>
-                <p className="font-medium text-emerald-800">{computedSchedule}</p>
+                <span className="font-bold text-[#0c2217]">Agreed Schedule Summary:</span>
+                <p className="font-medium text-slate-700">{computedSchedule}</p>
               </div>
             </div>
 
           </div>
 
           {/* Safety & Trial Guarantee Banner */}
-          <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-100 text-[11px] text-emerald-900 flex items-start gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+          <div className="p-3 bg-[#faf8f5] rounded-2xl border border-[#e6ded1] text-[11px] text-slate-800 flex items-start gap-2">
+            <ShieldCheck className="w-4 h-4 text-[#0c2217] shrink-0 mt-0.5" />
             <p className="leading-snug">
               When sent, the student receives the offer in chat and can immediately activate the <strong>3-Day Free Trial</strong> with zero advance payment.
             </p>
@@ -499,9 +499,9 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
               type="submit"
               form="deal-offer-form"
               disabled={loading}
-              className="flex-1 sm:flex-none px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-emerald-600/30 transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5 active:scale-95"
+              className="flex-1 sm:flex-none px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-[#b85d34]/25 transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5 active:scale-95"
             >
-              <Sparkles className="w-4 h-4 text-emerald-200 shrink-0" />
+              <Sparkles className="w-4 h-4 text-white/80 shrink-0" />
               <span>{loading ? 'Sending Offer...' : 'Send Course Offer'}</span>
             </button>
           </div>

@@ -123,7 +123,7 @@ export default function TutorApprovalPage() {
                 {[
                   { id: 'under_review', label: 'Under Review', count: counts.under_review, badgeBg: 'bg-blue-600 text-white' },
                   { id: 'incomplete', label: 'Incomplete Profiles', count: counts.incomplete, badgeBg: 'bg-amber-600 text-white' },
-                  { id: 'approved', label: 'Approved & Live', count: counts.approved, badgeBg: 'bg-emerald-600 text-white' },
+                  { id: 'approved', label: 'Approved & Live', count: counts.approved, badgeBg: 'bg-[#b85d34] text-white' },
                   { id: 'contact_needed', label: 'Needs Contact', count: counts.contact_needed, badgeBg: 'bg-purple-600 text-white' },
                   { id: 'rejected', label: 'Rejected', count: counts.rejected, badgeBg: 'bg-rose-600 text-white' },
                   { id: 'all', label: 'All Tutors', count: counts.all, badgeBg: 'bg-slate-600 text-white' }
@@ -165,7 +165,7 @@ export default function TutorApprovalPage() {
                     <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                       <div className="flex items-start gap-4">
                         <img
-                          src={tutor.user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(tutor.user?.name || 'T')}&background=059669&color=fff`}
+                          src={tutor.user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(tutor.user?.name || 'T')}&background=0c2217&color=d4a359`}
                           alt="Applicant"
                           className="w-14 h-14 rounded-2xl object-cover border border-slate-200"
                         />
@@ -174,7 +174,7 @@ export default function TutorApprovalPage() {
                             <h3 className="font-bold text-base text-slate-900">{tutor.user?.name}</h3>
                             <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full border ${
                               tutor.verificationStatus === 'approved'
-                                ? 'bg-emerald-100 text-emerald-900 border-emerald-300'
+                                ? 'bg-[#f0ece1] text-[#0c2217] border-[#d4a359]/40'
                                 : tutor.verificationStatus === 'under_review'
                                 ? 'bg-blue-100 text-blue-900 border-blue-300'
                                 : tutor.verificationStatus === 'incomplete'
@@ -191,7 +191,7 @@ export default function TutorApprovalPage() {
                           <p className="text-xs text-slate-500 mt-0.5">
                             {tutor.user?.email} &bull; {tutor.user?.phone} &bull; {tutor.user?.city || 'No City'}
                           </p>
-                          <p className="text-xs font-semibold text-emerald-800 mt-1">
+                          <p className="text-xs font-semibold text-[#0c2217] mt-1">
                             Degree/Sanad: {tutor.qualifications || 'Not specified'} ({tutor.experienceYears} Yrs Exp)
                           </p>
                         </div>
@@ -204,9 +204,9 @@ export default function TutorApprovalPage() {
                           setActiveTutorName(tutor.user?.name || 'Tutor');
                           setSanadModalOpen(true);
                         }}
-                        className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 flex items-center gap-1.5"
+                        className="px-3 py-1.5 bg-[#f0ece1] hover:bg-[#e6ded1] text-[#0c2217] font-bold text-xs rounded-xl border border-[#d4a359]/40 flex items-center gap-1.5 cursor-pointer"
                       >
-                        <FileText className="w-4 h-4" />
+                        <FileText className="w-4 h-4 text-[#d4a359]" />
                         <span>Inspect Sanad ({tutor.sanadDocuments?.length || 0})</span>
                       </button>
                     </div>
@@ -216,13 +216,13 @@ export default function TutorApprovalPage() {
                       <div className="p-3 bg-slate-50 border border-slate-200/80 rounded-2xl space-y-1.5">
                         <div className="flex items-center justify-between text-xs">
                           <span className="font-bold text-slate-700">Profile Strength & Completion:</span>
-                          <span className={`font-black ${tutor.completion.percentage >= 100 ? 'text-emerald-700' : 'text-amber-700'}`}>
+                          <span className={`font-black ${tutor.completion.percentage >= 100 ? 'text-[#0c2217]' : 'text-amber-700'}`}>
                             {tutor.completion.percentage}% {tutor.completion.percentage >= 100 ? '(100% Ready for Approval)' : '(Incomplete)'}
                           </span>
                         </div>
                         <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
                           <div
-                            className={`h-full transition-all rounded-full ${tutor.completion.percentage >= 100 ? 'bg-emerald-500' : 'bg-amber-500'}`}
+                            className={`h-full transition-all rounded-full ${tutor.completion.percentage >= 100 ? 'bg-[#b85d34]' : 'bg-amber-500'}`}
                             style={{ width: `${tutor.completion.percentage}%` }}
                           />
                         </div>
@@ -249,7 +249,7 @@ export default function TutorApprovalPage() {
                         <button
                           onClick={() => handleApprove(tutor._id)}
                           disabled={actionLoading}
-                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 cursor-pointer"
+                          className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
                         >
                           <CheckCircle2 className="w-4 h-4" />
                           <span>Approve & Make Live</span>

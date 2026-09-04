@@ -232,7 +232,7 @@ const Navbar = () => {
     {
       title: 'Quran & Islamic Sciences',
       icon: BookOpen,
-      color: 'text-emerald-600 bg-emerald-50',
+      color: 'text-[#0c2217] bg-[#f0ece1]',
       items: [
         { name: 'Nazra Quran Reading & Qaida', link: '/tutors?category=nazra-quran' },
         { name: 'Tajweed al-Quran', link: '/tutors?category=tajweed-al-quran' },
@@ -244,7 +244,7 @@ const Navbar = () => {
     {
       title: 'School & College Academics',
       icon: GraduationCap,
-      color: 'text-teal-600 bg-teal-50',
+      color: 'text-[#b85d34] bg-[#faf0eb]',
       items: [
         { name: 'Matric / SSC Science & Arts', link: '/tutors?category=matric-ssc-science' },
         { name: 'FSc Pre-Medical & Engineering', link: '/tutors?category=fsc-pre-engineering' },
@@ -284,7 +284,7 @@ const Navbar = () => {
           
           {/* Brand Logo & Tagline */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#0c2217] flex items-center justify-center text-[#faf8f5] shadow-md shadow-[#0c2217]/20 group-hover:scale-105 transition-transform border border-[#2b6e51]/50">
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#0c2217] flex items-center justify-center text-[#faf8f5] shadow-md shadow-[#0c2217]/20 group-hover:scale-105 transition-transform border border-[#d4a359]/40">
               <BookOpen className="w-5 h-5 text-[#d4a359]" />
             </div>
             <div>
@@ -292,7 +292,7 @@ const Navbar = () => {
                 <span className="text-lg sm:text-xl font-serif font-black tracking-tight text-slate-900">
                   Ilm<span className="text-[#0c2217]">Portal</span>
                 </span>
-                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-extrabold uppercase bg-[#143d2b] text-[#f5f0e6] border border-[#2b6e51]/40">
+                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-extrabold uppercase bg-[#143d2b] text-[#f5f0e6] border border-[#d4a359]/40">
                   Pakistan
                 </span>
               </div>
@@ -414,9 +414,9 @@ const Navbar = () => {
                 {/* Active Portal Badge Link */}
                 <Link
                   href={getDashboardRoute()}
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200/80 text-xs font-bold hover:bg-emerald-100 transition-colors shadow-2xs"
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0c2217] text-[#d4a359] border border-[#0c2217] text-xs font-bold hover:bg-[#143d2b] transition-colors shadow-2xs"
                 >
-                  <Layers className="w-3.5 h-3.5 text-emerald-600" />
+                  <Layers className="w-3.5 h-3.5 text-[#d4a359]" />
                   <span>
                     {isAdmin ? 'Admin Portal' : isTutor ? 'Tutor Portal' : 'Student Portal'}
                   </span>
@@ -425,12 +425,12 @@ const Navbar = () => {
                 {/* Messages Link with Counter Badge */}
                 <Link
                   href={isTutor ? '/tutor/messages' : isStudent ? '/student/messages' : '/admin/chats'}
-                  className="p-2.5 rounded-xl text-slate-600 hover:text-emerald-700 hover:bg-slate-100 relative transition-colors"
+                  className="p-2.5 rounded-xl text-stone-700 hover:text-[#0c2217] hover:bg-[#faf8f5] relative transition-colors"
                   title="Messages & Discussions"
                 >
                   <MessageSquare className="w-5 h-5" />
                   {unreadMessagesCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 px-1 min-w-[18px] h-[18px] bg-rose-600 text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-pulse">
+                    <span className="absolute -top-0.5 -right-0.5 px-1 min-w-[18px] h-[18px] bg-[#b85d34] text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-pulse">
                       {unreadMessagesCount > 99 ? '99+' : unreadMessagesCount}
                     </span>
                   )}
@@ -440,12 +440,12 @@ const Navbar = () => {
                 <div className="relative" ref={notifMenuRef}>
                   <button
                     onClick={() => setNotifMenuOpen(!notifMenuOpen)}
-                    className="p-2.5 rounded-xl text-slate-600 hover:text-emerald-700 hover:bg-slate-100 relative transition-colors cursor-pointer"
+                    className="p-2.5 rounded-xl text-stone-700 hover:text-[#0c2217] hover:bg-[#faf8f5] relative transition-colors cursor-pointer"
                     title="Notifications & Safety Alerts"
                   >
                     <Bell className="w-5 h-5" />
                     {unreadNotifCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 px-1 min-w-[18px] h-[18px] bg-emerald-600 text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-pulse">
+                      <span className="absolute -top-0.5 -right-0.5 px-1 min-w-[18px] h-[18px] bg-[#b85d34] text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-pulse">
                         {unreadNotifCount > 99 ? '99+' : unreadNotifCount}
                       </span>
                     )}
@@ -453,13 +453,13 @@ const Navbar = () => {
 
                   {/* Dropdown Menu */}
                   {notifMenuOpen && (
-                    <div className="fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 w-auto sm:w-96 max-w-[calc(100vw-1.5rem)] sm:max-w-none bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in duration-150">
-                      <div className="px-4 py-3 border-b border-slate-100 bg-slate-50/80 flex items-center justify-between">
+                    <div className="fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 w-auto sm:w-96 max-w-[calc(100vw-1.5rem)] sm:max-w-none bg-white rounded-3xl shadow-2xl border border-stone-200 overflow-hidden z-50 animate-in fade-in duration-150">
+                      <div className="px-4 py-3 border-b border-stone-100 bg-[#faf8f5] flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
-                          <Bell className="w-4 h-4 text-emerald-600" />
-                          <span className="text-xs font-black text-slate-900">Notifications</span>
+                          <Bell className="w-4 h-4 text-[#0c2217]" />
+                          <span className="text-xs font-black text-stone-900">Notifications</span>
                           {unreadNotifCount > 0 && (
-                            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800">
+                            <span className="px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-[#f0ece1] text-[#0c2217]">
                               {unreadNotifCount} new
                             </span>
                           )}
@@ -467,7 +467,7 @@ const Navbar = () => {
                         {unreadNotifCount > 0 && (
                           <button
                             onClick={markAllAsRead}
-                            className="text-[11px] font-bold text-emerald-700 hover:underline cursor-pointer"
+                            className="text-[11px] font-bold text-[#b85d34] hover:underline cursor-pointer"
                           >
                             Mark all read
                           </button>
@@ -475,18 +475,18 @@ const Navbar = () => {
                       </div>
 
                       {/* Audio & Browser Alert Settings Bar */}
-                      <div className="px-4 py-2 bg-slate-100/90 border-b border-slate-200/80 flex items-center justify-between text-[11px] text-slate-700">
+                      <div className="px-4 py-2 bg-stone-100/80 border-b border-stone-200/80 flex items-center justify-between text-[11px] text-stone-700">
                         <div className="flex items-center gap-2">
                           <button
                             type="button"
                             onClick={() => toggleSound()}
-                            className="flex items-center gap-1 font-semibold hover:text-emerald-700 transition-colors cursor-pointer"
+                            className="flex items-center gap-1 font-semibold hover:text-[#0c2217] transition-colors cursor-pointer"
                             title={soundEnabled ? 'Mute notification sound' : 'Unmute notification sound'}
                           >
                             {soundEnabled ? (
-                              <Volume2 className="w-3.5 h-3.5 text-emerald-600" />
+                              <Volume2 className="w-3.5 h-3.5 text-[#0c2217]" />
                             ) : (
-                              <VolumeX className="w-3.5 h-3.5 text-slate-400" />
+                              <VolumeX className="w-3.5 h-3.5 text-stone-400" />
                             )}
                             <span>Sound {soundEnabled ? 'ON' : 'MUTED'}</span>
                           </button>
@@ -494,7 +494,7 @@ const Navbar = () => {
                           <button
                             type="button"
                             onClick={testChime}
-                            className="text-[10px] text-slate-500 hover:text-slate-900 underline font-medium cursor-pointer"
+                            className="text-[10px] text-stone-500 hover:text-stone-900 underline font-medium cursor-pointer"
                             title="Test audio chime"
                           >
                             (Test)
@@ -505,25 +505,25 @@ const Navbar = () => {
                           <button
                             type="button"
                             onClick={requestPermission}
-                            className="text-[11px] font-bold text-amber-700 hover:text-amber-800 bg-amber-100/80 px-2 py-0.5 rounded-lg border border-amber-200 cursor-pointer flex items-center gap-1"
+                            className="text-[11px] font-bold text-[#b85d34] hover:text-[#9e4e2a] bg-[#b85d34]/10 px-2 py-0.5 rounded-lg border border-[#b85d34]/20 cursor-pointer flex items-center gap-1"
                           >
-                            <Bell className="w-3 h-3 text-amber-600 animate-pulse" />
+                            <Bell className="w-3 h-3 text-[#b85d34] animate-pulse" />
                             <span>Turn on Notifications</span>
                           </button>
                         ) : (
-                          <span className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
-                            <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          <span className="text-[10px] text-[#0c2217] font-semibold flex items-center gap-1">
+                            <CheckCircle2 className="w-3 h-3 text-[#0c2217]" />
                             <span>Notifications On</span>
                           </span>
                         )}
                       </div>
 
-                      <div className="max-h-80 overflow-y-auto divide-y divide-slate-100">
+                      <div className="max-h-80 overflow-y-auto divide-y divide-stone-100">
                         {notifications.length === 0 ? (
-                          <div className="py-8 text-center text-xs text-slate-500 space-y-1">
-                            <ShieldCheck className="w-6 h-6 mx-auto text-slate-400" />
-                            <p className="font-semibold text-slate-700">All caught up!</p>
-                            <p className="text-[11px] text-slate-400">No new notifications or safety alerts.</p>
+                          <div className="py-8 text-center text-xs text-stone-500 space-y-1">
+                            <ShieldCheck className="w-6 h-6 mx-auto text-stone-400" />
+                            <p className="font-semibold text-stone-700">All caught up!</p>
+                            <p className="text-[11px] text-stone-400">No new notifications or safety alerts.</p>
                           </div>
                         ) : (
                           notifications.slice(0, 8).map((n) => (
@@ -534,25 +534,25 @@ const Navbar = () => {
                                 markAsRead(n._id);
                                 setNotifMenuOpen(false);
                               }}
-                              className={`block p-3.5 hover:bg-slate-50 transition-colors text-xs space-y-1 ${
-                                !n.isRead ? 'bg-emerald-50/40' : ''
+                              className={`block p-3.5 hover:bg-stone-50 transition-colors text-xs space-y-1 ${
+                                !n.isRead ? 'bg-[#faf8f5]' : ''
                               }`}
                             >
                               <div className="flex items-start justify-between gap-2">
-                                <span className="font-bold text-slate-900 flex items-center gap-1.5">
+                                <span className="font-bold text-stone-900 flex items-center gap-1.5">
                                   {n.type === 'safety_report' && (
-                                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                                    <ShieldCheck className="w-3.5 h-3.5 text-[#0c2217] shrink-0" />
                                   )}
                                   <span>{n.title}</span>
                                 </span>
                                 {!n.isRead && (
-                                  <span className="w-2 h-2 rounded-full bg-emerald-600 shrink-0 mt-1" />
+                                  <span className="w-2 h-2 rounded-full bg-[#b85d34] shrink-0 mt-1" />
                                 )}
                               </div>
-                              <p className="text-[11px] text-slate-600 line-clamp-2 leading-relaxed">
+                              <p className="text-[11px] text-stone-600 line-clamp-2 leading-relaxed">
                                 {n.message}
                               </p>
-                              <span className="text-[10px] text-slate-400 block pt-0.5">
+                              <span className="text-[10px] text-stone-400 block pt-0.5">
                                 {new Date(n.createdAt).toLocaleDateString('en-PK', {
                                   day: 'numeric',
                                   month: 'short',
@@ -566,13 +566,13 @@ const Navbar = () => {
                       </div>
 
                       {user?.role && (
-                        <div className="p-2.5 bg-slate-50 border-t border-slate-100 text-center">
+                        <div className="p-2.5 bg-[#faf8f5] border-t border-stone-100 text-center">
                           <Link
                             href={user.role === 'tutor' ? '/tutor/profile#safety-reports' : '/student/profile#safety-reports'}
                             onClick={() => setNotifMenuOpen(false)}
-                            className="text-[11px] font-bold text-emerald-700 hover:text-emerald-800 flex items-center justify-center gap-1"
+                            className="text-[11px] font-bold text-[#0c2217] hover:text-[#b85d34] flex items-center justify-center gap-1"
                           >
-                            <ShieldCheck className="w-3.5 h-3.5" />
+                            <ShieldCheck className="w-3.5 h-3.5 text-[#0c2217]" />
                             <span>View Safety Reports &amp; Incident Resolutions</span>
                           </Link>
                         </div>
@@ -589,42 +589,42 @@ const Navbar = () => {
                     aria-label="User account menu"
                   >
                     {/* Mobile: Edge-to-edge avatar box with ZERO inner padding */}
-                    <div className="sm:hidden w-9 h-9 rounded-2xl overflow-hidden ring-2 ring-emerald-500/30 hover:ring-emerald-500 active:scale-95 transition-all shadow-xs relative shrink-0">
+                    <div className="sm:hidden w-9 h-9 rounded-2xl overflow-hidden ring-2 ring-[#d4a359]/40 hover:ring-[#d4a359] active:scale-95 transition-all shadow-xs relative shrink-0">
                       <img
-                        src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=059669&color=fff`}
+                        src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=0c2217&color=d4a359`}
                         alt={user?.name}
                         className="w-full h-full object-cover"
                       />
                     </div>
 
                     {/* Desktop: Decent, elegant, modern profile box */}
-                    <div className="hidden sm:flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-2xl bg-white border border-slate-200/90 hover:border-emerald-400 hover:shadow-md transition-all shadow-2xs group">
-                      <div className="w-8 h-8 rounded-xl overflow-hidden ring-1 ring-emerald-500/25 group-hover:ring-emerald-500/50 transition-all shrink-0 relative">
+                    <div className="hidden sm:flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-2xl bg-white border border-stone-200 hover:border-[#0c2217] hover:shadow-md transition-all shadow-2xs group">
+                      <div className="w-8 h-8 rounded-xl overflow-hidden ring-1 ring-[#d4a359]/30 group-hover:ring-[#d4a359]/60 transition-all shrink-0 relative">
                         <img
-                          src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=059669&color=fff`}
+                          src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=0c2217&color=d4a359`}
                           alt={user?.name}
                           className="w-full h-full object-cover"
                         />
                       </div>
                       <div className="text-left">
-                        <p className="text-xs font-bold text-slate-800 leading-tight max-w-[110px] truncate group-hover:text-emerald-700 transition-colors">
+                        <p className="text-xs font-bold text-stone-800 leading-tight max-w-[110px] truncate group-hover:text-[#0c2217] transition-colors">
                           {user?.name?.split(' ')[0]}
                         </p>
-                        <span className="inline-block text-[9px] uppercase font-black tracking-wider text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded border border-emerald-200/60 mt-0.5">
+                        <span className="inline-block text-[9px] uppercase font-black tracking-wider text-[#0c2217] bg-[#f0ece1] px-1.5 py-0.2 rounded border border-[#d4a359]/30 mt-0.5">
                           {user?.role}
                         </span>
                       </div>
-                      <ChevronDown className={`w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-600 transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`} />
+                      <ChevronDown className={`w-3.5 h-3.5 text-stone-400 group-hover:text-[#0c2217] transition-transform duration-200 ${userMenuOpen ? 'rotate-180' : ''}`} />
                     </div>
                   </button>
 
                   {/* Dropdown Menu */}
                   {userMenuOpen && (
-                    <div className="fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 w-auto sm:w-72 max-w-[calc(100vw-1.5rem)] sm:max-w-none bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden z-50 animate-in fade-in duration-150">
-                      <div className="px-5 py-3.5 border-b border-slate-100 bg-gradient-to-b from-slate-50/80 to-white">
-                        <p className="text-xs font-bold text-slate-900 truncate">{user?.name}</p>
-                        <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>
-                        <span className="inline-block mt-1.5 px-2 py-0.5 text-[10px] font-bold rounded-md bg-emerald-100 text-emerald-800 uppercase">
+                    <div className="fixed inset-x-3 top-16 sm:absolute sm:inset-x-auto sm:right-0 sm:top-auto sm:mt-2 w-auto sm:w-72 max-w-[calc(100vw-1.5rem)] sm:max-w-none bg-white rounded-3xl shadow-2xl border border-stone-200 overflow-hidden z-50 animate-in fade-in duration-150">
+                      <div className="px-5 py-3.5 border-b border-stone-100 bg-gradient-to-b from-[#faf8f5] to-white">
+                        <p className="text-xs font-bold text-stone-900 truncate">{user?.name}</p>
+                        <p className="text-[11px] text-stone-500 truncate">{user?.email}</p>
+                        <span className="inline-block mt-1.5 px-2 py-0.5 text-[10px] font-bold rounded-md bg-[#f0ece1] text-[#0c2217] uppercase">
                           {user?.role} Account
                         </span>
                       </div>
@@ -633,9 +633,9 @@ const Navbar = () => {
                         <Link
                           href={getDashboardRoute()}
                           onClick={() => setUserMenuOpen(false)}
-                          className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
+                          className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-stone-700 hover:bg-[#faf8f5] hover:text-[#0c2217] rounded-2xl transition-colors"
                         >
-                          <Layers className="w-4 h-4 text-emerald-600" />
+                          <Layers className="w-4 h-4 text-[#0c2217]" />
                           <span>{isAdmin ? 'Admin Dashboard' : isTutor ? 'Tutor Dashboard' : 'Student Dashboard'}</span>
                         </Link>
 
@@ -644,25 +644,25 @@ const Navbar = () => {
                             <Link
                               href="/student/deals"
                               onClick={() => setUserMenuOpen(false)}
-                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-stone-700 hover:bg-[#faf8f5] hover:text-[#0c2217] rounded-2xl transition-colors"
                             >
-                              <BookOpen className="w-4 h-4 text-emerald-600" />
+                              <BookOpen className="w-4 h-4 text-[#0c2217]" />
                               <span>My Courses & Subscriptions</span>
                             </Link>
                             <Link
                               href="/student/certificates"
                               onClick={() => setUserMenuOpen(false)}
-                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-stone-700 hover:bg-[#faf8f5] hover:text-[#0c2217] rounded-2xl transition-colors"
                             >
-                              <Award className="w-4 h-4 text-emerald-600" />
+                              <Award className="w-4 h-4 text-[#0c2217]" />
                               <span>My Certificates</span>
                             </Link>
                             <Link
                               href="/student/profile"
                               onClick={() => setUserMenuOpen(false)}
-                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-stone-700 hover:bg-[#faf8f5] hover:text-[#0c2217] rounded-2xl transition-colors"
                             >
-                              <User className="w-4 h-4 text-emerald-600" />
+                              <User className="w-4 h-4 text-[#0c2217]" />
                               <span>Profile & Account Settings</span>
                             </Link>
                           </>
@@ -673,33 +673,33 @@ const Navbar = () => {
                             <Link
                               href="/tutor/courses"
                               onClick={() => setUserMenuOpen(false)}
-                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-stone-700 hover:bg-[#faf8f5] hover:text-[#0c2217] rounded-2xl transition-colors"
                             >
-                              <BookOpen className="w-4 h-4 text-emerald-600" />
+                              <BookOpen className="w-4 h-4 text-[#0c2217]" />
                               <span>Course Studio (Chapters, Tests)</span>
                             </Link>
                             <Link
                               href="/tutor/deals"
                               onClick={() => setUserMenuOpen(false)}
-                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-stone-700 hover:bg-[#faf8f5] hover:text-[#0c2217] rounded-2xl transition-colors"
                             >
-                              <CreditCard className="w-4 h-4 text-emerald-600" />
+                              <CreditCard className="w-4 h-4 text-[#0c2217]" />
                               <span>Student Deals & Trials</span>
                             </Link>
                             <Link
                               href="/tutor/certificates"
                               onClick={() => setUserMenuOpen(false)}
-                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-stone-700 hover:bg-[#faf8f5] hover:text-[#0c2217] rounded-2xl transition-colors"
                             >
-                              <Award className="w-4 h-4 text-emerald-600" />
+                              <Award className="w-4 h-4 text-[#0c2217]" />
                               <span>Student Certificates</span>
                             </Link>
                             <Link
                               href="/tutor/profile"
                               onClick={() => setUserMenuOpen(false)}
-                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-slate-700 hover:bg-emerald-50 hover:text-emerald-800 rounded-2xl transition-colors"
+                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-stone-700 hover:bg-[#faf8f5] hover:text-[#0c2217] rounded-2xl transition-colors"
                             >
-                              <User className="w-4 h-4 text-emerald-600" />
+                              <User className="w-4 h-4 text-[#0c2217]" />
                               <span>Profile & Sanad Credentials</span>
                             </Link>
                           </>
@@ -735,7 +735,7 @@ const Navbar = () => {
               <div className="hidden lg:flex items-center gap-1.5 sm:gap-2">
                 <Link
                   href="/login?role=student"
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] text-xs font-bold rounded-xl shadow-xs transition-all border border-[#2b6e51]/40"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] text-xs font-bold rounded-xl shadow-xs transition-all border border-[#d4a359]/40"
                 >
                   <GraduationCap className="w-3.5 h-3.5 text-[#d4a359]" />
                   <span>Student Portal</span>
@@ -771,7 +771,7 @@ const Navbar = () => {
                 <Link
                   href="/login?role=student"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 py-3 min-h-[44px] bg-[#0c2217] active:bg-[#07150e] text-[#faf8f5] rounded-2xl text-xs font-bold text-center transition-transform active:scale-95 shadow-sm border border-[#2b6e51]/40"
+                  className="flex items-center justify-center gap-2 py-3 min-h-[44px] bg-[#0c2217] active:bg-[#07150e] text-[#faf8f5] rounded-2xl text-xs font-bold text-center transition-transform active:scale-95 shadow-sm border border-[#d4a359]/40"
                 >
                   <GraduationCap className="w-4 h-4 text-[#d4a359]" />
                   <span>Student Portal</span>
@@ -853,17 +853,17 @@ const Navbar = () => {
               <Link
                 href="/safety"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-emerald-800 bg-emerald-50/50 hover:bg-emerald-100 transition-colors"
+                className="flex items-center gap-2 px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-[#0c2217] bg-[#faf8f5] hover:bg-[#f0ece1] transition-colors"
               >
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <ShieldCheck className="w-4 h-4 text-[#0c2217]" />
                 <span>Safety &amp; Privacy (Female Protection)</span>
               </Link>
               <Link
                 href="/contact-us"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2 px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-emerald-800 bg-emerald-50/70 hover:bg-emerald-100 transition-colors"
+                className="flex items-center gap-2 px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-[#0c2217] bg-[#faf8f5] hover:bg-[#f0ece1] transition-colors"
               >
-                <Headphones className="w-4 h-4 text-emerald-600" />
+                <Headphones className="w-4 h-4 text-[#0c2217]" />
                 <span>Need Help? Contact Support</span>
               </Link>
               <button
@@ -874,42 +874,42 @@ const Navbar = () => {
                     window.dispatchEvent(new CustomEvent('open-support-platform'));
                   }
                 }}
-                className="w-full flex items-center justify-between px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-emerald-900 bg-emerald-100/70 hover:bg-emerald-100 active:scale-98 transition-all cursor-pointer"
+                className="w-full flex items-center justify-between px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-[#0c2217] bg-[#f0ece1] hover:bg-[#e6dfd5] active:scale-98 transition-all cursor-pointer border border-[#d4a359]/30"
               >
                 <div className="flex items-center gap-2">
-                  <ShieldCheck className="w-4 h-4 text-emerald-700" />
+                  <ShieldCheck className="w-4 h-4 text-[#0c2217]" />
                   <span>Support Platform</span>
                 </div>
-                <QrCode className="w-4 h-4 text-emerald-700" />
+                <QrCode className="w-4 h-4 text-[#0c2217]" />
               </button>
             </div>
 
             {isAuthenticated ? (
-              <div className="pt-3 border-t border-slate-100 space-y-2">
+              <div className="pt-3 border-t border-stone-100 space-y-2">
                 <Link
                   href={isTutor ? '/tutor/messages' : isStudent ? '/student/messages' : '/admin/chats'}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-slate-800 bg-slate-50 hover:bg-emerald-50 transition-colors"
+                  className="flex items-center justify-between px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-stone-800 bg-[#faf8f5] hover:bg-[#f0ece1] transition-colors"
                 >
                   <div className="flex items-center gap-2">
-                    <MessageSquare className="w-4 h-4 text-emerald-600" />
+                    <MessageSquare className="w-4 h-4 text-[#0c2217]" />
                     <span>Messages &amp; Discussions</span>
                   </div>
                   {unreadMessagesCount > 0 ? (
-                    <span className="px-2 py-0.5 bg-rose-600 text-white font-black text-[10px] rounded-full animate-pulse">
+                    <span className="px-2 py-0.5 bg-[#b85d34] text-white font-black text-[10px] rounded-full animate-pulse">
                       {unreadMessagesCount > 99 ? '99+' : unreadMessagesCount} new
                     </span>
                   ) : (
-                    <span className="text-[10px] text-slate-400 font-medium">0 unread</span>
+                    <span className="text-[10px] text-stone-400 font-medium">0 unread</span>
                   )}
                 </Link>
 
                 <Link
                   href={getDashboardRoute()}
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-2 px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-emerald-800 bg-emerald-50 hover:bg-emerald-100 transition-colors"
+                  className="flex items-center gap-2 px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-[#0c2217] bg-[#f0ece1] hover:bg-[#e6dfd5] transition-colors"
                 >
-                  <Layers className="w-4 h-4 text-emerald-600" />
+                  <Layers className="w-4 h-4 text-[#0c2217]" />
                   <span>{isAdmin ? 'Admin Portal' : isTutor ? 'Tutor Portal' : 'Student Portal'}</span>
                 </Link>
 

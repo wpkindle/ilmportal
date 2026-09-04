@@ -176,25 +176,24 @@ export default function ProfileCompletionMeter({ user, tutorProfile, className =
   // When 100% complete, keep visible as an empowering achievement card to motivate tutors/students
   if (percentage >= 100) {
     return (
-      <div className={`p-5 sm:p-6 bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 text-white rounded-3xl border border-emerald-500/40 shadow-xl space-y-4 ${className} relative overflow-hidden group`}>
+      <div className={`p-5 sm:p-6 bg-gradient-to-r from-[#0c2217] via-slate-900 to-[#102d1f] text-white rounded-3xl border border-[#d4a359]/40 shadow-xl space-y-4 ${className} relative overflow-hidden group`}>
         {/* Shimmer line */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-400 via-teal-300 to-emerald-500" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#d4a359] via-[#b85d34] to-[#d4a359]" />
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div className="space-y-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                <span>100% Profile Strength</span>
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#d4a359]/20 text-[#d4a359] border border-[#d4a359]/40">
+                100% Verified Profile
               </span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-teal-500/20 text-teal-300 border border-teal-500/30">
+              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#b85d34]/20 text-[#b85d34] border border-[#b85d34]/30">
                 Ready for Students
               </span>
             </div>
-            <h3 className="text-base sm:text-lg font-black text-white pt-1">
+            <h3 className="text-base sm:text-lg font-serif font-bold text-white pt-1">
               🎉 Congratulations! Your Profile is 100% Complete
             </h3>
-            <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-stone-300 max-w-2xl leading-relaxed">
               {user?.role === 'tutor'
                 ? 'Your teaching bio, verified Sanad, hourly rates, and subject preferences are fully configured. Your profile is ranked at peak search visibility across Pakistan and primed to receive direct student inquiries and trial bookings!'
                 : 'Your student profile is 100% complete. Tutors can now easily understand your learning goals and provide tailored free trial sessions!'}
@@ -206,14 +205,14 @@ export default function ProfileCompletionMeter({ user, tutorProfile, className =
               <>
                 <Link
                   href={`/tutors/${user?.username || user?._id}`}
-                  className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/30 flex items-center justify-center gap-2 transition-transform active:scale-95"
+                  className="px-4 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition-transform active:scale-95"
                 >
                   <span>View Public Profile</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
                 <Link
                   href="/tutor/messages"
-                  className="px-4 py-2 bg-slate-800/80 hover:bg-slate-700 text-slate-200 border border-slate-700 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
+                  className="px-4 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] border border-[#d4a359]/40 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
                 >
                   <span>Check Inquiries</span>
                 </Link>
@@ -221,7 +220,7 @@ export default function ProfileCompletionMeter({ user, tutorProfile, className =
             ) : (
               <Link
                 href="/tutors"
-                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold shadow-md shadow-emerald-600/30 flex items-center justify-center gap-2 transition-transform active:scale-95"
+                className="px-4 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition-transform active:scale-95"
               >
                 <span>Find Tutors</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -233,11 +232,11 @@ export default function ProfileCompletionMeter({ user, tutorProfile, className =
         {/* 100% Filled Progress Bar */}
         <div className="space-y-1.5 pt-1">
           <div className="flex items-center justify-between text-xs font-bold">
-            <span className="text-emerald-400">Peak Visibility Score</span>
-            <span className="text-emerald-300 font-mono">100 / 100</span>
+            <span className="text-[#d4a359]">Peak Visibility Score</span>
+            <span className="text-[#d4a359] font-mono">100 / 100</span>
           </div>
-          <div className="w-full bg-slate-800/80 h-3 rounded-full overflow-hidden p-0.5 border border-emerald-500/30">
-            <div className="h-full rounded-full bg-gradient-to-r from-emerald-400 via-teal-400 to-emerald-300 w-full shadow-lg shadow-emerald-500/50" />
+          <div className="w-full bg-stone-900/80 h-3 rounded-full overflow-hidden p-0.5 border border-[#d4a359]/30">
+            <div className="h-full rounded-full bg-gradient-to-r from-[#d4a359] via-[#b85d34] to-[#d4a359] w-full shadow-lg" />
           </div>
         </div>
       </div>
@@ -249,8 +248,8 @@ export default function ProfileCompletionMeter({ user, tutorProfile, className =
   const remainingItems = items.filter((i) => !i.done);
 
   const getBarColor = (pct) => {
-    if (pct >= 85) return 'from-emerald-500 to-teal-500';
-    if (pct >= 60) return 'from-emerald-500 to-amber-500';
+    if (pct >= 85) return 'from-[#d4a359] via-[#b85d34] to-[#d4a359]';
+    if (pct >= 60) return 'from-[#d4a359] to-amber-500';
     if (pct >= 35) return 'from-amber-400 to-amber-500';
     return 'from-rose-500 to-rose-400';
   };
@@ -258,8 +257,8 @@ export default function ProfileCompletionMeter({ user, tutorProfile, className =
   const getStatusBadge = () => {
     if (percentage === 100) {
       return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40">
+          <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
           <span>100% Completed</span>
         </span>
       );
@@ -311,17 +310,17 @@ export default function ProfileCompletionMeter({ user, tutorProfile, className =
             <Link
               key={item.key}
               href={item.link}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-50 hover:bg-emerald-100 active:bg-emerald-200 text-emerald-800 text-[11px] font-bold border border-emerald-200/80 transition-all cursor-pointer"
+              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#f0ece1] hover:bg-[#e6dfd5] text-[#0c2217] text-[11px] font-bold border border-[#d4a359]/40 transition-all cursor-pointer"
             >
               <span>{item.actionLabel}</span>
-              <ArrowRight className="w-3 h-3 text-emerald-600" />
+              <ArrowRight className="w-3 h-3 text-[#b85d34]" />
             </Link>
           ))}
           {remainingItems.length > 4 && (
             <button
               type="button"
               onClick={() => setDetailsOpen(true)}
-              className="text-[11px] font-bold text-emerald-700 hover:underline cursor-pointer"
+              className="text-[11px] font-bold text-[#b85d34] hover:underline cursor-pointer"
             >
               +{remainingItems.length - 4} more
             </button>
@@ -333,8 +332,8 @@ export default function ProfileCompletionMeter({ user, tutorProfile, className =
       {user?.role === 'tutor' && (
         <div className="pt-1">
           {tutorProfile?.verificationStatus === 'approved' ? (
-            <div className="p-2.5 bg-emerald-50 rounded-2xl border border-emerald-200 flex items-center gap-2 text-xs font-bold text-emerald-800">
-              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+            <div className="p-2.5 bg-[#f0ece1] rounded-2xl border border-[#d4a359]/40 flex items-center gap-2 text-xs font-bold text-[#0c2217]">
+              <ShieldCheck className="w-4 h-4 text-[#d4a359] shrink-0" />
               <span>Verified Sanad & Degree: Your profile is Approved and publicly visible on Pakistan search filters.</span>
             </div>
           ) : tutorProfile?.verificationStatus === 'rejected' ? (
@@ -359,30 +358,30 @@ export default function ProfileCompletionMeter({ user, tutorProfile, className =
               key={item.key}
               className={`p-3 rounded-2xl border text-xs flex items-center justify-between gap-2 transition-all ${
                 item.done
-                  ? 'bg-emerald-50/50 border-emerald-200/80 text-emerald-900'
+                  ? 'bg-[#faf8f5] border-[#e6dfd5] text-stone-900'
                   : 'bg-white border-amber-200/90 shadow-2xs text-slate-800'
               }`}
             >
               <div className="flex items-center gap-2 min-w-0">
                 {item.done ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
                 ) : (
                   <Circle className="w-4 h-4 text-amber-500 shrink-0" />
                 )}
-                <span className={`truncate ${item.done ? 'font-medium text-emerald-900' : 'font-bold text-slate-800'}`}>
+                <span className={`truncate ${item.done ? 'font-medium text-[#0c2217]' : 'font-bold text-slate-800'}`}>
                   {item.label}
                 </span>
               </div>
 
               <div className="flex items-center gap-1.5 shrink-0">
                 {item.done ? (
-                  <span className="text-[10px] font-bold text-emerald-700 bg-emerald-100/70 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-bold text-[#0c2217] bg-[#f0ece1] border border-[#d4a359]/30 px-2 py-0.5 rounded-full">
                     Done (+{item.weight}%)
                   </span>
                 ) : (
                   <Link
                     href={item.link}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold shadow-2xs transition-all hover:scale-102 cursor-pointer"
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[11px] font-bold shadow-2xs transition-all hover:scale-102 cursor-pointer"
                   >
                     <span>{item.actionLabel}</span>
                     <ArrowRight className="w-3 h-3" />

@@ -156,28 +156,28 @@ export default function AccountStatusBanner({ user, tutorProfile, role = 'studen
   }
 
   return (
-    <div className="bg-emerald-50 border border-emerald-200/90 rounded-2xl p-3.5 flex items-center justify-between gap-3 shadow-xs">
+    <div className="bg-[#f0ece1] border border-[#d4a359]/40 rounded-2xl p-3.5 flex items-center justify-between gap-3 shadow-xs">
       <div className="flex items-center gap-2.5">
-        <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0">
+        <div className="w-8 h-8 rounded-xl bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/40 flex items-center justify-center shrink-0">
           <ShieldCheck className="w-4 h-4" />
         </div>
         <div>
           <div className="flex items-center gap-1.5">
-            <span className="text-xs font-black text-emerald-950">
+            <span className="text-xs font-black text-[#0c2217]">
               {isTutor ? 'Verified Faculty Account' : 'Verified Student Account'}
             </span>
-            <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-emerald-200/80 text-emerald-900">
+            <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40">
               Approved & Live
             </span>
           </div>
-          <p className="text-[11px] text-emerald-700 font-medium">
+          <p className="text-[11px] text-[#0c2217] font-medium">
             {isTutor
               ? 'Your profile is approved by administration and publicly visible to students across Pakistan.'
               : 'Account verified & fully active across Pakistan LMS portal'}
           </p>
         </div>
       </div>
-      <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0" />
+      <CheckCircle2 className="w-5 h-5 text-[#d4a359] shrink-0" />
     </div>
   );
 }

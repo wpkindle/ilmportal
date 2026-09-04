@@ -165,10 +165,10 @@ export default function MyDealsPage() {
                 </div>
 
                 {deal.status === 'completed' ? (
-                  <div className="p-4 bg-[#eef5f0] border border-[#c3dfcb] rounded-2xl flex items-center justify-between text-xs text-[#0c2217]">
+                  <div className="p-4 bg-[#f0ece1] border border-[#d4a359]/40 rounded-2xl flex items-center justify-between text-xs text-[#0c2217]">
                     <div className="space-y-0.5">
                       <span className="font-bold flex items-center gap-1.5">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                        <CheckCircle2 className="w-4 h-4 text-[#d4a359]" />
                         <span>Course Completed Successfully!</span>
                       </span>
                       <p className="text-[11px] text-stone-600">
@@ -203,8 +203,8 @@ export default function MyDealsPage() {
             </div>
 
             {reviewSuccess ? (
-              <div className="p-6 bg-[#eef5f0] rounded-2xl border border-[#c3dfcb] text-center space-y-2">
-                <CheckCircle2 className="w-8 h-8 text-emerald-600 mx-auto" />
+              <div className="p-6 bg-[#f0ece1] rounded-2xl border border-[#d4a359]/40 text-center space-y-2">
+                <CheckCircle2 className="w-8 h-8 text-[#d4a359] mx-auto" />
                 <p className="font-bold text-xs text-[#0c2217]">Review Submitted Successfully!</p>
               </div>
             ) : (

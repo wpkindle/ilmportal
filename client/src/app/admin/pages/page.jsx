@@ -203,7 +203,7 @@ export default function AdminCMSPagesPage() {
                   target="_blank"
                   className="inline-flex items-center gap-1.5 px-3.5 py-2 bg-white hover:bg-slate-100 text-slate-800 font-bold text-xs rounded-xl border border-slate-200 shadow-2xs transition-all"
                 >
-                  <ExternalLink className="w-3.5 h-3.5 text-emerald-600" />
+                  <ExternalLink className="w-3.5 h-3.5 text-[#b85d34]" />
                   <span>Preview Live Page</span>
                 </Link>
               )}
@@ -211,8 +211,8 @@ export default function AdminCMSPagesPage() {
 
             {/* Notification messages */}
             {successMessage && (
-              <div className="p-4 bg-emerald-50 text-emerald-900 border border-emerald-300 rounded-2xl text-xs font-bold flex items-center gap-2.5 shadow-2xs animate-in fade-in">
-                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <div className="p-4 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 rounded-2xl text-xs font-bold flex items-center gap-2.5 shadow-2xs animate-in fade-in">
+                <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
                 <span>{successMessage}</span>
               </div>
             )}
@@ -238,7 +238,7 @@ export default function AdminCMSPagesPage() {
                         : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
-                    <Icon className={`w-4 h-4 ${isCurrent ? 'text-emerald-600' : 'text-slate-400'}`} />
+                    <Icon className={`w-4 h-4 ${isCurrent ? 'text-[#b85d34]' : 'text-slate-400'}`} />
                     <span>{p.label}</span>
                   </button>
                 );
@@ -262,7 +262,7 @@ export default function AdminCMSPagesPage() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                    className="px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
                   >
                     <Save className="w-4 h-4" />
                     <span>{saving ? 'Saving Live...' : 'Save Page Content'}</span>
@@ -278,7 +278,7 @@ export default function AdminCMSPagesPage() {
                       required
                       value={title}
                       onChange={(e) => setTitle(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-emerald-500 focus:bg-white"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#d4a359] focus:bg-white"
                       placeholder="e.g. Privacy Policy"
                     />
                   </div>
@@ -288,7 +288,7 @@ export default function AdminCMSPagesPage() {
                       type="text"
                       value={subtitle}
                       onChange={(e) => setSubtitle(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-emerald-500 focus:bg-white"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#d4a359] focus:bg-white"
                       placeholder="Short descriptive banner subtitle"
                     />
                   </div>
@@ -301,16 +301,16 @@ export default function AdminCMSPagesPage() {
                     type="text"
                     value={metaDescription}
                     onChange={(e) => setMetaDescription(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-emerald-500 focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#d4a359] focus:bg-white"
                     placeholder="Brief description for Google search snippets"
                   />
                 </div>
 
                 {/* Specific Fields for About Us */}
                 {activeSlug === 'about-us' && (
-                  <div className="p-5 bg-emerald-50/60 border border-emerald-200/80 rounded-2xl space-y-4">
-                    <h3 className="text-xs font-black text-emerald-950 uppercase tracking-wider flex items-center gap-1.5">
-                      <Heart className="w-4 h-4 text-emerald-600" />
+                  <div className="p-5 bg-[#f0ece1]/60 border border-[#d4a359]/40 rounded-2xl space-y-4">
+                    <h3 className="text-xs font-black text-[#0c2217] uppercase tracking-wider flex items-center gap-1.5">
+                      <Heart className="w-4 h-4 text-[#b85d34]" />
                       <span>About Us Special Organization Fields</span>
                     </h3>
                     
@@ -320,7 +320,7 @@ export default function AdminCMSPagesPage() {
                         type="text"
                         value={aboutDetails.initiativeText}
                         onChange={(e) => setAboutDetails({ ...aboutDetails, initiativeText: e.target.value })}
-                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-emerald-500"
+                        className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#d4a359]"
                         placeholder="e.g. An initiative by Mr. & Mrs. Abdul Khaliq from Lahore, Pakistan."
                       />
                     </div>
@@ -332,7 +332,7 @@ export default function AdminCMSPagesPage() {
                           rows={2}
                           value={aboutDetails.mission}
                           onChange={(e) => setAboutDetails({ ...aboutDetails, mission: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-emerald-500"
+                          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#d4a359]"
                         />
                       </div>
                       <div className="space-y-1.5">
@@ -341,7 +341,7 @@ export default function AdminCMSPagesPage() {
                           rows={2}
                           value={aboutDetails.vision}
                           onChange={(e) => setAboutDetails({ ...aboutDetails, vision: e.target.value })}
-                          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-emerald-500"
+                          className="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#d4a359]"
                         />
                       </div>
                     </div>
@@ -383,7 +383,7 @@ export default function AdminCMSPagesPage() {
                       </div>
                       <div className="space-y-1.5">
                         <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                          <Phone className="w-3.5 h-3.5 text-emerald-600" />
+                          <Phone className="w-3.5 h-3.5 text-[#b85d34]" />
                           <span>WhatsApp Helpline</span>
                         </label>
                         <input
@@ -439,11 +439,11 @@ export default function AdminCMSPagesPage() {
                     required
                     value={content}
                     onChange={(e) => setContent(e.target.value)}
-                    className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-mono text-slate-900 leading-relaxed focus:outline-hidden focus:border-emerald-500 focus:bg-white resize-y"
+                    className="w-full p-4 bg-slate-50 border border-slate-200 rounded-2xl text-xs font-mono text-slate-900 leading-relaxed focus:outline-hidden focus:border-[#d4a359] focus:bg-white resize-y"
                     placeholder="Enter formatted content with headings (###), bold (**text**), bullet points (* item), etc."
                   />
                   <p className="text-[11px] text-slate-500 flex items-center gap-1">
-                    <Info className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <Info className="w-3.5 h-3.5 text-[#b85d34] shrink-0" />
                     <span><strong>Tip:</strong> Use <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px]">### Section Title</code> for headings, <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px]">* point</code> for bullet lists, and <code className="bg-slate-200 px-1 py-0.5 rounded text-[10px]">---</code> for horizontal dividers.</span>
                   </p>
                 </div>
@@ -453,7 +453,7 @@ export default function AdminCMSPagesPage() {
                   <button
                     type="submit"
                     disabled={saving}
-                    className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 text-white font-black text-xs rounded-xl shadow-md shadow-emerald-600/20 flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
+                    className="px-6 py-3 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-black text-xs rounded-xl shadow-md flex items-center gap-2 cursor-pointer transition-all disabled:opacity-50"
                   >
                     <Save className="w-4 h-4" />
                     <span>{saving ? 'Saving Live...' : 'Publish & Save Changes'}</span>

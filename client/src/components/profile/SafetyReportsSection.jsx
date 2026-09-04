@@ -48,8 +48,8 @@ export default function SafetyReportsSection({ userRole = 'student' }) {
     switch (status) {
       case 'resolved':
         return (
-          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+          <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
             <span>Resolved</span>
           </span>
         );
@@ -111,17 +111,17 @@ export default function SafetyReportsSection({ userRole = 'student' }) {
   return (
     <section id="safety-reports" className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden scroll-mt-24 transition-all">
       {/* Header */}
-      <div className="p-5 sm:p-6 border-b border-slate-100 bg-gradient-to-r from-emerald-900/5 via-teal-900/5 to-transparent flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="p-5 sm:p-6 border-b border-slate-100 bg-gradient-to-r from-[#0c2217]/5 via-[#d4a359]/5 to-transparent flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-start gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0 shadow-xs border border-emerald-200">
-            <ShieldCheck className="w-6 h-6 text-emerald-700" />
+          <div className="w-12 h-12 rounded-2xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center shrink-0 shadow-xs border border-[#d4a359]/40">
+            <ShieldCheck className="w-6 h-6 text-[#0c2217]" />
           </div>
           <div>
             <div className="flex items-center gap-2">
               <h2 className="text-lg sm:text-xl font-black text-slate-900">
                 Safety Reports &amp; Admin Responses
               </h2>
-              <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40">
                 Trust &amp; Safety Portal
               </span>
             </div>
@@ -144,9 +144,9 @@ export default function SafetyReportsSection({ userRole = 'student' }) {
 
           <Link
             href="/safety"
-            className="px-3.5 py-2 rounded-xl bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200/80 text-xs font-bold transition-colors flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-xl bg-[#f0ece1] hover:bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 text-xs font-bold transition-colors flex items-center gap-1.5"
           >
-            <HelpCircle className="w-3.5 h-3.5 text-emerald-600" />
+            <HelpCircle className="w-3.5 h-3.5 text-[#d4a359]" />
             <span>Safety Policy</span>
           </Link>
         </div>
@@ -158,13 +158,13 @@ export default function SafetyReportsSection({ userRole = 'student' }) {
           onClick={() => setActiveTab('filed')}
           className={`pb-3 flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
             activeTab === 'filed'
-              ? 'border-emerald-600 text-emerald-800'
+              ? 'border-[#0c2217] text-[#0c2217]'
               : 'border-transparent text-slate-500 hover:text-slate-800'
           }`}
         >
           <span>Reports Filed by You</span>
           <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-            activeTab === 'filed' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+            activeTab === 'filed' ? 'bg-[#f0ece1] text-[#0c2217]' : 'bg-slate-200 text-slate-600'
           }`}>
             {reportsFiled.length}
           </span>
@@ -175,13 +175,13 @@ export default function SafetyReportsSection({ userRole = 'student' }) {
             onClick={() => setActiveTab('received')}
             className={`pb-3 flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
               activeTab === 'received'
-                ? 'border-emerald-600 text-emerald-800'
+                ? 'border-[#0c2217] text-[#0c2217]'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
             }`}
           >
             <span>Conduct Notices</span>
             <span className={`px-2 py-0.5 rounded-full text-[10px] ${
-              activeTab === 'received' ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-600'
+              activeTab === 'received' ? 'bg-[#f0ece1] text-[#0c2217]' : 'bg-slate-200 text-slate-600'
             }`}>
               {reportsReceived.length}
             </span>
@@ -193,15 +193,15 @@ export default function SafetyReportsSection({ userRole = 'student' }) {
       <div className="p-5 sm:p-6">
         {loading ? (
           <div className="py-12 text-center text-slate-400 space-y-2">
-            <RefreshCw className="w-6 h-6 animate-spin mx-auto text-emerald-600" />
+            <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#d4a359]" />
             <p className="text-xs font-medium">Checking safety registry &amp; incident logs...</p>
           </div>
         ) : activeTab === 'filed' ? (
           reportsFiled.length === 0 ? (
             /* Empty State */
             <div className="text-center py-10 px-4 space-y-3 max-w-md mx-auto">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-50 border border-emerald-200/80 text-emerald-600 flex items-center justify-center mx-auto shadow-inner">
-                <ShieldCheck className="w-7 h-7 text-emerald-600" />
+              <div className="w-14 h-14 rounded-2xl bg-[#f0ece1] border border-[#d4a359]/40 text-[#d4a359] flex items-center justify-center mx-auto shadow-inner">
+                <ShieldCheck className="w-7 h-7 text-[#d4a359]" />
               </div>
               <h3 className="text-sm sm:text-base font-bold text-slate-800">
                 No Active Incident Reports
@@ -225,7 +225,7 @@ export default function SafetyReportsSection({ userRole = 'student' }) {
               {reportsFiled.map((report) => (
                 <div
                   key={report._id}
-                  className="border border-slate-200 rounded-2xl p-4 sm:p-5 hover:border-emerald-300/80 transition-all bg-white shadow-2xs space-y-3.5"
+                  className="border border-slate-200 rounded-2xl p-4 sm:p-5 hover:border-[#d4a359]/40 transition-all bg-white shadow-2xs space-y-3.5"
                 >
                   {/* Top Row: Category + Status + Date */}
                   <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-100 text-xs">
@@ -269,23 +269,23 @@ export default function SafetyReportsSection({ userRole = 'student' }) {
 
                   {/* OFFICIAL ADMINISTRATION RESPONSE */}
                   {report.adminResponse ? (
-                    <div className="p-4 rounded-2xl bg-emerald-50/80 border border-emerald-200 text-xs space-y-2">
+                    <div className="p-4 rounded-2xl bg-[#f0ece1] border border-[#d4a359]/40 text-xs space-y-2">
                       <div className="flex items-center justify-between gap-2">
-                        <div className="flex items-center gap-1.5 text-emerald-800 font-black">
-                          <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                        <div className="flex items-center gap-1.5 text-[#0c2217] font-black">
+                          <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
                           <span>Official Admin Response &amp; Resolution:</span>
                         </div>
                         {report.resolvedAt && (
-                          <span className="text-[10px] text-emerald-700 font-semibold">
+                          <span className="text-[10px] text-[#0c2217] font-semibold">
                             {formatDate(report.resolvedAt)}
                           </span>
                         )}
                       </div>
-                      <p className="text-emerald-950 font-medium whitespace-pre-line leading-relaxed pl-5">
+                      <p className="text-[#0c2217] font-medium whitespace-pre-line leading-relaxed pl-5">
                         {report.adminResponse}
                       </p>
-                      <div className="pt-1 pl-5 text-[11px] text-emerald-700 font-semibold flex items-center gap-1">
-                        <UserCheck className="w-3 h-3 text-emerald-600" />
+                      <div className="pt-1 pl-5 text-[11px] text-[#0c2217] font-semibold flex items-center gap-1">
+                        <UserCheck className="w-3 h-3 text-[#d4a359]" />
                         <span>Action handled by: {report.resolvedBy?.name || 'Trust & Safety Moderator'}</span>
                       </div>
                     </div>
@@ -345,12 +345,12 @@ export default function SafetyReportsSection({ userRole = 'student' }) {
       {/* Safety Bottom Guarantee */}
       <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-500">
         <div className="flex items-center gap-1.5">
-          <ShieldAlert className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+          <ShieldAlert className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
           <span>Need immediate protection or wish to report harassment? Our emergency response team operates 24/7.</span>
         </div>
         <Link
           href="/safety"
-          className="font-bold text-emerald-700 hover:text-emerald-800 hover:underline flex items-center gap-1 shrink-0"
+          className="font-bold text-[#0c2217] hover:text-[#0c2217] hover:underline flex items-center gap-1 shrink-0"
         >
           <span>Safety Guidelines</span>
           <ExternalLink className="w-3 h-3" />

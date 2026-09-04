@@ -50,9 +50,9 @@ export default function AboutUsPage() {
           
           {/* Breadcrumbs */}
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-            <Link href="/" className="hover:text-emerald-400 transition-colors">Home</Link>
+            <Link href="/" className="hover:text-[#d4a359] transition-colors">Home</Link>
             <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
-            <span className="text-emerald-400">About Us</span>
+            <span className="text-[#d4a359]">About Us</span>
           </div>
 
           <div className="flex items-center gap-2.5">
@@ -71,9 +71,9 @@ export default function AboutUsPage() {
 
           {/* Founder Initiative Box */}
           <div className="pt-4">
-            <div className="inline-flex items-center gap-2.5 px-4 py-2.5 bg-gradient-to-r from-emerald-950/80 to-slate-900/80 border border-emerald-500/40 rounded-2xl shadow-lg shrink-0 md:whitespace-nowrap">
+            <div className="inline-flex items-center gap-2.5 px-4 py-2.5 bg-[#0c2217] border border-[#d4a359]/40 rounded-2xl shadow-lg shrink-0 md:whitespace-nowrap">
               <Heart className="w-4 h-4 text-rose-400 fill-rose-400 shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-emerald-300 md:whitespace-nowrap">
+              <span className="text-xs sm:text-sm font-bold text-[#d4a359] md:whitespace-nowrap">
                 {initiativeTag}
               </span>
             </div>
@@ -89,8 +89,8 @@ export default function AboutUsPage() {
             
             {/* Mission */}
             <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-3">
-              <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-800 flex items-center justify-center shadow-xs">
-                <Target className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-2xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center shadow-xs">
+                <Target className="w-5 h-5 text-[#d4a359]" />
               </div>
               <h3 className="text-lg font-black text-slate-900">Our Mission</h3>
               <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
@@ -137,7 +137,7 @@ export default function AboutUsPage() {
               <div className="flex items-center gap-3">
                 <Link
                   href="/tutors"
-                  className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all"
+                  className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all"
                 >
                   <span>Find a Tutor</span>
                   <ArrowRight className="w-3.5 h-3.5" />

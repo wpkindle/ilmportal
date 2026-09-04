@@ -95,11 +95,11 @@ export default function TutorDealsPage() {
         {feedback && (
           <div className={`p-4 rounded-2xl flex items-center justify-between text-xs font-bold border ${
             feedback.type === 'success'
-              ? 'bg-[#eef5f0] border-[#c3dfcb] text-[#0c2217]'
+              ? 'bg-[#f0ece1] border-[#d4a359]/40 text-[#0c2217]'
               : 'bg-[#fdf2f0] border-[#f5d6cf] text-[#b85d34]'
           }`}>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
               <span>{feedback.message}</span>
             </div>
             <button
@@ -172,14 +172,14 @@ export default function TutorDealsPage() {
                         className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-black text-[#faf8f5] text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer hover:scale-[1.02]"
                         title="Mark deal completed and clear chat messages to save storage"
                       >
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
                         <span>Mark Completed</span>
                       </button>
                     )}
 
                     {deal.status === 'completed' && (
-                      <div className="px-3 py-1.5 bg-[#eef5f0] border border-[#c3dfcb] rounded-xl text-xs text-[#143d2b] font-semibold flex items-center gap-1.5">
-                        <Check className="w-3.5 h-3.5 text-emerald-600" />
+                      <div className="px-3 py-1.5 bg-[#f0ece1] border border-[#d4a359]/40 rounded-xl text-xs text-[#0c2217] font-semibold flex items-center gap-1.5">
+                        <Check className="w-3.5 h-3.5 text-[#d4a359]" />
                         <span>Completed &bull; Storage Cleared</span>
                       </div>
                     )}
@@ -215,8 +215,8 @@ export default function TutorDealsPage() {
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-xl bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-5 h-5 text-[#d4a359]" />
                 </div>
                 <div>
                   <h3 className="font-black text-slate-900 text-base">Mark Deal as Completed</h3>
@@ -244,7 +244,7 @@ export default function TutorDealsPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Agreed Fee:</span>
-                  <strong className="text-emerald-700 font-mono">PKR {dealToComplete.price?.toLocaleString()}</strong>
+                  <strong className="text-[#0c2217] font-mono">PKR {dealToComplete.price?.toLocaleString()}</strong>
                 </div>
               </div>
 
@@ -272,7 +272,7 @@ export default function TutorDealsPage() {
                     value={completionNotes}
                     onChange={(e) => setCompletionNotes(e.target.value)}
                     placeholder="e.g. Student successfully completed Quran Tajweed syllabus..."
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500 text-xs resize-none"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0c2217] text-xs resize-none"
                   />
                 </div>
 
@@ -288,7 +288,7 @@ export default function TutorDealsPage() {
                   <button
                     type="submit"
                     disabled={completing}
-                    className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black flex items-center gap-1.5 shadow-md shadow-emerald-600/20 cursor-pointer disabled:opacity-50"
+                    className="px-5 py-2.5 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-black flex items-center gap-1.5 shadow-md shadow-[#b85d34]/20 cursor-pointer disabled:opacity-50"
                   >
                     {completing ? (
                       <>

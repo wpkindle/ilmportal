@@ -61,7 +61,7 @@ export default function ChromeAppInstallModal({ isOpen, onClose }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-[#143d2b] border border-[#2b6e51]/60 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-[#143d2b] border border-[#d4a359]/40 px-2 py-0.5 rounded-full">
                   Google Chrome App
                 </span>
                 <span className="text-[10px] text-stone-500 font-medium">Fast &amp; Offline Ready</span>

@@ -5,41 +5,41 @@ import React, { useRef, useEffect } from 'react';
 // Deterministic site-wide stardust particles (24 particles spanning viewport)
 const GLOBAL_PARTICLES = [
   { top: '8%', left: '11%', size: 6, color: '#f59e0b', delay: '0s', duration: '9s' },
-  { top: '15%', left: '88%', size: 5, color: '#10b981', delay: '1.5s', duration: '11s' },
+  { top: '15%', left: '88%', size: 5, color: '#b85d34', delay: '1.5s', duration: '11s' },
   { top: '28%', left: '5%', size: 7, color: '#d4a359', delay: '2.8s', duration: '8.5s' },
-  { top: '35%', left: '92%', size: 5.5, color: '#34d399', delay: '0.5s', duration: '10.5s' },
+  { top: '35%', left: '92%', size: 5.5, color: '#e89569', delay: '0.5s', duration: '10.5s' },
   { top: '48%', left: '14%', size: 6.5, color: '#f59e0b', delay: '3.2s', duration: '9.2s' },
   { top: '55%', left: '82%', size: 7, color: '#d4a359', delay: '1.2s', duration: '12s' },
-  { top: '68%', left: '7%', size: 5, color: '#10b981', delay: '4s', duration: '8s' },
+  { top: '68%', left: '7%', size: 5, color: '#b85d34', delay: '4s', duration: '8s' },
   { top: '75%', left: '94%', size: 6, color: '#f59e0b', delay: '2.1s', duration: '10s' },
   { top: '88%', left: '18%', size: 7.5, color: '#d4a359', delay: '0.8s', duration: '9.5s' },
-  { top: '92%', left: '78%', size: 5, color: '#34d399', delay: '3.6s', duration: '11.5s' },
+  { top: '92%', left: '78%', size: 5, color: '#e89569', delay: '3.6s', duration: '11.5s' },
   { top: '22%', left: '48%', size: 5.5, color: '#d4a359', delay: '1.9s', duration: '10.2s' },
   { top: '62%', left: '42%', size: 6, color: '#f59e0b', delay: '2.4s', duration: '8.8s' },
-  { top: '4%', left: '65%', size: 6.5, color: '#10b981', delay: '0.3s', duration: '9.6s' },
+  { top: '4%', left: '65%', size: 6.5, color: '#b85d34', delay: '0.3s', duration: '9.6s' },
   { top: '42%', left: '72%', size: 5, color: '#d4a359', delay: '3.8s', duration: '11.2s' },
   { top: '82%', left: '56%', size: 7, color: '#f59e0b', delay: '1.4s', duration: '8.4s' },
-  { top: '19%', left: '28%', size: 5, color: '#34d399', delay: '2.6s', duration: '10.8s' },
+  { top: '19%', left: '28%', size: 5, color: '#e89569', delay: '2.6s', duration: '10.8s' },
   { top: '51%', left: '26%', size: 6.5, color: '#d4a359', delay: '0.9s', duration: '9.1s' },
-  { top: '71%', left: '32%', size: 5.5, color: '#10b981', delay: '3.4s', duration: '12.5s' },
+  { top: '71%', left: '32%', size: 5.5, color: '#b85d34', delay: '3.4s', duration: '12.5s' },
   { top: '95%', left: '36%', size: 7, color: '#f59e0b', delay: '1.7s', duration: '8.2s' },
   { top: '31%', left: '60%', size: 6, color: '#d4a359', delay: '4.2s', duration: '10.4s' },
   { top: '12%', left: '42%', size: 5, color: '#f59e0b', delay: '2.2s', duration: '9s' },
-  { top: '64%', left: '64%', size: 6.5, color: '#34d399', delay: '0.7s', duration: '11s' },
+  { top: '64%', left: '64%', size: 6.5, color: '#e89569', delay: '0.7s', duration: '11s' },
   { top: '85%', left: '88%', size: 5.5, color: '#d4a359', delay: '3.1s', duration: '8.7s' },
-  { top: '39%', left: '38%', size: 7, color: '#10b981', delay: '1.6s', duration: '9.9s' }
+  { top: '39%', left: '38%', size: 7, color: '#b85d34', delay: '1.6s', duration: '9.9s' }
 ];
 
 // Educational watermarks & motifs drifting across the entire app
 const EDUCATIONAL_GLYPHS = [
   { type: 'book', top: '14%', left: '6%', size: 38, delay: '0s', duration: '13s', color: '#d4a359', label: 'Quran & Ilm' },
-  { type: 'cap', top: '24%', left: '91%', size: 40, delay: '2s', duration: '15s', color: '#10b981', label: 'Academic Excellence' },
+  { type: 'cap', top: '24%', left: '91%', size: 40, delay: '2s', duration: '15s', color: '#b85d34', label: 'Academic Excellence' },
   { type: 'qalam', top: '46%', left: '4%', size: 34, delay: '3.5s', duration: '12s', color: '#f59e0b', label: 'Qalam (Pen)' },
   { type: 'award', top: '60%', left: '92%', size: 38, delay: '1.2s', duration: '14s', color: '#d4a359', label: 'Sanad Verification' },
-  { type: 'atom', top: '78%', left: '8%', size: 42, delay: '4s', duration: '16s', color: '#34d399', label: 'Science & Logic' },
+  { type: 'atom', top: '78%', left: '8%', size: 42, delay: '4s', duration: '16s', color: '#b85d34', label: 'Science & Logic' },
   { type: 'book', top: '85%', left: '86%', size: 36, delay: '2.5s', duration: '13s', color: '#f59e0b', label: 'Tajweed' },
   { type: 'cap', top: '36%', left: '48%', size: 32, delay: '1.8s', duration: '14s', color: '#d4a359', label: 'Matric & Cambridge' },
-  { type: 'qalam', top: '68%', left: '46%', size: 30, delay: '3s', duration: '11s', color: '#10b981', label: 'Arabic Calligraphy' }
+  { type: 'qalam', top: '68%', left: '46%', size: 30, delay: '3s', duration: '11s', color: '#b85d34', label: 'Arabic Calligraphy' }
 ];
 
 function RenderEducationalIcon({ type, size, color }) {

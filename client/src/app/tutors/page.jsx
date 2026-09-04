@@ -224,7 +224,7 @@ function TutorSearchContent() {
           <div className="lg:col-span-8 xl:col-span-9 space-y-4">
             <div className="flex items-center justify-between px-1">
               <p className="text-xs sm:text-sm font-bold text-slate-700">
-                Showing <span className="text-emerald-700 font-extrabold">{tutors.length}</span> Verified Tutors
+                Showing <span className="text-[#0c2217] font-black">{tutors.length}</span> Verified Tutors
               </p>
             </div>
 
@@ -233,15 +233,15 @@ function TutorSearchContent() {
                 <LoadingSpinner />
               </div>
             ) : tutors.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-slate-200 p-8 sm:p-12 text-center space-y-3 shadow-sm">
+              <div className="bg-white rounded-3xl border border-[#e6ded1] p-8 sm:p-12 text-center space-y-3 shadow-sm">
                 <Users className="w-12 h-12 text-slate-300 mx-auto" />
-                <h3 className="text-base font-bold text-slate-800">No tutors found</h3>
+                <h3 className="text-base font-bold text-slate-800 font-serif">No tutors found</h3>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
                   Try adjusting your filters, selecting a different city or sector, or clearing search keywords.
                 </p>
                 <button
                   onClick={handleReset}
-                  className="px-5 py-3 min-h-[44px] bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-500 active:scale-95 transition-all cursor-pointer"
+                  className="px-5 py-3 min-h-[44px] bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] text-xs font-bold rounded-xl active:scale-95 transition-all cursor-pointer shadow-sm"
                 >
                   Clear All Filters
                 </button>
@@ -263,8 +263,8 @@ function TutorSearchContent() {
       {mobileFiltersOpen && (
         <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end bg-black/70 backdrop-blur-xs animate-in fade-in duration-200">
           <div className="w-full max-h-[85vh] bg-white rounded-t-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-250">
-            <div className="p-4 bg-slate-900 text-white flex items-center justify-between">
-              <span className="text-sm font-bold">Filter Pakistani Tutors</span>
+            <div className="p-4 bg-[#0c2217] text-white flex items-center justify-between">
+              <span className="text-sm font-bold font-serif">Filter Pakistani Tutors</span>
               <button
                 onClick={() => setMobileFiltersOpen(false)}
                 className="px-3 py-1.5 min-h-[44px] text-xs font-bold text-slate-300 hover:text-white"
@@ -283,10 +283,10 @@ function TutorSearchContent() {
               />
             </div>
 
-            <div className="p-4 border-t border-slate-200 bg-slate-50 pb-safe">
+            <div className="p-4 border-t border-[#e6ded1] bg-[#faf8f5] pb-safe">
               <button
                 onClick={() => setMobileFiltersOpen(false)}
-                className="w-full py-3.5 min-h-[44px] bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-2xl shadow-lg transition-all"
+                className="w-full py-3.5 min-h-[44px] bg-[#0c2217] hover:bg-[#143d2b] text-white font-bold text-xs rounded-2xl shadow-lg transition-all"
               >
                 View {tutors.length} Tutors
               </button>

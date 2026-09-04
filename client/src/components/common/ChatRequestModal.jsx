@@ -72,11 +72,11 @@ export default function ChatRequestModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-emerald-100 overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-[#e6ded1] overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header */}
-        <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 text-white p-6 relative">
+        <div className="bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#07150e] text-white p-6 relative">
           <button
             type="button"
             onClick={handleResetAndClose}
@@ -87,19 +87,19 @@ export default function ChatRequestModal({
           </button>
 
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-emerald-500/20 border border-emerald-500/30 rounded-2xl text-emerald-300">
+            <div className="p-3 bg-[#d4a359]/20 border border-[#d4a359]/30 rounded-2xl text-[#d4a359]">
               <MessageSquare className="w-6 h-6" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-[#0c2217] px-2.5 py-0.5 rounded-full border border-[#d4a359]/30">
                   Verified Request
                 </span>
-                <span className="text-[10px] font-bold text-teal-300 bg-teal-950/80 px-2 py-0.5 rounded-full border border-teal-500/30">
+                <span className="text-[10px] font-bold text-[#faf8f5] bg-white/10 px-2 py-0.5 rounded-full border border-white/20">
                   Female Tutor
                 </span>
               </div>
-              <h2 className="text-lg font-black text-white mt-1">
+              <h2 className="text-lg font-black text-white mt-1 font-serif">
                 Send Message Request
               </h2>
             </div>
@@ -110,11 +110,11 @@ export default function ChatRequestModal({
         <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
           {submitted ? (
             <div className="py-6 text-center space-y-4">
-              <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center mx-auto ring-8 ring-emerald-50 shadow-inner">
+              <div className="w-16 h-16 bg-[#f0ece1] text-[#0c2217] rounded-full flex items-center justify-center mx-auto ring-8 ring-[#faf8f5] shadow-inner">
                 <CheckCircle2 className="w-9 h-9" />
               </div>
               <div className="space-y-1">
-                <h3 className="text-lg font-black text-slate-900">
+                <h3 className="text-lg font-black text-slate-900 font-serif">
                   Request Sent Successfully!
                 </h3>
                 <p className="text-xs text-slate-600 max-w-sm mx-auto leading-relaxed">
@@ -122,9 +122,9 @@ export default function ChatRequestModal({
                 </p>
               </div>
 
-              <div className="p-4 bg-emerald-50/80 rounded-2xl border border-emerald-200 text-left space-y-2 text-xs text-emerald-900">
-                <div className="flex items-center gap-2 font-bold text-emerald-950">
-                  <Clock className="w-4 h-4 text-emerald-700 shrink-0" />
+              <div className="p-4 bg-[#faf8f5] rounded-2xl border border-[#e6ded1] text-left space-y-2 text-xs text-slate-800">
+                <div className="flex items-center gap-2 font-bold text-[#0c2217]">
+                  <Clock className="w-4 h-4 text-[#0c2217] shrink-0" />
                   <span>What happens next?</span>
                 </div>
                 <ul className="list-disc list-inside space-y-1 text-slate-700 text-[11px] pl-1">
@@ -137,7 +137,7 @@ export default function ChatRequestModal({
               <button
                 type="button"
                 onClick={handleResetAndClose}
-                className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white rounded-xl text-xs font-black shadow-md shadow-emerald-600/30 transition-all cursor-pointer"
+                className="w-full py-3 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white rounded-xl text-xs font-black shadow-md shadow-[#b85d34]/25 transition-all cursor-pointer"
               >
                 Done
               </button>
@@ -145,7 +145,7 @@ export default function ChatRequestModal({
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
               {/* Tutor Info Preview */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200/90 flex items-center gap-3">
+              <div className="p-3.5 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] flex items-center gap-3">
                 <img
                   src={tutorAvatar}
                   alt={tutorName}
@@ -160,13 +160,13 @@ export default function ChatRequestModal({
               </div>
 
               {/* Student Verified Data Snapshot Preview */}
-              <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 space-y-2 text-xs">
+              <div className="p-3.5 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-2 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-emerald-900 flex items-center gap-1.5">
-                    <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <span className="font-bold text-[#0c2217] flex items-center gap-1.5">
+                    <ShieldCheck className="w-4 h-4 text-[#0c2217]" />
                     <span>Your Verified Profile Snapshot</span>
                   </span>
-                  <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-emerald-200/70 text-emerald-800 rounded-full">
+                  <span className="text-[10px] font-black uppercase px-2 py-0.5 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 rounded-full">
                     100% Strength
                   </span>
                 </div>
@@ -176,7 +176,7 @@ export default function ChatRequestModal({
                   <div><strong>Gender:</strong> {studentUser?.gender || 'Provided'}</div>
                   <div><strong>City:</strong> {studentUser?.city || 'Pakistan'}</div>
                 </div>
-                <p className="text-[10px] text-slate-500 pt-1 border-t border-emerald-200/60">
+                <p className="text-[10px] text-slate-500 pt-1 border-t border-[#e6ded1]">
                   This authentic snapshot ensures female tutors can verify your family/student context with confidence.
                 </p>
               </div>
@@ -192,7 +192,7 @@ export default function ChatRequestModal({
                   placeholder="e.g., Assalam-o-Alaikum! I am looking for online tutoring in FSc Biology / Tajweed for myself / my daughter. We would like to learn 3 days a week in the evening and discuss the monthly fee..."
                   rows={4}
                   required
-                  className="w-full p-3.5 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 text-xs text-slate-800 placeholder:text-slate-400 leading-relaxed outline-none transition-all resize-none"
+                  className="w-full p-3.5 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-[#0c2217]/20 focus:border-[#0c2217] text-xs text-slate-800 placeholder:text-slate-400 leading-relaxed outline-none transition-all resize-none"
                 />
                 <div className="flex items-center justify-between text-[10.5px] text-slate-400">
                   <span>Minimum 10 characters</span>
@@ -220,13 +220,13 @@ export default function ChatRequestModal({
                 <button
                   type="submit"
                   disabled={loading || details.trim().length < 10}
-                  className="px-6 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 disabled:opacity-50 text-white rounded-xl text-xs font-black shadow-md shadow-emerald-600/30 flex items-center gap-2 transition-all cursor-pointer"
+                  className="px-6 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] disabled:opacity-50 text-white rounded-xl text-xs font-black shadow-md shadow-[#b85d34]/25 flex items-center gap-2 transition-all cursor-pointer"
                 >
                   {loading ? (
                     <span>Sending Request...</span>
                   ) : (
                     <>
-                      <Send className="w-3.5 h-3.5 text-emerald-200" />
+                      <Send className="w-3.5 h-3.5 text-white/80" />
                       <span>Send Message Request</span>
                     </>
                   )}

@@ -56,7 +56,7 @@ const SubjectExplorer = () => {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
           <div className="space-y-3 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ebe3d3] text-[#143d2b] text-xs font-bold shadow-2xs">
-              <BookOpen className="w-3.5 h-3.5 text-[#2b6e51]" />
+              <BookOpen className="w-3.5 h-3.5 text-[#d4a359]" />
               <span>Curriculum &amp; Disciplines</span>
             </div>
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-black text-[#141c19] tracking-tight leading-[1.15]">
@@ -94,13 +94,13 @@ const SubjectExplorer = () => {
 
         {/* Featured Course Banner for Quranic Studies */}
         {activeTab === 'quran' && (
-          <div className="p-6 rounded-3xl bg-[#0c2217] text-white border-2 border-[#2b6e51]/50 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="p-6 rounded-3xl bg-[#0c2217] text-white border-2 border-[#d4a359]/40 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#143d2b] border border-[#2b6e51] flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-[#143d2b] border border-[#d4a359]/40 flex items-center justify-center shrink-0">
                 <Sparkles className="w-6 h-6 text-[#d4a359]" />
               </div>
               <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-[#d4a359] bg-[#143d2b] px-2.5 py-0.5 rounded border border-[#2b6e51]/60">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#d4a359] bg-[#143d2b] px-2.5 py-0.5 rounded border border-[#d4a359]/40">
                   Recommended for Beginners
                 </span>
                 <h3 className="text-base sm:text-lg font-serif font-black text-white mt-1">

@@ -42,7 +42,7 @@ export default function CaptchaBox({ onValidate, isVerified, setIsVerified, comp
       ctx.beginPath();
       ctx.moveTo(Math.random() * width, Math.random() * height);
       ctx.lineTo(Math.random() * width, Math.random() * height);
-      ctx.strokeStyle = `rgba(${Math.floor(Math.random() * 100)}, ${Math.floor(Math.random() * 150 + 50)}, ${Math.floor(Math.random() * 100)}, 0.35)`;
+      ctx.strokeStyle = `rgba(184, 93, 52, 0.25)`;
       ctx.lineWidth = Math.random() * 2 + 1;
       ctx.stroke();
     }
@@ -51,12 +51,12 @@ export default function CaptchaBox({ onValidate, isVerified, setIsVerified, comp
     for (let i = 0; i < 40; i++) {
       ctx.beginPath();
       ctx.arc(Math.random() * width, Math.random() * height, Math.random() * 1.5, 0, Math.PI * 2);
-      ctx.fillStyle = `rgba(5, 150, 105, 0.4)`;
+      ctx.fillStyle = `rgba(212, 163, 89, 0.4)`;
       ctx.fill();
     }
 
     // Draw characters with random rotation and colors
-    const colors = ['#047857', '#0f766e', '#1d4ed8', '#7c3aed', '#b45309', '#0f172a'];
+    const colors = ['#b85d34', '#0c2217', '#1d4ed8', '#7c3aed', '#b45309', '#0f172a'];
     const charWidth = width / (text.length + 1);
 
     for (let i = 0; i < text.length; i++) {
@@ -107,12 +107,12 @@ export default function CaptchaBox({ onValidate, isVerified, setIsVerified, comp
       <div className="p-2 bg-slate-50 rounded-xl border border-slate-200 flex flex-col gap-1.5">
         <div className="flex items-center justify-between">
           <span className="text-[10.5px] font-bold text-slate-700 flex items-center gap-1">
-            <ShieldCheck className="w-3 h-3 text-emerald-600" />
+            <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
             <span>Security Code *</span>
           </span>
           {isVerified && (
-            <span className="text-[10px] font-bold text-emerald-700 flex items-center gap-0.5">
-              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+            <span className="text-[10px] font-bold text-[#0c2217] flex items-center gap-0.5">
+              <CheckCircle2 className="w-3 h-3 text-[#d4a359]" />
               <span>Verified</span>
             </span>
           )}
@@ -147,10 +147,10 @@ export default function CaptchaBox({ onValidate, isVerified, setIsVerified, comp
             onChange={handleInputChange}
             className={`w-full px-2.5 py-1.5 bg-white rounded-lg text-xs font-mono font-bold tracking-wider outline-none ${
               isVerified
-                ? 'border border-emerald-500 text-emerald-900'
+                ? 'border border-[#d4a359] text-[#0c2217] bg-[#faf8f5]'
                 : touched && userInput.length >= 4
                 ? 'border border-rose-400 text-rose-900'
-                : 'border border-slate-200 text-slate-800 focus:border-emerald-500'
+                : 'border border-slate-200 text-slate-800 focus:border-[#b85d34]'
             }`}
           />
         </div>
@@ -162,12 +162,12 @@ export default function CaptchaBox({ onValidate, isVerified, setIsVerified, comp
     <div className="p-3 bg-slate-50/90 rounded-2xl border border-slate-200 space-y-2">
       <div className="flex items-center justify-between">
         <label className="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-          <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+          <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
           <span>Security Verification (CAPTCHA) *</span>
         </label>
         {isVerified && (
-          <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+          <span className="text-[11px] font-bold text-[#0c2217] flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
             <span>Verified</span>
           </span>
         )}
@@ -205,10 +205,10 @@ export default function CaptchaBox({ onValidate, isVerified, setIsVerified, comp
             onChange={handleInputChange}
             className={`w-full px-3 py-1.5 bg-white rounded-xl text-xs font-mono font-bold tracking-wider outline-none transition-all ${
               isVerified
-                ? 'border-2 border-emerald-500 text-emerald-900 focus:ring-2 focus:ring-emerald-500'
+                ? 'border-2 border-[#d4a359] text-[#0c2217] focus:ring-2 focus:ring-[#d4a359]'
                 : touched && userInput.length >= 4
                 ? 'border-2 border-rose-400 text-rose-900'
-                : 'border border-slate-200 text-slate-800 focus:border-emerald-500'
+                : 'border border-slate-200 text-slate-800 focus:border-[#b85d34]'
             }`}
           />
         </div>

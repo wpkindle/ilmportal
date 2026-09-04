@@ -10,7 +10,7 @@ const LoadingSpinner = ({ size = 'md', text = 'Loading...' }) => {
   return (
     <div className="flex flex-col items-center justify-center p-8 space-y-3">
       <div
-        className={`${sizes[size] || sizes.md} border-emerald-600 border-t-transparent rounded-full animate-spin`}
+        className={`${sizes[size] || sizes.md} border-[#b85d34] border-t-transparent rounded-full animate-spin`}
       />
       {text && <p className="text-xs font-medium text-slate-500 animate-pulse">{text}</p>}
     </div>

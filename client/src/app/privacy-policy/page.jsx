@@ -36,13 +36,13 @@ export default function PrivacyPolicyPage() {
           
           {/* Breadcrumbs */}
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
-            <Link href="/" className="hover:text-emerald-400 transition-colors">Home</Link>
+            <Link href="/" className="hover:text-[#d4a359] transition-colors">Home</Link>
             <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
-            <span className="text-emerald-400">Privacy Policy</span>
+            <span className="text-[#d4a359]">Privacy Policy</span>
           </div>
 
           <div className="flex items-center gap-2.5">
-            <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 flex items-center gap-1.5">
+            <span className="px-3 py-1 rounded-full text-xs font-black uppercase tracking-wider bg-[#d4a359]/20 text-[#d4a359] border border-[#d4a359]/30 flex items-center gap-1.5">
               <Shield className="w-3.5 h-3.5" />
               <span>User & Family Protection</span>
             </span>
@@ -81,10 +81,10 @@ export default function PrivacyPolicyPage() {
 
             <div className="mt-12 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
               <div className="flex items-center gap-2">
-                <Lock className="w-4 h-4 text-emerald-600" />
+                <Lock className="w-4 h-4 text-[#d4a359]" />
                 <span>Encrypted storage & Pakistan PECA compliant</span>
               </div>
-              <Link href="/contact-us" className="text-emerald-700 font-bold hover:underline">
+              <Link href="/contact-us" className="text-[#b85d34] font-bold hover:underline">
                 Have questions? Contact our Data Officer &rarr;
               </Link>
             </div>

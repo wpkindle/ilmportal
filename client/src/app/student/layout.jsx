@@ -43,11 +43,11 @@ export default function StudentLayout({ children }) {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#143d2b] bg-[#eef5f0] px-2 py-0.5 rounded-md border border-[#c3dfcb]">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#0c2217] bg-[#f0ece1] px-2 py-0.5 rounded-md border border-[#d4a359]/40">
                     Student Portal
                   </span>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                    <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                  <span className="inline-flex items-center gap-1 text-[10px] font-semibold text-[#0c2217] bg-[#f0ece1] px-2 py-0.5 rounded-full border border-[#d4a359]/40">
+                    <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
                     Female Privacy Protected
                   </span>
                 </div>
@@ -58,7 +58,7 @@ export default function StudentLayout({ children }) {
             </div>
 
             <div className="hidden sm:flex items-center gap-2 text-xs text-stone-500">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-[#d4a359] animate-pulse" />
               <span>Direct WebRTC Classrooms &bull; Zero Personal Phone Sharing</span>
             </div>
           </div>

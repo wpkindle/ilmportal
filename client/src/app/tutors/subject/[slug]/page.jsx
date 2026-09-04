@@ -70,19 +70,19 @@ export default async function SubjectTutorsPage({ params }) {
         {/* Back Link */}
         <Link
           href="/tutors"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-emerald-700 transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-500 hover:text-[#0c2217] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           <span>All Disciplines</span>
         </Link>
 
         {/* Subject Hero Header */}
-        <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-slate-950 text-white rounded-3xl p-6 sm:p-10 shadow-xl space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">
+        <div className="bg-[#0c2217] text-white rounded-3xl p-6 sm:p-10 shadow-xl border border-[#d4a359]/30 space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#d4a359]/20 text-[#d4a359] text-xs font-bold border border-[#d4a359]/30">
             <BookOpen className="w-3.5 h-3.5" />
             <span>Discipline Specialization</span>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black text-white">
+          <h1 className="text-2xl sm:text-4xl font-black text-white font-serif">
             {formattedName} Tutors in Pakistan
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
@@ -107,7 +107,7 @@ export default async function SubjectTutorsPage({ params }) {
               </p>
               <Link
                 href="/tutors"
-                className="inline-block px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold"
+                className="inline-block px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-xl text-xs font-bold shadow-md transition-all"
               >
                 Browse All Tutors
               </Link>

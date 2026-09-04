@@ -138,7 +138,7 @@ export default function Hero() {
             <div className="flex items-center gap-2">
               <Link
                 href="/safety"
-                className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#143d2b] hover:bg-[#1e543c] border border-[#2b6e51]/60 text-[#d4a359] text-xs font-bold transition-all shadow-sm group"
+                className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#143d2b] hover:bg-[#0c2217] border border-[#d4a359]/40 text-[#d4a359] text-xs font-bold transition-all shadow-sm group"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
                 <span>Female-First Safety • Verified Qaris, Alimahs &amp; Academic Tutors</span>
@@ -159,20 +159,20 @@ export default function Hero() {
 
             {/* Key Assurance Signals */}
             <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-semibold">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b]/80 border border-[#2b6e51]/50 text-[#e5f3ec]">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b]/80 border border-[#d4a359]/30 text-[#faf8f5]">
                 <Heart className="w-3.5 h-3.5 text-rose-400" />
                 <span>100% Female Privacy &amp; Comfort</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b]/80 border border-[#2b6e51]/50 text-[#e5f3ec]">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#388e6a]" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b]/80 border border-[#d4a359]/30 text-[#faf8f5]">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
                 <span>Verified Qaris &amp; Alimahs (Sanad)</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b]/80 border border-[#2b6e51]/50 text-[#e5f3ec]">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b]/80 border border-[#d4a359]/30 text-[#faf8f5]">
                 <Lock className="w-3.5 h-3.5 text-[#d4a359]" />
                 <span>Camera-Off by Default</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b]/80 border border-[#2b6e51]/50 text-[#e5f3ec]">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b]/80 border border-[#d4a359]/30 text-[#faf8f5]">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
                 <span>Zero Personal Contact Sharing</span>
               </span>
             </div>
@@ -181,7 +181,7 @@ export default function Hero() {
             <div className="pt-2 max-w-xl">
               <form
                 onSubmit={handleSearchSubmit}
-                className="bg-white p-2 rounded-2xl sm:rounded-full shadow-2xl border-2 border-[#2b6e51]/40 flex flex-col sm:flex-row items-center gap-2"
+                className="bg-white p-2 rounded-2xl sm:rounded-full shadow-2xl border-2 border-[#d4a359]/40 flex flex-col sm:flex-row items-center gap-2"
               >
                 {/* Search Text */}
                 <div className="flex items-center gap-2 px-3 py-1.5 w-full sm:w-1/2">
@@ -235,7 +235,7 @@ export default function Hero() {
                   <Link
                     key={sub.slug}
                     href={`/tutors?category=${sub.slug}`}
-                    className="px-2.5 py-1 rounded-full bg-[#143d2b]/60 hover:bg-[#1e543c] text-[#d1dbd6] hover:text-white text-xs font-medium border border-[#2b6e51]/40 transition-colors"
+                    className="px-2.5 py-1 rounded-full bg-[#143d2b]/60 hover:bg-[#1e543c] text-[#d1dbd6] hover:text-white text-xs font-medium border border-[#d4a359]/30 transition-colors"
                   >
                     {sub.label}
                   </Link>
@@ -247,7 +247,7 @@ export default function Hero() {
             <div className="pt-2 flex flex-col sm:flex-row items-center gap-3 max-w-md">
               <Link
                 href="/register/student"
-                className="w-full sm:w-1/2 px-5 py-3 rounded-xl bg-[#2b6e51] hover:bg-[#388e6a] text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#388e6a]/40"
+                className="w-full sm:w-1/2 px-5 py-3 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#b85d34]/40"
               >
                 <GraduationCap className="w-4 h-4" />
                 <span>Join as Student</span>
@@ -255,11 +255,11 @@ export default function Hero() {
               </Link>
               <Link
                 href="/register/tutor"
-                className="w-full sm:w-1/2 px-5 py-3 rounded-xl bg-[#143d2b] hover:bg-[#1e543c] text-[#f5f0e6] font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#2b6e51]"
+                className="w-full sm:w-1/2 px-5 py-3 rounded-xl bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#d4a359]/40"
               >
                 <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
                 <span>Apply as Tutor</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#81928e]" />
+                <ArrowRight className="w-3.5 h-3.5 text-[#d4a359]" />
               </Link>
             </div>
 
@@ -281,13 +281,13 @@ export default function Hero() {
           <div className="lg:col-span-5 relative mt-4 lg:mt-0">
             
             {/* Quick Segmented Mode Switcher Tabs */}
-            <div className="flex items-center justify-center p-1 mb-3.5 bg-[#0c2217]/90 backdrop-blur-md rounded-2xl border border-[#2b6e51]/50 max-w-sm mx-auto shadow-md">
+            <div className="flex items-center justify-center p-1 mb-3.5 bg-[#0c2217]/90 backdrop-blur-md rounded-2xl border border-[#d4a359]/30 max-w-sm mx-auto shadow-md">
               <button
                 type="button"
                 onClick={() => setCurrentSlide(0)}
                 className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                   currentSlide === 0
-                    ? 'bg-[#1e543c] text-[#d4a359] shadow-sm border border-[#2b6e51]'
+                    ? 'bg-[#143d2b] text-[#d4a359] shadow-sm border border-[#d4a359]/40'
                     : 'text-[#a3b8b0] hover:text-white'
                 }`}
               >
@@ -299,7 +299,7 @@ export default function Hero() {
                 onClick={() => setCurrentSlide(1)}
                 className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
                   currentSlide === 1
-                    ? 'bg-[#1e543c] text-teal-300 shadow-sm border border-teal-500/50'
+                    ? 'bg-[#143d2b] text-[#d4a359] shadow-sm border border-[#d4a359]/40'
                     : 'text-[#a3b8b0] hover:text-white'
                 }`}
               >
@@ -312,11 +312,11 @@ export default function Hero() {
             <div className="relative mx-auto max-w-md lg:max-w-none">
               
               {/* Backing warm tone shape */}
-              <div className="absolute -inset-2 bg-gradient-to-tr from-[#1e543c]/40 via-[#d4a359]/20 to-transparent rounded-3xl blur-xl" />
+              <div className="absolute -inset-2 bg-gradient-to-tr from-[#143d2b]/40 via-[#d4a359]/20 to-transparent rounded-3xl blur-xl" />
 
               {/* Main Editorial Card with Dual-Slide Tutoring Carousel */}
               <div
-                className="relative rounded-3xl overflow-hidden border-2 border-[#2b6e51]/50 bg-[#07150e] shadow-2xl h-80 sm:h-96 group"
+                className="relative rounded-3xl overflow-hidden border-2 border-[#d4a359]/40 bg-[#07150e] shadow-2xl h-80 sm:h-96 group"
                 onMouseEnter={() => setIsPaused(true)}
                 onMouseLeave={() => setIsPaused(false)}
               >
@@ -352,7 +352,7 @@ export default function Hero() {
                 </div>
 
                 {/* Top Left Badge: Mode Tag */}
-                <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0c2217]/90 backdrop-blur-md border border-[#2b6e51]/60 text-[11px] font-bold text-[#d4a359]">
+                <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0c2217]/90 backdrop-blur-md border border-[#d4a359]/40 text-[11px] font-bold text-[#d4a359]">
                   {currentSlide === 0 ? (
                     <>
                       <Home className="w-3.5 h-3.5 text-[#d4a359]" />
@@ -360,8 +360,8 @@ export default function Hero() {
                     </>
                   ) : (
                     <>
-                      <Video className="w-3.5 h-3.5 text-teal-300" />
-                      <span className="text-teal-200">1:1 WebRTC Video</span>
+                      <Video className="w-3.5 h-3.5 text-[#d4a359]" />
+                      <span className="text-[#faf8f5]">1:1 WebRTC Video</span>
                     </>
                   )}
                 </div>
@@ -377,7 +377,7 @@ export default function Hero() {
                   <button
                     type="button"
                     onClick={() => setCurrentSlide(1)}
-                    className={`h-2 rounded-full transition-all ${currentSlide === 1 ? 'w-5 bg-teal-400' : 'w-2 bg-white/40'}`}
+                    className={`h-2 rounded-full transition-all ${currentSlide === 1 ? 'w-5 bg-[#b85d34]' : 'w-2 bg-white/40'}`}
                     aria-label="Slide 2: WebRTC Video Call in Naqab"
                   />
                 </div>
@@ -401,15 +401,15 @@ export default function Hero() {
                 </button>
 
                 {/* Bottom Dynamic Caption */}
-                <div className="absolute bottom-3 left-3 right-3 p-3 rounded-2xl bg-[#0c2217]/90 backdrop-blur-md border border-[#2b6e51]/60 text-xs space-y-1 z-20">
+                <div className="absolute bottom-3 left-3 right-3 p-3 rounded-2xl bg-[#0c2217]/90 backdrop-blur-md border border-[#d4a359]/40 text-xs space-y-1 z-20">
                   {currentSlide === 0 ? (
                     <>
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-white flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                          <span className="w-2 h-2 rounded-full bg-[#d4a359] animate-pulse" />
                           <span>1:1 Male Tutor &amp; Boy Student</span>
                         </span>
-                        <span className="text-[10px] font-mono text-[#d4a359] bg-[#143d2b] px-2 py-0.5 rounded border border-[#2b6e51]/50">
+                        <span className="text-[10px] font-mono text-[#d4a359] bg-[#143d2b] px-2 py-0.5 rounded border border-[#d4a359]/30">
                           Home Tuition
                         </span>
                       </div>
@@ -421,10 +421,10 @@ export default function Hero() {
                     <>
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-white flex items-center gap-1.5">
-                          <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
+                          <span className="w-2 h-2 rounded-full bg-[#b85d34] animate-pulse" />
                           <span>1:1 WebRTC Video Call • Alimah in Naqab</span>
                         </span>
-                        <span className="text-[10px] font-mono text-teal-300 bg-[#0c2e22] px-2 py-0.5 rounded border border-teal-500/40">
+                        <span className="text-[10px] font-mono text-[#d4a359] bg-[#143d2b] px-2 py-0.5 rounded border border-[#d4a359]/30">
                           Naqab &amp; Privacy
                         </span>
                       </div>
@@ -447,9 +447,9 @@ export default function Hero() {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             
             {/* Feature 1: Verification */}
-            <div className="p-4 rounded-2xl bg-[#143d2b]/50 border border-[#2b6e51]/40 space-y-1">
+            <div className="p-4 rounded-2xl bg-[#143d2b]/50 border border-[#d4a359]/20 space-y-1">
               <div className="flex items-center gap-2 text-[#d4a359] font-bold text-xs">
-                <ShieldCheck className="w-4 h-4 shrink-0 text-emerald-400" />
+                <ShieldCheck className="w-4 h-4 shrink-0 text-[#d4a359]" />
                 <span>100% CNIC &amp; Sanad Audited</span>
               </div>
               <p className="text-xs text-[#a3b8b0] leading-relaxed">
@@ -458,7 +458,7 @@ export default function Hero() {
             </div>
 
             {/* Feature 2: Female Safety & Comfort */}
-            <div className="p-4 rounded-2xl bg-[#143d2b]/50 border border-[#2b6e51]/40 space-y-1">
+            <div className="p-4 rounded-2xl bg-[#143d2b]/50 border border-[#d4a359]/20 space-y-1">
               <div className="flex items-center gap-2 text-[#d4a359] font-bold text-xs">
                 <Heart className="w-4 h-4 shrink-0 text-rose-400" />
                 <span>Female Safety &amp; Comfort</span>
@@ -469,9 +469,9 @@ export default function Hero() {
             </div>
 
             {/* Feature 3: Live Classroom */}
-            <div className="p-4 rounded-2xl bg-[#143d2b]/50 border border-[#2b6e51]/40 space-y-1">
+            <div className="p-4 rounded-2xl bg-[#143d2b]/50 border border-[#d4a359]/20 space-y-1">
               <div className="flex items-center gap-2 text-[#d4a359] font-bold text-xs">
-                <Video className="w-4 h-4 shrink-0 text-teal-400" />
+                <Video className="w-4 h-4 shrink-0 text-[#d4a359]" />
                 <span>Direct In-Browser Classroom</span>
               </div>
               <p className="text-xs text-[#a3b8b0] leading-relaxed">
@@ -480,9 +480,9 @@ export default function Hero() {
             </div>
 
             {/* Feature 4: Transparent Fee */}
-            <div className="p-4 rounded-2xl bg-[#143d2b]/50 border border-[#2b6e51]/40 space-y-1">
+            <div className="p-4 rounded-2xl bg-[#143d2b]/50 border border-[#d4a359]/20 space-y-1">
               <div className="flex items-center gap-2 text-[#d4a359] font-bold text-xs">
-                <Sparkles className="w-4 h-4 shrink-0 text-rose-400" />
+                <Sparkles className="w-4 h-4 shrink-0 text-[#b85d34]" />
                 <span>Agreed Direct Monthly Rates</span>
               </div>
               <p className="text-xs text-[#a3b8b0] leading-relaxed">

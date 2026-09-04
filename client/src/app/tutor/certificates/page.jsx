@@ -195,7 +195,7 @@ export default function TutorCertificatesPage() {
                         isPendingMyReview
                           ? 'bg-amber-50 text-amber-700 border-amber-200'
                           : isIssued
-                          ? 'bg-emerald-50 text-emerald-700 border-emerald-200'
+                          ? 'bg-[#f0ece1] text-[#0c2217] border-[#d4a359]/40'
                           : 'bg-purple-50 text-purple-700 border-purple-200'
                       }`}>
                         <Award className="w-6 h-6" />
@@ -209,7 +209,7 @@ export default function TutorCertificatesPage() {
                           ? 'bg-indigo-100 text-indigo-800'
                           : isProofSubmitted
                           ? 'bg-purple-100 text-purple-800'
-                          : 'bg-emerald-100 text-emerald-800'
+                          : 'bg-[#f0ece1] text-[#0c2217]'
                       }`}>
                         {isPendingMyReview ? 'Action Required' : cert.status.replace(/_/g, ' ')}
                       </span>
@@ -242,7 +242,7 @@ export default function TutorCertificatesPage() {
                     <div className="p-3 bg-slate-50 rounded-xl border border-slate-100 text-xs space-y-1 text-slate-600">
                       <div className="flex items-center justify-between">
                         <span>Marks / Percentage:</span>
-                        <strong className="text-emerald-800 font-bold">
+                        <strong className="text-[#0c2217] font-bold">
                           {cert.marks || (isPendingMyReview ? 'Not assigned yet' : 'N/A')}
                         </strong>
                       </div>
@@ -257,7 +257,7 @@ export default function TutorCertificatesPage() {
                       {cert.price > 0 && (
                         <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200">
                           <span>Admin Fee:</span>
-                          <strong className="font-mono text-emerald-700 font-black">PKR {cert.price.toLocaleString()}</strong>
+                          <strong className="font-mono text-[#b85d34] font-black">PKR {cert.price.toLocaleString()}</strong>
                         </div>
                       )}
                     </div>
@@ -309,18 +309,18 @@ export default function TutorCertificatesPage() {
                     {isPendingMyReview ? (
                       <button
                         onClick={() => handleOpenEvaluationModal(cert)}
-                        className="w-full py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs rounded-xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer hover:scale-[1.02]"
+                        className="w-full py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-black text-xs rounded-xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer hover:scale-[1.02]"
                       >
-                        <Sparkles className="w-4 h-4 text-emerald-200" />
+                        <Sparkles className="w-4 h-4 text-white/80" />
                         <span>Add Marks &amp; Grades</span>
                       </button>
                     ) : isIssued ? (
                       <Link
                         href={`/certificates/${cert.certificateId}`}
                         target="_blank"
-                        className="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
+                        className="w-full py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] border border-[#d4a359]/40 font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
                       >
-                        <ExternalLink className="w-3.5 h-3.5" />
+                        <ExternalLink className="w-3.5 h-3.5 text-[#d4a359]" />
                         <span>View Verified Certificate</span>
                       </Link>
                     ) : (
@@ -347,8 +347,8 @@ export default function TutorCertificatesPage() {
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-200 max-h-[92vh] overflow-y-auto">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
-                <div className="p-2 bg-emerald-100 text-emerald-800 rounded-xl">
-                  <Award className="w-5 h-5" />
+                <div className="p-2 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 rounded-xl">
+                  <Award className="w-5 h-5 text-[#d4a359]" />
                 </div>
                 <div>
                   <h3 className="font-black text-slate-900 text-base">Academic Evaluation &amp; Marks</h3>
@@ -387,7 +387,7 @@ export default function TutorCertificatesPage() {
                   placeholder="e.g. 96%, 94/100, 98%"
                   value={marks}
                   onChange={(e) => setMarks(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs font-bold outline-none focus:border-emerald-500"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono text-xs font-bold outline-none focus:border-[#b85d34]"
                 />
                 <p className="text-[11px] text-slate-400 mt-1">This will be permanently printed on the official certificate.</p>
               </div>
@@ -399,7 +399,7 @@ export default function TutorCertificatesPage() {
                 <select
                   value={grade}
                   onChange={(e) => setGrade(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium outline-none focus:border-emerald-500"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium outline-none focus:border-[#b85d34]"
                 >
                   <option value="A+ (Distinction / Mumtaz)">A+ (Distinction / Mumtaz - ممتاز)</option>
                   <option value="A (Excellent / Jayyid Jiddan)">A (Excellent / Jayyid Jiddan - جيد جداً)</option>
@@ -416,7 +416,7 @@ export default function TutorCertificatesPage() {
                     placeholder="Enter custom grade (e.g. High Distinction)"
                     value={customGrade}
                     onChange={(e) => setCustomGrade(e.target.value)}
-                    className="w-full mt-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium outline-none focus:border-emerald-500"
+                    className="w-full mt-2 p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-medium outline-none focus:border-[#b85d34]"
                   />
                 )}
               </div>
@@ -430,7 +430,7 @@ export default function TutorCertificatesPage() {
                   min="1"
                   value={totalLessons}
                   onChange={(e) => setTotalLessons(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono outline-none focus:border-emerald-500 font-bold"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl font-mono outline-none focus:border-[#b85d34] font-bold"
                 />
               </div>
 
@@ -443,11 +443,11 @@ export default function TutorCertificatesPage() {
                   placeholder="e.g. Demonstrated exceptional memorization, flawless Tajweed pronunciation, and consistent attendance."
                   value={tutorNotes}
                   onChange={(e) => setTutorNotes(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500 resize-none font-medium"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#b85d34] resize-none font-medium"
                 />
               </div>
 
-              <div className="p-3 bg-emerald-50 rounded-xl border border-emerald-100 text-[11px] text-emerald-800 space-y-0.5">
+              <div className="p-3 bg-[#faf8f5] rounded-xl border border-[#d4a359]/30 text-[11px] text-[#0c2217] space-y-0.5">
                 <p className="font-bold">Next Step in Workflow:</p>
                 <p>When you click submit, your marks and remarks will be forwarded to Administration. Admin will then assign the certificate fee, after which the student will pay and receive their certificate.</p>
               </div>
@@ -463,7 +463,7 @@ export default function TutorCertificatesPage() {
                 <button
                   type="submit"
                   disabled={submittingEval}
-                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs shadow-md transition-all disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-black rounded-xl text-xs shadow-md transition-all disabled:opacity-50 cursor-pointer"
                 >
                   {submittingEval ? 'Submitting Marks...' : 'Submit Evaluation to Admin'}
                 </button>

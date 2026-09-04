@@ -57,8 +57,8 @@ export default function FAQ() {
         
         {/* Editorial Header */}
         <div className="text-center space-y-3 max-w-2xl mx-auto">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5f0e6] border border-[#ebe3d3] text-[#143d2b] text-xs font-bold shadow-2xs">
-            <HelpCircle className="w-3.5 h-3.5 text-[#2b6e51]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5f0e6] border border-[#ebe3d3] text-[#0c2217] text-xs font-bold shadow-2xs">
+            <HelpCircle className="w-3.5 h-3.5 text-[#d4a359]" />
             <span>Clear Answers for Families</span>
           </div>
 

@@ -244,7 +244,7 @@ export default function AdminDashboardPage() {
       case 'attendance_dispute':
         return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 border border-blue-200">Attendance Dispute</span>;
       case 'technical_issue':
-        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-100 text-teal-800 border border-teal-200">Technical Issue</span>;
+        return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 border border-amber-200">Technical Issue</span>;
       default:
         return <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-800 border border-slate-200">General Concern</span>;
     }
@@ -263,7 +263,7 @@ export default function AdminDashboardPage() {
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
                 <h1 className="text-2xl sm:text-3xl font-black text-slate-900 flex items-center gap-2.5">
-                  <ShieldCheck className="w-8 h-8 text-emerald-600" />
+                  <ShieldCheck className="w-8 h-8 text-[#d4a359]" />
                   <span>Admin Control Center</span>
                 </h1>
                 <p className="text-xs text-slate-500 mt-1">
@@ -293,7 +293,7 @@ export default function AdminDashboardPage() {
             {actionFeedback.message && (
               <div className={`p-4 rounded-2xl flex items-center justify-between text-xs font-bold ${
                 actionFeedback.type === 'success'
-                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                  ? 'bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40'
                   : 'bg-rose-50 text-rose-800 border border-rose-200'
               }`}>
                 <span>{actionFeedback.message}</span>
@@ -331,14 +331,14 @@ export default function AdminDashboardPage() {
 
               {/* Registered Students */}
               <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-2xs">
-                <div className="p-2 bg-emerald-100 text-emerald-700 w-fit rounded-xl mb-3">
-                  <Users className="w-5 h-5" />
+                <div className="p-2 bg-[#f0ece1] text-[#0c2217] w-fit rounded-xl mb-3 border border-[#d4a359]/30">
+                  <Users className="w-5 h-5 text-[#b85d34]" />
                 </div>
                 <p className="text-2xl font-black text-slate-900">{stats?.totalStudents || userCounts.students}</p>
                 <p className="text-xs text-slate-500 font-medium">Registered Students</p>
                 <button
                   onClick={() => setActiveTab('student')}
-                  className="text-[10px] font-bold text-emerald-700 hover:underline mt-1 block cursor-pointer"
+                  className="text-[10px] font-bold text-[#b85d34] hover:underline mt-1 block cursor-pointer"
                 >
                   View Students &rarr;
                 </button>
@@ -384,10 +384,10 @@ export default function AdminDashboardPage() {
 
               {/* Verified Payments */}
               <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-2xs">
-                <div className="p-2 bg-teal-100 text-teal-700 w-fit rounded-xl mb-3">
-                  <CreditCard className="w-5 h-5" />
+                <div className="p-2 bg-[#f0ece1] text-[#0c2217] w-fit rounded-xl mb-3 border border-[#d4a359]/30">
+                  <CreditCard className="w-5 h-5 text-[#b85d34]" />
                 </div>
-                <p className="text-xl font-black text-teal-700 font-mono">
+                <p className="text-xl font-black text-[#b85d34] font-mono">
                   PKR {stats?.totalRevenue?.toLocaleString() || 0}
                 </p>
                 <p className="text-xs text-slate-500 font-medium">Verified Payments</p>
@@ -436,7 +436,7 @@ export default function AdminDashboardPage() {
                     onClick={() => setActiveTab('student')}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                       activeTab === 'student'
-                        ? 'bg-emerald-600 text-white shadow-2xs'
+                        ? 'bg-[#b85d34] text-white shadow-2xs'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
@@ -525,7 +525,7 @@ export default function AdminDashboardPage() {
                       {/* Left: User Profile & Details */}
                       <div className="flex items-start gap-3.5">
                         <img
-                          src={u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=059669&color=fff`}
+                          src={u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=0c2217&color=d4a359`}
                           alt={u.name}
                           className="w-11 h-11 rounded-2xl object-cover border border-slate-100 shrink-0"
                         />
@@ -537,7 +537,7 @@ export default function AdminDashboardPage() {
                                 ? 'bg-purple-100 text-purple-800'
                                 : u.role === 'tutor'
                                 ? 'bg-blue-100 text-blue-800'
-                                : 'bg-emerald-100 text-emerald-800'
+                                : 'bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40'
                             }`}>
                               {u.role}
                             </span>
@@ -550,7 +550,7 @@ export default function AdminDashboardPage() {
                                 ? 'bg-orange-100 text-orange-800 border border-orange-200 animate-pulse'
                                 : u.status === 'warned'
                                 ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                                : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                                : 'bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40'
                             }`}>
                               {u.status || (u.isActive ? 'active' : 'suspended')}
                             </span>
@@ -606,7 +606,7 @@ export default function AdminDashboardPage() {
                         {u.status === 'under_review' ? (
                           <button
                             onClick={() => openStatusModal(u, 'active')}
-                            className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                            className="px-3 py-1.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
                           >
                             <CheckCircle2 className="w-3.5 h-3.5" />
                             <span>Reactivate</span>
@@ -625,9 +625,9 @@ export default function AdminDashboardPage() {
                         {u.status === 'suspended' || u.status === 'deactivated' || !u.isActive ? (
                           <button
                             onClick={() => openStatusModal(u, 'active')}
-                            className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                            className="px-3 py-1.5 bg-[#f0ece1] hover:bg-[#e4dcce] text-[#0c2217] font-bold text-xs rounded-xl border border-[#d4a359]/40 transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
                           >
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
                             <span>Unban</span>
                           </button>
                         ) : (
@@ -683,7 +683,7 @@ export default function AdminDashboardPage() {
 
               {!stats?.recentReports || stats.recentReports.length === 0 ? (
                 <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200">
-                  <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto mb-2" />
+                  <CheckCircle2 className="w-8 h-8 text-[#d4a359] mx-auto mb-2" />
                   <p className="text-xs font-bold text-slate-700">No Incident Reports Filed</p>
                   <p className="text-[11px] text-slate-400">All student and tutor interactions are currently in good standing.</p>
                 </div>
@@ -703,7 +703,7 @@ export default function AdminDashboardPage() {
                               : report.status === 'under_review'
                               ? 'bg-amber-100 text-amber-800'
                               : report.status === 'resolved'
-                              ? 'bg-emerald-100 text-emerald-800'
+                              ? 'bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40'
                               : 'bg-slate-200 text-slate-700'
                           }`}>
                             {report.status?.replace('_', ' ')}
@@ -743,7 +743,7 @@ export default function AdminDashboardPage() {
             {/* City Distribution Table */}
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-4">
               <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-emerald-600" />
+                <MapPin className="w-5 h-5 text-[#b85d34]" />
                 <span>Users Distribution Across Pakistan</span>
               </h3>
 
@@ -751,7 +751,7 @@ export default function AdminDashboardPage() {
                 {stats?.locationStats?.map((loc) => (
                   <div key={loc._id || 'other'} className="p-3 bg-slate-50 rounded-2xl border border-slate-200">
                     <p className="text-xs font-bold text-slate-800">{loc._id || 'General'}</p>
-                    <p className="text-lg font-black text-emerald-700">{loc.count} Users</p>
+                    <p className="text-lg font-black text-[#b85d34]">{loc.count} Users</p>
                   </div>
                 ))}
               </div>
@@ -853,10 +853,10 @@ export default function AdminDashboardPage() {
                 ? 'bg-rose-50 text-rose-900 border-rose-100'
                 : statusForm.status === 'under_review'
                 ? 'bg-orange-50 text-orange-900 border-orange-100'
-                : 'bg-emerald-50 text-emerald-900 border-emerald-100'
+                : 'bg-[#f0ece1] text-[#0c2217] border-[#d4a359]/40'
             }`}>
               <div className="flex items-center gap-2 font-black">
-                {statusForm.status === 'suspended' ? <Ban className="w-5 h-5 text-rose-600" /> : statusForm.status === 'under_review' ? <Clock className="w-5 h-5 text-orange-600" /> : <CheckCircle2 className="w-5 h-5 text-emerald-600" />}
+                {statusForm.status === 'suspended' ? <Ban className="w-5 h-5 text-rose-600" /> : statusForm.status === 'under_review' ? <Clock className="w-5 h-5 text-orange-600" /> : <CheckCircle2 className="w-5 h-5 text-[#d4a359]" />}
                 <span>Set Status: {statusForm.status.replace('_', ' ').toUpperCase()}</span>
               </div>
               <button onClick={() => setStatusModalOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
@@ -921,7 +921,7 @@ export default function AdminDashboardPage() {
                       ? 'bg-rose-700 hover:bg-rose-800 text-white'
                       : statusForm.status === 'under_review'
                       ? 'bg-orange-600 hover:bg-orange-700 text-white'
-                      : 'bg-emerald-700 hover:bg-emerald-800 text-white'
+                      : 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
                   }`}
                 >
                   <span>{actionLoading ? 'Updating Status...' : 'Apply Status Change'}</span>

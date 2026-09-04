@@ -36,14 +36,14 @@ export default function NotificationPermissionPrompt() {
 
   return (
     <div className="fixed bottom-20 sm:bottom-6 left-4 right-4 sm:left-auto sm:right-6 sm:max-w-md z-50 animate-in slide-in-from-bottom-5 duration-300">
-      <div className="bg-slate-900/95 backdrop-blur-md text-white p-4 rounded-3xl shadow-2xl border border-emerald-500/30 flex items-start gap-3 relative">
-        <div className="p-2.5 bg-emerald-500/20 text-emerald-400 rounded-2xl border border-emerald-500/30 shrink-0 mt-0.5">
+      <div className="bg-[#0c2217]/95 backdrop-blur-md text-[#faf8f5] p-4 rounded-3xl shadow-2xl border border-[#d4a359]/40 flex items-start gap-3 relative">
+        <div className="p-2.5 bg-[#d4a359]/20 text-[#d4a359] rounded-2xl border border-[#d4a359]/40 shrink-0 mt-0.5">
           <Bell className="w-5 h-5 animate-pulse" />
         </div>
 
         <div className="min-w-0 flex-1 space-y-1">
           <div className="flex items-center gap-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/30">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-[#143d2b] px-2 py-0.5 rounded-full border border-[#d4a359]/40">
               Live Alerts
             </span>
             <span className="text-xs font-bold text-white">Enable Notifications?</span>
@@ -56,7 +56,7 @@ export default function NotificationPermissionPrompt() {
             <button
               type="button"
               onClick={handleAllow}
-              className="px-4 py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-95 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-700/30 transition-all cursor-pointer"
+              className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-95 text-white font-bold text-xs rounded-xl shadow-md transition-all cursor-pointer"
             >
               Allow Notifications
             </button>

@@ -221,39 +221,39 @@ function CourseSearchContent() {
             {/* Header: Result Counts and Active Filter Badges */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
               <p className="text-xs sm:text-sm font-bold text-slate-700">
-                Showing <span className="text-emerald-700 font-extrabold">{courses.length}</span> Structured Courses
+                Showing <span className="text-[#0c2217] font-black">{courses.length}</span> Structured Courses
               </p>
 
               {hasActiveFilters && (
                 <div className="flex items-center gap-2 flex-wrap">
                   {filters.category && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg text-[11px] font-semibold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 rounded-lg text-[11px] font-semibold">
                       <span>Category: {filters.category}</span>
-                      <button onClick={() => handleFilterChange('category', '')} className="hover:text-emerald-950 font-bold">×</button>
+                      <button onClick={() => handleFilterChange('category', '')} className="hover:text-black font-bold">×</button>
                     </span>
                   )}
                   {filters.track !== 'all' && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg text-[11px] font-semibold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 rounded-lg text-[11px] font-semibold">
                       <span>Track: {filters.track}</span>
-                      <button onClick={() => handleFilterChange('track', 'all')} className="hover:text-emerald-950 font-bold">×</button>
+                      <button onClick={() => handleFilterChange('track', 'all')} className="hover:text-black font-bold">×</button>
                     </span>
                   )}
                   {filters.targetAudience && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg text-[11px] font-semibold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 rounded-lg text-[11px] font-semibold">
                       <span>Audience: {filters.targetAudience}</span>
-                      <button onClick={() => handleFilterChange('targetAudience', '')} className="hover:text-emerald-950 font-bold">×</button>
+                      <button onClick={() => handleFilterChange('targetAudience', '')} className="hover:text-black font-bold">×</button>
                     </span>
                   )}
                   {filters.duration && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg text-[11px] font-semibold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 rounded-lg text-[11px] font-semibold">
                       <span>Duration: {filters.duration}m</span>
-                      <button onClick={() => handleFilterChange('duration', '')} className="hover:text-emerald-950 font-bold">×</button>
+                      <button onClick={() => handleFilterChange('duration', '')} className="hover:text-black font-bold">×</button>
                     </span>
                   )}
                   {filters.tuitionRange && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-lg text-[11px] font-semibold">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 rounded-lg text-[11px] font-semibold">
                       <span>Tuition Filtered</span>
-                      <button onClick={() => handleFilterChange('tuitionRange', '')} className="hover:text-emerald-950 font-bold">×</button>
+                      <button onClick={() => handleFilterChange('tuitionRange', '')} className="hover:text-black font-bold">×</button>
                     </span>
                   )}
                   <button
@@ -272,15 +272,15 @@ function CourseSearchContent() {
                 <LoadingSpinner />
               </div>
             ) : courses.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-slate-200 p-12 text-center space-y-3 shadow-sm">
+              <div className="bg-white rounded-3xl border border-[#e6ded1] p-12 text-center space-y-3 shadow-sm">
                 <BookOpen className="w-12 h-12 text-slate-300 mx-auto" />
-                <h3 className="text-base font-bold text-slate-800">No courses match your filter criteria</h3>
+                <h3 className="text-base font-bold text-slate-800 font-serif">No courses match your filter criteria</h3>
                 <p className="text-xs text-slate-500 max-w-sm mx-auto">
                   Try changing your discipline selection, expanding the target audience, or resetting active search filters.
                 </p>
                 <button
                   onClick={handleReset}
-                  className="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded-xl hover:bg-emerald-500 transition-all cursor-pointer shadow-sm"
+                  className="px-5 py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm"
                 >
                   Clear All Filters
                 </button>

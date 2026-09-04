@@ -250,7 +250,7 @@ function StudentProfileContent() {
                 />
                 
                 {/* Upload Button overlay */}
-                <label className="absolute bottom-0 right-0 p-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full cursor-pointer shadow-md transition-transform hover:scale-105">
+                <label className="absolute bottom-0 right-0 p-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-full cursor-pointer shadow-md transition-transform hover:scale-105">
                   <Camera className="w-4 h-4" />
                   <input
                     type="file"
@@ -263,10 +263,10 @@ function StudentProfileContent() {
 
               <div>
                 <h3 className="font-bold text-sm text-slate-900">{name || 'Student Name'}</h3>
-                {username && <p className="text-[11px] font-mono font-bold text-emerald-600">@{username}</p>}
+                {username && <p className="text-[11px] font-mono font-bold text-[#b85d34]">@{username}</p>}
                 <p className="text-xs text-slate-500">{email || 'student@example.com'}</p>
                 <div className="mt-2 flex items-center justify-center gap-2">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-[#f0ece1] text-[#0c2217]">
                     Student Account
                   </span>
                   {user?.isVerified && (
@@ -302,7 +302,7 @@ function StudentProfileContent() {
             <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-xs space-y-5">
               <div className="border-b border-slate-100 pb-3">
                 <h2 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                  <User className="w-4 h-4 text-emerald-600" />
+                  <User className="w-4 h-4 text-[#b85d34]" />
                   <span>Personal Details & Contact</span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -311,8 +311,8 @@ function StudentProfileContent() {
               </div>
 
               {profileSuccess && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="p-3 bg-[#f0ece1] border border-[#d4a359]/40 text-[#0c2217] text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
+                  <CheckCircle2 className="w-4 h-4 text-[#b85d34] shrink-0" />
                   <span>{profileSuccess}</span>
                 </div>
               )}
@@ -336,7 +336,7 @@ function StudentProfileContent() {
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white font-semibold"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-semibold"
                     />
                   </div>
 
@@ -354,7 +354,7 @@ function StudentProfileContent() {
                         value={username}
                         onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
                         maxLength={30}
-                        className="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white font-semibold font-mono"
+                        className="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-semibold font-mono"
                       />
                     </div>
                     <p className="text-[10px] text-slate-400 mt-1">
@@ -372,7 +372,7 @@ function StudentProfileContent() {
                     <select
                       value={gender}
                       onChange={(e) => setGender(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 font-semibold h-[42px]"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-semibold h-[42px]"
                     >
                       <option value="">-- Select Gender --</option>
                       <option value="male">Male</option>
@@ -393,7 +393,7 @@ function StudentProfileContent() {
                       placeholder="e.g. 8"
                       value={age}
                       onChange={(e) => setAge(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white font-bold h-[42px]"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-bold h-[42px]"
                     />
                   </div>
                 </div>
@@ -408,7 +408,7 @@ function StudentProfileContent() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white font-medium"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-medium"
                   />
                 </div>
 
@@ -421,7 +421,7 @@ function StudentProfileContent() {
                     <select
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 font-semibold"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-semibold"
                     >
                       <option value="">-- Select City in Pakistan --</option>
                       {pakistaniCities.map((c) => (
@@ -440,7 +440,7 @@ function StudentProfileContent() {
                       placeholder="0300-1234567"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white"
                     />
                   </div>
                 </div>
@@ -449,9 +449,9 @@ function StudentProfileContent() {
                   <button
                     type="submit"
                     disabled={savingProfile}
-                    className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-2xl shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
+                    className="px-6 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-2xl shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
+                    <Sparkles className="w-3.5 h-3.5 text-[#faf8f5]" />
                     <span>{savingProfile ? 'Saving Details...' : 'Save Profile Changes'}</span>
                   </button>
                 </div>
@@ -462,7 +462,7 @@ function StudentProfileContent() {
             <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-xs space-y-5">
               <div className="border-b border-slate-100 pb-3">
                 <h2 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-emerald-600" />
+                  <Lock className="w-4 h-4 text-[#b85d34]" />
                   <span>Security & Change Password</span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -471,8 +471,8 @@ function StudentProfileContent() {
               </div>
 
               {passwordSuccess && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="p-3 bg-[#f0ece1] border border-[#d4a359]/40 text-[#0c2217] text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
+                  <CheckCircle2 className="w-4 h-4 text-[#b85d34] shrink-0" />
                   <span>{passwordSuccess}</span>
                 </div>
               )}
@@ -496,7 +496,7 @@ function StudentProfileContent() {
                       placeholder="••••••••"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white"
+                      className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white"
                     />
                     <button
                       type="button"
@@ -521,7 +521,7 @@ function StudentProfileContent() {
                         placeholder="Min. 6 characters"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white"
+                        className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white"
                       />
                       <button
                         type="button"
@@ -545,7 +545,7 @@ function StudentProfileContent() {
                         placeholder="Confirm password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white"
+                        className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white"
                       />
                       <button
                         type="button"
@@ -565,7 +565,7 @@ function StudentProfileContent() {
                     disabled={changingPassword}
                     className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-2xl shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
                   >
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
                     <span>{changingPassword ? 'Updating Password...' : 'Update Password'}</span>
                   </button>
                 </div>

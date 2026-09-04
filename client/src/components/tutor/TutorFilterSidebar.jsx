@@ -104,7 +104,7 @@ const TutorFilterSidebar = ({
       {/* 1. Sort Faculty Filter */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-          <ArrowUpDown className="w-3.5 h-3.5 text-emerald-600" />
+          <ArrowUpDown className="w-3.5 h-3.5 text-[#0c2217]" />
           <span>Sort Faculty By</span>
         </label>
         <CustomSelect
@@ -120,11 +120,11 @@ const TutorFilterSidebar = ({
             onClick={() => onFilterChange('sortBy', 'popular')}
             className={`py-1.5 px-2 rounded-xl text-center text-[11px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-1 border ${
               (filters.sortBy || 'popular') === 'popular'
-                ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217] shadow-xs'
+                : 'bg-[#f4efe8] border-[#e6dfd5] text-stone-700 hover:bg-[#eae3d8]'
             }`}
           >
-            <Sparkles className="w-3 h-3" />
+            <Sparkles className="w-3 h-3 text-[#d4a359]" />
             <span>Most Popular</span>
           </button>
 
@@ -133,11 +133,11 @@ const TutorFilterSidebar = ({
             onClick={() => onFilterChange('sortBy', 'newest')}
             className={`py-1.5 px-2 rounded-xl text-center text-[11px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-1 border ${
               filters.sortBy === 'newest'
-                ? 'bg-emerald-600 text-white border-emerald-600 shadow-xs'
-                : 'bg-slate-50 border-slate-200 text-slate-700 hover:bg-slate-100'
+                ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217] shadow-xs'
+                : 'bg-[#f4efe8] border-[#e6dfd5] text-stone-700 hover:bg-[#eae3d8]'
             }`}
           >
-            <Clock className="w-3 h-3" />
+            <Clock className="w-3 h-3 text-[#d4a359]" />
             <span>Newly Joined</span>
           </button>
         </div>
@@ -146,7 +146,7 @@ const TutorFilterSidebar = ({
       {/* 2. Category / Subject Filter */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-          <BookOpen className="w-3.5 h-3.5 text-emerald-600" />
+          <BookOpen className="w-3.5 h-3.5 text-[#0c2217]" />
           <span>Subject / Program</span>
         </label>
         <CustomSelect
@@ -162,7 +162,7 @@ const TutorFilterSidebar = ({
       {/* 3. City / Province Filter */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-          <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+          <MapPin className="w-3.5 h-3.5 text-[#0c2217]" />
           <span>Pakistani City / Region</span>
         </label>
         <CustomSelect
@@ -179,11 +179,11 @@ const TutorFilterSidebar = ({
       <div className="space-y-2">
         <div className="flex items-center justify-between">
           <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-            <Navigation className="w-3.5 h-3.5 text-emerald-600" />
+            <Navigation className="w-3.5 h-3.5 text-[#0c2217]" />
             <span>Local Area / Sector</span>
           </label>
           {activeCity && (
-            <span className="text-[10px] text-emerald-700 font-bold px-1.5 py-0.5 rounded bg-emerald-50 border border-emerald-200">
+            <span className="text-[10px] text-[#0c2217] font-bold px-1.5 py-0.5 rounded bg-[#f0ece1] border border-[#d4a359]/30">
               {activeCity}
             </span>
           )}
@@ -199,7 +199,7 @@ const TutorFilterSidebar = ({
             variant="filter"
           />
         ) : (
-          <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-500 font-medium">
+          <div className="p-2.5 rounded-xl bg-[#faf8f5] border border-[#e6ded1] text-[11px] text-stone-500 font-medium">
             {activeCity
               ? `General coverage across ${activeCity}`
               : 'Select a major city above to filter by local area/sector'}
@@ -210,7 +210,7 @@ const TutorFilterSidebar = ({
       {/* 5. Tutoring Mode Filter */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-          <Video className="w-3.5 h-3.5 text-emerald-600" />
+          <Video className="w-3.5 h-3.5 text-[#0c2217]" />
           <span>Tutoring Mode</span>
         </label>
         <div className="grid grid-cols-3 gap-1.5 text-xs font-semibold">
@@ -225,8 +225,8 @@ const TutorFilterSidebar = ({
               onClick={() => onFilterChange('mode', m.val)}
               className={`py-2 px-2 rounded-xl text-center transition-all cursor-pointer ${
                 (filters.mode || '') === m.val
-                  ? 'bg-emerald-600 text-white font-bold shadow-sm'
-                  : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+                  ? 'bg-[#0c2217] text-[#d4a359] font-bold shadow-sm border border-[#0c2217]'
+                  : 'bg-[#f4efe8] text-stone-700 hover:bg-[#eae3d8] border border-[#e6dfd5]'
               }`}
             >
               {m.label}
@@ -238,7 +238,7 @@ const TutorFilterSidebar = ({
       {/* 6. Gender Preference Filter */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-          <User className="w-3.5 h-3.5 text-emerald-600" />
+          <User className="w-3.5 h-3.5 text-[#0c2217]" />
           <span>Tutor Gender</span>
         </label>
         <div className="grid grid-cols-3 gap-1.5 text-xs font-semibold">
@@ -253,8 +253,8 @@ const TutorFilterSidebar = ({
               onClick={() => onFilterChange('gender', g.val)}
               className={`py-2 px-2 rounded-xl text-center transition-all cursor-pointer ${
                 (filters.gender || '') === g.val
-                  ? 'bg-emerald-600 text-white font-bold shadow-sm'
-                  : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+                  ? 'bg-[#0c2217] text-[#d4a359] font-bold shadow-sm border border-[#0c2217]'
+                  : 'bg-[#f4efe8] text-stone-700 hover:bg-[#eae3d8] border border-[#e6dfd5]'
               }`}
             >
               {g.label}
@@ -264,16 +264,16 @@ const TutorFilterSidebar = ({
       </div>
 
       {/* 7. Sanad / Degree Verified Only */}
-      <div className="pt-2 border-t border-slate-100">
+      <div className="pt-2 border-t border-[#e6ded1]">
         <label className="flex items-center gap-2 cursor-pointer select-none">
           <input
             type="checkbox"
             checked={filters.sanadVerified || false}
             onChange={(e) => onFilterChange('sanadVerified', e.target.checked)}
-            className="w-4 h-4 text-emerald-600 rounded border-slate-300 focus:ring-emerald-500 cursor-pointer"
+            className="w-4 h-4 accent-[#0c2217] rounded border-slate-300 cursor-pointer"
           />
           <div className="flex items-center gap-1 text-xs font-bold text-slate-800">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <ShieldCheck className="w-3.5 h-3.5 text-[#0c2217]" />
             <span>Sanad Verified Tutors Only</span>
           </div>
         </label>

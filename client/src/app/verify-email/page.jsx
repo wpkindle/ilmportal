@@ -95,7 +95,7 @@ function VerifyEmailContent() {
                 <Mail className="w-8 h-8 text-[#d4a359]" />
               </div>
               <div className="space-y-1">
-                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#d4a359] bg-[#143d2b] border border-[#2b6e51]/60 px-3 py-1 rounded-full uppercase tracking-wider">
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#d4a359] bg-[#143d2b] border border-[#d4a359]/40 px-3 py-1 rounded-full uppercase tracking-wider">
                   Verification Required
                 </span>
                 <h2 className="text-2xl font-serif font-bold text-[#0c2217]">Check Your Email</h2>

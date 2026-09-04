@@ -34,7 +34,7 @@ const CityGrid = () => {
         <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
           <div className="space-y-3 max-w-2xl">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5f0e6] border border-[#ebe3d3] text-[#143d2b] text-xs font-bold shadow-2xs">
-              <MapPin className="w-3.5 h-3.5 text-[#2b6e51]" />
+              <MapPin className="w-3.5 h-3.5 text-[#d4a359]" />
               <span>Regional Coverage across Pakistan</span>
             </div>
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-black text-[#141c19] tracking-tight leading-[1.18]">

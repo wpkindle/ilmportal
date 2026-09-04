@@ -242,7 +242,7 @@ export default function AdminUsersModerationPage() {
             {actionFeedback.message && (
               <div className={`p-4 rounded-2xl flex items-center justify-between text-xs font-bold ${
                 actionFeedback.type === 'success'
-                  ? 'bg-emerald-50 text-emerald-800 border border-emerald-200'
+                  ? 'bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40'
                   : 'bg-rose-50 text-rose-800 border border-rose-200'
               }`}>
                 <span>{actionFeedback.message}</span>
@@ -260,7 +260,7 @@ export default function AdminUsersModerationPage() {
               </div>
 
               <div className="bg-white p-4 rounded-2xl border border-slate-200 shadow-2xs">
-                <p className="text-2xl font-black text-emerald-600">{stats.students}</p>
+                <p className="text-2xl font-black text-[#0c2217]">{stats.students}</p>
                 <p className="text-[11px] text-slate-500 font-medium">Students</p>
               </div>
 
@@ -299,7 +299,7 @@ export default function AdminUsersModerationPage() {
                   onClick={() => setActiveTab('student')}
                   className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                     activeTab === 'student'
-                      ? 'bg-emerald-600 text-white shadow-2xs'
+                      ? 'bg-[#b85d34] text-white shadow-2xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                   }`}
                 >
@@ -388,7 +388,7 @@ export default function AdminUsersModerationPage() {
                     {/* User Info Left */}
                     <div className="flex items-start gap-4">
                       <img
-                        src={u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=059669&color=fff`}
+                        src={u.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(u.name)}&background=0c2217&color=d4a359`}
                         alt={u.name}
                         className="w-12 h-12 rounded-2xl object-cover border border-slate-100 shrink-0"
                       />
@@ -400,7 +400,7 @@ export default function AdminUsersModerationPage() {
                               ? 'bg-purple-100 text-purple-800 border border-purple-200'
                               : u.role === 'tutor'
                               ? 'bg-blue-100 text-blue-800 border border-blue-200'
-                              : 'bg-emerald-100 text-emerald-800 border border-emerald-200'
+                              : 'bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40'
                           }`}>
                             {u.role}
                           </span>
@@ -413,7 +413,7 @@ export default function AdminUsersModerationPage() {
                               ? 'bg-orange-100 text-orange-800 border border-orange-200 animate-pulse'
                               : u.status === 'warned'
                               ? 'bg-amber-100 text-amber-800 border border-amber-200'
-                              : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                              : 'bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40'
                           }`}>
                             {u.status || (u.isActive ? 'active' : 'suspended')}
                           </span>
@@ -472,7 +472,7 @@ export default function AdminUsersModerationPage() {
                       {u.status === 'under_review' ? (
                         <button
                           onClick={() => openStatusModal(u, 'active')}
-                          className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                          className="px-3 py-1.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           <span>Reactivate</span>
@@ -491,9 +491,9 @@ export default function AdminUsersModerationPage() {
                       {u.status === 'suspended' || u.status === 'deactivated' || !u.isActive ? (
                         <button
                           onClick={() => openStatusModal(u, 'active')}
-                          className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                          className="px-3 py-1.5 bg-[#f0ece1] hover:bg-[#e6ded1] text-[#0c2217] font-bold text-xs rounded-xl border border-[#d4a359]/40 transition-colors flex items-center gap-1.5 shadow-2xs cursor-pointer"
                         >
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
                           <span>Unban</span>
                         </button>
                       ) : (
@@ -616,10 +616,10 @@ export default function AdminUsersModerationPage() {
                 ? 'bg-rose-50 text-rose-900 border-rose-100'
                 : statusForm.status === 'under_review'
                 ? 'bg-orange-50 text-orange-900 border-orange-100'
-                : 'bg-emerald-50 text-emerald-900 border-emerald-100'
+                : 'bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40'
             }`}>
               <div className="flex items-center gap-2 font-black">
-                {statusForm.status === 'suspended' ? <Ban className="w-5 h-5 text-rose-600" /> : statusForm.status === 'under_review' ? <Clock className="w-5 h-5 text-orange-600" /> : <CheckCircle2 className="w-5 h-5 text-emerald-600" />}
+                {statusForm.status === 'suspended' ? <Ban className="w-5 h-5 text-rose-600" /> : statusForm.status === 'under_review' ? <Clock className="w-5 h-5 text-orange-600" /> : <CheckCircle2 className="w-5 h-5 text-[#d4a359]" />}
                 <span>Set Status: {statusForm.status.replace('_', ' ').toUpperCase()}</span>
               </div>
               <button onClick={() => setStatusModalOpen(false)} className="text-slate-400 hover:text-slate-600 cursor-pointer">
@@ -684,7 +684,7 @@ export default function AdminUsersModerationPage() {
                       ? 'bg-rose-700 hover:bg-rose-800 text-white'
                       : statusForm.status === 'under_review'
                       ? 'bg-orange-600 hover:bg-orange-700 text-white'
-                      : 'bg-emerald-700 hover:bg-emerald-800 text-white'
+                      : 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
                   }`}
                 >
                   <span>{actionLoading ? 'Updating Status...' : 'Apply Status Change'}</span>

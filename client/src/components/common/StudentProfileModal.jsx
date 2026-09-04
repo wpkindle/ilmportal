@@ -66,7 +66,7 @@ export default function StudentProfileModal({
   if (!isOpen) return null;
 
   const studentName = profile?.name || 'Verified Student';
-  const studentAvatar = profile?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(studentName)}&background=059669&color=fff`;
+  const studentAvatar = profile?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(studentName)}&background=0c2217&color=d4a359`;
   const studentAge = profile?.age;
   const studentGender = profile?.gender;
   const studentCity = profile?.city || 'Pakistan';
@@ -81,7 +81,7 @@ export default function StudentProfileModal({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header */}
-        <div className="bg-gradient-to-r from-slate-900 via-slate-800 to-emerald-950 text-white p-6 relative">
+        <div className="bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#07150e] text-white p-6 relative">
           <button
             type="button"
             onClick={onClose}
@@ -92,11 +92,11 @@ export default function StudentProfileModal({
           </button>
 
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-emerald-500/20 border border-emerald-500/30 rounded-2xl text-emerald-300">
+            <div className="p-3 bg-[#143d2b] border border-[#d4a359]/40 rounded-2xl text-[#d4a359]">
               <User className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-[#143d2b] px-2.5 py-0.5 rounded-full border border-[#d4a359]/40">
                 Verified Student Profile
               </span>
               <h2 className="text-lg font-black text-white mt-1">
@@ -110,7 +110,7 @@ export default function StudentProfileModal({
         <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
           {loading ? (
             <div className="py-12 text-center space-y-3">
-              <div className="w-8 h-8 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin mx-auto" />
+              <div className="w-8 h-8 border-3 border-[#d4a359] border-t-transparent rounded-full animate-spin mx-auto" />
               <p className="text-xs font-medium text-slate-500">Loading student details...</p>
             </div>
           ) : error ? (
@@ -131,15 +131,15 @@ export default function StudentProfileModal({
                     <h3 className="text-base sm:text-lg font-black text-slate-900 leading-tight">
                       {studentName}
                     </h3>
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200 shrink-0">
-                      <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 shrink-0">
+                      <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
                       <span>100% Profile Strength</span>
                     </span>
                   </div>
 
                   <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-600 pt-0.5">
                     <span className="flex items-center gap-1">
-                      <MapPin className="w-3.5 h-3.5 text-emerald-600" />
+                      <MapPin className="w-3.5 h-3.5 text-[#d4a359]" />
                       <span>{studentCity}</span>
                     </span>
                     {joinedDate && (
@@ -177,8 +177,8 @@ export default function StudentProfileModal({
 
                 <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs">
                   <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Account Status</span>
-                  <span className="text-xs sm:text-sm font-black text-emerald-700 mt-0.5 flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="text-xs sm:text-sm font-black text-[#0c2217] mt-0.5 flex items-center gap-1">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
                     <span>Active &amp; Verified</span>
                   </span>
                 </div>
@@ -201,12 +201,12 @@ export default function StudentProfileModal({
 
               {/* Message Request Inquiry & Learning Goals (if any) */}
               {profile?.latestRequest?.details && (
-                <div className="p-4 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 space-y-1.5 text-xs">
-                  <div className="flex items-center gap-1.5 font-bold text-emerald-900">
-                    <MessageSquare className="w-4 h-4 text-emerald-700" />
+                <div className="p-4 rounded-2xl bg-[#faf8f5] border border-[#d4a359]/40 space-y-1.5 text-xs">
+                  <div className="flex items-center gap-1.5 font-bold text-[#0c2217]">
+                    <MessageSquare className="w-4 h-4 text-[#0c2217]" />
                     <span>Inquiry &amp; Learning Goals:</span>
                   </div>
-                  <p className="text-slate-700 leading-relaxed italic bg-white/80 p-3 rounded-xl border border-emerald-100">
+                  <p className="text-slate-700 leading-relaxed italic bg-white/80 p-3 rounded-xl border border-[#e6dfd5]">
                     &ldquo;{profile.latestRequest.details}&rdquo;
                   </p>
                 </div>
@@ -219,7 +219,7 @@ export default function StudentProfileModal({
                     <span className="text-[10px] font-bold uppercase text-slate-400 block">Active Deal / Course</span>
                     <span className="font-bold text-slate-800">{profile.latestDeal.subject || 'Tuition Deal'}</span>
                   </div>
-                  <span className="px-2.5 py-1 rounded-full text-[10.5px] font-bold uppercase bg-emerald-100 text-emerald-800">
+                  <span className="px-2.5 py-1 rounded-full text-[10.5px] font-bold uppercase bg-[#f0ece1] text-[#0c2217]">
                     {profile.latestDeal.status}
                   </span>
                 </div>

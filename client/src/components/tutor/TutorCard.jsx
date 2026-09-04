@@ -100,7 +100,7 @@ const TiltCard = ({ children }) => {
       {/* Glow ring */}
       <motion.div
         style={{ opacity: glowOpacity }}
-        className="absolute -inset-[1.5px] rounded-3xl bg-gradient-to-br from-emerald-400/40 via-teal-400/30 to-sky-400/40 blur-[2px] pointer-events-none z-0"
+        className="absolute -inset-[1.5px] rounded-3xl bg-gradient-to-br from-[#d4a359]/40 via-[#b85d34]/30 to-[#d4a359]/40 blur-[2px] pointer-events-none z-0"
       />
       <div className="relative z-10 h-full">{children}</div>
     </motion.div>
@@ -129,7 +129,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
       ? '/images/dr-ayesha.jpg'
       : (rawAvatar && !rawAvatar.includes('594824813575'))
         ? rawAvatar
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=059669&color=fff`;
+        : `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=0c2217&color=d4a359`;
 
   // Resolve teachingModes — could be array or legacy string
   const rawModes = data.teachingModes || (data.teachingMode ? [data.teachingMode] : ['online']);
@@ -206,7 +206,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                     if (isAyesha) {
                       e.currentTarget.src = '/images/dr-ayesha.jpg';
                     } else {
-                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=059669&color=fff`;
+                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=0c2217&color=d4a359`;
                     }
                   }}
                   className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border-2 border-white shadow-md"

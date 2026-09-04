@@ -714,7 +714,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
             <button
               type="button"
               onClick={onBack}
-              className="lg:hidden p-1.5 -ml-1 text-slate-600 hover:text-emerald-700 hover:bg-slate-200/70 rounded-xl transition-colors cursor-pointer shrink-0"
+              className="lg:hidden p-1.5 -ml-1 text-stone-600 hover:text-[#0c2217] hover:bg-stone-200/70 rounded-xl transition-colors cursor-pointer shrink-0"
               title="Back to conversations"
             >
               <ArrowLeft className="w-5 h-5" />
@@ -722,18 +722,18 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
           )}
           <div className="relative shrink-0">
             <img
-              src={partner?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(partner?.name || 'User')}&background=059669&color=fff`}
+              src={partner?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(partner?.name || 'User')}&background=0c2217&color=d4a359`}
               alt={partner?.name}
               className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl object-cover border-2 border-white shadow-sm"
             />
             {isPartnerOnline ? (
               <span
-                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-emerald-500 border-2 border-white rounded-full ring-2 ring-emerald-500/20 shadow-xs"
+                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-[#0c2217] border-2 border-white rounded-full ring-2 ring-[#d4a359]/40 shadow-xs"
                 title="Online Now"
               />
             ) : (
               <span
-                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-slate-300 border-2 border-white rounded-full"
+                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-stone-300 border-2 border-white rounded-full"
                 title="Offline"
               />
             )}
@@ -741,31 +741,31 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
 
           <div className="min-w-0 flex-1">
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <h3 className="font-black text-xs sm:text-sm text-slate-900 truncate">
+              <h3 className="font-serif font-bold text-xs sm:text-sm text-stone-900 truncate">
                 {partner?.name || 'Tutoring Chat'}
               </h3>
-              <span className="text-[8.5px] sm:text-[9px] uppercase font-bold text-slate-500 bg-slate-100 px-1.5 py-0.5 rounded border border-slate-200 shrink-0">
+              <span className="text-[8.5px] sm:text-[9px] uppercase font-bold text-stone-500 bg-stone-100 px-1.5 py-0.5 rounded border border-stone-200 shrink-0">
                 {partner?.role}
               </span>
             </div>
 
             <div className="flex items-center gap-1.5 mt-0.5 text-[10.5px] sm:text-[11px] truncate">
               {isPartnerOnline ? (
-                <span className="inline-flex items-center gap-1 font-bold text-emerald-700 bg-emerald-100/80 px-2 py-0.5 rounded-full border border-emerald-300/70 text-[9.5px] sm:text-[10px] shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                <span className="inline-flex items-center gap-1 font-bold text-[#0c2217] bg-[#f0ece1] px-2 py-0.5 rounded-full border border-[#d4a359]/40 text-[9.5px] sm:text-[10px] shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#0c2217] animate-pulse" />
                   <span>Online</span>
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 font-semibold text-slate-400 bg-slate-100 px-2 py-0.5 rounded-full border border-slate-200 text-[9.5px] sm:text-[10px] shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-slate-400" />
+                <span className="inline-flex items-center gap-1 font-semibold text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full border border-stone-200 text-[9.5px] sm:text-[10px] shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-stone-400" />
                   <span>Offline</span>
                 </span>
               )}
 
-              <span className="text-slate-300 shrink-0">&bull;</span>
-              <span className="text-slate-500 truncate">{partner?.city || 'Pakistan'}</span>
-              <span className="text-[10px] text-emerald-700 font-medium hidden sm:inline-flex items-center gap-1 shrink-0">
-                <Mic className="w-3 h-3 text-emerald-600" />
+              <span className="text-stone-300 shrink-0">&bull;</span>
+              <span className="text-stone-500 truncate">{partner?.city || 'Pakistan'}</span>
+              <span className="text-[10px] text-[#0c2217] font-medium hidden sm:inline-flex items-center gap-1 shrink-0">
+                <Mic className="w-3 h-3 text-[#0c2217]" />
                 <span>Voice Notes</span>
               </span>
             </div>
@@ -777,10 +777,10 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
           {!isTutorToTutor && isDealAccepted && (
             <Link
               href={`/classroom/${conversationId}`}
-              className="p-2 sm:px-3 sm:py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-md shadow-emerald-600/20 flex items-center gap-1.5 transition-all cursor-pointer"
+              className="p-2 sm:px-3 sm:py-2 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] font-bold text-xs rounded-xl shadow-md border border-[#d4a359]/40 flex items-center gap-1.5 transition-all cursor-pointer"
               title="Start or Join In-Platform HD Video Class"
             >
-              <Video className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" />
+              <Video className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
               <span className="hidden sm:inline">Join Live Class</span>
             </Link>
           )}
@@ -790,10 +790,10 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
             <button
               type="button"
               onClick={() => setStudentProfileModalOpen(true)}
-              className="p-2 sm:px-3 sm:py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+              className="p-2 sm:px-3 sm:py-2 bg-stone-800 hover:bg-stone-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-stone-700"
               title="Inspect Student's Verified Profile"
             >
-              <User className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-400 shrink-0" />
+              <User className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
               <span className="hidden sm:inline">Student Profile</span>
             </button>
           )}
@@ -820,10 +820,10 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                   alert(err.message || 'Error completing deal');
                 }
               }}
-              className="p-2 sm:px-3 sm:py-2 bg-slate-900 hover:bg-black text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer"
+              className="p-2 sm:px-3 sm:py-2 bg-stone-900 hover:bg-black text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-stone-800"
               title="Mark this deal as completed and clear chat storage"
             >
-              <CheckCircle2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-400 shrink-0" />
+              <CheckCircle2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
               <span className="hidden sm:inline">Complete Deal</span>
             </button>
           )}
@@ -833,10 +833,10 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
             <button
               type="button"
               onClick={() => setDealModalOpen(true)}
-              className="p-2 sm:px-3 sm:py-2 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer"
+              className="p-2 sm:px-3 sm:py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30"
               title="Send Course Offer"
             >
-              <Sparkles className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-emerald-200 shrink-0" />
+              <Sparkles className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
               <span className="hidden sm:inline">Send Course Offer</span>
             </button>
           )}
@@ -860,8 +860,8 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
               onClick={() => toggleSound()}
               className={`p-2 rounded-xl border text-xs transition-all cursor-pointer ${
                 soundEnabled
-                  ? 'bg-emerald-50 border-emerald-200 text-emerald-700 hover:bg-emerald-100'
-                  : 'bg-slate-100 border-slate-200 text-slate-400 hover:bg-slate-200'
+                  ? 'bg-[#f0ece1] border-[#d4a359]/40 text-[#0c2217] hover:bg-[#e6dfd5]'
+                  : 'bg-stone-100 border-stone-200 text-stone-400 hover:bg-stone-200'
               }`}
               title={soundEnabled ? 'Mute chime' : 'Enable chime'}
             >
@@ -899,9 +899,9 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                   <Link
                     href={`/classroom/${conversationId}`}
                     onClick={() => setMenuOpen(false)}
-                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-emerald-700 font-semibold cursor-pointer"
+                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-[#0c2217] font-bold cursor-pointer"
                   >
-                    <Video className="w-4 h-4 text-emerald-600" />
+                    <Video className="w-4 h-4 text-[#d4a359]" />
                     <span>Join Live Class</span>
                   </Link>
                 )}
@@ -913,9 +913,9 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                       setDealModalOpen(true);
                       setMenuOpen(false);
                     }}
-                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-emerald-700 font-semibold cursor-pointer"
+                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-[#0c2217] font-bold cursor-pointer"
                   >
-                    <Sparkles className="w-4 h-4 text-emerald-600" />
+                    <Sparkles className="w-4 h-4 text-[#d4a359]" />
                     <span>Send Course Offer</span>
                   </button>
                 )}
@@ -930,7 +930,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                   }}
                   className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 cursor-pointer"
                 >
-                  {soundEnabled ? <Volume2 className="w-4 h-4 text-emerald-600" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
+                  {soundEnabled ? <Volume2 className="w-4 h-4 text-[#d4a359]" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
                   <span>{soundEnabled ? 'Mute Sound' : 'Enable Sound'}</span>
                 </button>
 
@@ -970,7 +970,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                     window.dispatchEvent(new CustomEvent('ilmportal:open-support'));
                     setMenuOpen(false);
                   }}
-                  className="w-full px-3 py-2 text-left flex items-center gap-2 text-emerald-700 hover:bg-emerald-50 font-semibold cursor-pointer"
+                  className="w-full px-3 py-2 text-left flex items-center gap-2 text-[#0c2217] hover:bg-[#f0ece1] font-bold cursor-pointer"
                 >
                   <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
                   <span>Support Platform</span>
@@ -982,41 +982,41 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
       </div>
 
       {/* End-to-End Encrypted & AI Moderation Safe Banner */}
-      <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-emerald-950 via-slate-900 to-emerald-950 text-white border-b border-emerald-800/60 flex items-center justify-between gap-1.5 text-[10px] sm:text-xs shrink-0">
+      <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#07150e] text-white border-b border-[#d4a359]/30 flex items-center justify-between gap-1.5 text-[10px] sm:text-xs shrink-0">
         <div className="flex items-center gap-1.5 sm:gap-2 truncate">
-          <div className="p-0.5 sm:p-1 rounded bg-emerald-500/20 text-emerald-400 shrink-0">
+          <div className="p-0.5 sm:p-1 rounded bg-[#d4a359]/20 text-[#d4a359] shrink-0">
             <Lock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
           </div>
-          <span className="font-bold text-emerald-300 truncate">AI Protected Safe Chat</span>
-          <span className="text-slate-400 hidden sm:inline">&bull; 100% Privacy &amp; Family Safe</span>
+          <span className="font-bold text-[#d4a359] truncate">AI Protected Safe Chat</span>
+          <span className="text-stone-300 hidden sm:inline">&bull; 100% Privacy &amp; Family Safe</span>
         </div>
-        <div className="text-[9.5px] sm:text-[10px] text-slate-300 font-medium shrink-0 flex items-center gap-1.5">
+        <div className="text-[9.5px] sm:text-[10px] text-stone-300 font-medium shrink-0 flex items-center gap-1.5">
           <span>Protected</span>
-          <Link href="/safety" className="text-emerald-400 hover:text-emerald-300 underline font-bold">
+          <Link href="/safety" className="text-[#d4a359] hover:text-white underline font-bold">
             Rules
           </Link>
         </div>
       </div>
 
       {/* Messages List Area */}
-      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50/40">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-stone-50/50">
         {messages.length === 0 && partnerDeal?.status === 'completed' ? (
           <div className="text-center py-12 space-y-2.5 max-w-sm mx-auto animate-in fade-in">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto shadow-xs">
+            <div className="w-12 h-12 rounded-2xl bg-[#0c2217] text-[#d4a359] flex items-center justify-center mx-auto shadow-xs border border-[#d4a359]/30">
               <CheckCircle2 className="w-6 h-6" />
             </div>
-            <p className="text-xs font-black text-slate-800">Course Deal Completed 🎉</p>
-            <p className="text-[11px] text-slate-500 leading-relaxed">
+            <p className="text-xs font-serif font-bold text-stone-900">Course Deal Completed 🎉</p>
+            <p className="text-[11px] text-stone-600 leading-relaxed">
               This course has been marked as completed. To optimize database storage, the conversation messages between you and this user have been cleared.
             </p>
           </div>
         ) : messages.length === 0 ? (
           <div className="text-center py-12 space-y-2">
-            <div className="w-12 h-12 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center mx-auto">
+            <div className="w-12 h-12 rounded-2xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center mx-auto border border-[#d4a359]/30">
               <Sparkles className="w-6 h-6" />
             </div>
-            <p className="text-xs font-bold text-slate-700">Start the conversation</p>
-            <p className="text-[11px] text-slate-400 max-w-xs mx-auto">
+            <p className="text-xs font-serif font-bold text-stone-800">Start the conversation</p>
+            <p className="text-[11px] text-stone-500 max-w-xs mx-auto">
               Discuss trial timings, learning goals, or send a course agreement offer.
             </p>
           </div>
@@ -1055,15 +1055,15 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                   <div
                     className={`max-w-xs sm:max-w-sm rounded-2xl overflow-hidden shadow-2xs ${
                       isMe
-                        ? 'bg-emerald-700 text-white rounded-br-none'
-                        : 'bg-white border border-slate-200/90 text-slate-800 rounded-bl-none'
+                        ? 'bg-[#0c2217] text-[#faf8f5] rounded-br-none border border-[#0c2217]'
+                        : 'bg-white border border-stone-200/90 text-stone-800 rounded-bl-none'
                     }`}
                   >
                     <a
                       href={getFileUrl(msg.fileUrl)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="block relative group/img overflow-hidden cursor-pointer bg-slate-950/5"
+                      className="block relative group/img overflow-hidden cursor-pointer bg-stone-950/5"
                     >
                       <img
                         src={getFileUrl(msg.fileUrl)}
@@ -1082,7 +1082,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                     )}
                     <div
                       className={`px-3 py-1.5 text-[10px] flex items-center justify-between border-t ${
-                        isMe ? 'border-emerald-600/50 text-emerald-100' : 'border-slate-100 text-slate-500'
+                        isMe ? 'border-[#143d2b] text-[#f0ece1]' : 'border-stone-100 text-stone-500'
                       }`}
                     >
                       <span className="truncate max-w-[180px] font-medium">{msg.fileName || 'Photo'}</span>
@@ -1094,7 +1094,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                     <button
                       type="button"
                       onClick={() => setReportModalOpen(true)}
-                      className="opacity-0 group-hover/msg:opacity-100 p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
+                      className="opacity-0 group-hover/msg:opacity-100 p-1 rounded-md text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
                       title="Report this file"
                     >
                       <Flag className="w-3 h-3" />
@@ -1107,14 +1107,14 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                   <div
                     className={`max-w-xs sm:max-w-sm p-3.5 rounded-2xl shadow-2xs space-y-2.5 ${
                       isMe
-                        ? 'bg-emerald-700 text-white rounded-br-none'
-                        : 'bg-white border border-slate-200/90 text-slate-800 rounded-bl-none'
+                        ? 'bg-[#0c2217] text-[#faf8f5] rounded-br-none border border-[#0c2217]'
+                        : 'bg-white border border-stone-200/90 text-stone-800 rounded-bl-none'
                     }`}
                   >
                     <div className="flex items-center gap-3">
                       <div
                         className={`p-2.5 rounded-xl shrink-0 ${
-                          isMe ? 'bg-emerald-800 text-white' : 'bg-emerald-50 text-emerald-700'
+                          isMe ? 'bg-[#143d2b] text-[#d4a359]' : 'bg-[#f0ece1] text-[#0c2217]'
                         }`}
                       >
                         <FileText className="w-5 h-5" />
@@ -1123,7 +1123,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                         <p className="text-xs font-bold truncate" title={msg.fileName}>
                           {msg.fileName || 'Document Attachment'}
                         </p>
-                        <p className={`text-[10px] ${isMe ? 'text-emerald-200' : 'text-slate-500'}`}>
+                        <p className={`text-[10px] ${isMe ? 'text-[#f0ece1]' : 'text-stone-500'}`}>
                           {formatFileSize(msg.fileSize)} &bull; {msg.fileName?.split('.').pop()?.toUpperCase() || 'FILE'}
                         </p>
                       </div>
@@ -1140,8 +1140,8 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                       rel="noopener noreferrer"
                       className={`w-full py-2 px-3 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
                         isMe
-                          ? 'bg-emerald-800/90 hover:bg-emerald-900 text-white'
-                          : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800'
+                          ? 'bg-[#143d2b] hover:bg-[#07150e] text-[#faf8f5] border border-[#d4a359]/30'
+                          : 'bg-[#f0ece1] hover:bg-[#e6dfd5] text-[#0c2217]'
                       }`}
                     >
                       <Download className="w-3.5 h-3.5" />
@@ -1153,7 +1153,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                     <button
                       type="button"
                       onClick={() => setReportModalOpen(true)}
-                      className="opacity-0 group-hover/msg:opacity-100 p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
+                      className="opacity-0 group-hover/msg:opacity-100 p-1 rounded-md text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
                       title="Report this file"
                     >
                       <Flag className="w-3 h-3" />
@@ -1166,8 +1166,8 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                   <div
                     className={`max-w-md p-3 rounded-2xl text-xs leading-relaxed ${
                       isMe
-                        ? 'bg-emerald-700 text-white rounded-br-none shadow-2xs'
-                        : 'bg-white border border-slate-200/90 text-slate-800 rounded-bl-none shadow-2xs'
+                        ? 'bg-[#0c2217] text-[#faf8f5] rounded-br-none shadow-2xs border border-[#0c2217]'
+                        : 'bg-white border border-stone-200/90 text-stone-800 rounded-bl-none shadow-2xs'
                     }`}
                   >
                     {msg.text}
@@ -1177,7 +1177,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                     <button
                       type="button"
                       onClick={() => setReportModalOpen(true)}
-                      className="opacity-0 group-hover/msg:opacity-100 p-1 rounded-md text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
+                      className="opacity-0 group-hover/msg:opacity-100 p-1 rounded-md text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-all cursor-pointer"
                       title="Report this specific message for moderation review"
                     >
                       <Flag className="w-3 h-3" />
@@ -1187,7 +1187,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
               )}
 
               {/* Timestamp + Sent / Delivered / Seen Status for Outgoing Messages */}
-              <div className="flex items-center gap-1.5 mt-1 px-1 text-[9px] font-mono text-slate-400">
+              <div className="flex items-center gap-1.5 mt-1 px-1 text-[9px] font-mono text-stone-400">
                 <span>
                   {new Date(msg.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </span>
@@ -1195,18 +1195,18 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                 {isMe && (
                   <span className="flex items-center gap-0.5 ml-1">
                     {msg.isRead ? (
-                      <span className="flex items-center gap-0.5 text-emerald-600 font-bold" title={`Seen ${msg.readAt ? new Date(msg.readAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}`}>
-                        <CheckCheck className="w-3.5 h-3.5 text-emerald-500" />
+                      <span className="flex items-center gap-0.5 text-[#0c2217] font-bold" title={`Seen ${msg.readAt ? new Date(msg.readAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : ''}`}>
+                        <CheckCheck className="w-3.5 h-3.5 text-[#d4a359]" />
                         <span className="text-[8.5px] uppercase tracking-wider">Seen</span>
                       </span>
                     ) : msg.isDelivered ? (
-                      <span className="flex items-center gap-0.5 text-slate-400 font-medium" title="Delivered">
-                        <CheckCheck className="w-3.5 h-3.5 text-slate-400" />
+                      <span className="flex items-center gap-0.5 text-stone-400 font-medium" title="Delivered">
+                        <CheckCheck className="w-3.5 h-3.5 text-stone-400" />
                         <span className="text-[8.5px] uppercase tracking-wider">Delivered</span>
                       </span>
                     ) : (
-                      <span className="flex items-center gap-0.5 text-slate-400" title="Sent">
-                        <Check className="w-3 h-3 text-slate-400" />
+                      <span className="flex items-center gap-0.5 text-stone-400" title="Sent">
+                        <Check className="w-3 h-3 text-stone-400" />
                         <span className="text-[8.5px] uppercase tracking-wider">Sent</span>
                       </span>
                     )}
@@ -1250,18 +1250,18 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
           </div>
         ) : user?.role === 'student' && femaleTutorRequestStatus?.isFemaleTutor && femaleTutorRequestStatus?.requestStatus !== 'accepted' ? (
           /* Female Tutor Request Status Gate Banner */
-          <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 border border-emerald-500/40 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
+          <div className="p-3.5 sm:p-4 rounded-2xl bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#07150e] border border-[#d4a359]/40 text-white flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-lg">
             <div className="flex items-start gap-2.5 min-w-0">
               <Clock className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
               <div className="space-y-0.5 text-xs">
-                <p className="font-black text-emerald-300">
+                <p className="font-serif font-bold text-[#d4a359]">
                   {femaleTutorRequestStatus?.requestStatus === 'pending'
                     ? 'Message Request Pending Approval'
                     : femaleTutorRequestStatus?.requestStatus === 'declined'
                     ? 'Tutor Currently Unavailable'
                     : '100% Profile & Intro Request Required'}
                 </p>
-                <p className="text-slate-300 text-[11px] leading-relaxed">
+                <p className="text-stone-300 text-[11px] leading-relaxed">
                   {femaleTutorRequestStatus?.requestStatus === 'pending'
                     ? `${partner?.name || 'The tutor'} has received your request. Once accepted, live messaging will unlock immediately. You will also be notified by email and in your Notification Center.`
                     : femaleTutorRequestStatus?.requestStatus === 'declined'
@@ -1279,7 +1279,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                   if (percentage < 100) setGateModalOpen(true);
                   else setRequestModalOpen(true);
                 }}
-                className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-md shrink-0 transition-colors cursor-pointer"
+                className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-md shrink-0 transition-colors cursor-pointer"
               >
                 Send Message Request
               </button>
@@ -1288,7 +1288,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
             {femaleTutorRequestStatus?.requestStatus === 'declined' && (
               <Link
                 href="/tutors"
-                className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs rounded-xl shrink-0 transition-colors"
+                className="px-4 py-2 bg-stone-800 hover:bg-stone-700 text-white font-bold text-xs rounded-xl shrink-0 transition-colors"
               >
                 Browse Other Tutors
               </Link>
@@ -1330,22 +1330,22 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
           <div className="w-full space-y-2">
             {/* File attachment preview chip before sending */}
             {selectedFile && (
-              <div className="p-2 sm:p-2.5 bg-slate-50 border border-emerald-200 rounded-xl sm:rounded-2xl flex items-center justify-between gap-2 animate-in fade-in duration-150">
+              <div className="p-2 sm:p-2.5 bg-[#faf8f5] border border-[#d4a359]/40 rounded-xl sm:rounded-2xl flex items-center justify-between gap-2 animate-in fade-in duration-150">
                 <div className="flex items-center gap-2.5 min-w-0">
                   {filePreview ? (
                     <img
                       src={filePreview}
                       alt="Upload Preview"
-                      className="w-10 h-10 rounded-xl object-cover border border-slate-200 shrink-0"
+                      className="w-10 h-10 rounded-xl object-cover border border-stone-200 shrink-0"
                     />
                   ) : (
-                    <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                    <div className="w-10 h-10 rounded-xl bg-[#0c2217] text-[#d4a359] flex items-center justify-center shrink-0">
                       <FileText className="w-5 h-5" />
                     </div>
                   )}
                   <div className="min-w-0">
-                    <p className="text-xs font-bold text-slate-800 truncate">{selectedFile.name}</p>
-                    <p className="text-[10px] text-slate-500 font-medium">
+                    <p className="text-xs font-bold text-stone-800 truncate">{selectedFile.name}</p>
+                    <p className="text-[10px] text-stone-500 font-medium">
                       {formatFileSize(selectedFile.size)} &bull; Ready to send
                     </p>
                   </div>
@@ -1355,7 +1355,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                   type="button"
                   onClick={handleClearSelectedFile}
                   disabled={uploadingFile}
-                  className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer shrink-0"
+                  className="p-1.5 text-stone-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer shrink-0"
                   title="Remove Attachment"
                 >
                   <X className="w-4 h-4" />
@@ -1378,7 +1378,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingFile}
-                className="p-2 sm:p-2.5 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl sm:rounded-2xl transition-colors cursor-pointer shrink-0"
+                className="p-2 sm:p-2.5 text-stone-500 hover:text-[#0c2217] hover:bg-[#f0ece1] rounded-xl sm:rounded-2xl transition-colors cursor-pointer shrink-0"
                 title="Attach Document or Image"
               >
                 <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -1389,7 +1389,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                 type="button"
                 onClick={startRecording}
                 disabled={uploadingFile || !!selectedFile}
-                className="p-2 sm:p-2.5 text-slate-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl sm:rounded-2xl transition-colors cursor-pointer shrink-0 disabled:opacity-30"
+                className="p-2 sm:p-2.5 text-stone-500 hover:text-[#0c2217] hover:bg-[#f0ece1] rounded-xl sm:rounded-2xl transition-colors cursor-pointer shrink-0 disabled:opacity-30"
                 title="Hold to Record Voice Note"
               >
                 <Mic className="w-4 h-4 sm:w-5 sm:h-5" />
@@ -1402,14 +1402,14 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                 value={inputText}
                 onChange={(e) => setInputText(e.target.value)}
                 disabled={uploadingFile}
-                className="flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2.5 bg-slate-50 border border-slate-200 rounded-xl sm:rounded-2xl text-sm sm:text-sm text-slate-900 outline-none focus:border-emerald-500 focus:bg-white transition-all font-medium min-h-[40px] sm:min-h-[44px]"
+                className="flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#faf8f5] border border-stone-200 rounded-xl sm:rounded-2xl text-sm sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 focus:bg-white transition-all font-medium min-h-[40px] sm:min-h-[44px]"
               />
 
               {/* Send Button */}
               <button
                 type="submit"
                 disabled={uploadingFile || (!inputText.trim() && !selectedFile)}
-                className="p-2.5 sm:p-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-xl sm:rounded-2xl disabled:opacity-40 transition-all shadow-md cursor-pointer shrink-0 flex items-center justify-center"
+                className="p-2.5 sm:p-3 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white rounded-xl sm:rounded-2xl disabled:opacity-40 transition-all shadow-md cursor-pointer shrink-0 flex items-center justify-center"
               >
                 {uploadingFile ? (
                   <Clock className="w-4 h-4 animate-spin" />

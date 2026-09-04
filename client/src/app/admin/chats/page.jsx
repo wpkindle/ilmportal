@@ -83,7 +83,7 @@ export default function ChatAuditPage() {
                       <td className="p-4 text-slate-500">
                         {new Date(conv.lastMessage?.createdAt).toLocaleString()}
                       </td>
-                      <td className="p-4 font-bold text-emerald-800">
+                      <td className="p-4 font-bold text-[#0c2217]">
                         {conv.messageCount} messages
                       </td>
                       <td className="p-4 text-right">
@@ -142,7 +142,7 @@ export default function ChatAuditPage() {
                     </div>
                     <p className="text-slate-700">{msg.text}</p>
                     {msg.dealOfferData && (
-                      <div className="p-2 bg-emerald-50 rounded-lg text-[11px] text-emerald-900 font-medium mt-1">
+                      <div className="p-2 bg-[#f0ece1] border border-[#d4a359]/40 rounded-lg text-[11px] text-[#0c2217] font-medium mt-1">
                         Deal Offer: {msg.dealOfferData.subject} - PKR {msg.dealOfferData.price} ({msg.dealOfferData.mode})
                       </div>
                     )}

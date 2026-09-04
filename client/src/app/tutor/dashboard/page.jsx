@@ -105,11 +105,11 @@ export default function TutorDashboardPage() {
         {feedback && (
           <div className={`p-4 rounded-2xl flex items-center justify-between text-xs font-bold border ${
             feedback.type === 'success'
-              ? 'bg-[#eef5f0] border-[#c3dfcb] text-[#0c2217]'
+              ? 'bg-[#f0ece1] border-[#d4a359]/40 text-[#0c2217]'
               : 'bg-[#fdf2f0] border-[#f5d6cf] text-[#b85d34]'
           }`}>
             <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
               <span>{feedback.message}</span>
             </div>
             <button
@@ -171,11 +171,11 @@ export default function TutorDashboardPage() {
               <svg viewBox="0 0 200 200" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <circle cx="100" cy="100" r="90" stroke="#d4a359" strokeWidth="1" strokeDasharray="4 6" />
                 <rect x="55" y="55" width="90" height="90" stroke="#d4a359" strokeWidth="1" />
-                <rect x="55" y="55" width="90" height="90" transform="rotate(45 100 100)" stroke="#388e6a" strokeWidth="1" />
+                <rect x="55" y="55" width="90" height="90" transform="rotate(45 100 100)" stroke="#d4a359" strokeWidth="1" />
               </svg>
             </div>
             <span className="absolute top-6 right-20 w-1.5 h-1.5 rounded-full bg-[#d4a359] shadow-[0_0_8px_#d4a359] animate-particle-drift pointer-events-none" style={{ animationDelay: '0.8s', animationDuration: '7s' }} />
-            <span className="absolute bottom-8 right-1/3 w-1 h-1 rounded-full bg-[#388e6a] shadow-[0_0_6px_#388e6a] animate-particle-drift pointer-events-none" style={{ animationDelay: '2.1s', animationDuration: '9s' }} />
+            <span className="absolute bottom-8 right-1/3 w-1 h-1 rounded-full bg-[#b85d34] shadow-[0_0_6px_#b85d34] animate-particle-drift pointer-events-none" style={{ animationDelay: '2.1s', animationDuration: '9s' }} />
 
             <div className="space-y-2.5 z-10">
               <div className="flex items-center gap-2 flex-wrap">
@@ -183,7 +183,7 @@ export default function TutorDashboardPage() {
                   <ShieldCheck className="w-3.5 h-3.5" />
                   Verified Sanad Teacher &bull; IlmPortal Pakistan
                 </span>
-                <span className="text-[11px] font-semibold text-emerald-300 bg-emerald-950/60 px-2.5 py-1 rounded-full border border-emerald-500/30">
+                <span className="text-[11px] font-semibold text-[#d4a359] bg-[#143d2b] px-2.5 py-1 rounded-full border border-[#d4a359]/40">
                   Female Safety Compliant
                 </span>
               </div>
@@ -359,14 +359,14 @@ export default function TutorDashboardPage() {
                           className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-black text-[#faf8f5] text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer hover:scale-[1.02]"
                           title="Mark deal completed and clear chat messages to save storage"
                         >
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
                           <span>Mark Completed</span>
                         </button>
                       )}
 
                       {deal.status === 'completed' && (
-                        <div className="px-3 py-1.5 bg-[#eef5f0] border border-[#c3dfcb] rounded-xl text-xs text-[#143d2b] font-semibold flex items-center gap-1.5">
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                        <div className="px-3 py-1.5 bg-[#f0ece1] border border-[#d4a359]/40 rounded-xl text-xs text-[#0c2217] font-semibold flex items-center gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-[#d4a359]" />
                           <span>Completed &bull; Storage Cleared</span>
                         </div>
                       )}
@@ -403,8 +403,8 @@ export default function TutorDashboardPage() {
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl border border-slate-100 space-y-4">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="w-5 h-5" />
+                <div className="w-9 h-9 rounded-xl bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-5 h-5 text-[#d4a359]" />
                 </div>
                 <div>
                   <h3 className="font-black text-slate-900 text-base">Mark Deal as Completed</h3>
@@ -432,7 +432,7 @@ export default function TutorDashboardPage() {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-slate-500">Agreed Fee:</span>
-                  <strong className="text-emerald-700 font-mono">PKR {dealToComplete.price?.toLocaleString()}</strong>
+                  <strong className="text-[#0c2217] font-mono">PKR {dealToComplete.price?.toLocaleString()}</strong>
                 </div>
               </div>
 
@@ -460,7 +460,7 @@ export default function TutorDashboardPage() {
                     value={completionNotes}
                     onChange={(e) => setCompletionNotes(e.target.value)}
                     placeholder="e.g. Student successfully completed Quran Tajweed syllabus..."
-                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-emerald-500 text-xs resize-none"
+                    className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-[#0c2217] text-xs resize-none"
                   />
                 </div>
 
@@ -476,7 +476,7 @@ export default function TutorDashboardPage() {
                   <button
                     type="submit"
                     disabled={completing}
-                    className="px-5 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-black flex items-center gap-1.5 shadow-md shadow-emerald-600/20 cursor-pointer disabled:opacity-50"
+                    className="px-5 py-2.5 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-black flex items-center gap-1.5 shadow-md shadow-[#b85d34]/20 cursor-pointer disabled:opacity-50"
                   >
                     {completing ? (
                       <>

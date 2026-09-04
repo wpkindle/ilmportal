@@ -11,7 +11,7 @@ export default function PromotionTopBar() {
         
         {/* Left Trust Statement */}
         <div className="flex items-center gap-2.5 flex-wrap">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#143d2b] text-[#d4a359] font-bold text-[10px] tracking-wide uppercase border border-[#2b6e51]/40">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#143d2b] text-[#d4a359] font-bold text-[10px] tracking-wide uppercase border border-[#d4a359]/40">
             <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
             <span>Female-First Safety</span>
           </span>

@@ -99,7 +99,7 @@ export default function TutorOnboardingPage() {
         
         {/* Top Header */}
         <div className="text-center space-y-2">
-          <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-[#143d2b] border border-[#2b6e51]/60 px-3 py-1 rounded-full">
+          <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-[#143d2b] border border-[#d4a359]/40 px-3 py-1 rounded-full">
             Faculty Onboarding &amp; Subjects Setup
           </span>
           <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#0c2217] tracking-tight">

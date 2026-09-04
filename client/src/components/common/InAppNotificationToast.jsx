@@ -29,10 +29,10 @@ export default function InAppNotificationToast() {
     >
       <div 
         onClick={handleOpen}
-        className="p-4 rounded-2xl bg-slate-900/95 text-white border border-emerald-500/50 shadow-2xl backdrop-blur-xl cursor-pointer hover:border-emerald-400 transition-all group relative overflow-hidden"
+        className="p-4 rounded-2xl bg-[#0c2217]/95 text-white border border-[#d4a359]/40 shadow-2xl backdrop-blur-xl cursor-pointer hover:border-[#d4a359] transition-all group relative overflow-hidden"
       >
-        {/* Top emerald accent line */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-300" />
+        {/* Top gold accent line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#d4a359] via-[#fde047] to-[#d4a359]" />
 
         <div className="flex items-start gap-3">
           {/* Avatar / Icon */}
@@ -40,15 +40,15 @@ export default function InAppNotificationToast() {
             <img
               src={toastAlert.senderAvatar || '/icon.png'}
               alt="Sender"
-              className="w-10 h-10 rounded-xl object-cover border border-emerald-400/40 shadow-sm"
+              className="w-10 h-10 rounded-xl object-cover border border-[#d4a359]/40 shadow-sm"
               onError={(e) => { e.target.src = '/icon.png'; }}
             />
-            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-slate-900 rounded-full" />
+            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#d4a359] border-2 border-slate-900 rounded-full" />
           </div>
 
           <div className="flex-1 min-w-0 pr-6">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold text-emerald-400 uppercase tracking-wider">
+              <span className="text-xs font-bold text-[#d4a359] uppercase tracking-wider">
                 {isMessage ? 'New Chat Message' : 'Notification'}
               </span>
             </div>
@@ -62,7 +62,7 @@ export default function InAppNotificationToast() {
             </p>
 
             <div className="mt-2.5 flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-300 group-hover:text-emerald-200 transition-colors">
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#d4a359] group-hover:text-white transition-colors">
                 <span>Open in Chat</span>
                 <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
               </span>

@@ -11,12 +11,12 @@ const SanadBadge = ({ documents = [], isVerified = true, onClick }) => {
     <button
       type="button"
       onClick={onClick}
-      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200 hover:bg-emerald-100 transition-colors shadow-sm"
+      className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 hover:bg-[#e6dfd5] transition-colors shadow-sm cursor-pointer"
       title="Click to view verified Sanad / Certificate"
     >
-      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+      <ShieldCheck className="w-3.5 h-3.5 text-[#0c2217]" />
       <span>Sanad / Degree Verified</span>
-      <Award className="w-3 h-3 text-amber-500 ml-0.5" />
+      <Award className="w-3 h-3 text-[#b85d34] ml-0.5" />
     </button>
   );
 };
@@ -32,24 +32,24 @@ export const SanadModal = ({ isOpen, onClose, documents = [], tutorName = '' }) 
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl max-w-2xl w-full p-6 shadow-2xl relative max-h-[90vh] flex flex-col border border-slate-100">
-        <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+      <div className="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl relative max-h-[90vh] flex flex-col border border-stone-200">
+        <div className="flex items-center justify-between pb-4 border-b border-stone-200">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 bg-emerald-100 text-emerald-700 rounded-lg">
+            <div className="p-2 bg-[#0c2217] text-[#d4a359] rounded-xl">
               <Award className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-lg font-bold text-slate-900">
-                Verified Credentials & Sanad
+              <h3 className="text-lg font-serif font-bold text-[#0c2217]">
+                Verified Credentials &amp; Sanad
               </h3>
-              <p className="text-xs text-slate-500">
-                Official documents submitted by {tutorName || 'Tutor'} & verified by IlmPortal
+              <p className="text-xs text-stone-500">
+                Official documents submitted by {tutorName || 'Tutor'} &amp; verified by IlmPortal
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+            className="p-1.5 rounded-lg text-stone-400 hover:text-stone-600 hover:bg-stone-100 transition-colors cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -57,11 +57,11 @@ export const SanadModal = ({ isOpen, onClose, documents = [], tutorName = '' }) 
 
         <div className="overflow-y-auto flex-1 py-4 space-y-4">
           {documents.map((doc, idx) => (
-            <div key={idx} className="border border-slate-200 rounded-xl overflow-hidden bg-slate-50">
-              <div className="p-3 bg-white border-b border-slate-200 flex items-center justify-between">
+            <div key={idx} className="border border-stone-200 rounded-2xl overflow-hidden bg-[#faf8f5]">
+              <div className="p-3 bg-white border-b border-stone-200 flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-emerald-600" />
-                  <span className="font-semibold text-sm text-slate-800">
+                  <FileText className="w-4 h-4 text-[#0c2217]" />
+                  <span className="font-semibold text-sm text-stone-800">
                     {doc.title || `Document #${idx + 1}`}
                   </span>
                 </div>
@@ -69,7 +69,7 @@ export const SanadModal = ({ isOpen, onClose, documents = [], tutorName = '' }) 
                   href={doc.fileUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-xs font-medium text-emerald-600 hover:text-emerald-700 inline-flex items-center gap-1"
+                  className="text-xs font-bold text-[#b85d34] hover:text-[#9e4e2a] inline-flex items-center gap-1"
                 >
                   Full View <ExternalLink className="w-3 h-3" />
                 </a>

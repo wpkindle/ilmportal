@@ -135,7 +135,7 @@ export default function DealsManagementPage() {
                     key={st}
                     onClick={() => setStatusFilter(st)}
                     className={`px-3 py-1.5 rounded-xl capitalize transition-all cursor-pointer ${
-                      statusFilter === st ? 'bg-white text-emerald-800 shadow-sm' : 'text-slate-600 hover:text-slate-900'
+                      statusFilter === st ? 'bg-white text-[#0c2217] shadow-sm font-bold' : 'text-slate-600 hover:text-slate-900'
                     }`}
                   >
                     {st.replace('_', ' ')}
@@ -176,14 +176,14 @@ export default function DealsManagementPage() {
                         </td>
                         <td className="p-4">
                           <p className="font-bold text-slate-900">{deal.subject}</p>
-                          <p className="text-emerald-700 font-mono font-bold">
+                          <p className="text-[#b85d34] font-mono font-bold">
                             PKR {deal.price?.toLocaleString()} / {deal.priceUnit === 'per_hour' ? 'hr' : 'mo'}
                           </p>
                         </td>
                         <td className="p-4">
                           {deal.platformFee !== null && deal.platformFee !== undefined ? (
                             <div>
-                              <span className="font-mono font-bold text-emerald-800 text-sm">
+                              <span className="font-mono font-bold text-[#b85d34] text-sm">
                                 PKR {deal.platformFee.toLocaleString()}
                               </span>
                               <button
@@ -192,7 +192,7 @@ export default function DealsManagementPage() {
                                   setInputPlatformFee(deal.platformFee);
                                   setFeeNotes(deal.platformFeeNotes || '');
                                 }}
-                                className="block text-[10px] text-emerald-700 hover:underline font-bold mt-0.5 cursor-pointer"
+                                className="block text-[10px] text-[#b85d34] hover:underline font-bold mt-0.5 cursor-pointer"
                               >
                                 Edit Fee
                               </button>
@@ -208,7 +208,7 @@ export default function DealsManagementPage() {
                                   setInputPlatformFee('');
                                   setFeeNotes('');
                                 }}
-                                className="block text-[11px] text-emerald-700 hover:underline font-bold mt-1 cursor-pointer"
+                                className="block text-[11px] text-[#b85d34] hover:underline font-bold mt-1 cursor-pointer"
                               >
                                 + Set Fee
                               </button>
@@ -218,7 +218,7 @@ export default function DealsManagementPage() {
                         <td className="p-4">
                           <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                             deal.status === 'active_paid'
-                              ? 'bg-emerald-100 text-emerald-800'
+                              ? 'bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40'
                               : deal.status === 'continuation_agreed'
                               ? 'bg-blue-100 text-blue-800 border border-blue-300'
                               : deal.status === 'active_trial'
@@ -239,7 +239,7 @@ export default function DealsManagementPage() {
                                   OVERDUE (72h Expired)
                                 </span>
                               ) : (
-                                <span className="block text-emerald-700 font-semibold">
+                                <span className="block text-[#0c2217] font-semibold">
                                   Within 72h Grace (Live classes active)
                                 </span>
                               )}
@@ -280,14 +280,14 @@ export default function DealsManagementPage() {
                           {deal.status === 'continuation_agreed' && !deal.tutorFeePaid && (
                             <button
                               onClick={() => handleClearTutorFee(deal._id)}
-                              className="px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-lg text-xs transition-colors shadow-xs"
+                              className="px-2.5 py-1.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold rounded-lg text-xs transition-colors shadow-xs"
                             >
                               Clear Fee
                             </button>
                           )}
                           <button
                             onClick={() => setSelectedDealForVerify(deal)}
-                            className="px-2.5 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg border border-emerald-200"
+                            className="px-2.5 py-1.5 bg-[#f0ece1] hover:bg-[#e4dcce] text-[#0c2217] font-bold rounded-lg border border-[#d4a359]/40"
                           >
                             Verify
                           </button>
@@ -321,7 +321,7 @@ export default function DealsManagementPage() {
               <p><strong>Course:</strong> {selectedDealForVerify.subject}</p>
               <p><strong>Fee:</strong> PKR {selectedDealForVerify.price}</p>
               <p><strong>Method:</strong> {selectedDealForVerify.paymentMethod?.toUpperCase() || 'Meezan'}</p>
-              <p><strong>Proof Status:</strong> <span className="font-mono font-bold text-emerald-800">{selectedDealForVerify.paymentProofReference || 'Screenshot Proof Attached'}</span></p>
+              <p><strong>Proof Status:</strong> <span className="font-mono font-bold text-[#b85d34]">{selectedDealForVerify.paymentProofReference || 'Screenshot Proof Attached'}</span></p>
               {selectedDealForVerify.paymentProofNotes && (
                 <p><strong>Notes:</strong> {selectedDealForVerify.paymentProofNotes}</p>
               )}
@@ -333,7 +333,7 @@ export default function DealsManagementPage() {
                       href={selectedDealForVerify.proofImageUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-emerald-700 hover:underline text-[11px] font-semibold"
+                      className="text-[#b85d34] hover:underline text-[11px] font-semibold"
                     >
                       View Full Size ↗
                     </a>
@@ -371,7 +371,7 @@ export default function DealsManagementPage() {
               <button
                 onClick={() => handleVerifyPayment(selectedDealForVerify._id, 'verified')}
                 disabled={actionLoading}
-                className="px-4 py-2 bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-md"
+                className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-md cursor-pointer"
               >
                 Verify & Activate
               </button>
@@ -465,7 +465,7 @@ export default function DealsManagementPage() {
                   placeholder="e.g. 1000 or 1500"
                   value={inputPlatformFee}
                   onChange={(e) => setInputPlatformFee(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono font-bold text-slate-900 outline-none focus:border-emerald-500 focus:bg-white"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono font-bold text-slate-900 outline-none focus:border-[#d4a359] focus:bg-white"
                 />
               </div>
 
@@ -478,7 +478,7 @@ export default function DealsManagementPage() {
                   placeholder="e.g. Standard 25% first month platform commission"
                   value={feeNotes}
                   onChange={(e) => setFeeNotes(e.target.value)}
-                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500"
+                  className="w-full p-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#d4a359]"
                 />
               </div>
 
@@ -493,7 +493,7 @@ export default function DealsManagementPage() {
                 <button
                   type="submit"
                   disabled={actionLoading || inputPlatformFee === ''}
-                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-md disabled:opacity-50 cursor-pointer"
+                  className="px-5 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-md disabled:opacity-50 cursor-pointer"
                 >
                   {actionLoading ? 'Saving...' : 'Save Platform Fee'}
                 </button>

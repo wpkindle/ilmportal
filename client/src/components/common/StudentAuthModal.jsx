@@ -87,7 +87,7 @@ export default function StudentAuthModal({
   const data = tutor || {};
   const tutorUser = data.user || {};
   const tutorName = tutorUser.name || data.name || 'Verified Faculty';
-  const tutorAvatar = tutorUser.avatar || data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=059669&color=fff`;
+  const tutorAvatar = tutorUser.avatar || data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=0c2217&color=d4a359`;
   const tutorRate = data.hourlyRate ? `PKR ${data.hourlyRate}/hr` : 'Custom Agreed Fee';
   const tutorTargetId = tutorUser._id || tutorUser.id || data._id;
   const tutorCity = tutorUser.city || data.city || 'Pakistan';
@@ -251,12 +251,12 @@ export default function StudentAuthModal({
         {/* ======================================================== */}
         {/* LEFT COLUMN: TUTOR SPOTLIGHT & BENEFITS (COMPACT)         */}
         {/* ======================================================== */}
-        <div className="md:w-5/12 bg-gradient-to-br from-emerald-950 via-slate-900 to-slate-950 text-white p-5 sm:p-6 flex flex-col justify-between shrink-0 relative overflow-hidden">
+        <div className="md:w-5/12 bg-gradient-to-br from-[#0c2217] via-[#143d2b] to-[#07150e] text-white p-5 sm:p-6 flex flex-col justify-between shrink-0 relative overflow-hidden">
           
           <div className="space-y-4 relative z-10">
             {/* Top Badge */}
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-black uppercase tracking-wider">
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#d4a359]/20 text-[#d4a359] border border-[#d4a359]/40 text-[10px] font-black uppercase tracking-wider">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
               <span>Direct 1:1 Inquiry</span>
             </div>
 
@@ -266,9 +266,9 @@ export default function StudentAuthModal({
                 <img
                   src={tutorAvatar}
                   alt={tutorName}
-                  className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl object-cover border-2 border-emerald-400/40 shadow-md"
+                  className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl object-cover border-2 border-[#d4a359]/50 shadow-md"
                 />
-                <div className="absolute -bottom-1 -right-1 p-0.5 bg-emerald-600 text-white rounded-full ring-2 ring-slate-900">
+                <div className="absolute -bottom-1 -right-1 p-0.5 bg-[#d4a359] text-[#0c2217] rounded-full ring-2 ring-[#0c2217]">
                   <ShieldCheck className="w-3 h-3" />
                 </div>
               </div>
@@ -277,56 +277,56 @@ export default function StudentAuthModal({
                 <h3 className="text-base font-bold text-white truncate">
                   {tutorName}
                 </h3>
-                <p className="text-[11px] text-emerald-300 truncate">
+                <p className="text-[11px] text-[#d4a359] truncate font-medium">
                   {tutorSubject}
                 </p>
                 <p className="text-[11px] text-slate-300 font-mono mt-0.5">
-                  {tutorCity} &bull; <strong className="text-emerald-400">{tutorRate}</strong>
+                  {tutorCity} &bull; <strong className="text-[#d4a359]">{tutorRate}</strong>
                 </p>
               </div>
             </div>
 
             {/* Platform Trust Highlights */}
-            <div className="space-y-2 pt-3 border-t border-slate-800 text-xs text-slate-300">
+            <div className="space-y-2 pt-3 border-t border-white/15 text-xs text-slate-200">
               <div className="flex items-start gap-2">
-                <div className="p-1 rounded-md bg-emerald-500/10 text-emerald-400 shrink-0 mt-0.5">
+                <div className="p-1 rounded-md bg-[#d4a359]/20 text-[#d4a359] shrink-0 mt-0.5">
                   <MessageSquare className="w-3.5 h-3.5" />
                 </div>
                 <div className="text-[11px]">
                   <span className="font-bold text-white block">Private Chat & Voice Notes</span>
-                  <span className="text-slate-400">Directly discuss syllabus & timings.</span>
+                  <span className="text-slate-300">Directly discuss syllabus & timings.</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-2">
-                <div className="p-1 rounded-md bg-emerald-500/10 text-emerald-400 shrink-0 mt-0.5">
+                <div className="p-1 rounded-md bg-[#d4a359]/20 text-[#d4a359] shrink-0 mt-0.5">
                   <Award className="w-3.5 h-3.5" />
                 </div>
                 <div className="text-[11px]">
                   <span className="font-bold text-white block">3-Day Free Trial Session</span>
-                  <span className="text-slate-400">Zero advance fee before trial completion.</span>
+                  <span className="text-slate-300">Zero advance fee before trial completion.</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-2">
-                <div className="p-1 rounded-md bg-emerald-500/10 text-emerald-400 shrink-0 mt-0.5">
+                <div className="p-1 rounded-md bg-[#d4a359]/20 text-[#d4a359] shrink-0 mt-0.5">
                   <Video className="w-3.5 h-3.5" />
                 </div>
                 <div className="text-[11px]">
                   <span className="font-bold text-white block">Live WebRTC Video Classroom</span>
-                  <span className="text-slate-400">HD interactive video & recitations.</span>
+                  <span className="text-slate-300">HD interactive video & recitations.</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="pt-3 mt-3 border-t border-slate-800/80 space-y-2">
-            <div className="text-[10px] text-slate-400 flex items-center justify-between">
+          <div className="pt-3 mt-3 border-t border-white/15 space-y-2">
+            <div className="text-[10px] text-slate-300 flex items-center justify-between">
               <span>IlmPortal Trust &amp; Safety</span>
-              <span className="text-emerald-400 font-mono font-bold">Verified Faculty</span>
+              <span className="text-[#d4a359] font-mono font-bold">Verified Faculty</span>
             </div>
-            <div className="flex items-center justify-between text-[9px] text-slate-400 font-semibold pt-1 border-t border-slate-800/60">
-              <span className="flex items-center gap-1 text-emerald-400">
+            <div className="flex items-center justify-between text-[9px] text-slate-300 font-semibold pt-1 border-t border-white/10">
+              <span className="flex items-center gap-1 text-[#d4a359]">
                 <ShieldCheck className="w-3 h-3" />
                 <span>SSL Secured</span>
               </span>
@@ -383,8 +383,8 @@ export default function StudentAuthModal({
 
           {/* Info Banner */}
           {infoMessage && mode !== 'invitation_sent' && (
-            <div className="p-2 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-xl text-xs flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+            <div className="p-2 bg-[#faf8f5] border border-[#d4a359]/40 text-[#0c2217] rounded-xl text-xs flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#0c2217] shrink-0" />
               <span>{infoMessage}</span>
             </div>
           )}
@@ -413,7 +413,7 @@ export default function StudentAuthModal({
                     placeholder="student@example.com or username"
                     value={loginForm.email}
                     onChange={(e) => setLoginForm({ ...loginForm, email: e.target.value })}
-                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500 font-medium"
+                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 font-medium"
                   />
                 </div>
               </div>
@@ -431,7 +431,7 @@ export default function StudentAuthModal({
                     placeholder="••••••••"
                     value={loginForm.password}
                     onChange={(e) => setLoginForm({ ...loginForm, password: e.target.value })}
-                    className="w-full pl-8 pr-8 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500"
+                    className="w-full pl-8 pr-8 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20"
                   />
                   <button
                     type="button"
@@ -446,7 +446,7 @@ export default function StudentAuthModal({
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all disabled:opacity-50 mt-1"
+                className="w-full py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all disabled:opacity-50 mt-1"
               >
                 <MessageSquare className="w-3.5 h-3.5" />
                 <span>{loading ? 'Signing In...' : 'Sign In & Connect with Tutor'}</span>
@@ -457,7 +457,7 @@ export default function StudentAuthModal({
                 <button
                   type="button"
                   onClick={() => { setMode('register'); setError(''); setInfoMessage(''); }}
-                  className="text-emerald-700 font-bold hover:underline cursor-pointer"
+                  className="text-[#b85d34] font-bold hover:underline cursor-pointer"
                 >
                   Create student account
                 </button>
@@ -483,7 +483,7 @@ export default function StudentAuthModal({
                     placeholder="e.g. Hamza Khan"
                     value={registerForm.name}
                     onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
-                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500 font-medium"
+                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 font-medium"
                   />
                 </div>
               </div>
@@ -503,7 +503,7 @@ export default function StudentAuthModal({
                       placeholder="e.g. hamza_khan"
                       value={registerForm.username}
                       onChange={(e) => setRegisterForm({ ...registerForm, username: e.target.value.toLowerCase().replace(/[^a-z0-9_.-]/g, '') })}
-                      className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500 font-medium"
+                      className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 font-medium"
                     />
                   </div>
                 </div>
@@ -521,7 +521,7 @@ export default function StudentAuthModal({
                       placeholder="0300-1234567"
                       value={registerForm.phone}
                       onChange={(e) => setRegisterForm({ ...registerForm, phone: e.target.value })}
-                      className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500 font-medium"
+                      className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 font-medium"
                     />
                   </div>
                 </div>
@@ -541,7 +541,7 @@ export default function StudentAuthModal({
                     placeholder="student@example.com"
                     value={registerForm.email}
                     onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
-                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500 font-medium"
+                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 font-medium"
                   />
                 </div>
               </div>
@@ -560,7 +560,7 @@ export default function StudentAuthModal({
                     placeholder="Minimum 6 characters"
                     value={registerForm.password}
                     onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
-                    className="w-full pl-8 pr-8 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500 font-medium"
+                    className="w-full pl-8 pr-8 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 font-medium"
                   />
                   <button
                     type="button"
@@ -575,16 +575,16 @@ export default function StudentAuthModal({
               {/* Visible Privacy & Terms Trust Notice */}
               <p className="text-[10px] text-slate-500 leading-tight text-center pt-1">
                 By continuing, you agree to our{' '}
-                <Link href="/terms" target="_blank" className="text-emerald-700 underline font-bold">Terms</Link>
+                <Link href="/terms" target="_blank" className="text-[#0c2217] underline font-bold">Terms</Link>
                 {' '}&amp;{' '}
-                <Link href="/privacy-policy" target="_blank" className="text-emerald-700 underline font-bold">Privacy Policy</Link>.
+                <Link href="/privacy-policy" target="_blank" className="text-[#0c2217] underline font-bold">Privacy Policy</Link>.
                 {' '}Protected under PECA 2016.
               </p>
 
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-1.5 cursor-pointer transition-all disabled:opacity-50 mt-1"
+                className="w-full py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5 cursor-pointer transition-all disabled:opacity-50 mt-1"
               >
                 <span>{loading ? 'Creating...' : 'Continue to Email Code →'}</span>
               </button>
@@ -594,7 +594,7 @@ export default function StudentAuthModal({
                 <button
                   type="button"
                   onClick={() => { setMode('login'); setError(''); setInfoMessage(''); }}
-                  className="text-emerald-700 font-bold hover:underline cursor-pointer"
+                  className="text-[#b85d34] font-bold hover:underline cursor-pointer"
                 >
                   Sign in here
                 </button>
@@ -605,8 +605,8 @@ export default function StudentAuthModal({
           {/* 3. OTP VERIFICATION */}
           {mode === 'verify_otp' && (
             <div className="space-y-3 animate-in fade-in text-center py-2">
-              <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center mx-auto">
-                <KeyRound className="w-4 h-4" />
+              <div className="w-9 h-9 rounded-xl bg-[#faf8f5] text-[#0c2217] border border-[#d4a359]/40 flex items-center justify-center mx-auto shadow-2xs">
+                <KeyRound className="w-4 h-4 text-[#d4a359]" />
               </div>
 
               <div>
@@ -625,13 +625,13 @@ export default function StudentAuthModal({
                   placeholder="••••••"
                   value={otpCode}
                   onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ''))}
-                  className="w-full py-2 text-center text-2xl font-mono tracking-widest font-black bg-slate-50 border-2 border-emerald-500/40 rounded-xl text-slate-900 outline-none focus:border-emerald-600 focus:bg-white"
+                  className="w-full py-2 text-center text-2xl font-mono tracking-widest font-black bg-slate-50 border-2 border-[#0c2217]/30 rounded-xl text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white"
                 />
 
                 <button
                   type="submit"
                   disabled={loading || otpCode.length < 6}
-                  className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all disabled:opacity-50"
+                  className="w-full py-2 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl shadow-md border border-[#d4a359]/40 transition-all disabled:opacity-50"
                 >
                   <span>{loading ? 'Verifying...' : 'Verify & Open 1:1 Chat'}</span>
                 </button>
@@ -641,7 +641,7 @@ export default function StudentAuthModal({
                     type="button"
                     onClick={handleResendOtp}
                     disabled={resending}
-                    className="text-emerald-700 font-bold hover:underline flex items-center gap-1"
+                    className="text-[#b85d34] font-bold hover:underline flex items-center gap-1"
                   >
                     <RotateCcw className="w-3 h-3" />
                     <span>{resending ? 'Sending...' : 'Resend Code'}</span>
@@ -661,8 +661,8 @@ export default function StudentAuthModal({
           {/* 4. INVITATION SENT */}
           {mode === 'invitation_sent' && (
             <div className="space-y-3 animate-in zoom-in-95 text-center py-2">
-              <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
-                <CheckCircle2 className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-xl bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 flex items-center justify-center mx-auto">
+                <CheckCircle2 className="w-5 h-5 text-[#0c2217]" />
               </div>
 
               <div>
@@ -695,7 +695,7 @@ export default function StudentAuthModal({
                 <button
                   type="button"
                   onClick={handleOpenChat}
-                  className="w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-1.5"
+                  className="w-full py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-md flex items-center justify-center gap-1.5"
                 >
                   <MessageSquare className="w-3.5 h-3.5" />
                   <span>Open 1:1 Chat Now</span>

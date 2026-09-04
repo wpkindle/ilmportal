@@ -27,11 +27,11 @@ export default function FemaleTutorGateModal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-emerald-100 overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-[#e6ded1] overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header Banner */}
-        <div className="bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 text-white p-6 relative">
+        <div className="bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#07150e] text-white p-6 relative">
           <button
             type="button"
             onClick={onClose}
@@ -42,14 +42,14 @@ export default function FemaleTutorGateModal({
           </button>
 
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-emerald-500/20 border border-emerald-500/30 rounded-2xl text-emerald-300">
+            <div className="p-3 bg-[#d4a359]/20 border border-[#d4a359]/30 rounded-2xl text-[#d4a359]">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-950/80 px-2.5 py-0.5 rounded-full border border-emerald-500/30">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-[#0c2217] px-2.5 py-0.5 rounded-full border border-[#d4a359]/30">
                 Safety &amp; Privacy Protocol
               </span>
-              <h2 className="text-lg font-black text-white mt-1">
+              <h2 className="text-lg font-black text-white mt-1 font-serif">
                 100% Profile Strength Required
               </h2>
             </div>
@@ -59,16 +59,16 @@ export default function FemaleTutorGateModal({
         {/* Content Body */}
         <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
           {/* Tutor Info Preview */}
-          <div className="p-3.5 rounded-2xl bg-emerald-50/70 border border-emerald-200/80 flex items-center gap-3">
+          <div className="p-3.5 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] flex items-center gap-3">
             <img
-              src={tutorAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=059669&color=fff`}
+              src={tutorAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=0c2217&color=d4a359`}
               alt={tutorName}
               className="w-12 h-12 rounded-xl object-cover border border-white shadow-xs"
             />
             <div className="min-w-0 flex-1">
               <div className="flex items-center gap-2">
                 <h4 className="font-bold text-sm text-slate-900 truncate">{tutorName}</h4>
-                <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full">
+                <span className="text-[9px] font-extrabold uppercase px-2 py-0.5 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 rounded-full">
                   Female Tutor
                 </span>
               </div>
@@ -89,14 +89,14 @@ export default function FemaleTutorGateModal({
           </div>
 
           {/* Completion Progress Bar */}
-          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-2.5">
+          <div className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-2.5">
             <div className="flex items-center justify-between text-xs">
               <span className="font-bold text-slate-700">Your Current Profile Strength</span>
-              <span className="font-mono font-black text-emerald-700">{percentage}% / 100%</span>
+              <span className="font-mono font-black text-[#0c2217]">{percentage}% / 100%</span>
             </div>
             <div className="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
               <div
-                className="h-full bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full transition-all duration-500"
+                className="h-full bg-gradient-to-r from-[#0c2217] to-[#d4a359] rounded-full transition-all duration-500"
                 style={{ width: `${Math.max(percentage, 5)}%` }}
               />
             </div>
@@ -120,14 +120,14 @@ export default function FemaleTutorGateModal({
                   <div className="flex items-center gap-2 min-w-0">
                     <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
                     <span className="font-medium text-slate-800 truncate">{item.label}</span>
-                    <span className="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-1.5 py-0.5 rounded shrink-0">
+                    <span className="text-[10px] font-bold text-[#0c2217] bg-[#f0ece1] border border-[#d4a359]/30 px-1.5 py-0.5 rounded shrink-0">
                       +{item.weight}%
                     </span>
                   </div>
                   <Link
                     href={item.link}
                     onClick={onClose}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white rounded-lg font-bold text-[11px] shadow-xs transition-colors shrink-0"
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] border border-[#d4a359]/30 rounded-lg font-bold text-[11px] shadow-xs transition-colors shrink-0"
                   >
                     <span>{item.actionLabel}</span>
                     <ArrowRight className="w-3 h-3" />
@@ -150,9 +150,9 @@ export default function FemaleTutorGateModal({
           <Link
             href="/student/profile"
             onClick={onClose}
-            className="px-5 py-2.5 bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 active:scale-98 text-white rounded-xl text-xs font-black shadow-md shadow-emerald-600/30 flex items-center gap-2 transition-all"
+            className="px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-98 text-white rounded-xl text-xs font-black shadow-md shadow-[#b85d34]/25 flex items-center gap-2 transition-all"
           >
-            <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
+            <Sparkles className="w-3.5 h-3.5 text-white/80" />
             <span>Complete My Profile ({percentage}% Done)</span>
           </Link>
         </div>

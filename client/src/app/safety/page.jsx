@@ -44,7 +44,7 @@ export default function SafetyPage() {
       icon: Video,
       badge: 'Encrypted Peer-to-Peer',
       title: 'Live Video Classroom Safe-Room Protocol',
-      color: 'bg-emerald-50 text-emerald-800 border-emerald-200',
+      color: 'bg-[#f0ece1] text-[#0c2217] border-[#d4a359]/40',
       description:
         'Our proprietary browser classroom gives students total ownership over their camera, microphone, and learning space without downloading third-party software.',
       features: [
@@ -74,7 +74,7 @@ export default function SafetyPage() {
       icon: Award,
       badge: 'Rigorous Background Checks',
       title: 'Sanad Degrees & Identity Verification',
-      color: 'bg-teal-50 text-teal-800 border-teal-200',
+      color: 'bg-[#f0ece1] text-[#0c2217] border-[#d4a359]/40',
       description:
         'We do not allow anonymous or unvetted teachers. Every educator on IlmPortal undergoes multi-step manual credential checks.',
       features: [
@@ -101,11 +101,11 @@ export default function SafetyPage() {
         {/* Subtle Ambient Background */}
         <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[700px] h-[350px] bg-[#1e543c]/20 rounded-full blur-[140px] pointer-events-none" />
         <div className="absolute -top-10 right-10 w-[450px] h-[300px] bg-[#d4a359]/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute inset-0 bg-[radial-gradient(#2b6e51_0.6px,transparent_0.6px)] [background-size:32px_32px] opacity-20 pointer-events-none" />
+        <div className="absolute inset-0 bg-[radial-gradient(#d4a359_0.6px,transparent_0.6px)] [background-size:32px_32px] opacity-20 pointer-events-none" />
 
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-6">
           
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#143d2b] border border-[#2b6e51]/60 text-[#d4a359] text-xs font-bold shadow-md">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#143d2b] border border-[#d4a359]/40 text-[#d4a359] text-xs font-bold shadow-md">
             <Heart className="w-3.5 h-3.5 text-rose-400" />
             <span>Designed Especially for Females &amp; Pakistani Families</span>
           </div>
@@ -124,7 +124,7 @@ export default function SafetyPage() {
             {trustBadges.map((badge, idx) => (
               <div
                 key={idx}
-                className="p-3.5 rounded-2xl bg-[#143d2b]/60 border border-[#2b6e51]/50 shadow-sm flex flex-col items-center justify-center text-center space-y-1"
+                className="p-3.5 rounded-2xl bg-[#143d2b]/60 border border-[#d4a359]/30 shadow-sm flex flex-col items-center justify-center text-center space-y-1"
               >
                 <div className="w-2 h-2 rounded-full bg-[#d4a359] animate-pulse" />
                 <span className="text-xs font-bold text-white leading-tight">{badge.label}</span>
@@ -146,7 +146,7 @@ export default function SafetyPage() {
 
             <a
               href="mailto:contact@ilmportal.org"
-              className="w-full sm:w-auto px-6 py-3.5 bg-[#143d2b] hover:bg-[#1e543c] text-[#f5f0e6] font-bold text-xs sm:text-sm rounded-xl border border-[#2b6e51] transition-all flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full sm:w-auto px-6 py-3.5 bg-[#143d2b] hover:bg-[#1e543c] text-[#f5f0e6] font-bold text-xs sm:text-sm rounded-xl border border-[#d4a359]/40 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <Mail className="w-4 h-4 text-[#d4a359]" />
               <span>Safety Helpline: contact@ilmportal.org</span>
@@ -200,7 +200,7 @@ export default function SafetyPage() {
                   <ul className="space-y-2.5 pt-2">
                     {pillar.features.map((feat, idx) => (
                       <li key={idx} className="flex items-start gap-2.5 text-xs text-slate-700">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0 mt-0.5" />
                         <span className="leading-snug">{feat}</span>
                       </li>
                     ))}
@@ -209,8 +209,8 @@ export default function SafetyPage() {
 
                 <div className="pt-4 border-t border-[#e6ded1] text-[11px] text-slate-500 flex items-center justify-between">
                   <span>Zero personal contact leaks</span>
-                  <span className="text-emerald-800 font-bold flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5" />
+                  <span className="text-[#0c2217] font-bold flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
                     <span>100% Protected</span>
                   </span>
                 </div>
@@ -238,8 +238,8 @@ export default function SafetyPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             <div className="p-6 rounded-2xl bg-white border border-[#e6ded1] space-y-3 shadow-xs">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-800 flex items-center justify-center border border-emerald-200">
-                <Camera className="w-5 h-5" />
+              <div className="w-10 h-10 rounded-xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center border border-[#d4a359]/40">
+                <Camera className="w-5 h-5 text-[#d4a359]" />
               </div>
               <h4 className="text-sm font-bold text-slate-900 font-serif">Camera Off by Default</h4>
               <p className="text-xs text-slate-600 leading-relaxed">
@@ -273,7 +273,7 @@ export default function SafetyPage() {
 
       {/* Legal & PECA 2016 Compliance */}
       <section className="py-16 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="p-8 rounded-3xl bg-[#0c2217] text-[#f5f0e6] border-2 border-[#2b6e51]/50 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
+        <div className="p-8 rounded-3xl bg-[#0c2217] text-[#f5f0e6] border border-[#d4a359]/40 flex flex-col md:flex-row items-center justify-between gap-6 shadow-xl">
           <div className="space-y-2 max-w-xl">
             <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#d4a359]">
               <ShieldCheck className="w-4 h-4" />
@@ -290,13 +290,13 @@ export default function SafetyPage() {
           <div className="flex flex-col sm:flex-row items-center gap-3 shrink-0">
             <Link
               href="/privacy-policy"
-              className="px-5 py-2.5 rounded-xl bg-[#143d2b] hover:bg-[#1e543c] text-white font-bold text-xs border border-[#2b6e51] transition-colors"
+              className="px-5 py-2.5 rounded-xl bg-[#143d2b] hover:bg-[#1e543c] text-white font-bold text-xs border border-[#d4a359]/40 transition-colors"
             >
               Read Privacy Policy
             </Link>
             <Link
               href="/terms"
-              className="px-5 py-2.5 rounded-xl bg-[#143d2b] hover:bg-[#1e543c] text-white font-bold text-xs border border-[#2b6e51] transition-colors"
+              className="px-5 py-2.5 rounded-xl bg-[#143d2b] hover:bg-[#1e543c] text-white font-bold text-xs border border-[#d4a359]/40 transition-colors"
             >
               Terms of Service
             </Link>

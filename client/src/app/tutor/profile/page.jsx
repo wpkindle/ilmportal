@@ -362,7 +362,7 @@ function TutorProfileContent() {
                 />
                 
                 {/* Upload Button overlay */}
-                <label className="absolute bottom-0 right-0 p-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-full cursor-pointer shadow-md transition-transform hover:scale-105">
+                <label className="absolute bottom-0 right-0 p-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-full cursor-pointer shadow-md transition-transform hover:scale-105">
                   <Camera className="w-4 h-4" />
                   <input
                     type="file"
@@ -375,14 +375,14 @@ function TutorProfileContent() {
 
               <div>
                 <h3 className="font-bold text-sm text-slate-900">{name || 'Tutor Name'}</h3>
-                {username && <p className="text-[11px] font-mono font-bold text-emerald-600">@{username}</p>}
+                {username && <p className="text-[11px] font-mono font-bold text-[#b85d34]">@{username}</p>}
                 <p className="text-xs text-slate-500">{email || 'tutor@example.com'}</p>
                 <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-[#f0ece1] text-[#0c2217]">
                     Tutor
                   </span>
                   {tutorProfile?.verificationStatus === 'approved' ? (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 text-white flex items-center gap-1 shadow-xs">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#b85d34] text-white flex items-center gap-1 shadow-xs">
                       <ShieldCheck className="w-3 h-3" />
                       <span>Verified & Approved</span>
                     </span>
@@ -411,7 +411,7 @@ function TutorProfileContent() {
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Rate / Hour:</span>
-                  <span className="font-bold text-emerald-700 font-mono">Rs. {hourlyRate} PKR</span>
+                  <span className="font-bold text-[#0c2217] font-mono">Rs. {hourlyRate} PKR</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Experience:</span>
@@ -427,7 +427,7 @@ function TutorProfileContent() {
             {/* Teaching Mode Switcher Card */}
             <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-xs space-y-3">
               <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                <Briefcase className="w-4 h-4 text-emerald-600" />
+                <Briefcase className="w-4 h-4 text-[#b85d34]" />
                 <span>Teaching Modes</span>
               </h4>
               <div className="grid grid-cols-2 gap-2">
@@ -452,17 +452,17 @@ function TutorProfileContent() {
                       }
                       className={`flex flex-col items-start gap-0.5 p-3 rounded-2xl border-2 text-left transition-all cursor-pointer ${
                         active
-                          ? 'border-emerald-500 bg-emerald-50 text-emerald-800'
+                          ? 'border-[#d4a359]/50 bg-[#f0ece1] text-[#0c2217]'
                           : 'border-slate-200 bg-white text-slate-500 hover:border-slate-300'
                       }`}
                     >
-                      <div className={`p-1.5 rounded-xl ${active ? 'bg-emerald-200/60 text-emerald-800' : 'bg-slate-100 text-slate-600'}`}>
+                      <div className={`p-1.5 rounded-xl ${active ? 'bg-[#d4a359]/20 text-[#0c2217]' : 'bg-slate-100 text-slate-600'}`}>
                         <IconComp className="w-4 h-4" />
                       </div>
                       <span className="text-xs font-bold mt-1">{m.label}</span>
                       <span className="text-[10px] opacity-70">{m.sub}</span>
                       {active && (
-                        <span className="text-[9px] font-bold bg-emerald-600 text-white px-1.5 py-0.5 rounded-full mt-1 flex items-center gap-1">
+                        <span className="text-[9px] font-bold bg-[#b85d34] text-white px-1.5 py-0.5 rounded-full mt-1 flex items-center gap-1">
                           <Check className="w-2.5 h-2.5" />
                           <span>Selected</span>
                         </span>
@@ -482,7 +482,7 @@ function TutorProfileContent() {
             <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-xs space-y-5">
               <div className="border-b border-slate-100 pb-3">
                 <h2 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                  <User className="w-4 h-4 text-emerald-600" />
+                  <User className="w-4 h-4 text-[#b85d34]" />
                   <span>Personal & Teaching Details</span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -491,8 +491,8 @@ function TutorProfileContent() {
               </div>
 
               {profileSuccess && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="p-3 bg-[#f0ece1] border border-[#d4a359]/40 text-[#0c2217] text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
+                  <CheckCircle2 className="w-4 h-4 text-[#b85d34] shrink-0" />
                   <span>{profileSuccess}</span>
                 </div>
               )}
@@ -517,7 +517,7 @@ function TutorProfileContent() {
                       required
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white font-semibold"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-semibold"
                     />
                   </div>
 
@@ -535,11 +535,11 @@ function TutorProfileContent() {
                         value={username}
                         onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
                         maxLength={30}
-                        className="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white font-semibold font-mono"
+                        className="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-semibold font-mono"
                       />
                     </div>
                     <p className="text-[10px] text-slate-400 mt-1 truncate">
-                      Public profile link: <span className="text-emerald-700 font-mono font-bold">/tutors/{username || user?._id || 'username'}</span>
+                      Public profile link: <span className="text-[#0c2217] font-mono font-bold">/tutors/{username || user?._id || 'username'}</span>
                     </p>
                   </div>
                 </div>
@@ -553,7 +553,7 @@ function TutorProfileContent() {
                     <select
                       value={gender}
                       onChange={(e) => setGender(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 font-semibold h-[42px]"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-semibold h-[42px]"
                     >
                       <option value="">-- Select Gender --</option>
                       <option value="male">Male</option>
@@ -574,7 +574,7 @@ function TutorProfileContent() {
                       placeholder="e.g. 28"
                       value={age}
                       onChange={(e) => setAge(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white font-bold h-[42px]"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-bold h-[42px]"
                     />
                   </div>
                 </div>
@@ -589,7 +589,7 @@ function TutorProfileContent() {
                     required
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white font-medium"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-medium"
                   />
                 </div>
 
@@ -602,7 +602,7 @@ function TutorProfileContent() {
                     <select
                       value={city}
                       onChange={(e) => setCity(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 font-semibold"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-semibold"
                     >
                       <option value="">-- Select City in Pakistan --</option>
                       {pakistaniCities.map((c) => (
@@ -621,7 +621,7 @@ function TutorProfileContent() {
                       placeholder="0300-1234567"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white font-medium"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-medium"
                     />
                   </div>
                 </div>
@@ -642,7 +642,7 @@ function TutorProfileContent() {
                         required
                         value={hourlyRate}
                         onChange={(e) => setHourlyRate(e.target.value)}
-                        className="w-full pl-12 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 font-bold"
+                        className="w-full pl-12 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-bold"
                       />
                     </div>
                   </div>
@@ -658,7 +658,7 @@ function TutorProfileContent() {
                       required
                       value={experienceYears}
                       onChange={(e) => setExperienceYears(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 font-bold"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-bold"
                     />
                   </div>
                 </div>
@@ -674,7 +674,7 @@ function TutorProfileContent() {
                     placeholder="e.g. Dars-e-Nizami (Shahadat-ul-Almiya), Wifaq-ul-Madaris, Hafiz-e-Quran, BS Islamic Studies"
                     value={qualifications}
                     onChange={(e) => setQualifications(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 font-medium"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-medium"
                   />
                 </div>
 
@@ -689,7 +689,7 @@ function TutorProfileContent() {
                     placeholder="Describe your teaching methodology, Quranic Tajweed proficiency, student track record..."
                     value={bio}
                     onChange={(e) => setBio(e.target.value)}
-                    className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 font-normal leading-relaxed"
+                    className="w-full p-3.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-normal leading-relaxed"
                   />
                 </div>
 
@@ -697,9 +697,9 @@ function TutorProfileContent() {
                   <button
                     type="submit"
                     disabled={savingProfile}
-                    className="px-6 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-2xl shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
+                    className="px-6 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-2xl shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
                   >
-                    <Sparkles className="w-3.5 h-3.5 text-emerald-200" />
+                    <Sparkles className="w-3.5 h-3.5 text-[#faf8f5]" />
                     <span>{savingProfile ? 'Saving Details...' : 'Save Profile Changes'}</span>
                   </button>
                 </div>
@@ -711,7 +711,7 @@ function TutorProfileContent() {
               <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
                 <div>
                   <h2 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                    <Award className="w-4 h-4 text-emerald-600" />
+                    <Award className="w-4 h-4 text-[#b85d34]" />
                     <span>Sanad & Educational Degrees</span>
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
@@ -720,16 +720,16 @@ function TutorProfileContent() {
                 </div>
 
                 {tutorProfile?.verificationStatus === 'approved' && (
-                  <span className="px-2.5 py-1 bg-emerald-100 text-emerald-800 text-[11px] font-bold rounded-xl flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                  <span className="px-2.5 py-1 bg-[#f0ece1] text-[#0c2217] text-[11px] font-bold rounded-xl flex items-center gap-1">
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
                     <span>Verified Sanad</span>
                   </span>
                 )}
               </div>
 
               {sanadSuccess && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="p-3 bg-[#f0ece1] border border-[#d4a359]/40 text-[#0c2217] text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
+                  <CheckCircle2 className="w-4 h-4 text-[#b85d34] shrink-0" />
                   <span>{sanadSuccess}</span>
                 </div>
               )}
@@ -756,10 +756,10 @@ function TutorProfileContent() {
                     {uploadedSanads.map((doc, idx) => (
                       <div
                         key={idx}
-                        className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between gap-3 group hover:bg-emerald-50/40 hover:border-emerald-200 transition-all"
+                        className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between gap-3 group hover:bg-[#f0ece1]/40 hover:border-[#d4a359]/40 transition-all"
                       >
                         <div className="flex items-center gap-3 overflow-hidden">
-                          <div className="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-800 flex items-center justify-center shrink-0">
+                          <div className="w-10 h-10 rounded-xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center shrink-0">
                             <Award className="w-5 h-5" />
                           </div>
                           <div className="truncate">
@@ -773,7 +773,7 @@ function TutorProfileContent() {
                         <button
                           type="button"
                           onClick={() => setSelectedSanadModal(true)}
-                          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-emerald-700 hover:border-emerald-300 shadow-2xs transition-colors cursor-pointer"
+                          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-[#0c2217] hover:border-[#d4a359]/40 shadow-2xs transition-colors cursor-pointer"
                           title="Preview Document"
                         >
                           <Eye className="w-3.5 h-3.5" />
@@ -787,7 +787,7 @@ function TutorProfileContent() {
               {/* Upload New Sanad Document Form */}
               <form onSubmit={handleUploadSanadSubmit} className="pt-4 border-t border-slate-100 space-y-3">
                 <h4 className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-                  <PlusCircle className="w-4 h-4 text-emerald-600" />
+                  <PlusCircle className="w-4 h-4 text-[#b85d34]" />
                   <span>Upload Additional Sanad / Degree Document</span>
                 </h4>
 
@@ -801,7 +801,7 @@ function TutorProfileContent() {
                       placeholder="e.g. Shahadat-ul-Almiya / BS Degree"
                       value={newSanadTitle}
                       onChange={(e) => setNewSanadTitle(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 font-medium"
+                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-medium"
                     />
                   </div>
 
@@ -813,18 +813,18 @@ function TutorProfileContent() {
                       type="file"
                       accept="image/*,application/pdf"
                       onChange={handleSanadFileSelect}
-                      className="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-emerald-50 file:text-emerald-800 hover:file:bg-emerald-100 cursor-pointer"
+                      className="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#f0ece1] file:text-[#0c2217] hover:file:bg-[#f0ece1] cursor-pointer"
                     />
                   </div>
                 </div>
 
                 {newSanadFileUrl && (
-                  <div className="p-3 bg-emerald-50/70 border border-emerald-200 rounded-2xl text-xs text-emerald-900 flex items-center justify-between">
+                  <div className="p-3 bg-[#f0ece1]/70 border border-[#d4a359]/40 rounded-2xl text-xs text-[#0c2217] flex items-center justify-between">
                     <span>Document ready to upload</span>
                     <button
                       type="submit"
                       disabled={uploadingSanad}
-                      className="px-4 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer disabled:opacity-50"
+                      className="px-4 py-1.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer disabled:opacity-50"
                     >
                       {uploadingSanad ? 'Uploading...' : 'Confirm Upload'}
                     </button>
@@ -838,7 +838,7 @@ function TutorProfileContent() {
             <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-xs space-y-5">
               <div className="border-b border-slate-100 pb-3">
                 <h2 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                  <Lock className="w-4 h-4 text-emerald-600" />
+                  <Lock className="w-4 h-4 text-[#b85d34]" />
                   <span>Security & Change Password</span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
@@ -847,8 +847,8 @@ function TutorProfileContent() {
               </div>
 
               {passwordSuccess && (
-                <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
-                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div className="p-3 bg-[#f0ece1] border border-[#d4a359]/40 text-[#0c2217] text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
+                  <CheckCircle2 className="w-4 h-4 text-[#b85d34] shrink-0" />
                   <span>{passwordSuccess}</span>
                 </div>
               )}
@@ -872,7 +872,7 @@ function TutorProfileContent() {
                       placeholder="••••••••"
                       value={currentPassword}
                       onChange={(e) => setCurrentPassword(e.target.value)}
-                      className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white"
+                      className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white"
                     />
                     <button
                       type="button"
@@ -897,7 +897,7 @@ function TutorProfileContent() {
                         placeholder="Min. 6 characters"
                         value={newPassword}
                         onChange={(e) => setNewPassword(e.target.value)}
-                        className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white"
+                        className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white"
                       />
                       <button
                         type="button"
@@ -921,7 +921,7 @@ function TutorProfileContent() {
                         placeholder="Confirm password"
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
-                        className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-emerald-500 focus:bg-white"
+                        className="w-full pl-4 pr-10 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white"
                       />
                       <button
                         type="button"
@@ -941,7 +941,7 @@ function TutorProfileContent() {
                     disabled={changingPassword}
                     className="px-6 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-2xl shadow-md transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
                   >
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
                     <span>{changingPassword ? 'Updating Password...' : 'Update Password'}</span>
                   </button>
                 </div>

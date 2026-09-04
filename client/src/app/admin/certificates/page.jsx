@@ -255,7 +255,7 @@ export default function AdminCertificatesPage() {
                             <td className="p-4">
                               {cert.marks || cert.completionGrade ? (
                                 <div className="space-y-0.5">
-                                  <span className="font-bold text-emerald-800 font-mono text-xs block">
+                                  <span className="font-bold text-[#0c2217] font-mono text-xs block">
                                     {cert.marks ? `Marks: ${cert.marks}` : 'Marks Pending'}
                                   </span>
                                   <span className="text-[11px] text-slate-600 block">
@@ -269,7 +269,7 @@ export default function AdminCertificatesPage() {
 
                             <td className="p-4">
                               {cert.price > 0 ? (
-                                <span className="font-bold text-emerald-700 font-mono text-sm">
+                                <span className="font-bold text-[#b85d34] font-mono text-sm">
                                   PKR {cert.price.toLocaleString()}
                                 </span>
                               ) : (
@@ -282,7 +282,7 @@ export default function AdminCertificatesPage() {
                             <td className="p-4">
                               <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                                 isIssued
-                                  ? 'bg-emerald-100 text-emerald-800'
+                                  ? 'bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40'
                                   : isProofSubmitted
                                   ? 'bg-blue-100 text-blue-800 animate-pulse'
                                   : isAwaitingPayment
@@ -339,9 +339,9 @@ export default function AdminCertificatesPage() {
                                 <Link
                                   href={`/certificates/${cert.certificateId}`}
                                   target="_blank"
-                                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold rounded-lg border border-emerald-200 text-xs transition-colors"
+                                  className="inline-flex items-center gap-1 px-3 py-1.5 bg-[#f0ece1] hover:bg-[#e6dfd5] text-[#0c2217] font-bold rounded-lg border border-[#d4a359]/40 text-xs transition-colors"
                                 >
-                                  <Eye className="w-3.5 h-3.5" />
+                                  <Eye className="w-3.5 h-3.5 text-[#d4a359]" />
                                   <span>View Certificate</span>
                                 </Link>
                               )}
@@ -385,7 +385,7 @@ export default function AdminCertificatesPage() {
               <div className="pt-1.5 border-t border-purple-200 grid grid-cols-2 gap-2 text-slate-700">
                 <div>
                   <span className="text-[10px] text-purple-700 font-bold uppercase block">Tutor Marks:</span>
-                  <strong className="text-emerald-800 font-mono text-xs">{pricingModalCert.marks || 'N/A'}</strong>
+                  <strong className="text-[#0c2217] font-mono text-xs">{pricingModalCert.marks || 'N/A'}</strong>
                 </div>
                 <div>
                   <span className="text-[10px] text-purple-700 font-bold uppercase block">Sanad Grade:</span>
@@ -463,7 +463,7 @@ export default function AdminCertificatesPage() {
           <div className="bg-white rounded-3xl max-w-lg w-full p-6 space-y-4 shadow-2xl border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
             <div className="flex items-center justify-between pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-emerald-600" />
+                <ShieldCheck className="w-5 h-5 text-[#d4a359]" />
                 <h3 className="font-black text-slate-900 text-base">Review Payment Proof</h3>
               </div>
               <button
@@ -481,7 +481,7 @@ export default function AdminCertificatesPage() {
               </div>
               <div className="p-3 bg-slate-50 rounded-xl">
                 <span className="text-slate-400 block text-[10px] uppercase font-bold">Amount Due</span>
-                <strong className="text-emerald-700 font-mono">PKR {proofModalCert.price}</strong>
+                <strong className="text-[#b85d34] font-mono">PKR {proofModalCert.price}</strong>
               </div>
               <div className="p-3 bg-slate-50 rounded-xl">
                 <span className="text-slate-400 block text-[10px] uppercase font-bold">Method</span>
@@ -546,12 +546,12 @@ export default function AdminCertificatesPage() {
                   Cancel
                 </button>
                 <button
-                  type="button"
+                  type="submit"
                   onClick={() => handleApproveProof(proofModalCert._id)}
                   disabled={processingProof}
-                  className="px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-xs transition-all shadow-md cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
+                  className="px-5 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-black rounded-xl text-xs transition-all shadow-md cursor-pointer disabled:opacity-50 flex items-center gap-1.5"
                 >
-                  <CheckCircle2 className="w-4 h-4" />
+                  <CheckCircle2 className="w-4 h-4 text-white" />
                   <span>{processingProof ? 'Approving...' : 'Approve & Release Certificate'}</span>
                 </button>
               </div>

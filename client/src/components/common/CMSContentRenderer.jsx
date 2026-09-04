@@ -29,7 +29,7 @@ export default function CMSContentRenderer({ content }) {
     return text
       .replace(/\*\*(.*?)\*\*/g, '<strong class="text-slate-900 font-bold">$1</strong>')
       .replace(/\*(.*?)\*/g, '<em class="italic">$1</em>')
-      .replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 bg-slate-100 rounded text-xs font-mono text-emerald-800">$1</code>');
+      .replace(/`([^`]+)`/g, '<code class="px-1.5 py-0.5 bg-slate-100 rounded text-xs font-mono text-[#0c2217]">$1</code>');
   };
 
   for (let i = 0; i < lines.length; i++) {

@@ -184,7 +184,7 @@ function StudentMessagesContent() {
           >
             <h2 className="text-sm font-bold text-slate-900 pb-3 border-b border-slate-100 flex items-center justify-between shrink-0">
               <div className="flex items-center gap-2">
-                <MessageSquare className="w-4 h-4 text-emerald-600" />
+                <MessageSquare className="w-4 h-4 text-[#d4a359]" />
                 <span>Messages &amp; Tutors</span>
               </div>
               <span className="text-[10px] text-slate-400 font-bold">
@@ -209,19 +209,19 @@ function StudentMessagesContent() {
                       onClick={() => handleSelectConversation(conv)}
                       className={`w-full p-3 rounded-2xl text-left transition-all flex items-center gap-3 ${
                         isSelected
-                          ? 'bg-emerald-50/90 border border-emerald-300/80 shadow-2xs'
+                          ? 'bg-[#f0ece1]/80 border border-[#d4a359]/50 shadow-2xs'
                           : 'hover:bg-slate-50 border border-transparent'
                       }`}
                     >
                       <div className="relative shrink-0">
                         <img
-                          src={conv.partner?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.partner?.name || 'T')}&background=059669&color=fff`}
+                          src={conv.partner?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(conv.partner?.name || 'T')}&background=0c2217&color=d4a359`}
                           alt={conv.partner?.name}
                           className="w-11 h-11 rounded-2xl object-cover border border-slate-200"
                         />
                         <span
                           className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-white rounded-full ${
-                            isTutorOnline ? 'bg-emerald-500 ring-2 ring-emerald-500/20' : 'bg-slate-300'
+                            isTutorOnline ? 'bg-amber-500 ring-2 ring-amber-500/20' : 'bg-slate-300'
                           }`}
                           title={isTutorOnline ? 'Online' : 'Offline'}
                         />
@@ -234,8 +234,8 @@ function StudentMessagesContent() {
                           </h4>
                           <div className="flex items-center gap-1.5 shrink-0">
                             {isTutorOnline ? (
-                              <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-700 bg-emerald-100/90 px-2 py-0.5 rounded-full border border-emerald-300">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
+                              <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-[#0c2217] bg-[#f0ece1] px-2 py-0.5 rounded-full border border-[#d4a359]/40">
+                                <span className="w-1.5 h-1.5 rounded-full bg-[#d4a359] animate-pulse" />
                                 Online
                               </span>
                             ) : (
@@ -245,7 +245,7 @@ function StudentMessagesContent() {
                               </span>
                             )}
                             {conv.unreadCount > 0 && (
-                              <span className="min-w-[18px] h-4 px-1.5 bg-emerald-600 text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs">
+                              <span className="min-w-[18px] h-4 px-1.5 bg-[#b85d34] text-white rounded-full text-[10px] font-bold flex items-center justify-center shadow-xs">
                                 {conv.unreadCount}
                               </span>
                             )}

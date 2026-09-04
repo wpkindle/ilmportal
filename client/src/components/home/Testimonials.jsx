@@ -48,8 +48,8 @@ export default function Testimonials() {
         
         {/* Editorial Header */}
         <div className="max-w-2xl space-y-3 text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5f0e6] border border-[#ebe3d3] text-[#143d2b] text-xs font-bold shadow-2xs">
-            <Quote className="w-3.5 h-3.5 text-[#2b6e51]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5f0e6] border border-[#ebe3d3] text-[#0c2217] text-xs font-bold shadow-2xs">
+            <Quote className="w-3.5 h-3.5 text-[#d4a359]" />
             <span>Family Voices across Pakistan</span>
           </div>
 
@@ -66,14 +66,14 @@ export default function Testimonials() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           
           {/* Featured Large Card (7 cols) */}
-          <div className="lg:col-span-7 p-7 sm:p-9 rounded-3xl bg-[#0c2217] text-white border-2 border-[#2b6e51]/50 shadow-xl flex flex-col justify-between space-y-6 relative overflow-hidden">
+          <div className="lg:col-span-7 p-7 sm:p-9 rounded-3xl bg-[#0c2217] text-white border border-[#d4a359]/30 shadow-xl flex flex-col justify-between space-y-6 relative overflow-hidden">
             <div className="absolute top-6 right-6 text-7xl font-serif font-black text-white/5 select-none pointer-events-none">
               “
             </div>
 
             <div className="space-y-4 relative z-10">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#143d2b] text-[#d4a359] border border-[#2b6e51]/60">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40">
                   {featured.highlight}
                 </span>
                 <RatingStars rating={featured.rating} size="sm" />
@@ -90,7 +90,7 @@ export default function Testimonials() {
                 <p className="text-xs text-[#a3b8b0]">{featured.role} &bull; {featured.location}</p>
               </div>
               <div className="flex items-center gap-1.5 text-xs text-[#d4a359] font-bold">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
                 <span>Verified Family</span>
               </div>
             </div>
@@ -120,7 +120,7 @@ export default function Testimonials() {
                     <h5 className="font-bold text-xs text-[#141c19]">{item.name}</h5>
                     <p className="text-[11px] text-[#5c6e69]">{item.role} &bull; {item.location}</p>
                   </div>
-                  <CheckCircle2 className="w-4 h-4 text-[#2b6e51] shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
                 </div>
               </div>
             ))}

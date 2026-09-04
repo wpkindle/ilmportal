@@ -72,7 +72,7 @@ export default async function TutorProfilePage({ params }) {
     return (
       <div className="py-20 text-center space-y-4">
         <h2 className="text-xl font-bold text-slate-800">Tutor profile not found</h2>
-        <Link href="/tutors" className="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold inline-block">
+        <Link href="/tutors" className="px-5 py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] rounded-xl text-xs font-bold inline-block shadow-sm">
           Browse Other Tutors
         </Link>
       </div>

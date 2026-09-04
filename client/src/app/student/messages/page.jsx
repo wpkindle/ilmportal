@@ -41,7 +41,16 @@ function StudentMessagesContent() {
     const init = async () => {
       const convs = await fetchConversations();
       if (activeConvParam) {
-        const found = convs.find(c => c.conversationId === activeConvParam);
+        let found = convs.find(c => c.conversationId === activeConvParam);
+        if (!found && activeConvParam.includes('_')) {
+          const [u1, u2] = activeConvParam.split('_');
+          const altId = `${u2}_${u1}`;
+          found = convs.find(c => 
+            c.conversationId === altId ||
+            c.partner?._id?.toString() === u1 ||
+            c.partner?._id?.toString() === u2
+          );
+        }
         if (found) {
           setActiveConversation(found);
           setMobileView('chat');
@@ -53,6 +62,20 @@ function StudentMessagesContent() {
               partner: tutorRes.tutor.user
             });
             setMobileView('chat');
+          }
+        } else if (activeConvParam.includes('_')) {
+          const myId = (user?._id || user?.id)?.toString();
+          const [u1, u2] = activeConvParam.split('_');
+          const partnerId = u1 === myId ? u2 : u1;
+          if (partnerId) {
+            const tutorRes = await api.getTutorById(partnerId).catch(() => null);
+            if (tutorRes?.success && tutorRes.tutor?.user) {
+              setActiveConversation({
+                conversationId: activeConvParam,
+                partner: tutorRes.tutor.user
+              });
+              setMobileView('chat');
+            }
           }
         }
       } else if (convs.length > 0 && typeof window !== 'undefined' && window.innerWidth >= 1024) {

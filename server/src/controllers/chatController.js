@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Message = require('../models/Message');
 const User = require('../models/User');
 const Deal = require('../models/Deal');
@@ -42,8 +43,9 @@ exports.getConversations = async (req, res) => {
     const conversationMap = new Map();
 
     for (const msg of messages) {
+      if (!msg.sender || !msg.recipient || !msg.sender._id || !msg.recipient._id) continue;
       const otherUser = msg.sender._id.toString() === userId.toString() ? msg.recipient : msg.sender;
-      if (!otherUser) continue;
+      if (!otherUser || !otherUser._id) continue;
       
       const key = otherUser._id.toString();
       if (!conversationMap.has(key)) {
@@ -113,14 +115,26 @@ exports.getMessages = async (req, res) => {
       const p0 = parts[0];
       const p1 = parts[1];
       const altConvId = `${p1}_${p0}`;
-      query = {
-        $or: [
-          { conversationId },
-          { conversationId: altConvId },
-          { sender: p0, recipient: p1 },
-          { sender: p1, recipient: p0 }
-        ]
-      };
+      const isP0Valid = mongoose.Types.ObjectId.isValid(p0);
+      const isP1Valid = mongoose.Types.ObjectId.isValid(p1);
+
+      if (isP0Valid && isP1Valid) {
+        query = {
+          $or: [
+            { conversationId },
+            { conversationId: altConvId },
+            { sender: p0, recipient: p1 },
+            { sender: p1, recipient: p0 }
+          ]
+        };
+      } else {
+        query = {
+          $or: [
+            { conversationId },
+            { conversationId: altConvId }
+          ]
+        };
+      }
     }
 
     // Sort newest first ({ createdAt: -1 }) with limit 200, then reverse to chronological order.
@@ -132,6 +146,8 @@ exports.getMessages = async (req, res) => {
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit);
+
+    const messages = (rawMessages || []).reverse();
 
     // Mark undelivered messages to this user as delivered
     try {

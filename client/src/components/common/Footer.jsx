@@ -37,8 +37,8 @@ const Footer = () => {
     }
   };
 
-  // Hide footer completely on live video classroom and messages pages
-  if (pathname?.startsWith('/classroom') || pathname?.includes('/messages')) {
+  // Hide footer completely on live video classroom
+  if (pathname?.startsWith('/classroom')) {
     return null;
   }
 

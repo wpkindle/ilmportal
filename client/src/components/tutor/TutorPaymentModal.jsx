@@ -28,7 +28,8 @@ const paymentAccounts = [
     fullTitle: 'Meezan Bank (Islamic)',
     accountTitle: 'Abdul Khaliq',
     accountNumber: '96010105435308',
-    type: 'Bank Transfer / IBAN',
+    raastId: '03171759093',
+    type: 'Meezan Account Number',
     badge: 'Recommended',
     qrImage: '/images/qr-meezan.jpg',
     qrNote: 'Scan Meezan QR or transfer to Account: 96010105435308'
@@ -39,7 +40,8 @@ const paymentAccounts = [
     fullTitle: 'EasyPaisa Wallet',
     accountTitle: 'Abdul Khaliq',
     accountNumber: '03171759093',
-    type: 'Mobile Wallet / QR',
+    raastId: '03171759093',
+    type: 'EasyPaisa Mobile Number',
     qrImage: '/images/qr-easypaisa.jpg',
     qrNote: 'Scan EasyPaisa QR or send to: 0317-1759093'
   },
@@ -49,7 +51,8 @@ const paymentAccounts = [
     fullTitle: 'JazzCash Wallet',
     accountTitle: 'Abdul Khaliq',
     accountNumber: '03171759093',
-    type: 'Mobile Wallet / QR',
+    raastId: '03171759093',
+    type: 'JazzCash Mobile Number',
     qrImage: '/images/qr-jazzcash.jpg',
     qrNote: 'Scan JazzCash QR or send to: 0317-1759093'
   },
@@ -59,7 +62,8 @@ const paymentAccounts = [
     fullTitle: 'UPaisa & Raast Instant ID',
     accountTitle: 'Abdul Khaliq',
     accountNumber: '03171759093',
-    type: 'State Bank Raast / Wallet',
+    raastId: '03171759093',
+    type: 'Raast Instant ID / Wallet',
     qrImage: '/images/qr-upaisa.jpg',
     qrNote: 'Scan UPaisa QR or send via Raast to: 0317-1759093'
   }
@@ -261,6 +265,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
               <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-3.5">
                 {/* Clear Account Details Card for Manual Transfer & Easy Copy */}
                 <div className="p-3 bg-white border border-slate-200 rounded-xl space-y-2.5 shadow-2xs">
+                  {/* Account Title without copy button */}
                   <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
                     <div>
                       <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">
@@ -270,26 +275,19 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                         {activeAccount.accountTitle}
                       </span>
                     </div>
-                    <button
-                      type="button"
-                      onClick={() => handleCopy(activeAccount.accountTitle, 'acc-title')}
-                      className="px-2.5 py-1.5 bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg text-xs font-bold text-slate-700 hover:text-emerald-800 flex items-center gap-1 transition-all cursor-pointer shadow-2xs shrink-0"
-                    >
-                      {copiedId === 'acc-title' ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-600" />
-                          <span className="text-emerald-700">Copied!</span>
-                        </>
-                      ) : (
-                        <>
-                          <Copy className="w-3.5 h-3.5 text-slate-400" />
-                          <span>Copy Title</span>
-                        </>
-                      )}
-                    </button>
+                    {activeAccount.badge ? (
+                      <span className="px-2 py-0.5 bg-emerald-100 text-emerald-800 text-[10px] font-bold rounded-md border border-emerald-200">
+                        {activeAccount.badge}
+                      </span>
+                    ) : (
+                      <span className="px-2 py-0.5 bg-slate-100 text-slate-700 text-[10px] font-bold rounded-md border border-slate-200">
+                        {activeAccount.name}
+                      </span>
+                    )}
                   </div>
 
-                  <div className="flex items-center justify-between gap-2">
+                  {/* Primary Account Number with Copy Button */}
+                  <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
                     <div>
                       <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">
                         {activeAccount.type}
@@ -316,6 +314,35 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                       )}
                     </button>
                   </div>
+
+                  {/* Raast ID Number with Copy Button */}
+                  <div className="flex items-center justify-between gap-2">
+                    <div>
+                      <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">
+                        Raast ID Number
+                      </span>
+                      <span className="font-mono text-sm sm:text-base font-black text-slate-900 select-all">
+                        {activeAccount.raastId || '03171759093'}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => handleCopy(activeAccount.raastId || '03171759093', 'raast-id')}
+                      className="px-2.5 py-1.5 bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg text-xs font-mono font-black text-slate-800 flex items-center gap-1 transition-all cursor-pointer shadow-2xs shrink-0"
+                    >
+                      {copiedId === 'raast-id' ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-600" />
+                          <span className="text-emerald-700 font-sans">Copied!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Copy className="w-3.5 h-3.5 text-slate-500" />
+                          <span className="font-sans text-xs">Copy Raast ID</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
 
                 {/* The Barcode Image (Unobstructed, NO overlay on top) */}
@@ -334,7 +361,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                 </div>
 
                 <p className="text-[10.5px] text-slate-500 leading-tight text-center">
-                  Open your banking/wallet app to scan this barcode, or copy the account title &amp; number above to transfer directly.
+                  Open your banking/wallet app to scan this barcode, or copy the account number or Raast ID number above to transfer directly.
                 </p>
               </div>
 

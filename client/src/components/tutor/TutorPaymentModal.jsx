@@ -29,7 +29,6 @@ const paymentAccounts = [
     accountTitle: 'Abdul Khaliq',
     accountNumber: '96010105435308',
     raastId: '03171759093',
-    type: 'Meezan Account Number',
     badge: 'Recommended',
     qrImage: '/images/qr-meezan.jpg',
     qrNote: 'Scan Meezan QR or transfer to Account: 96010105435308'
@@ -41,7 +40,6 @@ const paymentAccounts = [
     accountTitle: 'Abdul Khaliq',
     accountNumber: '03171759093',
     raastId: '03171759093',
-    type: 'EasyPaisa Mobile Number',
     qrImage: '/images/qr-easypaisa.jpg',
     qrNote: 'Scan EasyPaisa QR or send to: 0317-1759093'
   },
@@ -52,7 +50,6 @@ const paymentAccounts = [
     accountTitle: 'Abdul Khaliq',
     accountNumber: '03171759093',
     raastId: '03171759093',
-    type: 'JazzCash Mobile Number',
     qrImage: '/images/qr-jazzcash.jpg',
     qrNote: 'Scan JazzCash QR or send to: 0317-1759093'
   },
@@ -63,7 +60,6 @@ const paymentAccounts = [
     accountTitle: 'Abdul Khaliq',
     accountNumber: '03171759093',
     raastId: '03171759093',
-    type: 'Raast Instant ID / Wallet',
     qrImage: '/images/qr-upaisa.jpg',
     qrNote: 'Scan UPaisa QR or send via Raast to: 0317-1759093'
   }
@@ -290,7 +286,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                   <div className="flex items-center justify-between gap-2 border-b border-slate-100 pb-2">
                     <div>
                       <span className="text-[10px] font-bold uppercase text-slate-400 tracking-wider block">
-                        {activeAccount.type}
+                        Account Number
                       </span>
                       <span className="font-mono text-sm sm:text-base font-black text-emerald-800 select-all">
                         {activeAccount.accountNumber}

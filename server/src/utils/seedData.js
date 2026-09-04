@@ -340,7 +340,7 @@ const seedDatabase = async () => {
       isVerified: true,
       city: 'Lahore',
       phone: '+92 301 2345678',
-      avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200'
+      avatar: '/images/tutors/qari-huzaifa.jpg'
     });
 
     const tutor1Profile = await TutorProfile.create({
@@ -382,7 +382,7 @@ const seedDatabase = async () => {
       isVerified: true,
       city: 'Islamabad',
       phone: '+92 333 4567890',
-      avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=200'
+      avatar: '/images/tutors/alimah-fatima.jpg'
     });
 
     const tutor2Profile = await TutorProfile.create({
@@ -484,7 +484,7 @@ const seedDatabase = async () => {
       isVerified: true,
       city: 'Peshawar',
       phone: '+92 312 3344556',
-      avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200'
+      avatar: '/images/tutors/ustadh-abdul-rehman.jpg'
     });
 
     const tutor5Profile = await TutorProfile.create({
@@ -1040,7 +1040,7 @@ const seedDatabase = async () => {
         track: 'kids',
         sessionDuration: '15–20 minutes',
         totalLessons: 18,
-        thumbnail: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=800&q=80',
+        thumbnail: '/images/tutors/alimah-fatima.jpg',
         enrolledCount: 65,
         ratingAverage: 5.0,
         ratingCount: 19,

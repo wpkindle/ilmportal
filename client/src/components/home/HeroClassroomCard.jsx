@@ -75,7 +75,7 @@ export default function HeroClassroomCard() {
         <div className="relative rounded-2xl overflow-hidden bg-slate-950 border border-white/10 aspect-[16/10] group">
           {/* Main Simulated Video Feed (Tutor Camera) */}
           <img
-            src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80"
+            src="/images/tutors/qari-huzaifa.jpg"
             alt="Qari Muhammad Huzaifa Live Session"
             className="w-full h-full object-cover object-top opacity-90 transition-transform duration-700 group-hover:scale-105"
           />

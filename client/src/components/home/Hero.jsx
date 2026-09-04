@@ -53,7 +53,7 @@ const heroSlides = [
     title: '1:1 Male Qari & Boy Student (Home Tuition)',
     desc: 'In-person 1-on-1 home tuition is exclusively for verified male Qaris and academic tutors visiting your residence.',
     image: '/images/hero-home-tutoring.jpg',
-    alt: 'Pakistani male tutor in traditional shalwar kameez teaching a young boy student at home with study books and notebooks'
+    alt: 'Pakistani male Qari with beard and prayer cap teaching a young boy student the Holy Quran on a wooden rihal at home'
   },
   {
     id: 1,

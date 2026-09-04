@@ -254,7 +254,7 @@ export default function CourseDetailPage() {
                 {course.instructor && (
                   <div className="p-3 bg-white/5 rounded-2xl border border-white/10 flex items-center gap-3">
                     <img
-                      src={course.instructor.avatar || 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=100'}
+                      src={course.instructor.avatar || '/images/tutors/qari-huzaifa.jpg'}
                       alt={course.instructor.name}
                       className="w-12 h-12 rounded-xl object-cover border border-[#d4a359]/40 shrink-0"
                     />

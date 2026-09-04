@@ -48,7 +48,7 @@ const activities = [
     action: 'verified tuition payment via JazzCash for',
     subject: 'FSc Pre-Medical Biology',
     tutor: 'Dr. Ayesha Tariq',
-    avatar: 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=120&q=80',
+    avatar: '/images/dr-ayesha.jpg',
     timeAgo: '2 mins ago',
     typeLabel: 'JazzCash Verified',
     badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30'
@@ -60,7 +60,7 @@ const activities = [
     action: 'booked online lessons for',
     subject: 'Noorani Qaida for Kids',
     tutor: 'Alimah Fatima Zahra',
-    avatar: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=120&q=80',
+    avatar: '/images/tutors/alimah-fatima.jpg',
     timeAgo: '3 mins ago',
     typeLabel: 'New Student',
     badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/30'
@@ -84,7 +84,7 @@ const activities = [
     action: 'started 3-day free trial for',
     subject: 'Hifz al-Quran & Manzil Revision',
     tutor: 'Qari Muhammad Huzaifa',
-    avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&q=80',
+    avatar: '/images/tutors/qari-huzaifa.jpg',
     timeAgo: '1 min ago',
     typeLabel: 'Free Trial',
     badgeClass: 'bg-[#d4a359]/20 text-[#d4a359] border-[#d4a359]/30'
@@ -96,7 +96,7 @@ const activities = [
     action: 'enrolled in past paper revision for',
     subject: 'Matric Class 10 Science & Math',
     tutor: 'Dr. Ayesha Tariq',
-    avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&q=80',
+    avatar: '/images/dr-ayesha.jpg',
     timeAgo: '2 mins ago',
     typeLabel: 'Matric Board',
     badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/30'
@@ -108,7 +108,7 @@ const activities = [
     action: 'completed live video session for',
     subject: 'Tafseer & Quranic Translation',
     tutor: 'Ustadh Abdul Rahman',
-    avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=120&q=80',
+    avatar: '/images/tutors/ustadh-abdul-rehman.jpg',
     timeAgo: 'Just now',
     typeLabel: 'Live Session Done',
     badgeClass: 'bg-[#d4a359]/20 text-[#d4a359] border-[#d4a359]/30'
@@ -120,7 +120,7 @@ const activities = [
     action: 'booked female tutor for',
     subject: 'Tajweed Rules & Daily Duas',
     tutor: 'Alimah Fatima Zahra',
-    avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=120&q=80',
+    avatar: '/images/tutors/alimah-fatima.jpg',
     timeAgo: '1 min ago',
     typeLabel: 'Female Qaria',
     badgeClass: 'bg-[#b85d34]/20 text-[#e07a4a] border-[#b85d34]/30'

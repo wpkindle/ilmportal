@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 import CustomSelect from '../common/CustomSelect';
 import ChromeAppInstallModal from '../common/ChromeAppInstallModal';
+import AnimatedHeroBackground from './AnimatedHeroBackground';
 import { api } from '../../services/api';
 
 const initialTutorCities = [
@@ -122,12 +123,8 @@ export default function Hero() {
 
   return (
     <section className="relative overflow-hidden bg-[#0c2217] text-[#f5f0e6] pt-10 pb-16 sm:pt-14 sm:pb-20 border-b border-[#143d2b]">
-      {/* Editorial Ambient Background Glow & Subtle Texture */}
-      <div className="absolute top-0 right-0 w-[550px] h-[550px] bg-[#1e543c]/20 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute -bottom-20 -left-20 w-[450px] h-[450px] bg-[#d4a359]/10 rounded-full blur-[130px] pointer-events-none" />
-      
-      {/* Geometric arabesque lattice watermark (subtle, dignified) */}
-      <div className="absolute inset-0 bg-[radial-gradient(#2b6e51_0.75px,transparent_0.75px)] [background-size:32px_32px] opacity-25 pointer-events-none" />
+      {/* Dynamic Animated Background: Living Aurora, Sacred Geometry, Mouse Spotlight & Stardust */}
+      <AnimatedHeroBackground />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full space-y-12">
         

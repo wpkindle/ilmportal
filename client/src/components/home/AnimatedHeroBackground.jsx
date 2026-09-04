@@ -1,111 +1,201 @@
 'use client';
 
-import React, { useState } from 'react';
-import {
-  BookOpen,
-  GraduationCap,
-  Sparkles,
-  ShieldCheck,
-  Video,
-  Award,
-  BookMarked,
-  Layers,
-  Atom,
-  Languages
-} from 'lucide-react';
+import React, { useRef, useEffect } from 'react';
+
+// Deterministic particle coordinates & timings to ensure 100% SSR-Client hydration parity
+const STARDUST_PARTICLES = [
+  { top: '12%', left: '14%', size: 3.5, color: '#d4a359', delay: '0s', duration: '9s' },
+  { top: '22%', left: '84%', size: 3, color: '#388e6a', delay: '1.4s', duration: '11s' },
+  { top: '64%', left: '9%', size: 4.5, color: '#d4a359', delay: '2.5s', duration: '8.5s' },
+  { top: '78%', left: '76%', size: 3, color: '#f59e0b', delay: '0.8s', duration: '10s' },
+  { top: '34%', left: '46%', size: 2.5, color: '#d4a359', delay: '3.2s', duration: '12s' },
+  { top: '16%', left: '62%', size: 4, color: '#388e6a', delay: '2.1s', duration: '7.8s' },
+  { top: '84%', left: '34%', size: 3, color: '#d4a359', delay: '4s', duration: '9.2s' },
+  { top: '48%', left: '92%', size: 4, color: '#388e6a', delay: '1.2s', duration: '10.5s' },
+  { top: '40%', left: '24%', size: 3, color: '#d4a359', delay: '3s', duration: '8.2s' },
+  { top: '9%', left: '40%', size: 2.5, color: '#f59e0b', delay: '0.5s', duration: '11.5s' },
+  { top: '70%', left: '52%', size: 3.5, color: '#388e6a', delay: '2.2s', duration: '9s' },
+  { top: '56%', left: '36%', size: 4, color: '#d4a359', delay: '1.8s', duration: '13s' },
+  { top: '86%', left: '88%', size: 2.5, color: '#d4a359', delay: '3.5s', duration: '8.5s' },
+  { top: '28%', left: '5%', size: 3.5, color: '#388e6a', delay: '0.3s', duration: '10.2s' },
+  { top: '90%', left: '20%', size: 4, color: '#f59e0b', delay: '4.2s', duration: '12.5s' },
+  { top: '14%', left: '94%', size: 3, color: '#d4a359', delay: '2.8s', duration: '9.5s' },
+  { top: '46%', left: '68%', size: 2, color: '#388e6a', delay: '1.1s', duration: '11s' },
+  { top: '60%', left: '82%', size: 3.5, color: '#d4a359', delay: '3.7s', duration: '8s' }
+];
 
 export default function AnimatedHeroBackground() {
-  const [videoLoaded, setVideoLoaded] = useState(false);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    // Interactive mouse cursor spotlight tracker
+    const handlePointerMove = (e) => {
+      if (!containerRef.current) return;
+      const rect = containerRef.current.getBoundingClientRect();
+      const x = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
+      const y = Math.max(0, Math.min(100, ((e.clientY - rect.top) / rect.height) * 100));
+      containerRef.current.style.setProperty('--mouse-x', `${x.toFixed(1)}%`);
+      containerRef.current.style.setProperty('--mouse-y', `${y.toFixed(1)}%`);
+    };
+
+    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    return () => {
+      window.removeEventListener('pointermove', handlePointerMove);
+    };
+  }, []);
 
   return (
-    <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0">
-      
-      {/* 1. Dynamic Moving Aurora Multi-Gradient Layer */}
-      <div className="absolute inset-0 bg-gradient-to-br from-slate-950 via-emerald-950/95 to-teal-950/90 animate-aurora opacity-95" />
+    <div
+      ref={containerRef}
+      style={{
+        '--mouse-x': '50%',
+        '--mouse-y': '38%'
+      }}
+      className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none z-0 select-none"
+      aria-hidden="true"
+    >
+      {/* 1. Deep Editorial Base Tones */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e] via-[#0c2217] to-[#07150e]" />
 
-      {/* 2. Deep 3D Radial Glow Beams */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(16,185,129,0.28),transparent_65%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_85%_35%,rgba(20,184,166,0.22),transparent_50%)]" />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_65%,rgba(6,182,212,0.18),transparent_55%)]" />
+      {/* 2. Dynamic Moving Aurora Multi-Gradient Layer */}
+      <div className="absolute inset-0 bg-gradient-to-tr from-[#0c2217] via-[#143d2b]/80 to-[#1e543c]/60 animate-aurora opacity-75 mix-blend-screen" />
 
-      {/* 3. Embedded HD Educational Looping Video */}
-      <video
-        autoPlay
-        loop
-        muted
-        playsInline
-        onLoadedData={() => setVideoLoaded(true)}
-        className={`absolute inset-0 w-full h-full object-cover mix-blend-screen transition-opacity duration-1000 ${
-          videoLoaded ? 'opacity-35' : 'opacity-20'
-        }`}
-        style={{ filter: 'brightness(0.85) contrast(1.25) saturate(1.35)' }}
-      >
-        <source
-          src="https://assets.mixkit.co/videos/preview/mixkit-hands-of-a-student-taking-notes-on-a-notebook-42880-large.mp4"
-          type="video/mp4"
-        />
-        <source
-          src="https://assets.mixkit.co/videos/preview/mixkit-student-doing-homework-in-the-library-41005-large.mp4"
-          type="video/mp4"
-        />
-      </video>
+      {/* 3. Interactive Mouse Spotlight (illuminates around cursor) */}
+      <div
+        className="absolute inset-0 transition-opacity duration-700 pointer-events-none"
+        style={{
+          background: `radial-gradient(650px circle at var(--mouse-x) var(--mouse-y), rgba(212, 163, 89, 0.16), rgba(43, 110, 81, 0.2) 40%, transparent 75%)`
+        }}
+      />
 
-      {/* 4. Glowing Radiant 3D Light Spheres (Ambient Aurora Orbs with Pulsing Glow) */}
-      <div className="absolute -top-24 -left-24 w-[550px] h-[550px] bg-emerald-500/25 rounded-full blur-[110px] animate-pulse-glow" />
-      <div className="absolute top-1/4 -right-24 w-[600px] h-[600px] bg-teal-400/20 rounded-full blur-[130px] animate-float-reverse" />
-      <div className="absolute -bottom-24 left-1/4 w-[650px] h-[450px] bg-emerald-400/20 rounded-full blur-[120px] animate-float-slow" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[750px] h-[400px] bg-gradient-to-r from-emerald-600/15 via-teal-500/15 to-cyan-500/15 blur-[140px] rounded-full pointer-events-none" />
+      {/* 4. Pulsing Atmospheric Ambient Orbs */}
+      <div className="absolute -top-24 -left-20 w-[550px] h-[550px] bg-[#1e543c]/25 rounded-full blur-[130px] animate-pulse-glow" />
+      <div className="absolute top-1/4 -right-28 w-[600px] h-[600px] bg-[#d4a359]/12 rounded-full blur-[150px] animate-float-reverse" />
+      <div className="absolute -bottom-24 left-1/3 w-[620px] h-[480px] bg-[#388e6a]/20 rounded-full blur-[130px] animate-float-slow" />
 
-      {/* 5. 3D Sacred Geometry Rings (Rotating Concentric Circles with Dashes) */}
-      <div className="absolute -top-36 right-4 sm:right-16 w-[620px] h-[620px] border border-emerald-500/20 rounded-full animate-spin-slow pointer-events-none flex items-center justify-center">
-        <div className="w-[480px] h-[480px] border border-teal-400/25 rounded-full border-dashed" />
-        <div className="w-[340px] h-[340px] border border-emerald-300/20 rounded-full" />
-        <div className="w-[200px] h-[200px] border border-emerald-400/15 rounded-full border-dotted" />
+      {/* 5. Sacred Islamic Geometric Wireframe (Top-Right Astrolabe & Rub el Hizb) */}
+      <div className="absolute -top-28 right-0 sm:right-6 lg:right-12 w-[520px] h-[520px] sm:w-[620px] sm:h-[620px] pointer-events-none opacity-20 sm:opacity-25 animate-spin-slow">
+        <svg
+          viewBox="0 0 400 400"
+          className="w-full h-full"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          {/* Concentric rings */}
+          <circle cx="200" cy="200" r="195" stroke="#d4a359" strokeWidth="1" strokeDasharray="4 8" />
+          <circle cx="200" cy="200" r="182" stroke="#388e6a" strokeWidth="1" />
+          <circle cx="200" cy="200" r="170" stroke="#d4a359" strokeWidth="0.75" strokeDasharray="1 5" />
+          <circle cx="200" cy="200" r="145" stroke="#388e6a" strokeWidth="1" strokeDasharray="6 6" />
+          <circle cx="200" cy="200" r="118" stroke="#d4a359" strokeWidth="1" />
+          <circle cx="200" cy="200" r="75" stroke="#388e6a" strokeWidth="0.75" strokeDasharray="3 5" />
+          <circle cx="200" cy="200" r="30" stroke="#d4a359" strokeWidth="1" />
+
+          {/* 8-pointed star (Rub el Hizb) - Square 1 */}
+          <rect
+            x="110"
+            y="110"
+            width="180"
+            height="180"
+            stroke="#d4a359"
+            strokeWidth="1.25"
+            strokeOpacity="0.8"
+          />
+          {/* 8-pointed star (Rub el Hizb) - Square 2 (rotated 45 deg) */}
+          <rect
+            x="110"
+            y="110"
+            width="180"
+            height="180"
+            transform="rotate(45 200 200)"
+            stroke="#d4a359"
+            strokeWidth="1.25"
+            strokeOpacity="0.8"
+          />
+
+          {/* Inner 8-pointed star */}
+          <rect
+            x="142"
+            y="142"
+            width="116"
+            height="116"
+            stroke="#388e6a"
+            strokeWidth="1"
+            strokeOpacity="0.9"
+          />
+          <rect
+            x="142"
+            y="142"
+            width="116"
+            height="116"
+            transform="rotate(45 200 200)"
+            stroke="#388e6a"
+            strokeWidth="1"
+            strokeOpacity="0.9"
+          />
+
+          {/* Radial axis rays (45-degree intervals) */}
+          <line x1="200" y1="5" x2="200" y2="395" stroke="#d4a359" strokeWidth="0.5" strokeDasharray="3 9" />
+          <line x1="5" y1="200" x2="395" y2="200" stroke="#d4a359" strokeWidth="0.5" strokeDasharray="3 9" />
+          <line x1="62" y1="62" x2="338" y2="338" stroke="#388e6a" strokeWidth="0.5" strokeDasharray="3 9" />
+          <line x1="62" y1="338" x2="338" y2="62" stroke="#388e6a" strokeWidth="0.5" strokeDasharray="3 9" />
+        </svg>
       </div>
 
-      <div className="absolute -bottom-48 -left-28 w-[580px] h-[580px] border border-emerald-500/20 rounded-full animate-spin-reverse pointer-events-none flex items-center justify-center">
-        <div className="w-[420px] h-[420px] border border-teal-300/20 rounded-full border-dashed" />
-        <div className="w-[260px] h-[260px] border border-emerald-400/15 rounded-full" />
+      {/* 6. Sacred Islamic Geometric Wireframe (Bottom-Left Counter-Rotating Motif) */}
+      <div className="absolute -bottom-36 -left-24 sm:-left-16 w-[420px] h-[420px] sm:w-[500px] sm:h-[500px] pointer-events-none opacity-15 sm:opacity-20 animate-spin-reverse">
+        <svg
+          viewBox="0 0 400 400"
+          className="w-full h-full"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle cx="200" cy="200" r="185" stroke="#388e6a" strokeWidth="1" strokeDasharray="6 8" />
+          <circle cx="200" cy="200" r="160" stroke="#d4a359" strokeWidth="0.75" />
+          <circle cx="200" cy="200" r="125" stroke="#388e6a" strokeWidth="1" strokeDasharray="4 6" />
+          <circle cx="200" cy="200" r="85" stroke="#d4a359" strokeWidth="1" />
+
+          {/* Interlocking geometric octagram */}
+          <polygon
+            points="200,45 235,165 355,200 235,235 200,355 165,235 45,200 165,165"
+            stroke="#d4a359"
+            strokeWidth="1.25"
+            strokeOpacity="0.7"
+          />
+          <polygon
+            points="200,45 235,165 355,200 235,235 200,355 165,235 45,200 165,165"
+            transform="rotate(22.5 200 200)"
+            stroke="#388e6a"
+            strokeWidth="0.75"
+            strokeOpacity="0.6"
+          />
+        </svg>
       </div>
 
-      {/* 6. Floating 3D Educational Glass Pills with Glowing Holographic Borders */}
-      {/* Pill 1: Quran / Holy Scripture */}
-      <div className="absolute top-20 left-[6%] animate-float-slow hidden lg:flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-slate-900/70 border border-emerald-500/40 text-emerald-300 shadow-[0_8px_32px_rgba(16,185,129,0.3)] backdrop-blur-xl transform-gpu hover:scale-105 transition-transform">
-        <div className="p-1.5 bg-emerald-500/20 text-emerald-400 rounded-xl">
-          <BookOpen className="w-4 h-4" />
-        </div>
-        <span className="text-xs font-bold text-white">Quran &amp; Tajweed</span>
+      {/* 7. Drifting Stardust Glowing Particles */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {STARDUST_PARTICLES.map((p, idx) => (
+          <span
+            key={idx}
+            className="absolute rounded-full animate-particle-drift"
+            style={{
+              top: p.top,
+              left: p.left,
+              width: `${p.size}px`,
+              height: `${p.size}px`,
+              backgroundColor: p.color,
+              boxShadow: `0 0 ${p.size * 2.5}px ${p.color}`,
+              animationDelay: p.delay,
+              animationDuration: p.duration
+            }}
+          />
+        ))}
       </div>
 
-      {/* Pill 2: Cambridge & Matric Academic Excellence */}
-      <div className="absolute top-24 right-[7%] animate-float-reverse hidden lg:flex items-center gap-2.5 px-4 py-2.5 rounded-2xl bg-slate-900/70 border border-teal-500/40 text-teal-300 shadow-[0_8px_32px_rgba(20,184,166,0.3)] backdrop-blur-xl transform-gpu hover:scale-105 transition-transform">
-        <div className="p-1.5 bg-teal-500/20 text-teal-400 rounded-xl">
-          <GraduationCap className="w-4 h-4" />
-        </div>
-        <span className="text-xs font-bold text-white">Cambridge &amp; Matric</span>
-      </div>
+      {/* 8. Arabesque Sacred Geometric Dot Watermark */}
+      <div className="absolute inset-0 bg-[radial-gradient(#2b6e51_0.85px,transparent_0.85px)] [background-size:28px_28px] opacity-25" />
 
-      {/* Pill 3: In-Platform HD Video */}
-      <div className="absolute bottom-32 left-[8%] animate-float-reverse hidden xl:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-slate-900/70 border border-blue-500/40 text-blue-300 shadow-[0_8px_32px_rgba(59,130,246,0.25)] backdrop-blur-xl transform-gpu">
-        <div className="p-1.5 bg-blue-500/20 text-blue-400 rounded-xl">
-          <Video className="w-3.5 h-3.5" />
-        </div>
-        <span className="text-[11px] font-bold text-slate-200">1:1 HD Live Class</span>
-      </div>
-
-      {/* Pill 4: Sanad Verified Tutor */}
-      <div className="absolute bottom-28 right-[9%] animate-float-slow hidden xl:flex items-center gap-2 px-3.5 py-2 rounded-2xl bg-slate-900/70 border border-emerald-500/40 text-emerald-300 shadow-[0_8px_32px_rgba(16,185,129,0.3)] backdrop-blur-xl transform-gpu">
-        <div className="p-1.5 bg-emerald-500/20 text-emerald-400 rounded-xl">
-          <ShieldCheck className="w-3.5 h-3.5" />
-        </div>
-        <span className="text-[11px] font-bold text-slate-200">Sanad Verified Tutors</span>
-      </div>
-
-      {/* 7. Subtle 3D Depth Matrix Grid */}
-      <div className="absolute inset-0 bg-[radial-gradient(#10b981_1.25px,transparent_1.25px)] [background-size:32px_32px] opacity-25" />
-
-      {/* 8. Soft Vignette Edge Blending */}
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-transparent to-slate-950/70" />
+      {/* 9. Soft Vignette Edge Blending */}
+      <div className="absolute inset-0 bg-gradient-to-t from-[#0c2217] via-transparent to-[#07150e]/60 pointer-events-none" />
     </div>
   );
 }

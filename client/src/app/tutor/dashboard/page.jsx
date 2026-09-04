@@ -164,8 +164,18 @@ export default function TutorDashboardPage() {
 
         {isApproved && (
           <div className="bg-[#0c2217] text-[#faf8f5] rounded-3xl p-6 sm:p-9 border border-[#d4a359]/30 shadow-[0_8px_30px_rgba(12,34,23,0.12)] relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-            <div className="absolute -right-16 -bottom-16 w-64 h-64 rounded-full bg-[#143d2b]/40 blur-3xl pointer-events-none" />
-            <div className="absolute top-0 right-1/4 w-32 h-32 rounded-full bg-[#d4a359]/10 blur-2xl pointer-events-none" />
+            {/* Dynamic background ambient effects */}
+            <div className="absolute -right-16 -bottom-16 w-64 h-64 rounded-full bg-[#143d2b]/40 blur-3xl pointer-events-none animate-pulse-glow" />
+            <div className="absolute top-0 right-1/4 w-32 h-32 rounded-full bg-[#d4a359]/15 blur-2xl pointer-events-none animate-float-slow" />
+            <div className="absolute -right-12 -top-12 w-48 h-48 pointer-events-none opacity-15 animate-spin-slow">
+              <svg viewBox="0 0 200 200" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="100" cy="100" r="90" stroke="#d4a359" strokeWidth="1" strokeDasharray="4 6" />
+                <rect x="55" y="55" width="90" height="90" stroke="#d4a359" strokeWidth="1" />
+                <rect x="55" y="55" width="90" height="90" transform="rotate(45 100 100)" stroke="#388e6a" strokeWidth="1" />
+              </svg>
+            </div>
+            <span className="absolute top-6 right-20 w-1.5 h-1.5 rounded-full bg-[#d4a359] shadow-[0_0_8px_#d4a359] animate-particle-drift pointer-events-none" style={{ animationDelay: '0.8s', animationDuration: '7s' }} />
+            <span className="absolute bottom-8 right-1/3 w-1 h-1 rounded-full bg-[#388e6a] shadow-[0_0_6px_#388e6a] animate-particle-drift pointer-events-none" style={{ animationDelay: '2.1s', animationDuration: '9s' }} />
 
             <div className="space-y-2.5 z-10">
               <div className="flex items-center gap-2 flex-wrap">

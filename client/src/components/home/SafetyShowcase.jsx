@@ -23,8 +23,18 @@ export default function SafetyShowcase() {
   return (
     <section className="py-16 sm:py-24 relative overflow-hidden bg-[#07150e] text-[#f5f0e6] border-b border-[#143d2b]">
       {/* Ambient Deep Emerald Glows */}
-      <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-[#1e543c]/15 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute -bottom-24 right-10 w-[550px] h-[550px] bg-[#d4a359]/10 rounded-full blur-[150px] pointer-events-none" />
+      <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-[#1e543c]/20 rounded-full blur-[140px] pointer-events-none animate-pulse-glow" />
+      <div className="absolute -bottom-24 right-10 w-[550px] h-[550px] bg-[#d4a359]/12 rounded-full blur-[150px] pointer-events-none animate-float-slow" />
+
+      {/* Rotating Sacred Geometry Trust Motif */}
+      <div className="absolute -top-20 -right-20 w-[480px] h-[480px] pointer-events-none opacity-[0.08] animate-spin-slow">
+        <svg viewBox="0 0 400 400" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="200" cy="200" r="185" stroke="#d4a359" strokeWidth="1" strokeDasharray="6 8" />
+          <circle cx="200" cy="200" r="145" stroke="#388e6a" strokeWidth="1" strokeDasharray="3 5" />
+          <rect x="110" y="110" width="180" height="180" stroke="#d4a359" strokeWidth="1.2" />
+          <rect x="110" y="110" width="180" height="180" transform="rotate(45 200 200)" stroke="#d4a359" strokeWidth="1.2" />
+        </svg>
+      </div>
 
       {/* Tasteful subtle grid */}
       <div className="absolute inset-0 bg-[radial-gradient(#1e543c_0.75px,transparent_0.75px)] [background-size:28px_28px] opacity-20 pointer-events-none" />

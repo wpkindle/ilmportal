@@ -250,6 +250,54 @@
   animation: radarWave 4s cubic-bezier(0, 0, 0.2, 1) infinite;
 }
 
+@keyframes particleDrift {
+  0%, 100% {
+    transform: translateY(0px) translateX(0px) scale(1);
+    opacity: 0.25;
+  }
+  35% {
+    transform: translateY(-20px) translateX(10px) scale(1.25);
+    opacity: 0.85;
+  }
+  70% {
+    transform: translateY(-36px) translateX(-8px) scale(0.9);
+    opacity: 0.4;
+  }
+}
+
+.animate-particle-drift {
+  animation: particleDrift 9s ease-in-out infinite;
+}
+
+@keyframes geometricPulse {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.45;
+    transform: scale(1.04);
+  }
+}
+
+.animate-geometric-pulse {
+  animation: geometricPulse 10s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-float-slow,
+  .animate-float-reverse,
+  .animate-aurora,
+  .animate-pulse-glow,
+  .animate-spin-slow,
+  .animate-spin-reverse,
+  .animate-radar,
+  .animate-particle-drift,
+  .animate-geometric-pulse {
+    animation: none !important;
+  }
+}
+
 /* Distinct Section Background Pattern Presets */
 .bg-blueprint-grid {
   background-image: 

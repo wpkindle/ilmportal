@@ -36,8 +36,10 @@ export default function DisclaimerPage() {
           
           {/* Breadcrumbs */}
           <div className="flex items-center gap-2 text-xs font-semibold text-slate-400">
+            <Link href="/" className="hover:text-emerald-400 transition-colors">Home</Link>
             <Link href="/" className="hover:text-[#d4a359] transition-colors">Home</Link>
             <ChevronRight className="w-3.5 h-3.5 text-slate-600" />
+            <span className="text-emerald-400">Disclaimer</span>
             <span className="text-[#d4a359]">Disclaimer</span>
           </div>
 
@@ -81,9 +83,11 @@ export default function DisclaimerPage() {
 
             <div className="mt-12 pt-6 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
               <div className="flex items-center gap-2">
+                <HelpCircle className="w-4 h-4 text-amber-600" />
                 <HelpCircle className="w-4 h-4 text-[#d4a359]" />
                 <span>Verified Faculty Directory & LMS Technology Portal</span>
               </div>
+              <Link href="/how-it-works" className="text-emerald-700 font-bold hover:underline">
               <Link href="/how-it-works" className="text-[#b85d34] font-bold hover:underline">
                 Learn How IlmPortal Works &rarr;
               </Link>

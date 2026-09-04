@@ -66,12 +66,14 @@ export default function SessionsLogPage() {
                       <td className="p-4 text-slate-600">
                         {new Date(sess.scheduledStartTime).toLocaleString()}
                       </td>
+                      <td className="p-4 font-mono font-bold text-emerald-800">
                       <td className="p-4 font-mono font-bold text-[#0c2217]">
                         {sess.durationMinutes || 0} mins
                       </td>
                       <td className="p-4">
                         <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
                           sess.status === 'completed'
+                            ? 'bg-emerald-100 text-emerald-800'
                             ? 'bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40'
                             : sess.status === 'live'
                             ? 'bg-red-100 text-red-800 animate-pulse'

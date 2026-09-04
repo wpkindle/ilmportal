@@ -320,10 +320,32 @@ export default function DealsManagementPage() {
             <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200 text-xs space-y-2">
               <p><strong>Course:</strong> {selectedDealForVerify.subject}</p>
               <p><strong>Fee:</strong> PKR {selectedDealForVerify.price}</p>
-              <p><strong>Method:</strong> {selectedDealForVerify.paymentMethod?.toUpperCase() || 'JazzCash'}</p>
-              <p><strong>TID / Reference:</strong> <span className="font-mono font-bold text-emerald-800">{selectedDealForVerify.paymentProofReference || 'None'}</span></p>
+              <p><strong>Method:</strong> {selectedDealForVerify.paymentMethod?.toUpperCase() || 'Meezan'}</p>
+              <p><strong>Proof Status:</strong> <span className="font-mono font-bold text-emerald-800">{selectedDealForVerify.paymentProofReference || 'Screenshot Proof Attached'}</span></p>
               {selectedDealForVerify.paymentProofNotes && (
                 <p><strong>Notes:</strong> {selectedDealForVerify.paymentProofNotes}</p>
+              )}
+              {selectedDealForVerify.proofImageUrl && (
+                <div className="pt-2 border-t border-slate-200/80">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="font-bold text-slate-800">Screenshot Proof:</span>
+                    <a
+                      href={selectedDealForVerify.proofImageUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-emerald-700 hover:underline text-[11px] font-semibold"
+                    >
+                      View Full Size ↗
+                    </a>
+                  </div>
+                  <a href={selectedDealForVerify.proofImageUrl} target="_blank" rel="noopener noreferrer">
+                    <img
+                      src={selectedDealForVerify.proofImageUrl}
+                      alt="Payment proof screenshot"
+                      className="w-full max-h-56 object-contain rounded-xl border border-slate-300 bg-white hover:opacity-95 transition-opacity cursor-zoom-in"
+                    />
+                  </a>
+                </div>
               )}
             </div>
 

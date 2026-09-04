@@ -14,56 +14,59 @@ import {
   Trash2,
   Percent,
   QrCode,
-  ChevronDown,
-  ChevronUp
+  ScanLine,
+  Building2,
+  Smartphone,
+  ExternalLink
 } from 'lucide-react';
 import { api } from '../../services/api';
-import CustomSelect from '../common/CustomSelect';
 
 const paymentAccounts = [
   {
     id: 'meezan',
-    title: 'Meezan Bank (Islamic)',
+    name: 'Meezan Bank',
+    fullTitle: 'Meezan Bank (Islamic)',
     accountTitle: 'Abdul Khaliq',
     accountNumber: '96010105435308',
     type: 'Bank Transfer / IBAN',
-    badge: 'Preferred',
-    color: 'from-green-700 to-emerald-700',
-    // Meezan QR placeholder (replace with real QR image URL or import)
-    qrInfo: 'IBAN: PK00MEZN0001960101054353'
+    badge: 'Recommended',
+    qrImage: '/images/qr-meezan.jpg',
+    qrNote: 'Scan Meezan QR or transfer to Account: 96010105435308'
   },
   {
     id: 'easypaisa',
-    title: 'EasyPaisa',
+    name: 'EasyPaisa',
+    fullTitle: 'EasyPaisa Wallet',
     accountTitle: 'Abdul Khaliq',
     accountNumber: '03171759093',
-    type: 'Mobile Wallet',
-    color: 'from-green-600 to-lime-600',
-    qrInfo: 'Send to: 0317-1759093'
+    type: 'Mobile Wallet / QR',
+    qrImage: '/images/qr-easypaisa.jpg',
+    qrNote: 'Scan EasyPaisa QR or send to: 0317-1759093'
   },
   {
     id: 'jazzcash',
-    title: 'JazzCash',
+    name: 'JazzCash',
+    fullTitle: 'JazzCash Wallet',
     accountTitle: 'Abdul Khaliq',
     accountNumber: '03171759093',
-    type: 'Mobile Wallet',
-    color: 'from-red-600 to-orange-600',
-    qrInfo: 'Send to: 0317-1759093'
+    type: 'Mobile Wallet / QR',
+    qrImage: '/images/qr-jazzcash.jpg',
+    qrNote: 'Scan JazzCash QR or send to: 0317-1759093'
   },
   {
-    id: 'raast',
-    title: 'Raast Instant',
+    id: 'upaisa',
+    name: 'UPaisa / Raast',
+    fullTitle: 'UPaisa & Raast Instant ID',
     accountTitle: 'Abdul Khaliq',
     accountNumber: '03171759093',
-    type: 'State Bank Raast ID',
-    color: 'from-blue-600 to-indigo-600',
-    qrInfo: 'Raast ID: 0317-1759093'
+    type: 'State Bank Raast / Wallet',
+    qrImage: '/images/qr-upaisa.jpg',
+    qrNote: 'Scan UPaisa QR or send via Raast to: 0317-1759093'
   }
 ];
 
 export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) {
-  const [paymentMethod, setPaymentMethod] = useState('meezan');
-  const [referenceCode, setReferenceCode] = useState('');
+  const [selectedMethod, setSelectedMethod] = useState('meezan');
   const [notes, setNotes] = useState('');
   const [proofImage, setProofImage] = useState(null);
   const [proofPreview, setProofPreview] = useState(null);
@@ -71,7 +74,6 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
   const [success, setSuccess] = useState(false);
   const [copiedId, setCopiedId] = useState(null);
   const [error, setError] = useState('');
-  const [expandedQr, setExpandedQr] = useState(null);
   const fileInputRef = useRef(null);
 
   if (!isOpen || !deal) return null;
@@ -81,8 +83,10 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
     ? deal.platformFee
     : Math.round((deal.price || 0) * 0.10);
 
-  const isAutoFee = deal.platformFeeNotes?.includes('Auto-calculated') || 
+  const isAutoFee = deal.platformFeeNotes?.includes('Auto-calculated') ||
                     (deal.platformFee === null || deal.platformFee === undefined);
+
+  const activeAccount = paymentAccounts.find(a => a.id === selectedMethod) || paymentAccounts[0];
 
   const handleCopy = (text, id) => {
     if (typeof navigator !== 'undefined' && navigator.clipboard) {
@@ -95,8 +99,12 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
   const handleImageSelect = (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Screenshot must be under 5MB.');
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload an image file (JPG, PNG, WEBP).');
+      return;
+    }
+    if (file.size > 8 * 1024 * 1024) {
+      setError('Screenshot must be under 8MB.');
       return;
     }
     setProofImage(file);
@@ -112,8 +120,8 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!referenceCode.trim()) {
-      setError('Please provide the Transaction ID (TID) / reference code.');
+    if (!proofImage) {
+      setError('Please attach your payment screenshot proof before submitting.');
       return;
     }
 
@@ -123,7 +131,11 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
     try {
       const res = await api.submitPaymentProof(
         deal._id,
-        { paymentMethod, referenceCode: referenceCode.trim(), notes: notes.trim() },
+        {
+          paymentMethod: selectedMethod,
+          referenceCode: 'Screenshot Proof Attached',
+          notes: notes.trim()
+        },
         proofImage
       );
 
@@ -132,7 +144,6 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
         if (onSuccess) onSuccess();
         setTimeout(() => {
           setSuccess(false);
-          setReferenceCode('');
           setNotes('');
           setProofImage(null);
           setProofPreview(null);
@@ -148,13 +159,11 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
     }
   };
 
-  const selectedAccount = paymentAccounts.find(a => a.id === paymentMethod) || paymentAccounts[0];
-
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/75 backdrop-blur-xs animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-slate-900/80 backdrop-blur-xs animate-in fade-in duration-200">
       <div className="bg-white rounded-t-3xl sm:rounded-3xl max-w-lg w-full max-h-[94vh] sm:max-h-[90vh] flex flex-col shadow-2xl relative border border-slate-100 overflow-hidden">
 
-        {/* Header */}
+        {/* Modal Header */}
         <div className="flex items-center justify-between p-4 sm:p-5 border-b border-slate-100 shrink-0 bg-white">
           <div className="flex items-center gap-3">
             <div className="p-2 sm:p-2.5 bg-emerald-100 text-emerald-800 rounded-xl sm:rounded-2xl shrink-0">
@@ -162,7 +171,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
             </div>
             <div className="min-w-0">
               <h3 className="font-black text-slate-900 text-sm sm:text-base truncate">
-                Pay Platform Fee
+                Clear Platform Fee
               </h3>
               <p className="text-[11px] sm:text-xs text-slate-500 truncate">
                 Student: <strong>{deal.student?.name}</strong> &bull; {deal.subject}
@@ -178,190 +187,169 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
           </button>
         </div>
 
-        {/* Scrollable Content */}
+        {/* Scrollable Modal Content */}
         <div className="p-4 sm:p-5 overflow-y-auto flex-1 space-y-4">
 
+          {/* Success Notification */}
           {success ? (
-            <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-2.5 my-4">
-              <CheckCircle2 className="w-12 h-12 text-emerald-600 mx-auto animate-bounce" />
+            <div className="p-6 bg-emerald-50 rounded-2xl border border-emerald-200 text-center space-y-3 my-4">
+              <CheckCircle2 className="w-14 h-14 text-emerald-600 mx-auto animate-bounce" />
               <h4 className="font-black text-emerald-950 text-base">
-                Payment Proof Submitted!
+                Payment Screenshot Submitted!
               </h4>
-              <p className="text-xs text-emerald-800 leading-relaxed">
-                Transaction ID <strong>{referenceCode}</strong>{proofImage ? ' + screenshot' : ''} sent to admin. Classroom access will be cleared shortly.
+              <p className="text-xs text-emerald-800 leading-relaxed max-w-sm mx-auto">
+                Your payment screenshot has been sent directly to administration. Your classroom access will be cleared shortly.
               </p>
             </div>
           ) : (
             <form id="tutor-fee-modal-form" onSubmit={handleSubmit} className="space-y-4">
 
-              {/* ── Fee Amount Banner ── */}
-              <div className="p-3.5 bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200 rounded-2xl">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-emerald-100 flex items-center justify-center shrink-0">
-                      <Percent className="w-4 h-4 text-emerald-700" />
+              {/* ── Fee Amount Banner (10% Auto Adjusted) ── */}
+              <div className="p-3.5 bg-gradient-to-r from-emerald-500/10 via-teal-500/10 to-emerald-500/5 border border-emerald-200 rounded-2xl">
+                <div className="flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-2.5">
+                    <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-sm">
+                      <Percent className="w-4 h-4" />
                     </div>
                     <div>
-                      <span className="text-[10px] font-bold uppercase text-emerald-800 tracking-wider block">
+                      <span className="text-[10px] font-black uppercase text-emerald-800 tracking-wider block">
                         Platform Fee Due
                       </span>
-                      <p className="text-[10px] text-slate-500">
+                      <p className="text-[11px] text-slate-600">
                         {isAutoFee
                           ? `10% of deal price (PKR ${deal.price?.toLocaleString()})`
-                          : 'Admin-assigned custom fee'}
+                          : 'Admin assigned fee'}
                       </p>
                     </div>
                   </div>
                   <div className="text-right shrink-0">
-                    <span className="font-mono font-black text-emerald-900 text-xl">
+                    <span className="font-mono font-black text-emerald-900 text-xl sm:text-2xl">
                       PKR {platformFee.toLocaleString()}
                     </span>
                   </div>
                 </div>
               </div>
 
-              {/* ── Payment Method Select ── */}
+              {/* ── Payment Method Selector Tabs ── */}
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                  Select Payment Method
+                <label className="text-xs font-bold text-slate-800 block mb-1.5 flex items-center gap-1.5">
+                  <ScanLine className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Select Payment Method &amp; View Barcode:</span>
                 </label>
-                <CustomSelect
-                  options={[
-                    { value: 'meezan', label: 'Meezan Bank Transfer', sublabel: '96010105435308' },
-                    { value: 'easypaisa', label: 'EasyPaisa Mobile Wallet', sublabel: '0317-1759093' },
-                    { value: 'jazzcash', label: 'JazzCash Mobile Wallet', sublabel: '0317-1759093' },
-                    { value: 'raast', label: 'Raast Instant Transfer', sublabel: '0317-1759093' }
-                  ]}
-                  value={paymentMethod}
-                  onChange={setPaymentMethod}
-                  variant="filter"
-                />
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5 p-1 bg-slate-100 rounded-2xl">
+                  {paymentAccounts.map((acc) => {
+                    const isSelected = selectedMethod === acc.id;
+                    return (
+                      <button
+                        key={acc.id}
+                        type="button"
+                        onClick={() => setSelectedMethod(acc.id)}
+                        className={`py-2 px-2 rounded-xl text-xs font-bold transition-all cursor-pointer text-center truncate ${
+                          isSelected
+                            ? 'bg-white text-emerald-800 shadow-xs border border-emerald-200'
+                            : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                        }`}
+                      >
+                        {acc.name}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
-              {/* ── Payment Details + QR ── */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between mb-1">
-                  <label className="text-xs font-bold text-slate-800">
-                    Payment Details
-                  </label>
-                  <span className="text-[10px] text-emerald-700 font-semibold">Tap number to copy</span>
-                </div>
-
-                {/* All accounts list */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {paymentAccounts.map((acc) => (
-                    <div key={acc.id} className="rounded-xl border border-slate-200 overflow-hidden">
-                      {/* Account header row */}
-                      <div
-                        onClick={() => handleCopy(acc.accountNumber, acc.id)}
-                        className="p-2.5 bg-slate-50 hover:bg-emerald-50/60 transition-colors cursor-pointer group"
-                      >
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-bold text-slate-900 text-[11px]">{acc.title}</span>
-                          {acc.badge && (
-                            <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 font-bold text-[8.5px] rounded">
-                              {acc.badge}
-                            </span>
-                          )}
-                        </div>
-                        <p className="text-[10px] text-slate-500">Title: {acc.accountTitle}</p>
-                        <div className="flex items-center justify-between pt-1 font-mono font-bold text-emerald-800 text-[11.5px]">
-                          <span>{acc.accountNumber}</span>
-                          {copiedId === acc.id
-                            ? <Check className="w-3.5 h-3.5 text-emerald-600" />
-                            : <Copy className="w-3.5 h-3.5 text-slate-400 group-hover:text-emerald-700" />}
-                        </div>
-                      </div>
-
-                      {/* QR Code toggle */}
-                      <button
-                        type="button"
-                        onClick={() => setExpandedQr(expandedQr === acc.id ? null : acc.id)}
-                        className="w-full flex items-center justify-between px-2.5 py-1.5 bg-white border-t border-slate-100 text-[10px] font-semibold text-slate-500 hover:text-emerald-700 hover:bg-emerald-50/40 transition-colors"
-                      >
-                        <span className="flex items-center gap-1">
-                          <QrCode className="w-3 h-3" />
-                          {expandedQr === acc.id ? 'Hide QR / Details' : 'Show QR / Details'}
+              {/* ── Prominent Barcode / QR Image Display ── */}
+              <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-center space-y-3">
+                <div className="flex items-center justify-between pb-2 border-b border-slate-200/80">
+                  <div className="text-left">
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-black text-xs text-slate-900">{activeAccount.fullTitle}</span>
+                      {activeAccount.badge && (
+                        <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 text-[8.5px] font-bold rounded">
+                          {activeAccount.badge}
                         </span>
-                        {expandedQr === acc.id
-                          ? <ChevronUp className="w-3 h-3" />
-                          : <ChevronDown className="w-3 h-3" />}
-                      </button>
-
-                      {/* QR expanded panel */}
-                      {expandedQr === acc.id && (
-                        <div className="p-3 bg-white border-t border-slate-100 text-center space-y-2">
-                          {/* QR Code visual (text-based barcode style with border) */}
-                          <div className="mx-auto w-28 h-28 bg-white border-2 border-slate-800 rounded-lg flex items-center justify-center relative overflow-hidden">
-                            {/* Styled QR representation */}
-                            <div className="w-24 h-24 grid grid-cols-6 grid-rows-6 gap-0.5 p-1">
-                              {/* Top-left finder */}
-                              <div className="col-span-2 row-span-2 border-2 border-slate-800 rounded-sm" />
-                              {/* Top-right finder */}
-                              <div className="col-start-5 col-span-2 row-span-2 border-2 border-slate-800 rounded-sm" />
-                              {/* Bottom-left finder */}
-                              <div className="col-span-2 row-start-5 row-span-2 border-2 border-slate-800 rounded-sm" />
-                              {/* Center icon */}
-                              <div className="col-start-3 col-span-2 row-start-3 row-span-2 flex items-center justify-center">
-                                <QrCode className="w-5 h-5 text-slate-700" />
-                              </div>
-                            </div>
-                          </div>
-                          <p className="text-[10px] font-mono font-bold text-emerald-800 bg-emerald-50 rounded px-2 py-1">
-                            {acc.qrInfo}
-                          </p>
-                          <p className="text-[9px] text-slate-400">
-                            Open your banking app → Scan QR or enter number manually
-                          </p>
-                        </div>
                       )}
                     </div>
-                  ))}
+                    <p className="text-[10px] text-slate-500">Account Title: <strong className="text-slate-700">{activeAccount.accountTitle}</strong></p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => handleCopy(activeAccount.accountNumber, activeAccount.id)}
+                    className="px-2.5 py-1.5 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded-lg text-xs font-mono font-bold text-emerald-800 flex items-center gap-1 transition-all cursor-pointer shadow-2xs"
+                  >
+                    <span>{activeAccount.accountNumber}</span>
+                    {copiedId === activeAccount.id ? (
+                      <Check className="w-3.5 h-3.5 text-emerald-600" />
+                    ) : (
+                      <Copy className="w-3.5 h-3.5 text-slate-400" />
+                    )}
+                  </button>
                 </div>
-                <p className="text-[10px] text-slate-400 text-right">
-                  Admin Helpline: 0317 1759093 &bull; 0315 4453745
+
+                {/* The Barcode Image */}
+                <div className="relative mx-auto w-48 sm:w-52 h-48 sm:h-52 bg-white rounded-2xl border-2 border-emerald-500/40 p-2.5 shadow-md flex items-center justify-center overflow-hidden group">
+                  <img
+                    src={activeAccount.qrImage}
+                    alt={`${activeAccount.name} Barcode / QR Code`}
+                    className="w-full h-full object-contain rounded-xl"
+                  />
+                  <div className="absolute inset-x-0 bottom-0 bg-emerald-950/80 text-emerald-200 text-[9.5px] py-1 font-semibold flex items-center justify-center gap-1">
+                    <ScanLine className="w-3 h-3 text-emerald-400" />
+                    <span>Scan with {activeAccount.name} App</span>
+                  </div>
+                </div>
+
+                <p className="text-[10.5px] text-slate-500 leading-tight">
+                  Open your mobile banking or wallet app, scan this barcode, or transfer directly to account number above.
                 </p>
               </div>
 
-              {/* ── Screenshot Upload ── */}
+              {/* ── Screenshot Proof Upload (Required, replaces TID box) ── */}
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1.5">
-                  Payment Screenshot <span className="text-emerald-600 font-bold">(Recommended)</span>
+                <label className="text-xs font-black text-slate-800 block mb-1.5 flex items-center gap-1.5">
+                  <ImageIcon className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Upload Payment Screenshot Proof *</span>
                 </label>
 
                 {proofPreview ? (
-                  <div className="relative rounded-xl overflow-hidden border border-emerald-300 bg-emerald-50">
+                  <div className="relative rounded-2xl overflow-hidden border-2 border-emerald-300 bg-emerald-50/70 p-3 flex flex-col items-center gap-2">
                     <img
                       src={proofPreview}
-                      alt="Payment proof"
-                      className="w-full max-h-48 object-contain"
+                      alt="Payment proof screenshot"
+                      className="max-h-48 w-full object-contain rounded-xl bg-white border border-emerald-200 shadow-2xs"
                     />
-                    <button
-                      type="button"
-                      onClick={handleRemoveImage}
-                      className="absolute top-2 right-2 p-1.5 bg-rose-600 text-white rounded-lg hover:bg-rose-700 transition-colors"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </button>
-                    <div className="p-2 flex items-center gap-1.5 text-[10px] text-emerald-800 font-semibold">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                      {proofImage?.name} ({(proofImage?.size / 1024).toFixed(0)} KB)
+                    <div className="w-full flex items-center justify-between text-xs pt-1">
+                      <div className="flex items-center gap-1.5 text-emerald-800 font-bold truncate">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                        <span className="truncate">{proofImage?.name}</span>
+                        <span className="text-[10px] text-emerald-600 font-normal shrink-0">
+                          ({(proofImage?.size / 1024).toFixed(0)} KB)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="px-2.5 py-1 bg-rose-100 hover:bg-rose-200 text-rose-700 text-xs font-bold rounded-lg flex items-center gap-1 transition-colors shrink-0"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Remove</span>
+                      </button>
                     </div>
                   </div>
                 ) : (
-                  <button
-                    type="button"
+                  <div
                     onClick={() => fileInputRef.current?.click()}
-                    className="w-full border-2 border-dashed border-slate-300 hover:border-emerald-400 bg-slate-50 hover:bg-emerald-50/40 rounded-xl p-4 text-center transition-all cursor-pointer group"
+                    className="border-2 border-dashed border-emerald-300 hover:border-emerald-500 bg-emerald-50/40 hover:bg-emerald-50/70 rounded-2xl p-5 text-center transition-all cursor-pointer group"
                   >
-                    <ImageIcon className="w-7 h-7 text-slate-400 group-hover:text-emerald-600 mx-auto mb-1.5 transition-colors" />
-                    <p className="text-xs font-semibold text-slate-600 group-hover:text-emerald-800">
-                      Upload payment screenshot
+                    <div className="w-10 h-10 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto mb-2 group-hover:scale-110 transition-transform shadow-xs">
+                      <Upload className="w-5 h-5" />
+                    </div>
+                    <p className="text-xs font-black text-slate-800 group-hover:text-emerald-900">
+                      Tap here to upload payment screenshot
                     </p>
-                    <p className="text-[10px] text-slate-400 mt-0.5">
-                      JPG, PNG, WEBP &bull; max 5MB
+                    <p className="text-[10.5px] text-slate-500 mt-0.5">
+                      Screenshot of transaction from your bank / EasyPaisa / JazzCash app (JPG, PNG, WEBP)
                     </p>
-                  </button>
+                  </div>
                 )}
                 <input
                   ref={fileInputRef}
@@ -372,51 +360,41 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                 />
               </div>
 
-              {/* ── Error ── */}
-              {error && (
-                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-semibold">
-                  {error}
-                </div>
-              )}
-
-              {/* ── Transaction ID ── */}
+              {/* ── Optional Sender Notes ── */}
               <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
-                  Transaction ID (TID) / Reference Number <span className="text-rose-500">*</span>
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. JC992817291 or Bank Ref 01054353"
-                  value={referenceCode}
-                  onChange={(e) => setReferenceCode(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono text-slate-900 outline-none focus:border-emerald-500 focus:bg-white transition-all font-semibold"
-                />
-              </div>
-
-              {/* ── Sender Notes ── */}
-              <div>
-                <label className="text-xs font-bold text-slate-700 block mb-1">
+                <label className="text-[11px] font-bold text-slate-600 block mb-1">
                   Sender Account / Notes <span className="text-slate-400 font-normal">(Optional)</span>
                 </label>
                 <input
                   type="text"
-                  placeholder="e.g. Transferred from 0300-1234567"
+                  placeholder="e.g. Transferred from 0300-1234567 or Meezan account"
                   value={notes}
                   onChange={(e) => setNotes(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500 focus:bg-white transition-all"
+                  className="w-full px-3.5 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-emerald-500 focus:bg-white transition-all"
                 />
               </div>
 
+              {/* ── Error Display ── */}
+              {error && (
+                <div className="p-3 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-bold">
+                  {error}
+                </div>
+              )}
+
+              <p className="text-[10px] text-slate-400 text-center">
+                Need urgent help? Admin Helpline: 0317 1759093 &bull; 0315 4453745
+              </p>
+
             </form>
           )}
+
         </div>
 
-        {/* Footer */}
+        {/* Modal Footer */}
         {!success && (
           <div className="p-3.5 sm:p-4 border-t border-slate-100 shrink-0 bg-slate-50/90 flex items-center justify-between gap-2.5">
-            <span className="text-[10px] text-slate-500 font-semibold hidden sm:block">
-              Fee: <span className="text-emerald-700 font-black">PKR {platformFee.toLocaleString()}</span>
+            <span className="text-[10.5px] text-slate-500 font-semibold hidden sm:block">
+              Fee: <strong className="text-emerald-800 font-black">PKR {platformFee.toLocaleString()}</strong>
             </span>
             <div className="flex items-center gap-2 ml-auto">
               <button
@@ -429,18 +407,18 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
               <button
                 type="submit"
                 form="tutor-fee-modal-form"
-                disabled={submitting || !referenceCode.trim()}
-                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-md disabled:opacity-50 transition-all cursor-pointer flex items-center gap-1.5"
+                disabled={submitting || !proofImage}
+                className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-black rounded-xl shadow-md disabled:opacity-50 transition-all cursor-pointer flex items-center gap-1.5"
               >
                 {submitting ? (
                   <>
                     <Clock className="w-3.5 h-3.5 animate-spin" />
-                    <span>Submitting...</span>
+                    <span>Submitting Proof...</span>
                   </>
                 ) : (
                   <>
                     <ShieldCheck className="w-4 h-4" />
-                    <span>Submit Proof</span>
+                    <span>Submit Screenshot Proof</span>
                   </>
                 )}
               </button>

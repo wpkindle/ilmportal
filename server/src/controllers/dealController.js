@@ -385,13 +385,6 @@ exports.submitPaymentProof = async (req, res) => {
   try {
     const { paymentMethod, referenceCode, notes } = req.body;
 
-    if (!referenceCode) {
-      return res.status(400).json({
-        success: false,
-        message: 'Please provide the transaction ID (TID) / reference code of your payment.'
-      });
-    }
-
     const deal = await Deal.findById(req.params.id)
       .populate('student', 'name email')
       .populate('tutor', 'name email');
@@ -400,6 +393,13 @@ exports.submitPaymentProof = async (req, res) => {
       return res.status(404).json({
         success: false,
         message: 'Deal not found'
+      });
+    }
+
+    if (!req.file && !referenceCode && !deal.proofImageUrl) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please upload a screenshot proof of your payment.'
       });
     }
 
@@ -426,8 +426,8 @@ exports.submitPaymentProof = async (req, res) => {
     }
 
     deal.paymentStatus = 'submitted_proof';
-    deal.paymentMethod = paymentMethod || 'jazzcash';
-    deal.paymentProofReference = referenceCode.trim();
+    deal.paymentMethod = paymentMethod || 'meezan';
+    deal.paymentProofReference = (referenceCode || '').trim() || 'Screenshot Proof Attached';
     deal.paymentProofNotes = notes || '';
     if (proofImageUrl) deal.proofImageUrl = proofImageUrl;
     await deal.save();

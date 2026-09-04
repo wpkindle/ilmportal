@@ -139,31 +139,31 @@ function CourseSearchContent() {
     Boolean(filters.tuitionRange);
 
   return (
-    <div className="min-h-screen bg-slate-50/50 py-8 sm:py-12">
+    <div className="min-h-screen bg-[#faf8f5] py-8 sm:py-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Top Header & Search Bar Banner */}
-        <div className="bg-white rounded-3xl border border-slate-200/90 p-6 sm:p-8 shadow-sm space-y-5">
+        <div className="bg-white rounded-3xl border border-[#e6ded1] p-6 sm:p-8 shadow-sm space-y-5">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">
-                <BookOpen className="w-4 h-4" />
-                <span>Structured Learning Tracks & Curriculums</span>
+              <div className="flex items-center gap-2 text-xs font-bold text-[#b85d34] uppercase tracking-wider mb-1">
+                <BookOpen className="w-4 h-4 text-[#b85d34]" />
+                <span>Verified Curriculums • Home-Friendly Tutoring</span>
               </div>
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
-                Explore Verified Quran & Academic Courses
+              <h1 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 tracking-tight">
+                Explore Quranic &amp; Academic Curriculums
               </h1>
-              <p className="text-xs sm:text-sm text-slate-500 mt-1">
-                Find modular syllabuses with chapter breakdown, diagnostic assessments, and 1-on-1 tutoring sessions across Pakistan.
+              <p className="text-xs sm:text-sm text-slate-600 mt-1">
+                Structured Noorani Qaida, Tajweed, Hifz, and Cambridge/Matric syllabuses designed for Pakistani students with 1-on-1 verified tutor guidance.
               </p>
             </div>
 
             <button
               type="button"
               onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
-              className="lg:hidden px-4 py-2.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-2xl text-xs font-bold flex items-center justify-center gap-2"
+              className="lg:hidden px-4 py-2.5 bg-[#f5ebe6] text-[#b85d34] border border-[#b85d34]/30 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Filter className="w-4 h-4 text-emerald-600" />
+              <Filter className="w-4 h-4 text-[#b85d34]" />
               <span>{mobileFilterOpen ? 'Hide Filters' : 'Filter & Sort Courses'}</span>
             </button>
           </div>
@@ -177,7 +177,7 @@ function CourseSearchContent() {
                 placeholder="Search course title, syllabus topics (Nazra, Tajweed, Physics, Biology)..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-slate-200/90 rounded-2xl text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-emerald-500 shadow-sm font-medium"
+                className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#e6ded1] rounded-2xl text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#b85d34] shadow-xs font-medium"
               />
               {filters.search && (
                 <button

@@ -153,21 +153,21 @@ function TutorSearchContent() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-slate-50/50 py-6 sm:py-12 pb-24 md:pb-12">
+    <div className="min-h-screen bg-[#faf8f5] py-6 sm:py-12 pb-24 md:pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         
         {/* Top Header & Search Bar */}
-        <div className="bg-white rounded-3xl border border-slate-200/90 p-5 sm:p-8 shadow-sm space-y-4 sm:space-y-5">
+        <div className="bg-white rounded-3xl border border-[#e6ded1] p-5 sm:p-8 shadow-sm space-y-4 sm:space-y-5">
           <div>
-            <div className="flex items-center gap-2 text-xs font-bold text-emerald-600 uppercase tracking-wider mb-1">
-              <Users className="w-4 h-4" />
-              <span>Verified Pakistani Faculty Directory</span>
+            <div className="flex items-center gap-2 text-xs font-bold text-[#b85d34] uppercase tracking-wider mb-1">
+              <Heart className="w-3.5 h-3.5 text-rose-500" />
+              <span>Female-Safe Tutoring Directory • Pakistan</span>
             </div>
-            <h1 className="text-xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Find Your Ideal Quran &amp; Academic Tutor
+            <h1 className="text-xl sm:text-3xl font-serif font-black text-slate-900 tracking-tight">
+              Verified Qaris, Alimahs &amp; Academic Tutors
             </h1>
-            <p className="text-xs sm:text-sm text-slate-500 mt-1">
-              Connect with certified Quran teachers and Cambridge/Matric specialists. Flexible rates and agreed timings.
+            <p className="text-xs sm:text-sm text-slate-600 mt-1">
+              Connect with certified Quran teachers, verified female Alimahs for daughters, and Cambridge/Matric specialists. 1-on-1 classes with camera-off privacy by default.
             </p>
           </div>
 
@@ -176,10 +176,10 @@ function TutorSearchContent() {
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search tutor name, subject (Tajweed, Physics)..."
+                placeholder="Search tutor name, subject (Tajweed, Math, O-Level)..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full pl-10 pr-4 py-3 sm:py-2.5 min-h-[44px] bg-white border border-slate-200/90 rounded-2xl text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-emerald-500 shadow-sm"
+                className="w-full pl-10 pr-4 py-3 sm:py-2.5 min-h-[44px] bg-white border border-[#e6ded1] rounded-2xl text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#b85d34] shadow-xs"
               />
             </div>
 
@@ -198,9 +198,9 @@ function TutorSearchContent() {
             <button
               type="button"
               onClick={() => setMobileFiltersOpen(true)}
-              className="lg:hidden w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[44px] bg-emerald-50 border border-emerald-300 text-emerald-800 rounded-2xl font-bold text-xs shadow-xs active:bg-emerald-100 transition-colors"
+              className="lg:hidden w-full flex items-center justify-center gap-2 py-3 px-4 min-h-[44px] bg-[#f5ebe6] border border-[#b85d34]/30 text-[#b85d34] rounded-2xl font-bold text-xs shadow-xs active:bg-[#ebdcd3] transition-colors"
             >
-              <Users className="w-4 h-4 text-emerald-600" />
+              <Users className="w-4 h-4 text-[#b85d34]" />
               <span>Filter Tutors &amp; Cities</span>
             </button>
           </div>

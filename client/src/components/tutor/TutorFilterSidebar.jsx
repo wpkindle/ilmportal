@@ -63,17 +63,17 @@ const TutorFilterSidebar = ({
   };
 
   return (
-    <div className="bg-white rounded-3xl border border-slate-200/90 p-5 shadow-sm space-y-6">
+    <div className="bg-white rounded-3xl border border-[#e6ded1] p-5 shadow-sm space-y-6">
       
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+      <div className="flex items-center justify-between pb-3 border-b border-[#e6ded1]">
         <div className="flex items-center gap-2">
-          <Filter className="w-4 h-4 text-emerald-600" />
-          <h3 className="font-bold text-xs sm:text-sm text-slate-900">Filter & Sort</h3>
+          <Filter className="w-4 h-4 text-[#0c2217]" />
+          <h3 className="font-bold text-xs sm:text-sm text-slate-900 font-serif">Filter &amp; Sort</h3>
         </div>
         <button
           onClick={onReset}
-          className="text-[11px] font-bold text-slate-500 hover:text-emerald-700 flex items-center gap-1 transition-colors cursor-pointer"
+          className="text-[11px] font-bold text-slate-500 hover:text-[#b85d34] flex items-center gap-1 transition-colors cursor-pointer"
         >
           <RotateCcw className="w-3 h-3" />
           <span>Reset</span>
@@ -84,20 +84,20 @@ const TutorFilterSidebar = ({
       <button
         type="button"
         onClick={() => onFilterChange('gender', filters.gender === 'female' ? '' : 'female')}
-        className={`w-full p-3 rounded-2xl border text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+        className={`w-full p-3.5 rounded-2xl border text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
           filters.gender === 'female'
-            ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-500 shadow-md shadow-emerald-700/20'
-            : 'bg-emerald-50/70 hover:bg-emerald-100 text-emerald-950 border-emerald-200/80'
+            ? 'bg-[#b85d34] text-white border-[#b85d34] shadow-md shadow-[#b85d34]/25'
+            : 'bg-[#f5ebe6] hover:bg-[#ebdcd3] text-[#b85d34] border-[#b85d34]/30'
         }`}
       >
         <div className="flex items-center gap-2">
-          <ShieldCheck className={`w-4 h-4 ${filters.gender === 'female' ? 'text-white' : 'text-emerald-700'}`} />
-          <span>Female Tutors Only</span>
+          <Heart className={`w-4 h-4 ${filters.gender === 'female' ? 'text-white' : 'text-[#b85d34]'}`} />
+          <span>Female Alimahs &amp; Tutors Only</span>
         </div>
         <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold uppercase tracking-wider ${
-          filters.gender === 'female' ? 'bg-white/20 text-white' : 'bg-emerald-200/80 text-emerald-900'
+          filters.gender === 'female' ? 'bg-white/20 text-white' : 'bg-white text-[#b85d34] border border-[#b85d34]/30'
         }`}>
-          {filters.gender === 'female' ? 'Active' : 'Alimahs'}
+          {filters.gender === 'female' ? 'Selected' : 'Filter'}
         </span>
       </button>
 

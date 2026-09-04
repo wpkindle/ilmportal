@@ -188,7 +188,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
   return (
     <>
       <TiltCard>
-      <div className="bg-white/95 backdrop-blur-sm rounded-3xl border border-slate-200/80 p-4 sm:p-5 md:p-6 shadow-sm flex flex-col justify-between h-full gap-4 transition-colors duration-300 hover:border-emerald-300/70">
+      <div className="bg-white rounded-3xl border border-[#e6ded1] p-4 sm:p-5 md:p-6 shadow-sm flex flex-col justify-between h-full gap-4 transition-all duration-300 hover:border-[#b85d34]/40 hover:shadow-md">
 
         {/* ── Body ── */}
         <div className="space-y-3.5">
@@ -212,8 +212,8 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                   className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border-2 border-white shadow-md"
                 />
                 {data.isSanadVerified && (
-                  <div className="absolute -bottom-1 -right-1 p-1 bg-emerald-600 text-white rounded-full ring-2 ring-white shadow">
-                    <ShieldCheck className="w-3 h-3" />
+                  <div className="absolute -bottom-1 -right-1 p-1 bg-[#143d2b] text-white rounded-full ring-2 ring-white shadow" title="Sanad Verified Faculty">
+                    <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
                   </div>
                 )}
               </div>
@@ -222,24 +222,24 @@ const TutorCard = ({ tutor, tutorProfile }) => {
               <div className="min-w-0">
                 <Link
                   href={`/tutors/${data._id}`}
-                  className="font-black text-sm sm:text-[15px] text-slate-900 hover:text-emerald-700 transition-colors leading-tight line-clamp-1"
+                  className="font-serif font-black text-sm sm:text-[15px] text-slate-900 hover:text-[#0c2217] transition-colors leading-tight line-clamp-1"
                 >
                   {tutorName}
                 </Link>
 
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500 mt-0.5">
                   <span className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-emerald-600 shrink-0" />
+                    <MapPin className="w-3 h-3 text-[#b85d34] shrink-0" />
                     {tutorCity}
                   </span>
                   <span className="text-slate-300">·</span>
                   {data.gender === 'female' ? (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-teal-700 bg-teal-50 px-2 py-0.5 rounded-full border border-teal-200">
-                      <ShieldCheck className="w-3 h-3 text-teal-600" />
-                      <span>Female Teacher</span>
+                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#b85d34] bg-[#f5ebe6] px-2 py-0.5 rounded-full border border-[#b85d34]/30">
+                      <Heart className="w-3 h-3 text-rose-500" />
+                      <span>Verified Female Alimah</span>
                     </span>
                   ) : (
-                    <span className="capitalize text-slate-600">{data.gender || 'Tutor'}</span>
+                    <span className="capitalize text-slate-600 font-medium">{data.gender || 'Tutor'}</span>
                   )}
                 </div>
 
@@ -276,7 +276,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
             {data.subjects?.slice(0, 3).map((subj) => (
               <span
                 key={subj._id || subj}
-                className="text-[10.5px] font-semibold bg-emerald-50 text-emerald-800 border border-emerald-200/60 px-2.5 py-0.5 rounded-lg whitespace-nowrap"
+                className="text-[10.5px] font-semibold bg-[#f0eae1] text-[#0c2217] border border-[#e6ded1] px-2.5 py-0.5 rounded-lg whitespace-nowrap"
               >
                 {subj.name || subj}
               </span>
@@ -289,14 +289,14 @@ const TutorCard = ({ tutor, tutorProfile }) => {
           </div>
 
           {/* Credentials + Mode row */}
-          <div className="grid grid-cols-2 gap-3 pt-3 border-t border-slate-100 text-xs">
+          <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#e6ded1] text-xs">
             {/* Qualifications */}
             <div className="space-y-0.5 min-w-0">
               <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wide">
                 Qualifications
               </span>
               <p className="font-semibold text-slate-800 text-[11px] truncate">
-                {data.qualifications || 'Certified Tutor'}
+                {data.qualifications || 'Certified Educator'}
               </p>
             </div>
 
@@ -315,21 +315,21 @@ const TutorCard = ({ tutor, tutorProfile }) => {
         </div>
 
         {/* ── Footer Action Row ── */}
-        <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-3 flex-wrap">
+        <div className="pt-3 border-t border-[#e6ded1] flex items-center justify-between gap-3 flex-wrap">
           <div>
             <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wide">
-              Fee / Rate
+              Tuition Rate
             </span>
-            <p className="text-xs font-bold text-emerald-800 flex items-center gap-1 mt-0.5">
-              <Sparkles className="w-3 h-3 text-emerald-600 shrink-0" />
-              <span>Flexible / Negotiable</span>
+            <p className="text-xs font-bold text-[#0c2217] flex items-center gap-1 mt-0.5">
+              <Sparkles className="w-3 h-3 text-[#d4a359] shrink-0" />
+              <span>Direct Agreed Rate</span>
             </p>
           </div>
 
           <div className="flex items-center gap-2 shrink-0">
             <Link
               href={`/tutors/${data._id}`}
-              className="px-3 py-2 rounded-xl text-slate-600 hover:text-emerald-700 hover:bg-slate-50 border border-slate-200 hover:border-emerald-200 transition-all text-xs font-bold"
+              className="px-3 py-2 rounded-xl text-slate-700 hover:text-[#0c2217] hover:bg-[#f5f0e6] border border-[#e6ded1] transition-all text-xs font-bold"
             >
               Profile
             </Link>
@@ -338,7 +338,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
               <motion.button
                 onClick={handleStartChat}
                 whileTap={{ scale: 0.94 }}
-                className="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-lg shadow-emerald-600/25 transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-md shadow-[#b85d34]/25 transition-colors flex items-center gap-1.5 cursor-pointer"
               >
                 <MessageSquare className="w-3.5 h-3.5 shrink-0" />
                 <span className="whitespace-nowrap">Message Tutor</span>

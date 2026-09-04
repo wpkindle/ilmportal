@@ -131,35 +131,39 @@ export default function Hero() {
                 className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-[#143d2b] hover:bg-[#1e543c] border border-[#2b6e51]/60 text-[#d4a359] text-xs font-bold transition-all shadow-sm group"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-                <span>Verified Qaris &amp; Academic Tutors in Pakistan</span>
+                <span>Female-First Safety • Verified Qaris, Alimahs &amp; Academic Tutors</span>
                 <ChevronRight className="w-3 h-3 text-[#d4a359] group-hover:translate-x-0.5 transition-transform" />
               </Link>
             </div>
 
             {/* Main Editorial Headline with Dramatic Contrast */}
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-black tracking-tight text-white leading-[1.12]">
-              Real Quran teachers &amp; school tutors for your children,{' '}
-              <span className="hand-drawn-underline text-[#faf8f5]">right at home.</span>
+              Verified Qaris, Alimahs &amp; Academic Tutors,{' '}
+              <span className="hand-drawn-underline text-[#faf8f5]">safe at home.</span>
             </h1>
 
             {/* Humanized, Colloquial Pakistani Copy */}
             <p className="text-sm sm:text-base text-[#d1dbd6] max-w-xl leading-relaxed font-normal">
-              Vetted with CNIC and Sanad certificates. Qualified female Alimahs for daughters. Live 1-on-1 classes with camera-off privacy by default — no crowded tuition centers, no commute, and agreed fees directly with your teacher.
+              Designed specifically so female learners, daughters, and mothers feel 100% comfortable and protected. Verified female Alimahs from Wafaq-ul-Madaris, certified Qaris, and top school tutors. 1-on-1 classes with camera-off privacy by default, zero personal phone number sharing, and agreed fees directly with your educator.
             </p>
 
             {/* Key Assurance Signals */}
             <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-semibold">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b]/80 border border-[#2b6e51]/50 text-[#e5f3ec]">
+                <Heart className="w-3.5 h-3.5 text-rose-400" />
+                <span>100% Female Privacy &amp; Comfort</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b]/80 border border-[#2b6e51]/50 text-[#e5f3ec]">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#388e6a]" />
-                <span>CNIC &amp; Sanad Verified</span>
+                <span>Verified Qaris &amp; Alimahs (Sanad)</span>
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b]/80 border border-[#2b6e51]/50 text-[#e5f3ec]">
                 <Lock className="w-3.5 h-3.5 text-[#d4a359]" />
                 <span>Camera-Off by Default</span>
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b]/80 border border-[#2b6e51]/50 text-[#e5f3ec]">
-                <Heart className="w-3.5 h-3.5 text-rose-400" />
-                <span>Female Tutors for Girls &amp; Kids</span>
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Zero Personal Contact Sharing</span>
               </span>
             </div>
 
@@ -275,8 +279,8 @@ export default function Hero() {
               {/* Main Editorial Card with Contextual Image */}
               <div className="relative rounded-3xl overflow-hidden border-2 border-[#2b6e51]/50 bg-[#07150e] shadow-2xl">
                 <img
-                  src="https://images.unsplash.com/photo-1577896851231-70ef18881754?w=800&auto=format&fit=crop&q=80"
-                  alt="Pakistani student learning Quran Tajweed and academic lessons online from home with complete family privacy"
+                  src="https://images.unsplash.com/photo-1509062522246-3755977927d7?w=800&auto=format&fit=crop&q=80"
+                  alt="Verified Pakistani tutor and student engaged in 1:1 online tutoring session with complete family privacy"
                   className="w-full h-72 sm:h-80 object-cover opacity-90 filter brightness-[0.92] contrast-[1.05]"
                   loading="eager"
                   fetchPriority="high"
@@ -290,37 +294,37 @@ export default function Hero() {
                   <div className="flex items-center justify-between">
                     <span className="font-bold text-white flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                      <span>Live 1:1 Browser Classroom</span>
+                      <span>1:1 Tutor &amp; Student Learning</span>
                     </span>
                     <span className="text-[10px] font-mono text-[#d4a359] bg-[#143d2b] px-2 py-0.5 rounded border border-[#2b6e51]/50">
-                      No Zoom Needed
+                      Camera-Off Option
                     </span>
                   </div>
                   <p className="text-[11px] text-[#a3b8b0] leading-snug">
-                    Integrated digital Quran, audio playback, interactive whiteboard, and screen sharing right in your browser.
+                    Safe, personalized classes with verified Qaris, Alimahs, and Cambridge/Matric specialists.
                   </p>
                 </div>
               </div>
 
               {/* Floating Trust Artifact 1: Verified Sanad & CNIC Stamp (Top Right) */}
-              <div className="absolute -top-4 -right-3 sm:-right-4 bg-white text-slate-900 p-3 rounded-2xl shadow-xl border border-slate-200 space-y-1 max-w-[200px] transform rotate-1">
+              <div className="absolute -top-4 -right-3 sm:-right-4 bg-white text-slate-900 p-3 rounded-2xl shadow-xl border border-slate-200 space-y-1 max-w-[210px] transform rotate-1">
                 <div className="flex items-center gap-1.5 text-emerald-800 font-extrabold text-xs">
                   <Award className="w-4 h-4 text-amber-500 shrink-0" />
-                  <span>Sanad &amp; CNIC</span>
+                  <span>Verified Qaris &amp; Alimahs</span>
                 </div>
                 <p className="text-[10px] text-slate-600 leading-tight">
-                  Manually verified with Wafaq-ul-Madaris &amp; university credentials.
+                  Wafaq-ul-Madaris Sanad &amp; Government CNIC verified for family trust.
                 </p>
               </div>
 
-              {/* Floating Trust Artifact 2: Camera-Off Privacy Guarantee (Bottom Left) */}
-              <div className="absolute -bottom-4 -left-3 sm:-left-4 bg-[#07150e] text-[#f5f0e6] p-3 rounded-2xl shadow-2xl border-2 border-[#2b6e51] space-y-1 max-w-[210px] transform -rotate-1">
+              {/* Floating Trust Artifact 2: Female Privacy Shield (Bottom Left) */}
+              <div className="absolute -bottom-4 -left-3 sm:-left-4 bg-[#07150e] text-[#f5f0e6] p-3 rounded-2xl shadow-2xl border-2 border-[#2b6e51] space-y-1 max-w-[220px] transform -rotate-1">
                 <div className="flex items-center gap-1.5 text-[#d4a359] font-bold text-xs">
-                  <Camera className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span>Camera-Off by Default</span>
+                  <Heart className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+                  <span>Female Safety &amp; Comfort</span>
                 </div>
                 <p className="text-[10px] text-[#a3b8b0] leading-tight">
-                  Student video remains completely disabled unless family chooses otherwise.
+                  Camera-off by default, zero phone number leaks, and dedicated female tutors.
                 </p>
               </div>
 
@@ -345,14 +349,14 @@ export default function Hero() {
               </p>
             </div>
 
-            {/* Feature 2: Family Privacy */}
+            {/* Feature 2: Female Safety & Comfort */}
             <div className="p-4 rounded-2xl bg-[#143d2b]/50 border border-[#2b6e51]/40 space-y-1">
               <div className="flex items-center gap-2 text-[#d4a359] font-bold text-xs">
-                <Lock className="w-4 h-4 shrink-0 text-amber-400" />
-                <span>Family Privacy Protocol</span>
+                <Heart className="w-4 h-4 shrink-0 text-rose-400" />
+                <span>Female Safety &amp; Comfort</span>
               </div>
               <p className="text-xs text-[#a3b8b0] leading-relaxed">
-                Camera off by default, dedicated female tutor gate, and private messaging without exchanging personal numbers.
+                Camera-off by default, verified female Alimahs for daughters, and private messaging with zero personal numbers shared.
               </p>
             </div>
 

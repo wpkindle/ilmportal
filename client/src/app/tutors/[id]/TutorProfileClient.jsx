@@ -117,11 +117,11 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
   };
 
   return (
-    <div className="py-8 bg-slate-50 min-h-screen">
+    <div className="py-8 bg-[#faf8f5] min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Top Profile Card */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/90 shadow-2xs space-y-6">
+        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e6ded1] shadow-xs space-y-6">
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
@@ -137,21 +137,28 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                       e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=059669&color=fff`;
                     }
                   }}
-                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl object-cover border-2 border-slate-100 shadow-sm"
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl object-cover border-2 border-[#e6ded1] shadow-sm"
                 />
                 {tutor.isSanadVerified && (
-                  <div className="absolute -bottom-1 -right-1 p-1.5 bg-emerald-600 text-white rounded-full ring-2 ring-white">
-                    <ShieldCheck className="w-4 h-4" />
+                  <div className="absolute -bottom-1 -right-1 p-1.5 bg-[#143d2b] text-white rounded-full ring-2 ring-white" title="Sanad Verified">
+                    <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
                   </div>
                 )}
               </div>
 
               <div className="space-y-1.5">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-xl sm:text-2xl font-black text-slate-900">{tutorName}</h1>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-100 text-emerald-800">
-                    {tutor.gender || 'Teacher'}
-                  </span>
+                  <h1 className="text-xl sm:text-2xl font-serif font-black text-slate-900">{tutorName}</h1>
+                  {isFemaleTutor ? (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-[#f5ebe6] text-[#b85d34] border border-[#b85d34]/30">
+                      <Heart className="w-3.5 h-3.5 text-rose-500" />
+                      <span>Verified Female Alimah</span>
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-[#f0eae1] text-[#0c2217]">
+                      {tutor.gender || 'Teacher'}
+                    </span>
+                  )}
                   {tutorUser.status === 'under_review' ? (
                     <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-orange-100 text-orange-800 border border-orange-200">
                       <Search className="w-3 h-3" />
@@ -163,15 +170,15 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                       <span>Policy Warning</span>
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-[#143d2b]/10 text-[#0c2217] border border-[#2b6e51]/30">
+                      <CheckCircle2 className="w-3 h-3 text-[#2b6e51]" />
                       <span>Verified Faculty</span>
                     </span>
                   )}
                 </div>
 
                 <p className="text-xs sm:text-sm font-semibold text-slate-600 flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-emerald-600" />
+                  <MapPin className="w-4 h-4 text-[#b85d34]" />
                   <span>{tutorUser.city || 'Pakistan'}</span>
                   <span>&bull;</span>
                   <span className="capitalize">{tutor.teachingMode === 'both' ? 'Online & In-Person' : tutor.teachingMode}</span>
@@ -197,15 +204,13 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                 onClick={() => setSanadModalOpen(true)}
               />
 
-
-
               {user?.role !== 'tutor' && (
                 <button
                   onClick={handleStartChat}
-                  className="px-6 py-3 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-emerald-600/20 transition-all flex items-center justify-center gap-2"
+                  className="px-6 py-3 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-98 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-[#b85d34]/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
                 >
                   <MessageSquare className="w-4 h-4" />
-                  <span>Message & Discuss Schedule</span>
+                  <span>Message &amp; Discuss Schedule</span>
                 </button>
               )}
             </div>

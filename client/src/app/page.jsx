@@ -10,14 +10,14 @@ import FAQ from '../components/home/FAQ';
 import { api } from '../services/api';
 
 export const metadata = {
-  title: 'Online Quran & Academic Tutors Pakistan | Verified Qaris & School Teachers | IlmPortal',
-  description: 'Connect with verified Pakistani Quran Qaris, female Alimahs, and Cambridge/Matric academic tutors. Safe 1:1 online classes from Lahore, Karachi, Islamabad & nationwide with camera-off privacy by default.',
+  title: 'Verified Qaris, Alimahs & Academic Tutors in Pakistan | Female-Safe | IlmPortal',
+  description: 'Connect with verified Pakistani Quran Qaris, certified female Alimahs, and Cambridge/Matric tutors. Designed especially for female privacy & comfort with camera-off classes by default.',
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'Online Quran & Academic Tutors Pakistan | IlmPortal',
-    description: 'Connect with verified Pakistani Quran Qaris and Cambridge/Matric educators for live 1:1 video classrooms with camera-off privacy by default.',
+    title: 'Verified Qaris, Alimahs & Academic Tutors in Pakistan | IlmPortal',
+    description: 'Connect with verified Pakistani Quran Qaris, female Alimahs, and Cambridge/Matric educators with camera-off privacy by default.',
     url: 'https://pakistanlms.pk',
   },
 };

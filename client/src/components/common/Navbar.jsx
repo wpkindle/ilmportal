@@ -275,7 +275,7 @@ const Navbar = () => {
     <>
       <PromotionTopBar />
       <header
-        className={`fixed left-0 right-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-2xs transition-[top] duration-150 ${
+        className={`fixed left-0 right-0 z-40 bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e6ded1] shadow-2xs transition-[top] duration-150 ${
           scrolledPastTopBar ? 'top-0' : 'top-0 md:top-[37px]'
         }`}
       >
@@ -284,20 +284,20 @@ const Navbar = () => {
           
           {/* Brand Logo & Tagline */}
           <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-emerald-800 via-emerald-600 to-teal-500 flex items-center justify-center text-white shadow-md shadow-emerald-700/20 group-hover:scale-105 transition-transform">
-              <BookOpen className="w-5 h-5" />
+            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#0c2217] flex items-center justify-center text-[#faf8f5] shadow-md shadow-[#0c2217]/20 group-hover:scale-105 transition-transform border border-[#2b6e51]/50">
+              <BookOpen className="w-5 h-5 text-[#d4a359]" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-lg sm:text-xl font-black tracking-tight text-slate-900 font-display">
-                  Ilm<span className="text-emerald-700">Portal</span>
+                <span className="text-lg sm:text-xl font-serif font-black tracking-tight text-slate-900">
+                  Ilm<span className="text-[#0c2217]">Portal</span>
                 </span>
-                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-800 border border-emerald-200/60">
+                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-extrabold uppercase bg-[#143d2b] text-[#f5f0e6] border border-[#2b6e51]/40">
                   Pakistan
                 </span>
               </div>
-              <p className="text-[9.5px] font-medium text-slate-400 -mt-0.5 hidden sm:block">
-                Quran & Academic Tutoring Platform
+              <p className="text-[9.5px] font-medium text-slate-500 -mt-0.5 hidden sm:block">
+                Quran &amp; Academic Tutoring • Female-Safe
               </p>
             </div>
           </Link>
@@ -308,12 +308,12 @@ const Navbar = () => {
               href="/courses"
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                 pathname.startsWith('/courses')
-                  ? 'text-emerald-800 bg-emerald-50'
-                  : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
+                  ? 'text-[#0c2217] bg-[#ede6db]'
+                  : 'text-slate-700 hover:text-[#0c2217] hover:bg-[#f3ece2]'
               }`}
             >
               <span>Courses</span>
-              <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-emerald-600 text-white">
+              <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-[#b85d34] text-white">
                 New
               </span>
             </Link>
@@ -322,8 +322,8 @@ const Navbar = () => {
               href="/tutors"
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 pathname === '/tutors'
-                  ? 'text-emerald-800 bg-emerald-50'
-                  : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
+                  ? 'text-[#0c2217] bg-[#ede6db]'
+                  : 'text-slate-700 hover:text-[#0c2217] hover:bg-[#f3ece2]'
               }`}
             >
               Find Tutors
@@ -335,19 +335,19 @@ const Navbar = () => {
                 onClick={() => setSubjectsDropdownOpen(!subjectsDropdownOpen)}
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                   subjectsDropdownOpen || pathname.includes('/tutors')
-                    ? 'text-emerald-800 bg-emerald-50'
-                    : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
+                    ? 'text-[#0c2217] bg-[#ede6db]'
+                    : 'text-slate-700 hover:text-[#0c2217] hover:bg-[#f3ece2]'
                 }`}
               >
                 <span>Subjects</span>
-                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${subjectsDropdownOpen ? 'rotate-180 text-emerald-600' : 'text-slate-400'}`} />
+                <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${subjectsDropdownOpen ? 'rotate-180 text-[#0c2217]' : 'text-slate-400'}`} />
               </button>
 
               {subjectsDropdownOpen && (
-                <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-[680px] max-w-[calc(100vw-2rem)] bg-white rounded-3xl shadow-2xl border border-slate-200/90 p-4 sm:p-5 z-50 animate-in fade-in slide-in-from-top-2 duration-150 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
+                <div className="absolute left-1/2 -translate-x-1/2 mt-2 w-[680px] max-w-[calc(100vw-2rem)] bg-[#faf8f5] rounded-3xl shadow-2xl border border-[#e6ded1] p-4 sm:p-5 z-50 animate-in fade-in slide-in-from-top-2 duration-150 grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5">
                   {subjectCategories.map((cat, idx) => (
                     <div key={idx} className="space-y-2">
-                      <div className="flex items-center gap-2 pb-1 border-b border-slate-100">
+                      <div className="flex items-center gap-2 pb-1 border-b border-[#e6ded1]">
                         <div className={`p-1.5 rounded-lg ${cat.color}`}>
                           <cat.icon className="w-3.5 h-3.5" />
                         </div>
@@ -359,7 +359,7 @@ const Navbar = () => {
                             <Link
                               href={item.link}
                               onClick={() => setSubjectsDropdownOpen(false)}
-                              className="text-[11px] font-semibold text-slate-600 hover:text-emerald-700 hover:translate-x-0.5 block py-0.5 transition-all"
+                              className="text-[11px] font-semibold text-slate-600 hover:text-[#0c2217] hover:translate-x-0.5 block py-0.5 transition-all"
                             >
                               &bull; {item.name}
                             </Link>
@@ -368,12 +368,12 @@ const Navbar = () => {
                       </ul>
                     </div>
                   ))}
-                  <div className="col-span-1 md:col-span-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs">
+                  <div className="col-span-1 md:col-span-3 pt-2.5 border-t border-[#e6ded1] flex items-center justify-between text-xs">
                     <span className="text-slate-500 font-medium">Over 20+ subjects &amp; courses</span>
                     <Link
                       href="/courses"
                       onClick={() => setSubjectsDropdownOpen(false)}
-                      className="font-bold text-emerald-700 hover:underline flex items-center gap-1"
+                      className="font-bold text-[#b85d34] hover:underline flex items-center gap-1"
                     >
                       <span>View All Courses</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -387,8 +387,8 @@ const Navbar = () => {
               href="/how-it-works"
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
                 pathname === '/how-it-works'
-                  ? 'text-emerald-800 bg-emerald-50'
-                  : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
+                  ? 'text-[#0c2217] bg-[#ede6db]'
+                  : 'text-slate-700 hover:text-[#0c2217] hover:bg-[#f3ece2]'
               }`}
             >
               How It Works
@@ -398,12 +398,12 @@ const Navbar = () => {
               href="/safety"
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                 pathname === '/safety'
-                  ? 'text-emerald-800 bg-emerald-50'
-                  : 'text-slate-700 hover:text-emerald-700 hover:bg-slate-50'
+                  ? 'text-[#b85d34] bg-[#f5ebe6] border border-[#b85d34]/30'
+                  : 'text-[#0c2217] hover:text-[#b85d34] hover:bg-[#f5ebe6]'
               }`}
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-              <span>Safety &amp; Privacy</span>
+              <Heart className="w-3.5 h-3.5 text-[#b85d34]" />
+              <span>Female Safety &amp; Privacy</span>
             </Link>
           </nav>
 
@@ -735,17 +735,17 @@ const Navbar = () => {
               <div className="hidden lg:flex items-center gap-1.5 sm:gap-2">
                 <Link
                   href="/login?role=student"
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-900 hover:bg-slate-800 active:bg-slate-950 text-white text-xs font-bold rounded-xl shadow-xs transition-all"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] text-xs font-bold rounded-xl shadow-xs transition-all border border-[#2b6e51]/40"
                 >
-                  <GraduationCap className="w-3.5 h-3.5 text-emerald-400" />
+                  <GraduationCap className="w-3.5 h-3.5 text-[#d4a359]" />
                   <span>Student Portal</span>
                 </Link>
 
                 <Link
                   href="/login?role=tutor"
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white text-xs font-bold rounded-xl shadow-xs hover:shadow-md transition-all"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#854020] text-white text-xs font-bold rounded-xl shadow-xs hover:shadow-md transition-all"
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-200" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-amber-200" />
                   <span>Tutor Portal</span>
                 </Link>
               </div>
@@ -754,10 +754,10 @@ const Navbar = () => {
             {/* Mobile Menu Toggle Button (44x44px touch target) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-700 hover:bg-slate-100 active:scale-95 transition-all"
+              className="lg:hidden p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-700 hover:bg-[#f0eae1] active:scale-95 transition-all"
               aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-6 h-6 text-[#0c2217]" /> : <Menu className="w-6 h-6 text-[#0c2217]" />}
             </button>
           </div>
 
@@ -765,23 +765,23 @@ const Navbar = () => {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-slate-200 py-4 px-3 space-y-3 animate-in slide-in-from-top-2 duration-150 bg-white/95 backdrop-blur-md">
+          <div className="lg:hidden border-t border-[#e6ded1] py-4 px-3 space-y-3 animate-in slide-in-from-top-2 duration-150 bg-[#faf8f5]/98 backdrop-blur-md">
             {!isAuthenticated && (
-              <div className="grid grid-cols-2 gap-2 pb-3 border-b border-slate-100">
+              <div className="grid grid-cols-2 gap-2 pb-3 border-b border-[#e6ded1]">
                 <Link
                   href="/login?role=student"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 py-3 min-h-[44px] bg-slate-900 active:bg-slate-950 text-white rounded-2xl text-xs font-bold text-center transition-transform active:scale-95 shadow-sm"
+                  className="flex items-center justify-center gap-2 py-3 min-h-[44px] bg-[#0c2217] active:bg-[#07150e] text-[#faf8f5] rounded-2xl text-xs font-bold text-center transition-transform active:scale-95 shadow-sm border border-[#2b6e51]/40"
                 >
-                  <GraduationCap className="w-4 h-4 text-emerald-400" />
+                  <GraduationCap className="w-4 h-4 text-[#d4a359]" />
                   <span>Student Portal</span>
                 </Link>
                 <Link
                   href="/login?role=tutor"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 py-3 min-h-[44px] bg-emerald-600 active:bg-emerald-700 text-white rounded-2xl text-xs font-bold text-center transition-transform active:scale-95 shadow-sm"
+                  className="flex items-center justify-center gap-2 py-3 min-h-[44px] bg-[#b85d34] active:bg-[#9e4e2a] text-white rounded-2xl text-xs font-bold text-center transition-transform active:scale-95 shadow-sm"
                 >
-                  <ShieldCheck className="w-4 h-4 text-emerald-200" />
+                  <ShieldCheck className="w-4 h-4 text-amber-200" />
                   <span>Tutor Portal</span>
                 </Link>
               </div>
@@ -789,12 +789,21 @@ const Navbar = () => {
 
             <div className="space-y-1">
               <Link
+                href="/safety"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2 px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-[#b85d34] bg-[#f5ebe6] border border-[#b85d34]/20 transition-colors"
+              >
+                <Heart className="w-4 h-4 text-[#b85d34]" />
+                <span>Female Safety &amp; Privacy Guarantee</span>
+              </Link>
+
+              <Link
                 href="/courses"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-slate-900 bg-emerald-50/70 hover:bg-emerald-50 active:bg-emerald-100 transition-colors"
+                className="flex items-center justify-between px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-slate-900 bg-[#ede6db]/60 hover:bg-[#ede6db] active:bg-[#ede6db] transition-colors"
               >
                 <span>Curriculum Courses</span>
-                <span className="px-2 py-0.5 rounded text-[9px] font-black bg-emerald-600 text-white">
+                <span className="px-2 py-0.5 rounded text-[9px] font-black bg-[#b85d34] text-white">
                   New
                 </span>
               </Link>
@@ -802,35 +811,42 @@ const Navbar = () => {
               <Link
                 href="/tutors"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-slate-800 hover:bg-emerald-50 active:bg-emerald-100 transition-colors"
+                className="block px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-slate-800 hover:bg-[#ede6db] active:bg-[#ede6db] transition-colors"
               >
                 Find Tutors
               </Link>
               <Link
+                href="/tutors?gender=female"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-[#b85d34] hover:bg-[#f5ebe6] transition-colors"
+              >
+                &bull; Female Alimahs &amp; Teachers Only
+              </Link>
+              <Link
                 href="/tutors?category=tajweed-al-quran"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-emerald-800 hover:bg-emerald-50 transition-colors"
+                className="block px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-[#0c2217] hover:bg-[#ede6db] transition-colors"
               >
                 &bull; Quran &amp; Tajweed Tutors
               </Link>
               <Link
                 href="/tutors?category=matric-ssc-science"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 transition-colors"
+                className="block px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-700 hover:bg-[#ede6db] transition-colors"
               >
                 &bull; School &amp; College Academics
               </Link>
               <Link
                 href="/tutors?category=o-level-cambridge"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-700 hover:bg-emerald-50 transition-colors"
+                className="block px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-700 hover:bg-[#ede6db] transition-colors"
               >
                 &bull; Cambridge O &amp; A Levels
               </Link>
               <Link
                 href="/how-it-works"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-slate-800 hover:bg-emerald-50 transition-colors"
+                className="block px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-slate-800 hover:bg-[#ede6db] transition-colors"
               >
                 How It Works
               </Link>

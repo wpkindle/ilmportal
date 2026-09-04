@@ -13,23 +13,27 @@ export default function PromotionTopBar() {
         <div className="flex items-center gap-2.5 flex-wrap">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#143d2b] text-[#d4a359] font-bold text-[10px] tracking-wide uppercase border border-[#2b6e51]/40">
             <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
-            <span>Family First</span>
+            <span>Female-First Safety</span>
           </span>
           <p className="font-medium text-[#ebe3d3] text-xs">
-            1-on-1 Quran &amp; Academic Tutoring across Pakistan with <strong className="text-white font-bold">Camera-Off Privacy by Default</strong>
+            Designed for Female Safety &amp; Comfort • <strong className="text-white font-bold">Verified Qaris, Alimahs &amp; Academic Tutors</strong> • Camera-Off by Default
           </p>
         </div>
 
         {/* Right Authentic Value & Link */}
         <div className="flex items-center gap-4 shrink-0 text-xs">
-          <span className="text-[#a3b8b0] text-[11px] hidden lg:inline">
-            Serving Lahore, Karachi, Islamabad, Rawalpindi, Peshawar, Quetta &amp; Nationwide
-          </span>
+          <Link
+            href="/safety"
+            className="text-[#d4a359] hover:text-white font-bold text-xs inline-flex items-center gap-1 transition-colors"
+          >
+            <span>Female Privacy Shield</span>
+          </Link>
+          <span className="text-[#3b5949]">|</span>
           <Link
             href="/tutors"
-            className="inline-flex items-center gap-1 text-[#d4a359] hover:text-white font-bold text-xs transition-colors group"
+            className="inline-flex items-center gap-1 text-[#ebe3d3] hover:text-[#d4a359] font-bold text-xs transition-colors group"
           >
-            <span>Find a Tutor</span>
+            <span>Find Tutors</span>
             <ArrowRight className="w-3 h-3 group-hover:translate-x-0.5 transition-transform" />
           </Link>
         </div>

@@ -34,19 +34,19 @@ export default function SafetyShowcase() {
         {/* Asymmetric 12-Column Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-start">
           
-          {/* Left Column (5 cols): The Family Privacy Manifesto */}
+          {/* Left Column (5 cols): The Female Safety & Family Privacy Manifesto */}
           <div className="lg:col-span-5 space-y-6 text-left">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#143d2b] border border-[#2b6e51]/60 text-[#d4a359] text-xs font-bold shadow-sm">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-              <span>Family Privacy &amp; Dignity</span>
+              <Heart className="w-3.5 h-3.5 text-rose-400" />
+              <span>Designed Especially for Females &amp; Families</span>
             </div>
 
             <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-black text-white tracking-tight leading-[1.15]">
-              Why family privacy is our first rule in Pakistan.
+              Built so females feel 100% comfortable &amp; protected.
             </h2>
 
             <p className="text-xs sm:text-sm text-[#d1dbd6] leading-relaxed font-normal">
-              In Pakistani households, inviting a teacher into your daughter&apos;s or child&apos;s learning routine requires absolute trust. We built IlmPortal around non-negotiable family privacy rules — not generic software promises.
+              In Pakistan, female learners, mothers, and daughters deserve complete peace of mind. IlmPortal was built from the ground up so females never have any concern regarding their privacy — with camera-off learning, verified female Alimahs, and zero exposure of personal phone numbers.
             </p>
 
             {/* Stat Callout Strip */}

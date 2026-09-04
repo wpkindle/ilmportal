@@ -8,7 +8,6 @@ import {
   ShieldCheck,
   Heart,
   Mail,
-  MapPin,
   GraduationCap,
   Sparkles,
   CheckCircle2,
@@ -122,10 +121,6 @@ const Footer = () => {
                 <a href="mailto:contact@ilmportal.org" className="hover:text-white font-semibold transition-colors">
                   contact@ilmportal.org
                 </a>
-              </div>
-              <div className="flex items-center gap-2.5 text-[#a3b8b0] text-[11px]">
-                <MapPin className="w-3.5 h-3.5 text-[#d4a359] shrink-0 ml-1.5" />
-                <span>Lahore Cantt, Punjab, Pakistan</span>
               </div>
             </div>
 

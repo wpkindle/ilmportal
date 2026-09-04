@@ -44,7 +44,6 @@ const Navbar = () => {
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const [subjectsDropdownOpen, setSubjectsDropdownOpen] = useState(false);
   const [unreadMessagesCount, setUnreadMessagesCount] = useState(0);
-  const [scrolledPastTopBar, setScrolledPastTopBar] = useState(false);
 
   const {
     notifications,
@@ -65,16 +64,6 @@ const Navbar = () => {
 
   const router = useRouter();
   const pathname = usePathname();
-
-  // Scroll listener to keep header fixed at top-0 when scrolled past topbar
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolledPastTopBar(window.scrollY > 36);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    handleScroll();
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
   // Fetch unread messages count on load and route change
   useEffect(() => {
@@ -273,11 +262,7 @@ const Navbar = () => {
   return (
     <>
       <PromotionTopBar />
-      <header
-        className={`fixed left-0 right-0 z-40 bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e6ded1] shadow-2xs transition-[top] duration-150 ${
-          scrolledPastTopBar ? 'top-0' : 'top-0 md:top-[37px]'
-        }`}
-      >
+      <header className="sticky top-0 z-40 bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e6ded1] shadow-2xs">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
           

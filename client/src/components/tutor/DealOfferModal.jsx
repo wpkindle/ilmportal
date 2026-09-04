@@ -153,23 +153,23 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/80 backdrop-blur-md animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full shadow-2xl relative border border-slate-200/90 flex flex-col max-h-[92vh] sm:max-h-[88vh] overflow-hidden">
+    <div className="fixed inset-0 z-[70] overflow-y-auto bg-slate-950/80 backdrop-blur-md p-2 sm:p-4 md:p-6 flex items-start sm:items-center justify-center animate-in fade-in duration-200">
+      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full shadow-2xl relative border border-slate-200/90 flex flex-col max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-2.5rem)] overflow-hidden my-auto">
         
-        {/* Modal Header (Pinned at Top) */}
-        <div className="p-3.5 sm:p-5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0">
-          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
-            <div className="p-2 sm:p-2.5 bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/40 rounded-xl sm:rounded-2xl shadow-md shrink-0">
+        {/* Modal Header (Pinned at Top, 100% visible) */}
+        <div className="p-3 sm:p-4 md:p-5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0 z-10">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className="p-1.5 sm:p-2.5 bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/40 rounded-xl sm:rounded-2xl shadow-md shrink-0">
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="min-w-0">
-              <h3 className="font-bold text-sm sm:text-base text-slate-900 flex flex-wrap items-center gap-1.5 leading-tight">
+              <h3 className="font-bold text-xs sm:text-sm md:text-base text-slate-900 flex flex-wrap items-center gap-1.5 leading-tight">
                 <span>Send Course Agreement Offer</span>
                 <span className="text-[10px] font-bold px-2 py-0.5 bg-[#f0ece1] text-[#0c2217] rounded-full border border-[#d4a359]/40 shrink-0">
                   3-Day Free Trial
                 </span>
               </h3>
-              <p className="text-[11px] sm:text-xs text-slate-500 truncate mt-0.5">
+              <p className="text-[10px] sm:text-xs text-slate-500 truncate mt-0.5">
                 To student: <strong className="text-slate-800">{studentName || 'Student'}</strong>
               </p>
             </div>
@@ -185,7 +185,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
         </div>
 
         {/* Scrollable Form Body */}
-        <form id="deal-offer-form" onSubmit={handleSubmit} className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 text-left">
+        <form id="deal-offer-form" onSubmit={handleSubmit} className="flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-5 md:p-6 space-y-3.5 sm:space-y-4 text-left">
           
           {error && (
             <div className="p-3.5 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-2xl">
@@ -483,15 +483,15 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
         </form>
 
         {/* Modal Footer (Pinned at Bottom, ALWAYS visible) */}
-        <div className="p-3 sm:p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3 shrink-0">
+        <div className="p-3 sm:p-4 bg-slate-50 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shrink-0 z-10">
           <p className="text-[11px] text-slate-500 hidden sm:block">
             Zero advance fee &bull; 3-Day Free Trial
           </p>
-          <div className="flex items-center justify-end gap-2.5 w-full sm:w-auto">
+          <div className="flex items-center justify-end gap-2 w-full sm:w-auto">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200/70 rounded-xl transition-colors cursor-pointer"
+              className="px-3.5 py-2 text-xs font-bold text-slate-600 hover:bg-slate-200/70 rounded-xl transition-colors cursor-pointer"
             >
               Cancel
             </button>
@@ -499,7 +499,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
               type="submit"
               form="deal-offer-form"
               disabled={loading}
-              className="flex-1 sm:flex-none px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-[#b85d34]/25 transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5 active:scale-95"
+              className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-[#b85d34]/25 transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5 active:scale-95"
             >
               <Sparkles className="w-4 h-4 text-white/80 shrink-0" />
               <span>{loading ? 'Sending Offer...' : 'Send Course Offer'}</span>

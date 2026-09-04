@@ -257,10 +257,10 @@ function TutorMessagesContent() {
   if (loading) return <LoadingSpinner text="Loading messages..." />;
 
   return (
-    <div className="bg-slate-50 min-h-[calc(100dvh-64px)] -mb-16 md:mb-0 pb-14 md:pb-0 flex flex-col">
-      <div className="max-w-7xl mx-auto px-1.5 sm:px-4 lg:px-8 py-1.5 sm:py-3 flex-1 flex flex-col w-full">
+    <div className="bg-slate-50 flex flex-col">
+      <div className="max-w-7xl mx-auto px-1.5 sm:px-4 lg:px-8 py-2 sm:py-3 w-full">
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6 flex-1">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 lg:gap-6">
 
           {/* Left Sidebar — full screen on mobile when mobileView=list, hidden when mobileView=chat */}
           <div

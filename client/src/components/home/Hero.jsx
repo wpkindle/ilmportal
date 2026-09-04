@@ -307,7 +307,7 @@ export default function Hero() {
                 }`}
               >
                 <Video className="w-3.5 h-3.5" />
-                <span>WebRTC Call (In Naqab)</span>
+                <span>WebRTC Video Call</span>
               </button>
             </div>
 
@@ -364,7 +364,7 @@ export default function Hero() {
                   ) : (
                     <>
                       <Video className="w-3.5 h-3.5 text-teal-300" />
-                      <span className="text-teal-200">1:1 WebRTC Video (In Naqab)</span>
+                      <span className="text-teal-200">1:1 WebRTC Video</span>
                     </>
                   )}
                 </div>
@@ -437,32 +437,6 @@ export default function Hero() {
                     </>
                   )}
                 </div>
-              </div>
-
-              {/* Floating Trust Artifact 1: Verified Sanad & CNIC Stamp (Top Right) */}
-              <div className="absolute -top-4 -right-3 sm:-right-4 bg-white text-slate-900 p-3 rounded-2xl shadow-xl border border-slate-200 space-y-1 max-w-[210px] transform rotate-1 z-30">
-                <div className="flex items-center gap-1.5 text-emerald-800 font-extrabold text-xs">
-                  <Award className="w-4 h-4 text-amber-500 shrink-0" />
-                  <span>{currentSlide === 0 ? 'Verified Qaris & Tutors' : 'Verified Alimahs in Naqab'}</span>
-                </div>
-                <p className="text-[10px] text-slate-600 leading-tight">
-                  {currentSlide === 0
-                    ? 'CNIC & degree verified male faculty for safe home visits across Pakistan.'
-                    : 'Wafaq-ul-Madaris Sanad & CNIC verified for safe online study.'}
-                </p>
-              </div>
-
-              {/* Floating Trust Artifact 2: Female Privacy Shield (Bottom Left) */}
-              <div className="absolute -bottom-4 -left-3 sm:-left-4 bg-[#07150e] text-[#f5f0e6] p-3 rounded-2xl shadow-2xl border-2 border-[#2b6e51] space-y-1 max-w-[220px] transform -rotate-1 z-30">
-                <div className="flex items-center gap-1.5 text-[#d4a359] font-bold text-xs">
-                  <Heart className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                  <span>{currentSlide === 0 ? 'Safe Home Tuition' : 'Female Safety & Naqab'}</span>
-                </div>
-                <p className="text-[10px] text-[#a3b8b0] leading-tight">
-                  {currentSlide === 0
-                    ? 'In-person visits strictly screened with direct agreed fees and zero broker harassment.'
-                    : 'Encrypted WebRTC, Alimah in Naqab, and zero personal phone numbers shared.'}
-                </p>
               </div>
 
             </div>

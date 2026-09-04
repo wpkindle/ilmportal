@@ -15,6 +15,8 @@ import {
   CheckCircle2,
   ArrowRight,
   ChevronRight,
+  ChevronLeft,
+  Home,
   Heart,
   Lock,
   Chrome,
@@ -44,6 +46,17 @@ export default function Hero() {
   const [selectedCity, setSelectedCity] = useState('');
   const [availableCities, setAvailableCities] = useState(initialTutorCities);
   const [chromeModalOpen, setChromeModalOpen] = useState(false);
+  const [currentSlide, setCurrentSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Auto-advance hero tutoring slider every 5.5s (pauses on hover)
+  useEffect(() => {
+    if (isPaused) return;
+    const interval = setInterval(() => {
+      setCurrentSlide((prev) => (prev === 0 ? 1 : 0));
+    }, 5500);
+    return () => clearInterval(interval);
+  }, [isPaused]);
 
   // Fetch active tutors and dynamically build the list of available tutor cities
   useEffect(() => {
@@ -267,50 +280,170 @@ export default function Hero() {
 
           </div>
 
-          {/* Right Column (5 cols): Asymmetric Visual Composition with Trust Artifacts */}
+          {/* Right Column (5 cols): Asymmetric Visual Composition with Tutoring Slider */}
           <div className="lg:col-span-5 relative mt-4 lg:mt-0">
             
+            {/* Quick Segmented Mode Switcher Tabs */}
+            <div className="flex items-center justify-center p-1 mb-3.5 bg-[#0c2217]/90 backdrop-blur-md rounded-2xl border border-[#2b6e51]/50 max-w-sm mx-auto shadow-md">
+              <button
+                type="button"
+                onClick={() => setCurrentSlide(0)}
+                className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  currentSlide === 0
+                    ? 'bg-[#1e543c] text-[#d4a359] shadow-sm border border-[#2b6e51]'
+                    : 'text-[#a3b8b0] hover:text-white'
+                }`}
+              >
+                <Home className="w-3.5 h-3.5" />
+                <span>Home Tutoring</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => setCurrentSlide(1)}
+                className={`flex-1 py-1.5 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 ${
+                  currentSlide === 1
+                    ? 'bg-[#1e543c] text-teal-300 shadow-sm border border-teal-500/50'
+                    : 'text-[#a3b8b0] hover:text-white'
+                }`}
+              >
+                <Video className="w-3.5 h-3.5" />
+                <span>WebRTC Call (In Naqab)</span>
+              </button>
+            </div>
+
             {/* Outer Decorative Frame */}
             <div className="relative mx-auto max-w-md lg:max-w-none">
               
               {/* Backing warm tone shape */}
               <div className="absolute -inset-2 bg-gradient-to-tr from-[#1e543c]/40 via-[#d4a359]/20 to-transparent rounded-3xl blur-xl" />
 
-              {/* Main Editorial Card with Contextual Image */}
-              <div className="relative rounded-3xl overflow-hidden border-2 border-[#2b6e51]/50 bg-[#07150e] shadow-2xl">
-                <img
-                  src="/images/hero-alimah-student.jpg"
-                  alt="Verified Pakistani female Alimah teaching a young girl student at home with complete family privacy and comfort"
-                  className="w-full h-72 sm:h-80 object-cover opacity-95 filter contrast-[1.02]"
-                  loading="eager"
-                  fetchPriority="high"
-                />
+              {/* Main Editorial Card with Dual-Slide Tutoring Carousel */}
+              <div
+                className="relative rounded-3xl overflow-hidden border-2 border-[#2b6e51]/50 bg-[#07150e] shadow-2xl h-80 sm:h-96 group"
+                onMouseEnter={() => setIsPaused(true)}
+                onMouseLeave={() => setIsPaused(false)}
+              >
+                {/* Slide 0: Young Female Alimah In-Home Tutoring */}
+                <div
+                  className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                    currentSlide === 0 ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                  }`}
+                >
+                  <img
+                    src="/images/hero-home-tutoring.jpg"
+                    alt="Young Pakistani female Alimah teaching a young schoolgirl student at home with study books and notebooks"
+                    className="w-full h-full object-cover filter contrast-[1.02]"
+                    loading="eager"
+                    fetchPriority="high"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0c2217] via-transparent to-transparent opacity-85" />
+                </div>
 
-                {/* Subtle dark gradient overlay at base */}
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0c2217] via-transparent to-transparent opacity-80" />
+                {/* Slide 1: WebRTC Video Call Tutoring with Alimah in Naqab */}
+                <div
+                  className={`absolute inset-0 transition-opacity duration-700 ease-in-out ${
+                    currentSlide === 1 ? 'opacity-100 z-10' : 'opacity-0 z-0 pointer-events-none'
+                  }`}
+                >
+                  <img
+                    src="/images/hero-online-webrtc.jpg"
+                    alt="Pakistani girl student attending 1:1 online WebRTC video call with female Alimah in Naqab"
+                    className="w-full h-full object-cover filter contrast-[1.02]"
+                    loading="eager"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#0c2217] via-transparent to-transparent opacity-85" />
+                </div>
 
-                {/* Bottom Caption within the image card */}
-                <div className="absolute bottom-3 left-3 right-3 p-3 rounded-2xl bg-[#0c2217]/90 backdrop-blur-md border border-[#2b6e51]/60 text-xs space-y-1">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-white flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                      <span>1:1 Female Alimah &amp; Student</span>
-                    </span>
-                    <span className="text-[10px] font-mono text-[#d4a359] bg-[#143d2b] px-2 py-0.5 rounded border border-[#2b6e51]/50">
-                      Camera-Off Option
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-[#a3b8b0] leading-snug">
-                    Safe, personalized 1-on-1 classes with verified Alimahs, Qaris, and academic tutors with total privacy.
-                  </p>
+                {/* Top Left Badge: Mode Tag */}
+                <div className="absolute top-3 left-3 z-20 flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0c2217]/90 backdrop-blur-md border border-[#2b6e51]/60 text-[11px] font-bold text-[#d4a359]">
+                  {currentSlide === 0 ? (
+                    <>
+                      <Home className="w-3.5 h-3.5 text-[#d4a359]" />
+                      <span>In-Home 1:1 Tutoring</span>
+                    </>
+                  ) : (
+                    <>
+                      <Video className="w-3.5 h-3.5 text-teal-300" />
+                      <span className="text-teal-200">1:1 WebRTC Video (In Naqab)</span>
+                    </>
+                  )}
+                </div>
+
+                {/* Top Right: Progress Indicator Dots */}
+                <div className="absolute top-3.5 right-3 z-20 flex items-center gap-1.5 bg-black/50 backdrop-blur-md px-2 py-1 rounded-full border border-white/15">
+                  <button
+                    type="button"
+                    onClick={() => setCurrentSlide(0)}
+                    className={`h-2 rounded-full transition-all ${currentSlide === 0 ? 'w-5 bg-[#d4a359]' : 'w-2 bg-white/40'}`}
+                    aria-label="Slide 1: In-Home Tutoring"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setCurrentSlide(1)}
+                    className={`h-2 rounded-full transition-all ${currentSlide === 1 ? 'w-5 bg-teal-400' : 'w-2 bg-white/40'}`}
+                    aria-label="Slide 2: WebRTC Video Call in Naqab"
+                  />
+                </div>
+
+                {/* Interactive Navigation Arrows */}
+                <button
+                  type="button"
+                  onClick={() => setCurrentSlide((prev) => (prev === 0 ? 1 : 0))}
+                  className="absolute left-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/75 backdrop-blur-md text-white flex items-center justify-center border border-white/20 transition-all opacity-80 group-hover:opacity-100 z-20"
+                  aria-label="Previous slide"
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentSlide((prev) => (prev === 0 ? 1 : 0))}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/75 backdrop-blur-md text-white flex items-center justify-center border border-white/20 transition-all opacity-80 group-hover:opacity-100 z-20"
+                  aria-label="Next slide"
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </button>
+
+                {/* Bottom Dynamic Caption */}
+                <div className="absolute bottom-3 left-3 right-3 p-3 rounded-2xl bg-[#0c2217]/90 backdrop-blur-md border border-[#2b6e51]/60 text-xs space-y-1 z-20">
+                  {currentSlide === 0 ? (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-white flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                          <span>1:1 Young Female Alimah &amp; Student</span>
+                        </span>
+                        <span className="text-[10px] font-mono text-[#d4a359] bg-[#143d2b] px-2 py-0.5 rounded border border-[#2b6e51]/50">
+                          Home Tutoring
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-[#a3b8b0] leading-snug">
+                        Young certified Alimahs visiting your home for comfortable 1-on-1 Quran, Tajweed &amp; school studies with complete family trust.
+                      </p>
+                    </>
+                  ) : (
+                    <>
+                      <div className="flex items-center justify-between">
+                        <span className="font-bold text-white flex items-center gap-1.5">
+                          <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse" />
+                          <span>1:1 WebRTC Video Call • Alimah in Naqab</span>
+                        </span>
+                        <span className="text-[10px] font-mono text-teal-300 bg-[#0c2e22] px-2 py-0.5 rounded border border-teal-500/40">
+                          Naqab &amp; Privacy
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-[#a3b8b0] leading-snug">
+                        Direct in-browser WebRTC encrypted classroom with female Alimah in Naqab, camera-off comfort &amp; interactive digital Quran recitation.
+                      </p>
+                    </>
+                  )}
                 </div>
               </div>
 
               {/* Floating Trust Artifact 1: Verified Sanad & CNIC Stamp (Top Right) */}
-              <div className="absolute -top-4 -right-3 sm:-right-4 bg-white text-slate-900 p-3 rounded-2xl shadow-xl border border-slate-200 space-y-1 max-w-[210px] transform rotate-1">
+              <div className="absolute -top-4 -right-3 sm:-right-4 bg-white text-slate-900 p-3 rounded-2xl shadow-xl border border-slate-200 space-y-1 max-w-[210px] transform rotate-1 z-30">
                 <div className="flex items-center gap-1.5 text-emerald-800 font-extrabold text-xs">
                   <Award className="w-4 h-4 text-amber-500 shrink-0" />
-                  <span>Verified Qaris &amp; Alimahs</span>
+                  <span>Verified Young Alimahs</span>
                 </div>
                 <p className="text-[10px] text-slate-600 leading-tight">
                   Wafaq-ul-Madaris Sanad &amp; Government CNIC verified for family trust.
@@ -318,13 +451,15 @@ export default function Hero() {
               </div>
 
               {/* Floating Trust Artifact 2: Female Privacy Shield (Bottom Left) */}
-              <div className="absolute -bottom-4 -left-3 sm:-left-4 bg-[#07150e] text-[#f5f0e6] p-3 rounded-2xl shadow-2xl border-2 border-[#2b6e51] space-y-1 max-w-[220px] transform -rotate-1">
+              <div className="absolute -bottom-4 -left-3 sm:-left-4 bg-[#07150e] text-[#f5f0e6] p-3 rounded-2xl shadow-2xl border-2 border-[#2b6e51] space-y-1 max-w-[220px] transform -rotate-1 z-30">
                 <div className="flex items-center gap-1.5 text-[#d4a359] font-bold text-xs">
                   <Heart className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                  <span>Female Safety &amp; Comfort</span>
+                  <span>Female Safety &amp; Naqab</span>
                 </div>
                 <p className="text-[10px] text-[#a3b8b0] leading-tight">
-                  Camera-off by default, zero phone number leaks, and dedicated female tutors.
+                  {currentSlide === 0
+                    ? 'In-person home visits strictly screened with zero third-party harassment.'
+                    : 'Encrypted WebRTC, Alimah in Naqab, and zero personal phone numbers shared.'}
                 </p>
               </div>
 

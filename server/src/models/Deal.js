@@ -137,4 +137,10 @@ const dealSchema = new mongoose.Schema({
   timestamps: true
 });
 
+dealSchema.index({ student: 1, tutor: 1, status: 1 });
+dealSchema.index({ tutor: 1, student: 1, status: 1 });
+dealSchema.index({ student: 1, createdAt: -1 });
+dealSchema.index({ tutor: 1, createdAt: -1 });
+dealSchema.index({ status: 1 });
+
 module.exports = mongoose.model('Deal', dealSchema);

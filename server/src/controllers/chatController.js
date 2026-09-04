@@ -29,17 +29,55 @@ const isStudentProfile100Percent = (user) => {
 exports.getConversations = async (req, res) => {
   try {
     const userId = req.user.id;
+    const userObjId = mongoose.Types.ObjectId.isValid(userId) ? new mongoose.Types.ObjectId(userId) : userId;
 
-    // Find all distinct conversationIds involving this user
+    // 1. Fetch recent messages involving this user without voiceData and using lean()
     const messages = await Message.find({
-      $or: [{ sender: userId }, { recipient: userId }]
+      $or: [{ sender: userObjId }, { recipient: userObjId }]
     })
+      .select('-voiceData')
       .sort({ createdAt: -1 })
       .populate('sender', 'name avatar role city')
       .populate('recipient', 'name avatar role city')
-      .populate('deal');
+      .populate('deal')
+      .lean();
 
-    // Group by conversation partner
+    // 2. Fetch all unread counts for this user in ONE aggregation query
+    const unreadAgg = await Message.aggregate([
+      {
+        $match: {
+          recipient: userObjId,
+          isRead: false
+        }
+      },
+      {
+        $group: {
+          _id: '$sender',
+          count: { $sum: 1 }
+        }
+      }
+    ]);
+    const unreadMap = new Map();
+    unreadAgg.forEach(u => unreadMap.set(u._id.toString(), u.count));
+
+    // 3. Fetch all deals for this user in ONE query and index by counterpart in memory
+    const userDeals = await Deal.find({
+      $or: [{ student: userObjId }, { tutor: userObjId }]
+    })
+      .sort({ updatedAt: -1, createdAt: -1 })
+      .lean();
+
+    const dealMap = new Map();
+    for (const d of userDeals) {
+      const sId = (d.student?._id || d.student)?.toString();
+      const tId = (d.tutor?._id || d.tutor)?.toString();
+      const counterpartId = sId === userId.toString() ? tId : sId;
+      if (counterpartId && !dealMap.has(counterpartId)) {
+        dealMap.set(counterpartId, d);
+      }
+    }
+
+    // 4. Group by conversation partner in memory
     const conversationMap = new Map();
 
     for (const msg of messages) {
@@ -49,37 +87,15 @@ exports.getConversations = async (req, res) => {
       
       const key = otherUser._id.toString();
       if (!conversationMap.has(key)) {
-        // Count unread messages accurately
-        const unreadCount = await Message.countDocuments({
-          sender: otherUser._id,
-          recipient: userId,
-          isRead: false
-        });
-
-        // Find latest active/accepted deal for this user and otherUser
-        let deal = await Deal.findOne({
-          $or: [
-            { student: userId, tutor: otherUser._id },
-            { student: otherUser._id, tutor: userId }
-          ],
-          status: { $in: ['active_trial', 'continuation_agreed', 'active_paid'] }
-        }).sort({ updatedAt: -1, createdAt: -1 });
-
-        if (!deal) {
-          deal = await Deal.findOne({
-            $or: [
-              { student: userId, tutor: otherUser._id },
-              { student: otherUser._id, tutor: userId }
-            ]
-          }).sort({ updatedAt: -1, createdAt: -1 });
-        }
+        const unreadCount = unreadMap.get(key) || 0;
+        const deal = dealMap.get(key) || msg.deal || null;
 
         conversationMap.set(key, {
           conversationId: msg.conversationId,
           partner: otherUser,
           lastMessage: msg,
           unreadCount,
-          deal: deal || msg.deal
+          deal
         });
       }
     }
@@ -105,7 +121,7 @@ exports.getMessages = async (req, res) => {
   try {
     const { conversationId } = req.params;
     const page = parseInt(req.query.page, 10) || 1;
-    const limit = parseInt(req.query.limit, 10) || 200;
+    const limit = parseInt(req.query.limit, 10) || 100;
     const skip = (page - 1) * limit;
 
     const parts = (conversationId || '').split('_');
@@ -137,30 +153,25 @@ exports.getMessages = async (req, res) => {
       }
     }
 
-    // Sort newest first ({ createdAt: -1 }) with limit 200, then reverse to chronological order.
-    // Guarantees newest messages are always retrieved on reload and not truncated by oldest-first limit.
+    // Sort newest first ({ createdAt: -1 }) with limit 100, then reverse to chronological order.
     const rawMessages = await Message.find(query)
       .populate('sender', 'name avatar role city')
       .populate('recipient', 'name avatar role city')
       .populate('deal')
       .sort({ createdAt: -1 })
       .skip(skip)
-      .limit(limit);
+      .limit(limit)
+      .lean();
 
     const messages = (rawMessages || []).reverse();
 
-    // Mark undelivered messages to this user as delivered
+    // Mark undelivered messages to this user as delivered directly
     try {
-      const undeliveredCount = await Message.countDocuments({
-        ...query,
-        recipient: req.user.id,
-        isDelivered: false
-      });
-      if (undeliveredCount > 0) {
-        await Message.updateMany(
-          { ...query, recipient: req.user.id, isDelivered: false },
-          { isDelivered: true, deliveredAt: new Date() }
-        );
+      const updateRes = await Message.updateMany(
+        { ...query, recipient: req.user.id, isDelivered: false },
+        { isDelivered: true, deliveredAt: new Date() }
+      );
+      if (updateRes.modifiedCount > 0) {
         const io = req.app.get('io');
         if (io) {
           io.to(`conv_${conversationId}`).emit('messages-delivered', {
@@ -180,8 +191,8 @@ exports.getMessages = async (req, res) => {
           { student: parts[0], tutor: parts[1] },
           { student: parts[1], tutor: parts[0] }
         ],
-        status: { $in: ['active_trial', 'continuation_agreed', 'active_paid'] }
-      }).sort({ updatedAt: -1, createdAt: -1 });
+        status: { $in: ['active_trial', 'continuation_agreed', 'active_paid', 'pending_offer'] }
+      }).sort({ updatedAt: -1, createdAt: -1 }).lean();
 
       if (!latestDeal) {
         latestDeal = await Deal.findOne({
@@ -189,7 +200,7 @@ exports.getMessages = async (req, res) => {
             { student: parts[0], tutor: parts[1] },
             { student: parts[1], tutor: parts[0] }
           ]
-        }).sort({ updatedAt: -1, createdAt: -1 });
+        }).sort({ updatedAt: -1, createdAt: -1 }).lean();
       }
     }
 

@@ -195,24 +195,36 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
   };
 
   // Fetch initial messages and active deal (Seen is ONLY emitted when tab has active focus)
+  // Fetch initial messages and active deal (Immediate display with background deal verification)
   useEffect(() => {
+    let isMounted = true;
     const fetchMessages = async () => {
       setLoading(true);
       try {
         const res = await api.getChatMessages(conversationId);
+        if (!isMounted) return;
         if (res.success) {
           setMessages(res.messages || []);
           if (res.deal) {
             setPartnerDeal(res.deal);
           }
         }
+      } catch (err) {
+        console.error('Error loading chat messages:', err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+          setTimeout(() => scrollToBottom(false), 50);
+        }
+      }
 
-        // Fetch active/pending deal if available
-        const pId = (partner?._id || partner?.id)?.toString();
-        const myId = (user?._id || user?.id)?.toString();
-        if (pId) {
+      // Background deal verification without blocking message UI
+      const pId = (partner?._id || partner?.id)?.toString();
+      const myId = (user?._id || user?.id)?.toString();
+      if (pId && isMounted) {
+        try {
           const dealsRes = await api.getMyDeals();
-          if (dealsRes.success && dealsRes.deals) {
+          if (isMounted && dealsRes?.success && dealsRes.deals) {
             const currentDeal = dealsRes.deals.find((d) => {
               const tId = (d.tutor?._id || d.tutor)?.toString();
               const sId = (d.student?._id || d.student)?.toString();
@@ -223,16 +235,17 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
             });
             if (currentDeal) setPartnerDeal(currentDeal);
           }
+        } catch (dealErr) {
+          console.warn('Background deal verification warning:', dealErr);
         }
-      } catch (err) {
-        console.error('Error loading chat messages:', err);
-      } finally {
-        setLoading(false);
       }
     };
 
     fetchMessages();
-  }, [conversationId, socket]);
+    return () => {
+      isMounted = false;
+    };
+  }, [conversationId]);
 
   // Socket listener for new incoming messages, deal updates, and seen receipts
   useEffect(() => {
@@ -744,9 +757,6 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
               <h3 className="font-serif font-bold text-xs sm:text-sm text-stone-900 truncate">
                 {partner?.name || 'Tutoring Chat'}
               </h3>
-              <span className="text-[8.5px] sm:text-[9px] uppercase font-bold text-stone-500 bg-stone-100 px-1.5 py-0.5 rounded border border-stone-200 shrink-0">
-                {partner?.role}
-              </span>
             </div>
 
             <div className="flex items-center gap-1.5 mt-0.5 text-[10.5px] sm:text-[11px] truncate">
@@ -764,10 +774,6 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
 
               <span className="text-stone-300 shrink-0">&bull;</span>
               <span className="text-stone-500 truncate">{partner?.city || 'Pakistan'}</span>
-              <span className="text-[10px] text-[#0c2217] font-medium hidden sm:inline-flex items-center gap-1 shrink-0">
-                <Mic className="w-3 h-3 text-[#0c2217]" />
-                <span>Voice Notes</span>
-              </span>
             </div>
           </div>
         </div>

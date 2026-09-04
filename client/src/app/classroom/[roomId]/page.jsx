@@ -65,8 +65,7 @@ export default function VideoClassroomPage() {
           </p>
           <button
             onClick={() => window.location.href = user?.role === 'tutor' ? '/tutor/messages' : '/student/messages'}
-            className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
-            className="w-full py-3 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-md"
+            className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-md"
           >
             Return to Messages
           </button>
@@ -89,14 +88,11 @@ export default function VideoClassroomPage() {
           </p>
           <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 text-xs text-emerald-400 font-semibold space-y-1">
             <p>Official Support: <a href="mailto:contact@ilmportal.org" className="underline hover:text-emerald-300">contact@ilmportal.org</a></p>
-          <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 text-xs text-[#d4a359] font-semibold space-y-1">
-            <p>Official Support: <a href="mailto:contact@ilmportal.org" className="underline hover:text-white">contact@ilmportal.org</a></p>
             <p className="text-[11px] text-slate-400">Meezan Bank &bull; Raast &bull; JazzCash &bull; EasyPaisa</p>
           </div>
           <button
             onClick={() => window.location.href = user?.role === 'tutor' ? '/tutor/deals' : '/student/messages'}
-            className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition-all cursor-pointer"
-            className="w-full py-3 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-md"
+            className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-md"
           >
             {user?.role === 'tutor' ? 'Go to Deals & Submit Fee' : 'Return to Messages'}
           </button>

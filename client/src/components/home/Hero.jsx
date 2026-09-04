@@ -378,7 +378,7 @@ export default function Hero() {
                     type="button"
                     onClick={() => setCurrentSlide(1)}
                     className={`h-2 rounded-full transition-all ${currentSlide === 1 ? 'w-5 bg-[#b85d34]' : 'w-2 bg-white/40'}`}
-                    aria-label="Slide 2: WebRTC Video Call in Naqab"
+                    aria-label="Slide 2: WebRTC Video Call with Female Alimah &amp; Tutor"
                   />
                 </div>
 
@@ -422,14 +422,14 @@ export default function Hero() {
                       <div className="flex items-center justify-between">
                         <span className="font-bold text-white flex items-center gap-1.5">
                           <span className="w-2 h-2 rounded-full bg-[#b85d34] animate-pulse" />
-                          <span>1:1 WebRTC Video Call • Alimah in Naqab</span>
+                          <span>1:1 WebRTC Video Call • Female Alimah &amp; Tutor</span>
                         </span>
                         <span className="text-[10px] font-mono text-[#d4a359] bg-[#143d2b] px-2 py-0.5 rounded border border-[#d4a359]/30">
-                          Naqab &amp; Privacy
+                          Privacy &amp; Safety
                         </span>
                       </div>
                       <p className="text-[11px] text-[#a3b8b0] leading-snug">
-                        Direct in-browser WebRTC encrypted classroom with female Alimah in Naqab, camera-off comfort &amp; interactive digital Quran recitation.
+                        Direct in-browser WebRTC encrypted classroom with female Alimah &amp; tutor. Camera-off comfort &amp; interactive digital Quran &amp; academic learning.
                       </p>
                     </>
                   )}

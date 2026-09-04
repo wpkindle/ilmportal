@@ -275,16 +275,12 @@ const Navbar = () => {
 
   return (
     <>
-      {!isHomePage && <PromotionTopBar />}
+      <PromotionTopBar />
       <header
-        className={`transition-all duration-300 z-40 ${
-          isHomePage
-            ? `fixed top-0 left-0 right-0 ${
-                isTransparent
-                  ? 'bg-transparent border-b border-transparent shadow-none'
-                  : 'bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e6ded1] shadow-2xs'
-              }`
-            : 'sticky top-0 bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e6ded1] shadow-2xs'
+        className={`sticky top-0 z-40 transition-all duration-300 ${
+          isTransparent
+            ? 'bg-transparent border-b border-transparent shadow-none'
+            : 'bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e6ded1] shadow-2xs'
         }`}
       >
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">

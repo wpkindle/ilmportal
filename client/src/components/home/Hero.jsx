@@ -180,7 +180,7 @@ export default function Hero() {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-[#0c2217] text-[#f5f0e6] pt-20 pb-16 sm:pt-28 sm:pb-20 lg:pt-32 border-b border-[#143d2b]">
+    <section className="relative overflow-hidden bg-[#0c2217] text-[#f5f0e6] -mt-14 sm:-mt-16 pt-20 pb-16 sm:pt-28 sm:pb-20 lg:pt-32 border-b border-[#143d2b]">
       {/* Dynamic Animated Background: Living Aurora, Sacred Geometry, Mouse Spotlight & Stardust */}
       <AnimatedHeroBackground />
 

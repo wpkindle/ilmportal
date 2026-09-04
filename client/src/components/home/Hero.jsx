@@ -17,7 +17,6 @@ import {
   ChevronRight,
   ChevronLeft,
   Home,
-  Heart,
   Lock,
   Chrome,
   Camera,
@@ -160,7 +159,7 @@ export default function Hero() {
             {/* Key Assurance Signals */}
             <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-semibold">
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b]/80 border border-[#d4a359]/30 text-[#faf8f5]">
-                <Heart className="w-3.5 h-3.5 text-rose-400" />
+                <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
                 <span>100% Female Privacy &amp; Comfort</span>
               </span>
               <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b]/80 border border-[#d4a359]/30 text-[#faf8f5]">
@@ -460,7 +459,7 @@ export default function Hero() {
             {/* Feature 2: Female Safety & Comfort */}
             <div className="p-4 rounded-2xl bg-[#143d2b]/50 border border-[#d4a359]/20 space-y-1">
               <div className="flex items-center gap-2 text-[#d4a359] font-bold text-xs">
-                <Heart className="w-4 h-4 shrink-0 text-rose-400" />
+                <ShieldCheck className="w-4 h-4 shrink-0 text-[#d4a359]" />
                 <span>Female Safety &amp; Comfort</span>
               </div>
               <p className="text-xs text-[#a3b8b0] leading-relaxed">

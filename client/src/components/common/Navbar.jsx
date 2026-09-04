@@ -23,7 +23,6 @@ import {
   ArrowRight,
   CreditCard,
   Headphones,
-  Heart,
   QrCode,
   Bell,
   Volume2,
@@ -402,7 +401,7 @@ const Navbar = () => {
                   : 'text-[#0c2217] hover:text-[#b85d34] hover:bg-[#f5ebe6]'
               }`}
             >
-              <Heart className="w-3.5 h-3.5 text-[#b85d34]" />
+              <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
               <span>Female Safety &amp; Privacy</span>
             </Link>
           </nav>
@@ -793,7 +792,7 @@ const Navbar = () => {
                 onClick={() => setMobileMenuOpen(false)}
                 className="flex items-center gap-2 px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-[#b85d34] bg-[#f5ebe6] border border-[#b85d34]/20 transition-colors"
               >
-                <Heart className="w-4 h-4 text-[#b85d34]" />
+                <ShieldCheck className="w-4 h-4 text-[#b85d34]" />
                 <span>Female Safety &amp; Privacy Guarantee</span>
               </Link>
 

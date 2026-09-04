@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Filter, RotateCcw, MapPin, BookOpen, User, Video, ShieldCheck, Navigation, ArrowUpDown, Sparkles, Clock, Star, Award, Heart } from 'lucide-react';
+import { Filter, RotateCcw, MapPin, BookOpen, User, Video, ShieldCheck, Navigation, ArrowUpDown, Sparkles, Clock, Star, Award } from 'lucide-react';
 import CustomSelect from '../common/CustomSelect';
 import { pakistaniCityAreas } from '../../data/pakistanAreas';
 
@@ -91,7 +91,7 @@ const TutorFilterSidebar = ({
         }`}
       >
         <div className="flex items-center gap-2">
-          <Heart className={`w-4 h-4 ${filters.gender === 'female' ? 'text-white' : 'text-[#b85d34]'}`} />
+          <ShieldCheck className={`w-4 h-4 ${filters.gender === 'female' ? 'text-white' : 'text-[#b85d34]'}`} />
           <span>Female Alimahs &amp; Tutors Only</span>
         </div>
         <span className={`text-[10px] px-2 py-0.5 rounded-full font-extrabold uppercase tracking-wider ${

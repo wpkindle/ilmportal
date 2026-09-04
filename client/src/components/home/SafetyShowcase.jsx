@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import {
   ShieldCheck,
-  Heart,
   Video,
   Lock,
   MessageSquare,
@@ -64,7 +63,7 @@ export default function SafetyShowcase() {
           {/* Left Column (5 cols): The Female Safety & Family Privacy Manifesto */}
           <div className="lg:col-span-5 space-y-6 text-left">
             <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#143d2b] border border-[#d4a359]/40 text-[#d4a359] text-xs font-bold shadow-sm">
-              <Heart className="w-3.5 h-3.5 text-rose-400" />
+              <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
               <span>Designed Especially for Females &amp; Families</span>
             </div>
 
@@ -166,10 +165,10 @@ export default function SafetyShowcase() {
               <div className="p-5 rounded-2xl bg-[#0c2217] border border-[#143d2b] space-y-3 flex flex-col justify-between">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <div className="p-2 rounded-xl bg-rose-950/80 text-rose-300 border border-rose-500/30 w-fit">
-                      <Heart className="w-4 h-4" />
+                    <div className="p-2 rounded-xl bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40 w-fit">
+                      <ShieldCheck className="w-4 h-4" />
                     </div>
-                    <span className="text-[10px] font-bold uppercase tracking-wider text-rose-300 bg-rose-950 px-2 py-0.5 rounded border border-rose-800">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-[#143d2b] px-2 py-0.5 rounded border border-[#d4a359]/40">
                       Girls &amp; Kids
                     </span>
                   </div>

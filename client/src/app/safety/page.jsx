@@ -13,7 +13,6 @@ import {
   AlertTriangle,
   CheckCircle2,
   Users,
-  Heart,
   ArrowRight,
   Sparkles,
   Camera,
@@ -26,10 +25,10 @@ export default function SafetyPage() {
   const safetyPillars = [
     {
       id: 'female-safety',
-      icon: Heart,
+      icon: ShieldCheck,
       badge: 'Protected & Supervised',
       title: 'Complete Female Comfort & Privacy Guarantee',
-      color: 'bg-rose-50 text-rose-700 border-rose-200',
+      color: 'bg-[#f5ebe6] text-[#b85d34] border-[#b85d34]/30',
       description:
         'This platform was created specifically with female comfort and dignity in mind. Pakistani mothers, daughters, and female educators must never have any concerns about their privacy.',
       features: [
@@ -106,7 +105,7 @@ export default function SafetyPage() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center space-y-6">
           
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#143d2b] border border-[#d4a359]/40 text-[#d4a359] text-xs font-bold shadow-md">
-            <Heart className="w-3.5 h-3.5 text-rose-400" />
+            <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
             <span>Designed Especially for Females &amp; Pakistani Families</span>
           </div>
 
@@ -139,7 +138,7 @@ export default function SafetyPage() {
               href="/tutors?gender=female"
               className="w-full sm:w-auto px-6 py-3.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs sm:text-sm rounded-xl shadow-lg shadow-[#b85d34]/30 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
-              <Heart className="w-4 h-4 text-rose-200" />
+              <ShieldCheck className="w-4 h-4 text-white" />
               <span>Browse Verified Female Alimahs &amp; Tutors</span>
               <ArrowRight className="w-4 h-4" />
             </Link>

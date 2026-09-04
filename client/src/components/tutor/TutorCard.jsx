@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
   MapPin,
   ShieldCheck,
@@ -12,8 +12,7 @@ import {
   MessageSquare,
   Sparkles,
   Wifi,
-  User,
-  Heart
+  User
 } from 'lucide-react';
 import RatingStars from '../common/RatingStars';
 import SanadBadge, { SanadModal } from '../common/SanadBadge';
@@ -31,16 +30,16 @@ const ModeBadge = ({ mode }) => {
   const isOnline = mode === 'online';
   return (
     <span
-      className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+      className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
         isOnline
-          ? 'bg-sky-50 text-sky-700 border-sky-200'
-          : 'bg-amber-50 text-amber-700 border-amber-200'
+          ? 'bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/30'
+          : 'bg-[#ede6db] text-slate-700'
       }`}
     >
       {isOnline ? (
-        <Wifi className="w-2.5 h-2.5" />
+        <Wifi className="w-2.5 h-2.5 text-[#d4a359]" />
       ) : (
-        <Home className="w-2.5 h-2.5" />
+        <Home className="w-2.5 h-2.5 text-slate-500" />
       )}
       {isOnline ? 'Online' : 'In-Person'}
     </span>
@@ -48,62 +47,13 @@ const ModeBadge = ({ mode }) => {
 };
 
 // ─────────────────────────────────────────────
-// 3-D Tilt wrapper (Framer Motion)
+// Card Wrapper (Gentle Zoom on Hover, non-3D)
 // ─────────────────────────────────────────────
-const TiltCard = ({ children }) => {
-  const ref = useRef(null);
-
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-
-  const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [8, -8]), { stiffness: 260, damping: 26 });
-  const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-8, 8]), { stiffness: 260, damping: 26 });
-  const glowOpacity = useSpring(0, { stiffness: 200, damping: 24 });
-  const scale = useSpring(1, { stiffness: 260, damping: 26 });
-
-  const handleMouseMove = (e) => {
-    const rect = ref.current?.getBoundingClientRect();
-    if (!rect) return;
-    const nx = (e.clientX - rect.left) / rect.width - 0.5;
-    const ny = (e.clientY - rect.top) / rect.height - 0.5;
-    x.set(nx);
-    y.set(ny);
-  };
-
-  const handleMouseEnter = () => {
-    glowOpacity.set(1);
-    scale.set(1.025);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-    glowOpacity.set(0);
-    scale.set(1);
-  };
-
+const CardHoverWrapper = ({ children }) => {
   return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        rotateX,
-        rotateY,
-        scale,
-        transformStyle: 'preserve-3d',
-        transformPerspective: 1000,
-      }}
-      className="relative h-full"
-    >
-      {/* Glow ring */}
-      <motion.div
-        style={{ opacity: glowOpacity }}
-        className="absolute -inset-[1.5px] rounded-3xl bg-gradient-to-br from-[#d4a359]/40 via-[#b85d34]/30 to-[#d4a359]/40 blur-[2px] pointer-events-none z-0"
-      />
+    <div className="relative h-full transition-transform duration-200 ease-out hover:scale-[1.02] will-change-transform">
       <div className="relative z-10 h-full">{children}</div>
-    </motion.div>
+    </div>
   );
 };
 
@@ -187,7 +137,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
 
   return (
     <>
-      <TiltCard>
+      <CardHoverWrapper>
       <div className="bg-white rounded-3xl border border-[#e6ded1] p-4 sm:p-5 md:p-6 shadow-sm flex flex-col justify-between h-full gap-4 transition-all duration-300 hover:border-[#b85d34]/40 hover:shadow-md">
 
         {/* ── Body ── */}
@@ -235,7 +185,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                   <span className="text-slate-300">·</span>
                   {data.gender === 'female' ? (
                     <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#b85d34] bg-[#f5ebe6] px-2 py-0.5 rounded-full border border-[#b85d34]/30">
-                      <Heart className="w-3 h-3 text-rose-500" />
+                      <ShieldCheck className="w-3 h-3 text-[#b85d34]" />
                       <span>Verified Female Alimah</span>
                     </span>
                   ) : (
@@ -347,7 +297,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
           </div>
         </div>
       </div>
-    </TiltCard>
+    </CardHoverWrapper>
 
       {/* Sanad Preview Modal */}
       <SanadModal

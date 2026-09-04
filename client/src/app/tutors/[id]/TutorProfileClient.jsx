@@ -21,8 +21,7 @@ import {
   Baby,
   Layers,
   Search,
-  AlertTriangle,
-  Heart
+  AlertTriangle
 } from 'lucide-react';
 import RatingStars from '../../../components/common/RatingStars';
 import SanadBadge, { SanadModal } from '../../../components/common/SanadBadge';
@@ -152,7 +151,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                   <h1 className="text-xl sm:text-2xl font-serif font-black text-slate-900">{tutorName}</h1>
                   {isFemaleTutor ? (
                     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-[#f5ebe6] text-[#b85d34] border border-[#b85d34]/30">
-                      <Heart className="w-3.5 h-3.5 text-rose-500" />
+                      <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
                       <span>Verified Female Alimah</span>
                     </span>
                   ) : (

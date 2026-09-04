@@ -7,7 +7,7 @@ import TutorFilterSidebar from '../../components/tutor/TutorFilterSidebar';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import CustomSelect from '../../components/common/CustomSelect';
 import { api } from '../../services/api';
-import { Search, Users, ArrowUpDown, Heart } from 'lucide-react';
+import { Search, Users, ArrowUpDown, ShieldCheck } from 'lucide-react';
 
 const sortOptions = [
   { value: 'popular', label: 'Most Popular', sublabel: 'Top Enrolled & Active' },
@@ -160,7 +160,7 @@ function TutorSearchContent() {
         <div className="bg-white rounded-3xl border border-[#e6ded1] p-5 sm:p-8 shadow-sm space-y-4 sm:space-y-5">
           <div>
             <div className="flex items-center gap-2 text-xs font-bold text-[#b85d34] uppercase tracking-wider mb-1">
-              <Heart className="w-3.5 h-3.5 text-rose-500" />
+              <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
               <span>Female-Safe Tutoring Directory • Pakistan</span>
             </div>
             <h1 className="text-xl sm:text-3xl font-serif font-black text-slate-900 tracking-tight">

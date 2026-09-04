@@ -50,7 +50,7 @@ const Footer = () => {
           <div className="flex flex-col lg:flex-row items-center justify-between gap-6 relative z-10">
             <div className="space-y-2 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40">
-                <Heart className="w-3.5 h-3.5 text-rose-400" />
+                <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
                 <span>Female Safety &amp; Complete Family Privacy Guaranteed</span>
               </div>
               <h3 className="text-xl sm:text-3xl font-serif font-black text-white tracking-tight">
@@ -122,7 +122,7 @@ const Footer = () => {
             {/* Trust Badges Pill Bar */}
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#143d2b]/70 text-[#d4a359] border border-[#d4a359]/30">
-                <Heart className="w-3 h-3 text-rose-400" />
+                <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
                 <span>100% Female Privacy</span>
               </span>
               <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold bg-[#143d2b]/70 text-[#f5f0e6] border border-[#d4a359]/30">
@@ -183,7 +183,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link href="/tutors?gender=female" className="hover:text-white font-bold text-[#d4a359] transition-colors flex items-center gap-2">
-                  <Heart className="w-3.5 h-3.5 text-rose-400" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
                   <span>Female Alimahs Only</span>
                 </Link>
               </li>

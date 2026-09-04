@@ -13,7 +13,6 @@ import {
   ArrowRight,
   ChevronDown,
   ChevronRight,
-  Heart,
   Baby,
   Users,
   Video,

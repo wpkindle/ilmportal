@@ -243,8 +243,6 @@ export default function ProfileCompletionMeter({
             <rect x="55" y="55" width="90" height="90" transform="rotate(45 100 100)" stroke="#d4a359" strokeWidth="1" />
           </svg>
         </div>
-        <span className="absolute top-6 right-20 w-1.5 h-1.5 rounded-full bg-[#d4a359] shadow-[0_0_8px_#d4a359] animate-particle-drift pointer-events-none" style={{ animationDelay: '0.8s', animationDuration: '7s' }} />
-        <span className="absolute bottom-8 right-1/3 w-1 h-1 rounded-full bg-[#b85d34] shadow-[0_0_6px_#b85d34] animate-particle-drift pointer-events-none" style={{ animationDelay: '2.1s', animationDuration: '9s' }} />
 
         {/* ── Top Header Row: User Name & Action Buttons ── */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6 relative z-10">

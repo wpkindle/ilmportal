@@ -8,7 +8,6 @@ import {
   Video,
   VideoOff,
   Monitor,
-  MonitorOff,
   PhoneOff,
   MessageSquare,
   Users,
@@ -22,13 +21,16 @@ import {
   Sparkles,
   Volume2,
   VolumeX,
-  Sliders,
   ShieldAlert,
   Flag,
   Lock,
-  AlertTriangle,
   RotateCcw,
-  X
+  X,
+  Maximize2,
+  Minimize2,
+  Expand,
+  Shrink,
+  Sliders
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
@@ -95,8 +97,8 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
   // Safety Modal State
   const [safetyModalOpen, setSafetyModalOpen] = useState(true);
 
-  // Layout view modes: 'grid' (50/50 dual conference) | 'spotlight' | 'quran'
-  const [viewMode, setViewMode] = useState('grid');
+  // Layout view modes: 'meet' (Google Meet default: Opponent large stage + PiP self) | 'grid' (50/50 dual) | 'quran' (Quran split)
+  const [viewMode, setViewMode] = useState('meet');
 
   // Media & Connection states
   const [localStream, setLocalStream] = useState(null);
@@ -120,11 +122,21 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
   const [isConnecting, setIsConnecting] = useState(false);
   const [facingMode, setFacingMode] = useState('user');
 
-  const localVideoRef = useRef(null);
-  const remoteVideoRef = useRef(null);
-  const remoteAudioRef = useRef(null);
-  const spotlightRemoteVideoRef = useRef(null);
+  // Google Meet Layout Controls:
+  const [isSwapped, setIsSwapped] = useState(false); // When true: local stream is on big stage, remote is in PiP
+  const [isSelfMinimized, setIsSelfMinimized] = useState(false); // Minimized self floating card
+  const [objectFitMode, setObjectFitMode] = useState('cover'); // 'cover' or 'contain' for main stage
+  const [showVolumePopover, setShowVolumePopover] = useState(false);
+
+  // Video Refs
+  const primaryVideoRef = useRef(null);
+  const pipVideoRef = useRef(null);
+  const gridRemoteVideoRef = useRef(null);
+  const gridLocalVideoRef = useRef(null);
   const quranRemoteVideoRef = useRef(null);
+  const quranLocalVideoRef = useRef(null);
+  const remoteAudioRef = useRef(null);
+
   const peerConnectionRef = useRef(null);
   const localStreamRef = useRef(null);
   const screenTrackRef = useRef(null);
@@ -150,6 +162,20 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     return `${mins.toString().padStart(2, '0')}:${s.toString().padStart(2, '0')}`;
   };
 
+  // Helper to reliably attach streams to video elements
+  const attachStreamToVideo = useCallback((videoEl, stream, isMuted = true) => {
+    if (!videoEl) return;
+    if (stream) {
+      if (videoEl.srcObject !== stream) {
+        videoEl.srcObject = stream;
+      }
+      videoEl.muted = isMuted;
+      videoEl.play().catch(() => {});
+    } else {
+      videoEl.srcObject = null;
+    }
+  }, []);
+
   // Update remote speaker audio volume and mute state
   useEffect(() => {
     if (remoteAudioRef.current) {
@@ -157,6 +183,34 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       remoteAudioRef.current.volume = isSpeakerMuted ? 0 : speakerVolume;
     }
   }, [isSpeakerMuted, speakerVolume]);
+
+  // Synchronize streams with all active video DOM elements
+  useEffect(() => {
+    const bigStream = !isSwapped ? remoteStream : localStream;
+    const smallStream = !isSwapped ? localStream : remoteStream;
+
+    attachStreamToVideo(primaryVideoRef.current, bigStream, true);
+    attachStreamToVideo(pipVideoRef.current, smallStream, true);
+    attachStreamToVideo(gridRemoteVideoRef.current, remoteStream, true);
+    attachStreamToVideo(gridLocalVideoRef.current, localStream, true);
+    attachStreamToVideo(quranRemoteVideoRef.current, remoteStream, true);
+    attachStreamToVideo(quranLocalVideoRef.current, localStream, true);
+
+    if (remoteStream && remoteAudioRef.current) {
+      if (remoteAudioRef.current.srcObject !== remoteStream) {
+        remoteAudioRef.current.srcObject = remoteStream;
+      }
+      remoteAudioRef.current.muted = isSpeakerMuted;
+      remoteAudioRef.current.volume = isSpeakerMuted ? 0 : speakerVolume;
+      remoteAudioRef.current.play()
+        .then(() => {
+          if (!isSpeakerMuted) {
+            fadeInAudio(remoteAudioRef.current, speakerVolume);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [remoteStream, localStream, viewMode, isSwapped, isSpeakerMuted, speakerVolume, attachStreamToVideo]);
 
   // Helper to create and configure RTCPeerConnection
   const createPeerConnection = useCallback((targetSocketId) => {
@@ -173,7 +227,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     peerConnectionRef.current = pc;
     iceCandidateQueue.current = [];
 
-    // Add local tracks (Audio + Video) to peer connection — ensuring no duplicate senders
+    // Add local tracks (Audio + Video) to peer connection
     if (localStreamRef.current) {
       const existingSenders = pc.getSenders();
       localStreamRef.current.getTracks().forEach((track) => {
@@ -196,25 +250,6 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
       setPeerConnected(true);
       setIsConnecting(false);
 
-      // IMPORTANT FOR NOISE SUPPRESSION:
-      // Keep all <video> elements MUTED to prevent double-audio decoding and howling loops!
-      if (remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = stream;
-        remoteVideoRef.current.muted = true; // Video element is muted, only audio tag plays sound
-        remoteVideoRef.current.play().catch(() => {});
-      }
-      if (spotlightRemoteVideoRef.current) {
-        spotlightRemoteVideoRef.current.srcObject = stream;
-        spotlightRemoteVideoRef.current.muted = true;
-        spotlightRemoteVideoRef.current.play().catch(() => {});
-      }
-      if (quranRemoteVideoRef.current) {
-        quranRemoteVideoRef.current.srcObject = stream;
-        quranRemoteVideoRef.current.muted = true;
-        quranRemoteVideoRef.current.play().catch(() => {});
-      }
-
-      // Dedicated audio tag plays remote voice directly
       if (remoteAudioRef.current) {
         remoteAudioRef.current.srcObject = stream;
         remoteAudioRef.current.muted = isSpeakerMuted;
@@ -252,7 +287,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     };
 
     return pc;
-  }, [socket, user, roomId]);
+  }, [socket, user, roomId, isSpeakerMuted, speakerVolume]);
 
   // Flush queued ICE candidates
   const processCandidateQueue = async (pc) => {
@@ -322,7 +357,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               echoCancellation: true,
               noiseSuppression: true,
               autoGainControl: true,
-              channelCount: 1 // Single-channel mono prevents acoustic feedback phase screeching
+              channelCount: 1
             }
           });
           // Female & family safety: Disable camera tracks by default until user opts in
@@ -332,12 +367,6 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           activeStream = stream;
           localStreamRef.current = stream;
           setLocalStream(stream);
-
-          if (localVideoRef.current) {
-            localVideoRef.current.srcObject = stream;
-            localVideoRef.current.muted = true;
-            localVideoRef.current.play().catch(() => {});
-          }
 
           // If peer connection already exists, attach local tracks to it
           if (peerConnectionRef.current) {
@@ -366,13 +395,12 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           user: myInfo
         });
 
-        // When existing peers are in room (I am the newly joined peer)
+        // When existing peers are in room
         socket.on('existing-peers', async ({ peers }) => {
           if (Array.isArray(peers) && peers.length > 0) {
             const peerSocketId = peers[0];
             targetPeerSocketIdRef.current = peerSocketId;
             console.log('[WebRTC] Existing peer in room detected:', peerSocketId);
-            // We wait for the existing peer to initiate the offer to prevent double-offer glare
           }
         });
 
@@ -393,7 +421,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           }
         });
 
-        // Signaling receiver with Perfect Negotiation (Glaring prevention)
+        // Signaling receiver with Perfect Negotiation
         socket.on('webrtc-signal-received', async ({ callerSocketId, signalData, callerInfo }) => {
           if (!signalData) return;
           if (callerInfo) setRemotePeerInfo(callerInfo);
@@ -504,43 +532,6 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     };
   }, [roomId, socket, user, isPolite, createPeerConnection, sendOffer]);
 
-  // Keep video and audio elements updated cleanly without audio doubling
-  useEffect(() => {
-    if (remoteStream) {
-      if (remoteVideoRef.current) {
-        remoteVideoRef.current.srcObject = remoteStream;
-        remoteVideoRef.current.muted = true; // Kept muted to prevent loop
-        remoteVideoRef.current.play().catch(() => {});
-      }
-      if (remoteAudioRef.current) {
-        remoteAudioRef.current.srcObject = remoteStream;
-        remoteAudioRef.current.muted = isSpeakerMuted;
-        remoteAudioRef.current.play()
-          .then(() => {
-            if (!isSpeakerMuted) {
-              fadeInAudio(remoteAudioRef.current, speakerVolume);
-            }
-          })
-          .catch(() => {});
-      }
-      if (spotlightRemoteVideoRef.current) {
-        spotlightRemoteVideoRef.current.srcObject = remoteStream;
-        spotlightRemoteVideoRef.current.muted = true;
-        spotlightRemoteVideoRef.current.play().catch(() => {});
-      }
-      if (quranRemoteVideoRef.current) {
-        quranRemoteVideoRef.current.srcObject = remoteStream;
-        quranRemoteVideoRef.current.muted = true;
-        quranRemoteVideoRef.current.play().catch(() => {});
-      }
-    }
-    if (localStream && localVideoRef.current) {
-      localVideoRef.current.srcObject = localStream;
-      localVideoRef.current.muted = true;
-      localVideoRef.current.play().catch(() => {});
-    }
-  }, [remoteStream, localStream, viewMode, isSpeakerMuted, speakerVolume]);
-
   // Manual connect/reconnect action
   const handleManualReconnect = () => {
     sendOffer(targetPeerSocketIdRef.current || null);
@@ -594,8 +585,8 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
         const sender = peerConnectionRef.current.getSenders().find((s) => s.track && s.track.kind === 'video');
         if (sender) sender.replaceTrack(newVideoTrack);
       }
-      if (localVideoRef.current) {
-        localVideoRef.current.srcObject = localStreamRef.current;
+      if (localStreamRef.current) {
+        setLocalStream(new MediaStream(localStreamRef.current.getTracks()));
       }
     } catch (err) {
       console.warn('Camera switch error:', err);
@@ -616,9 +607,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             .find((s) => s.track && s.track.kind === 'video');
           if (sender) sender.replaceTrack(videoTrack);
         }
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = localStreamRef.current;
-        }
+        setLocalStream(new MediaStream(localStreamRef.current.getTracks()));
       }
       setIsScreenSharing(false);
     } else {
@@ -634,9 +623,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           if (sender) sender.replaceTrack(screenTrack);
         }
 
-        if (localVideoRef.current) {
-          localVideoRef.current.srcObject = screenStream;
-        }
+        setLocalStream(screenStream);
 
         screenTrack.onended = () => {
           toggleScreenShare();
@@ -694,7 +681,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
     router.push(user?.role === 'tutor' ? '/tutor/dashboard' : '/student/dashboard');
   };
 
-  // Emergency Leave & Report: Instantly cuts all media & connection, but keeps user on screen to fill report!
+  // Emergency Leave & Report
   const handleEmergencyLeaveAndReport = () => {
     if (localStreamRef.current) {
       localStreamRef.current.getTracks().forEach((track) => track.stop());
@@ -741,9 +728,9 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
   return (
     <div
       ref={containerRef}
-      className="flex flex-col h-screen w-screen bg-slate-950 text-white overflow-hidden fixed inset-0 z-50 select-none font-sans"
+      className="flex flex-col h-screen w-screen bg-[#121314] text-white overflow-hidden fixed inset-0 z-50 select-none font-sans"
     >
-      {/* Single dedicated remote audio element for crystal-clear voice without echo loops */}
+      {/* Dedicated audio element for crystal-clear voice without double decoding */}
       <audio ref={remoteAudioRef} autoPlay playsInline />
 
       {/* Pre-Class Safety Guarantee Modal */}
@@ -841,29 +828,71 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
         </div>
       )}
 
-      {/* Top Classroom Bar */}
-      <div className="px-4 py-3 bg-[#0c2217]/95 backdrop-blur-md border-b border-[#143d2b] flex items-center justify-between z-20 shrink-0">
+      {/* Top Google Meet Style Minimalist Header */}
+      <div className="px-4 py-2.5 bg-[#18191a]/95 backdrop-blur-md border-b border-white/10 flex items-center justify-between z-20 shrink-0 select-none">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-2.5 h-2.5 rounded-full bg-[#d4a359] animate-ping shrink-0" />
-          <div className="min-w-0">
-            <h2 className="text-xs sm:text-sm font-bold text-white flex items-center gap-2 truncate">
-              <span>{sessionData?.title || 'Live Tutoring Class'}</span>
-              <span className="text-[9px] font-bold px-1.5 py-0.2 bg-[#143d2b] text-[#d4a359] rounded border border-[#d4a359]/40 shrink-0">
-                LIVE • 1:1 Class
-              </span>
-            </h2>
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#d4a359] animate-ping shrink-0" />
+            <span className="font-bold text-xs sm:text-sm text-white truncate">
+              {sessionData?.title || 'IlmPortal Live Tutoring Classroom'}
+            </span>
           </div>
+          <span className="hidden md:inline-flex text-[9px] font-bold px-2 py-0.5 bg-[#0c2217] text-[#d4a359] rounded-full border border-[#d4a359]/40 shrink-0">
+            1:1 Verified Safe Session
+          </span>
         </div>
 
-        {/* Center/Right Timer, Modes & Security Badges */}
+        {/* Header Right Actions */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* End-to-End Encrypted Label */}
-          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-[#143d2b] border border-[#d4a359]/40 text-[#d4a359] text-[11px] font-bold">
+          {/* E2EE Lock */}
+          <div className="hidden lg:flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#0c2217] border border-[#d4a359]/30 text-[#d4a359] text-[11px] font-bold">
             <Lock className="w-3 h-3 text-[#d4a359]" />
             <span>E2EE 1:1 Safe Room</span>
           </div>
 
-          {/* Always-Visible Report / Block Button */}
+          {/* View Mode Switcher Pills */}
+          <div className="flex items-center bg-[#242526] p-0.5 rounded-xl border border-white/10 text-xs font-semibold">
+            <button
+              onClick={() => setViewMode('meet')}
+              className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewMode === 'meet'
+                  ? 'bg-[#0c2217] text-[#d4a359] font-bold shadow-xs border border-[#d4a359]/40'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+              title="Google Meet Spotlight Layout (Opponent Bigger)"
+            >
+              <Users className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Google Meet</span>
+            </button>
+
+            <button
+              onClick={() => setViewMode('grid')}
+              className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewMode === 'grid'
+                  ? 'bg-[#0c2217] text-[#d4a359] font-bold shadow-xs border border-[#d4a359]/40'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+              title="50/50 Dual Conference Grid"
+            >
+              <LayoutGrid className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Dual Grid</span>
+            </button>
+
+            <button
+              onClick={() => setViewMode('quran')}
+              className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
+                viewMode === 'quran'
+                  ? 'bg-[#0c2217] text-[#d4a359] font-bold shadow-xs border border-[#d4a359]/40'
+                  : 'text-slate-300 hover:text-white'
+              }`}
+              title="Split Screen Tajweed & Quran Reader"
+            >
+              <BookOpen className="w-3.5 h-3.5 text-[#d4a359]" />
+              <span className="hidden sm:inline">Quran Reader</span>
+            </button>
+          </div>
+
+          {/* Emergency Safety Flag Button */}
           <button
             onClick={() => {
               setIsReportingAfterLeave(false);
@@ -873,146 +902,286 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             title="Report Concern or Block Participant"
           >
             <Flag className="w-3.5 h-3.5 text-rose-400" />
-            <span className="hidden sm:inline">Report / Block</span>
-          </button>
-
-          {/* Duration Timer */}
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/50 border border-[#d4a359]/30 text-xs font-mono font-bold text-[#d4a359]">
-            <Clock className="w-3.5 h-3.5 text-[#d4a359]" />
-            <span>{formatTime(classDurationSeconds)}</span>
-          </div>
-
-          {/* Conference 50/50 Grid vs Spotlight Mode Toggle */}
-          <button
-            onClick={() => setViewMode(viewMode === 'grid' ? 'spotlight' : 'grid')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border cursor-pointer ${
-              viewMode === 'grid'
-                ? 'bg-[#143d2b] text-[#d4a359] border-[#d4a359]/40 shadow-xs'
-                : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
-            }`}
-            title="Toggle Conference Grid View"
-          >
-            <LayoutGrid className="w-3.5 h-3.5 text-white" />
-            <span className="hidden sm:inline">{viewMode === 'grid' ? 'Conference Grid' : 'Spotlight'}</span>
-          </button>
-
-          {/* Digital Quran Reader Tab */}
-          <button
-            onClick={() => setViewMode(viewMode === 'quran' ? 'grid' : 'quran')}
-            className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 border cursor-pointer ${
-              viewMode === 'quran'
-                ? 'bg-[#143d2b] text-[#d4a359] border-[#d4a359]/40 shadow-xs'
-                : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700'
-            }`}
-          >
-            <BookOpen className="w-3.5 h-3.5 text-[#d4a359]" />
-            <span className="hidden sm:inline">Quran Reader</span>
+            <span className="hidden md:inline">Report / Flag</span>
           </button>
         </div>
       </div>
 
-      {/* Main Classroom Stage */}
-      <div className="flex-1 flex overflow-hidden relative bg-slate-950">
+      {/* Main Classroom Stage Area */}
+      <div className="flex-1 flex overflow-hidden relative bg-[#121314]">
         
-        {/* VIEW MODE 1: True Dual 50/50 Conference Grid (Desktop 50/50, Mobile: Opponent in bottom big screen) */}
-        {viewMode === 'grid' && (
-          <div className="flex-1 flex flex-col md:grid md:grid-cols-2 gap-2 sm:gap-4 p-2 sm:p-4 h-full w-full overflow-hidden">
+        {/* ========================================================================= */}
+        {/* VIEW MODE 1: GOOGLE MEET LAYOUT (OPPONENT BIGGER + FLOATING LOCAL PiP)    */}
+        {/* ========================================================================= */}
+        {viewMode === 'meet' && (
+          <div className="flex-1 relative w-full h-full flex items-center justify-center p-2 sm:p-4 overflow-hidden">
             
-            {/* Card 1: Remote Peer (Opponent) - Placed in the bottom big video screen on mobile */}
-            <div className="order-2 md:order-1 flex-1 w-full h-full min-h-[56%] md:min-h-0 rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900 border-2 border-slate-800/90 flex items-center justify-center relative shadow-2xl">
+            {/* HERO STAGE: Opponent Screen is Big & Dominant */}
+            <div className="w-full h-full max-w-[1700px] rounded-2xl sm:rounded-3xl overflow-hidden bg-[#202124] border border-white/10 shadow-2xl relative flex items-center justify-center group">
+              
               <video
-                ref={remoteVideoRef}
+                ref={(el) => {
+                  primaryVideoRef.current = el;
+                  attachStreamToVideo(el, !isSwapped ? remoteStream : localStream, true);
+                }}
                 autoPlay
                 muted
                 playsInline
-                className={`w-full h-full object-cover ${!peerConnected ? 'hidden' : ''}`}
+                className={`w-full h-full ${
+                  objectFitMode === 'cover' ? 'object-cover' : 'object-contain'
+                } transition-all ${
+                  (!isSwapped ? (!peerConnected || !isRemoteCameraOn) : !isCameraOn) ? 'hidden' : ''
+                } ${isSwapped && isBackgroundBlurred ? 'filter blur-[5px] scale-105' : ''}`}
               />
 
-              {/* Waiting screen when remote peer hasn't connected */}
-              {!peerConnected && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-gradient-to-b from-slate-900 to-slate-950 space-y-3">
+              {/* Waiting screen when opponent has not connected yet */}
+              {!isSwapped && !peerConnected && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-gradient-to-b from-[#202124] to-[#161718] space-y-4">
                   <div className="relative">
-                    <div className="w-20 h-20 rounded-3xl bg-[#0c2217] text-[#d4a359] flex items-center justify-center border border-[#d4a359]/40 shadow-lg">
-                      <Users className="w-10 h-10 animate-pulse" />
+                    <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full bg-[#0c2217] text-[#d4a359] flex items-center justify-center border-2 border-[#d4a359]/40 shadow-2xl">
+                      <Users className="w-12 h-12 text-[#d4a359] animate-pulse" />
                     </div>
                     <span className="absolute -top-1 -right-1 w-4 h-4 bg-[#d4a359] rounded-full animate-ping" />
                   </div>
 
-                  <div>
-                    <h3 className="text-base sm:text-lg font-bold text-white">
-                      Waiting for {otherRoleName} to connect...
+                  <div className="space-y-1 max-w-sm">
+                    <h3 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+                      Waiting for {otherPartyName} ({otherRoleName}) to connect...
                     </h3>
-                    <p className="text-xs text-slate-400 mt-1 max-w-xs mx-auto">
-                      Automated in-platform live stream active with echo cancellation and noise suppression.
+                    <p className="text-xs text-slate-400 leading-relaxed">
+                      End-to-end encrypted classroom live stream. High-definition video will start automatically upon connection.
                     </p>
                   </div>
 
                   <button
                     onClick={handleManualReconnect}
-                    className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
+                    className="px-4 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white font-bold text-xs rounded-xl shadow-lg flex items-center gap-2 cursor-pointer transition-all hover:scale-105"
                   >
-                    <RefreshCw className={`w-3.5 h-3.5 ${isConnecting ? 'animate-spin' : ''}`} />
-                    <span>{isConnecting ? 'Connecting Stream...' : 'Connect Video & Voice Now'}</span>
+                    <RefreshCw className={`w-4 h-4 ${isConnecting ? 'animate-spin' : ''}`} />
+                    <span>{isConnecting ? 'Connecting Stream...' : 'Reconnect Live Stream'}</span>
                   </button>
                 </div>
               )}
 
-              {/* If remote peer connected but turned their camera off */}
-              {peerConnected && !isRemoteCameraOn && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-slate-900 space-y-2.5">
-                  <div className="w-16 h-16 rounded-2xl bg-slate-800 flex items-center justify-center border border-slate-700">
-                    <VideoOff className="w-8 h-8 text-slate-400" />
+              {/* Opponent Connected but Camera is OFF (Google Meet Style Avatar Card) */}
+              {(!isSwapped ? (peerConnected && !isRemoteCameraOn) : !isCameraOn) && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-[#202124] space-y-4 select-none">
+                  <div className="relative">
+                    <div className="w-28 h-28 sm:w-36 sm:h-36 rounded-full bg-gradient-to-tr from-[#0c2217] via-[#143d2b] to-[#1e5c41] text-[#d4a359] border-4 border-[#d4a359]/50 flex items-center justify-center text-4xl sm:text-5xl font-black shadow-2xl">
+                      {(!isSwapped ? otherPartyName : (user?.name || 'U')).charAt(0).toUpperCase()}
+                    </div>
+                    {(!isSwapped ? isRemoteMicOn : isMicOn) && (
+                      <span className="absolute inset-0 rounded-full border-2 border-[#d4a359]/60 animate-ping pointer-events-none" />
+                    )}
                   </div>
-                  <div>
-                    <h3 className="text-sm font-bold text-white">
-                      {otherPartyName}&apos;s Camera is Off
+
+                  <div className="space-y-1">
+                    <h3 className="text-lg sm:text-xl font-bold text-white">
+                      {!isSwapped ? otherPartyName : 'You'}
                     </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      Live voice audio is active.
+                    <p className="text-xs text-slate-400">
+                      Camera is turned off • Live voice audio connected
                     </p>
                   </div>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40">
-                    <span className="w-1.5 h-1.5 rounded-full bg-[#d4a359] animate-pulse" />
-                    <span>Voice Audio Connected</span>
+
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-semibold bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40 shadow-sm">
+                    <span className="w-2 h-2 rounded-full bg-[#d4a359] animate-pulse" />
+                    <span>Voice Audio Active</span>
                   </span>
                 </div>
               )}
 
-              {/* Peer Name & Role Badge */}
-              <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-sm text-xs font-bold text-white flex items-center gap-2 border border-white/10 z-10">
-                <span className={`w-2 h-2 rounded-full ${peerConnected ? 'bg-[#d4a359] animate-pulse' : 'bg-amber-400'}`} />
-                <span>{otherPartyName}</span>
-                <span className="text-[10px] font-normal text-slate-300 bg-white/10 px-1.5 py-0.2 rounded">
-                  {otherRoleName}
+              {/* Fit / Fill Aspect Toggle Button (Google Meet Style) */}
+              <button
+                type="button"
+                onClick={() => setObjectFitMode(objectFitMode === 'cover' ? 'contain' : 'cover')}
+                className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 px-3 py-1.5 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/15 text-slate-200 hover:text-white text-[11px] font-semibold flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-opacity z-20 cursor-pointer shadow-lg"
+                title={objectFitMode === 'cover' ? 'Fit full camera sensor to screen' : 'Fill entire video card'}
+              >
+                {objectFitMode === 'cover' ? <Shrink className="w-3.5 h-3.5" /> : <Expand className="w-3.5 h-3.5" />}
+                <span className="hidden sm:inline">{objectFitMode === 'cover' ? 'Fit Frame' : 'Fill Screen'}</span>
+              </button>
+
+              {/* Opponent / Main Stage Participant Name Capsule */}
+              <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/15 text-white flex items-center gap-2.5 z-20 shadow-xl">
+                <span className="flex items-center justify-center">
+                  {(!isSwapped ? !isRemoteMicOn : !isMicOn) ? (
+                    <span className="w-6 h-6 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center">
+                      <MicOff className="w-3.5 h-3.5" />
+                    </span>
+                  ) : (
+                    <span className="w-6 h-6 rounded-full bg-[#143d2b] text-[#d4a359] flex items-center justify-center">
+                      <Mic className="w-3.5 h-3.5" />
+                    </span>
+                  )}
                 </span>
+                <span className="text-xs sm:text-sm font-bold tracking-tight">
+                  {!isSwapped ? otherPartyName : `You (${user?.name || 'Self'})`}
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-white/10 text-[#d4a359] border border-[#d4a359]/30">
+                  {!isSwapped ? otherRoleName : (user?.role || 'Active')}
+                </span>
+                {peerConnected && !isSwapped && (
+                  <span className="hidden sm:flex items-center gap-1 text-[10px] text-[#d4a359] font-semibold bg-[#0c2217] px-2 py-0.5 rounded border border-[#d4a359]/30">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#d4a359] animate-pulse" />
+                    <span>HD 1:1</span>
+                  </span>
+                )}
               </div>
             </div>
 
-            {/* Card 2 (Right on desktop, Top compact preview on mobile): Local User (Self) */}
-            <div className="order-1 md:order-2 w-full h-36 sm:h-48 md:h-full md:flex-1 rounded-2xl sm:rounded-3xl overflow-hidden bg-slate-900 border-2 border-[#d4a359]/40 flex items-center justify-center relative shadow-2xl shrink-0">
+            {/* FLOATING SELF PiP CARD (Google Meet Floating Tile in Corner) */}
+            {isSelfMinimized ? (
+              <div
+                onClick={() => setIsSelfMinimized(false)}
+                className="absolute bottom-20 sm:bottom-24 right-4 sm:right-6 px-3.5 py-2 rounded-full bg-black/80 hover:bg-black/95 backdrop-blur-md border border-white/20 text-white text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-2xl z-30 transition-all hover:scale-105"
+                title="Expand your video preview"
+              >
+                <div className="w-2.5 h-2.5 rounded-full bg-[#d4a359]" />
+                <span>You ({(!isSwapped ? isCameraOn : isRemoteCameraOn) ? 'Video ON' : 'Video OFF'})</span>
+                <Maximize2 className="w-3.5 h-3.5 text-[#d4a359]" />
+              </div>
+            ) : (
+              <div className="absolute bottom-20 sm:bottom-24 right-4 sm:right-6 w-44 sm:w-60 md:w-68 aspect-video rounded-2xl overflow-hidden shadow-2xl border-2 border-white/25 hover:border-[#d4a359] bg-[#202124] z-30 transition-all duration-200 group">
+                <video
+                  ref={(el) => {
+                    pipVideoRef.current = el;
+                    attachStreamToVideo(el, !isSwapped ? localStream : remoteStream, true);
+                  }}
+                  autoPlay
+                  muted
+                  playsInline
+                  className={`w-full h-full object-cover ${
+                    (!isSwapped ? !isCameraOn : (!peerConnected || !isRemoteCameraOn)) ? 'hidden' : ''
+                  } ${!isSwapped && isBackgroundBlurred ? 'filter blur-[5px] scale-105' : ''}`}
+                />
+
+                {/* If Camera OFF in PiP Tile */}
+                {(!isSwapped ? !isCameraOn : (!peerConnected || !isRemoteCameraOn)) && (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-[#202124] text-slate-300 p-3 text-center space-y-1.5 select-none">
+                    <div className="w-10 h-10 rounded-full bg-[#0c2217] border border-[#d4a359]/40 text-[#d4a359] flex items-center justify-center font-bold text-sm">
+                      {(!isSwapped ? (user?.name || 'U') : otherPartyName).charAt(0).toUpperCase()}
+                    </div>
+                    <span className="text-[11px] font-medium text-slate-300">
+                      {!isSwapped ? 'Your Camera is Off' : `${otherPartyName}'s Camera is Off`}
+                    </span>
+                    {!isSwapped && (
+                      <button
+                        type="button"
+                        onClick={toggleCamera}
+                        className="text-[10px] px-2.5 py-0.5 rounded-md bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold cursor-pointer transition-colors"
+                      >
+                        Turn On
+                      </button>
+                    )}
+                  </div>
+                )}
+
+                {/* Top Hover Controls: Swap to Main & Minimize */}
+                <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity z-20">
+                  <button
+                    type="button"
+                    onClick={() => setIsSwapped(!isSwapped)}
+                    className="p-1.5 rounded-lg bg-black/70 hover:bg-black/90 text-white text-xs cursor-pointer shadow-md transition-transform hover:scale-110"
+                    title={isSwapped ? "Switch back: Opponent on big screen" : "Swap: Put your screen on big stage"}
+                  >
+                    <Maximize2 className="w-3.5 h-3.5 text-[#d4a359]" />
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsSelfMinimized(true)}
+                    className="p-1.5 rounded-lg bg-black/70 hover:bg-black/90 text-white text-xs cursor-pointer shadow-md transition-transform hover:scale-110"
+                    title="Minimize self preview"
+                  >
+                    <Minimize2 className="w-3.5 h-3.5 text-white" />
+                  </button>
+                </div>
+
+                {/* Bottom Name Pill on PiP */}
+                <div className="absolute bottom-2 left-2 px-2.5 py-1 rounded-md bg-black/70 backdrop-blur-xs text-[11px] font-bold text-white flex items-center gap-1.5 z-10">
+                  <span>{!isSwapped ? 'You' : otherPartyName}</span>
+                  {(!isSwapped ? !isMicOn : !isRemoteMicOn) ? (
+                    <MicOff className="w-3 h-3 text-rose-400" />
+                  ) : (
+                    <Mic className="w-3 h-3 text-[#d4a359]" />
+                  )}
+                </div>
+              </div>
+            )}
+
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* VIEW MODE 2: DUAL 50/50 CONFERENCE GRID                                   */}
+        {/* ========================================================================= */}
+        {viewMode === 'grid' && (
+          <div className="flex-1 flex flex-col md:grid md:grid-cols-2 gap-3 sm:gap-4 p-3 sm:p-4 h-full w-full overflow-hidden">
+            {/* Card 1: Remote Peer (Opponent) */}
+            <div className="flex-1 w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden bg-[#202124] border-2 border-slate-800 flex items-center justify-center relative shadow-2xl">
               <video
-                ref={localVideoRef}
+                ref={(el) => {
+                  gridRemoteVideoRef.current = el;
+                  attachStreamToVideo(el, remoteStream, true);
+                }}
                 autoPlay
                 muted
                 playsInline
-                className={`w-full h-full object-cover transition-all ${!isCameraOn ? 'hidden' : ''} ${
+                className={`w-full h-full object-cover ${(!peerConnected || !isRemoteCameraOn) ? 'hidden' : ''}`}
+              />
+
+              {!peerConnected && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-[#202124] space-y-3">
+                  <div className="w-16 h-16 rounded-full bg-[#0c2217] text-[#d4a359] flex items-center justify-center border border-[#d4a359]/40">
+                    <Users className="w-8 h-8 animate-pulse" />
+                  </div>
+                  <h3 className="text-sm sm:text-base font-bold text-white">
+                    Waiting for {otherPartyName} ({otherRoleName})...
+                  </h3>
+                </div>
+              )}
+
+              {peerConnected && !isRemoteCameraOn && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-[#202124] space-y-2">
+                  <div className="w-16 h-16 rounded-full bg-[#0c2217] text-[#d4a359] border-2 border-[#d4a359]/40 flex items-center justify-center font-bold text-2xl">
+                    {otherPartyName.charAt(0).toUpperCase()}
+                  </div>
+                  <h3 className="text-sm font-bold text-white">{otherPartyName}</h3>
+                  <span className="text-xs text-slate-400">Camera is off • Audio active</span>
+                </div>
+              )}
+
+              <div className="absolute bottom-3 left-3 px-3 py-1 rounded-full bg-black/70 backdrop-blur-xs text-xs font-bold text-white flex items-center gap-2 border border-white/10 z-10">
+                <span>{otherPartyName}</span>
+                <span className="text-[10px] text-[#d4a359]">{otherRoleName}</span>
+              </div>
+            </div>
+
+            {/* Card 2: Local User (Self) */}
+            <div className="flex-1 w-full h-full rounded-2xl sm:rounded-3xl overflow-hidden bg-[#202124] border-2 border-[#d4a359]/40 flex items-center justify-center relative shadow-2xl">
+              <video
+                ref={(el) => {
+                  gridLocalVideoRef.current = el;
+                  attachStreamToVideo(el, localStream, true);
+                }}
+                autoPlay
+                muted
+                playsInline
+                className={`w-full h-full object-cover ${!isCameraOn ? 'hidden' : ''} ${
                   isBackgroundBlurred ? 'filter blur-[5px] scale-105' : ''
                 }`}
               />
 
               {!isCameraOn && (
-                <div className="w-full h-full flex flex-col items-center justify-center bg-slate-900 text-slate-400 text-xs space-y-2.5 p-4 text-center">
-                  <div className="w-14 h-14 rounded-2xl bg-slate-800 flex items-center justify-center border border-slate-700">
-                    <VideoOff className="w-7 h-7 text-slate-400" />
+                <div className="w-full h-full flex flex-col items-center justify-center bg-[#202124] text-slate-300 p-4 text-center space-y-2">
+                  <div className="w-16 h-16 rounded-full bg-[#0c2217] text-[#d4a359] border-2 border-[#d4a359]/40 flex items-center justify-center font-bold text-2xl">
+                    {(user?.name || 'U').charAt(0).toUpperCase()}
                   </div>
-                  <div>
-                    <span className="font-bold text-slate-200 block text-xs">Your Camera is Off (Privacy Safe)</span>
-                    <span className="text-[11px] text-slate-400">Click below or use toolbar to show your video</span>
-                  </div>
+                  <span className="font-bold text-sm text-white">Your Camera is Off</span>
                   <button
                     type="button"
                     onClick={toggleCamera}
-                    className="px-3.5 py-1.5 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white font-bold text-xs flex items-center gap-1.5 shadow-md cursor-pointer transition-all"
+                    className="px-3.5 py-1.5 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs flex items-center gap-1.5 shadow-md cursor-pointer"
                   >
                     <Video className="w-3.5 h-3.5" />
                     <span>Turn Camera On</span>
@@ -1020,66 +1189,16 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                 </div>
               )}
 
-              {/* Local User Badge */}
-              <div className="absolute bottom-3 left-3 px-3 py-1.5 rounded-xl bg-black/75 backdrop-blur-sm text-xs font-bold text-white flex items-center gap-2 border border-white/10 z-10">
-                <span className={`w-2 h-2 rounded-full ${isCameraOn ? 'bg-[#d4a359]' : 'bg-slate-500'}`} />
+              <div className="absolute bottom-3 left-3 px-3 py-1 rounded-full bg-black/70 backdrop-blur-xs text-xs font-bold text-white flex items-center gap-2 border border-white/10 z-10">
                 <span>You ({user?.name || 'Self'})</span>
-                <span className="text-[10px] font-normal text-[#d4a359] bg-[#143d2b] px-1.5 py-0.2 rounded border border-[#d4a359]/40">
-                  {user?.role || 'Active'}
-                </span>
-                {isBackgroundBlurred && (
-                  <span className="text-[9px] font-bold text-[#faf8f5] bg-[#143d2b] px-1.5 py-0.2 rounded border border-[#d4a359]/40 flex items-center gap-1">
-                    <Sparkles className="w-2.5 h-2.5 text-[#d4a359]" />
-                    <span>Blur</span>
-                  </span>
-                )}
-              </div>
-            </div>
-
-          </div>
-        )}
-
-        {/* VIEW MODE 2: Spotlight View (Large Remote + Floating Local PiP) */}
-        {viewMode === 'spotlight' && (
-          <div className="flex-1 flex items-center justify-center p-4 relative h-full w-full">
-            <div className="w-full h-full rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center relative shadow-inner">
-              <video
-                ref={spotlightRemoteVideoRef}
-                autoPlay
-                muted
-                playsInline
-                className={`w-full h-full object-cover ${!peerConnected ? 'hidden' : ''}`}
-              />
-
-              {!peerConnected && (
-                <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-6 bg-slate-900/90 backdrop-blur-xs">
-                  <div className="w-16 h-16 rounded-full bg-[#0c2217] text-[#d4a359] flex items-center justify-center mb-3 border border-[#d4a359]/40 animate-pulse">
-                    <Users className="w-8 h-8" />
-                  </div>
-                  <h3 className="text-base font-bold text-white">
-                    Waiting for {otherRoleName} to connect...
-                  </h3>
-                </div>
-              )}
-            </div>
-
-            {/* Floating Local PiP */}
-            <div className="absolute bottom-6 right-6 w-40 sm:w-56 aspect-[4/3] rounded-2xl overflow-hidden shadow-2xl border-2 border-[#d4a359]/70 bg-slate-900 z-20">
-              <video
-                ref={localVideoRef}
-                autoPlay
-                muted
-                playsInline
-                className={`w-full h-full object-cover ${!isCameraOn ? 'hidden' : ''}`}
-              />
-              <div className="absolute bottom-1.5 left-2 px-2 py-0.5 rounded bg-black/70 text-[10px] font-bold text-white">
-                You ({user?.name?.split(' ')[0]})
               </div>
             </div>
           </div>
         )}
 
-        {/* VIEW MODE 3: Digital Quran Reader Split Mode */}
+        {/* ========================================================================= */}
+        {/* VIEW MODE 3: DIGITAL QURAN READER SPLIT MODE                              */}
+        {/* ========================================================================= */}
         {viewMode === 'quran' && (
           <div className="flex-1 flex flex-col md:flex-row gap-3 p-3 sm:p-4 h-full w-full overflow-hidden">
             {/* Quran Text Viewer */}
@@ -1098,34 +1217,43 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                   صِرَاطَ الَّذِينَ أَنْعَمْتَ عَلَيْهِمْ غَيْرِ الْمَغْضُوبِ عَلَيْهِمْ وَلَا الضَّالِّينَ ﴿٧﴾
                 </div>
                 <p className="text-xs text-stone-500 italic">
-                  Interactive reference mode for Tajweed articulation, Qira'at rules, and Makharij correction.
+                  Interactive reference mode for Tajweed articulation, Qira&apos;at rules, and Makharij correction.
                 </p>
               </div>
             </div>
 
-            {/* Side Floating Video Strip */}
-            <div className="w-full md:w-64 flex md:flex-col gap-2 shrink-0">
-              <div className="flex-1 aspect-[4/3] rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 relative">
+            {/* Side Floating Video Strip (Opponent is Bigger) */}
+            <div className="w-full md:w-80 flex md:flex-col gap-2.5 shrink-0">
+              {/* Opponent is Top Big Card (65% height on desktop) */}
+              <div className="flex-1 md:flex-[2] aspect-[4/3] rounded-2xl overflow-hidden bg-[#202124] border-2 border-slate-700 relative shadow-xl">
                 <video
-                  ref={quranRemoteVideoRef}
+                  ref={(el) => {
+                    quranRemoteVideoRef.current = el;
+                    attachStreamToVideo(el, remoteStream, true);
+                  }}
                   autoPlay
                   muted
                   playsInline
                   className="w-full h-full object-cover"
                 />
-                <span className="absolute bottom-1 left-2 text-[10px] bg-black/60 px-1.5 py-0.2 rounded text-white font-bold">
-                  {otherPartyName}
+                <span className="absolute bottom-2 left-2 text-[11px] bg-black/70 px-2 py-0.5 rounded-md text-white font-bold">
+                  {otherPartyName} ({otherRoleName})
                 </span>
               </div>
-              <div className="flex-1 aspect-[4/3] rounded-2xl overflow-hidden bg-slate-900 border border-[#d4a359]/50 relative">
+
+              {/* Self is Bottom Compact Card */}
+              <div className="flex-1 aspect-[4/3] rounded-2xl overflow-hidden bg-[#202124] border-2 border-[#d4a359]/40 relative shadow-xl">
                 <video
-                  ref={localVideoRef}
+                  ref={(el) => {
+                    quranLocalVideoRef.current = el;
+                    attachStreamToVideo(el, localStream, true);
+                  }}
                   autoPlay
                   muted
                   playsInline
                   className="w-full h-full object-cover"
                 />
-                <span className="absolute bottom-1 left-2 text-[10px] bg-black/60 px-1.5 py-0.2 rounded text-white font-bold">
+                <span className="absolute bottom-2 left-2 text-[11px] bg-black/70 px-2 py-0.5 rounded-md text-white font-bold">
                   You
                 </span>
               </div>
@@ -1135,8 +1263,8 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
         {/* In-Call Live Chat Sidebar */}
         {chatOpen && (
-          <div className="w-80 bg-slate-900/95 border-l border-slate-800 flex flex-col z-30 animate-in slide-in-from-right duration-200">
-            <div className="p-3.5 border-b border-slate-800 font-bold text-xs text-[#d4a359] flex items-center justify-between">
+          <div className="w-80 bg-[#1e1f20] border-l border-white/10 flex flex-col z-40 animate-in slide-in-from-right duration-200 select-text">
+            <div className="p-3.5 border-b border-white/10 font-bold text-xs text-[#d4a359] flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <MessageSquare className="w-4 h-4" />
                 <span>In-Class Live Chat</span>
@@ -1151,8 +1279,8 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
             <div className="flex-1 overflow-y-auto p-3 space-y-2 text-xs">
               {chatMessages.length === 0 ? (
-                <p className="text-center text-slate-500 py-12">
-                  Send live questions, notes, or Ayah references during the class.
+                <p className="text-center text-slate-400 py-12 leading-relaxed">
+                  Send live questions, notes, or Ayah references during the session.
                 </p>
               ) : (
                 chatMessages.map((msg, i) => (
@@ -1166,7 +1294,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               )}
             </div>
 
-            <form onSubmit={handleSendChatMessage} className="p-2.5 border-t border-slate-800 flex gap-1.5">
+            <form onSubmit={handleSendChatMessage} className="p-2.5 border-t border-white/10 flex gap-1.5">
               <input
                 type="text"
                 placeholder="Type in-call message..."
@@ -1186,133 +1314,168 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
 
       </div>
 
-      {/* Bottom Floating Controls Bar */}
-      <div className="px-4 py-3 pb-safe bg-slate-900/95 backdrop-blur-md border-t border-slate-800/90 flex items-center justify-center gap-2.5 sm:gap-4 z-30 shrink-0">
-        {/* Mic Toggle */}
-        <button
-          onClick={toggleMic}
-          className={`p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl transition-all shadow-md cursor-pointer flex items-center justify-center ${
-            isMicOn
-              ? 'bg-slate-800 hover:bg-slate-700 text-white'
-              : 'bg-red-600 hover:bg-red-700 text-white ring-2 ring-red-400'
-          }`}
-          title={isMicOn ? 'Mute Microphone' : 'Unmute Microphone'}
-        >
-          {isMicOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
-        </button>
-
-        {/* Camera Toggle */}
-        <button
-          onClick={toggleCamera}
-          className={`p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl transition-all shadow-md cursor-pointer flex items-center justify-center ${
-            isCameraOn
-              ? 'bg-slate-800 hover:bg-slate-700 text-white'
-              : 'bg-red-600 hover:bg-red-700 text-white ring-2 ring-red-400'
-          }`}
-          title={isCameraOn ? 'Turn Camera Off' : 'Turn Camera On'}
-        >
-          {isCameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
-        </button>
-
-        {/* Privacy Background Blur Toggle */}
-        <button
-          onClick={() => setIsBackgroundBlurred(!isBackgroundBlurred)}
-          className={`p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl transition-all shadow-md cursor-pointer flex items-center justify-center ${
-            isBackgroundBlurred
-              ? 'bg-[#143d2b] hover:bg-[#0c2217] text-[#d4a359] ring-2 ring-[#d4a359]'
-              : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white'
-          }`}
-          title={isBackgroundBlurred ? 'Turn Blur Off' : 'Turn Privacy Background Blur On'}
-        >
-          <Sparkles className="w-5 h-5" />
-        </button>
-
-        {/* Mobile Switch Camera (Front/Back) */}
-        <button
-          onClick={switchCamera}
-          className="md:hidden p-3 min-h-[44px] min-w-[44px] rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white shadow-md cursor-pointer flex items-center justify-center"
-          title="Flip Camera (Front / Back for Quran scanning)"
-        >
-          <RotateCcw className="w-5 h-5 text-[#d4a359]" />
-        </button>
-
-        {/* Speaker Volume & Mute Toggle */}
-        <div className="flex items-center gap-1.5 bg-slate-800/90 px-3 py-2 rounded-2xl border border-slate-700">
-          <button
-            onClick={() => setIsSpeakerMuted(!isSpeakerMuted)}
-            className="text-slate-300 hover:text-white p-1 rounded-lg cursor-pointer"
-            title={isSpeakerMuted || speakerVolume === 0 ? 'Unmute Remote Speaker' : 'Mute Remote Speaker'}
-          >
-            {isSpeakerMuted || speakerVolume === 0 ? (
-              <VolumeX className="w-4 h-4 text-red-400" />
-            ) : (
-              <Volume2 className="w-4 h-4 text-[#d4a359]" />
-            )}
-          </button>
-          <input
-            type="range"
-            min="0"
-            max="1"
-            step="0.05"
-            value={isSpeakerMuted ? 0 : speakerVolume}
-            onChange={(e) => {
-              const val = parseFloat(e.target.value);
-              setSpeakerVolume(val);
-              if (val > 0 && isSpeakerMuted) setIsSpeakerMuted(false);
-            }}
-            className="w-14 sm:w-20 accent-[#d4a359] h-1.5 bg-slate-700 rounded-lg cursor-pointer"
-            title="Classroom Speaker Volume"
-          />
+      {/* ========================================================================= */}
+      {/* BOTTOM GOOGLE MEET STYLE CONTROL DOCK                                     */}
+      {/* ========================================================================= */}
+      <div className="px-4 py-3 bg-[#18191a]/95 backdrop-blur-md border-t border-white/10 flex items-center justify-between z-40 shrink-0 select-none">
+        
+        {/* Left: Meeting Info & Live Timer */}
+        <div className="hidden md:flex items-center gap-3 min-w-0 flex-1">
+          <div className="flex items-center gap-2">
+            <span className="w-2.5 h-2.5 rounded-full bg-[#d4a359] animate-ping" />
+            <span className="text-xs font-mono font-bold text-[#d4a359] bg-black/50 px-2.5 py-1 rounded-lg border border-[#d4a359]/30 flex items-center gap-1.5">
+              <Clock className="w-3.5 h-3.5 text-[#d4a359]" />
+              <span>{formatTime(classDurationSeconds)}</span>
+            </span>
+          </div>
+          <div className="h-4 w-px bg-white/20" />
+          <span className="text-xs font-medium text-slate-300 truncate">
+            {sessionData?.title || '1:1 Live Tutoring Classroom'}
+          </span>
         </div>
 
-        {/* Desktop Screen Share Toggle */}
-        <button
-          onClick={toggleScreenShare}
-          className={`hidden md:flex p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl transition-all shadow-md cursor-pointer items-center justify-center ${
-            isScreenSharing
-              ? 'bg-[#143d2b] hover:bg-[#0c2217] text-[#d4a359] ring-2 ring-[#d4a359]'
-              : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white'
-          }`}
-          title={isScreenSharing ? 'Stop Screen Share' : 'Share Screen with Student'}
-        >
-          <Monitor className="w-5 h-5" />
-        </button>
+        {/* Center: Iconic Google Meet Circular Control Buttons */}
+        <div className="flex items-center justify-center gap-2 sm:gap-3 flex-shrink-0 mx-auto">
+          {/* Microphone Button */}
+          <button
+            onClick={toggleMic}
+            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center cursor-pointer transition-all shadow-md ${
+              isMicOn
+                ? 'bg-[#3c4043] hover:bg-[#474a4d] text-white'
+                : 'bg-red-600 hover:bg-red-700 text-white ring-2 ring-red-400 shadow-lg shadow-red-900/40'
+            }`}
+            title={isMicOn ? 'Mute Microphone' : 'Unmute Microphone'}
+          >
+            {isMicOn ? <Mic className="w-5 h-5" /> : <MicOff className="w-5 h-5" />}
+          </button>
 
-        {/* Live Chat Toggle */}
-        <button
-          onClick={() => setChatOpen(!chatOpen)}
-          className={`relative p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl transition-all shadow-md cursor-pointer flex items-center justify-center ${
-            chatOpen
-              ? 'bg-[#143d2b] text-[#d4a359]'
-              : 'bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white'
-          }`}
-          title="Open Classroom Live Chat"
-        >
-          <MessageSquare className="w-5 h-5" />
-          {chatMessages.length > 0 && !chatOpen && (
-            <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#d4a359] rounded-full animate-ping" />
-          )}
-        </button>
+          {/* Camera Button */}
+          <button
+            onClick={toggleCamera}
+            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center cursor-pointer transition-all shadow-md ${
+              isCameraOn
+                ? 'bg-[#3c4043] hover:bg-[#474a4d] text-white'
+                : 'bg-red-600 hover:bg-red-700 text-white ring-2 ring-red-400 shadow-lg shadow-red-900/40'
+            }`}
+            title={isCameraOn ? 'Turn Camera Off' : 'Turn Camera On'}
+          >
+            {isCameraOn ? <Video className="w-5 h-5" /> : <VideoOff className="w-5 h-5" />}
+          </button>
 
-        {/* Emergency Leave & Report Button */}
-        <button
-          onClick={handleEmergencyLeaveAndReport}
-          className="p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-bold transition-all shadow-lg shadow-amber-900/40 cursor-pointer flex items-center justify-center gap-1.5"
-          title="Emergency Exit & Flag Incident to Lahore Safety Team"
-        >
-          <ShieldAlert className="w-5 h-5 text-white" />
-          <span className="hidden sm:inline text-xs font-bold">Leave &amp; Report</span>
-        </button>
+          {/* Background Blur Button */}
+          <button
+            onClick={() => setIsBackgroundBlurred(!isBackgroundBlurred)}
+            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full flex items-center justify-center cursor-pointer transition-all shadow-md ${
+              isBackgroundBlurred
+                ? 'bg-[#143d2b] hover:bg-[#0c2217] text-[#d4a359] ring-2 ring-[#d4a359]'
+                : 'bg-[#3c4043] hover:bg-[#474a4d] text-slate-300 hover:text-white'
+            }`}
+            title={isBackgroundBlurred ? 'Turn Blur Off' : 'Turn Background Blur On'}
+          >
+            <Sparkles className="w-5 h-5" />
+          </button>
 
-        {/* Leave Classroom */}
-        <button
-          onClick={handleLeaveClassroom}
-          className="p-3 sm:p-3.5 min-h-[44px] min-w-[44px] rounded-2xl bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold transition-all shadow-lg shadow-red-900/40 cursor-pointer flex items-center justify-center gap-1.5"
-          title="End Live Class Session"
-        >
-          <PhoneOff className="w-5 h-5" />
-          <span className="hidden sm:inline text-xs font-bold">End Class</span>
-        </button>
+          {/* Screen Share Button */}
+          <button
+            onClick={toggleScreenShare}
+            className={`hidden md:flex w-11 h-11 sm:w-12 sm:h-12 rounded-full items-center justify-center cursor-pointer transition-all shadow-md ${
+              isScreenSharing
+                ? 'bg-blue-600 hover:bg-blue-700 text-white ring-2 ring-blue-400'
+                : 'bg-[#3c4043] hover:bg-[#474a4d] text-slate-300 hover:text-white'
+            }`}
+            title={isScreenSharing ? 'Stop Screen Share' : 'Present Screen'}
+          >
+            <Monitor className="w-5 h-5" />
+          </button>
+
+          {/* Mobile Flip Camera Button */}
+          <button
+            onClick={switchCamera}
+            className="md:hidden w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#3c4043] hover:bg-[#474a4d] text-slate-200 flex items-center justify-center cursor-pointer shadow-md"
+            title="Switch Camera (Front / Back for Quran scanning)"
+          >
+            <RotateCcw className="w-5 h-5 text-[#d4a359]" />
+          </button>
+
+          {/* Speaker Volume Popover Trigger */}
+          <div className="relative">
+            <button
+              onClick={() => setShowVolumePopover(!showVolumePopover)}
+              className="w-11 h-11 sm:w-12 sm:h-12 rounded-full bg-[#3c4043] hover:bg-[#474a4d] text-slate-300 hover:text-white flex items-center justify-center cursor-pointer shadow-md"
+              title="Remote Speaker Volume"
+            >
+              {isSpeakerMuted || speakerVolume === 0 ? (
+                <VolumeX className="w-5 h-5 text-rose-400" />
+              ) : (
+                <Volume2 className="w-5 h-5 text-[#d4a359]" />
+              )}
+            </button>
+
+            {showVolumePopover && (
+              <div className="absolute bottom-14 left-1/2 -translate-x-1/2 p-3 bg-slate-900/95 border border-white/15 rounded-2xl shadow-2xl flex flex-col items-center gap-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+                <span className="text-[10px] font-bold text-slate-300 uppercase tracking-wider">Speaker Volume</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="1"
+                  step="0.05"
+                  value={isSpeakerMuted ? 0 : speakerVolume}
+                  onChange={(e) => {
+                    const val = parseFloat(e.target.value);
+                    setSpeakerVolume(val);
+                    if (val > 0 && isSpeakerMuted) setIsSpeakerMuted(false);
+                  }}
+                  className="w-24 accent-[#d4a359] h-2 bg-slate-700 rounded-lg cursor-pointer"
+                />
+                <button
+                  onClick={() => setIsSpeakerMuted(!isSpeakerMuted)}
+                  className="text-[10px] font-bold text-[#d4a359] hover:underline cursor-pointer"
+                >
+                  {isSpeakerMuted ? 'Unmute' : 'Mute'}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Emergency Safety Leave & Report Button */}
+          <button
+            onClick={handleEmergencyLeaveAndReport}
+            className="px-3.5 h-11 sm:h-12 rounded-full bg-amber-600 hover:bg-amber-700 active:bg-amber-800 text-white font-bold transition-all shadow-md cursor-pointer flex items-center justify-center gap-1.5"
+            title="Emergency Exit & Flag Incident to Safety Team"
+          >
+            <ShieldAlert className="w-4 h-4 text-white" />
+            <span className="hidden sm:inline text-xs">Leave &amp; Report</span>
+          </button>
+
+          {/* End Call Signature Google Meet Red Pill Button */}
+          <button
+            onClick={handleLeaveClassroom}
+            className="w-16 sm:w-20 h-11 sm:h-12 rounded-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white font-bold transition-transform hover:scale-105 shadow-lg shadow-red-900/40 cursor-pointer flex items-center justify-center gap-1.5"
+            title="Leave Call"
+          >
+            <PhoneOff className="w-5 h-5" />
+          </button>
+        </div>
+
+        {/* Right: Chat Drawer & In-Call Utilities */}
+        <div className="flex items-center justify-end gap-2 flex-1">
+          {/* Chat Button */}
+          <button
+            onClick={() => setChatOpen(!chatOpen)}
+            className={`w-11 h-11 sm:w-12 sm:h-12 rounded-full transition-all shadow-md cursor-pointer flex items-center justify-center relative ${
+              chatOpen
+                ? 'bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/40'
+                : 'bg-[#3c4043] hover:bg-[#474a4d] text-slate-300 hover:text-white'
+            }`}
+            title="In-Call Chat"
+          >
+            <MessageSquare className="w-5 h-5" />
+            {chatMessages.length > 0 && !chatOpen && (
+              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-[#d4a359] rounded-full animate-ping" />
+            )}
+          </button>
+        </div>
+
       </div>
 
       {/* In-Classroom Report & Safety Incident Modal */}

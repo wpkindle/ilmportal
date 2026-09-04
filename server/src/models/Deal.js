@@ -102,6 +102,10 @@ const dealSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  proofImageUrl: {
+    type: String,
+    default: ''
+  },
   paymentVerifiedAt: {
     type: Date
   },

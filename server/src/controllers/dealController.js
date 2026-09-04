@@ -154,6 +154,14 @@ exports.respondToDealOffer = async (req, res) => {
       deal.tutorFeeDueDate = feeDueDate;
       deal.tutorFeePaid = false;
       deal.accessRestricted = false;
+
+      // Auto-calculate 10% platform fee from deal price if not already set by admin
+      if (deal.platformFee === null || deal.platformFee === undefined) {
+        deal.platformFee = Math.round(deal.price * 0.10);
+        deal.platformFeeAssignedAt = now;
+        deal.platformFeeNotes = 'Auto-calculated: 10% of deal price';
+      }
+
       await deal.save();
 
       // Write acceptance message to chat
@@ -395,10 +403,33 @@ exports.submitPaymentProof = async (req, res) => {
       });
     }
 
+    // Handle proof image upload if provided
+    let proofImageUrl = deal.proofImageUrl || '';
+    if (req.file) {
+      if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+        const { cloudinary } = require('../config/cloudinary');
+        proofImageUrl = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: 'ilmportal/payment-proofs', resource_type: 'image' },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result.secure_url);
+            }
+          );
+          stream.end(req.file.buffer);
+        });
+      } else {
+        // Dev fallback: base64 data URL
+        const base64 = req.file.buffer.toString('base64');
+        proofImageUrl = `data:${req.file.mimetype};base64,${base64}`;
+      }
+    }
+
     deal.paymentStatus = 'submitted_proof';
     deal.paymentMethod = paymentMethod || 'jazzcash';
     deal.paymentProofReference = referenceCode.trim();
     deal.paymentProofNotes = notes || '';
+    if (proofImageUrl) deal.proofImageUrl = proofImageUrl;
     await deal.save();
 
     // Notify Admin
@@ -408,7 +439,7 @@ exports.submitPaymentProof = async (req, res) => {
         recipient: admin._id,
         sender: req.user.id,
         title: 'New Payment Verification Pending',
-        message: `${deal.student.name} submitted ${deal.paymentMethod.toUpperCase()} payment proof (TID: ${referenceCode}) for deal ${deal.subject} (PKR ${deal.price}).`,
+        message: `${deal.tutor.name} submitted ${deal.paymentMethod.toUpperCase()} payment proof (TID: ${referenceCode}) for ${deal.subject} (PKR ${deal.platformFee || deal.price}).`,
         type: 'payment_pending',
         link: `/admin/deals`
       });
@@ -416,7 +447,7 @@ exports.submitPaymentProof = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Payment proof submitted successfully! Admin will verify and mark your deal as Active Paid.',
+      message: 'Payment proof submitted successfully! Admin will verify and clear your classroom access.',
       deal
     });
   } catch (error) {

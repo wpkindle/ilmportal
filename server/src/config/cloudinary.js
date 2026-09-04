@@ -49,3 +49,4 @@ const uploadToCloud = multer({
 });
 
 module.exports = { cloudinary, uploadToCloud };
+

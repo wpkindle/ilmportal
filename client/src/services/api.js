@@ -371,11 +371,20 @@ export const api = {
     headers: getHeaders()
   }).then(handleResponse),
 
-  submitPaymentProof: (id, body) => fetch(`${API_BASE}/deals/${id}/submit-payment`, {
-    method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify(body)
-  }).then(handleResponse),
+  submitPaymentProof: (id, body, proofImageFile) => {
+    const formData = new FormData();
+    formData.append('paymentMethod', body.paymentMethod || '');
+    formData.append('referenceCode', body.referenceCode || '');
+    formData.append('notes', body.notes || '');
+    if (proofImageFile) {
+      formData.append('proofImage', proofImageFile);
+    }
+    return fetch(`${API_BASE}/deals/${id}/submit-payment`, {
+      method: 'POST',
+      headers: getHeaders(true), // multipart — no Content-Type header
+      body: formData
+    }).then(handleResponse);
+  },
 
   cancelDeal: (id) => fetch(`${API_BASE}/deals/${id}/cancel`, {
     method: 'PUT',

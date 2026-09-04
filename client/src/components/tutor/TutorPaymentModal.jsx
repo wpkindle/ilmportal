@@ -160,20 +160,20 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto p-2 sm:p-4 md:p-6 bg-slate-900/80 backdrop-blur-xs flex items-center justify-center animate-in fade-in duration-200">
-      <div className="bg-white rounded-2xl sm:rounded-3xl max-w-lg md:max-w-4xl lg:max-w-5xl w-full my-auto flex flex-col shadow-2xl relative border border-stone-200 overflow-hidden max-h-[96vh] sm:max-h-[92vh]">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-xs p-2 sm:p-4 flex items-center justify-center animate-in fade-in duration-200">
+      <div className="relative w-full max-w-lg md:max-w-4xl lg:max-w-5xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-stone-200 flex flex-col max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-2.5rem)] overflow-hidden">
 
-        {/* Modal Header */}
-        <div className="flex items-center justify-between p-3.5 sm:p-4 border-b border-stone-200 shrink-0 bg-white">
-          <div className="flex items-center gap-3">
-            <div className="p-2 sm:p-2.5 bg-[#0c2217] text-[#d4a359] rounded-xl sm:rounded-2xl shrink-0">
+        {/* Modal Header - Pinned at top */}
+        <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-3.5 border-b border-stone-200 shrink-0 bg-white z-10">
+          <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="p-1.5 sm:p-2 bg-[#0c2217] text-[#d4a359] rounded-xl sm:rounded-2xl shrink-0">
               <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="min-w-0">
               <h3 className="font-serif font-bold text-[#0c2217] text-sm sm:text-base truncate">
                 Clear Platform Fee
               </h3>
-              <p className="text-[11px] sm:text-xs text-stone-500 truncate">
+              <p className="text-[10.5px] sm:text-xs text-stone-500 truncate">
                 Student: <strong>{deal.student?.name}</strong> &bull; {deal.subject}
               </p>
             </div>
@@ -187,8 +187,8 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
           </button>
         </div>
 
-        {/* Scrollable Modal Content */}
-        <div className="p-3.5 sm:p-5 md:p-6 overflow-y-auto flex-1">
+        {/* Scrollable Modal Content - flex-1 min-h-0 ensures it properly scrolls within bounds */}
+        <div className="p-3 sm:p-4 md:p-5 overflow-y-auto flex-1 min-h-0">
 
           {/* Success Notification */}
           {success ? (
@@ -203,17 +203,17 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
             </div>
           ) : (
             <form id="tutor-fee-modal-form" onSubmit={handleSubmit}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 lg:gap-6 items-start">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 lg:gap-5 items-start">
 
                 {/* ── Left Column: Payment Method & Barcode Details ── */}
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {/* Payment Method Selector Tabs */}
                   <div>
-                    <label className="text-xs font-bold text-stone-800 block mb-1.5 flex items-center gap-1.5">
+                    <label className="text-xs font-bold text-stone-800 block mb-1 flex items-center gap-1.5">
                       <ScanLine className="w-3.5 h-3.5 text-[#0c2217]" />
                       <span>Select Payment Method &amp; View Barcode:</span>
                     </label>
-                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 sm:gap-1.5 p-1 bg-stone-100 rounded-xl sm:rounded-2xl">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 p-1 bg-stone-100 rounded-xl">
                       {paymentAccounts.map((acc) => {
                         const isSelected = selectedMethod === acc.id;
                         return (
@@ -221,7 +221,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                             key={acc.id}
                             type="button"
                             onClick={() => setSelectedMethod(acc.id)}
-                            className={`py-1.5 sm:py-2 px-1.5 sm:px-2 rounded-lg sm:rounded-xl text-[11px] sm:text-xs font-bold transition-all cursor-pointer text-center truncate ${
+                            className={`py-1.5 px-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer text-center truncate ${
                               isSelected
                                 ? 'bg-[#0c2217] text-[#d4a359] shadow-xs border border-[#0c2217]'
                                 : 'text-stone-600 hover:text-stone-900 hover:bg-stone-200/60'
@@ -235,13 +235,13 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                   </div>
 
                   {/* Prominent Barcode & Account Display */}
-                  <div className="p-3 sm:p-3.5 bg-[#faf8f5] border border-stone-200 rounded-2xl space-y-2.5">
+                  <div className="p-2.5 sm:p-3 bg-[#faf8f5] border border-stone-200 rounded-2xl space-y-2">
                     {/* Clear Account Details Card */}
-                    <div className="p-2.5 sm:p-3 bg-white border border-stone-200 rounded-xl space-y-2 shadow-2xs">
+                    <div className="p-2 sm:p-2.5 bg-white border border-stone-200 rounded-xl space-y-1.5 shadow-2xs">
                       {/* Account Title */}
-                      <div className="flex items-center justify-between gap-2 border-b border-stone-100 pb-1.5">
+                      <div className="flex items-center justify-between gap-2 border-b border-stone-100 pb-1">
                         <div>
-                          <span className="text-[9px] sm:text-[10px] font-bold uppercase text-stone-400 tracking-wider block">
+                          <span className="text-[9px] font-bold uppercase text-stone-400 tracking-wider block">
                             Account Title
                           </span>
                           <span className="text-xs sm:text-sm font-bold text-stone-900 select-all">
@@ -260,9 +260,9 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                       </div>
 
                       {/* Primary Account Number */}
-                      <div className="flex items-center justify-between gap-2 border-b border-stone-100 pb-1.5">
+                      <div className="flex items-center justify-between gap-2 border-b border-stone-100 pb-1">
                         <div className="min-w-0">
-                          <span className="text-[9px] sm:text-[10px] font-bold uppercase text-stone-400 tracking-wider block">
+                          <span className="text-[9px] font-bold uppercase text-stone-400 tracking-wider block">
                             Account Number
                           </span>
                           <span className="font-mono text-xs sm:text-sm font-bold text-[#0c2217] select-all truncate block">
@@ -272,7 +272,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                         <button
                           type="button"
                           onClick={() => handleCopy(activeAccount.accountNumber, activeAccount.id)}
-                          className="px-2 sm:px-2.5 py-1 sm:py-1.5 bg-[#faf8f5] hover:bg-[#f0ece1] border border-[#d4a359]/40 rounded-lg text-[11px] sm:text-xs font-mono font-bold text-[#0c2217] flex items-center gap-1 transition-all cursor-pointer shadow-2xs shrink-0"
+                          className="px-2 py-1 bg-[#faf8f5] hover:bg-[#f0ece1] border border-[#d4a359]/40 rounded-lg text-[10.5px] sm:text-xs font-mono font-bold text-[#0c2217] flex items-center gap-1 transition-all cursor-pointer shadow-2xs shrink-0"
                         >
                           {copiedId === activeAccount.id ? (
                             <>
@@ -291,7 +291,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                       {/* Raast ID Number with Copy Button */}
                       <div className="flex items-center justify-between gap-2">
                         <div className="min-w-0">
-                          <span className="text-[9px] sm:text-[10px] font-bold uppercase text-stone-400 tracking-wider block">
+                          <span className="text-[9px] font-bold uppercase text-stone-400 tracking-wider block">
                             Raast ID Number
                           </span>
                           <span className="font-mono text-xs sm:text-sm font-bold text-stone-900 select-all truncate block">
@@ -301,7 +301,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                         <button
                           type="button"
                           onClick={() => handleCopy(activeAccount.raastId || '03171759093', 'raast-id')}
-                          className="px-2 sm:px-2.5 py-1 sm:py-1.5 bg-[#faf8f5] hover:bg-[#f0ece1] border border-[#d4a359]/40 rounded-lg text-[11px] sm:text-xs font-mono font-bold text-[#0c2217] flex items-center gap-1 transition-all cursor-pointer shadow-2xs shrink-0"
+                          className="px-2 py-1 bg-[#faf8f5] hover:bg-[#f0ece1] border border-[#d4a359]/40 rounded-lg text-[10.5px] sm:text-xs font-mono font-bold text-[#0c2217] flex items-center gap-1 transition-all cursor-pointer shadow-2xs shrink-0"
                         >
                           {copiedId === 'raast-id' ? (
                             <>
@@ -311,50 +311,50 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                           ) : (
                             <>
                               <Copy className="w-3 h-3 text-stone-500" />
-                              <span className="font-sans text-[11px] sm:text-xs">Copy Raast ID</span>
+                              <span className="font-sans text-[10.5px] sm:text-xs">Copy Raast ID</span>
                             </>
                           )}
                         </button>
                       </div>
                     </div>
 
-                    {/* The Barcode Image (Optimized sizing for responsiveness) */}
-                    <div className="mx-auto w-32 sm:w-36 md:w-40 h-32 sm:h-36 md:h-40 bg-white rounded-2xl border-2 border-[#d4a359]/40 p-1.5 shadow-md flex items-center justify-center">
+                    {/* The Barcode Image (Optimized compact sizing for responsive height) */}
+                    <div className="mx-auto w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32 bg-white rounded-xl border-2 border-[#d4a359]/40 p-1 shadow-xs flex items-center justify-center">
                       <img
                         src={activeAccount.qrImage}
                         alt={`${activeAccount.name} Barcode / QR Code`}
-                        className="w-full h-full object-contain rounded-xl"
+                        className="w-full h-full object-contain rounded-lg"
                       />
                     </div>
 
                     {/* Scan Notice Below Image */}
                     <div className="flex justify-center">
-                      <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 bg-[#f0ece1] text-[#0c2217] rounded-full text-[10px] sm:text-[11px] font-bold border border-[#d4a359]/40">
+                      <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-[#f0ece1] text-[#0c2217] rounded-full text-[10px] font-bold border border-[#d4a359]/40">
                         <ScanLine className="w-3 h-3 text-[#0c2217]" />
                         <span>Scan barcode with your {activeAccount.name} app</span>
                       </div>
                     </div>
 
-                    <p className="text-[10px] sm:text-[10.5px] text-stone-500 leading-tight text-center">
-                      Open your banking/wallet app to scan this barcode, or copy the account number or Raast ID number above to transfer directly.
+                    <p className="text-[9.5px] sm:text-[10px] text-stone-500 leading-tight text-center">
+                      Open your banking/wallet app to scan this barcode, or transfer directly via account number / Raast ID.
                     </p>
                   </div>
                 </div>
 
                 {/* ── Right Column: Fee Due & Proof Upload ── */}
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   {/* Fee Amount Banner */}
-                  <div className="p-3 sm:p-3.5 bg-[#faf8f5] border border-[#d4a359]/30 rounded-2xl">
+                  <div className="p-2.5 sm:p-3 bg-[#faf8f5] border border-[#d4a359]/30 rounded-2xl">
                     <div className="flex items-center justify-between gap-3">
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#0c2217] text-[#d4a359] flex items-center justify-center shrink-0 shadow-sm">
-                          <Percent className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <div className="flex items-center gap-2 min-w-0">
+                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#0c2217] text-[#d4a359] flex items-center justify-center shrink-0 shadow-xs">
+                          <Percent className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
                         </div>
                         <div className="min-w-0">
                           <span className="text-[10px] font-bold uppercase text-[#0c2217] tracking-wider block font-serif truncate">
                             Platform Fee Due
                           </span>
-                          <p className="text-[10px] sm:text-[11px] text-stone-600 truncate">
+                          <p className="text-[10px] sm:text-[10.5px] text-stone-600 truncate">
                             {isAutoFee
                               ? `10% of deal price (PKR ${deal.price?.toLocaleString()})`
                               : 'Admin assigned fee'}
@@ -362,7 +362,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                         </div>
                       </div>
                       <div className="text-right shrink-0">
-                        <span className="font-mono font-bold text-[#0c2217] text-xl sm:text-2xl md:text-3xl">
+                        <span className="font-mono font-bold text-[#0c2217] text-xl sm:text-2xl">
                           PKR {platformFee.toLocaleString()}
                         </span>
                       </div>
@@ -377,13 +377,13 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                     </label>
 
                     {proofPreview ? (
-                      <div className="relative rounded-2xl overflow-hidden border-2 border-[#d4a359]/40 bg-[#faf8f5] p-2.5 flex flex-col items-center gap-2">
+                      <div className="relative rounded-2xl overflow-hidden border-2 border-[#d4a359]/40 bg-[#faf8f5] p-2 flex flex-col items-center gap-1.5">
                         <img
                           src={proofPreview}
                           alt="Payment proof screenshot"
-                          className="max-h-36 sm:max-h-44 md:max-h-48 w-full object-contain rounded-xl bg-white border border-stone-200 shadow-2xs"
+                          className="max-h-28 sm:max-h-36 w-full object-contain rounded-xl bg-white border border-stone-200 shadow-2xs"
                         />
-                        <div className="w-full flex items-center justify-between text-xs pt-1">
+                        <div className="w-full flex items-center justify-between text-xs pt-0.5">
                           <div className="flex items-center gap-1.5 text-[#0c2217] font-bold truncate">
                             <CheckCircle2 className="w-3.5 h-3.5 text-[#0c2217] shrink-0" />
                             <span className="truncate text-xs">{proofImage?.name}</span>
@@ -394,7 +394,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                           <button
                             type="button"
                             onClick={handleRemoveImage}
-                            className="px-2 py-0.5 bg-rose-100 hover:bg-rose-200 text-rose-700 text-[11px] font-bold rounded-lg flex items-center gap-1 transition-colors shrink-0 cursor-pointer"
+                            className="px-2 py-0.5 bg-rose-100 hover:bg-rose-200 text-rose-700 text-[10.5px] font-bold rounded-lg flex items-center gap-1 transition-colors shrink-0 cursor-pointer"
                           >
                             <Trash2 className="w-3 h-3" />
                             <span>Remove</span>
@@ -404,15 +404,15 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                     ) : (
                       <div
                         onClick={() => fileInputRef.current?.click()}
-                        className="border-2 border-dashed border-[#d4a359]/50 hover:border-[#0c2217] bg-[#faf8f5] hover:bg-[#f0ece1] rounded-2xl p-4 sm:p-5 text-center transition-all cursor-pointer group"
+                        className="border-2 border-dashed border-[#d4a359]/50 hover:border-[#0c2217] bg-[#faf8f5] hover:bg-[#f0ece1] rounded-2xl p-3 sm:p-3.5 text-center transition-all cursor-pointer group"
                       >
-                        <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#0c2217] text-[#d4a359] flex items-center justify-center mx-auto mb-1.5 group-hover:scale-110 transition-transform shadow-xs">
-                          <Upload className="w-5 h-5" />
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#0c2217] text-[#d4a359] flex items-center justify-center mx-auto mb-1 group-hover:scale-110 transition-transform shadow-xs">
+                          <Upload className="w-4 h-4" />
                         </div>
-                        <p className="text-xs font-bold text-stone-800 group-hover:text-[#0c2217]">
+                        <p className="text-[11.5px] sm:text-xs font-bold text-stone-800 group-hover:text-[#0c2217]">
                           Tap here to upload payment screenshot
                         </p>
-                        <p className="text-[10px] sm:text-[10.5px] text-stone-500 mt-0.5">
+                        <p className="text-[9.5px] sm:text-[10px] text-stone-500 mt-0.5">
                           Screenshot from bank / EasyPaisa / JazzCash app (JPG, PNG, WEBP)
                         </p>
                       </div>
@@ -428,7 +428,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
 
                   {/* Optional Sender Notes */}
                   <div>
-                    <label className="text-[10.5px] sm:text-[11px] font-bold text-stone-600 block mb-1">
+                    <label className="text-[10px] sm:text-[10.5px] font-bold text-stone-600 block mb-0.5">
                       Sender Account / Notes <span className="text-stone-400 font-normal">(Optional)</span>
                     </label>
                     <input
@@ -436,19 +436,19 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                       placeholder="e.g. Transferred from 0300-1234567 or Meezan account"
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      className="w-full px-3 py-2 bg-[#faf8f5] border border-stone-200 rounded-xl text-xs text-stone-800 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
+                      className="w-full px-3 py-1.5 bg-[#faf8f5] border border-stone-200 rounded-xl text-xs text-stone-800 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
                     />
                   </div>
 
                   {/* Error Display */}
                   {error && (
-                    <div className="p-2.5 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-bold">
+                    <div className="p-2 bg-rose-50 border border-rose-200 rounded-xl text-xs text-rose-700 font-bold">
                       {error}
                     </div>
                   )}
 
-                  <div className="p-2 sm:p-2.5 bg-[#faf8f5] rounded-xl border border-stone-200 text-center">
-                    <p className="text-[10px] sm:text-[10.5px] text-stone-500">
+                  <div className="p-1.5 sm:p-2 bg-[#faf8f5] rounded-xl border border-stone-200 text-center">
+                    <p className="text-[9.5px] sm:text-[10px] text-stone-500">
                       Need assistance? Official Support: <a href="mailto:contact@ilmportal.org" className="text-[#b85d34] underline font-bold">contact@ilmportal.org</a>
                     </p>
                   </div>
@@ -460,9 +460,9 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
 
         </div>
 
-        {/* Modal Footer (Fully Responsive) */}
+        {/* Modal Footer (Pinned at bottom, fully responsive) */}
         {!success && (
-          <div className="p-3 sm:p-3.5 border-t border-stone-200 shrink-0 bg-[#faf8f5] flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2.5">
+          <div className="px-4 py-2.5 sm:px-5 sm:py-3 border-t border-stone-200 shrink-0 bg-[#faf8f5] z-10 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
             <div className="text-[11px] sm:text-xs text-stone-600 font-medium text-center sm:text-left truncate">
               Fee Due: <strong className="text-[#0c2217] font-bold">PKR {platformFee.toLocaleString()}</strong> &bull; Student: <strong className="text-stone-800">{deal.student?.name}</strong>
             </div>
@@ -470,7 +470,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
               <button
                 type="button"
                 onClick={onClose}
-                className="flex-1 sm:flex-initial px-4 py-2 sm:py-2.5 rounded-xl border border-stone-300 text-xs font-bold text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer text-center"
+                className="flex-1 sm:flex-initial px-3.5 py-1.5 sm:py-2 rounded-xl border border-stone-300 text-xs font-bold text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer text-center"
               >
                 Cancel
               </button>
@@ -478,7 +478,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                 type="submit"
                 form="tutor-fee-modal-form"
                 disabled={submitting || !proofImage}
-                className="flex-1 sm:flex-initial px-5 py-2 sm:py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white text-xs font-bold rounded-xl shadow-md disabled:opacity-50 transition-all cursor-pointer flex items-center justify-center gap-1.5"
+                className="flex-1 sm:flex-initial px-4 py-1.5 sm:py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white text-xs font-bold rounded-xl shadow-md disabled:opacity-50 transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
                 {submitting ? (
                   <>
@@ -487,7 +487,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                   </>
                 ) : (
                   <>
-                    <ShieldCheck className="w-4 h-4" />
+                    <ShieldCheck className="w-3.5 h-3.5" />
                     <span>Submit Screenshot Proof</span>
                   </>
                 )}

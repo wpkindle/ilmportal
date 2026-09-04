@@ -246,45 +246,28 @@ export default function ProfileCompletionMeter({
         <span className="absolute top-6 right-20 w-1.5 h-1.5 rounded-full bg-[#d4a359] shadow-[0_0_8px_#d4a359] animate-particle-drift pointer-events-none" style={{ animationDelay: '0.8s', animationDuration: '7s' }} />
         <span className="absolute bottom-8 right-1/3 w-1 h-1 rounded-full bg-[#b85d34] shadow-[0_0_6px_#b85d34] animate-particle-drift pointer-events-none" style={{ animationDelay: '2.1s', animationDuration: '9s' }} />
 
-        {/* ── Top Header Row: Greeting & Action Buttons ── */}
-        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
-          <div className="space-y-2.5 max-w-2xl">
-            {/* Role Assurance Badges */}
+        {/* ── Top Header Row: User Name & Action Buttons ── */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 sm:gap-6 relative z-10">
+          <div className="space-y-1.5 max-w-2xl">
+            {/* Role Assurance Badge */}
             <div className="flex items-center gap-2 flex-wrap">
               {isTutor ? (
-                <>
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#d4a359] text-[#0c2217] shadow-xs">
-                    <ShieldCheck className="w-3.5 h-3.5" />
-                    {isApproved ? 'Verified Sanad Teacher • IlmPortal Pakistan' : 'Sanad Verification Pending'}
-                  </span>
-                  <span className="text-[11px] font-semibold text-[#d4a359] bg-[#143d2b] px-2.5 py-1 rounded-full border border-[#d4a359]/40">
-                    Female Safety Compliant
-                  </span>
-                </>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#d4a359] text-[#0c2217] shadow-xs">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  {isApproved ? 'Verified Sanad Tutor • IlmPortal Pakistan' : 'Sanad Verification Pending'}
+                </span>
               ) : (
-                <>
-                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#d4a359] bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5 border border-[#d4a359]/20">
-                    <GraduationCap className="w-3.5 h-3.5" />
-                    Talib-e-Ilm &bull; Learning Space
-                  </span>
-                  <span className="text-[11px] font-semibold text-[#d4a359] bg-[#143d2b] px-2.5 py-1 rounded-full border border-[#d4a359]/40">
-                    Female Privacy Protected
-                  </span>
-                </>
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#d4a359] bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5 border border-[#d4a359]/20">
+                  <GraduationCap className="w-3.5 h-3.5" />
+                  Talib-e-Ilm &bull; Learning Space
+                </span>
               )}
             </div>
 
-            {/* Greeting Headline */}
+            {/* Profile User Name */}
             <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-[#faf8f5] tracking-tight">
-              Assalam-o-Alaikum, {user?.name || (isTutor ? 'Mu’allim' : 'Talib-e-Ilm')}!
+              {user?.name || (isTutor ? 'Mu’allim' : 'Talib-e-Ilm')}
             </h1>
-
-            {/* Subtitle */}
-            <p className="text-xs sm:text-sm text-stone-300 leading-relaxed font-normal">
-              {isTutor
-                ? 'Your teaching profile is active across Pakistan. Manage student course deals, track the 72-hour fee timer, and conduct live WebRTC classes.'
-                : 'Track your enrolled Quran & academic courses, schedule lessons with verified Pakistani teachers, and enter protected live classrooms.'}
-            </p>
           </div>
 
           {/* Action Buttons */}

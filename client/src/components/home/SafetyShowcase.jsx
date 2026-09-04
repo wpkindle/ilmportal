@@ -22,18 +22,35 @@ export default function SafetyShowcase() {
 
   return (
     <section className="py-16 sm:py-24 relative overflow-hidden bg-[#07150e] text-[#f5f0e6] border-b border-[#143d2b]">
-      {/* Ambient Deep Emerald Glows */}
-      <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-[#1e543c]/20 rounded-full blur-[140px] pointer-events-none animate-pulse-glow" />
-      <div className="absolute -bottom-24 right-10 w-[550px] h-[550px] bg-[#d4a359]/12 rounded-full blur-[150px] pointer-events-none animate-float-slow" />
+      {/* Ambient Deep Emerald & Gold Glows */}
+      <div className="absolute top-1/4 -left-32 w-[550px] h-[550px] bg-[#1e543c]/35 rounded-full blur-[130px] pointer-events-none animate-pulse-glow" />
+      <div className="absolute -bottom-24 right-10 w-[600px] h-[600px] bg-[#d4a359]/25 rounded-full blur-[140px] pointer-events-none animate-float-slow" />
 
-      {/* Rotating Sacred Geometry Trust Motif */}
-      <div className="absolute -top-20 -right-20 w-[480px] h-[480px] pointer-events-none opacity-[0.08] animate-spin-slow">
-        <svg viewBox="0 0 400 400" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="200" cy="200" r="185" stroke="#d4a359" strokeWidth="1" strokeDasharray="6 8" />
-          <circle cx="200" cy="200" r="145" stroke="#388e6a" strokeWidth="1" strokeDasharray="3 5" />
-          <rect x="110" y="110" width="180" height="180" stroke="#d4a359" strokeWidth="1.2" />
-          <rect x="110" y="110" width="180" height="180" transform="rotate(45 200 200)" stroke="#d4a359" strokeWidth="1.2" />
+      {/* Rotating Sacred Geometry Trust Motif (High Visibility) */}
+      <div className="absolute -top-20 -right-20 w-[480px] h-[480px] sm:w-[580px] sm:h-[580px] pointer-events-none opacity-50 sm:opacity-65 animate-spin-slow">
+        <svg viewBox="0 0 400 400" className="w-full h-full drop-shadow-[0_0_12px_rgba(212,163,89,0.35)]" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="200" cy="200" r="185" stroke="#d4a359" strokeWidth="1.75" strokeDasharray="6 8" />
+          <circle cx="200" cy="200" r="155" stroke="#34d399" strokeWidth="1.5" />
+          <circle cx="200" cy="200" r="125" stroke="#d4a359" strokeWidth="1" strokeDasharray="3 5" />
+          <rect x="110" y="110" width="180" height="180" stroke="#d4a359" strokeWidth="1.75" />
+          <rect x="110" y="110" width="180" height="180" transform="rotate(45 200 200)" stroke="#34d399" strokeWidth="1.75" />
         </svg>
+      </div>
+
+      {/* Floating Stardust Points in Safety Showcase */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        <span className="absolute top-16 left-[15%] w-2 h-2 rounded-full bg-[#fbbf24] shadow-[0_0_12px_#fbbf24] animate-particle-drift pointer-events-none flex items-center justify-center" style={{ animationDelay: '0.5s', animationDuration: '8s' }}>
+          <span className="w-1 h-1 rounded-full bg-white block" />
+        </span>
+        <span className="absolute top-1/2 left-[5%] w-2.5 h-2.5 rounded-full bg-[#34d399] shadow-[0_0_14px_#34d399] animate-particle-drift pointer-events-none flex items-center justify-center" style={{ animationDelay: '1.8s', animationDuration: '10s' }}>
+          <span className="w-1 h-1 rounded-full bg-white block" />
+        </span>
+        <span className="absolute bottom-20 right-[15%] w-2 h-2 rounded-full bg-[#f59e0b] shadow-[0_0_12px_#f59e0b] animate-particle-drift pointer-events-none flex items-center justify-center" style={{ animationDelay: '2.5s', animationDuration: '7.5s' }}>
+          <span className="w-1 h-1 rounded-full bg-white block" />
+        </span>
+        <span className="absolute top-1/3 right-[10%] w-2 h-2 rounded-full bg-[#fbbf24] shadow-[0_0_12px_#fbbf24] animate-particle-drift pointer-events-none flex items-center justify-center" style={{ animationDelay: '3.2s', animationDuration: '9s' }}>
+          <span className="w-1 h-1 rounded-full bg-white block" />
+        </span>
       </div>
 
       {/* Tasteful subtle grid */}

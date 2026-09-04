@@ -9,6 +9,61 @@ import Testimonials from '../components/home/Testimonials';
 import FAQ from '../components/home/FAQ';
 import { api } from '../services/api';
 
+export const metadata = {
+  title: 'Online Quran & Academic Tutors Pakistan | Verified Qaris & School Teachers | IlmPortal',
+  description: 'Connect with verified Pakistani Quran Qaris, female Alimahs, and Cambridge/Matric academic tutors. Safe 1:1 online classes from Lahore, Karachi, Islamabad & nationwide with camera-off privacy by default.',
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    title: 'Online Quran & Academic Tutors Pakistan | IlmPortal',
+    description: 'Connect with verified Pakistani Quran Qaris and Cambridge/Matric educators for live 1:1 video classrooms with camera-off privacy by default.',
+    url: 'https://pakistanlms.pk',
+  },
+};
+
+const homeStructuredData = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'EducationalOrganization',
+      '@id': 'https://pakistanlms.pk/#organization',
+      name: 'IlmPortal Pakistan',
+      url: 'https://pakistanlms.pk',
+      logo: 'https://pakistanlms.pk/icon.svg',
+      description: 'Pakistan’s premier educational network connecting families with verified Quran Qaris, female Alimahs, and Cambridge/Matric tutors.',
+      email: 'contact@ilmportal.org',
+      address: {
+        '@type': 'PostalAddress',
+        addressLocality: 'Lahore',
+        addressRegion: 'Punjab',
+        addressCountry: 'PK'
+      },
+      areaServed: [
+        { '@type': 'City', name: 'Lahore' },
+        { '@type': 'City', name: 'Karachi' },
+        { '@type': 'City', name: 'Islamabad' },
+        { '@type': 'City', name: 'Rawalpindi' },
+        { '@type': 'City', name: 'Peshawar' },
+        { '@type': 'City', name: 'Quetta' },
+        { '@type': 'City', name: 'Faisalabad' },
+        { '@type': 'City', name: 'Multan' }
+      ]
+    },
+    {
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        {
+          '@type': 'ListItem',
+          position: 1,
+          name: 'Home',
+          item: 'https://pakistanlms.pk'
+        }
+      ]
+    }
+  ]
+};
+
 export const revalidate = 60; // SSR with ISR caching every 60s
 
 async function getFeaturedTutors() {
@@ -28,6 +83,12 @@ export default async function HomePage() {
 
   return (
     <div className="space-y-0">
+      {/* Search Engine Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(homeStructuredData) }}
+      />
+
       {/* 1. Hero Section */}
       <Hero />
 

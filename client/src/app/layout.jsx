@@ -10,13 +10,20 @@ export const viewport = {
   initialScale: 1,
   maximumScale: 5,
   userScalable: true,
-  themeColor: '#020617',
+  themeColor: '#0c2217',
 };
 
 export const metadata = {
-  title: 'IlmPortal Pakistan - Quran & Academic Tutoring LMS',
-  description: 'Pakistan’s #1 online tutoring platform for Quran recitation, Tajweed, Hifz, and Academic subjects (Matric, FSc, O/A Levels) across Lahore, Karachi, Islamabad, Peshawar, Quetta, and all cities.',
-  keywords: 'Quran tutor Pakistan, Tajweed tutor Lahore, O Level tutor Karachi, Online Quran Academy, Hifz tutor, Matric science tutor, In-platform WebRTC classroom',
+  metadataBase: new URL('https://pakistanlms.pk'),
+  title: {
+    default: 'IlmPortal Pakistan | Verified Quran & Academic Tutoring',
+    template: '%s | IlmPortal Pakistan',
+  },
+  description: 'Connect with verified Pakistani Quran Qaris, female Alimahs, and Cambridge & Matric subject tutors. 1-on-1 live video classes with camera-off privacy from Lahore, Karachi, Islamabad & across Pakistan.',
+  keywords: 'Quran tutor Pakistan, Tajweed tutor Lahore, O Level tutor Karachi, Online Quran Academy, Hifz tutor, Matric science tutor, Female Quran teacher Pakistan, In-platform WebRTC classroom',
+  alternates: {
+    canonical: '/',
+  },
   manifest: '/manifest.json',
   icons: {
     icon: '/icon.svg',
@@ -32,13 +39,52 @@ export const metadata = {
     'mobile-web-app-capable': 'yes',
   },
   openGraph: {
-    title: 'IlmPortal Pakistan - Online Quran & Academic Tutoring',
-    description: 'Connect with verified Pakistani Quran Qaris and Cambridge/Matric educators for live in-platform video classrooms.',
+    title: 'IlmPortal Pakistan | Verified Quran & Academic Tutoring',
+    description: 'Connect with verified Pakistani Quran Qaris and Cambridge/Matric educators for live 1:1 in-platform video classrooms with complete family privacy.',
     url: 'https://pakistanlms.pk',
     siteName: 'IlmPortal Pakistan',
     locale: 'en_PK',
     type: 'website',
   },
+};
+
+const orgSchema = {
+  '@context': 'https://schema.org',
+  '@graph': [
+    {
+      '@type': 'Organization',
+      '@id': 'https://pakistanlms.pk/#organization',
+      name: 'IlmPortal Pakistan',
+      url: 'https://pakistanlms.pk',
+      logo: 'https://pakistanlms.pk/icon.svg',
+      description: 'Pakistan’s dedicated platform for 1-on-1 verified Quran and academic tutoring with camera-off privacy.',
+      contactPoint: {
+        '@type': 'ContactPoint',
+        email: 'contact@ilmportal.org',
+        contactType: 'customer support',
+        areaServed: 'PK',
+        availableLanguage: ['Urdu', 'English']
+      },
+      sameAs: [
+        'https://facebook.com/ilmportal',
+        'https://twitter.com/ilmportal'
+      ]
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://pakistanlms.pk/#website',
+      url: 'https://pakistanlms.pk',
+      name: 'IlmPortal Pakistan',
+      publisher: {
+        '@id': 'https://pakistanlms.pk/#organization'
+      },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: 'https://pakistanlms.pk/tutors?q={search_term_string}',
+        'query-input': 'required name=search_term_string'
+      }
+    }
+  ]
 };
 
 export default function RootLayout({ children }) {
@@ -47,9 +93,16 @@ export default function RootLayout({ children }) {
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Amiri:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet" />
+        <link
+          href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+          rel="stylesheet"
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
+        />
       </head>
-      <body className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans antialiased selection:bg-emerald-500 selection:text-white">
+      <body className="min-h-screen flex flex-col bg-[#faf8f5] text-[#1c2826] font-sans antialiased selection:bg-[#143d2b] selection:text-white">
         <AppProviders>
           <Navbar />
           <main className="flex-1 pb-16 md:pb-0">

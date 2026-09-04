@@ -45,100 +45,78 @@ const SubjectExplorer = () => {
   const filteredCategories = categories.filter(c => c.type === activeTab);
 
   return (
-    <section className="py-20 relative overflow-hidden bg-slate-50/70 border-b border-slate-200/80 bg-blueprint-grid">
-      {/* Unique Background Effect Layer 1: Radial Glow Spots */}
-      <div className="absolute top-1/4 -left-20 w-80 h-80 bg-teal-500/10 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute bottom-10 -right-20 w-96 h-96 bg-emerald-500/10 rounded-full blur-[110px] pointer-events-none" />
-
-      {/* Unique Background Effect Layer 2: Floating Coordinate Blueprint Matrix Icons */}
-      <div className="absolute top-12 left-10 pointer-events-none text-emerald-600/15 animate-float-slow hidden md:block">
-        <svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="currentColor" strokeWidth="1.5">
-          <circle cx="20" cy="20" r="16" strokeDasharray="3 3" />
-          <path d="M20 4v32M4 20h32" />
-        </svg>
-      </div>
-
-      <div className="absolute bottom-20 left-16 pointer-events-none text-teal-600/15 animate-float-reverse hidden md:block">
-        <svg width="50" height="50" viewBox="0 0 50 50" fill="none" stroke="currentColor" strokeWidth="1.2">
-          <polygon points="25,5 45,40 5,40" />
-          <circle cx="25" cy="28" r="8" strokeDasharray="2 2" />
-        </svg>
-      </div>
-
-      <div className="absolute top-28 right-16 pointer-events-none text-emerald-600/20 animate-float-slow hidden md:block">
-        <svg width="60" height="60" viewBox="0 0 60 60" fill="none" stroke="currentColor" strokeWidth="1">
-          <ellipse cx="30" cy="30" rx="25" ry="10" transform="rotate(30 30 30)" />
-          <ellipse cx="30" cy="30" rx="25" ry="10" transform="rotate(-30 30 30)" />
-          <circle cx="30" cy="30" r="4" fill="currentColor" />
-        </svg>
-      </div>
+    <section className="py-16 sm:py-24 relative overflow-hidden bg-[#f5f0e6] border-b border-[#ebe3d3]">
+      {/* Subtle warm glow */}
+      <div className="absolute top-1/4 -left-20 w-80 h-80 bg-[#1e543c]/10 rounded-full blur-[100px] pointer-events-none" />
+      <div className="absolute bottom-10 -right-20 w-96 h-96 bg-[#d4a359]/10 rounded-full blur-[110px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 relative z-10">
         
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-          <div className="space-y-2">
-            <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-3.5 py-1.5 rounded-full border border-emerald-300 shadow-2xs inline-flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600" />
-              <span>Explore Subjects</span>
-            </span>
-            <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-              Quran &amp; School Subjects
+        {/* Editorial Header & Stream Switcher */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-3 max-w-2xl">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ebe3d3] text-[#143d2b] text-xs font-bold shadow-2xs">
+              <BookOpen className="w-3.5 h-3.5 text-[#2b6e51]" />
+              <span>Curriculum &amp; Disciplines</span>
+            </div>
+            <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-black text-[#141c19] tracking-tight leading-[1.15]">
+              Two paths: Sacred Quranic sciences &amp; academic excellence.
             </h2>
-            <p className="text-xs sm:text-sm text-slate-500 max-w-xl">
-              Find verified tutors for Quran and school classes with flexible timings.
+            <p className="text-xs sm:text-sm text-[#5c6e69] leading-relaxed">
+              From gentle Noorani Qaida for young children to rigorous Cambridge CAIE O/A Levels and FSc Board prep, find specialized educators for every milestone.
             </p>
           </div>
 
-          {/* Category Tabs */}
-          <div className="flex items-center gap-2 bg-slate-200/80 p-1.5 rounded-2xl text-xs font-bold self-start md:self-auto">
+          {/* Stream Switcher Tabs */}
+          <div className="flex items-center gap-1.5 bg-[#ebe3d3] p-1.5 rounded-2xl text-xs font-bold self-start md:self-auto shrink-0 shadow-inner">
             <button
               onClick={() => setActiveTab('quran')}
-              className={`px-4 py-2 rounded-xl transition-all ${
+              className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
                 activeTab === 'quran'
-                  ? 'bg-white text-emerald-800 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#143d2b] text-white shadow-sm'
+                  : 'text-[#2d3a37] hover:text-[#141c19]'
               }`}
             >
-              Quran &amp; Islamic Subjects
+              Quran &amp; Islamic Sciences
             </button>
             <button
               onClick={() => setActiveTab('academic')}
-              className={`px-4 py-2 rounded-xl transition-all ${
+              className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
                 activeTab === 'academic'
-                  ? 'bg-white text-emerald-800 shadow-sm'
-                  : 'text-slate-600 hover:text-slate-900'
+                  ? 'bg-[#143d2b] text-white shadow-sm'
+                  : 'text-[#2d3a37] hover:text-[#141c19]'
               }`}
             >
-              School &amp; College Subjects
+              School &amp; College Academics
             </button>
           </div>
         </div>
 
         {/* Featured Course Banner for Quranic Studies */}
         {activeTab === 'quran' && (
-          <div className="p-5 rounded-3xl bg-gradient-to-r from-emerald-950 via-slate-900 to-teal-950 text-white border border-emerald-500/40 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-3.5">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center shrink-0">
-                <Sparkles className="w-6 h-6 text-emerald-400" />
+          <div className="p-6 rounded-3xl bg-[#0c2217] text-white border-2 border-[#2b6e51]/50 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <div className="w-12 h-12 rounded-2xl bg-[#143d2b] border border-[#2b6e51] flex items-center justify-center shrink-0">
+                <Sparkles className="w-6 h-6 text-[#d4a359]" />
               </div>
               <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-emerald-400 bg-emerald-950 px-2 py-0.5 rounded border border-emerald-500/30">
-                  POPULAR FOR KIDS
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#d4a359] bg-[#143d2b] px-2.5 py-0.5 rounded border border-[#2b6e51]/60">
+                  Recommended for Beginners
                 </span>
-                <h4 className="text-base sm:text-lg font-black text-white mt-1">
-                  Quran Reading for Kids (Ages 5–12)
-                </h4>
-                <p className="text-xs text-slate-300">
-                  Fun, step-by-step lessons for children with Quran letters, correct pronunciation, and a free trial.
+                <h3 className="text-base sm:text-lg font-serif font-black text-white mt-1">
+                  Noorani Qaida &amp; Makharij for Children (Ages 5–12)
+                </h3>
+                <p className="text-xs text-[#a3b8b0] leading-snug">
+                  Gentle, patient 1-on-1 recitation with correct Arabic letters and vocal articulation points.
                 </p>
               </div>
             </div>
 
             <Link
               href="/courses/nazra-quran-kids"
-              className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-md shrink-0 flex items-center gap-2 hover:scale-105 transition-all cursor-pointer"
+              className="px-5 py-2.5 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs shadow-md shrink-0 flex items-center gap-2 transition-all cursor-pointer"
             >
-              <span>View Course Details</span>
+              <span>Explore Course</span>
               <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
@@ -152,35 +130,35 @@ const SubjectExplorer = () => {
               <Link
                 key={cat._id}
                 href={`/tutors?category=${cat.slug}`}
-                className="group bg-white p-6 rounded-3xl border border-slate-200/90 shadow-2xs hover:shadow-xl hover:border-emerald-300 transition-all space-y-4 flex flex-col justify-between"
+                className="group bg-[#faf8f5] p-6 rounded-3xl border border-[#ebe3d3] hover:border-[#143d2b] shadow-2xs hover:shadow-lg transition-all space-y-4 flex flex-col justify-between"
               >
                 <div className="space-y-3">
-                  <div className="p-3 bg-emerald-50 text-emerald-700 rounded-2xl w-fit group-hover:scale-110 transition-transform">
+                  <div className="p-3 bg-[#f5f0e6] text-[#143d2b] rounded-2xl w-fit group-hover:bg-[#143d2b] group-hover:text-white transition-all">
                     <IconComponent className="w-6 h-6" />
                   </div>
                   <div>
-                    <h3 className="font-bold text-base text-slate-900 group-hover:text-emerald-700 transition-colors">
+                    <h3 className="font-serif font-bold text-base text-[#141c19] group-hover:text-[#143d2b] transition-colors">
                       {cat.name}
                     </h3>
-                    <p className="text-xs text-slate-500 mt-1 leading-relaxed line-clamp-2">
+                    <p className="text-xs text-[#5c6e69] mt-1 leading-relaxed line-clamp-2">
                       {cat.description}
                     </p>
                   </div>
                 </div>
 
-                <div className="space-y-3 pt-2 border-t border-slate-100">
+                <div className="space-y-3 pt-3 border-t border-[#ebe3d3]/80">
                   {cat.subtopics && cat.subtopics.length > 0 && (
                     <div className="flex flex-wrap gap-1.5">
                       {cat.subtopics.slice(0, 3).map((st, sidx) => (
-                        <span key={sidx} className="text-[10px] font-semibold bg-slate-100 text-slate-700 px-2 py-0.5 rounded-md">
+                        <span key={sidx} className="text-[10px] font-semibold bg-[#f0ece1] text-[#2d3a37] px-2 py-0.5 rounded-md">
                           {st}
                         </span>
                       ))}
                     </div>
                   )}
 
-                  <div className="flex items-center justify-between text-xs font-bold text-emerald-700 pt-1">
-                    <span>Find Available Tutors</span>
+                  <div className="flex items-center justify-between text-xs font-bold text-[#143d2b] pt-1">
+                    <span>Find Verified Tutors</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>
                 </div>

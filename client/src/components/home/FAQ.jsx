@@ -1,99 +1,105 @@
 'use client';
 
 import React, { useState } from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, HelpCircle } from 'lucide-react';
 
 const faqs = [
   {
-    q: 'How does tutoring work on IlmPortal?',
-    a: 'You can search for verified Quran teachers and school tutors. Once you choose a tutor, you can chat for free, set your schedule and monthly fee, and take 1-on-1 video classes right on our website.'
+    q: 'How does tutoring work on IlmPortal for Pakistani families?',
+    a: 'You can search verified Quran teachers and school tutors by subject, city, and teacher gender. You chat directly with the teacher for free to discuss class days and mutually agree on a monthly fee (PKR). 1-on-1 live video classes happen right in your internet browser with camera-off privacy by default.'
   },
   {
-    q: 'Do I need Zoom or any other app to join classes?',
-    a: 'No! You do not need to download Zoom or any app. Classes happen directly in your internet browser with clear video, screen sharing, and an online Quran.'
+    q: 'Do I or my child need to download Zoom, Skype, or any software?',
+    a: 'No! Zero app downloads required. Classes take place directly inside your web browser (Chrome, Edge, Safari, Firefox, or mobile browser) with crystal-clear audio, interactive screen sharing, digital Quran reader, and digital blackboard.'
   },
   {
-    q: 'How are teachers verified?',
-    a: 'Every teacher uploads their government ID card, university degrees, and Quran certificates. Our team checks each document carefully before approving the teacher.'
+    q: 'How are Quran Qaris and academic tutors verified?',
+    a: 'Every teacher must submit their national CNIC identity card, university degrees, and authenticated Quran Sanads (such as Wafaq-ul-Madaris diplomas). Our Lahore administration manually reviews each document and verifies credentials before approving the teacher profile.'
   },
   {
-    q: 'How do I pay my teacher\'s fee?',
-    a: 'You can pay easily using EasyPaisa, JazzCash, or online bank transfer (like Meezan Bank or Raast). Simply enter your payment confirmation number for instant verification.'
+    q: 'How are monthly fees paid to the teacher?',
+    a: 'You pay easily via EasyPaisa, JazzCash, or direct bank transfer (e.g. Meezan Bank, HBL, or Raast). You upload a simple transaction screenshot in your portal for immediate administrative clearance.'
   },
   {
-    q: 'Can female students learn from female teachers?',
-    a: 'Yes! You can filter your search to find qualified female teachers (Alimahs) for girls and young children with complete privacy.'
+    q: 'Can daughters and young children learn exclusively from female teachers?',
+    a: 'Yes, absolutely. We have a dedicated female tutor directory. Families can filter specifically for qualified female teachers (Alimahs) with complete privacy guarantees and camera-off defaults.'
   }
 ];
 
-const FAQ = () => {
+const faqSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: faqs.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: {
+      '@type': 'Answer',
+      text: f.a
+    }
+  }))
+};
+
+export default function FAQ() {
   const [openIdx, setOpenIdx] = useState(0);
 
   return (
-    <section className="py-24 relative overflow-hidden bg-slate-50/80 border-b border-slate-200/80">
-      {/* Unique Background Effect Layer 1: Central Knowledge Glow Core */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-emerald-400/10 rounded-full blur-[130px] pointer-events-none" />
-      <div className="absolute -bottom-20 -left-20 w-80 h-80 bg-teal-400/10 rounded-full blur-[100px] pointer-events-none" />
+    <section className="py-16 sm:py-24 relative overflow-hidden bg-[#faf8f5] border-b border-[#ebe3d3]">
+      {/* Embedded FAQPage Schema for Rich Search Results */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
 
-      {/* Unique Background Effect Layer 2: Concentric Acoustic Ripple Rings */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[900px] pointer-events-none opacity-20">
-        <svg viewBox="0 0 900 900" className="w-full h-full text-emerald-700 stroke-current fill-none">
-          <circle cx="450" cy="450" r="150" strokeWidth="1" strokeDasharray="4 4" />
-          <circle cx="450" cy="450" r="260" strokeWidth="1.2" strokeDasharray="6 6" />
-          <circle cx="450" cy="450" r="370" strokeWidth="1" strokeDasharray="3 3" />
-          <circle cx="450" cy="450" r="440" strokeWidth="0.8" />
-        </svg>
-      </div>
-
-      {/* Unique Background Effect Layer 3: Floating Question Sparkle Nodes */}
-      <div className="absolute top-16 left-12 pointer-events-none opacity-15 hidden md:block animate-float-slow">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-emerald-700">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3" />
-          <line x1="12" y1="17" x2="12.01" y2="17" />
-        </svg>
-      </div>
-
-      <div className="absolute bottom-16 right-12 pointer-events-none opacity-15 hidden md:block animate-float-reverse">
-        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="text-teal-700">
-          <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
-        </svg>
-      </div>
+      {/* Subtle warm ambient lighting */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-[#d4a359]/5 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 relative z-10">
         
-        <div className="text-center space-y-2.5">
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-3.5 py-1.5 rounded-full border border-emerald-300 shadow-2xs inline-flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-pulse" />
-            <span>Frequently Asked Questions</span>
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-            Got Questions? We Have Answers
+        {/* Editorial Header */}
+        <div className="text-center space-y-3 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5f0e6] border border-[#ebe3d3] text-[#143d2b] text-xs font-bold shadow-2xs">
+            <HelpCircle className="w-3.5 h-3.5 text-[#2b6e51]" />
+            <span>Clear Answers for Families</span>
+          </div>
+
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-black text-[#141c19] tracking-tight leading-[1.18]">
+            Frequently asked questions about learning from home.
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500 max-w-md mx-auto">
-            Everything you need to know about starting your online Quran & academic tutoring.
+
+          <p className="text-xs sm:text-sm text-[#5c6e69] leading-relaxed">
+            Straightforward answers to the most common questions Pakistani parents ask us about our tutors, privacy rules, and fee structure.
           </p>
         </div>
 
-        <div className="space-y-3">
+        {/* Accordion List */}
+        <div className="space-y-3.5">
           {faqs.map((faq, idx) => {
             const isOpen = openIdx === idx;
             return (
               <div
                 key={idx}
-                className="bg-white rounded-2xl border border-slate-200/90 shadow-2xs overflow-hidden transition-all"
+                className={`bg-white rounded-3xl border transition-all overflow-hidden ${
+                  isOpen
+                    ? 'border-[#143d2b] shadow-md'
+                    : 'border-[#ebe3d3] shadow-2xs hover:border-[#143d2b]/40'
+                }`}
               >
                 <button
+                  type="button"
                   onClick={() => setOpenIdx(isOpen ? null : idx)}
-                  className="w-full p-4 sm:p-5 text-left flex items-center justify-between gap-4"
+                  className="w-full p-5 sm:p-6 text-left flex items-center justify-between gap-4 cursor-pointer"
                 >
-                  <span className="font-bold text-xs sm:text-sm text-slate-900">
+                  <span className="font-serif font-bold text-sm sm:text-base text-[#141c19]">
                     {faq.q}
                   </span>
-                  <ChevronDown className={`w-4 h-4 text-slate-400 transition-transform ${isOpen ? 'rotate-180 text-emerald-600' : ''}`} />
+                  <ChevronDown
+                    className={`w-4 h-4 text-[#81928e] shrink-0 transition-transform duration-200 ${
+                      isOpen ? 'rotate-180 text-[#143d2b]' : ''
+                    }`}
+                  />
                 </button>
                 {isOpen && (
-                  <div className="px-4 pb-4 sm:px-5 sm:pb-5 text-xs text-slate-600 leading-relaxed border-t border-slate-100 pt-3">
+                  <div className="px-5 pb-5 sm:px-6 sm:pb-6 text-xs sm:text-sm text-[#5c6e69] leading-relaxed border-t border-[#ebe3d3]/70 pt-3">
                     {faq.a}
                   </div>
                 )}
@@ -105,6 +111,4 @@ const FAQ = () => {
       </div>
     </section>
   );
-};
-
-export default FAQ;
+}

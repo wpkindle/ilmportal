@@ -31,6 +31,9 @@ export async function generateMetadata({ params }) {
       return {
         title: `${tutorName} - Verified Tutor Profile | IlmPortal Pakistan`,
         description: `${tutorName} (${tutor.user?.city || 'Pakistan'}) specializes in ${tutor.qualifications || 'Quran & Academic Tutoring'}. Rating: ${tutor.averageRating?.toFixed(1) || '5.0'}/5. In-platform live video classes available.`,
+        alternates: {
+          canonical: `https://pakistanlms.pk/tutors/${params.id}`,
+        },
         openGraph: {
           title: `${tutorName} - Certified Tutor | IlmPortal`,
           description: tutor.bio?.slice(0, 160) || 'Verified Quran & Academic Tutor on IlmPortal Pakistan.',
@@ -44,6 +47,9 @@ export async function generateMetadata({ params }) {
   return {
     title: 'Tutor Profile | IlmPortal Pakistan',
     description: 'Find verified Quran and Academic tutors across Pakistan.',
+    alternates: {
+      canonical: `https://pakistanlms.pk/tutors/${params.id}`,
+    },
   };
 }
 
@@ -76,24 +82,58 @@ export default async function TutorProfilePage({ params }) {
   const tutorUser = tutor.user || {};
   const tutorName = tutorUser.name || 'Verified Tutor';
 
-  // Schema.org Person & Service JSON-LD Structured Data
+  // Schema.org Person & BreadcrumbList JSON-LD Structured Data
   const jsonLd = {
     '@context': 'https://schema.org',
-    '@type': 'Person',
-    name: tutorName,
-    jobTitle: tutor.qualifications || 'Tutor',
-    address: {
-      '@type': 'PostalAddress',
-      addressLocality: tutorUser.city || 'Pakistan',
-      addressCountry: 'PK'
-    },
-    aggregateRating: {
-      '@type': 'AggregateRating',
-      ratingValue: tutor.averageRating || 5.0,
-      reviewCount: reviews.length || 1,
-      bestRating: '5',
-      worstRating: '1'
-    }
+    '@graph': [
+      {
+        '@type': 'Person',
+        '@id': `https://pakistanlms.pk/tutors/${params.id}#person`,
+        name: tutorName,
+        jobTitle: tutor.qualifications || 'Verified Educator',
+        description: tutor.bio || `${tutorName} is a verified tutor on IlmPortal Pakistan offering personalized 1:1 online classes.`,
+        image: tutorUser.avatar || undefined,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: tutorUser.city || 'Pakistan',
+          addressCountry: 'PK'
+        },
+        knowsAbout: [
+          ...(tutor.subjects || []),
+          ...(tutor.qualifications ? [tutor.qualifications] : [])
+        ],
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: tutor.averageRating || 5.0,
+          reviewCount: reviews.length || 1,
+          bestRating: '5',
+          worstRating: '1'
+        }
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: 'https://pakistanlms.pk'
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Tutors',
+            item: 'https://pakistanlms.pk/tutors'
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: tutorName,
+            item: `https://pakistanlms.pk/tutors/${params.id}`
+          }
+        ]
+      }
+    ]
   };
 
   return (

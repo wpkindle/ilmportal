@@ -1,97 +1,134 @@
 import React from 'react';
-import { Star, ShieldCheck, Quote } from 'lucide-react';
+import { Star, ShieldCheck, Quote, CheckCircle2 } from 'lucide-react';
 import RatingStars from '../common/RatingStars';
 
 const testimonials = [
   {
-    name: 'Muhammad Tariq (Parent)',
-    city: 'Lahore, Punjab',
-    role: 'Parent of 2 Quran Students',
+    featured: true,
+    name: 'Mrs. Shazia Farooq',
+    location: 'DHA Phase 5, Lahore',
+    role: 'Mother of 8-year-old Quran student',
     rating: 5,
-    review: 'Finding a qualified Quran teacher with proper certificates was difficult. On IlmPortal, we easily checked the teacher\'s certificates, chose our evening timing, and my son loves the online Quran classes!'
+    highlight: 'Daughter learning with verified female Alimah',
+    review:
+      'Finding a trustworthy Quran teacher for my 8-year-old daughter who is both patient and possesses genuine Tajweed was our biggest worry. On IlmPortal, we verified the teacher’s Sanad from Wafaq-ul-Madaris before our first interaction. The camera-off default gave our family absolute peace of mind. She has now completed two Paras with genuine joy and accurate Makharij.'
   },
   {
-    name: 'Ayesha Siddiqui (Student)',
-    city: 'Karachi, Sindh',
-    role: 'A-Level Physics Student',
+    featured: false,
+    name: 'Hamza Rizvi',
+    location: 'Gulshan-e-Iqbal, Karachi',
+    role: 'Cambridge O-Level Physics Student',
     rating: 5,
-    review: 'My tutor Sir Bilal helped me practice exam questions using screen sharing and the online whiteboard. Having video classes and messaging all in one place made learning so simple.'
+    highlight: 'CAIE Past Paper Problem Solving',
+    review:
+      'I was struggling with CAIE kinematics and paper-2 numericals. My tutor Sir Bilal explains everything on the digital whiteboard in the browser. No commuting through Shahrah-e-Faisal traffic, and I save 2 hours daily.'
   },
   {
-    name: 'Qari Huzaifa ur Rehman',
-    city: 'Islamabad, ICT',
-    role: 'Verified Quran Teacher',
+    featured: false,
+    name: 'Tariq Mehmood',
+    location: 'Sector F-10, Islamabad',
+    role: 'Father of Matric & Hifz students',
     rating: 5,
-    review: 'As a teacher, IlmPortal gives me everything I need: a verified teacher profile, direct messaging with students, and clear video classes with a built-in Quran.'
+    highlight: 'Direct Fee Agreement & Zero Hassle',
+    review:
+      'The fee transparency is what impressed me most. We agreed on a fair monthly fee in chat, paid via Raast directly, and classes happen punctually every evening. Exactly what Pakistani parents need.'
   }
 ];
 
-const Testimonials = () => {
+export default function Testimonials() {
+  const featured = testimonials[0];
+  const supporting = testimonials.slice(1);
+
   return (
-    <section className="py-24 relative overflow-hidden bg-white border-b border-slate-200/80">
-      {/* Unique Background Effect Layer 1: Warm Mint & Amber Ambient Halo */}
-      <div className="absolute -top-24 left-1/3 w-[500px] h-[300px] bg-emerald-400/10 rounded-full blur-[110px] pointer-events-none" />
-      <div className="absolute -bottom-24 right-10 w-[450px] h-[300px] bg-amber-400/10 rounded-full blur-[110px] pointer-events-none" />
+    <section className="py-16 sm:py-24 relative overflow-hidden bg-[#faf8f5] border-b border-[#ebe3d3]">
+      {/* Subtle warm glow */}
+      <div className="absolute top-1/4 right-10 w-96 h-96 bg-[#d4a359]/10 rounded-full blur-[130px] pointer-events-none" />
 
-      {/* Unique Background Effect Layer 2: Giant Translucent Quote Watermarks */}
-      <div className="absolute top-8 left-8 text-9xl font-serif font-black text-emerald-600/5 select-none pointer-events-none leading-none">
-        “
-      </div>
-      <div className="absolute bottom-8 right-8 text-9xl font-serif font-black text-amber-600/5 select-none pointer-events-none leading-none">
-        ”
-      </div>
-
-      {/* Unique Background Effect Layer 3: Flowing Harmonic Silk Wave Ribbon */}
-      <div className="absolute inset-0 pointer-events-none opacity-20">
-        <svg className="w-full h-full text-emerald-600/20 fill-none stroke-current" preserveAspectRatio="none" viewBox="0 0 1200 400">
-          <path d="M0,100 C300,300 600,0 1200,200 L1200,400 L0,400 Z" fill="rgba(16, 185, 129, 0.03)" stroke="none" />
-          <path d="M0,150 C400,20 800,350 1200,100" strokeWidth="1.5" strokeDasharray="5 5" />
-          <path d="M0,220 C350,380 750,50 1200,250" strokeWidth="1.2" />
-        </svg>
-      </div>
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
         
-        <div className="text-center max-w-2xl mx-auto space-y-2.5">
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-100 px-3.5 py-1.5 rounded-full border border-emerald-300 shadow-2xs inline-flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-ping" />
-            <span>What People Say</span>
-          </span>
-          <h2 className="text-2xl sm:text-4xl font-black text-slate-900 tracking-tight">
-            Trusted by Families &amp; Teachers
+        {/* Editorial Header */}
+        <div className="max-w-2xl space-y-3 text-left">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5f0e6] border border-[#ebe3d3] text-[#143d2b] text-xs font-bold shadow-2xs">
+            <Quote className="w-3.5 h-3.5 text-[#2b6e51]" />
+            <span>Family Voices across Pakistan</span>
+          </div>
+
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-black text-[#141c19] tracking-tight leading-[1.15]">
+            Trusted by parents who wanted something better than tuition centers.
           </h2>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Honest reviews from students, parents, and teachers across Pakistan.
+
+          <p className="text-xs sm:text-sm text-[#5c6e69] leading-relaxed">
+            Real experiences from families across Lahore, Karachi, Islamabad, and nationwide studying with verified educators.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {testimonials.map((t, idx) => (
-            <div
-              key={idx}
-              className="bg-slate-50 p-6 rounded-3xl border border-slate-200/90 shadow-2xs space-y-4 flex flex-col justify-between"
-            >
-              <div className="space-y-3">
-                <RatingStars rating={t.rating} size="sm" />
-                <p className="text-xs text-slate-700 leading-relaxed italic">
-                  "{t.review}"
-                </p>
+        {/* Asymmetric Testimonial Grid (1 Large Featured + 2 Supporting) */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
+          
+          {/* Featured Large Card (7 cols) */}
+          <div className="lg:col-span-7 p-7 sm:p-9 rounded-3xl bg-[#0c2217] text-white border-2 border-[#2b6e51]/50 shadow-xl flex flex-col justify-between space-y-6 relative overflow-hidden">
+            <div className="absolute top-6 right-6 text-7xl font-serif font-black text-white/5 select-none pointer-events-none">
+              “
+            </div>
+
+            <div className="space-y-4 relative z-10">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#143d2b] text-[#d4a359] border border-[#2b6e51]/60">
+                  {featured.highlight}
+                </span>
+                <RatingStars rating={featured.rating} size="sm" />
               </div>
 
-              <div className="pt-3 border-t border-slate-200/80 flex items-center justify-between">
-                <div>
-                  <h4 className="font-bold text-xs text-slate-900">{t.name}</h4>
-                  <p className="text-[11px] text-slate-500">{t.role} &bull; {t.city}</p>
-                </div>
-                <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0" />
+              <p className="text-sm sm:text-base text-[#e5f3ec] font-serif leading-relaxed italic">
+                &ldquo;{featured.review}&rdquo;
+              </p>
+            </div>
+
+            <div className="pt-4 border-t border-[#143d2b] flex items-center justify-between relative z-10">
+              <div>
+                <h4 className="font-bold text-sm text-white">{featured.name}</h4>
+                <p className="text-xs text-[#a3b8b0]">{featured.role} &bull; {featured.location}</p>
+              </div>
+              <div className="flex items-center gap-1.5 text-xs text-[#d4a359] font-bold">
+                <ShieldCheck className="w-4 h-4 text-emerald-400" />
+                <span>Verified Family</span>
               </div>
             </div>
-          ))}
+          </div>
+
+          {/* Supporting Cards (5 cols) */}
+          <div className="lg:col-span-5 flex flex-col justify-between gap-6">
+            {supporting.map((item, idx) => (
+              <div
+                key={idx}
+                className="p-6 rounded-3xl bg-[#f5f0e6] border border-[#ebe3d3] shadow-2xs space-y-4 flex flex-col justify-between"
+              >
+                <div className="space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded bg-[#ebe3d3] text-[#5e4e37]">
+                      {item.highlight}
+                    </span>
+                    <RatingStars rating={item.rating} size="xs" />
+                  </div>
+                  <p className="text-xs text-[#2d3a37] leading-relaxed italic">
+                    &ldquo;{item.review}&rdquo;
+                  </p>
+                </div>
+
+                <div className="pt-3 border-t border-[#ebe3d3] flex items-center justify-between">
+                  <div>
+                    <h5 className="font-bold text-xs text-[#141c19]">{item.name}</h5>
+                    <p className="text-[11px] text-[#5c6e69]">{item.role} &bull; {item.location}</p>
+                  </div>
+                  <CheckCircle2 className="w-4 h-4 text-[#2b6e51] shrink-0" />
+                </div>
+              </div>
+            ))}
+          </div>
+
         </div>
 
       </div>
     </section>
   );
-};
-
-export default Testimonials;
+}

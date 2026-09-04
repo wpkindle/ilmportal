@@ -48,15 +48,61 @@
 
 /* Custom Islamic pattern background and modern accents */
 .bg-islamic-pattern {
-  background-color: #064e3b;
-  background-image: radial-gradient(#059669 0.75px, transparent 0.75px), radial-gradient(#059669 0.75px, #064e3b 0.75px);
+  background-color: #0c2217;
+  background-image: radial-gradient(#1e543c 0.75px, transparent 0.75px), radial-gradient(#1e543c 0.75px, #0c2217 0.75px);
   background-size: 30px 30px;
   background-position: 0 0, 15px 15px;
 }
 
 .bg-subtle-pattern {
-  background-image: radial-gradient(#cbd5e1 0.75px, transparent 0.75px);
+  background-image: radial-gradient(#d6cec0 0.75px, transparent 0.75px);
   background-size: 24px 24px;
+}
+
+/* Warm Parchment Subtle Grain */
+.bg-parchment-grain {
+  background-color: #faf8f5;
+  background-image: radial-gradient(#e7ded0 0.65px, transparent 0.65px);
+  background-size: 16px 16px;
+}
+
+/* Editorial Hand-Drawn Underline */
+.hand-drawn-underline {
+  position: relative;
+  display: inline-block;
+}
+.hand-drawn-underline::after {
+  content: '';
+  position: absolute;
+  left: -2%;
+  bottom: -4px;
+  width: 104%;
+  height: 8px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 250 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 60 4, 140 14, 247 6' stroke='%23b85d34' stroke-width='4' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+.hand-drawn-underline-gold::after {
+  content: '';
+  position: absolute;
+  left: -2%;
+  bottom: -4px;
+  width: 104%;
+  height: 8px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 250 16' preserveAspectRatio='none'%3E%3Cpath d='M3 11 C 60 4, 140 14, 247 6' stroke='%23d97706' stroke-width='4' stroke-linecap='round' fill='none'/%3E%3C/svg%3E");
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
+  pointer-events: none;
+}
+
+/* Subtle Arabesque Section Motif Divider */
+.divider-arabesque {
+  background-image: url("data:image/svg+xml,%3Csvg width='40' height='16' viewBox='0 0 40 16' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 0 L24 8 L20 16 L16 8 Z M8 8 L12 4 L16 8 L12 12 Z M32 8 L36 4 L40 8 L36 12 Z' fill='%23c8933b' fill-opacity='0.25'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-position: center;
+  height: 16px;
 }
 
 /* Custom scrollbar */

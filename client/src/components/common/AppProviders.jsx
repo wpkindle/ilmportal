@@ -6,7 +6,6 @@ import { AuthProvider } from '../../context/AuthContext';
 import { SocketProvider } from '../../context/SocketContext';
 import { NotificationProvider } from '../../context/NotificationContext';
 import InitialPageLoader from './InitialPageLoader';
-import LiveActivityToast from './LiveActivityToast';
 import SupportPlatformWidget from './SupportPlatformWidget';
 import InAppNotificationToast from './InAppNotificationToast';
 
@@ -66,7 +65,6 @@ export default function AppProviders({ children }) {
         <NotificationProvider>
           <InitialPageLoader />
           <InAppNotificationToast />
-          <LiveActivityToast />
           <SupportPlatformWidget />
           {children}
         </NotificationProvider>

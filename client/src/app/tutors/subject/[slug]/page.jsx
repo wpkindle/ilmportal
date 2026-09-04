@@ -12,6 +12,9 @@ export async function generateMetadata({ params }) {
   return {
     title: `${formattedName} Tutors in Pakistan | IlmPortal Pakistan`,
     description: `Find certified ${formattedName} tutors across Pakistan for personalized 1:1 live video classes. Authentic Sanad verified scholars & educators.`,
+    alternates: {
+      canonical: `https://pakistanlms.pk/tutors/subject/${params.slug}`,
+    },
     openGraph: {
       title: `${formattedName} Tutors - IlmPortal Pakistan`,
       description: `Learn ${formattedName} with certified tutors in Pakistan.`,
@@ -31,8 +34,37 @@ export default async function SubjectTutorsPage({ params }) {
     console.error('SSR fetch error for subject tutors:', err);
   }
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      {
+        '@type': 'ListItem',
+        position: 1,
+        name: 'Home',
+        item: 'https://pakistanlms.pk'
+      },
+      {
+        '@type': 'ListItem',
+        position: 2,
+        name: 'Tutors',
+        item: 'https://pakistanlms.pk/tutors'
+      },
+      {
+        '@type': 'ListItem',
+        position: 3,
+        name: `${formattedName} Tutors`,
+        item: `https://pakistanlms.pk/tutors/subject/${params.slug}`
+      }
+    ]
+  };
+
   return (
-    <div className="py-12 bg-slate-50 min-h-screen">
+    <div className="py-12 bg-[#faf8f5] min-h-screen">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Back Link */}

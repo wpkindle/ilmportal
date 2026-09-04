@@ -105,9 +105,62 @@ export default function CourseDetailPage() {
     totalLessonsCount = course.totalLessons;
   }
 
+  const courseJsonLd = {
+    '@context': 'https://schema.org',
+    '@graph': [
+      {
+        '@type': 'Course',
+        '@id': `https://pakistanlms.pk/courses/${slug}#course`,
+        name: course.title,
+        description: course.shortDescription || course.description || `${course.title} curriculum on IlmPortal Pakistan`,
+        provider: {
+          '@type': 'EducationalOrganization',
+          name: 'IlmPortal Pakistan',
+          sameAs: 'https://pakistanlms.pk'
+        },
+        educationalLevel: course.targetAudience || 'All Ages',
+        inLanguage: 'en',
+        offers: {
+          '@type': 'Offer',
+          category: 'Paid',
+          priceCurrency: 'PKR',
+          availability: 'https://schema.org/InStock'
+        }
+      },
+      {
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: 'https://pakistanlms.pk'
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Courses',
+            item: 'https://pakistanlms.pk/courses'
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: course.title,
+            item: `https://pakistanlms.pk/courses/${slug}`
+          }
+        ]
+      }
+    ]
+  };
+
   return (
-    <div className="min-h-screen bg-slate-50/60 py-8 sm:py-14">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseJsonLd) }}
+      />
+      <div className="min-h-screen bg-[#faf8f5] py-8 sm:py-14">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-xs font-semibold text-slate-500">
@@ -778,6 +831,7 @@ export default function CourseDetailPage() {
 
       </div>
     </div>
+    </>
   );
 }
 

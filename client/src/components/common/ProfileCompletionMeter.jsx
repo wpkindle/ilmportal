@@ -193,11 +193,6 @@ export default function ProfileCompletionMeter({ user, tutorProfile, className =
             <h3 className="text-base sm:text-lg font-serif font-bold text-white pt-1">
               🎉 Congratulations! Your Profile is 100% Complete
             </h3>
-            <p className="text-xs sm:text-sm text-stone-300 max-w-2xl leading-relaxed">
-              {user?.role === 'tutor'
-                ? 'Your teaching bio, verified Sanad, hourly rates, and subject preferences are fully configured. Your profile is ranked at peak search visibility across Pakistan and primed to receive direct student inquiries and trial bookings!'
-                : 'Your student profile is 100% complete. Tutors can now easily understand your learning goals and provide tailored free trial sessions!'}
-            </p>
           </div>
 
           <div className="flex flex-wrap sm:flex-col gap-2 shrink-0">

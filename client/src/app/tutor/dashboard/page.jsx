@@ -31,21 +31,22 @@ export default function TutorDashboardPage() {
   const [loading, setLoading] = useState(true);
   const [selectedDealForPay, setSelectedDealForPay] = useState(null);
 
+  const fetchData = async () => {
+    try {
+      const [dealsRes, sessRes] = await Promise.all([
+        api.getMyDeals(),
+        api.getMySessions()
+      ]);
+      if (dealsRes.success) setDeals(dealsRes.deals);
+      if (sessRes.success) setSessions(sessRes.sessions);
+    } catch (err) {
+      console.error('Error fetching tutor dashboard:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const [dealsRes, sessRes] = await Promise.all([
-          api.getMyDeals(),
-          api.getMySessions()
-        ]);
-        if (dealsRes.success) setDeals(dealsRes.deals);
-        if (sessRes.success) setSessions(sessRes.sessions);
-      } catch (err) {
-        console.error('Error fetching tutor dashboard:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchData();
   }, []);
 

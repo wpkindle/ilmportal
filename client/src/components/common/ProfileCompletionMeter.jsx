@@ -11,7 +11,12 @@ import {
   ShieldCheck,
   Clock,
   AlertCircle,
-  ArrowRight
+  ArrowRight,
+  MessageSquare,
+  Award,
+  Search,
+  User,
+  GraduationCap
 } from 'lucide-react';
 
 export const calculateClientCompletion = (user, tutorProfile) => {
@@ -169,74 +174,17 @@ export const calculateClientCompletion = (user, tutorProfile) => {
   }
 };
 
-export default function ProfileCompletionMeter({ user, tutorProfile, className = '', alwaysShow = false }) {
+export default function ProfileCompletionMeter({
+  user,
+  tutorProfile,
+  className = '',
+  alwaysShow = false,
+  showGreeting = true
+}) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const { percentage, items } = calculateClientCompletion(user, tutorProfile);
-
-  // When 100% complete, keep visible as an empowering achievement card to motivate tutors/students
-  if (percentage >= 100) {
-    return (
-      <div className={`p-5 sm:p-6 bg-gradient-to-r from-[#0c2217] via-slate-900 to-[#102d1f] text-white rounded-3xl border border-[#d4a359]/40 shadow-xl space-y-4 ${className} relative overflow-hidden group`}>
-        {/* Shimmer line */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#d4a359] via-[#b85d34] to-[#d4a359]" />
-        
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#d4a359]/20 text-[#d4a359] border border-[#d4a359]/40">
-                100% Verified Profile
-              </span>
-              <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-[#b85d34]/20 text-[#b85d34] border border-[#b85d34]/30">
-                Ready for Students
-              </span>
-            </div>
-            <h3 className="text-base sm:text-lg font-serif font-bold text-white pt-1">
-              🎉 Congratulations! Your Profile is 100% Complete
-            </h3>
-          </div>
-
-          <div className="flex flex-wrap sm:flex-col gap-2 shrink-0">
-            {user?.role === 'tutor' ? (
-              <>
-                <Link
-                  href={`/tutors/${user?.username || user?._id}`}
-                  className="px-4 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition-transform active:scale-95"
-                >
-                  <span>View Public Profile</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-                <Link
-                  href="/tutor/messages"
-                  className="px-4 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] border border-[#d4a359]/40 rounded-xl text-xs font-semibold flex items-center justify-center gap-2 transition-colors"
-                >
-                  <span>Check Inquiries</span>
-                </Link>
-              </>
-            ) : (
-              <Link
-                href="/tutors"
-                className="px-4 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-xl text-xs font-bold shadow-md flex items-center justify-center gap-2 transition-transform active:scale-95"
-              >
-                <span>Find Tutors</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-            )}
-          </div>
-        </div>
-
-        {/* 100% Filled Progress Bar */}
-        <div className="space-y-1.5 pt-1">
-          <div className="flex items-center justify-between text-xs font-bold">
-            <span className="text-[#d4a359]">Peak Visibility Score</span>
-            <span className="text-[#d4a359] font-mono">100 / 100</span>
-          </div>
-          <div className="w-full bg-stone-900/80 h-3 rounded-full overflow-hidden p-0.5 border border-[#d4a359]/30">
-            <div className="h-full rounded-full bg-gradient-to-r from-[#d4a359] via-[#b85d34] to-[#d4a359] w-full shadow-lg" />
-          </div>
-        </div>
-      </div>
-    );
-  }
+  const isApproved = tutorProfile?.verificationStatus === 'approved';
+  const isTutor = user?.role === 'tutor';
 
   const completedCount = items.filter((i) => i.done).length;
   const totalCount = items.length;
@@ -249,30 +197,307 @@ export default function ProfileCompletionMeter({ user, tutorProfile, className =
     return 'from-rose-500 to-rose-400';
   };
 
-  const getStatusBadge = () => {
+  const getStatusBadge = (isDark = false) => {
     if (percentage === 100) {
       return (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40">
+        <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+          isDark
+            ? 'bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40'
+            : 'bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40'
+        }`}>
           <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
           <span>100% Completed</span>
         </span>
       );
     }
     return (
-      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-900 border border-amber-200">
-        <Sparkles className="w-3.5 h-3.5 text-amber-600" />
+      <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
+        isDark
+          ? 'bg-amber-950/80 text-amber-300 border border-amber-500/40'
+          : 'bg-amber-100 text-amber-900 border border-amber-200'
+      }`}>
+        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
         <span>{percentage}% Complete</span>
       </span>
     );
   };
+
+  // ─────────────────────────────────────────────────────────────
+  // 1. UNIFIED GREETING & PROFILE STRENGTH TAB (Default)
+  // ─────────────────────────────────────────────────────────────
+  if (showGreeting) {
+    return (
+      <div
+        className={`bg-[#0c2217] text-[#faf8f5] rounded-3xl p-6 sm:p-8 border border-[#d4a359]/30 shadow-[0_8px_30px_rgba(12,34,23,0.12)] relative overflow-hidden space-y-5 ${className}`}
+      >
+        {/* Top Gold Shimmer Line */}
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#d4a359] via-[#b85d34] to-[#d4a359]" />
+
+        {/* Ambient Effects & Islamic Star Watermark */}
+        <div className="absolute -right-16 -bottom-16 w-64 h-64 rounded-full bg-[#143d2b]/40 blur-3xl pointer-events-none animate-pulse-glow" />
+        <div className="absolute top-0 right-1/4 w-32 h-32 rounded-full bg-[#d4a359]/15 blur-2xl pointer-events-none animate-float-slow" />
+        <div className="absolute -right-12 -top-12 w-48 h-48 pointer-events-none opacity-15 animate-spin-slow">
+          <svg viewBox="0 0 200 200" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="100" cy="100" r="90" stroke="#d4a359" strokeWidth="1" strokeDasharray="4 6" />
+            <rect x="55" y="55" width="90" height="90" stroke="#d4a359" strokeWidth="1" />
+            <rect x="55" y="55" width="90" height="90" transform="rotate(45 100 100)" stroke="#d4a359" strokeWidth="1" />
+          </svg>
+        </div>
+        <span className="absolute top-6 right-20 w-1.5 h-1.5 rounded-full bg-[#d4a359] shadow-[0_0_8px_#d4a359] animate-particle-drift pointer-events-none" style={{ animationDelay: '0.8s', animationDuration: '7s' }} />
+        <span className="absolute bottom-8 right-1/3 w-1 h-1 rounded-full bg-[#b85d34] shadow-[0_0_6px_#b85d34] animate-particle-drift pointer-events-none" style={{ animationDelay: '2.1s', animationDuration: '9s' }} />
+
+        {/* ── Top Header Row: Greeting & Action Buttons ── */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 relative z-10">
+          <div className="space-y-2.5 max-w-2xl">
+            {/* Role Assurance Badges */}
+            <div className="flex items-center gap-2 flex-wrap">
+              {isTutor ? (
+                <>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#d4a359] text-[#0c2217] shadow-xs">
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    {isApproved ? 'Verified Sanad Teacher • IlmPortal Pakistan' : 'Sanad Verification Pending'}
+                  </span>
+                  <span className="text-[11px] font-semibold text-[#d4a359] bg-[#143d2b] px-2.5 py-1 rounded-full border border-[#d4a359]/40">
+                    Female Safety Compliant
+                  </span>
+                </>
+              ) : (
+                <>
+                  <span className="text-[11px] font-bold uppercase tracking-wider text-[#d4a359] bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5 border border-[#d4a359]/20">
+                    <GraduationCap className="w-3.5 h-3.5" />
+                    Talib-e-Ilm &bull; Learning Space
+                  </span>
+                  <span className="text-[11px] font-semibold text-[#d4a359] bg-[#143d2b] px-2.5 py-1 rounded-full border border-[#d4a359]/40">
+                    Female Privacy Protected
+                  </span>
+                </>
+              )}
+            </div>
+
+            {/* Greeting Headline */}
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-[#faf8f5] tracking-tight">
+              Assalam-o-Alaikum, {user?.name || (isTutor ? 'Mu’allim' : 'Talib-e-Ilm')}!
+            </h1>
+
+            {/* Subtitle */}
+            <p className="text-xs sm:text-sm text-stone-300 leading-relaxed font-normal">
+              {isTutor
+                ? 'Your teaching profile is active across Pakistan. Manage student course deals, track the 72-hour fee timer, and conduct live WebRTC classes.'
+                : 'Track your enrolled Quran & academic courses, schedule lessons with verified Pakistani teachers, and enter protected live classrooms.'}
+            </p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex flex-wrap items-center gap-2.5 z-10 shrink-0">
+            {isTutor ? (
+              <>
+                <Link
+                  href="/tutor/messages"
+                  className="px-4 py-2.5 bg-[#d4a359] hover:bg-[#c39248] text-[#0c2217] font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2 hover:scale-[1.02] cursor-pointer"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span>Chat &amp; Send Offers</span>
+                </Link>
+                <Link
+                  href={`/tutors/${user?.username || user?._id}`}
+                  className="px-4 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2 hover:scale-[1.02] cursor-pointer"
+                >
+                  <User className="w-4 h-4" />
+                  <span>View Public Profile</span>
+                </Link>
+                <Link
+                  href="/tutor/profile"
+                  className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-[#faf8f5] font-semibold text-xs rounded-xl transition-all flex items-center gap-2 border border-white/20 hover:scale-[1.02] cursor-pointer"
+                >
+                  <Award className="w-4 h-4 text-[#d4a359]" />
+                  <span>Edit Profile &amp; Sanad</span>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/tutors"
+                  className="px-4 py-2.5 bg-[#d4a359] hover:bg-[#c39248] active:bg-[#b08139] text-[#0c2217] font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2 hover:scale-[1.02] cursor-pointer"
+                >
+                  <Search className="w-4 h-4" />
+                  <span>Browse Verified Tutors</span>
+                </Link>
+                <Link
+                  href="/student/certificates"
+                  className="px-4 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2 hover:scale-[1.02] cursor-pointer"
+                >
+                  <Award className="w-4 h-4 text-white" />
+                  <span>My Certificates</span>
+                </Link>
+                <Link
+                  href="/student/messages"
+                  className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-[#faf8f5] font-semibold text-xs rounded-xl transition-all flex items-center gap-2 border border-white/20 hover:scale-[1.02] cursor-pointer"
+                >
+                  <MessageSquare className="w-4 h-4 text-[#d4a359]" />
+                  <span>Messages &amp; Class</span>
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* ── Lower Section: Profile Strength & Progress Bar (on SAME tab) ── */}
+        <div className="pt-4 border-t border-[#d4a359]/20 space-y-3 relative z-10">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <span className="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+                <span>Profile Strength</span>
+              </span>
+              {getStatusBadge(true)}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono font-bold text-[#d4a359]">
+                {percentage >= 100 ? 'Peak Visibility: 100 / 100' : `${percentage} / 100`}
+              </span>
+              {remainingItems.length > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setDetailsOpen(!detailsOpen)}
+                  className="p-1 px-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-stone-200 transition-colors flex items-center gap-1 text-[11px] font-bold cursor-pointer border border-white/15"
+                >
+                  <span>{detailsOpen ? 'Hide Checklist' : `Missing Fields (${remainingItems.length})`}</span>
+                  {detailsOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Progress Bar */}
+          <div className="w-full bg-stone-900/80 h-2.5 rounded-full overflow-hidden p-0.5 border border-[#d4a359]/30">
+            <div
+              className={`h-full rounded-full bg-gradient-to-r ${getBarColor(percentage)} transition-all duration-500 shadow-sm`}
+              style={{ width: `${Math.max(percentage, 5)}%` }}
+            />
+          </div>
+
+          {/* Quick Action Badges for Remaining Items (if < 100%) */}
+          {remainingItems.length > 0 && (
+            <div className="flex flex-wrap items-center gap-2 pt-1">
+              <span className="text-[11px] font-medium text-stone-400">Complete to reach 100%:</span>
+              {remainingItems.slice(0, 4).map((item) => (
+                <Link
+                  key={item.key}
+                  href={item.link}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#143d2b] hover:bg-[#1e543c] text-[#d4a359] text-[11px] font-bold border border-[#d4a359]/40 transition-all cursor-pointer"
+                >
+                  <span>{item.actionLabel}</span>
+                  <ArrowRight className="w-3 h-3 text-[#d4a359]" />
+                </Link>
+              ))}
+              {remainingItems.length > 4 && (
+                <button
+                  type="button"
+                  onClick={() => setDetailsOpen(true)}
+                  className="text-[11px] font-bold text-[#d4a359] hover:underline cursor-pointer"
+                >
+                  +{remainingItems.length - 4} more
+                </button>
+              )}
+            </div>
+          )}
+
+          {/* Verification State Callout for Tutor */}
+          {isTutor && (
+            <div className="pt-1">
+              {tutorProfile?.verificationStatus === 'approved' ? (
+                <div className="p-2.5 bg-[#143d2b]/60 rounded-xl border border-[#d4a359]/40 flex items-center gap-2 text-xs font-medium text-stone-200">
+                  <ShieldCheck className="w-4 h-4 text-[#d4a359] shrink-0" />
+                  <span>Verified Sanad &amp; Degree: Your profile is Approved and publicly visible across Pakistan.</span>
+                </div>
+              ) : tutorProfile?.verificationStatus === 'rejected' ? (
+                <div className="p-2.5 bg-rose-950/60 rounded-xl border border-rose-500/40 flex items-center gap-2 text-xs font-medium text-rose-200">
+                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                  <span>Application Clarification: {tutorProfile?.rejectionReason || 'Please re-upload clear educational degrees for review.'}</span>
+                </div>
+              ) : (
+                <div className="p-2.5 bg-[#143d2b]/40 rounded-xl border border-[#d4a359]/20 flex items-center gap-2 text-xs font-medium text-stone-300">
+                  <Clock className="w-4 h-4 text-[#d4a359] shrink-0" />
+                  <span>Pending Verification: Your degrees are in the verification queue before full public listing.</span>
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Detailed Checklist Accordion */}
+          {detailsOpen && (
+            <div className="pt-3 border-t border-[#d4a359]/20 grid grid-cols-1 sm:grid-cols-2 gap-2 animate-in fade-in">
+              {items.map((item) => (
+                <div
+                  key={item.key}
+                  className={`p-2.5 rounded-xl border text-xs flex items-center justify-between gap-2 transition-all ${
+                    item.done
+                      ? 'bg-[#143d2b]/50 border-[#d4a359]/30 text-stone-200'
+                      : 'bg-white/5 border-amber-400/30 text-stone-200'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 min-w-0">
+                    {item.done ? (
+                      <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
+                    ) : (
+                      <Circle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    )}
+                    <span className={`truncate ${item.done ? 'font-medium text-stone-300' : 'font-bold text-white'}`}>
+                      {item.label}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-1.5 shrink-0">
+                    {item.done ? (
+                      <span className="text-[10px] font-bold text-[#d4a359] bg-[#143d2b] border border-[#d4a359]/30 px-2 py-0.5 rounded-full">
+                        Done
+                      </span>
+                    ) : (
+                      <Link
+                        href={item.link}
+                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[10px] font-bold shadow-xs transition-all cursor-pointer"
+                      >
+                        <span>{item.actionLabel}</span>
+                        <ArrowRight className="w-2.5 h-2.5" />
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // ─────────────────────────────────────────────────────────────
+  // 2. EMBEDDED PROFILE COMPLETION WIDGET (when showGreeting=false, e.g. on profile page)
+  // ─────────────────────────────────────────────────────────────
+  if (percentage >= 100) {
+    return (
+      <div className={`p-4 sm:p-5 bg-white rounded-3xl border border-[#d4a359]/40 shadow-sm space-y-3 ${className}`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-bold text-[#0c2217]">Profile Strength</span>
+            {getStatusBadge(false)}
+          </div>
+          <span className="text-xs font-mono font-bold text-[#d4a359]">100 / 100</span>
+        </div>
+        <div className="w-full bg-stone-100 h-2.5 rounded-full overflow-hidden p-0.5 border border-stone-200">
+          <div className="h-full rounded-full bg-gradient-to-r from-[#d4a359] via-[#b85d34] to-[#d4a359] w-full shadow-xs" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className={`p-4 sm:p-5 bg-white rounded-3xl border border-amber-200/90 shadow-sm space-y-3.5 ${className}`}>
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h3 className="text-xs sm:text-sm font-black text-slate-900 flex items-center gap-2">
-            <span>Profile Strength & Completion</span>
-            {getStatusBadge()}
+            <span>Profile Strength &amp; Completion</span>
+            {getStatusBadge(false)}
           </h3>
           <p className="text-[11px] sm:text-xs text-slate-500 mt-0.5">
             {completedCount} of {totalCount} profile settings provided. Complete the remaining {remainingItems.length} field(s) to reach 100%.
@@ -297,7 +522,7 @@ export default function ProfileCompletionMeter({ user, tutorProfile, className =
         />
       </div>
 
-      {/* Quick Action Badges for Remaining Items (Visible without opening checklist) */}
+      {/* Quick Action Badges for Remaining Items */}
       {remainingItems.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 pt-0.5">
           <span className="text-[11px] font-bold text-slate-500">Remaining to reach 100%:</span>
@@ -324,17 +549,17 @@ export default function ProfileCompletionMeter({ user, tutorProfile, className =
       )}
 
       {/* Verification State Callout for Tutor */}
-      {user?.role === 'tutor' && (
+      {isTutor && (
         <div className="pt-1">
           {tutorProfile?.verificationStatus === 'approved' ? (
             <div className="p-2.5 bg-[#f0ece1] rounded-2xl border border-[#d4a359]/40 flex items-center gap-2 text-xs font-bold text-[#0c2217]">
               <ShieldCheck className="w-4 h-4 text-[#d4a359] shrink-0" />
-              <span>Verified Sanad & Degree: Your profile is Approved and publicly visible on Pakistan search filters.</span>
+              <span>Verified Sanad &amp; Degree: Your profile is Approved and publicly visible on Pakistan search filters.</span>
             </div>
           ) : tutorProfile?.verificationStatus === 'rejected' ? (
             <div className="p-2.5 bg-rose-50 rounded-2xl border border-rose-200 flex items-center gap-2 text-xs font-bold text-rose-800">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
-              <span>Application Rejected: {tutorProfile?.rejectionReason || 'Please re-upload clear educational degrees for review.'}</span>
+              <span>Application Clarification: {tutorProfile?.rejectionReason || 'Please re-upload clear educational degrees for review.'}</span>
             </div>
           ) : (
             <div className="p-2.5 bg-amber-50 rounded-2xl border border-amber-200 flex items-center gap-2 text-xs font-bold text-amber-900">
@@ -345,7 +570,7 @@ export default function ProfileCompletionMeter({ user, tutorProfile, className =
         </div>
       )}
 
-      {/* Detailed Checklist Accordion with Direct Action Links */}
+      {/* Detailed Checklist Accordion */}
       {detailsOpen && (
         <div className="pt-3 border-t border-slate-100 grid grid-cols-1 sm:grid-cols-2 gap-2.5 animate-in fade-in">
           {items.map((item) => (

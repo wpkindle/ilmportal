@@ -235,7 +235,7 @@ function StudentProfileContent() {
         <AccountStatusBanner user={user} role="student" />
 
         {/* Dynamic Profile Completion Meter Widget */}
-        <ProfileCompletionMeter user={user} />
+        <ProfileCompletionMeter user={user} showGreeting={false} />
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           

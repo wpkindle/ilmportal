@@ -62,57 +62,7 @@ export default function StudentDashboardPage() {
     <div className="py-6 md:py-8 pb-24 md:pb-12 bg-[#faf8f5] min-h-screen text-stone-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         
-        {/* Top Editorial Welcome Card */}
-        <div className="bg-[#0c2217] text-[#faf8f5] rounded-3xl p-6 sm:p-9 border border-[#d4a359]/30 shadow-[0_8px_30px_rgba(12,34,23,0.12)] relative overflow-hidden flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
-          {/* Dynamic background ambient effects */}
-          <div className="absolute -right-16 -bottom-16 w-64 h-64 rounded-full bg-[#143d2b]/40 blur-3xl pointer-events-none animate-pulse-glow" />
-          <div className="absolute top-0 right-1/4 w-32 h-32 rounded-full bg-[#d4a359]/15 blur-2xl pointer-events-none animate-float-slow" />
-          <div className="absolute -right-12 -top-12 w-48 h-48 pointer-events-none opacity-15 animate-spin-slow">
-            <svg viewBox="0 0 200 200" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="100" cy="100" r="90" stroke="#d4a359" strokeWidth="1" strokeDasharray="4 6" />
-              <rect x="55" y="55" width="90" height="90" stroke="#d4a359" strokeWidth="1" />
-              <rect x="55" y="55" width="90" height="90" transform="rotate(45 100 100)" stroke="#d4a359" strokeWidth="1" />
-            </svg>
-          </div>
-          <span className="absolute top-6 right-20 w-1.5 h-1.5 rounded-full bg-[#d4a359] shadow-[0_0_8px_#d4a359] animate-particle-drift pointer-events-none" style={{ animationDelay: '0.8s', animationDuration: '7s' }} />
-          <span className="absolute bottom-8 right-1/3 w-1 h-1 rounded-full bg-[#b85d34] shadow-[0_0_6px_#b85d34] animate-particle-drift pointer-events-none" style={{ animationDelay: '2.1s', animationDuration: '9s' }} />
 
-          <div className="space-y-2.5 z-10">
-            <div className="flex items-center gap-2 flex-wrap">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-[#d4a359] bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5 border border-[#d4a359]/20">
-                <GraduationCap className="w-3.5 h-3.5" />
-                Talib-e-Ilm &bull; Learning Space
-              </span>
-              <span className="text-[11px] font-semibold text-[#d4a359] bg-[#143d2b] px-2.5 py-1 rounded-full border border-[#d4a359]/40">
-                Female Privacy Protected
-              </span>
-            </div>
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-[#faf8f5] tracking-tight">
-              Assalam-o-Alaikum, {user?.name}!
-            </h1>
-            <p className="text-xs sm:text-sm text-stone-300 max-w-xl leading-relaxed">
-              Track your enrolled Quran &amp; academic courses, schedule lessons with verified Pakistani teachers, and enter protected live classrooms.
-            </p>
-          </div>
-
-          <div className="flex items-center gap-3 z-10 flex-wrap">
-            <Link
-              href="/student/certificates"
-              className="px-4 sm:px-5 py-2.5 sm:py-3 bg-white/10 hover:bg-white/20 text-[#faf8f5] font-bold text-xs rounded-2xl border border-white/20 transition-all flex items-center gap-2"
-            >
-              <Award className="w-4 h-4 text-[#d4a359]" />
-              <span>My Certificates</span>
-            </Link>
-
-            <Link
-              href="/tutors"
-              className="px-4 sm:px-5 py-2.5 sm:py-3 bg-[#d4a359] hover:bg-[#c39248] active:bg-[#b08139] text-[#0c2217] font-bold text-xs rounded-2xl shadow-md transition-all flex items-center gap-2"
-            >
-              <Search className="w-4 h-4" />
-              <span>Browse Verified Tutors</span>
-            </Link>
-          </div>
-        </div>
 
         {/* Account Status / Warning Notice Banner */}
         <AccountStatusBanner user={user} role="student" />

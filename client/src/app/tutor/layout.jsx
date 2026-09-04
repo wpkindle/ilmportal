@@ -15,9 +15,9 @@ export default function TutorLayout({ children }) {
   return (
     <div className="min-h-screen bg-[#faf8f5] text-stone-900 flex flex-col font-sans selection:bg-[#d4a359]/30">
 
-      {/* Profile Completion Meter */}
+      {/* Profile Completion Meter & Greeting Tab */}
       {!isProfilePage && !isChatPage && user && (
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-5 -mb-2 w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 w-full">
           <ProfileCompletionMeter user={user} tutorProfile={tutorProfile} />
         </div>
       )}

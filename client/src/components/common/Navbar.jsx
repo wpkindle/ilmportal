@@ -914,8 +914,6 @@ const Navbar = () => {
 
       </div>
     </header>
-    {/* Spacer so page content flows seamlessly below fixed header */}
-    <div className="h-14 sm:h-16" aria-hidden="true" />
     </>
   );
 };

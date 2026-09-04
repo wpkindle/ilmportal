@@ -92,10 +92,10 @@ const heroSlides = [
     badgeColor: 'text-[#faf8f5]',
     dotColor: 'bg-[#b85d34]',
     tag: 'O/A Level & STEM',
-    title: '1:1 Cambridge & Matric Academic Mentorship',
-    desc: 'Expert subject specialists for O/A Level, FSc, and Matric exams in Mathematics, Physics, Chemistry, Biology & English.',
+    title: '1:1 Male Academic Tutor & High-School Student',
+    desc: 'Expert male subject specialists visiting your home or teaching online for O/A Level, FSc, and Matric exams in Mathematics, Physics & Sciences.',
     image: '/images/hero-academic-tutoring.jpg',
-    alt: 'Pakistani female Cambridge academic tutor guiding student through O/A Level physics and mathematics at study desk'
+    alt: 'Pakistani male Cambridge academic tutor guiding a high-school boy student through O/A Level physics and mathematics at study desk'
   }
 ];
 

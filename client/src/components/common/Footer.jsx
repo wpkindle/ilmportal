@@ -336,8 +336,8 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar with Family Initiative Credit */}
-        <div className="pt-6 border-t border-[#143d2b] flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-[#81928e]">
-          <div className="flex flex-wrap items-center justify-center md:justify-start gap-4 sm:gap-6">
+        <div className="pt-6 border-t border-[#143d2b] flex flex-col xl:flex-row items-center justify-between gap-4 text-xs text-[#81928e]">
+          <div className="flex flex-wrap items-center justify-center xl:justify-start gap-4 sm:gap-6">
             <p className="font-medium text-[#a3b8b0]">
               &copy; {new Date().getFullYear()} IlmPortal Pakistan. All rights reserved.
             </p>
@@ -355,9 +355,9 @@ const Footer = () => {
             </Link>
           </div>
 
-          <div className="flex items-center gap-2 text-xs bg-[#0c2217] px-4 py-2 rounded-xl border border-[#143d2b] text-center">
+          <div className="flex items-center gap-2 text-xs bg-[#0c2217] px-4 py-2 rounded-xl border border-[#143d2b] text-center shrink-0 md:whitespace-nowrap">
             <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400 shrink-0" />
-            <span className="text-[#d1dbd6] font-medium text-[11px] sm:text-xs">
+            <span className="text-[#d1dbd6] font-medium text-[11px] sm:text-xs md:whitespace-nowrap">
               An initiative by <strong className="text-white">Mr. &amp; Mrs. Abdul Khaliq</strong> from Lahore, Pakistan.
             </span>
           </div>

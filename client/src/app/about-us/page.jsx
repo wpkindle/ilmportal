@@ -71,9 +71,9 @@ export default function AboutUsPage() {
 
           {/* Founder Initiative Box */}
           <div className="pt-4">
-            <div className="inline-flex items-center gap-2.5 px-4 py-2.5 bg-gradient-to-r from-emerald-950/80 to-slate-900/80 border border-emerald-500/40 rounded-2xl shadow-lg">
+            <div className="inline-flex items-center gap-2.5 px-4 py-2.5 bg-gradient-to-r from-emerald-950/80 to-slate-900/80 border border-emerald-500/40 rounded-2xl shadow-lg shrink-0 md:whitespace-nowrap">
               <Heart className="w-4 h-4 text-rose-400 fill-rose-400 shrink-0" />
-              <span className="text-xs sm:text-sm font-bold text-emerald-300">
+              <span className="text-xs sm:text-sm font-bold text-emerald-300 md:whitespace-nowrap">
                 {initiativeTag}
               </span>
             </div>

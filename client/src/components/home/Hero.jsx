@@ -207,7 +207,7 @@ export default function Hero() {
             {/* Main Editorial Headline with Dramatic Contrast */}
             <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-black tracking-tight text-white leading-[1.12]">
               Verified Qaris, Alimahs &amp; Academic Tutors{' '}
-              <span className="hand-drawn-underline text-[#faf8f5]">from Pakistan.</span>
+              <span className="hand-drawn-underline text-[#faf8f5]">accross Pakistan.</span>
             </h1>
 
             {/* Humanized, Colloquial Pakistani Copy */}

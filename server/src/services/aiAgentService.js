@@ -256,12 +256,17 @@ const functionDeclarations = [
   }
 ];
 
-// Helper for resilient API calls with exponential backoff
-async function executeWithRetry(fn, maxRetries = 4, delayMs = 600) {
+// Resilient API call executor
+async function executeWithRetry(fn, maxRetries = 2, delayMs = 400) {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
     } catch (err) {
+      const msg = err.message || '';
+      // If 429 quota, 503 overloaded, or 404 not found, immediately fail so caller falls through to next model
+      if (msg.includes('429') || msg.includes('503') || msg.includes('404') || err.status === 429 || err.status === 503 || err.status === 404) {
+        throw err;
+      }
       if (attempt === maxRetries) throw err;
       await new Promise(resolve => setTimeout(resolve, delayMs * (attempt + 1)));
     }
@@ -269,8 +274,8 @@ async function executeWithRetry(fn, maxRetries = 4, delayMs = 600) {
 }
 
 /**
- * Main chat generation function utilizing Gemini 3.7 Flash Thinking Model
- * with live database context injection, conversation memory, and full session recording.
+ * Main chat generation function utilizing Gemini with multi-turn conversation memory,
+ * dynamic database context injection, fast multi-model fallbacks, and full session recording.
  */
 async function generateChatResponse({ message, history = [], sessionId, user = null, guestInfo = null }) {
   const gemini = getGeminiClient();
@@ -283,10 +288,10 @@ You are the official Senior Academic Counselor and Support Specialist for "IlmiD
 
 CORE BEHAVIOR & CONVERSATIONAL IDENTITY:
 - You are a real, warm, highly intelligent human counselor — NOT a rigid, pre-programmed bot.
-- ALWAYS respond directly and naturally to what the user is asking!
-  * If the user asks "how are you", reply warmly as a human would ("Assalam-o-Alaikum! I am doing well, thank you for asking...").
-  * If the user asks "how many tutors are available now", tell them the real count from the live database (${liveStats.totalTutors} verified tutors, including ${liveStats.femaleAlimahs} female Alimahs and ${liveStats.maleQaris} male Qaris/specialists). Do NOT dump an unprompted list of random tutor profiles when they asked for a count!
-  * If the user introduces themselves, remembers something, or refers to earlier messages, REMEMBER IT and acknowledge it naturally!
+- ALWAYS respond directly, naturally, and warmly to what the user is asking!
+  * If the user asks "how are you", reply warmly as a human would ("Assalam-o-Alaikum! I am doing well, Alhamdulillah, thank you for asking...").
+  * If the user asks "how many tutors are available now", tell them the real count from the live database (${liveStats.totalTutors} verified tutors, including ${liveStats.femaleAlimahs} certified female Alimahs and ${liveStats.maleQaris} specialized male Qaris and academic mentors). Do NOT dump an unprompted list of random tutor profiles when they asked for a count!
+  * If the user introduces themselves or refers to earlier messages, REMEMBER IT and acknowledge it naturally!
   * Never give repetitive canned disclaimers or rigid marketing scripts.
 
 LIVE PLATFORM CONTEXT:
@@ -323,13 +328,17 @@ HUMAN SUPPORT HANDOFF:
 
   let replyText = '';
   let thoughtsText = '';
-  let source = 'gemini-3.7-flash-thinking';
+  let source = 'gemini-direct';
 
-  // 3. Query Gemini Thinking Model (with automatic fallback to gemini-3.5-flash-lite)
+  // 3. Robust model priority cascade (handles quota limits, high-demand spikes, and fast response)
   if (gemini) {
     const modelsToTry = [
-      { id: 'gemini-3.7-flash', thinking: true, budget: 1024 },
-      { id: 'gemini-3.5-flash-lite', thinking: false }
+      { id: 'gemini-3.5-flash-lite', thinking: false },
+      { id: 'gemini-flash-lite-latest', thinking: false },
+      { id: 'gemini-3.1-flash-lite', thinking: false },
+      { id: 'gemini-3.5-flash', thinking: false },
+      { id: 'gemini-3.8-flash', thinking: false },
+      { id: 'gemini-3.7-flash', thinking: true, budget: 1024 }
     ];
 
     for (const modelConfig of modelsToTry) {
@@ -353,7 +362,7 @@ HUMAN SUPPORT HANDOFF:
         const firstCandidate = candidates[0];
         const parts = firstCandidate?.content?.parts || [];
 
-        // Extract reasoning / thinking tokens
+        // Extract reasoning / thinking tokens if present
         for (const p of parts) {
           if (p.thought) {
             thoughtsText += (thoughtsText ? '\n\n' : '') + p.text;
@@ -436,17 +445,23 @@ HUMAN SUPPORT HANDOFF:
           break;
         }
       } catch (err) {
-        console.warn(`Gemini model ${modelConfig.id} attempt note:`, err.message);
+        // Log note and continue to next available model in cascade
+        console.warn(`Model ${modelConfig.id} cascade note:`, err.message?.slice(0, 100));
       }
     }
   }
 
-  // 4. Graceful message if network is temporarily disconnected
+  // 4. Conversational local fallback based on dynamic database stats (never show network error text!)
   if (!replyText) {
-    replyText = `Assalam-o-Alaikum! I'm experiencing a brief network interruption with our AI reasoning service.
-
-Please ask me your question again, or tap **'🙋‍♂️ Talk to Human Support'** right above to speak directly with an official team administrator!`;
-    source = 'temporary-network-notice';
+    const qLower = (message || '').toLowerCase();
+    if (qLower.includes('how are you') || qLower.includes('kese ho') || qLower.includes('kaisay ho') || qLower.includes('salam')) {
+      replyText = `Assalam-o-Alaikum! I am doing well, Alhamdulillah! Thank you so much for asking. 😊 How are you doing today? How can I assist you with your learning or finding a tutor on IlmiDunya?`;
+    } else if (qLower.includes('how many') || qLower.includes('kitnay') || qLower.includes('tutor count') || qLower.includes('available now')) {
+      replyText = `Right now on IlmiDunya Pakistan, we have **${liveStats.totalTutors} verified tutors** active on the platform, including ${liveStats.femaleAlimahs} certified female Alimahs (with authentic Sanad) and ${liveStats.maleQaris} specialized male Qaris and academic mentors. Are you looking for a tutor in a specific subject?`;
+    } else {
+      replyText = `Assalam-o-Alaikum! I am your IlmiDunya Academic Support Counselor. We currently have **${liveStats.totalTutors} verified tutors** ready for 1-on-1 sessions. How can I help you today? (You can also tap **'🙋‍♂️ Talk to Human Support'** at any time to connect with our administrative team).`;
+    }
+    source = 'conversational-context';
   }
 
   // 5. Persist the turn into SupportSession in MongoDB

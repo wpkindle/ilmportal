@@ -14,8 +14,7 @@ import {
   Clock,
   PhoneCall,
   ShieldCheck,
-  ExternalLink,
-  Sparkles
+  ExternalLink
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
@@ -467,9 +466,7 @@ export default function LiveSupportWidget() {
           <div className="flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-4 space-y-3 scrollbar-thin scrollbar-thumb-stone-700">
             {messages.map((m) => {
               const isUser = m.sender === 'user';
-              const isAssistant = m.sender === 'assistant';
               const isSystem = m.sender === 'system';
-              const isAdmin = m.sender === 'admin';
 
               if (isSystem) {
                 return (
@@ -485,34 +482,19 @@ export default function LiveSupportWidget() {
               return (
                 <div key={m.id} className={`flex gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
                   {!isUser && (
-                    <div className={`w-6 h-6 rounded-full border flex items-center justify-center shrink-0 mt-1 ${
-                      isAssistant
-                        ? 'bg-[#d4a359]/20 border-[#d4a359]/50 text-[#d4a359]'
-                        : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
-                    }`}>
-                      {isAssistant ? <Sparkles className="w-3.5 h-3.5" /> : <Headphones className="w-3.5 h-3.5" />}
+                    <div className="w-6 h-6 rounded-full border border-emerald-500/40 bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-1">
+                      <Headphones className="w-3.5 h-3.5" />
                     </div>
                   )}
 
                   <div className={`max-w-[85%] sm:max-w-[80%] rounded-2xl p-3 text-xs leading-relaxed ${
                     isUser
                       ? 'bg-gradient-to-r from-[#ba4c18] to-[#963b10] text-white rounded-br-xs shadow-md'
-                      : isAssistant
-                        ? 'bg-[#0c2217] border border-[#d4a359]/35 text-stone-100 rounded-bl-xs shadow-lg'
-                        : 'bg-emerald-950/80 border border-emerald-500/30 text-emerald-100 rounded-bl-xs shadow-md'
+                      : 'bg-[#0c2217] border border-emerald-500/30 text-emerald-100 rounded-bl-xs shadow-md'
                   }`}>
                     <div className="flex items-center justify-between gap-2 mb-1">
                       <span className="text-[10px] font-bold opacity-85">
-                        {isUser ? (
-                          'You'
-                        ) : isAssistant ? (
-                          <span className="text-[#d4a359] font-extrabold flex items-center gap-1">
-                            <Sparkles className="w-2.5 h-2.5 text-[#d4a359]" />
-                            IlmiDunya Counselor
-                          </span>
-                        ) : (
-                          `Staff (${m.senderName || 'Admin Desk'})`
-                        )}
+                        {isUser ? 'You' : (m.senderName || 'IlmiDunya Support Desk')}
                       </span>
                       <span className="text-[9px] opacity-60">
                         {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

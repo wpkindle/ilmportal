@@ -4,11 +4,12 @@ import React from 'react';
 
 /**
  * BrandLogo component for IlmiDunya Pakistan.
- * Inspired by the authentic open-book emblem, modern typography, and Urdu calligraphy.
+ * Inspired by the authentic open-book emblem, modern typography, and Urdu script.
+ * Color scheme: Vibrant Teal (#15a18d) and Charcoal (#373737).
  *
  * @param {'light' | 'dark' | 'icon'} variant - Color scheme ('light' for navbar/white cards, 'dark' for footer)
  * @param {'xs' | 'sm' | 'md' | 'lg'} size - Overall dimension scaling
- * @param {boolean} withUrdu - Whether to display the "علمی دنیا" subtitle
+ * @param {boolean} withUrdu - Whether to display the "علمی دُنیا" subtitle
  * @param {boolean} withBadge - Whether to display the "Pakistan" badge
  * @param {string} className - Optional custom class name
  */
@@ -22,45 +23,58 @@ export default function BrandLogo({
   const isDark = variant === 'dark';
   const isIconOnly = variant === 'icon';
 
-  // Size specifications
+  // Proportional height scales
   const heights = {
     xs: 28,
     sm: 34,
-    md: 42,
-    lg: 52
+    md: 44,
+    lg: 54
   };
 
   const currentHeight = heights[size] || heights.md;
+  const bookColor = '#15a18d';
+  const textColor = isDark ? '#ffffff' : '#373737';
+  const urduColor = isDark ? '#15a18d' : '#373737';
 
+  // Icon only rendering (for compact mobile avatars / favicons)
   if (isIconOnly) {
     return (
       <div className={`inline-flex items-center justify-center shrink-0 ${className}`}>
         <svg
           height={currentHeight}
-          viewBox="0 0 54 54"
+          viewBox="0 0 64 64"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
           className="overflow-visible"
         >
-          <g transform="translate(1, 1)">
-            {/* Outer Book Frame */}
+          <rect width="64" height="64" rx="16" fill={bookColor} />
+          <g transform="translate(4, 7)">
             <path
-              d="M 6 12 L 6 42 C 6 45 8 47 11 47 L 40 47 L 40 41 L 12 41 C 11.5 41 11 40.5 11 40 L 11 14 L 6 12 Z"
-              fill={isDark ? '#00d1a7' : '#00a884'}
+              d="
+                M 10 12
+                C 19 4, 33 4, 40 12
+                L 40 17
+                C 33 10, 20 10, 15 17
+                L 15 36
+                L 36 36
+                L 36 41
+                L 10 41
+                Z
+              "
+              fill="#ffffff"
             />
-            {/* Top Open Pages Arch */}
             <path
-              d="M 6 12 C 13 8 21 10 26 16 C 31 10 39 8 46 12 L 46 18 C 39 14 31 16 26 21 C 21 16 13 14 6 18 Z"
-              fill={isDark ? '#00d1a7' : '#00a884'}
-            />
-            {/* Inner Pages Line */}
-            <path
-              d="M 14 22 Q 20 18 26 24 Q 32 18 38 22"
-              stroke={isDark ? '#d4a359' : '#0c2217'}
-              strokeWidth="2"
-              strokeLinecap="round"
-              fill="none"
-              opacity="0.8"
+              d="
+                M 40 12
+                C 47 4, 61 4, 70 12
+                L 70 17
+                C 61 10, 48 10, 42 17
+                L 40 21
+                L 38 17
+                Z
+              "
+              fill="#ffffff"
+              transform="scale(0.68) translate(-1, 0)"
             />
           </g>
         </svg>
@@ -68,83 +82,98 @@ export default function BrandLogo({
     );
   }
 
+  // Dynamic SVG bounds based on visible elements
+  const viewBoxWidth = withBadge ? 320 : 215;
+  const viewBoxHeight = withUrdu ? 88 : 66;
+
   return (
-    <div className={`inline-flex items-center gap-2 sm:gap-2.5 select-none ${className}`}>
-      {/* Emblem */}
-      <div className="shrink-0 flex items-center">
-        <svg
-          height={currentHeight}
-          viewBox="0 0 52 54"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-          className="transition-transform group-hover:scale-105"
+    <div className={`inline-flex items-center select-none ${className}`}>
+      <svg
+        height={currentHeight}
+        viewBox={`0 0 ${viewBoxWidth} ${viewBoxHeight}`}
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className="overflow-visible"
+      >
+        {/* Teal Open Book Bracket framing 'ilmi' */}
+        <path
+          d="
+            M 12 16
+            C 24 5, 46 5, 60 16
+            C 74 5, 96 5, 108 16
+            L 108 23
+            C 96 14, 76 14, 62 23
+            L 60 28
+            L 58 23
+            C 44 14, 24 14, 19 23
+            L 19 54
+            L 72 54
+            L 72 62
+            L 12 62
+            Z
+          "
+          fill={bookColor}
+        />
+
+        {/* 'ilmi' sitting inside the book bracket */}
+        <text
+          x="26"
+          y="52"
+          fontFamily="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif"
+          fontWeight="900"
+          fontSize="34"
+          fill={textColor}
+          letterSpacing="-0.8"
         >
-          {/* Outer Book Spine & Lower Horizontal Shelf */}
-          <path
-            d="M 5 10 L 5 44 C 5 48 8 51 12 51 L 44 51 L 44 43 L 13 43 C 12.5 43 12 42.5 12 42 L 12 12 L 5 10 Z"
-            fill={isDark ? '#00d1a7' : '#00a884'}
-          />
-          {/* Top Open Pages Arch */}
-          <path
-            d="M 5 10 C 13 5 22 7 26 14 C 30 7 39 5 47 10 L 47 18 C 39 13 31 15 26 20 C 21 15 13 13 5 18 Z"
-            fill={isDark ? '#00d1a7' : '#00a884'}
-          />
-          {/* Inner Curved Page Spine Highlight */}
-          <path
-            d="M 13 22 Q 20 17 26 23 Q 32 17 39 22"
-            stroke={isDark ? '#ffffff' : '#143d2b'}
-            strokeWidth="2"
-            strokeLinecap="round"
-            fill="none"
-            opacity="0.75"
-          />
-        </svg>
-      </div>
+          ilmi
+        </text>
 
-      {/* Typography & Badge Lockup */}
-      <div className="flex flex-col justify-center text-left leading-none">
-        <div className="flex items-center gap-1.5 sm:gap-2">
-          <span
-            className={`font-sans font-black tracking-tight flex items-baseline ${
-              size === 'xs'
-                ? 'text-base'
-                : size === 'sm'
-                ? 'text-lg'
-                : size === 'lg'
-                ? 'text-2xl sm:text-3xl'
-                : 'text-xl sm:text-2xl'
-            } ${isDark ? 'text-white' : 'text-slate-900'}`}
-          >
-            <span>ilmi</span>
-            <span className={isDark ? 'text-[#00d1a7]' : 'text-[#00a884]'}>dunya</span>
-          </span>
+        {/* 'dunya' flowing immediately after the bracket */}
+        <text
+          x="110"
+          y="52"
+          fontFamily="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif"
+          fontWeight="900"
+          fontSize="34"
+          fill={textColor}
+          letterSpacing="-0.8"
+        >
+          dunya
+        </text>
 
-          {withBadge && (
-            <span
-              className={`px-1.5 py-0.5 rounded text-[8.5px] sm:text-[9.5px] font-extrabold uppercase tracking-wider ${
-                isDark
-                  ? 'bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40 shadow-xs'
-                  : 'bg-[#143d2b] text-[#f5f0e6] border border-[#d4a359]/30 shadow-2xs'
-              }`}
-            >
-              Pakistan
-            </span>
-          )}
-        </div>
-
+        {/* Urdu: Strictly 'علمی دُنیا' (Pakistan removed, aligned along the bottom shelf) */}
         {withUrdu && (
-          <div className="flex items-center justify-between -mt-0.5 sm:mt-0">
-            <span
-              className={`font-serif text-[11px] sm:text-[12px] font-bold tracking-normal ${
-                isDark ? 'text-[#00d1a7]' : 'text-[#00a884]'
-              }`}
-              dir="rtl"
-            >
-              علمی دُنیا پاکستان
-            </span>
-          </div>
+          <text
+            x="76"
+            y="77"
+            fontFamily="'Noto Nastaliq Urdu', 'Amiri', 'Urdu Typesetting', serif"
+            fontWeight="700"
+            fontSize="15"
+            fill={urduColor}
+          >
+            علمی دُنیا
+          </text>
         )}
-      </div>
+
+        {/* Sleek 'PAKISTAN' badge */}
+        {withBadge && (
+          <g transform="translate(216, 28)">
+            <rect x="0" y="0" width="76" height="22" rx="6" fill={bookColor} />
+            <text
+              x="38"
+              y="15"
+              fontFamily="'Plus Jakarta Sans', system-ui, sans-serif"
+              fontWeight="800"
+              fontSize="9.5"
+              fill="#ffffff"
+              textAnchor="middle"
+              letterSpacing="1.2"
+            >
+              PAKISTAN
+            </text>
+          </g>
+        )}
+      </svg>
     </div>
   );
 }

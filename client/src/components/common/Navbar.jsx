@@ -35,6 +35,7 @@ import { soundEngine } from '../../utils/soundEffects';
 import { showNativeNotification } from '../../utils/notificationManager';
 import { api } from '../../services/api';
 import PromotionTopBar from './PromotionTopBar';
+import BrandLogo from './BrandLogo';
 
 const Navbar = () => {
   const { user, isAuthenticated, logout, isStudent, isTutor, isAdmin } = useAuth();
@@ -267,23 +268,8 @@ const Navbar = () => {
           <div className="flex items-center justify-between h-14 sm:h-16">
           
           {/* Brand Logo & Tagline */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#0c2217] flex items-center justify-center text-[#faf8f5] shadow-md shadow-[#0c2217]/20 group-hover:scale-105 transition-transform border border-[#d4a359]/40">
-              <BookOpen className="w-5 h-5 text-[#d4a359]" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-lg sm:text-xl font-serif font-black tracking-tight text-slate-900">
-                  Ilm<span className="text-[#0c2217]">Portal</span>
-                </span>
-                <span className="hidden sm:inline-block px-1.5 py-0.5 rounded text-[9px] sm:text-[10px] font-extrabold uppercase bg-[#143d2b] text-[#f5f0e6] border border-[#d4a359]/40">
-                  Pakistan
-                </span>
-              </div>
-              <p className="text-[9.5px] font-medium text-slate-500 -mt-0.5 hidden sm:block">
-                Quran &amp; Academic Tutoring • Female-Safe
-              </p>
-            </div>
+          <Link href="/" className="flex items-center group py-1" title="IlmiDunya Pakistan">
+            <BrandLogo variant="light" size="sm" withUrdu={true} withBadge={true} />
           </Link>
 
           {/* Desktop Nav Links */}

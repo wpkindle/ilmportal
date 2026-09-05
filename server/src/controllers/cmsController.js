@@ -191,9 +191,9 @@ exports.diagnoseEmail = async (req, res) => {
   try {
     const result = await sendEmailDetailed({
       to: targetEmail,
-      subject: 'IlmPortal Diagnostic Test Email',
-      html: '<p>This is a live diagnostic email from IlmPortal backend.</p>',
-      text: 'This is a live diagnostic email from IlmPortal backend.'
+      subject: 'IlmiDunya Diagnostic Test Email',
+      html: '<p>This is a live diagnostic email from IlmiDunya backend.</p>',
+      text: 'This is a live diagnostic email from IlmiDunya backend.'
     });
     diag.result = result;
     res.status(200).json({ success: true, diag });

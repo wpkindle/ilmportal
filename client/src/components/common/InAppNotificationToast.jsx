@@ -58,7 +58,7 @@ export default function InAppNotificationToast() {
             </h4>
 
             <p className="text-xs text-slate-300 mt-0.5 line-clamp-2 leading-relaxed">
-              {toastAlert.message || 'You received a new message on IlmPortal.'}
+              {toastAlert.message || 'You received a new message on IlmiDunya.'}
             </p>
 
             <div className="mt-2.5 flex items-center gap-2">

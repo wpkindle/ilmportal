@@ -77,7 +77,7 @@ export default function ContactUsPage() {
   };
 
   const contact = page?.contactDetails || {
-    email: 'contact@ilmportal.org',
+    email: 'contact@ilmidunya.pk',
     workingHours: 'Monday – Saturday: 9:00 AM – 9:00 PM PKT'
   };
 
@@ -103,7 +103,7 @@ export default function ContactUsPage() {
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
-            {page?.title || 'Contact IlmPortal Pakistan'}
+            {page?.title || 'Contact IlmiDunya Pakistan'}
           </h1>
           <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
             {page?.subtitle || 'We are here to assist students, parents, and tutors across Pakistan.'}
@@ -123,8 +123,8 @@ export default function ContactUsPage() {
               </div>
               <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Email Support</h4>
               <p className="text-sm font-black text-slate-900">
-                <a href="mailto:contact@ilmportal.org" className="hover:text-[#b85d34] transition-colors">
-                  contact@ilmportal.org
+                <a href="mailto:contact@ilmidunya.pk" className="hover:text-[#b85d34] transition-colors">
+                  contact@ilmidunya.pk
                 </a>
               </p>
               <p className="text-[11px] text-slate-500">Official support &amp; Sanad verified tutor inquiries</p>

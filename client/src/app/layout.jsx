@@ -16,8 +16,8 @@ export const viewport = {
 export const metadata = {
   metadataBase: new URL('https://pakistanlms.pk'),
   title: {
-    default: 'IlmPortal Pakistan | Verified Quran & Academic Tutoring',
-    template: '%s | IlmPortal Pakistan',
+    default: 'IlmiDunya Pakistan | Verified Quran & Academic Tutoring',
+    template: '%s | IlmiDunya Pakistan',
   },
   description: 'Connect with verified Pakistani Quran Qaris, female Alimahs, and Cambridge & Matric subject tutors. 1-on-1 live video classes with camera-off privacy from Lahore, Karachi, Islamabad & across Pakistan.',
   keywords: 'Quran tutor Pakistan, Tajweed tutor Lahore, O Level tutor Karachi, Online Quran Academy, Hifz tutor, Matric science tutor, Female Quran teacher Pakistan, In-platform WebRTC classroom',
@@ -33,16 +33,16 @@ export const metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'IlmPortal',
+    title: 'IlmiDunya',
   },
   other: {
     'mobile-web-app-capable': 'yes',
   },
   openGraph: {
-    title: 'IlmPortal Pakistan | Verified Quran & Academic Tutoring',
+    title: 'IlmiDunya Pakistan | Verified Quran & Academic Tutoring',
     description: 'Connect with verified Pakistani Quran Qaris and Cambridge/Matric educators for live 1:1 in-platform video classrooms with complete family privacy.',
     url: 'https://pakistanlms.pk',
-    siteName: 'IlmPortal Pakistan',
+    siteName: 'IlmiDunya Pakistan',
     locale: 'en_PK',
     type: 'website',
   },
@@ -54,27 +54,27 @@ const orgSchema = {
     {
       '@type': 'Organization',
       '@id': 'https://pakistanlms.pk/#organization',
-      name: 'IlmPortal Pakistan',
+      name: 'IlmiDunya Pakistan',
       url: 'https://pakistanlms.pk',
-      logo: 'https://pakistanlms.pk/icon.svg',
+      logo: 'https://pakistanlms.pk/logo.svg',
       description: 'Pakistan’s dedicated platform for 1-on-1 verified Quran and academic tutoring with camera-off privacy.',
       contactPoint: {
         '@type': 'ContactPoint',
-        email: 'contact@ilmportal.org',
+        email: 'contact@ilmidunya.pk',
         contactType: 'customer support',
         areaServed: 'PK',
         availableLanguage: ['Urdu', 'English']
       },
       sameAs: [
-        'https://facebook.com/ilmportal',
-        'https://twitter.com/ilmportal'
+        'https://facebook.com/ilmidunya',
+        'https://twitter.com/ilmidunya'
       ]
     },
     {
       '@type': 'WebSite',
       '@id': 'https://pakistanlms.pk/#website',
       url: 'https://pakistanlms.pk',
-      name: 'IlmPortal Pakistan',
+      name: 'IlmiDunya Pakistan',
       publisher: {
         '@id': 'https://pakistanlms.pk/#organization'
       },

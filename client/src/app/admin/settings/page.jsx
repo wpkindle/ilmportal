@@ -9,12 +9,12 @@ import { Settings, CheckCircle2, CreditCard } from 'lucide-react';
 export default function SystemSettingsPage() {
   const [trialDurationDays, setTrialDurationDays] = useState(3);
   const [bankName, setBankName] = useState('Meezan Bank Limited');
-  const [accountTitle, setAccountTitle] = useState('IlmPortal Education Pvt Ltd');
+  const [accountTitle, setAccountTitle] = useState('IlmiDunya Education Pvt Ltd');
   const [iban, setIban] = useState('PK36MEZN0001020304050607');
   const [jazzcashNumber, setJazzcashNumber] = useState('03001234567');
-  const [jazzcashTitle, setJazzcashTitle] = useState('IlmPortal Online Tutoring');
+  const [jazzcashTitle, setJazzcashTitle] = useState('IlmiDunya Online Tutoring');
   const [easypaisaNumber, setEasypaisaNumber] = useState('03451234567');
-  const [easypaisaTitle, setEasypaisaTitle] = useState('IlmPortal Online Tutoring');
+  const [easypaisaTitle, setEasypaisaTitle] = useState('IlmiDunya Online Tutoring');
   const [instructionsNotes, setInstructionsNotes] = useState('');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -28,12 +28,12 @@ export default function SystemSettingsPage() {
           setTrialDurationDays(res.config.trialDurationDays || 3);
           const pay = res.config.paymentInstructions || {};
           setBankName(pay.bankName || 'Meezan Bank Limited');
-          setAccountTitle(pay.accountTitle || 'IlmPortal Education Pvt Ltd');
+          setAccountTitle(pay.accountTitle || 'IlmiDunya Education Pvt Ltd');
           setIban(pay.iban || 'PK36MEZN0001020304050607');
           setJazzcashNumber(pay.jazzcashNumber || '03001234567');
-          setJazzcashTitle(pay.jazzcashTitle || 'IlmPortal Online Tutoring');
+          setJazzcashTitle(pay.jazzcashTitle || 'IlmiDunya Online Tutoring');
           setEasypaisaNumber(pay.easypaisaNumber || '03451234567');
-          setEasypaisaTitle(pay.easypaisaTitle || 'IlmPortal Online Tutoring');
+          setEasypaisaTitle(pay.easypaisaTitle || 'IlmiDunya Online Tutoring');
           setInstructionsNotes(pay.instructionsNotes || '');
         }
       } catch (e) {

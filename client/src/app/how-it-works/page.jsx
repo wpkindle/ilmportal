@@ -5,7 +5,7 @@ import FAQ from '../../components/home/FAQ';
 import { ShieldCheck, Video, CreditCard, Sparkles, GraduationCap } from 'lucide-react';
 
 export const metadata = {
-  title: 'How It Works | IlmPortal Pakistan',
+  title: 'How It Works | IlmiDunya Pakistan',
   description: 'Learn how to find verified Quran and academic tutors, negotiate custom rates, and attend live WebRTC classes in Pakistan.',
 };
 
@@ -18,7 +18,7 @@ export default function HowItWorksPage() {
             Platform Guide
           </span>
           <h1 className="text-3xl sm:text-5xl font-black text-white font-serif">
-            How IlmPortal Works
+            How IlmiDunya Works
           </h1>
           <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto">
             From discovering verified Sanad scholars to joining interactive live video sessions and straightforward Pakistani fee payment methods.

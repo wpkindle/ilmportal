@@ -329,7 +329,7 @@ export default function Hero() {
                 className="inline-flex items-center gap-2 text-xs font-semibold text-[#a3b8b0] hover:text-white transition-colors cursor-pointer"
               >
                 <Chrome className="w-3.5 h-3.5 text-[#d4a359]" />
-                <span>Install IlmPortal App for Chrome / Windows / Android (Free PWA)</span>
+                <span>Install IlmiDunya App for Chrome / Windows / Android (Free PWA)</span>
               </button>
             </div>
 

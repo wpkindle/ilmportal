@@ -129,7 +129,7 @@ function VerifyEmailContent() {
               </div>
               <ol className="text-[11px] text-stone-700 space-y-1.5 pl-4 list-decimal font-medium leading-relaxed">
                 <li>Open your email inbox (and check <strong>Spam / Junk</strong> folder).</li>
-                <li>Open the email from <strong>IlmPortal Pakistan</strong>.</li>
+                <li>Open the email from <strong>IlmiDunya Pakistan</strong>.</li>
                 <li>Click the <strong>&ldquo;Verify Account &amp; Go to Profile&rdquo;</strong> button.</li>
               </ol>
             </div>

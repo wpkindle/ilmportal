@@ -501,7 +501,7 @@ exports.updateUserStatus = async (req, res) => {
     let notifMsg = `Your account status has been set to: ${status.replace('_', ' ').toUpperCase()}.`;
     if (status === 'active') {
       notifTitle = 'Account Reinstated & Active';
-      notifMsg = 'Your account has been fully verified and is active on IlmPortal.';
+      notifMsg = 'Your account has been fully verified and is active on IlmiDunya.';
     } else if (status === 'under_review') {
       notifTitle = 'Account Placed Under Administrative Review';
       notifMsg = `Your account is temporarily under review. Reason: ${reason || 'Standard safety audit'}.`;

@@ -138,7 +138,7 @@ const AdminSidebar = () => {
       </div>
 
       <div className="pt-4 mt-4 border-t border-slate-800 text-[11px] text-slate-500 px-2">
-        <p className="font-semibold text-slate-400">IlmPortal Core v1.0</p>
+        <p className="font-semibold text-slate-400">IlmiDunya Core v1.0</p>
         <p>Real-time audit logging active</p>
       </div>
     </aside>

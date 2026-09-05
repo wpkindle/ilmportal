@@ -1251,7 +1251,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
           <div className="p-3 bg-amber-50 border border-amber-200 rounded-2xl text-center space-y-1">
             <p className="text-xs font-bold text-amber-900">Direct Chat Disabled Between Tutors</p>
             <p className="text-[11px] text-amber-700">
-              IlmPortal messaging is dedicated strictly to student-tutor learning communication. Tutors cannot chat with other tutors.
+              IlmiDunya messaging is dedicated strictly to student-tutor learning communication. Tutors cannot chat with other tutors.
             </p>
           </div>
         ) : user?.role === 'student' && femaleTutorRequestStatus?.isFemaleTutor && femaleTutorRequestStatus?.requestStatus !== 'accepted' ? (

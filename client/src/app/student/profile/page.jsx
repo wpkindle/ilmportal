@@ -225,7 +225,7 @@ function StudentProfileContent() {
                 <span className="text-[10px] bg-[#0c2217] text-[#faf8f5] font-bold px-2 py-0.5 rounded-full">ACTIVE</span>
               </h3>
               <p className="text-xs text-stone-700 leading-relaxed font-medium">
-                Welcome to IlmPortal Pakistan! Your account is active and verified. Please complete your profile details below (such as City, Gender, Age, and Profile Picture) to get the best tutoring experience.
+                Welcome to IlmiDunya Pakistan! Your account is active and verified. Please complete your profile details below (such as City, Gender, Age, and Profile Picture) to get the best tutoring experience.
               </p>
             </div>
           </div>

@@ -834,7 +834,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-[#d4a359] animate-ping shrink-0" />
             <span className="font-bold text-xs sm:text-sm text-white truncate">
-              {sessionData?.title || 'IlmPortal Live Tutoring Classroom'}
+              {sessionData?.title || 'IlmiDunya Live Tutoring Classroom'}
             </span>
           </div>
           <span className="hidden md:inline-flex text-[9px] font-bold px-2 py-0.5 bg-[#0c2217] text-[#d4a359] rounded-full border border-[#d4a359]/40 shrink-0">

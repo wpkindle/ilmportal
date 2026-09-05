@@ -11,7 +11,7 @@ const testimonials = [
     rating: 5,
     highlight: 'Daughter learning with verified female Alimah',
     review:
-      'Finding a trustworthy Quran teacher for my 8-year-old daughter who is both patient and possesses genuine Tajweed was our biggest worry. On IlmPortal, we verified the teacher’s Sanad from Wafaq-ul-Madaris before our first interaction. The camera-off default gave our family absolute peace of mind. She has now completed two Paras with genuine joy and accurate Makharij.'
+      'Finding a trustworthy Quran teacher for my 8-year-old daughter who is both patient and possesses genuine Tajweed was our biggest worry. On IlmiDunya, we verified the teacher’s Sanad from Wafaq-ul-Madaris before our first interaction. The camera-off default gave our family absolute peace of mind. She has now completed two Paras with genuine joy and accurate Makharij.'
   },
   {
     featured: false,

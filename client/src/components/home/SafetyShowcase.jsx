@@ -72,7 +72,7 @@ export default function SafetyShowcase() {
             </h2>
 
             <p className="text-xs sm:text-sm text-[#d1dbd6] leading-relaxed font-normal">
-              In Pakistan, female learners, mothers, and daughters deserve complete peace of mind. IlmPortal was built from the ground up so females never have any concern regarding their privacy — with camera-off learning, verified female Alimahs, and zero exposure of personal phone numbers.
+              In Pakistan, female learners, mothers, and daughters deserve complete peace of mind. IlmiDunya was built from the ground up so females never have any concern regarding their privacy — with camera-off learning, verified female Alimahs, and zero exposure of personal phone numbers.
             </p>
 
             {/* Stat Callout Strip */}
@@ -228,7 +228,7 @@ export default function SafetyShowcase() {
                 Official Administration Support &amp; Incident Monitoring
               </h4>
               <p className="text-xs text-[#a3b8b0]">
-                Immediate review for any family inquiry or feedback: <a href="mailto:contact@ilmportal.org" className="text-[#d4a359] underline font-bold">contact@ilmportal.org</a>
+                Immediate review for any family inquiry or feedback: <a href="mailto:contact@ilmidunya.pk" className="text-[#d4a359] underline font-bold">contact@ilmidunya.pk</a>
               </p>
             </div>
           </div>

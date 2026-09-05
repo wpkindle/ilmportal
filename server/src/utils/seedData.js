@@ -303,12 +303,12 @@ const seedDatabase = async () => {
       paymentInstructions: {
         bankName: 'Meezan Bank Limited (Islamic Banking)',
         accountNumber: '01020304050607',
-        accountTitle: 'IlmPortal Education Pvt Ltd',
+        accountTitle: 'IlmiDunya Education Pvt Ltd',
         iban: 'PK36MEZN0001020304050607',
         jazzcashNumber: '03001234567',
-        jazzcashTitle: 'IlmPortal Online Tutoring',
+        jazzcashTitle: 'IlmiDunya Online Tutoring',
         easypaisaNumber: '03451234567',
-        easypaisaTitle: 'IlmPortal Online Tutoring',
+        easypaisaTitle: 'IlmiDunya Online Tutoring',
         instructionsNotes: 'Transfer fee via JazzCash, EasyPaisa, or Online Bank Transfer and submit the Transaction ID (TID) below. Payments verified within 2–4 hours.'
       },
       platformNotice: 'Welcome to Pakistan’s premier Quran & Academic Tutoring Platform. All live classes feature full HD video & interactive whiteboard.',
@@ -319,7 +319,7 @@ const seedDatabase = async () => {
 
     // 4. Seed Admin User
     const adminUser = await User.create({
-      name: 'IlmPortal Admin',
+      name: 'IlmiDunya Admin',
       email: 'admin@pakistanlms.pk',
       password: 'Admin@12345',
       role: 'admin',

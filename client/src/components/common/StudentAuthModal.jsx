@@ -313,7 +313,7 @@ export default function StudentAuthModal({
 
           <div className="pt-3 mt-3 border-t border-white/15 space-y-2">
             <div className="text-[10px] text-slate-300 flex items-center justify-between">
-              <span>IlmPortal Trust &amp; Safety</span>
+              <span>IlmiDunya Trust &amp; Safety</span>
               <span className="text-[#d4a359] font-mono font-bold">Verified Faculty</span>
             </div>
             <div className="flex items-center justify-between text-[9px] text-slate-300 font-semibold pt-1 border-t border-white/10">
@@ -444,7 +444,7 @@ export default function StudentAuthModal({
               </button>
 
               <p className="text-[10.5px] text-center text-slate-500">
-                New to IlmPortal?{' '}
+                New to IlmiDunya?{' '}
                 <button
                   type="button"
                   onClick={() => { setMode('register'); setError(''); setInfoMessage(''); }}

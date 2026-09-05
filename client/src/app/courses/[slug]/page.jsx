@@ -111,10 +111,10 @@ export default function CourseDetailPage() {
         '@type': 'Course',
         '@id': `https://pakistanlms.pk/courses/${slug}#course`,
         name: course.title,
-        description: course.shortDescription || course.description || `${course.title} curriculum on IlmPortal Pakistan`,
+        description: course.shortDescription || course.description || `${course.title} curriculum on IlmiDunya Pakistan`,
         provider: {
           '@type': 'EducationalOrganization',
-          name: 'IlmPortal Pakistan',
+          name: 'IlmiDunya Pakistan',
           sameAs: 'https://pakistanlms.pk'
         },
         educationalLevel: course.targetAudience || 'All Ages',

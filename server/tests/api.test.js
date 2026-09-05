@@ -4,7 +4,7 @@ const { connectDB, disconnectDB } = require('../src/config/db');
 
 jest.setTimeout(90000);
 
-describe('IlmPortal Pakistan LMS API Tests', () => {
+describe('IlmiDunya Pakistan LMS API Tests', () => {
   let studentToken = '';
   let tutorToken = '';
   let adminToken = '';

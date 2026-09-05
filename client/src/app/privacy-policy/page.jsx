@@ -52,7 +52,7 @@ export default function PrivacyPolicyPage() {
             {page?.title || 'Privacy Policy'}
           </h1>
           <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
-            {page?.subtitle || 'How IlmPortal protects and handles your personal information, Sanad credentials, and family data.'}
+            {page?.subtitle || 'How IlmiDunya protects and handles your personal information, Sanad credentials, and family data.'}
           </p>
 
           {page?.updatedAt && (

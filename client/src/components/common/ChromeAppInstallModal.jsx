@@ -67,7 +67,7 @@ export default function ChromeAppInstallModal({ isOpen, onClose }) {
                 <span className="text-[10px] text-stone-500 font-medium">Fast &amp; Offline Ready</span>
               </div>
               <h2 className="text-lg sm:text-xl font-serif font-bold text-[#0c2217] mt-0.5">
-                Install IlmPortal App
+                Install IlmiDunya App
               </h2>
             </div>
           </div>
@@ -89,13 +89,13 @@ export default function ChromeAppInstallModal({ isOpen, onClose }) {
               <CheckCircle2 className="w-8 h-8 text-[#0c2217] mx-auto" />
               <h4 className="font-serif font-bold text-sm text-[#0c2217]">App Already Installed!</h4>
               <p className="text-xs text-stone-600">
-                You are currently enjoying IlmPortal as a desktop/mobile standalone app with instant notifications.
+                You are currently enjoying IlmiDunya as a desktop/mobile standalone app with instant notifications.
               </p>
             </div>
           ) : (
             <>
               <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-                Install IlmPortal directly to your desktop or phone home screen for 1-click access, low-latency live video classes, and background notifications.
+                Install IlmiDunya directly to your desktop or phone home screen for 1-click access, low-latency live video classes, and background notifications.
               </p>
 
               <button
@@ -120,7 +120,7 @@ export default function ChromeAppInstallModal({ isOpen, onClose }) {
                   <div className="text-xs space-y-0.5">
                     <p className="font-serif font-bold text-[#0c2217]">On Chrome Desktop (Windows / Mac / Linux)</p>
                     <p className="text-stone-600 text-[11px] leading-relaxed">
-                      Look at the right end of your Chrome address bar and click the <strong className="text-[#0c2217]">Install App</strong> icon (⭳), or click <strong className="text-[#0c2217]">Chrome Menu (︙) &gt; Cast, save, share &gt; Install IlmPortal</strong>.
+                      Look at the right end of your Chrome address bar and click the <strong className="text-[#0c2217]">Install App</strong> icon (⭳), or click <strong className="text-[#0c2217]">Chrome Menu (︙) &gt; Cast, save, share &gt; Install IlmiDunya</strong>.
                     </p>
                   </div>
                 </div>

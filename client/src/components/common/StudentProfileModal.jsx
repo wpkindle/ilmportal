@@ -194,7 +194,7 @@ export default function StudentProfileModal({
                     Contact Privacy &amp; Child Safety Protection
                   </span>
                   <p className="text-slate-500 text-[11px] leading-relaxed">
-                    Personal contact details (email address, username, password, and mobile/WhatsApp number) are private and kept strictly confidential by IlmPortal for student safety. Please conduct all conversations, tuition agreements, and classes inside IlmPortal.
+                    Personal contact details (email address, mobile/WhatsApp number) are private and kept strictly confidential by IlmiDunya for student safety. Please conduct all conversations, tuition agreements, and classes inside IlmiDunya.
                   </p>
                 </div>
               </div>

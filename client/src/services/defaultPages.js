@@ -1,8 +1,8 @@
 export const defaultPageData = {
   'privacy-policy': {
     title: 'Privacy Policy',
-    subtitle: 'How IlmPortal Pakistan protects and handles your personal information, Sanad credentials, and family data.',
-    metaDescription: 'Read the official privacy policy of IlmPortal Pakistan.',
+    subtitle: 'How IlmiDunya Pakistan protects and handles your personal information, Sanad credentials, and family data.',
+    metaDescription: 'Read the official privacy policy of IlmiDunya Pakistan.',
     content: `### 1. Information We Collect
 We collect information you provide directly during student or tutor registration:
 * **Account Credentials**: Name, email address, phone/WhatsApp number, city, and password.
@@ -25,15 +25,15 @@ All uploaded academic certificates and Sanad degrees are stored in private encry
 ---
 
 ### 4. Legal Compliance under PECA 2016
-IlmPortal complies with the Prevention of Electronic Crimes Act (PECA 2016) and applicable Pakistani privacy laws.`
+IlmiDunya complies with the Prevention of Electronic Crimes Act (PECA 2016) and applicable Pakistani privacy laws.`
   },
 
   'terms': {
     title: 'Terms of Service',
     subtitle: 'User agreements, ethical guidelines, and platform rules for students, parents, and tutors.',
-    metaDescription: 'Official Terms of Service for IlmPortal Pakistan.',
+    metaDescription: 'Official Terms of Service for IlmiDunya Pakistan.',
     content: `### 1. Acceptance of Terms
-By accessing IlmPortal Pakistan, registering an account, booking classes, or offering tutoring services, you agree to comply with these terms, Pakistani law, and Islamic adab of knowledge.
+By accessing IlmiDunya Pakistan, registering an account, booking classes, or offering tutoring services, you agree to comply with these terms, Pakistani law, and Islamic adab of knowledge.
 
 ---
 
@@ -59,9 +59,9 @@ All users must uphold respectful, professional, and Islamic conduct:
   'disclaimer': {
     title: 'Platform Disclaimer',
     subtitle: 'Transparency on verification scope, academic outcomes, and operational boundaries.',
-    metaDescription: 'Official platform disclaimer for IlmPortal Pakistan.',
+    metaDescription: 'Official platform disclaimer for IlmiDunya Pakistan.',
     content: `### 1. Independent Faculty & LMS Technology
-IlmPortal Pakistan operates as an educational technology platform and directory connecting students with independent Quran teachers, Qaris, Alimahs, and academic tutors.
+IlmiDunya Pakistan operates as an educational technology platform and directory connecting students with independent Quran teachers, Qaris, Alimahs, and academic tutors.
 
 ---
 
@@ -76,16 +76,16 @@ While our faculty strives for excellence in Cambridge CAIE (O/A Levels), Matric/
   },
 
   'about-us': {
-    title: 'About IlmPortal Pakistan',
+    title: 'About IlmiDunya Pakistan',
     subtitle: 'Empowering Pakistani homes with authentic Quranic education and academic excellence.',
-    metaDescription: 'Learn about IlmPortal Pakistan, founded in Lahore.',
+    metaDescription: 'Learn about IlmiDunya Pakistan, founded in Lahore.',
     aboutDetails: {
       mission: 'Empowering Pakistani families with accessible, authentic Quranic studies and high-achieving academic tutoring from the safety of home.',
       vision: 'To be the most trusted and credible learning platform in Pakistan, upholding academic excellence and authentic Quranic tradition.',
       initiativeText: 'An initiative by Mr. & Mrs. Abdul Khaliq from Lahore, Pakistan.'
     },
     content: `### Dedicated to Authentic Knowledge & Character Building
-Founded in Lahore, Punjab, IlmPortal Pakistan was created to bridge a vital gap in our society: connecting Pakistani households with genuine, certified Quran scholars and distinguished academic tutors in a safe, technologically advanced digital classroom.
+Founded in Lahore, Punjab, IlmiDunya Pakistan was created to bridge a vital gap in our society: connecting Pakistani households with genuine, certified Quran scholars and distinguished academic tutors in a safe, technologically advanced digital classroom.
 
 ---
 
@@ -95,7 +95,7 @@ Guided by the timeless Hadith: *"The best of you are those who learn the Quran a
 
 ---
 
-### What Sets IlmPortal Apart
+### What Sets IlmiDunya Apart
 * **Sanad-Verified Faculty**: Only tutors with authentic degrees from recognized institutions (Wifaq-ul-Madaris, Tanzeem-ul-Madaris, HEC-recognized universities, and Cambridge-certified coaches) are approved.
 * **Female Faculty for Families**: Certified Alimahs and female academic teachers available across Pakistan for girls and young learners.
 * **3-Day Risk-Free Trial**: Try classes with zero financial commitment before committing to a monthly deal.
@@ -103,11 +103,11 @@ Guided by the timeless Hadith: *"The best of you are those who learn the Quran a
   },
 
   'contact-us': {
-    title: 'Contact IlmPortal Pakistan',
+    title: 'Contact IlmiDunya Pakistan',
     subtitle: 'We are here to assist students, parents, and tutors across Pakistan.',
-    metaDescription: 'Get in touch with IlmPortal Pakistan.',
+    metaDescription: 'Get in touch with IlmiDunya Pakistan.',
     contactDetails: {
-      email: 'contact@ilmportal.org',
+      email: 'contact@ilmidunya.pk',
       phone: '',
       whatsapp: '',
       address: 'Lahore, Punjab, Pakistan',
@@ -119,7 +119,7 @@ Have questions about finding a verified Qari, scheduling 3-day free trials, requ
 ---
 
 ### Our Communication Channels
-* **Email Support**: Official assistance for student enrollment, tutor onboarding, and Sanad submissions at [contact@ilmportal.org](mailto:contact@ilmportal.org).
+* **Email Support**: Official assistance for student enrollment, tutor onboarding, and Sanad submissions at [contact@ilmidunya.pk](mailto:contact@ilmidunya.pk).
 * **Headquarters**: Lahore, Punjab, Pakistan, serving students nationwide across Pakistan & overseas.`
   }
 };

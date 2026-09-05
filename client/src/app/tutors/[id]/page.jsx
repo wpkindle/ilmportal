@@ -29,14 +29,14 @@ export async function generateMetadata({ params }) {
       const tutor = res.tutor;
       const tutorName = tutor.user?.name || 'Verified Tutor';
       return {
-        title: `${tutorName} - Verified Tutor Profile | IlmPortal Pakistan`,
+        title: `${tutorName} - Verified Tutor Profile | IlmiDunya Pakistan`,
         description: `${tutorName} (${tutor.user?.city || 'Pakistan'}) specializes in ${tutor.qualifications || 'Quran & Academic Tutoring'}. Rating: ${tutor.averageRating?.toFixed(1) || '5.0'}/5. In-platform live video classes available.`,
         alternates: {
           canonical: `https://pakistanlms.pk/tutors/${params.id}`,
         },
         openGraph: {
-          title: `${tutorName} - Certified Tutor | IlmPortal`,
-          description: tutor.bio?.slice(0, 160) || 'Verified Quran & Academic Tutor on IlmPortal Pakistan.',
+          title: `${tutorName} - Certified Tutor | IlmiDunya`,
+          description: tutor.bio?.slice(0, 160) || 'Verified Quran & Academic Tutor on IlmiDunya Pakistan.',
           images: [tutor.user?.avatar || '/images/tutors/qari-huzaifa.jpg'],
         }
       };
@@ -45,7 +45,7 @@ export async function generateMetadata({ params }) {
     console.error(e);
   }
   return {
-    title: 'Tutor Profile | IlmPortal Pakistan',
+    title: 'Tutor Profile | IlmiDunya Pakistan',
     description: 'Find verified Quran and Academic tutors across Pakistan.',
     alternates: {
       canonical: `https://pakistanlms.pk/tutors/${params.id}`,
@@ -91,7 +91,7 @@ export default async function TutorProfilePage({ params }) {
         '@id': `https://pakistanlms.pk/tutors/${params.id}#person`,
         name: tutorName,
         jobTitle: tutor.qualifications || 'Verified Educator',
-        description: tutor.bio || `${tutorName} is a verified tutor on IlmPortal Pakistan offering personalized 1:1 online classes.`,
+        description: tutor.bio || `${tutorName} is a verified tutor on IlmiDunya Pakistan offering personalized 1:1 online classes.`,
         image: tutorUser.avatar || undefined,
         address: {
           '@type': 'PostalAddress',

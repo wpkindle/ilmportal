@@ -84,7 +84,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         key: 'bio',
         label: 'Teaching Bio & Headline',
         weight: 10,
-        done: !!tutorProfile?.bio?.trim() && tutorProfile.bio.length > 20 && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmPortal'),
+        done: !!tutorProfile?.bio?.trim() && tutorProfile.bio.length > 20 && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmPortal') && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmiDunya'),
         link: '/tutor/profile#profile-bio',
         actionLabel: 'Write Bio'
       },
@@ -252,7 +252,7 @@ export default function ProfileCompletionMeter({
               {isTutor ? (
                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#d4a359] text-[#0c2217] shadow-xs">
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  {isApproved ? 'Verified Sanad Tutor • IlmPortal Pakistan' : 'Sanad Verification Pending'}
+                  {isApproved ? 'Verified Sanad Tutor • IlmiDunya Pakistan' : 'Sanad Verification Pending'}
                 </span>
               ) : (
                 <span className="text-[11px] font-bold uppercase tracking-wider text-[#d4a359] bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5 border border-[#d4a359]/20">

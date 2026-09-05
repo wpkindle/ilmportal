@@ -336,7 +336,7 @@ function TutorProfileContent() {
                 <span className="text-[10px] bg-[#0c2217] text-[#faf8f5] font-bold px-2 py-0.5 rounded-full">EMAIL CONFIRMED</span>
               </h3>
               <p className="text-xs text-stone-700 leading-relaxed font-medium">
-                Welcome to IlmPortal! Your email address is confirmed. Please complete your profile 100%, then the administration will review it. Profile will be visible to the public on approval from administration.
+                Welcome to IlmiDunya! Your email address is confirmed. Please complete your profile 100%, then the administration will review it. Profile will be visible to the public on approval from administration.
               </p>
             </div>
           </div>

@@ -44,7 +44,7 @@ export const NotificationProvider = ({ children }) => {
     setPermissionStatus(status);
     if (status === 'granted') {
       showNativeNotification({
-        title: 'IlmPortal Alerts Enabled',
+        title: 'IlmiDunya Alerts Enabled',
         body: 'You will now receive instant desktop & mobile alerts with sound for messages & classroom updates.',
         url: '#',
         soundType: 'message'
@@ -90,11 +90,11 @@ export const NotificationProvider = ({ children }) => {
         : (alertData?.link || '/');
 
       showNativeNotification({
-        title: alertData?.title || 'IlmPortal Notification',
-        body: alertData?.message || 'New update on your IlmPortal account',
+        title: alertData?.title || 'IlmiDunya Notification',
+        body: alertData?.message || 'New update on your IlmiDunya account',
         icon: alertData?.senderAvatar || '/icon.png',
         url: alertData?.link || defaultUrl,
-        tag: `ilmportal-${alertData?.type || 'general'}-${Date.now()}`,
+        tag: `ilmidunya-${alertData?.type || 'general'}-${Date.now()}`,
         soundType: isMessageAlert ? 'message' : 'alert'
       });
 

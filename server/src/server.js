@@ -75,7 +75,7 @@ app.get('/api/health', (req, res) => {
   res.status(200).json({
     status: 'online',
     timestamp: new Date().toISOString(),
-    message: 'IlmPortal Pakistan LMS API is running smoothly'
+    message: 'IlmiDunya Pakistan LMS API is running smoothly'
   });
 });
 
@@ -127,7 +127,7 @@ const startServer = async () => {
 
       server.listen(PORT, '0.0.0.0', () => {
         console.log(`\n======================================================`);
-        console.log(`🚀 IlmPortal Pakistan LMS Backend running on http://0.0.0.0:${PORT}`);
+        console.log(`🚀 IlmiDunya Pakistan LMS Backend running on http://0.0.0.0:${PORT}`);
         console.log(`📡 WebSocket server initialized`);
         console.log(`🔗 API Base URL: http://127.0.0.1:${PORT}/api`);
         console.log(`======================================================\n`);

@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import BrandLogo from '../../components/common/BrandLogo';
 
 function LoginContent() {
   const { login } = useAuth();
@@ -71,9 +72,7 @@ function LoginContent() {
         {/* Top Logo & Title */}
         <div className="text-center space-y-2">
           <Link href="/" className="inline-flex items-center gap-3 group">
-            <div className="w-12 h-12 rounded-2xl bg-[#0c2217] border border-[#d4a359]/40 flex items-center justify-center text-[#d4a359] shadow-md shadow-[#0c2217]/20 group-hover:scale-105 transition-transform">
-              <BookOpen className="w-6 h-6" />
-            </div>
+            <BrandLogo variant="light" size="md" />
           </Link>
 
           <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40 text-xs font-bold mx-auto shadow-xs">

@@ -592,7 +592,7 @@ exports.respondToTrialContinuation = async (req, res) => {
           studentName: deal.student.name,
           subject: deal.subject,
           feeDueDate: dueDateStr,
-          adminContactEmail: 'contact@ilmportal.org'
+          adminContactEmail: 'contact@ilmidunya.pk'
         });
       } catch (mailErr) {
         console.error('Failed to send tutor continuation email:', mailErr);
@@ -934,7 +934,7 @@ exports.completeDeal = async (req, res) => {
       recipient: studentId,
       sender: req.user.id,
       title: 'Course Deal Completed! 🎉',
-      message: `Tutor ${deal.tutor.name || 'Your tutor'} marked the course for "${deal.subject}" as completed. Thank you for learning on IlmPortal!`,
+      message: `Tutor ${deal.tutor.name || 'Your tutor'} marked the course for "${deal.subject}" as completed. Thank you for learning on IlmiDunya!`,
       type: 'deal_completed',
       link: '/student/deals'
     });

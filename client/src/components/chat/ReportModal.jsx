@@ -107,7 +107,7 @@ export default function ReportModal({
             </div>
             <h3 className="text-lg font-black text-slate-900">Report Submitted to Admin</h3>
             <p className="text-xs text-slate-600 max-w-sm mx-auto leading-relaxed">
-              Thank you for keeping our learning community safe and high-quality. Your report has been dispatched to the IlmPortal safety administration team for priority review.
+              Thank you for keeping our learning community safe and high-quality. Your report has been dispatched to the IlmiDunya safety administration team for priority review.
             </p>
             <div className="pt-3">
               <button
@@ -130,7 +130,7 @@ export default function ReportModal({
               <div>
                 <h3 className="text-base font-black text-slate-900">Report Issue to Admin</h3>
                 <p className="text-xs text-slate-500 font-medium">
-                  Confidential review by IlmPortal Trust & Safety
+                  Confidential review by IlmiDunya Trust & Safety
                 </p>
               </div>
             </div>

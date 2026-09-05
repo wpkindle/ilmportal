@@ -11,7 +11,7 @@ const cityLocalContext = {
     areas: 'DHA, Gulberg, Johar Town, Model Town, Bahria Town & Cantt',
     boards: 'BISE Lahore, Federal Board (FBISE), and Cambridge CAIE (O/A Levels)',
     popularSubjects: 'Tajweed al-Quran with Sanad, O-Level Physics/Math, FSc Pre-Medical, Noorani Qaida for Kids',
-    description: 'Lahore is a historic center of academic excellence and Islamic scholarship. IlmPortal connects families across Lahore with verified local Qaris, qualified female Alimahs for daughters, and top Cambridge/Matric tuition specialists offering camera-off live 1:1 sessions.'
+    description: 'Lahore is a historic center of academic excellence and Islamic scholarship. IlmiDunya connects families across Lahore with verified local Qaris, qualified female Alimahs for daughters, and top Cambridge/Matric tuition specialists offering camera-off live 1:1 sessions.'
   },
   karachi: {
     areas: 'Clifton, DHA, Gulshan-e-Iqbal, PECHS, North Nazimabad & Malir Cantt',
@@ -23,7 +23,7 @@ const cityLocalContext = {
     areas: 'Sectors F-6, F-7, F-8, F-10, F-11, G-11, DHA Islamabad & Bahria Town',
     boards: 'Federal Board (FBISE) and Cambridge International (CAIE)',
     popularSubjects: 'Noorani Qaida for Children, O/A Level Mathematics, HSSC Physics, Female Quran Teachers',
-    description: 'Families in Islamabad and the twin cities trust IlmPortal for certified Quran Qaris with authenticated Sanads, and university scholars for Cambridge & Federal Board tutoring.'
+    description: 'Families in Islamabad and the twin cities trust IlmiDunya for certified Quran Qaris with authenticated Sanads, and university scholars for Cambridge & Federal Board tutoring.'
   },
   rawalpindi: {
     areas: 'Bahria Town, Westridge, Saddar, Chaklala, Satellite Town & Askari',
@@ -51,7 +51,7 @@ export async function generateMetadata({ params }) {
   const formattedCity = rawCity.charAt(0).toUpperCase() + rawCity.slice(1);
   const context = cityLocalContext[cityKey];
 
-  const title = `Online Quran & Academic Tutors in ${formattedCity} | IlmPortal Pakistan`;
+  const title = `Online Quran & Academic Tutors in ${formattedCity} | IlmiDunya Pakistan`;
   const description = context
     ? `Connect with verified Quran Qaris, female Alimahs, and Cambridge/Matric tutors in ${formattedCity}. Serving ${context.areas}. Safe 1:1 classes with camera-off privacy.`
     : `Find top-rated Quran teachers, female Alimahs, and Cambridge/Matric academic tutors available for live online classes and home tutoring in ${formattedCity}, Pakistan.`;
@@ -63,7 +63,7 @@ export async function generateMetadata({ params }) {
       canonical: `/tutors/city/${cityKey}`,
     },
     openGraph: {
-      title: `Quran & Academic Tutors in ${formattedCity} - IlmPortal`,
+      title: `Quran & Academic Tutors in ${formattedCity} - IlmiDunya`,
       description,
       url: `https://pakistanlms.pk/tutors/city/${cityKey}`,
     }
@@ -94,7 +94,7 @@ export default async function CityTutorsPage({ params }) {
     '@graph': [
       {
         '@type': 'EducationalOrganization',
-        name: `IlmPortal Tutoring Network - ${formattedCity}`,
+        name: `IlmiDunya Tutoring Network - ${formattedCity}`,
         url: `https://pakistanlms.pk/tutors/city/${cityKey}`,
         description: `Verified Quran and academic tutoring service for families in ${formattedCity}, Pakistan.`,
         areaServed: {

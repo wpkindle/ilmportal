@@ -36,7 +36,7 @@ export async function showNativeNotification({
   body,
   icon = '/icon.svg',
   url = '/',
-  tag = 'ilmportal-notification',
+  tag = 'ilmidunya-notification',
   soundType = 'message' // 'message' | 'alert' | 'none'
 }) {
   if (typeof window === 'undefined') return null;

@@ -64,7 +64,7 @@ export default function CertificateViewPage() {
           The requested credential ID could not be verified in the national registry.
         </p>
         <Link href="/" className="px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-xl text-xs font-bold shadow-md transition-all">
-          Return to IlmPortal
+          Return to IlmiDunya
         </Link>
       </div>
     );
@@ -101,7 +101,7 @@ export default function CertificateViewPage() {
           className="inline-flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-[#b85d34] transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          <span>Back to IlmPortal</span>
+          <span>Back to IlmiDunya</span>
         </Link>
 
         <div className="flex items-center gap-2">
@@ -146,7 +146,7 @@ export default function CertificateViewPage() {
               <span>National Registry of Quranic & Academic Education</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-slate-900 tracking-tight font-display">
-              IlmPortal Pakistan
+              IlmiDunya Pakistan
             </h1>
             <p className="text-xs text-[#b85d34] font-bold uppercase tracking-widest">
               Certificate of Completion & Competency

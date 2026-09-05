@@ -449,7 +449,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
 
                   <div className="p-1.5 sm:p-2 bg-[#faf8f5] rounded-xl border border-stone-200 text-center">
                     <p className="text-[9.5px] sm:text-[10px] text-stone-500">
-                      Need assistance? Official Support: <a href="mailto:contact@ilmportal.org" className="text-[#b85d34] underline font-bold">contact@ilmportal.org</a>
+                      Need assistance? Official Support: <a href="mailto:contact@ilmidunya.pk" className="text-[#b85d34] underline font-bold">contact@ilmidunya.pk</a>
                     </p>
                   </div>
                 </div>

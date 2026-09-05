@@ -23,6 +23,7 @@ import {
   Copy
 } from 'lucide-react';
 import ChromeAppInstallModal from './ChromeAppInstallModal';
+import BrandLogo from './BrandLogo';
 
 const Footer = () => {
   const pathname = usePathname();
@@ -94,18 +95,8 @@ const Footer = () => {
           
           {/* Col 1: Brand, Mission & Female Safety Focus */}
           <div className="lg:col-span-2 space-y-4">
-            <Link href="/" className="inline-flex items-center gap-3 group">
-              <div className="w-10 h-10 rounded-xl bg-[#143d2b] flex items-center justify-center text-white shadow-md border border-[#d4a359]/40 group-hover:scale-105 transition-transform">
-                <BookOpen className="w-5 h-5 text-[#d4a359]" />
-              </div>
-              <div>
-                <span className="text-2xl font-serif font-black tracking-tight text-white flex items-center gap-1">
-                  Ilm<span className="text-[#d4a359]">Portal</span>
-                </span>
-                <span className="text-[10px] uppercase font-bold tracking-widest text-[#a3b8b0] block -mt-0.5">
-                  Pakistan&apos;s Tutoring Platform
-                </span>
-              </div>
+            <Link href="/" className="inline-flex items-center group py-1" title="IlmiDunya Pakistan">
+              <BrandLogo variant="dark" size="md" withUrdu={true} withBadge={true} />
             </Link>
 
             <p className="text-xs text-[#a3b8b0] leading-relaxed max-w-sm">
@@ -118,8 +109,8 @@ const Footer = () => {
                 <div className="w-7 h-7 rounded-lg bg-[#143d2b] border border-[#d4a359]/40 flex items-center justify-center text-[#d4a359] shrink-0">
                   <Mail className="w-3.5 h-3.5" />
                 </div>
-                <a href="mailto:contact@ilmportal.org" className="hover:text-white font-semibold transition-colors">
-                  contact@ilmportal.org
+                <a href="mailto:contact@ilmidunya.pk" className="hover:text-white font-semibold transition-colors">
+                  contact@ilmidunya.pk
                 </a>
               </div>
             </div>
@@ -296,7 +287,7 @@ const Footer = () => {
                 <Landmark className="w-4 h-4" />
               </div>
               <h4 className="text-sm font-extrabold text-white flex items-center gap-2">
-                <span>Support Platform (IlmPortal)</span>
+                <span>Support Platform (IlmiDunya)</span>
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-md bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40">
                   Meezan Bank &amp; Raast
                 </span>
@@ -386,7 +377,7 @@ const Footer = () => {
         <div className="pt-6 border-t border-[#143d2b] flex flex-col xl:flex-row items-center justify-between gap-4 text-xs text-[#81928e]">
           <div className="flex flex-wrap items-center justify-center xl:justify-start gap-4 sm:gap-6">
             <p className="font-medium text-[#a3b8b0]">
-              &copy; {new Date().getFullYear()} IlmPortal Pakistan. All rights reserved.
+              &copy; {new Date().getFullYear()} IlmiDunya Pakistan. All rights reserved.
             </p>
             <Link href="/terms" className="hover:text-white transition-colors">
               Terms of Service

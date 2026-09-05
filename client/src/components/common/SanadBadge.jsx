@@ -43,7 +43,7 @@ export const SanadModal = ({ isOpen, onClose, documents = [], tutorName = '' }) 
                 Verified Credentials &amp; Sanad
               </h3>
               <p className="text-xs text-stone-500">
-                Official documents submitted by {tutorName || 'Tutor'} &amp; verified by IlmPortal
+                Official documents submitted by {tutorName || 'Tutor'} &amp; verified by IlmiDunya
               </p>
             </div>
           </div>

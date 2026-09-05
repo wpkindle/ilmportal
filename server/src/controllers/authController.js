@@ -24,7 +24,7 @@ const calculateProfileCompletion = (user, tutorProfile) => {
       { key: 'age', label: 'Tutor Age', weight: 10, done: !!user.age },
       { key: 'gender', label: 'Gender', weight: 5, done: !!user.gender?.trim() },
       { key: 'city', label: 'City Location', weight: 10, done: !!user.city?.trim() },
-      { key: 'bio', label: 'Teaching Bio', weight: 10, done: !!tutorProfile?.bio?.trim() && tutorProfile.bio.length > 20 && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmPortal') },
+      { key: 'bio', label: 'Teaching Bio', weight: 10, done: !!tutorProfile?.bio?.trim() && tutorProfile.bio.length > 20 && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmPortal') && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmiDunya') },
       { key: 'qualifications', label: 'Educational Qualifications', weight: 10, done: !!tutorProfile?.qualifications?.trim() && tutorProfile.qualifications !== 'Tutor Qualifications' },
       { key: 'sanad', label: 'Sanad / Degree Document', weight: 10, done: Array.isArray(tutorProfile?.sanadDocuments) && tutorProfile.sanadDocuments.length > 0 }
     ];
@@ -266,7 +266,7 @@ exports.verifyOtp = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Email verified successfully! Welcome to IlmPortal Pakistan.',
+      message: 'Email verified successfully! Welcome to IlmiDunya Pakistan.',
       token,
       user: {
         id: user._id,
@@ -353,7 +353,7 @@ exports.verifyToken = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Email verified successfully! Welcome to IlmPortal Pakistan.',
+      message: 'Email verified successfully! Welcome to IlmiDunya Pakistan.',
       token: jwtToken,
       user: {
         id: user._id,
@@ -848,8 +848,8 @@ exports.testEmail = async (req, res) => {
     const to = req.query.to || 'abdulkhaliqwebdeveloper@gmail.com';
     const result = await sendEmailDetailed({
       to,
-      subject: '🧪 IlmPortal Diagnostic Email Test',
-      html: `<h3>IlmPortal Email Dispatch Verification</h3><p>This email confirms that live Gmail SMTP is functioning properly from the server to <strong>${to}</strong>.</p>`
+      subject: '🧪 IlmiDunya Diagnostic Email Test',
+      html: `<h3>IlmiDunya Email Dispatch Verification</h3><p>This email confirms that live Gmail SMTP is functioning properly from the server to <strong>${to}</strong>.</p>`
     });
     res.json(result);
   } catch (error) {

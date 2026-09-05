@@ -85,7 +85,7 @@ export default function DisclaimerPage() {
                 <span>Verified Faculty Directory & LMS Technology Portal</span>
               </div>
               <Link href="/how-it-works" className="text-emerald-700 font-bold hover:underline">
-                Learn How IlmPortal Works &rarr;
+                Learn How IlmiDunya Works &rarr;
               </Link>
             </div>
           </div>

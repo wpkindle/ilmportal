@@ -10,13 +10,13 @@ export async function generateMetadata({ params }) {
   const subjectSlug = decodeURIComponent(params.slug);
   const formattedName = subjectSlug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ');
   return {
-    title: `${formattedName} Tutors in Pakistan | IlmPortal Pakistan`,
+    title: `${formattedName} Tutors in Pakistan | IlmiDunya Pakistan`,
     description: `Find certified ${formattedName} tutors across Pakistan for personalized 1:1 live video classes. Authentic Sanad verified scholars & educators.`,
     alternates: {
       canonical: `https://pakistanlms.pk/tutors/subject/${params.slug}`,
     },
     openGraph: {
-      title: `${formattedName} Tutors - IlmPortal Pakistan`,
+      title: `${formattedName} Tutors - IlmiDunya Pakistan`,
       description: `Learn ${formattedName} with certified tutors in Pakistan.`,
     }
   };

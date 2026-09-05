@@ -130,7 +130,7 @@ export default function AdminDashboardPage() {
     setSelectedUser(u);
     setWarningForm({
       reason: 'Inappropriate Conduct / Disrespect',
-      message: 'Please ensure all communications and sessions strictly follow IlmPortal community guidelines.',
+      message: 'Please ensure all communications and sessions strictly follow IlmiDunya community guidelines.',
       sendEmail: true
     });
     setWarningModalOpen(true);

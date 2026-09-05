@@ -10,13 +10,13 @@ import FAQ from '../components/home/FAQ';
 import { api } from '../services/api';
 
 export const metadata = {
-  title: 'Verified Qaris, Alimahs & Academic Tutors in Pakistan | Female-Safe | IlmPortal',
+  title: 'Verified Qaris, Alimahs & Academic Tutors in Pakistan | Female-Safe | IlmiDunya',
   description: 'Connect with verified Pakistani Quran Qaris, certified female Alimahs, and Cambridge/Matric tutors. Designed especially for female privacy & comfort with camera-off classes by default.',
   alternates: {
     canonical: '/',
   },
   openGraph: {
-    title: 'Verified Qaris, Alimahs & Academic Tutors in Pakistan | IlmPortal',
+    title: 'Verified Qaris, Alimahs & Academic Tutors in Pakistan | IlmiDunya',
     description: 'Connect with verified Pakistani Quran Qaris, female Alimahs, and Cambridge/Matric educators with camera-off privacy by default.',
     url: 'https://pakistanlms.pk',
   },
@@ -28,11 +28,11 @@ const homeStructuredData = {
     {
       '@type': 'EducationalOrganization',
       '@id': 'https://pakistanlms.pk/#organization',
-      name: 'IlmPortal Pakistan',
+      name: 'IlmiDunya Pakistan',
       url: 'https://pakistanlms.pk',
       logo: 'https://pakistanlms.pk/icon.svg',
       description: 'Pakistan’s premier educational network connecting families with verified Quran Qaris, female Alimahs, and Cambridge/Matric tutors.',
-      email: 'contact@ilmportal.org',
+      email: 'contact@ilmidunya.pk',
       address: {
         '@type': 'PostalAddress',
         addressLocality: 'Lahore',

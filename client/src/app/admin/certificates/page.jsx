@@ -419,7 +419,7 @@ export default function AdminCertificatesPage() {
                   />
                 </div>
                 <p className="text-[11px] text-slate-400 mt-1">
-                  Once assigned, student will be invoiced and asked to transfer this amount to IlmPortal account.
+                  Once assigned, student will be invoiced and asked to transfer this amount to IlmiDunya account.
                 </p>
               </div>
 

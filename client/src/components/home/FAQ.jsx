@@ -5,7 +5,7 @@ import { ChevronDown, HelpCircle } from 'lucide-react';
 
 const faqs = [
   {
-    q: 'How does tutoring work on IlmPortal for Pakistani families?',
+    q: 'How does tutoring work on IlmiDunya for Pakistani families?',
     a: 'You can search verified Quran teachers and school tutors by subject, city, and teacher gender. You chat directly with the teacher for free to discuss class days and mutually agree on a monthly fee (PKR). 1-on-1 live video classes happen right in your internet browser with camera-off privacy by default.'
   },
   {

@@ -1,0 +1,48 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 340 75" fill="none" width="100%" height="100%">
+  <defs>
+    <linearGradient id="emeraldGradDark" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00d1a7" />
+      <stop offset="100%" stop-color="#00a884" />
+    </linearGradient>
+  </defs>
+
+  <!-- Open Book Emblem -->
+  <g transform="translate(4, 6)">
+    <!-- Outer Book Frame (Spine & Bottom Bar) -->
+    <path 
+      d="M 6 12 L 6 48 C 6 52 9 55 13 55 L 42 55 L 42 47 L 14 47 C 13.5 47 13 46.5 13 46 L 13 14 L 6 12 Z" 
+      fill="url(#emeraldGradDark)" 
+    />
+    <!-- Top Open Pages Arch -->
+    <path 
+      d="M 6 12 C 14 7 24 9 29 16 C 34 9 44 7 52 12 L 52 20 C 44 15 35 17 29 23 C 23 17 14 15 6 20 Z" 
+      fill="url(#emeraldGradDark)" 
+    />
+    <!-- Inner Book Page Accents -->
+    <path 
+      d="M 17 24 Q 24 20 29 26 Q 34 20 41 24" 
+      stroke="#0c2217" 
+      stroke-width="2.5" 
+      stroke-linecap="round" 
+      fill="none" 
+      opacity="0.9"
+    />
+  </g>
+
+  <!-- Brand Typography: ilmidunya (Crisp White + Bright Emerald) -->
+  <text x="56" y="47" font-family="'Plus Jakarta Sans', system-ui, -apple-system, sans-serif" font-size="34" font-weight="900" fill="#ffffff" letter-spacing="-0.03em">
+    ilmi<tspan fill="#00d1a7">dunya</tspan>
+  </text>
+
+  <!-- Pakistan Badge -->
+  <g transform="translate(225, 23)">
+    <rect width="68" height="18" rx="5" fill="#d4a359" />
+    <text x="34" y="12.5" font-family="'Plus Jakarta Sans', system-ui, sans-serif" font-size="9" font-weight="800" fill="#0c2217" letter-spacing="0.08em" text-anchor="middle">PAKISTAN</text>
+  </g>
+
+  <!-- Urdu Typography: علمی دنیا -->
+  <text x="58" y="66" font-family="'Amiri', 'Noto Nastaliq Urdu', serif" font-size="14" font-weight="bold" fill="#00d1a7" letter-spacing="0.02em">
+    علمی دُنیا پاکستان
+  </text>
+</svg>
+

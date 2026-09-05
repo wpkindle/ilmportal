@@ -139,7 +139,7 @@ export default function SupportPlatformWidget() {
                 </div>
                 <div>
                   <h3 className="font-serif font-black text-base sm:text-lg text-white leading-tight">
-                    Support IlmPortal Pakistan
+                    Support IlmiDunya Pakistan
                   </h3>
                   <p className="text-[11px] sm:text-xs text-[#d4a359] font-medium">
                     Sadaqah Jariyah &bull; Platform Server &amp; Verification Fund

@@ -89,7 +89,7 @@ export default function AdminLoginPage() {
           </div>
           <div>
             <span className="text-[10px] font-bold tracking-widest uppercase text-[#d4a359] bg-[#143d2b] border border-[#d4a359]/30 px-3 py-1 rounded-full">
-              IlmPortal Control Center
+              IlmiDunya Control Center
             </span>
             <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#faf8f5] mt-2">
               Super Admin Gateway

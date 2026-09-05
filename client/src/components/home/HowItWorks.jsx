@@ -296,7 +296,7 @@ export default function HowItWorks() {
 
             {/* Modal Footer */}
             <div className="p-3 sm:p-4 border-t border-[#e6dfd5] bg-white/70 flex items-center justify-between shrink-0">
-              <span className="text-[11px] text-stone-500 font-medium">IlmPortal Pakistan Family Safety</span>
+              <span className="text-[11px] text-stone-500 font-medium">IlmiDunya Pakistan Family Safety</span>
               <button
                 type="button"
                 onClick={() => setActiveModalStep(null)}

@@ -63,7 +63,7 @@ export default function AboutUsPage() {
           </div>
 
           <h1 className="text-3xl sm:text-5xl font-black tracking-tight text-white">
-            {page?.title || 'About IlmPortal Pakistan'}
+            {page?.title || 'About IlmiDunya Pakistan'}
           </h1>
           <p className="text-sm sm:text-base text-slate-300 max-w-2xl leading-relaxed">
             {page?.subtitle || 'Empowering Pakistani homes with authentic Quranic education and academic excellence.'}

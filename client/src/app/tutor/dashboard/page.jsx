@@ -128,7 +128,7 @@ export default function TutorDashboardPage() {
               <div>
                 <h4 className="font-serif font-bold text-sm text-[#0c2217]">Account Status: Pending Admin Verification</h4>
                 <p className="text-xs text-stone-600">
-                  Your Sanad credentials have been submitted and are being reviewed by the IlmPortal administrative team.
+                  Your Sanad credentials have been submitted and are being reviewed by the IlmiDunya administrative team.
                 </p>
               </div>
             </div>

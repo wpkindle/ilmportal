@@ -81,7 +81,7 @@ export default function FemaleTutorGateModal({
           {/* Explanation */}
           <div className="space-y-1.5 text-xs text-slate-600 leading-relaxed">
             <p>
-              To protect the privacy, dignity, and safety of female tutors on IlmPortal, students must achieve a <strong>100% complete profile</strong> before sending a message request.
+              To protect the privacy, dignity, and safety of female tutors on IlmiDunya, students must achieve a <strong>100% complete profile</strong> before sending a message request.
             </p>
             <p className="text-slate-500">
               Once your profile reaches 100%, you can submit a message request introducing yourself and your study goals.

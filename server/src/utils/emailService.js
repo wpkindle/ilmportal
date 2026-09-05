@@ -68,7 +68,7 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          sender: { name: 'IlmPortal Pakistan', email: fromEmail },
+          sender: { name: 'IlmiDunya Pakistan', email: fromEmail },
           to: [{ email: to }],
           subject,
           htmlContent: html,
@@ -92,7 +92,7 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
   // 2. Resend HTTP API (https://resend.com)
   if (process.env.RESEND_API_KEY) {
     try {
-      const fromAddr = process.env.RESEND_FROM || 'IlmPortal <onboarding@resend.dev>';
+      const fromAddr = process.env.RESEND_FROM || 'IlmiDunya <onboarding@resend.dev>';
       const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -132,7 +132,7 @@ const sendEmail = async ({ to, subject, html, text }) => {
 
   try {
     if (transporter) {
-      const fromAddress = `"IlmPortal Pakistan" <${process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com'}>`;
+      const fromAddress = `"IlmiDunya Pakistan" <${process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com'}>`;
       const info = await transporter.sendMail({
         from: fromAddress,
         to,
@@ -199,7 +199,7 @@ const getTransporter = (port = 587) => {
 };
 
 const sendEmailDetailed = async ({ to, subject, html, text }) => {
-  const fromAddress = `"IlmPortal Pakistan" <${process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com'}>`;
+  const fromAddress = `"IlmiDunya Pakistan" <${process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com'}>`;
 
   // 1. Direct Gmail SMTP Port 587 (Authentic DKIM signed by Google, delivers straight to Primary Inbox)
   try {
@@ -267,7 +267,7 @@ const sendVerificationOtpEmail = async (to, name, otp, token) => {
   console.log(`🔑 Token: ${token || otp}`);
   console.log(`======================================================\n`);
 
-  const subject = `🔐 Verify Your Account - IlmPortal Pakistan`;
+  const subject = `🔐 Verify Your Account - IlmiDunya Pakistan`;
   const clientUrl = getClientBaseUrl();
   const tokenParam = token || otp;
   const verifyLink = `${clientUrl}/verify-email?token=${encodeURIComponent(tokenParam)}&email=${encodeURIComponent(to)}`;
@@ -278,7 +278,7 @@ const sendVerificationOtpEmail = async (to, name, otp, token) => {
     <head>
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Verify Your Account - IlmPortal</title>
+      <title>Verify Your Account - IlmiDunya</title>
     </head>
     <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
       <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f1f5f9; padding: 30px 10px;">
@@ -301,7 +301,7 @@ const sendVerificationOtpEmail = async (to, name, otp, token) => {
                     </tr>
                     <tr>
                       <td align="center">
-                        <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; color: #ffffff;">IlmPortal Pakistan</h1>
+                        <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; color: #ffffff;">IlmiDunya Pakistan</h1>
                         <p style="margin: 4px 0 0 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #a7f3d0;">Online Quran & Academic LMS</p>
                       </td>
                     </tr>
@@ -316,7 +316,7 @@ const sendVerificationOtpEmail = async (to, name, otp, token) => {
                     Assalam-o-Alaikum, ${name}! 👋
                   </h2>
                   <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.6; color: #475569;">
-                    Thank you for joining <strong>IlmPortal Pakistan</strong>. To activate your account and complete your profile, please click the button below:
+                    Thank you for joining <strong>IlmiDunya Pakistan</strong>. To activate your account and complete your profile, please click the button below:
                   </p>
 
                   <!-- Direct 1-Click Action Button -->
@@ -343,7 +343,7 @@ const sendVerificationOtpEmail = async (to, name, otp, token) => {
                   <!-- Security Advisory Notice -->
                   <div style="background-color: #f8fafc; border-left: 4px solid #059669; padding: 14px 16px; border-radius: 8px; margin-top: 25px;">
                     <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #475569;">
-                      <strong style="color: #0f172a;">Security Advisory:</strong> If you did not create an account on IlmPortal Pakistan, please ignore this email.
+                      <strong style="color: #0f172a;">Security Advisory:</strong> If you did not create an account on IlmiDunya Pakistan, please ignore this email.
                     </p>
                   </div>
                 </td>
@@ -353,7 +353,7 @@ const sendVerificationOtpEmail = async (to, name, otp, token) => {
               <tr>
                 <td style="padding: 25px 35px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
                   <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #334155;">
-                    IlmPortal Pakistan &bull; Quality Quranic & Academic Education
+                    IlmiDunya Pakistan &bull; Quality Quranic & Academic Education
                   </p>
                   <p style="margin: 0; font-size: 11px; color: #94a3b8;">
                     Islamabad &bull; Lahore &bull; Karachi &bull; Peshawar &bull; Quetta &bull; Nationwide
@@ -374,7 +374,7 @@ const sendVerificationOtpEmail = async (to, name, otp, token) => {
     to,
     subject,
     html,
-    text: `Assalam-o-Alaikum ${name}, please click this link to verify your IlmPortal account: ${verifyLink}`
+    text: `Assalam-o-Alaikum ${name}, please click this link to verify your IlmiDunya account: ${verifyLink}`
   });
 
   // If sending failed (e.g. Resend free development sandbox restricted recipient to account owner)
@@ -386,7 +386,7 @@ const sendVerificationOtpEmail = async (to, name, otp, token) => {
       subject: `🔐 [Verification Link for ${to}]`,
       html: `
         <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0; max-width: 550px;">
-          <div style="font-size: 20px; font-weight: 800; color: #065f46; margin-bottom: 8px;">IlmPortal Account Verification</div>
+          <div style="font-size: 20px; font-weight: 800; color: #065f46; margin-bottom: 8px;">IlmiDunya Account Verification</div>
           <p style="font-size: 13px; color: #475569; margin: 0 0 16px 0;">New user registered: <strong>${name}</strong> (<code>${to}</code>). Click below to verify their account:</p>
           
           <div style="text-align: center; margin: 24px 0;">
@@ -420,7 +420,7 @@ const sendTutorStatusEmail = async (to, name, status, reason = '') => {
   const clientUrl = getClientBaseUrl();
 
   if (isApproved) {
-    const subject = `🎉 Congratulations! Your Tutor Profile is Approved & Live on IlmPortal`;
+    const subject = `🎉 Congratulations! Your Tutor Profile is Approved & Live on IlmiDunya`;
     const dashboardUrl = `${clientUrl}/tutor/dashboard`;
     const profileUrl = `${clientUrl}/tutor/profile`;
 
@@ -516,7 +516,7 @@ const sendTutorStatusEmail = async (to, name, status, reason = '') => {
                 <tr>
                   <td style="padding: 25px 35px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
                     <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #334155;">
-                      IlmPortal Pakistan &bull; Quality Quranic & Academic Education
+                      IlmiDunya Pakistan &bull; Quality Quranic & Academic Education
                     </p>
                     <p style="margin: 0; font-size: 11px; color: #94a3b8;">
                       Need assistance? Contact our instructor support team at support@pakistanlms.pk
@@ -537,11 +537,11 @@ const sendTutorStatusEmail = async (to, name, status, reason = '') => {
       to,
       subject,
       html,
-      text: `Assalam-o-Alaikum ${name}! Mubarak! Your tutor profile and Sanad credentials have been approved on IlmPortal Pakistan. Access your tutor dashboard at: ${dashboardUrl}`
+      text: `Assalam-o-Alaikum ${name}! Mubarak! Your tutor profile and Sanad credentials have been approved on IlmiDunya Pakistan. Access your tutor dashboard at: ${dashboardUrl}`
     });
   } else {
     // Rejection or Revision Request
-    const subject = `⚠️ Update on Your IlmPortal Tutor Application`;
+    const subject = `⚠️ Update on Your IlmiDunya Tutor Application`;
     const profileUrl = `${clientUrl}/tutor/profile`;
 
     const html = `
@@ -577,7 +577,7 @@ const sendTutorStatusEmail = async (to, name, status, reason = '') => {
                       Assalam-o-Alaikum, ${name},
                     </h2>
                     <p style="margin: 0 0 18px 0; font-size: 14px; line-height: 1.6; color: #475569;">
-                      Thank you for submitting your application to teach on IlmPortal Pakistan. Our verification team reviewed your submitted documents and could not approve your profile at this stage.
+                      Thank you for submitting your application to teach on IlmiDunya Pakistan. Our verification team reviewed your submitted documents and could not approve your profile at this stage.
                     </p>
 
                     <!-- Reason Card -->
@@ -607,7 +607,7 @@ const sendTutorStatusEmail = async (to, name, status, reason = '') => {
                 <tr>
                   <td style="padding: 25px 35px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
                     <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #334155;">
-                      IlmPortal Pakistan &bull; Quality Quranic & Academic Education
+                      IlmiDunya Pakistan &bull; Quality Quranic & Academic Education
                     </p>
                     <p style="margin: 0; font-size: 11px; color: #94a3b8;">
                       If you have questions, please reach out to admin@pakistanlms.pk
@@ -628,7 +628,7 @@ const sendTutorStatusEmail = async (to, name, status, reason = '') => {
       to,
       subject,
       html,
-      text: `Assalam-o-Alaikum ${name}. Update on your IlmPortal tutor application: ${reason || 'Please upload updated documents.'}. Update your profile at: ${profileUrl}`
+      text: `Assalam-o-Alaikum ${name}. Update on your IlmiDunya tutor application: ${reason || 'Please upload updated documents.'}. Update your profile at: ${profileUrl}`
     });
   }
 };
@@ -648,8 +648,8 @@ const sendDedicatedChatInvitationEmail = async ({
 }) => {
   const isStudent = recipientRole === 'student';
   const subject = isStudent
-    ? `💬 Your Dedicated 1:1 Chat with ${tutorName} is Ready | IlmPortal`
-    : `📩 New Student Inquiry: ${studentName} wants to connect with you | IlmPortal`;
+    ? `💬 Your Dedicated 1:1 Chat with ${tutorName} is Ready | IlmiDunya`
+    : `📩 New Student Inquiry: ${studentName} wants to connect with you | IlmiDunya`;
 
   const html = `
     <!DOCTYPE html>
@@ -740,7 +740,7 @@ const sendDedicatedChatInvitationEmail = async ({
               <tr>
                 <td style="padding: 25px 35px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
                   <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #334155;">
-                    IlmPortal Pakistan &bull; Safe, Verified & High-Quality Tutoring
+                    IlmiDunya Pakistan &bull; Safe, Verified & High-Quality Tutoring
                   </p>
                   <p style="margin: 0; font-size: 11px; color: #94a3b8;">
                     Keep communications inside the platform to protect your account and ensure verified course records.
@@ -793,7 +793,7 @@ const sendCertificateIssuedEmail = async ({ to, studentName, courseTitle, instru
                     🎓
                   </div>
                   <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; color: #ffffff;">Official Certificate Awarded</h1>
-                  <p style="margin: 4px 0 0 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #fef3c7;">IlmPortal Pakistan Credential</p>
+                  <p style="margin: 4px 0 0 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #fef3c7;">IlmiDunya Pakistan Credential</p>
                 </td>
               </tr>
 
@@ -852,7 +852,7 @@ const sendCertificateIssuedEmail = async ({ to, studentName, courseTitle, instru
               <tr>
                 <td style="padding: 25px 35px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
                   <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #334155;">
-                    IlmPortal Pakistan &bull; Quality Quranic & Academic Education
+                    IlmiDunya Pakistan &bull; Quality Quranic & Academic Education
                   </p>
                   <p style="margin: 0; font-size: 11px; color: #94a3b8;">
                     You can verify this certificate at any time using the link above.
@@ -881,7 +881,7 @@ const sendCertificateIssuedEmail = async ({ to, studentName, courseTitle, instru
  * Send Account Warning Email
  */
 const sendAccountWarningEmail = async ({ to, userName, reason, message, warningCount }) => {
-  const subject = `⚠️ Official Platform Policy Warning (Strike #${warningCount || 1}) - IlmPortal Pakistan`;
+  const subject = `⚠️ Official Platform Policy Warning (Strike #${warningCount || 1}) - IlmiDunya Pakistan`;
   const portalUrl = getClientBaseUrl();
 
   const html = `
@@ -896,7 +896,7 @@ const sendAccountWarningEmail = async ({ to, userName, reason, message, warningC
               <tr>
                 <td style="padding: 30px; background-color: #991b1b; text-align: center;">
                   <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 900;">⚠️ Official Policy Notice</h1>
-                  <p style="color: #fecaca; margin: 6px 0 0 0; font-size: 13px;">IlmPortal Trust, Safety & Quality Team</p>
+                  <p style="color: #fecaca; margin: 6px 0 0 0; font-size: 13px;">IlmiDunya Trust, Safety & Quality Team</p>
                 </td>
               </tr>
               <tr>
@@ -932,7 +932,7 @@ const sendAccountWarningEmail = async ({ to, userName, reason, message, warningC
               </tr>
               <tr>
                 <td style="padding: 20px 30px; background-color: #f1f5f9; text-align: center; border-top: 1px solid #e2e8f0;">
-                  <p style="margin: 0; font-size: 11px; color: #64748b;">IlmPortal Trust & Safety Center &bull; Pakistan</p>
+                  <p style="margin: 0; font-size: 11px; color: #64748b;">IlmiDunya Trust & Safety Center &bull; Pakistan</p>
                 </td>
               </tr>
             </table>
@@ -947,7 +947,7 @@ const sendAccountWarningEmail = async ({ to, userName, reason, message, warningC
     to,
     subject,
     html,
-    text: `Policy Warning from IlmPortal Pakistan: Category: ${reason}. Statement: ${message}. Total Warnings: ${warningCount || 1}.`
+    text: `Policy Warning from IlmiDunya Pakistan: Category: ${reason}. Statement: ${message}. Total Warnings: ${warningCount || 1}.`
   });
 };
 
@@ -961,7 +961,7 @@ const sendAccountStatusEmail = async ({ to, userName, status, reason, notes }) =
 
   const statusLabel = isSuspended ? 'Account Suspended' : isReview ? 'Account Under Review' : 'Account Reinstated (Active)';
   const headerBg = isSuspended ? '#7f1d1d' : isReview ? '#9a3412' : '#047857';
-  const subject = `Account Notice: ${statusLabel} - IlmPortal Pakistan`;
+  const subject = `Account Notice: ${statusLabel} - IlmiDunya Pakistan`;
 
   const html = `
     <!DOCTYPE html>
@@ -975,7 +975,7 @@ const sendAccountStatusEmail = async ({ to, userName, status, reason, notes }) =
               <tr>
                 <td style="padding: 30px; background-color: ${headerBg}; text-align: center;">
                   <h1 style="color: #ffffff; margin: 0; font-size: 22px; font-weight: 900;">${statusLabel}</h1>
-                  <p style="color: #ffffff; opacity: 0.9; margin: 6px 0 0 0; font-size: 13px;">IlmPortal Administration</p>
+                  <p style="color: #ffffff; opacity: 0.9; margin: 6px 0 0 0; font-size: 13px;">IlmiDunya Administration</p>
                 </td>
               </tr>
               <tr>
@@ -984,7 +984,7 @@ const sendAccountStatusEmail = async ({ to, userName, status, reason, notes }) =
                   
                   ${isRestored ? `
                     <p style="font-size: 14px; color: #065f46; line-height: 1.6;">
-                      We are pleased to inform you that your IlmPortal account is now fully active and verified. Your profile and courses are visible to students across Pakistan.
+                      We are pleased to inform you that your IlmiDunya account is now fully active and verified. Your profile and courses are visible to students across Pakistan.
                     </p>
                   ` : `
                     <p style="font-size: 14px; color: #475569; line-height: 1.6;">
@@ -1001,7 +1001,7 @@ const sendAccountStatusEmail = async ({ to, userName, status, reason, notes }) =
               </tr>
               <tr>
                 <td style="padding: 20px 30px; background-color: #f1f5f9; text-align: center; border-top: 1px solid #e2e8f0;">
-                  <p style="margin: 0; font-size: 11px; color: #64748b;">IlmPortal Moderation & Compliance &bull; Pakistan</p>
+                  <p style="margin: 0; font-size: 11px; color: #64748b;">IlmiDunya Moderation & Compliance &bull; Pakistan</p>
                 </td>
               </tr>
             </table>
@@ -1016,7 +1016,7 @@ const sendAccountStatusEmail = async ({ to, userName, status, reason, notes }) =
     to,
     subject,
     html,
-    text: `Your account status on IlmPortal has been updated to: ${statusLabel}. Details: ${reason || ''} ${notes || ''}`
+    text: `Your account status on IlmiDunya has been updated to: ${statusLabel}. Details: ${reason || ''} ${notes || ''}`
   });
 };
 
@@ -1033,7 +1033,7 @@ const sendChatRequestReceivedEmail = async ({
   details,
   tutorRequestsUrl
 }) => {
-  const subject = `📩 New Message Request from ${studentName} (100% Verified Profile) | IlmPortal`;
+  const subject = `📩 New Message Request from ${studentName} (100% Verified Profile) | IlmiDunya`;
   const html = `
     <!DOCTYPE html>
     <html>
@@ -1086,7 +1086,7 @@ const sendChatRequestReceivedEmail = async ({
               </tr>
               <tr>
                 <td style="padding: 16px 28px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
-                  <p style="margin: 0; font-size: 11px; color: #64748b;">IlmPortal &bull; Verified Quran &amp; Academic Tutoring in Pakistan</p>
+                  <p style="margin: 0; font-size: 11px; color: #64748b;">IlmiDunya &bull; Verified Quran &amp; Academic Tutoring in Pakistan</p>
                 </td>
               </tr>
             </table>
@@ -1119,8 +1119,8 @@ const sendChatRequestStatusEmail = async ({
 }) => {
   const isAccepted = status === 'accepted';
   const subject = isAccepted
-    ? `🎉 ${tutorName} Accepted Your Message Request! | IlmPortal`
-    : `Update Regarding Your Request to ${tutorName} | IlmPortal`;
+    ? `🎉 ${tutorName} Accepted Your Message Request! | IlmiDunya`
+    : `Update Regarding Your Request to ${tutorName} | IlmiDunya`;
 
   const html = `
     <!DOCTYPE html>
@@ -1178,7 +1178,7 @@ const sendChatRequestStatusEmail = async ({
               </tr>
               <tr>
                 <td style="padding: 16px 28px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
-                  <p style="margin: 0; font-size: 11px; color: #64748b;">IlmPortal &bull; Pakistan's Premier Tutoring Platform</p>
+                  <p style="margin: 0; font-size: 11px; color: #64748b;">IlmiDunya &bull; Pakistan's Premier Tutoring Platform</p>
                 </td>
               </tr>
             </table>
@@ -1210,7 +1210,7 @@ const sendTrialContinuationTutorEmail = async ({
   feeDueDate,
   adminContactPhone
 }) => {
-  const emailSubject = `🎉 Great News! Student ${studentName} agreed to continue classes with you | IlmPortal`;
+  const emailSubject = `🎉 Great News! Student ${studentName} agreed to continue classes with you | IlmiDunya`;
   const html = `
     <!DOCTYPE html>
     <html>
@@ -1241,7 +1241,7 @@ const sendTrialContinuationTutorEmail = async ({
                     <p style="color: #166534; font-size: 12px; margin: 0;">
                       Meezan Bank: <strong>96010105435308</strong> (Abdul Khaliq)<br>
                       Raast ID / EasyPaisa / JazzCash: <strong>03171759093</strong><br>
-                      Official Support: <strong>contact@ilmportal.org</strong>
+                      Official Support: <strong>contact@ilmidunya.pk</strong>
                     </p>
                   </div>
 
@@ -1269,7 +1269,7 @@ const sendTutorFeeClearedEmail = async ({
   studentName,
   subject
 }) => {
-  const emailSubject = `✅ Platform Fee Cleared - Regular Classes Active with ${studentName} | IlmPortal`;
+  const emailSubject = `✅ Platform Fee Cleared - Regular Classes Active with ${studentName} | IlmiDunya`;
   const html = `
     <!DOCTYPE html>
     <html>
@@ -1288,7 +1288,7 @@ const sendTutorFeeClearedEmail = async ({
                 <td style="padding: 24px;">
                   <p style="color: #1e293b; font-size: 14px;">Assalamu Alaikum <strong>${tutorName}</strong>,</p>
                   <p style="color: #334155; font-size: 13px; line-height: 1.6;">
-                    Your platform fee for teaching student <strong>${studentName}</strong> (${subject}) has been successfully verified and cleared by the IlmPortal administration.
+                    Your platform fee for teaching student <strong>${studentName}</strong> (${subject}) has been successfully verified and cleared by the IlmiDunya administration.
                   </p>
                   <p style="color: #059669; font-size: 13px; font-weight: bold;">
                     Your regular classes and live video sessions are 100% active with zero restrictions.
@@ -1313,7 +1313,7 @@ const sendPasswordResetEmail = async ({
   name,
   resetUrl
 }) => {
-  const emailSubject = `🔐 Reset Your IlmPortal Password`;
+  const emailSubject = `🔐 Reset Your IlmiDunya Password`;
   const html = `
     <!DOCTYPE html>
     <html>
@@ -1333,7 +1333,7 @@ const sendPasswordResetEmail = async ({
                 <td style="padding: 28px;">
                   <p style="color: #1e293b; font-size: 15px; margin: 0 0 16px 0;">Assalamu Alaikum <strong>${name || 'Dear User'}</strong>,</p>
                   <p style="color: #334155; font-size: 14px; line-height: 1.6; margin: 0 0 20px 0;">
-                    We received a request to reset your password for your <strong>IlmPortal</strong> account. Click the button below to set a new password:
+                    We received a request to reset your password for your <strong>IlmiDunya</strong> account. Click the button below to set a new password:
                   </p>
 
                   <div style="text-align: center; margin: 28px 0;">
@@ -1356,7 +1356,7 @@ const sendPasswordResetEmail = async ({
               </tr>
               <tr>
                 <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px; text-align: center; font-size: 11px; color: #94a3b8;">
-                  IlmPortal &bull; Pakistan&apos;s Trusted Quran &amp; Academic Learning Platform &bull; Lahore, Pakistan
+                  IlmiDunya &bull; Pakistan&apos;s Trusted Quran &amp; Academic Learning Platform &bull; Lahore, Pakistan
                 </td>
               </tr>
             </table>

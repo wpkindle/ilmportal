@@ -75,7 +75,7 @@ export default function SafetyPage() {
       title: 'Sanad Degrees & Identity Verification',
       color: 'bg-[#f0ece1] text-[#0c2217] border-[#d4a359]/40',
       description:
-        'We do not allow anonymous or unvetted teachers. Every educator on IlmPortal undergoes multi-step manual credential checks.',
+        'We do not allow anonymous or unvetted teachers. Every educator on IlmiDunya undergoes multi-step manual credential checks.',
       features: [
         'Wafaq-ul-Madaris Sanad Authentication: Quranic Qaris and Alimahs submit authenticated Shahadat-ul-Alimiyyah and Tajweed certificates.',
         'Academic Degrees: Cambridge O/A-Level and Matric/FSc tutors must provide verified transcripts and university degrees.',
@@ -162,7 +162,7 @@ export default function SafetyPage() {
             Our 4-Pillar Security Framework
           </span>
           <h2 className="text-2xl sm:text-4xl font-serif font-black text-slate-900 tracking-tight">
-            How IlmPortal Keeps Female Learners &amp; Families Safe
+            How IlmiDunya Keeps Female Learners &amp; Families Safe
           </h2>
           <p className="text-xs sm:text-sm text-slate-600">
             Engineered with deep cultural sensitivity, family ethics, and modern privacy technology.
@@ -282,7 +282,7 @@ export default function SafetyPage() {
               Governed by Prevention of Electronic Crimes Act (PECA 2016)
             </h3>
             <p className="text-xs text-[#d1dbd6] leading-relaxed">
-              IlmPortal enforces zero tolerance for digital harassment, identity impersonation, or unauthorized media distribution under Section 21 and Section 24 of PECA 2016. Violators face immediate account expulsion and direct referral to the FIA Cybercrime Wing.
+              IlmiDunya enforces zero tolerance for digital harassment, identity impersonation, or unauthorized media distribution under Section 21 and Section 24 of PECA 2016. Violators face immediate account expulsion and direct referral to the FIA Cybercrime Wing.
             </p>
           </div>
 

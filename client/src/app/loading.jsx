@@ -11,7 +11,7 @@ export default function RootLoading() {
         <div className="absolute inset-0 rounded-2xl border-2 border-[#b85d34] border-t-transparent animate-spin" />
       </div>
       <p className="text-xs font-semibold text-slate-500 tracking-wide animate-pulse">
-        Loading IlmPortal Pakistan...
+        Loading IlmiDunya Pakistan...
       </p>
     </div>
   );

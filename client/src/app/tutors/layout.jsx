@@ -5,7 +5,7 @@ export const metadata = {
     canonical: 'https://pakistanlms.pk/tutors',
   },
   openGraph: {
-    title: 'Verified Tutors in Pakistan | IlmPortal',
+    title: 'Verified Tutors in Pakistan | IlmiDunya',
     description: 'Find verified Quran teachers and academic tutors across Pakistan. Safe, home-friendly 1:1 online tutoring.',
     url: 'https://pakistanlms.pk/tutors',
   }

@@ -81,7 +81,7 @@ function ResetPasswordForm() {
         </div>
         <h2 className="text-2xl font-serif font-bold text-[#0c2217]">Password Updated!</h2>
         <p className="text-xs text-stone-600 max-w-xs mx-auto leading-relaxed">
-          Your new password has been securely saved. You can now log into your IlmPortal account.
+          Your new password has been securely saved. You can now log into your IlmiDunya account.
         </p>
         <div className="pt-2">
           <Link
@@ -178,7 +178,7 @@ export default function ResetPasswordPage() {
             Create New Password
           </h1>
           <p className="text-xs text-stone-600 leading-relaxed max-w-sm mx-auto">
-            Choose a strong password to protect your IlmPortal account
+            Choose a strong password to protect your IlmiDunya account
           </p>
         </div>
 

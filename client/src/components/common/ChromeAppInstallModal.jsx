@@ -56,8 +56,8 @@ export default function ChromeAppInstallModal({ isOpen, onClose }) {
         {/* Modal Top Header Bar */}
         <div className="p-4 sm:p-5 border-b border-[#e6dfd5] flex items-center justify-between shrink-0 bg-white/90 backdrop-blur-sm z-10">
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-[#0c2217] border border-[#d4a359]/40 flex items-center justify-center text-[#d4a359] shadow-md shrink-0">
-              <Chrome className="w-6 h-6" />
+            <div className="w-12 h-12 rounded-2xl bg-white border border-[#d4a359]/40 flex items-center justify-center shadow-md shrink-0 p-2">
+              <img src="/icon.png" alt="ilmidunya" className="w-full h-full object-contain select-none" />
             </div>
             <div>
               <div className="flex items-center gap-2">
@@ -67,7 +67,7 @@ export default function ChromeAppInstallModal({ isOpen, onClose }) {
                 <span className="text-[10px] text-stone-500 font-medium">Fast &amp; Offline Ready</span>
               </div>
               <h2 className="text-lg sm:text-xl font-serif font-bold text-[#0c2217] mt-0.5">
-                Install IlmiDunya App
+                Install ilmidunya App
               </h2>
             </div>
           </div>
@@ -89,13 +89,13 @@ export default function ChromeAppInstallModal({ isOpen, onClose }) {
               <CheckCircle2 className="w-8 h-8 text-[#0c2217] mx-auto" />
               <h4 className="font-serif font-bold text-sm text-[#0c2217]">App Already Installed!</h4>
               <p className="text-xs text-stone-600">
-                You are currently enjoying IlmiDunya as a desktop/mobile standalone app with instant notifications.
+                You are currently enjoying ilmidunya as a desktop/mobile standalone app with instant notifications.
               </p>
             </div>
           ) : (
             <>
               <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
-                Install IlmiDunya directly to your desktop or phone home screen for 1-click access, low-latency live video classes, and background notifications.
+                Install ilmidunya directly to your desktop or phone home screen for 1-click access, low-latency live video classes, and background notifications.
               </p>
 
               <button

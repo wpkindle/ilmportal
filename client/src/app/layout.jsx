@@ -37,7 +37,7 @@ export const metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'IlmiDunya',
+    title: 'ilmidunya',
   },
   other: {
     'mobile-web-app-capable': 'yes',

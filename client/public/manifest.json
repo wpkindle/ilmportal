@@ -1,6 +1,6 @@
 {
-  "name": "IlmiDunya - Quran & Academic Tutoring Platform Pakistan",
-  "short_name": "IlmiDunya",
+  "name": "ilmidunya",
+  "short_name": "ilmidunya",
   "description": "Pakistan's #1 verified platform for Quran Qaris and Academic Tutors with in-platform WebRTC classroom.",
   "start_url": "/",
   "display": "standalone",

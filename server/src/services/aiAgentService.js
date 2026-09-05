@@ -1,3 +1,7 @@
+const dns = require('dns');
+if (dns.setDefaultResultOrder) {
+  dns.setDefaultResultOrder('ipv4first');
+}
 const { GoogleGenAI } = require('@google/genai');
 const TutorProfile = require('../models/TutorProfile');
 const User = require('../models/User');
@@ -335,6 +339,7 @@ HUMAN SUPPORT HANDOFF:
     const modelsToTry = [
       { id: 'gemini-3.5-flash-lite', thinking: false },
       { id: 'gemini-flash-lite-latest', thinking: false },
+      { id: 'gemini-3.6-flash', thinking: false },
       { id: 'gemini-3.1-flash-lite', thinking: false },
       { id: 'gemini-3.5-flash', thinking: false },
       { id: 'gemini-3.8-flash', thinking: false },

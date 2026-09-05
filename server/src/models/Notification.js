@@ -26,6 +26,7 @@ const notificationSchema = new mongoose.Schema({
       'deal_offer',
       'deal_accepted',
       'deal_declined',
+      'deal_completed',
       'trial_expiring',
       'payment_pending',
       'payment_verified',

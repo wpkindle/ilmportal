@@ -6,7 +6,6 @@ import { useRouter } from 'next/navigation';
 import {
   ShieldCheck,
   User,
-  AtSign,
   Mail,
   Lock,
   Phone,
@@ -22,7 +21,6 @@ export default function TutorRegisterPage() {
   const router = useRouter();
 
   const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
@@ -36,17 +34,9 @@ export default function TutorRegisterPage() {
     setLoading(true);
     setError('');
 
-    const cleanUser = username.trim().toLowerCase().replace(/[^a-z0-9_.-]/g, '');
-    if (cleanUser.length < 3) {
-      setError('Username must be at least 3 characters long');
-      setLoading(false);
-      return;
-    }
-
     try {
       const payload = {
         name: name.trim(),
-        username: cleanUser,
         email: email.trim().toLowerCase(),
         phone: phone.trim(),
         number: phone.trim(),
@@ -123,24 +113,6 @@ export default function TutorRegisterPage() {
               </div>
             </div>
 
-            {/* Username */}
-            <div>
-              <label className="text-xs font-bold text-stone-800 block mb-1">
-                Username *
-              </label>
-              <div className="relative">
-                <AtSign className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  required
-                  placeholder="e.g. qari_tahir"
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_.-]/g, ''))}
-                  className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white font-medium"
-                />
-              </div>
-              <p className="text-[11px] text-stone-500 mt-1 pl-1">Unique handle for your public tutor profile URL and login</p>
-            </div>
 
             {/* Email Address */}
             <div>

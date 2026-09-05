@@ -11,7 +11,6 @@ import {
   Mail,
   Lock,
   User,
-  AtSign,
   Phone,
   MapPin,
   Sparkles,
@@ -66,7 +65,6 @@ export default function StudentAuthModal({
   // Registration Form
   const [registerForm, setRegisterForm] = useState({
     name: '',
-    username: '',
     email: '',
     phone: '',
     password: '',
@@ -158,12 +156,6 @@ export default function StudentAuthModal({
       setLoading(false);
       return;
     }
-    const cleanUser = registerForm.username.trim().toLowerCase().replace(/[^a-z0-9_.-]/g, '');
-    if (cleanUser.length < 3) {
-      setError('Username must be at least 3 characters');
-      setLoading(false);
-      return;
-    }
     if (!registerForm.phone.trim()) {
       setError('Mobile / WhatsApp number is required');
       setLoading(false);
@@ -173,7 +165,6 @@ export default function StudentAuthModal({
     try {
       const res = await api.register({
         name: registerForm.name.trim(),
-        username: cleanUser,
         email: registerForm.email.trim().toLowerCase(),
         phone: registerForm.phone.trim(),
         number: registerForm.phone.trim(),
@@ -488,42 +479,22 @@ export default function StudentAuthModal({
                 </div>
               </div>
 
-              {/* Row 2: Username & Phone Number in 2 columns */}
-              <div className="grid grid-cols-2 gap-2">
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-0.5">
-                    Username *
-                  </label>
-                  <div className="relative">
-                    <AtSign className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      required
-                      autoComplete="off"
-                      placeholder="e.g. hamza_khan"
-                      value={registerForm.username}
-                      onChange={(e) => setRegisterForm({ ...registerForm, username: e.target.value.toLowerCase().replace(/[^a-z0-9_.-]/g, '') })}
-                      className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 font-medium"
-                    />
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-[11px] font-bold text-slate-700 block mb-0.5">
-                    Mobile / WhatsApp *
-                  </label>
-                  <div className="relative">
-                    <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="tel"
-                      required
-                      autoComplete="off"
-                      placeholder="0300-1234567"
-                      value={registerForm.phone}
-                      onChange={(e) => setRegisterForm({ ...registerForm, phone: e.target.value })}
-                      className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 font-medium"
-                    />
-                  </div>
+              {/* Row 2: Phone Number */}
+              <div>
+                <label className="text-[11px] font-bold text-slate-700 block mb-0.5">
+                  Mobile / WhatsApp *
+                </label>
+                <div className="relative">
+                  <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                  <input
+                    type="tel"
+                    required
+                    autoComplete="off"
+                    placeholder="0300-1234567"
+                    value={registerForm.phone}
+                    onChange={(e) => setRegisterForm({ ...registerForm, phone: e.target.value })}
+                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 font-medium"
+                  />
                 </div>
               </div>
 

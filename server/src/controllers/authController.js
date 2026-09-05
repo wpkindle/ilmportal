@@ -72,9 +72,6 @@ exports.register = async (req, res) => {
     if (!name || !name.trim()) {
       return res.status(400).json({ success: false, message: 'Full name is required' });
     }
-    if (!username || !username.trim()) {
-      return res.status(400).json({ success: false, message: 'Username is required' });
-    }
     if (!email || !email.trim()) {
       return res.status(400).json({ success: false, message: 'Email address is required' });
     }
@@ -86,7 +83,6 @@ exports.register = async (req, res) => {
     }
 
     const emailClean = email.toLowerCase().trim();
-    const usernameClean = username.toLowerCase().trim().replace(/[^a-z0-9_]/g, '');
 
     // Check if email exists
     const emailExists = await User.findOne({ email: emailClean });
@@ -94,10 +90,17 @@ exports.register = async (req, res) => {
       return res.status(400).json({ success: false, message: 'An account with this email already exists' });
     }
 
-    // Check if username exists
-    const usernameExists = await User.findOne({ username: usernameClean });
-    if (usernameExists) {
-      return res.status(400).json({ success: false, message: 'Username is already taken. Please choose another.' });
+    // Optional username handling (if provided)
+    let usernameClean = undefined;
+    if (username && typeof username === 'string' && username.trim()) {
+      const sanitized = username.toLowerCase().trim().replace(/[^a-z0-9_]/g, '');
+      if (sanitized.length >= 3) {
+        const usernameExists = await User.findOne({ username: sanitized });
+        if (usernameExists) {
+          return res.status(400).json({ success: false, message: 'Username is already taken. Please choose another.' });
+        }
+        usernameClean = sanitized;
+      }
     }
 
     const userRole = role === 'tutor' ? 'tutor' : 'student';
@@ -107,9 +110,8 @@ exports.register = async (req, res) => {
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
     const otpExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
 
-    const user = await User.create({
+    const newUserData = {
       name: name.trim(),
-      username: usernameClean,
       email: emailClean,
       phone: userPhone,
       password,
@@ -123,7 +125,12 @@ exports.register = async (req, res) => {
       verificationOtpExpires: otpExpires,
       verificationToken,
       verificationTokenExpires: otpExpires
-    });
+    };
+    if (usernameClean) {
+      newUserData.username = usernameClean;
+    }
+
+    const user = await User.create(newUserData);
 
     // If registered as tutor, create initial TutorProfile in incomplete state
     if (userRole === 'tutor') {
@@ -144,7 +151,7 @@ exports.register = async (req, res) => {
           recipient: adminUser._id,
           sender: user._id,
           title: 'New Tutor Registration',
-          message: `${user.name} (@${user.username}) registered as a tutor.`,
+          message: `${user.name}${user.username ? ` (@${user.username})` : ''} registered as a tutor.`,
           type: 'tutor_application',
           link: '/admin/tutor-approvals'
         });

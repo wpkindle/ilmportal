@@ -714,5 +714,16 @@ export const api = {
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  // AI Chatbot Agent
+  sendAiChat: (body) => fetch(`${API_BASE}/ai/chat`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  getAiHealth: () => fetch(`${API_BASE}/ai/health`, {
+    headers: getHeaders()
   }).then(handleResponse)
 };

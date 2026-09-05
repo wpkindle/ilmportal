@@ -28,6 +28,7 @@ export default function AdminUsersModerationPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'student' | 'tutor' | 'warned' | 'under_review' | 'suspended'
+  const [statusFilter, setStatusFilter] = useState('all');
   const [selectedUser, setSelectedUser] = useState(null);
 
   // Modals state
@@ -89,6 +90,20 @@ export default function AdminUsersModerationPage() {
       if (activeTab === 'under_review' && u.status !== 'under_review') return false;
       if (activeTab === 'suspended' && u.status !== 'suspended' && u.status !== 'deactivated' && u.isActive !== false) return false;
 
+      // Status filter dropdown
+      if (statusFilter !== 'all') {
+        if (statusFilter === 'active') {
+          if (u.status !== 'active' && u.status && u.status !== 'approved') return false;
+          if (u.isActive === false) return false;
+        } else if (statusFilter === 'under_review') {
+          if (u.status !== 'under_review') return false;
+        } else if (statusFilter === 'warned') {
+          if ((u.warningCount || 0) === 0 && u.status !== 'warned') return false;
+        } else if (statusFilter === 'suspended') {
+          if (u.status !== 'suspended' && u.status !== 'deactivated' && u.isActive !== false) return false;
+        }
+      }
+
       // Search filter
       if (search.trim()) {
         const q = search.trim().toLowerCase();
@@ -101,7 +116,7 @@ export default function AdminUsersModerationPage() {
 
       return true;
     });
-  }, [allUsers, activeTab, search]);
+  }, [allUsers, activeTab, statusFilter, search]);
 
   // Open Warning Modal
   const openWarningModal = (u) => {

@@ -1,5 +1,3 @@
-const { generateSupportChatResponse } = require('../services/supportAgentService');
-const { generateQueryEmbedding } = require('../services/supportRagService');
 const { getKnowledgeBaseFAQs, saveSupportFAQ } = require('../config/supabaseClient');
 const SupportSession = require('../models/SupportSession');
 const Notification = require('../models/Notification');
@@ -7,54 +5,115 @@ const FAQ = require('../models/FAQ');
 const User = require('../models/User');
 
 /**
- * Handle user message to AI Support Agent
+ * Handle user message in Live Support Chat (routed directly to Admin Desk)
  */
 exports.sendMessage = async (req, res) => {
   try {
-    const { message, sessionId, history, guestInfo } = req.body;
+    const { message, sessionId, guestInfo } = req.body;
     if (!message || !message.trim()) {
       return res.status(400).json({ success: false, message: 'Message cannot be empty' });
     }
 
-    const result = await generateSupportChatResponse({
-      message: message.trim(),
-      sessionId,
-      history: Array.isArray(history) ? history : [],
-      user: req.user || null,
-      guestInfo: guestInfo || null
-    });
+    const sid = sessionId || `session_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
 
-    // If proactive escalation was triggered, notify admins via Socket.IO
-    if (result.shouldEscalate) {
-      const io = req.app.get('io');
-      if (io) {
-        io.to('admins').emit('human-support-alert', {
-          sessionId: result.sessionId,
-          reason: result.escalationReason,
-          userName: req.user?.name || guestInfo?.name || 'Guest Visitor',
-          message: message.trim(),
-          timestamp: new Date()
-        });
+    let session = await SupportSession.findOne({ sessionId: sid });
+    const senderName = req.user?.name || guestInfo?.name || 'Website Visitor';
+    const senderAvatar = req.user?.avatar || '';
+
+    const newMsg = {
+      sender: 'user',
+      senderName,
+      senderAvatar,
+      text: message.trim(),
+      createdAt: new Date()
+    };
+
+    const isNewSession = !session;
+
+    if (!session) {
+      session = new SupportSession({
+        sessionId: sid,
+        user: req.user?._id || null,
+        guestInfo: guestInfo || {
+          name: senderName,
+          email: req.user?.email || guestInfo?.email || '',
+          role: req.user?.role || 'visitor',
+          city: req.user?.city || guestInfo?.city || ''
+        },
+        status: 'human_requested',
+        requestedAt: new Date(),
+        messages: [newMsg],
+        lastMessage: message.trim().slice(0, 140),
+        lastSender: 'user',
+        unreadAdminCount: 1
+      });
+    } else {
+      session.messages.push(newMsg);
+      session.lastMessage = message.trim().slice(0, 140);
+      session.lastSender = 'user';
+      if (session.status !== 'admin_joined') {
+        session.status = 'human_requested';
+        session.requestedAt = new Date();
       }
-
-      // Update session status in MongoDB
-      await SupportSession.findOneAndUpdate(
-        { sessionId: result.sessionId },
-        {
-          status: 'human_requested',
-          escalationReason: result.escalationReason,
-          requestedAt: new Date()
-        }
-      );
+      session.unreadAdminCount = (session.unreadAdminCount || 0) + 1;
+      if (req.user && !session.user) {
+        session.user = req.user._id;
+      }
     }
 
-    res.status(200).json(result);
+    await session.save();
+
+    // Broadcast via socket to both the session room and the admin desk
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`support_${sid}`).emit('support-message-received', {
+        sessionId: sid,
+        message: newMsg
+      });
+
+      io.to('admins').emit('support-session-updated', {
+        sessionId: sid,
+        lastMessage: message.trim().slice(0, 140),
+        lastSender: 'user',
+        unreadAdminCount: session.unreadAdminCount
+      });
+
+      io.to('admins').emit('human-support-alert', {
+        sessionId: sid,
+        userName: senderName,
+        message: message.trim(),
+        timestamp: new Date()
+      });
+    }
+
+    // Notify admins in DB if this is a newly requested session
+    if (isNewSession) {
+      try {
+        const admins = await User.find({ role: 'admin', isActive: true });
+        for (const admin of admins) {
+          await Notification.create({
+            recipient: admin._id,
+            type: 'human_support_request',
+            title: '💬 New Live Support Inquiry',
+            message: `${senderName} initiated a live support chat: "${message.trim().slice(0, 60)}..."`,
+            link: `/admin/support?session=${sid}`,
+            data: { sessionId: sid }
+          });
+        }
+      } catch (nErr) {}
+    }
+
+    return res.status(200).json({
+      success: true,
+      sessionId: sid,
+      message: newMsg,
+      status: session.status
+    });
   } catch (error) {
-    console.error('Error in support sendMessage:', error);
+    console.error('Error in live support sendMessage:', error);
     res.status(500).json({
       success: false,
-      message: 'Support service encountered an unexpected error. Please tap Talk to Human Support.',
-      reply: 'Assalam-o-Alaikum! I apologize, but I experienced a brief processing error. Please tap **"🙋‍♂️ Talk to Human Support"** to speak directly with an administrator.'
+      message: 'Failed to send support message.'
     });
   }
 };
@@ -170,7 +229,7 @@ exports.getFaqs = async (req, res) => {
 };
 
 /**
- * Admin: Create new FAQ in Knowledge Base (with embedding)
+ * Admin: Create new FAQ in Knowledge Base / Help Center
  */
 exports.adminCreateFaq = async (req, res) => {
   try {
@@ -179,9 +238,6 @@ exports.adminCreateFaq = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Question and answer are required' });
     }
 
-    // Generate embedding vector
-    const embedding = await generateQueryEmbedding(`${question} ${answer}`);
-
     const id = await saveSupportFAQ({
       question,
       answer,
@@ -189,17 +245,17 @@ exports.adminCreateFaq = async (req, res) => {
       tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(t => t.trim()) : []),
       isActive: isActive !== false,
       displayOrder: Number(displayOrder) || 0,
-      embedding
+      embedding: []
     });
 
-    res.status(201).json({ success: true, message: 'FAQ added successfully with vector embeddings', id });
+    res.status(201).json({ success: true, message: 'FAQ added successfully', id });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }
 };
 
 /**
- * Admin: Update FAQ in Knowledge Base
+ * Admin: Update FAQ in Knowledge Base / Help Center
  */
 exports.adminUpdateFaq = async (req, res) => {
   try {
@@ -217,11 +273,6 @@ exports.adminUpdateFaq = async (req, res) => {
     if (tags !== undefined) faq.tags = Array.isArray(tags) ? tags : tags.split(',').map(t => t.trim());
     if (isActive !== undefined) faq.isActive = isActive;
     if (displayOrder !== undefined) faq.displayOrder = Number(displayOrder);
-
-    // Recompute embedding if question or answer changed
-    if (question || answer) {
-      faq.embedding = await generateQueryEmbedding(`${faq.question} ${faq.answer}`) || [];
-    }
 
     await faq.save();
     res.status(200).json({ success: true, message: 'FAQ updated successfully', faq });

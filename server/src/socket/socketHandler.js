@@ -478,11 +478,22 @@ const initSocket = (io) => {
 
         // If user sent it, notify all admins on the support desk
         if (sender !== 'admin') {
+          if (session.status !== 'admin_joined') {
+            session.status = 'human_requested';
+            session.requestedAt = new Date();
+            await session.save();
+          }
           io.to('admins').emit('support-session-updated', {
             sessionId,
             lastMessage: text.trim().slice(0, 140),
             lastSender: sender || 'user',
             unreadAdminCount: session.unreadAdminCount
+          });
+          io.to('admins').emit('human-support-alert', {
+            sessionId,
+            userName: senderName || 'Website Visitor',
+            message: text.trim(),
+            timestamp: new Date()
           });
         }
       } catch (err) {
@@ -490,15 +501,17 @@ const initSocket = (io) => {
       }
     });
 
-    socket.on('support-typing', ({ sessionId, senderName }) => {
+    socket.on('support-typing', ({ sessionId, senderName, sender }) => {
       if (sessionId) {
-        socket.to(`support_${sessionId}`).emit('support-user-typing', { senderName });
+        socket.to(`support_${sessionId}`).emit('support-typing', { sessionId, senderName, sender });
+        socket.to(`support_${sessionId}`).emit('support-user-typing', { sessionId, senderName, sender });
       }
     });
 
-    socket.on('support-stop-typing', ({ sessionId }) => {
+    socket.on('support-stop-typing', ({ sessionId, sender }) => {
       if (sessionId) {
-        socket.to(`support_${sessionId}`).emit('support-user-stopped-typing');
+        socket.to(`support_${sessionId}`).emit('support-stop-typing', { sessionId, sender });
+        socket.to(`support_${sessionId}`).emit('support-user-stopped-typing', { sessionId, sender });
       }
     });
 

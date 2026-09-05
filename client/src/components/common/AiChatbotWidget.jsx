@@ -3,62 +3,77 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { usePathname } from 'next/navigation';
 import {
-  Sparkles,
   X,
   Send,
-  Bot,
   User,
-  ShieldCheck,
-  RefreshCw,
-  ExternalLink,
   ChevronDown,
   Headphones,
-  BrainCircuit,
-  AlertCircle,
-  CheckCircle2,
-  PhoneCall,
-  Clock,
   ArrowLeft,
-  MessageSquare
+  MessageSquare,
+  CheckCircle2,
+  Clock,
+  PhoneCall,
+  ShieldCheck,
+  ExternalLink
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
 import { useAuth } from '../../context/AuthContext';
 
-const QUICK_PROMPTS = [
-  'Show verified female Alimahs for Quran & Tajweed',
-  'Find Cambridge O/A Level subject teachers',
-  'How does the 3-day free trial work?',
-  'Do you have tutors in Peshawar or Lahore?',
-  'What payment methods are supported in Pakistan?',
-  '🙋‍♂️ Talk to a Human Support Agent'
+const QUICK_INQUIRIES = [
+  'Inquire about 3-Day Free Trial',
+  'Find verified female Quran Alimah',
+  'Find Cambridge O/A Level tutor',
+  'Tuition fees & payment methods',
+  'Tutor verification & registration help',
+  'Chat on WhatsApp (+92 317 1759093)'
 ];
 
-export default function AiChatbotWidget() {
+export default function LiveSupportWidget() {
   const pathname = usePathname();
   const { user } = useAuth();
   const { socket } = useSocket();
 
   const [isOpen, setIsOpen] = useState(false);
   const [sessionId, setSessionId] = useState('');
-  const [supportStatus, setSupportStatus] = useState('ai_active'); // 'ai_active' | 'human_requested' | 'admin_joined' | 'resolved'
+  const [supportStatus, setSupportStatus] = useState('open'); // 'open' | 'human_requested' | 'admin_joined' | 'resolved'
   const [assignedAdmin, setAssignedAdmin] = useState(null);
   const [messages, setMessages] = useState([
     {
       id: 'welcome',
-      sender: 'bot',
-      senderName: 'IlmiDunya Support Guide',
-      text: "Assalam-o-Alaikum! 🌟 Welcome to **IlmiDunya Support Hub**.\n\nI am your AI Academic Counselor & Support Guide, connected live to our database.\n\nAsk me anything about verified tutors, female Alimahs, Cambridge faculty, trial periods, or your active lessons. You can also tap **'Talk to Human'** at any time to reach our administration!",
+      sender: 'admin',
+      senderName: 'IlmiDunya Support Desk',
+      text: "Assalam-o-Alaikum! Welcome to IlmiDunya Live Support. 👋\n\nHow can we help you today? Send your inquiry below and our administrative team will respond right here in real-time.\n\nFor urgent admissions or fee verification, you can also reach us directly on WhatsApp at **+92 317 1759093**.",
       timestamp: new Date()
     }
   ]);
   const [inputValue, setInputValue] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isRequestingHuman, setIsRequestingHuman] = useState(false);
-  const [unreadCount, setUnreadCount] = useState(1);
-  const [isTyping, setIsTyping] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
+  const [isAdminTyping, setIsAdminTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
+  const typingTimeoutRef = useRef(null);
+
+  // Play gentle chime on incoming admin message
+  const playMessageChime = () => {
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (!AudioCtx) return;
+      const ctx = new AudioCtx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(587.33, ctx.currentTime); // D5
+      osc.frequency.exponentialRampToValueAtTime(880, ctx.currentTime + 0.12); // A5
+      gain.gain.setValueAtTime(0.12, ctx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start();
+      osc.stop(ctx.currentTime + 0.3);
+    } catch (e) {}
+  };
 
   // 1. Initialize or restore persistent sessionId from localStorage
   useEffect(() => {
@@ -72,7 +87,7 @@ export default function AiChatbotWidget() {
     }
   }, []);
 
-  // 2. Restore previous chat history for returning users/sessions
+  // 2. Restore previous live conversation history from database
   useEffect(() => {
     if (!sessionId) return;
     api.getSupportSessionHistory(sessionId).then((res) => {
@@ -80,14 +95,16 @@ export default function AiChatbotWidget() {
         setMessages(res.messages.map((m) => ({
           id: m._id || (Date.now() + Math.random()).toString(),
           sender: m.sender,
-          senderName: m.senderName || (m.sender === 'user' ? 'You' : 'IlmiDunya Counselor'),
+          senderName: m.senderName || (m.sender === 'user' ? 'You' : 'Staff Admin'),
           senderAvatar: m.senderAvatar,
           text: m.text,
-          thoughts: m.thoughts,
           timestamp: new Date(m.createdAt || Date.now())
         })));
         if (res.session?.status) {
           setSupportStatus(res.session.status);
+        }
+        if (res.session?.assignedAdmin?.name) {
+          setAssignedAdmin(res.session.assignedAdmin.name);
         }
       }
     }).catch(() => {});
@@ -106,7 +123,7 @@ export default function AiChatbotWidget() {
     }
   }, [isOpen, messages]);
 
-  // 4. Connect to live support socket room
+  // 4. Socket listeners for real-time live chat with Admin
   useEffect(() => {
     if (!socket || !sessionId) return;
 
@@ -116,21 +133,26 @@ export default function AiChatbotWidget() {
       if (data?.sessionId === sessionId && data?.message) {
         const incoming = data.message;
         setMessages((prev) => {
-          if (prev.some((m) => m.id === incoming._id || (m.text === incoming.text && m.sender === incoming.sender))) {
+          // Avoid duplicate appends
+          if (prev.some((m) => m.id === incoming._id || (m.text === incoming.text && m.sender === incoming.sender && Math.abs(new Date(m.timestamp) - new Date(incoming.createdAt)) < 2000))) {
             return prev;
           }
-          if (!isOpen) {
-            setUnreadCount((c) => c + 1);
+
+          if (incoming.sender === 'admin') {
+            playMessageChime();
+            if (!isOpen) {
+              setUnreadCount((c) => c + 1);
+            }
           }
+
           return [
             ...prev,
             {
               id: incoming._id || (Date.now() + Math.random()).toString(),
               sender: incoming.sender,
-              senderName: incoming.senderName || 'Staff Agent',
+              senderName: incoming.senderName || (incoming.sender === 'admin' ? 'Staff Specialist' : 'You'),
               senderAvatar: incoming.senderAvatar,
               text: incoming.text,
-              thoughts: incoming.thoughts,
               timestamp: new Date(incoming.createdAt || Date.now())
             }
           ];
@@ -141,16 +163,17 @@ export default function AiChatbotWidget() {
     const handleAdminJoined = (data) => {
       if (data?.sessionId === sessionId) {
         setSupportStatus('admin_joined');
-        setAssignedAdmin(data.admin?.name || 'Official Staff');
+        setAssignedAdmin(data.admin?.name || 'Support Staff');
         setMessages((prev) => [
           ...prev,
           {
             id: Date.now().toString(),
             sender: 'system',
-            text: `🟢 **${data.admin?.name || 'A Support Specialist'} has joined the chat.** You are now speaking directly with our administrative team.`,
+            text: `🟢 **${data.admin?.name || 'A Support Administrator'} has joined this chat.** You are now speaking directly in real-time.`,
             timestamp: new Date()
           }
         ]);
+        playMessageChime();
       }
     };
 
@@ -162,13 +185,13 @@ export default function AiChatbotWidget() {
 
     const handleTyping = (data) => {
       if (data?.sessionId === sessionId && data.sender === 'admin') {
-        setIsTyping(true);
+        setIsAdminTyping(true);
       }
     };
 
     const handleStopTyping = (data) => {
       if (data?.sessionId === sessionId && data.sender === 'admin') {
-        setIsTyping(false);
+        setIsAdminTyping(false);
       }
     };
 
@@ -187,64 +210,42 @@ export default function AiChatbotWidget() {
     };
   }, [socket, sessionId, isOpen]);
 
-  // 5. Explicit Human Support Handoff Trigger
-  const handleRequestHuman = async () => {
-    if (isRequestingHuman) return;
-    setIsRequestingHuman(true);
+  // Handle typing debounce to alert admin desk
+  const handleInputChange = (e) => {
+    setInputValue(e.target.value);
+    if (!socket || !sessionId) return;
 
-    try {
-      const guestInfo = user ? {
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        city: user.city
-      } : {
-        name: 'Website Visitor',
-        role: 'visitor'
-      };
+    socket.emit('support-typing', {
+      sessionId,
+      sender: 'user',
+      senderName: user?.name || 'Website Visitor'
+    });
 
-      const res = await api.escalateSupportToHuman({
+    if (typingTimeoutRef.current) clearTimeout(typingTimeoutRef.current);
+    typingTimeoutRef.current = setTimeout(() => {
+      socket.emit('support-stop-typing', {
         sessionId,
-        guestInfo,
-        note: 'User clicked Talk to Human Support button'
+        sender: 'user',
+        senderName: user?.name || 'Website Visitor'
       });
-
-      if (res.success) {
-        setSupportStatus('human_requested');
-        setMessages((prev) => [
-          ...prev,
-          {
-            id: Date.now().toString(),
-            sender: 'system',
-            text: "🙋‍♂️ **Human Support Staff Alerted!**\n\nWe have alerted our administration team. An official support specialist will join this chat shortly.\n\nYou can continue typing your questions below, or reach out on WhatsApp at **+92 317 1759093** if urgent.",
-            timestamp: new Date()
-          }
-        ]);
-
-        if (socket) {
-          socket.emit('request-human-support', { sessionId, user: guestInfo });
-        }
-      }
-    } catch (err) {
-      console.error('Error requesting human support:', err);
-    } finally {
-      setIsRequestingHuman(false);
-    }
+    }, 1500);
   };
 
-  // 6. Handle User Message Dispatch
+  // 5. Send message directly to Admin Support Team
   const handleSend = async (textToSend) => {
     const text = (textToSend || inputValue).trim();
-    if (!text || isLoading) return;
+    if (!text || isSending) return;
 
-    // Quick prompt check for human handoff
-    if (text.includes('Talk to a Human') || text.includes('Human Support Agent')) {
-      setInputValue('');
-      await handleRequestHuman();
+    // Check if user clicked WhatsApp prompt
+    if (text.includes('WhatsApp')) {
+      window.open('https://wa.me/923171759093?text=Assalam-o-Alaikum%20IlmiDunya%20Team%2C%20I%20need%20assistance%20regarding...', '_blank', 'noopener,noreferrer');
       return;
     }
 
-    const userMessage = {
+    const senderName = user?.name || 'Website Visitor';
+    const senderAvatar = user?.avatar || '';
+
+    const localMessage = {
       id: Date.now().toString(),
       sender: 'user',
       senderName: user?.name || 'You',
@@ -252,34 +253,28 @@ export default function AiChatbotWidget() {
       timestamp: new Date()
     };
 
-    setMessages((prev) => [...prev, userMessage]);
+    // Optimistically show user's message
+    setMessages((prev) => [...prev, localMessage]);
     setInputValue('');
+    setIsSending(true);
 
-    // If an admin is connected live, route directly through WebSockets
-    if (supportStatus === 'admin_joined') {
+    if (supportStatus !== 'admin_joined') {
+      setSupportStatus('human_requested');
+    }
+
+    try {
+      // 1. Send via WebSocket for instant delivery to admins
       if (socket) {
         socket.emit('send-support-message', {
           sessionId,
           text,
           sender: 'user',
-          senderName: user?.name || 'User'
+          senderName,
+          senderAvatar
         });
       }
-      return;
-    }
 
-    // Otherwise, dispatch to AI Support Agent with live RAG context
-    setIsLoading(true);
-
-    try {
-      const history = messages
-        .filter((m) => m.id !== 'welcome' && m.sender !== 'system')
-        .slice(-6)
-        .map((m) => ({
-          role: m.sender === 'user' ? 'user' : 'model',
-          text: m.text
-        }));
-
+      // 2. Also persist via REST API fallback to guarantee DB write & admin alert
       const guestInfo = user ? {
         name: user.name,
         email: user.email,
@@ -290,45 +285,20 @@ export default function AiChatbotWidget() {
         role: 'visitor'
       };
 
-      const res = await api.sendSupportChatMessage({
+      await api.sendSupportChatMessage({
         message: text,
-        history,
         sessionId,
         guestInfo
       });
-
-      const botMessage = {
-        id: (Date.now() + 1).toString(),
-        sender: 'bot',
-        senderName: 'IlmiDunya Counselor',
-        text: res.reply || 'Assalam-o-Alaikum! How can I assist you further?',
-        thoughts: res.thoughts,
-        source: res.source,
-        timestamp: new Date()
-      };
-
-      setMessages((prev) => [...prev, botMessage]);
-
-      if (res.shouldEscalate) {
-        setSupportStatus('human_requested');
-      }
     } catch (err) {
-      setMessages((prev) => [
-        ...prev,
-        {
-          id: (Date.now() + 1).toString(),
-          sender: 'system',
-          text: 'Assalam-o-Alaikum! Please tap **"🙋‍♂️ Talk to Human Support"** right above to connect directly with our administrative team.',
-          timestamp: new Date()
-        }
-      ]);
+      console.warn('Support message sync notice:', err);
     } finally {
-      setIsLoading(false);
+      setIsSending(false);
     }
   };
 
   const isAdminConnected = supportStatus === 'admin_joined';
-  const isHumanRequested = supportStatus === 'human_requested';
+  const isWaitingForAdmin = supportStatus === 'human_requested' && !isAdminConnected;
 
   return (
     <>
@@ -337,25 +307,24 @@ export default function AiChatbotWidget() {
         <button
           onClick={() => setIsOpen((prev) => !prev)}
           className="group relative flex items-center gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#0c2217] border-2 border-[#d4a359]/60 shadow-[0_10px_30px_rgba(12,34,23,0.55)] hover:shadow-[0_15px_35px_rgba(212,163,89,0.35)] hover:scale-105 transition-all duration-300 cursor-pointer"
-          aria-label="Open IlmiDunya Support Chat"
+          aria-label="Open IlmiDunya Live Support Chat"
         >
           <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#d4a359]/20 border border-[#d4a359]/40 flex items-center justify-center text-[#d4a359] group-hover:bg-[#d4a359] group-hover:text-[#0c2217] transition-colors shrink-0">
-            {isAdminConnected ? (
-              <Headphones className="w-4 h-4 text-emerald-400 group-hover:text-[#0c2217]" />
-            ) : (
-              <Headphones className="w-4 h-4" />
-            )}
+            <Headphones className="w-4 h-4 text-emerald-400 group-hover:text-[#0c2217]" />
           </div>
           <span className="text-xs sm:text-sm font-extrabold tracking-tight text-white flex items-center gap-1.5">
             <span>Support</span>
-            <span className="hidden sm:inline text-[10px] text-emerald-300 font-semibold px-1.5 py-0.5 bg-emerald-950/70 rounded-md border border-emerald-500/30">
-              {isAdminConnected ? 'Live Staff' : 'AI & Staff'}
+            <span className="hidden sm:inline-flex items-center gap-1 text-[10px] text-emerald-300 font-semibold px-2 py-0.5 bg-emerald-950/80 rounded-full border border-emerald-500/30">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              Live Staff
             </span>
           </span>
           {unreadCount > 0 && !isOpen && (
-            <span className="flex h-2.5 w-2.5 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#fbbf24] opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#fbbf24]"></span>
+            <span className="flex h-3 w-3 relative">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500 text-[9px] text-white font-bold items-center justify-center">
+                {unreadCount}
+              </span>
             </span>
           )}
         </button>
@@ -370,39 +339,44 @@ export default function AiChatbotWidget() {
             <div className="flex items-center gap-2.5">
               <button
                 onClick={() => setIsOpen(false)}
-                className="sm:hidden p-1.5 -ml-1 text-stone-300 hover:text-white"
+                className="sm:hidden p-1.5 -ml-1 text-stone-300 hover:text-white cursor-pointer"
                 aria-label="Back"
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#10b981] via-[#d4a359] to-[#b85d34] p-0.5 flex items-center justify-center shadow-md">
+              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#10b981] via-[#d4a359] to-[#b85d34] p-0.5 flex items-center justify-center shadow-md">
                 <div className="w-full h-full bg-[#0c2217] rounded-[10px] flex items-center justify-center">
-                  {isAdminConnected ? (
-                    <Headphones className="w-4 h-4 text-[#10b981]" />
-                  ) : (
-                    <Bot className="w-4 h-4 text-[#d4a359]" />
-                  )}
+                  <Headphones className="w-4 h-4 text-[#d4a359]" />
                 </div>
               </div>
               <div>
                 <div className="flex items-center gap-2">
                   <h3 className="text-xs sm:text-sm font-extrabold text-white leading-tight">
-                    {isAdminConnected ? `Support Staff (${assignedAdmin})` : 'IlmiDunya Support'}
+                    {isAdminConnected ? `Staff Support (${assignedAdmin || 'Active'})` : 'IlmiDunya Live Support'}
                   </h3>
-                  <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-300 bg-emerald-950/80 px-1.5 py-0.5 rounded-full border border-emerald-500/40">
+                  <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-500/40">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    {isAdminConnected ? 'Live Staff' : isHumanRequested ? 'Connecting Staff' : 'AI Counselor'}
+                    {isAdminConnected ? 'Live Staff Active' : 'Staff Online'}
                   </span>
                 </div>
-                <p className="text-[10px] text-stone-300">
+                <p className="text-[10.5px] text-stone-300">
                   {isAdminConnected
-                    ? 'Connected with human support specialist'
-                    : '1:1 Tutors • Direct Dealing • 3-Day Trial • Safety'}
+                    ? 'Speaking live with administration specialist'
+                    : '1:1 Tutors • Admissions • 3-Day Trial • Fee Inquiries'}
                 </p>
               </div>
             </div>
 
             <div className="flex items-center gap-1">
+              <a
+                href="https://wa.me/923171759093"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hidden sm:flex p-1.5 rounded-lg text-emerald-400 hover:bg-emerald-950/50 transition-colors"
+                title="Open WhatsApp Support (+92 317 1759093)"
+              >
+                <PhoneCall className="w-4 h-4" />
+              </a>
               <button
                 onClick={() => setIsOpen(false)}
                 className="hidden sm:flex p-1.5 rounded-lg text-stone-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
@@ -413,7 +387,7 @@ export default function AiChatbotWidget() {
               </button>
               <button
                 onClick={() => setIsOpen(false)}
-                className="sm:hidden p-1.5 rounded-lg text-stone-400 hover:text-white hover:bg-white/10 transition-colors"
+                className="sm:hidden p-1.5 rounded-lg text-stone-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                 title="Close chat"
                 aria-label="Close chat"
               >
@@ -422,37 +396,37 @@ export default function AiChatbotWidget() {
             </div>
           </div>
 
-          {/* Persistent Human Escalation Banner */}
-          {!isAdminConnected && (
-            <div className="px-3.5 py-2 bg-[#0c2217]/90 border-b border-white/5 flex items-center justify-between gap-2 shrink-0">
-              <div className="flex items-center gap-1.5 text-[11px] text-stone-300">
-                {isHumanRequested ? (
-                  <span className="flex items-center gap-1 text-amber-300 font-bold">
-                    <Clock className="w-3.5 h-3.5 animate-spin" />
-                    Admin notified & connecting...
-                  </span>
-                ) : (
-                  <span className="flex items-center gap-1 text-stone-300 text-[10.5px]">
-                    <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
-                    AI Support Counselor Active
-                  </span>
-                )}
-              </div>
-
-              {!isHumanRequested ? (
-                <button
-                  onClick={handleRequestHuman}
-                  disabled={isRequestingHuman}
-                  className="px-2.5 py-1 rounded-full bg-[#ba4c18]/90 hover:bg-[#ba4c18] text-white text-[11px] font-bold flex items-center gap-1 transition-transform hover:scale-105 shadow-sm border border-[#d4a359]/30 cursor-pointer"
-                >
-                  <Headphones className="w-3 h-3" />
-                  <span>Talk to Human</span>
-                </button>
+          {/* Status Sub-Banner */}
+          <div className="px-3.5 py-2 bg-[#0c2217]/90 border-b border-white/5 flex items-center justify-between gap-2 shrink-0">
+            <div className="flex items-center gap-1.5 text-[11px]">
+              {isAdminConnected ? (
+                <span className="flex items-center gap-1 text-emerald-300 font-semibold">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  Live with Administrator ({assignedAdmin})
+                </span>
+              ) : isWaitingForAdmin ? (
+                <span className="flex items-center gap-1 text-amber-300 font-semibold">
+                  <Clock className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                  Admin desk alerted • Connecting with staff...
+                </span>
               ) : (
-                <span className="text-[10px] text-amber-200/80 font-mono">Live Queue: #1</span>
+                <span className="flex items-center gap-1 text-stone-300">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
+                  Verified Official Admin Support
+                </span>
               )}
             </div>
-          )}
+
+            <a
+              href="https://wa.me/923171759093"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-2.5 py-1 rounded-full bg-emerald-950/80 hover:bg-emerald-900 text-emerald-300 text-[10.5px] font-bold flex items-center gap-1 transition-all border border-emerald-500/40"
+            >
+              <PhoneCall className="w-3 h-3 text-emerald-400" />
+              <span>WhatsApp</span>
+            </a>
+          </div>
 
           {/* Messages Scroll Area */}
           <div className="flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-4 space-y-3 scrollbar-thin scrollbar-thumb-stone-700">
@@ -463,9 +437,9 @@ export default function AiChatbotWidget() {
 
               if (isSystem) {
                 return (
-                  <div key={m.id} className="p-3 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-amber-200 text-xs leading-relaxed space-y-1">
+                  <div key={m.id} className="p-3 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 text-xs leading-relaxed space-y-1">
                     <div className="whitespace-pre-wrap font-sans">{m.text}</div>
-                    <div className="text-[9px] text-amber-400/60 text-right">
+                    <div className="text-[9px] text-emerald-400/60 text-right">
                       {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
@@ -476,24 +450,18 @@ export default function AiChatbotWidget() {
                 <div key={m.id} className={`flex gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
                   {!isUser && (
                     <div className="w-6 h-6 rounded-full bg-[#d4a359]/20 border border-[#d4a359]/40 flex items-center justify-center shrink-0 mt-1">
-                      {isAdmin ? (
-                        <Headphones className="w-3.5 h-3.5 text-emerald-400" />
-                      ) : (
-                        <Bot className="w-3.5 h-3.5 text-[#d4a359]" />
-                      )}
+                      <Headphones className="w-3.5 h-3.5 text-emerald-400" />
                     </div>
                   )}
 
                   <div className={`max-w-[85%] sm:max-w-[80%] rounded-2xl p-3 text-xs leading-relaxed ${
                     isUser
                       ? 'bg-gradient-to-r from-[#ba4c18] to-[#963b10] text-white rounded-br-xs shadow-md'
-                      : isAdmin
-                      ? 'bg-emerald-950/80 border border-emerald-500/30 text-emerald-100 rounded-bl-xs shadow-md'
-                      : 'bg-[#102a1d]/90 border border-[#d4a359]/20 text-stone-200 rounded-bl-xs shadow-md'
+                      : 'bg-emerald-950/80 border border-emerald-500/30 text-emerald-100 rounded-bl-xs shadow-md'
                   }`}>
                     <div className="flex items-center justify-between gap-2 mb-1">
                       <span className="text-[10px] font-bold opacity-75">
-                        {isUser ? 'You' : isAdmin ? `Staff (${m.senderName || 'Admin'})` : 'IlmiDunya Counselor'}
+                        {isUser ? 'You' : `Staff (${m.senderName || 'Admin Desk'})`}
                       </span>
                       <span className="text-[9px] opacity-60">
                         {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -508,39 +476,28 @@ export default function AiChatbotWidget() {
               );
             })}
 
-            {isTyping && (
-              <div className="flex items-center gap-2 text-xs text-stone-400 italic">
+            {isAdminTyping && (
+              <div className="flex items-center gap-2 text-xs text-emerald-400 italic">
                 <div className="flex gap-1">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '0ms' }} />
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '150ms' }} />
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
-                <span>Staff agent is typing...</span>
-              </div>
-            )}
-
-            {isLoading && (
-              <div className="flex items-center gap-2 text-xs text-[#d4a359] italic">
-                <div className="flex gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#d4a359] animate-bounce" style={{ animationDelay: '0ms' }} />
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#d4a359] animate-bounce" style={{ animationDelay: '150ms' }} />
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#d4a359] animate-bounce" style={{ animationDelay: '300ms' }} />
-                </div>
-                <span>Retrieving verified platform data...</span>
+                <span>Support staff is typing a reply...</span>
               </div>
             )}
 
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Quick Prompts Bar */}
+          {/* Quick Inquiries Bar */}
           <div className="px-3 py-2 bg-[#0c2217]/70 border-t border-white/5 overflow-x-auto whitespace-nowrap scrollbar-none flex gap-1.5 shrink-0">
-            {QUICK_PROMPTS.map((prompt, idx) => (
+            {QUICK_INQUIRIES.map((prompt, idx) => (
               <button
                 key={idx}
                 onClick={() => handleSend(prompt)}
-                disabled={isLoading}
-                className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-[#d4a359]/20 text-stone-300 hover:text-[#d4a359] text-[10.5px] border border-white/10 transition-colors shrink-0 cursor-pointer"
+                disabled={isSending}
+                className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-[#d4a359]/20 text-stone-300 hover:text-[#d4a359] text-[10.5px] border border-white/10 transition-colors shrink-0 cursor-pointer disabled:opacity-50"
               >
                 {prompt}
               </button>
@@ -560,27 +517,23 @@ export default function AiChatbotWidget() {
                 ref={inputRef}
                 type="text"
                 value={inputValue}
-                onChange={(e) => setInputValue(e.target.value)}
-                placeholder={
-                  isAdminConnected
-                    ? 'Message support staff directly...'
-                    : 'Ask about tutors, trials, fees, or your lessons...'
-                }
+                onChange={handleInputChange}
+                placeholder="Type your message to support team..."
                 className="flex-1 bg-black/40 border border-white/15 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-[#d4a359] transition-colors"
-                disabled={isLoading}
+                disabled={isSending}
               />
               <button
                 type="submit"
-                disabled={isLoading || !inputValue.trim()}
+                disabled={isSending || !inputValue.trim()}
                 className="p-2 rounded-xl bg-gradient-to-r from-[#ba4c18] to-[#963b10] hover:scale-105 disabled:opacity-40 disabled:hover:scale-100 text-white transition-all cursor-pointer shrink-0"
-                aria-label="Send message"
+                aria-label="Send message to support"
               >
                 <Send className="w-4 h-4" />
               </button>
             </form>
             <div className="mt-1.5 flex items-center justify-between text-[9.5px] text-stone-400">
-              <span>IlmiDunya Pakistan • AI & Live Support Desk</span>
-              <span className="text-emerald-400/80">Support: contact@ilmidunya.pk</span>
+              <span>IlmiDunya Pakistan • Official Live Support Desk</span>
+              <span className="text-emerald-400/80">WhatsApp: +92 317 1759093</span>
             </div>
           </div>
 

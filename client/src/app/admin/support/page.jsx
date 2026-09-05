@@ -446,7 +446,7 @@ export default function AdminSupportDeskPage() {
                         : 'text-slate-400 hover:text-white'
                     }`}
                   >
-                    <span>Waiting for Human</span>
+                    <span>Waiting for Admin</span>
                     <span className="px-1.5 py-0.5 rounded-md text-[10px] bg-rose-500 text-white font-bold">
                       {counts.human_requested}
                     </span>
@@ -563,7 +563,7 @@ export default function AdminSupportDeskPage() {
                     <div>
                       <h4 className="text-sm font-bold text-slate-300">Select a support conversation</h4>
                       <p className="text-xs text-slate-500 mt-1 max-w-sm">
-                        View prior AI conversation transcripts, inspect user inquiries, and join live to assist students and parents.
+                        Live chat with students and visitors, inspect inquiries, and reply in real-time.
                       </p>
                     </div>
                   </div>
@@ -635,11 +635,11 @@ export default function AdminSupportDeskPage() {
                                 ? 'bg-slate-800 text-white rounded-bl-xs border border-slate-700'
                                 : isAdmin
                                 ? 'bg-emerald-600 text-white rounded-br-xs shadow-md'
-                                : 'bg-slate-900 border border-purple-500/30 text-purple-200 rounded-br-xs'
+                                : 'bg-slate-900 border border-emerald-500/30 text-emerald-200 rounded-br-xs'
                             }`}>
                               <div className="flex items-center justify-between gap-2 mb-1">
                                 <span className="font-bold text-[10px] opacity-80">
-                                  {isUser ? m.senderName || 'User' : isAdmin ? `Staff (${m.senderName || 'Admin'})` : 'AI Counselor'}
+                                  {isUser ? m.senderName || 'User' : isAdmin ? `Staff (${m.senderName || 'Admin'})` : (m.senderName || 'Support Staff')}
                                 </span>
                                 <span className="text-[9px] opacity-60">
                                   {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -682,14 +682,14 @@ export default function AdminSupportDeskPage() {
           )}
 
           {/* ========================================================= */}
-          {/* MODE 2: AI CONVERSATION LOGS (Searchable Archive) */}
+          {/* MODE 2: SUPPORT CONVERSATION LOGS (Searchable Archive) */}
           {/* ========================================================= */}
           {activeMode === 'logs' && (
             <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                 <div>
-                  <h3 className="text-base font-bold text-white">Full AI Support Chat Transcripts</h3>
-                  <p className="text-xs text-slate-400">Complete archive of all user-AI counseling sessions to audit inquiries & improve knowledge base.</p>
+                  <h3 className="text-base font-bold text-white">Support Chat Transcripts & Archive</h3>
+                  <p className="text-xs text-slate-400">Complete archive of all live support conversations to audit inquiries & review responses.</p>
                 </div>
                 <div className="relative w-full sm:w-64">
                   <Search className="w-4 h-4 absolute left-3 top-2.5 text-slate-500" />
@@ -758,7 +758,7 @@ export default function AdminSupportDeskPage() {
           )}
 
           {/* ========================================================= */}
-          {/* MODE 3: AI KNOWLEDGE BASE (FAQ CRUD with Embeddings) */}
+          {/* MODE 3: PLATFORM KNOWLEDGE BASE & FAQS */}
           {/* ========================================================= */}
           {activeMode === 'faqs' && (
             <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl space-y-6">
@@ -766,10 +766,10 @@ export default function AdminSupportDeskPage() {
                 <div>
                   <h3 className="text-base font-bold text-white flex items-center gap-2">
                     <BookOpen className="w-5 h-5 text-emerald-400" />
-                    <span>AI Knowledge Base & FAQs (Supabase pgvector)</span>
+                    <span>Platform Knowledge Base & FAQs</span>
                   </h3>
                   <p className="text-xs text-slate-400 mt-1">
-                    Manage FAQs and platform policies. Changes automatically update vector embeddings for Gemini retrieval with 0 code deployments.
+                    Manage verified platform FAQs, admissions guidelines, safety rules, and payment policies for support reference.
                   </p>
                 </div>
 
@@ -870,7 +870,7 @@ export default function AdminSupportDeskPage() {
               {loadingAnalytics || !analytics ? (
                 <div className="py-20 flex flex-col items-center justify-center text-slate-500">
                   <LoadingSpinner size="lg" />
-                  <p className="text-xs mt-2">Aggregating AI & support desk analytics...</p>
+                  <p className="text-xs mt-2">Aggregating live support desk analytics...</p>
                 </div>
               ) : (
                 <>
@@ -911,13 +911,13 @@ export default function AdminSupportDeskPage() {
 
                     <div className="p-5 rounded-3xl bg-slate-900 border border-slate-800 shadow-xl space-y-1">
                       <div className="flex items-center justify-between text-slate-400">
-                        <span className="text-xs font-semibold">Avg AI Latency</span>
+                        <span className="text-xs font-semibold">Avg Response Time</span>
                         <Clock className="w-4 h-4 text-blue-400" />
                       </div>
                       <div className="text-2xl font-black text-blue-300">
                         ~{analytics.metrics?.avgResponseTimeSec || 1.2}s
                       </div>
-                      <p className="text-[11px] text-emerald-400 font-mono">IPv4 Blazing Fast</p>
+                      <p className="text-[11px] text-emerald-400 font-mono">Blazing Fast Response</p>
                     </div>
                   </div>
 

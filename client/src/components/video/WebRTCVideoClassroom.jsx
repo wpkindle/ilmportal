@@ -960,7 +960,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               </button>
 
               {/* Opponent / Main Stage Participant Name Capsule */}
-              <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/15 text-white flex items-center gap-2.5 z-20 shadow-xl">
+              <div className="absolute bottom-5 right-5 sm:bottom-6 sm:right-6 px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/15 text-white flex items-center gap-2.5 z-20 shadow-xl">
                 <span className="flex items-center justify-center">
                   {(!isSwapped ? !isRemoteMicOn : !isMicOn) ? (
                     <span className="w-6 h-6 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center">
@@ -991,7 +991,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             {isSelfMinimized ? (
               <div
                 onClick={() => setIsSelfMinimized(false)}
-                className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 px-3.5 py-2 rounded-full bg-black/80 hover:bg-black/95 backdrop-blur-md border border-white/20 text-white text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-2xl z-30 transition-all hover:scale-105"
+                className="absolute bottom-5 left-5 sm:bottom-6 sm:left-6 px-3.5 py-2 rounded-full bg-black/80 hover:bg-black/95 backdrop-blur-md border border-white/20 text-white text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-2xl z-30 transition-all hover:scale-105"
                 title="Expand your video preview"
               >
                 <div className="w-2.5 h-2.5 rounded-full bg-[#d4a359]" />
@@ -999,7 +999,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                 <Maximize2 className="w-3.5 h-3.5 text-[#d4a359]" />
               </div>
             ) : (
-              <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 w-44 sm:w-60 md:w-68 aspect-video rounded-2xl overflow-hidden shadow-2xl border-2 border-white/25 hover:border-[#d4a359] bg-[#202124] z-30 transition-all duration-200 group">
+              <div className="absolute bottom-5 left-5 sm:bottom-6 sm:left-6 w-44 sm:w-60 md:w-68 aspect-video rounded-2xl overflow-hidden shadow-2xl border-2 border-white/25 hover:border-[#d4a359] bg-[#202124] z-30 transition-all duration-200 group">
                 <video
                   ref={(el) => {
                     pipVideoRef.current = el;

@@ -44,7 +44,7 @@ const Footer = () => {
   }
 
   return (
-    <footer className="relative bg-[#07150e] text-[#d1dbd6] pt-16 sm:pt-20 pb-28 md:pb-16 overflow-hidden border-t border-[#143d2b]">
+    <footer className="relative bg-[#07150e] text-[#d1dbd6] pt-16 sm:pt-20 pb-36 sm:pb-40 md:pb-36 lg:pb-36 overflow-hidden border-t border-[#143d2b]">
       
       {/* Subtle Ambient Background Gradients */}
       <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -374,8 +374,8 @@ const Footer = () => {
         </div>
 
         {/* Bottom Bar with Family Initiative Credit */}
-        <div className="pt-6 border-t border-[#143d2b] flex flex-col xl:flex-row items-center justify-between gap-4 text-xs text-[#81928e]">
-          <div className="flex flex-wrap items-center justify-center xl:justify-start gap-4 sm:gap-6">
+        <div className="pt-6 border-t border-[#143d2b] flex flex-col lg:flex-row items-center justify-between gap-4 text-xs text-[#81928e]">
+          <div className="flex flex-wrap items-center justify-center lg:justify-start gap-x-5 gap-y-2">
             <p className="font-medium text-[#a3b8b0]">
               &copy; {new Date().getFullYear()} IlmiDunya Pakistan. All rights reserved.
             </p>
@@ -393,9 +393,9 @@ const Footer = () => {
             </Link>
           </div>
 
-          <div className="flex items-center gap-2 text-xs bg-[#0c2217] px-4 py-2 rounded-xl border border-[#143d2b] text-center shrink-0 md:whitespace-nowrap">
+          <div className="flex items-center gap-2 text-xs bg-[#0c2217] px-3.5 py-2 rounded-xl border border-[#143d2b] text-center shrink-0">
             <Heart className="w-3.5 h-3.5 text-rose-400 fill-rose-400 shrink-0" />
-            <span className="text-[#d1dbd6] font-medium text-[11px] sm:text-xs md:whitespace-nowrap">
+            <span className="text-[#d1dbd6] font-medium text-[11px] sm:text-xs">
               An initiative by <strong className="text-white">Mr. &amp; Mrs. Abdul Khaliq</strong> from Lahore, Pakistan.
             </span>
           </div>

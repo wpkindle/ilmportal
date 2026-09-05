@@ -604,7 +604,7 @@ export default function LiveSupportWidget() {
   return (
     <>
       {/* 1. FLOATING BOTTOM-RIGHT SUPPORT TRIGGER PILL */}
-      <div className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-40 print:hidden">
+      <div className="fixed bottom-20 right-4 sm:bottom-20 sm:right-6 md:bottom-6 md:right-6 z-40 print:hidden">
         <button
           onClick={() => setIsOpen((prev) => !prev)}
           className="group relative flex items-center gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#0c2217] border-2 border-[#d4a359]/60 shadow-[0_10px_30px_rgba(12,34,23,0.55)] hover:shadow-[0_15px_35px_rgba(212,163,89,0.35)] hover:scale-105 transition-all duration-300 cursor-pointer"

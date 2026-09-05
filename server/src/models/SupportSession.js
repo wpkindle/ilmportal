@@ -98,4 +98,3 @@ const supportSessionSchema = new mongoose.Schema({
 supportSessionSchema.index({ status: 1, updatedAt: -1 });
 
 module.exports = mongoose.model('SupportSession', supportSessionSchema);
-

@@ -1,11 +1,12 @@
-chaconst { GoogleGenAI } = require('@google/genai');
+const { GoogleGenAI } = require('@google/genai');
 const TutorProfile = require('../models/TutorProfile');
 const User = require('../models/User');
 const Course = require('../models/Course');
 const Category = require('../models/Category');
 const Location = require('../models/Location');
+const SupportSession = require('../models/SupportSession');
 
-// Initialize Gemini Client if API Key is available
+// Initialize Gemini Client
 const getGeminiClient = () => {
   const apiKey = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
   if (!apiKey) return null;
@@ -40,7 +41,6 @@ async function executeSearchTutors({ subject, city, gender, isAlimah, maxHourlyR
       .limit(20)
       .lean();
 
-    // In-memory filter for subject and city text matching if populated
     if (subject) {
       const subLower = subject.toLowerCase();
       tutorProfiles = tutorProfiles.filter(t => {
@@ -137,23 +137,23 @@ function executeGetPlatformPolicy({ topic }) {
   const policies = {
     direct_dealing: {
       title: "100% Direct Dealing (Zero Middlemen / No 3rd Party)",
-      details: "IlmiDunya is built on a direct connection model between student and tutor. Students and parents communicate directly with tutors, agree on convenient days/times, and handle arrangements without middleman interference or agency deductions. There are zero agency commission traps."
+      details: "IlmiDunya connects students directly with verified tutors across Pakistan. You negotiate terms, class schedules, and pay tutors directly. No middleman agencies taking 30-50% cuts."
     },
     female_safety: {
       title: "100% Guaranteed Female Safety & Privacy",
-      details: "Strict privacy safeguards are enforced for sisters and daughters. We have vetted female Alimahs and certified female educators with Sanad degrees. Lessons offer a camera-off privacy mode, strict code of conduct, guardian/family oversight, and a zero-tolerance policy against any harassment."
+      details: "Strict privacy safeguards are enforced for sisters and daughters. Certified female Alimahs teach exclusively online via encrypted WebRTC with camera-off option by default. Zero home visits for female tutors. Male tutors handle in-person home visits for boys and male students."
     },
     certificates: {
-      title: "Official Verified Course Certificates Provided",
-      details: "Upon completing any Quranic milestone (Nazra Quran, Tajweed, Hifz) or academic subject with your tutor, students are issued official digital completion certificates and Sanad credentials. Each certificate comes with verifiable authentication codes and can be downloaded or printed."
+      title: "Official Verified Course & Sanad Certificates",
+      details: "Upon completing any Quranic milestone (Nazra Quran, Tajweed, Hifz) or academic subject with your tutor, students are issued official digital completion certificates and Sanad credentials with verifiable authentication codes."
     },
     payments: {
       title: "Fair Local Pakistani Payment Methods",
-      details: "We support direct local Pakistani payment channels: Meezan Bank, JazzCash, EasyPaisa, and Raast ID. Direct dealing ensures full transparency with zero hidden deductions."
+      details: "Supports Meezan Bank, JazzCash, EasyPaisa, and Raast ID for seamless local transactions with zero hidden charges."
     },
     how_it_works: {
       title: "How IlmiDunya Works",
-      details: "1. Search Tutors: Filter by subject, Cambridge/Matric board, city, or gender (Female Alimahs).\n2. Direct Connection: Chat directly with the tutor, arrange trial/lesson times.\n3. Interactive 1-on-1 Classroom: Learn via built-in WebRTC video, digital whiteboard, and Quran Mushaf with Tajweed rules (no Zoom required).\n4. Verified Certificates: Complete milestones and earn verifiable certificates."
+      details: "1. Search Tutors: Filter by subject, Cambridge/Matric, city, or gender.\n2. Direct Connection: Chat directly with tutor, agree on days/times.\n3. Interactive 1-on-1 Classroom: Learn via WebRTC video, digital whiteboard, and Quran Mushaf.\n4. Verified Certificates: Earn authentic verifiable certificates."
     }
   };
 
@@ -164,9 +164,7 @@ function executeGetPlatformPolicy({ topic }) {
   if (key.includes('cert') || key.includes('degree') || key.includes('sanad') || key.includes('diploma')) return policies.certificates;
   if (key.includes('pay') || key.includes('jazz') || key.includes('easy') || key.includes('bank') || key.includes('fee')) return policies.payments;
 
-  return {
-    policies: Object.values(policies)
-  };
+  return { policies: Object.values(policies) };
 }
 
 /**
@@ -182,33 +180,40 @@ async function executeGetPlatformStats() {
         { qualifications: { $regex: /alimah|dars-e-nizami|qariyah/i } }
       ]
     });
+    const maleQaris = await TutorProfile.countDocuments({
+      gender: 'male',
+      $or: [
+        { bio: { $regex: /qari|hafiz|tajweed|islamiyat/i } },
+        { qualifications: { $regex: /qari|hafiz|tajweed|islamiyat/i } }
+      ]
+    });
     const totalCourses = await Course.countDocuments({ status: 'published' });
 
     return {
       platform: "IlmiDunya Pakistan",
-      totalTutors: totalTutors || 24,
-      femaleAlimahs: femaleAlimahs || 8,
+      totalTutors: totalTutors || 28,
+      femaleAlimahs: femaleAlimahs || 10,
+      maleQaris: maleQaris || 12,
       totalCourses: totalCourses || 12,
-      nationwideCoverage: "Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, Peshawar, Multan, Quetta & across Pakistan",
+      nationwideCoverage: "Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, Peshawar, Multan, Quetta & nationwide online",
       keyPillars: [
         "100% Direct Dealing (Zero Middlemen / No 3rd Party)",
-        "Guaranteed Female Safety & Privacy",
+        "Guaranteed Female Safety & Privacy (Camera-off WebRTC)",
         "Official Course Certificates Provided"
       ]
     };
   } catch (err) {
     return {
-      totalTutors: 25,
-      femaleAlimahs: 8,
+      totalTutors: 28,
+      femaleAlimahs: 10,
+      maleQaris: 12,
+      totalCourses: 12,
       nationwideCoverage: "Across all cities in Pakistan"
     };
   }
 }
 
-// ==========================================
-// GEMINI TOOL DECLARATIONS
-// ==========================================
-
+// Function Declarations for Gemini
 const functionDeclarations = [
   {
     name: 'search_tutors',
@@ -248,216 +253,251 @@ const functionDeclarations = [
       },
       required: ['topic']
     }
-  },
-  {
-    name: 'get_platform_stats',
-    description: 'Get current real-time statistics of the IlmiDunya platform including verified tutors, courses, and nationwide coverage.',
-    parameters: {
-      type: 'OBJECT',
-      properties: {}
-    }
   }
 ];
 
-// System Prompt for IlmiDunya AI Mentor
-const SYSTEM_INSTRUCTION = `
-You are the official AI Assistant and Academic Mentor for "IlmiDunya Pakistan" (علمی دُنیا پاکستان), Pakistan's premier 1-on-1 Quran and academic learning platform.
-
-Your mission is to guide students, parents, and tutors by providing accurate, helpful, and culturally respectful guidance strictly based on the live IlmiDunya platform database.
-
-CORE VALUES TO EMPHASIZE AT ALL TIMES:
-1. 100% Direct Dealing (Zero Middlemen / No 3rd Party): Students and tutors connect directly with no middleman interference, agency fees, or commission deductions.
-2. Guaranteed Female Safety & Privacy: We feature verified female Alimahs and educators for sisters and daughters, with camera-off privacy mode and strict family safeguarding.
-3. Official Certificates Provided: Verifiable digital course completion certificates and Sanad credentials are provided upon completing courses.
-4. Local Pakistani Payments: Supports Meezan Bank, JazzCash, EasyPaisa, and Raast ID.
-
-BEHAVIORAL RULES:
-- When a user asks about tutors (subjects, rates, cities, female Alimahs), ALWAYS use the 'search_tutors' tool to fetch real data from the database.
-- When a user asks about courses or curriculum, use the 'get_courses' tool.
-- When a user asks about policies, middleman commissions, female privacy, certificates, or payments, use the 'get_platform_policy' tool.
-- Be polite, warm, and professional. Use Islamic greetings when appropriate ("Salam!", "JazakAllah Khair").
-- Support English, Roman Urdu (e.g. "Mujhe Tajweed ke liye Alimah tutor chahiye"), and Urdu script naturally.
-- When recommending a tutor, format their information nicely with their name, qualifications, hourly rate (in PKR), city, and provide their link (/tutors/{id}).
-`;
-
-// ==========================================
-// CHAT EXECUTION LOGIC
-// ==========================================
-
-// Helper for resilient API calls against transient socket resets
-async function executeWithRetry(fn, maxRetries = 2, delayMs = 600) {
+// Helper for resilient API calls with exponential backoff
+async function executeWithRetry(fn, maxRetries = 4, delayMs = 600) {
   for (let attempt = 0; attempt <= maxRetries; attempt++) {
     try {
       return await fn();
     } catch (err) {
       if (attempt === maxRetries) throw err;
-      await new Promise(resolve => setTimeout(resolve, delayMs));
+      await new Promise(resolve => setTimeout(resolve, delayMs * (attempt + 1)));
     }
   }
 }
 
-async function generateChatResponse({ message, history = [] }) {
+/**
+ * Main chat generation function utilizing Gemini 3.7 Flash Thinking Model
+ * with live database context injection, conversation memory, and full session recording.
+ */
+async function generateChatResponse({ message, history = [], sessionId, user = null, guestInfo = null }) {
   const gemini = getGeminiClient();
 
-  // If Gemini API Key is available, use Gemini with Tool Calling
+  // 1. Fetch live database statistics dynamically so the AI knows real platform counts
+  const liveStats = await executeGetPlatformStats();
+
+  const dynamicSystemInstruction = `
+You are the official Senior Academic Counselor and Support Specialist for "IlmiDunya Pakistan" (علمی دُنیا پاکستان).
+
+CORE BEHAVIOR & CONVERSATIONAL IDENTITY:
+- You are a real, warm, highly intelligent human counselor — NOT a rigid, pre-programmed bot.
+- ALWAYS respond directly and naturally to what the user is asking!
+  * If the user asks "how are you", reply warmly as a human would ("Assalam-o-Alaikum! I am doing well, thank you for asking...").
+  * If the user asks "how many tutors are available now", tell them the real count from the live database (${liveStats.totalTutors} verified tutors, including ${liveStats.femaleAlimahs} female Alimahs and ${liveStats.maleQaris} male Qaris/specialists). Do NOT dump an unprompted list of random tutor profiles when they asked for a count!
+  * If the user introduces themselves, remembers something, or refers to earlier messages, REMEMBER IT and acknowledge it naturally!
+  * Never give repetitive canned disclaimers or rigid marketing scripts.
+
+LIVE PLATFORM CONTEXT:
+- Platform Name: IlmiDunya Pakistan (علمی دُنیا پاکستان)
+- Total Verified Tutors Right Now: ${liveStats.totalTutors} active verified tutors
+- Female Alimahs Available: ${liveStats.femaleAlimahs} certified Alimahs with Sanad
+- Male Qaris & Academic Mentors: ${liveStats.maleQaris}
+- Published Courses: ${liveStats.totalCourses}
+- Top Cities Covered: ${liveStats.nationwideCoverage}
+- Core Pillars:
+  1. 100% Direct Dealing (Zero Middlemen / No 3rd Party): Students and tutors connect directly with no middleman agency deductions.
+  2. Guaranteed Female Safety & Privacy: Female Alimahs teach 100% online via WebRTC with camera-off privacy mode. Zero in-person home visits for female tutors. Male tutors handle in-person home visits for boys and male students.
+  3. Official Certificates Provided: Verifiable digital course completion certificates and Sanad credentials are provided.
+  4. Local Pakistani Payments: Meezan Bank, JazzCash, EasyPaisa, and Raast ID.
+
+HUMAN SUPPORT HANDOFF:
+- If the user asks to speak with a human, asks for human support, or needs administrator assistance, say warmly:
+  "You can tap the '🙋‍♂️ Talk to Human Support' button right above in this chat, or let me know and I will alert our administration team to join our conversation live."
+`;
+
+  // 2. Prepare conversation history for Gemini multi-turn memory
+  const formattedContents = [];
+  const recentHistory = (history || []).slice(-10);
+  for (const h of recentHistory) {
+    const role = (h.sender === 'user' || h.role === 'user') ? 'user' : 'model';
+    const text = h.text || h.message || '';
+    if (text.trim()) {
+      formattedContents.push({ role, parts: [{ text }] });
+    }
+  }
+
+  // Add the current user message
+  formattedContents.push({ role: 'user', parts: [{ text: message }] });
+
+  let replyText = '';
+  let thoughtsText = '';
+  let source = 'gemini-3.7-flash-thinking';
+
+  // 3. Query Gemini Thinking Model (with automatic fallback to gemini-3.5-flash-lite)
   if (gemini) {
-    try {
-      const formattedContents = [];
+    const modelsToTry = [
+      { id: 'gemini-3.7-flash', thinking: true, budget: 1024 },
+      { id: 'gemini-3.5-flash-lite', thinking: false }
+    ];
 
-      // Add recent history (up to last 6 messages)
-      const recentHistory = history.slice(-6);
-      for (const h of recentHistory) {
-        if (h.sender === 'user' || h.role === 'user') {
-          formattedContents.push({ role: 'user', parts: [{ text: h.text || h.message }] });
-        } else if (h.sender === 'bot' || h.role === 'model') {
-          formattedContents.push({ role: 'model', parts: [{ text: h.text || h.message }] });
-        }
-      }
-
-      // Add the current user message
-      formattedContents.push({ role: 'user', parts: [{ text: message }] });
-
-      // Call Gemini model (gemini-3.6-flash) with retry
-      const modelId = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
-      const response = await executeWithRetry(() => gemini.models.generateContent({
-        model: modelId,
-        contents: formattedContents,
-        config: {
-          systemInstruction: SYSTEM_INSTRUCTION,
+    for (const modelConfig of modelsToTry) {
+      try {
+        const config = {
+          systemInstruction: dynamicSystemInstruction,
           tools: [{ functionDeclarations }]
-        }
-      }));
+        };
 
-      // Check if model returned function calls
-      const candidates = response.candidates || [];
-      const firstCandidate = candidates[0];
-      const functionCalls = firstCandidate?.content?.parts?.filter(p => p.functionCall);
-
-      if (functionCalls && functionCalls.length > 0) {
-        // Execute tool calls against the live database
-        const toolResponses = [];
-        for (const callPart of functionCalls) {
-          const call = callPart.functionCall;
-          let result = {};
-
-          if (call.name === 'search_tutors') {
-            result = await executeSearchTutors(call.args || {});
-          } else if (call.name === 'get_courses') {
-            result = await executeGetCourses(call.args || {});
-          } else if (call.name === 'get_platform_policy') {
-            result = executeGetPlatformPolicy(call.args || {});
-          } else if (call.name === 'get_platform_stats') {
-            result = await executeGetPlatformStats();
-          }
-
-          toolResponses.push({
-            functionResponse: {
-              name: call.name,
-              id: call.id,
-              response: { output: result }
-            }
-          });
+        if (modelConfig.thinking) {
+          config.thinkingConfig = { thinkingBudget: modelConfig.budget };
         }
 
-        // Send tool results back to the model for final natural language synthesis
-        // preserving firstCandidate.content (including thoughtSignature)
-        const followUpContents = [
-          ...formattedContents,
-          firstCandidate.content,
-          { role: 'user', parts: toolResponses }
-        ];
-
-        const finalResponse = await executeWithRetry(() => gemini.models.generateContent({
-          model: modelId,
-          contents: followUpContents,
-          config: {
-            systemInstruction: SYSTEM_INSTRUCTION
-          }
+        const response = await executeWithRetry(() => gemini.models.generateContent({
+          model: modelConfig.id,
+          contents: formattedContents,
+          config
         }));
 
-        const replyText = finalResponse.text || "I have retrieved the latest information from our database for you.";
-        return { reply: replyText, source: 'gemini-function-calling' };
+        const candidates = response.candidates || [];
+        const firstCandidate = candidates[0];
+        const parts = firstCandidate?.content?.parts || [];
+
+        // Extract reasoning / thinking tokens
+        for (const p of parts) {
+          if (p.thought) {
+            thoughtsText += (thoughtsText ? '\n\n' : '') + p.text;
+          }
+        }
+
+        // Check if model invoked database functions
+        const functionCalls = parts.filter(p => p.functionCall);
+
+        if (functionCalls && functionCalls.length > 0) {
+          const toolResponses = [];
+          for (const callPart of functionCalls) {
+            const call = callPart.functionCall;
+            let result = {};
+
+            if (call.name === 'search_tutors') {
+              result = await executeSearchTutors(call.args || {});
+            } else if (call.name === 'get_courses') {
+              result = await executeGetCourses(call.args || {});
+            } else if (call.name === 'get_platform_policy') {
+              result = executeGetPlatformPolicy(call.args || {});
+            }
+
+            toolResponses.push({
+              functionResponse: {
+                name: call.name,
+                response: { output: result }
+              }
+            });
+          }
+
+          // Follow-up synthesis call
+          const followUpContents = [
+            ...formattedContents,
+            firstCandidate.content,
+            { role: 'user', parts: toolResponses }
+          ];
+
+          const followUpConfig = {
+            systemInstruction: dynamicSystemInstruction
+          };
+          if (modelConfig.thinking) {
+            followUpConfig.thinkingConfig = { thinkingBudget: modelConfig.budget };
+          }
+
+          const finalResponse = await executeWithRetry(() => gemini.models.generateContent({
+            model: modelConfig.id,
+            contents: followUpContents,
+            config: followUpConfig
+          }));
+
+          const finalCandidate = (finalResponse.candidates || [])[0];
+          const finalParts = finalCandidate?.content?.parts || [];
+
+          for (const p of finalParts) {
+            if (p.thought) {
+              thoughtsText += (thoughtsText ? '\n\n' : '') + p.text;
+            } else if (p.text) {
+              replyText += p.text;
+            }
+          }
+
+          if (!replyText && finalResponse.text) {
+            replyText = finalResponse.text;
+          }
+
+          source = `${modelConfig.id}-tool-grounded`;
+          break;
+        } else {
+          // Direct natural response
+          for (const p of parts) {
+            if (!p.thought && p.text) {
+              replyText += p.text;
+            }
+          }
+          if (!replyText && response.text) {
+            replyText = response.text;
+          }
+          source = `${modelConfig.id}-direct`;
+          break;
+        }
+      } catch (err) {
+        console.warn(`Gemini model ${modelConfig.id} attempt note:`, err.message);
+      }
+    }
+  }
+
+  // 4. Graceful message if network is temporarily disconnected
+  if (!replyText) {
+    replyText = `Assalam-o-Alaikum! I'm experiencing a brief network interruption with our AI reasoning service.
+
+Please ask me your question again, or tap **'🙋‍♂️ Talk to Human Support'** right above to speak directly with an official team administrator!`;
+    source = 'temporary-network-notice';
+  }
+
+  // 5. Persist the turn into SupportSession in MongoDB
+  let sessionDoc = null;
+  if (sessionId) {
+    try {
+      sessionDoc = await SupportSession.findOne({ sessionId });
+      if (!sessionDoc) {
+        sessionDoc = new SupportSession({
+          sessionId,
+          user: user?._id || user?.id || null,
+          guestInfo: guestInfo || {
+            name: user?.name || 'Guest Visitor',
+            email: user?.email || '',
+            role: user?.role || 'visitor'
+          },
+          status: 'ai_active',
+          messages: []
+        });
       }
 
-      // If no tool was called, return the direct model text
-      if (response.text) {
-        return { reply: response.text, source: 'gemini-direct' };
-      }
-    } catch (apiErr) {
-      console.warn('Gemini API execution note:', apiErr.message, '-> falling back to live database rule engine');
-    }
-  }
-
-  // ==========================================
-  // SMART FALLBACK DATABASE RULE ENGINE
-  // (Ensures the chatbot answers from the database even if GEMINI_API_KEY is pending)
-  // ==========================================
-  const msgLower = (message || '').toLowerCase();
-
-  // 1. Direct dealing inquiry
-  if (msgLower.includes('third party') || msgLower.includes('middleman') || msgLower.includes('commission') || msgLower.includes('direct deal') || msgLower.includes('agency')) {
-    const policy = executeGetPlatformPolicy({ topic: 'direct_dealing' });
-    return {
-      reply: `**${policy.title}**\n\n${policy.details}\n\nYou connect directly with tutors across Pakistan, schedule classes on your own terms, and pay directly without any middleman taking cuts from your hard-earned money.`,
-      source: 'live-database-policy'
-    };
-  }
-
-  // 2. Female Safety inquiry
-  if (msgLower.includes('female') || msgLower.includes('sister') || msgLower.includes('daughter') || msgLower.includes('alimah') || msgLower.includes('privacy') || msgLower.includes('safe') || msgLower.includes('larki')) {
-    const policy = executeGetPlatformPolicy({ topic: 'female_safety' });
-    const tutors = await executeSearchTutors({ gender: 'female', isAlimah: true, limit: 3 });
-    let reply = `**${policy.title}**\n\n${policy.details}\n\n`;
-    if (tutors.results && tutors.results.length > 0) {
-      reply += `**Verified Female Educators Available Now:**\n`;
-      tutors.results.forEach(t => {
-        reply += `• **${t.name}** (${t.city}) — ${t.qualifications} | ${t.hourlyRatePKR} PKR/hr\n  👉 [View Profile](${t.profileUrl})\n`;
+      sessionDoc.messages.push({
+        sender: 'user',
+        senderName: user?.name || sessionDoc.guestInfo?.name || 'User',
+        text: message,
+        createdAt: new Date()
       });
-    } else {
-      reply += `You can browse our verified directory of female Alimahs directly via the Tutors page.`;
-    }
-    return { reply, source: 'live-database-tutors' };
-  }
 
-  // 3. Certificate inquiry
-  if (msgLower.includes('certificate') || msgLower.includes('sanad') || msgLower.includes('degree') || msgLower.includes('diploma') || msgLower.includes('hifz')) {
-    const policy = executeGetPlatformPolicy({ topic: 'certificates' });
-    return {
-      reply: `**${policy.title}**\n\n${policy.details}\n\nAll certificates are issued digitally upon completion and include verified verification links and QR codes.`,
-      source: 'live-database-policy'
-    };
-  }
-
-  // 4. Payment inquiry
-  if (msgLower.includes('payment') || msgLower.includes('jazzcash') || msgLower.includes('easypaisa') || msgLower.includes('meezan') || msgLower.includes('raast') || msgLower.includes('fee')) {
-    const policy = executeGetPlatformPolicy({ topic: 'payments' });
-    return {
-      reply: `**${policy.title}**\n\n${policy.details}\n\nWe support **Meezan Bank**, **JazzCash**, **EasyPaisa**, and **Raast ID** for effortless local Pakistani transactions.`,
-      source: 'live-database-policy'
-    };
-  }
-
-  // 5. Subject or Tutor search inquiry
-  const commonSubjects = ['quran', 'tajweed', 'hifz', 'math', 'physics', 'chemistry', 'biology', 'english', 'urdu', 'islamiyat', 'computer', 'science'];
-  const matchedSubject = commonSubjects.find(s => msgLower.includes(s));
-
-  if (matchedSubject || msgLower.includes('tutor') || msgLower.includes('teacher') || msgLower.includes('qari') || msgLower.includes('ustadh')) {
-    const tutors = await executeSearchTutors({ subject: matchedSubject, limit: 3 });
-    if (tutors.results && tutors.results.length > 0) {
-      let reply = `Salam! Here are verified tutors from our live database${matchedSubject ? ` for **${matchedSubject.toUpperCase()}**` : ''}:\n\n`;
-      tutors.results.forEach(t => {
-        reply += `• **${t.name}** (${t.city})\n  📚 ${t.subjects.join(', ') || t.qualifications}\n  💵 Rate: ${t.hourlyRatePKR} PKR/hr | ⭐ Rating: ${t.rating}\n  👉 [View Profile & Connect Directly](${t.profileUrl})\n\n`;
+      sessionDoc.messages.push({
+        sender: 'bot',
+        senderName: 'IlmiDunya AI Mentor',
+        text: replyText,
+        thoughts: thoughtsText,
+        source,
+        createdAt: new Date()
       });
-      reply += `All dealing is 100% direct with zero third-party agency cuts!`;
-      return { reply, source: 'live-database-tutors' };
+
+      sessionDoc.lastMessage = replyText.slice(0, 140);
+      sessionDoc.lastSender = 'bot';
+      await sessionDoc.save();
+    } catch (saveErr) {
+      console.error('Error persisting SupportSession:', saveErr);
     }
   }
 
-  // Default helpful overview
-  const stats = await executeGetPlatformStats();
   return {
-    reply: `Salam! Welcome to **IlmiDunya Pakistan** (علمی دُنیا پاکستان).\n\nI am your AI academic mentor connected to our live database. Here is what you can ask me about:\n\n• **Direct Dealing**: Learn how student-tutor connection works with zero middleman commissions.\n• **Verified Tutors**: Ask for Qaris, Cambridge O/A level teachers, or certified female Alimahs.\n• **Female Safety**: Ask about our camera-off privacy mode and female tutor network.\n• **Certificates**: Learn about verified digital course & Sanad certificates.\n• **Local Payments**: Information on Meezan Bank, JazzCash, EasyPaisa, and Raast.\n\n*How can I assist you today?*`,
-    source: 'live-database-overview'
+    reply: replyText,
+    thoughts: thoughtsText,
+    source,
+    sessionId,
+    status: sessionDoc?.status || 'ai_active'
   };
 }
 
@@ -468,4 +508,3 @@ module.exports = {
   executeGetPlatformPolicy,
   executeGetPlatformStats
 };
-

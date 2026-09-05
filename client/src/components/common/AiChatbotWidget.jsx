@@ -16,7 +16,8 @@ import {
   BrainCircuit,
   AlertCircle,
   CheckCircle2,
-  PhoneCall
+  PhoneCall,
+  Clock
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';

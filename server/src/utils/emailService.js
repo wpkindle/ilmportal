@@ -198,19 +198,23 @@ const getTransporter = (port = 587) => {
   });
 };
 
-const sendEmailDetailed = async ({ to, subject, html, text }) => {
+const sendEmailDetailed = async ({ to, subject, html, text, replyTo }) => {
   const fromAddress = `"IlmiDunya Pakistan" <${process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com'}>`;
+  const mailPayload = {
+    from: fromAddress,
+    to,
+    subject,
+    text: text || html.replace(/<[^>]*>?/gm, ''),
+    html
+  };
+  if (replyTo) {
+    mailPayload.replyTo = replyTo;
+  }
 
   // 1. Direct Gmail SMTP Port 587 (Authentic DKIM signed by Google, delivers straight to Primary Inbox)
   try {
     const t587 = getTransporter(587);
-    const info587 = await t587.sendMail({
-      from: fromAddress,
-      to,
-      subject,
-      text: text || html.replace(/<[^>]*>?/gm, ''),
-      html
-    });
+    const info587 = await t587.sendMail(mailPayload);
     console.log(`\n======================================================`);
     console.log(`📧 [LIVE EMAIL SENT SUCCESSFULLY VIA GMAIL PORT 587]`);
     console.log(`📬 To: ${to}`);
@@ -224,13 +228,7 @@ const sendEmailDetailed = async ({ to, subject, html, text }) => {
     // 2. Direct Gmail SMTP Port 465 (SSL)
     try {
       const t465 = getTransporter(465);
-      const info465 = await t465.sendMail({
-        from: fromAddress,
-        to,
-        subject,
-        text: text || html.replace(/<[^>]*>?/gm, ''),
-        html
-      });
+      const info465 = await t465.sendMail(mailPayload);
       console.log(`\n======================================================`);
       console.log(`📧 [LIVE EMAIL SENT SUCCESSFULLY VIA GMAIL PORT 465]`);
       console.log(`📬 To: ${to}`);
@@ -1257,6 +1255,66 @@ const sendPasswordResetEmail = async ({
   return sendEmailDetailed({ to, subject: emailSubject, html });
 };
 
+// ==========================================
+// 12. OFFLINE SUPPORT INQUIRY EMAIL
+// ==========================================
+const sendOfflineSupportInquiryEmail = async ({ userName, userEmail, messageText, fileUrl, fileName, sessionId }) => {
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com';
+  const emailSubject = `💬 Offline Support Inquiry from ${userName || 'Visitor'} (${userEmail || 'No Email'})`;
+  const clientUrl = getClientBaseUrl();
+  const supportDeskUrl = `${clientUrl}/admin/support?session=${sessionId || ''}`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8" /></head>
+    <body style="font-family: 'Plus Jakarta Sans', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 24px;">
+      <table style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden;">
+        <tr>
+          <td style="background-color: #0c2217; padding: 24px; text-align: center;">
+            <h2 style="color: #d4a359; margin: 0; font-size: 20px;">IlmiDunya Live Support Desk</h2>
+            <p style="color: #ffffff; margin: 4px 0 0 0; font-size: 13px;">New Offline Inquiry While Staff Away</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 24px; color: #1e293b; font-size: 14px; line-height: 1.6;">
+            <p><strong>A user left an inquiry while administrators were offline:</strong></p>
+            <div style="background-color: #f1f5f9; border-left: 4px solid #d4a359; padding: 14px; margin: 16px 0; border-radius: 6px;">
+              <p style="margin: 0 0 6px 0;"><strong>Name:</strong> ${userName || 'Website Visitor'}</p>
+              <p style="margin: 0 0 6px 0;"><strong>Email:</strong> <a href="mailto:${userEmail}">${userEmail}</a></p>
+              <p style="margin: 0 0 6px 0;"><strong>Session ID:</strong> <code>${sessionId || 'N/A'}</code></p>
+              <p style="margin: 8px 0 0 0;"><strong>Message:</strong></p>
+              <p style="margin: 4px 0 0 0; white-space: pre-wrap; font-style: italic; color: #334155;">"${messageText || ''}"</p>
+              ${fileUrl ? `<p style="margin: 10px 0 0 0;"><strong>Attachment:</strong> <a href="${fileUrl}" target="_blank" style="color: #ba4c18; font-weight: bold;">📎 ${fileName || 'View Attached File'}</a></p>` : ''}
+            </div>
+            <p style="font-size: 13px; color: #64748b;">
+              💡 <strong>Action:</strong> You can click <strong>Reply</strong> in your email client to reach out to <strong>${userEmail}</strong> directly, or manage this chat inside the Support Desk:
+            </p>
+            <div style="text-align: center; margin: 24px 0 10px 0;">
+              <a href="${supportDeskUrl}" style="background-color: #0c2217; color: #d4a359; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+                Open Support Desk Session
+              </a>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px; text-align: center; font-size: 11px; color: #94a3b8;">
+            IlmiDunya Support Notifications &bull; Lahore, Pakistan
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  return sendEmailDetailed({
+    to: adminEmail,
+    subject: emailSubject,
+    html,
+    replyTo: userEmail
+  });
+};
+
 module.exports = {
   sendEmail,
   sendEmailDetailed,
@@ -1269,6 +1327,7 @@ module.exports = {
   sendChatRequestStatusEmail,
   sendTrialContinuationTutorEmail,
   sendTutorFeeClearedEmail,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  sendOfflineSupportInquiryEmail
 };
 

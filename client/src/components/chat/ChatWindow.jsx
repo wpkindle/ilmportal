@@ -67,7 +67,7 @@ const formatFileSize = (bytes) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
+const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversationDeleted }) => {
   const { user, isTutor, isStudent } = useAuth();
   const isTutorToTutor = (isTutor || user?.role === 'tutor') && partner?.role === 'tutor';
   const { socket, onlineUsers, onlineStatusMap, refreshUserOnlineStatus } = useSocket();
@@ -302,7 +302,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
 
         // If I received this message from my counterpart
         if (currentUserId && senderId !== currentUserId) {
-          // Play WhatsApp/Messenger style double-chime
+          // Play notification sound chime
           soundEngine.playMessageSound();
 
           // If document is not currently focused/visible, show native desktop/mobile OS notification banner
@@ -384,12 +384,20 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
       setPartnerDeal((prev) => prev ? { ...prev, status: 'completed' } : { status: 'completed' });
     };
 
+    const handleConversationDeleted = (data) => {
+      const delId = data?.conversationId || data;
+      if (delId === conversationId) {
+        setMessages([]);
+      }
+    };
+
     socket.on('new-message', handleReceiveMessage);
     socket.on('messages-seen', handleMessagesSeen);
     socket.on('messages-delivered', handleMessagesDelivered);
     socket.on('deal-status-updated', handleDealStatusUpdated);
     socket.on('deal-completed', handleDealCompleted);
     socket.on('conversation-cleared', handleConversationCleared);
+    socket.on('conversation-deleted', handleConversationDeleted);
 
     return () => {
       socket.off('new-message', handleReceiveMessage);
@@ -398,6 +406,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
       socket.off('deal-status-updated', handleDealStatusUpdated);
       socket.off('deal-completed', handleDealCompleted);
       socket.off('conversation-cleared', handleConversationCleared);
+      socket.off('conversation-deleted', handleConversationDeleted);
     };
   }, [socket, conversationId, user]);
 
@@ -461,6 +470,17 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'];
+    const allowedExtensions = ['.png', '.jpg', '.jpeg', '.pdf'];
+    const ext = '.' + (file.name.split('.').pop() || '').toLowerCase();
+    const isAllowed = allowedMimeTypes.includes(file.type) || allowedExtensions.includes(ext);
+
+    if (!isAllowed) {
+      alert('Only PNG, JPG, JPEG, and PDF files are allowed.');
+      e.target.value = '';
+      return;
+    }
+
     if (file.size > 10 * 1024 * 1024) {
       alert('File size exceeds the 10MB limit. Please choose a smaller file.');
       e.target.value = '';
@@ -484,6 +504,28 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
     setFilePreview(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  // Delete Conversation (User Action)
+  const handleDeleteConversation = async () => {
+    const ok = window.confirm(
+      'Are you sure you want to delete this conversation?\n\nThis will permanently remove all messages in this chat session for both participants.'
+    );
+    if (!ok) return;
+
+    try {
+      const res = await api.deleteConversation(conversationId);
+      if (res?.success) {
+        setMessages([]);
+        if (onConversationDeleted) {
+          onConversationDeleted(conversationId);
+        }
+      } else {
+        alert(res?.message || 'Failed to delete conversation');
+      }
+    } catch (err) {
+      alert(err.message || 'Error deleting conversation');
     }
   };
 
@@ -890,6 +932,16 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                 <span>Report</span>
               </button>
             )}
+
+            <button
+              type="button"
+              onClick={handleDeleteConversation}
+              className="p-2 rounded-xl text-stone-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors cursor-pointer"
+              title="Delete this chat history"
+              aria-label="Delete this chat"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
           </div>
 
           {/* Mobile Secondary Actions Dropdown (3-Dots Menu) */}
@@ -971,6 +1023,20 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                 >
                   <Flag className="w-4 h-4" />
                   <span>Report to Admin</span>
+                </button>
+
+                <div className="h-px bg-slate-100 my-1" />
+
+                <button
+                  type="button"
+                  onClick={() => {
+                    setMenuOpen(false);
+                    handleDeleteConversation();
+                  }}
+                  className="w-full px-3 py-2 text-left flex items-center gap-2 text-rose-600 hover:bg-rose-50 font-semibold cursor-pointer"
+                >
+                  <Trash2 className="w-4 h-4" />
+                  <span>Delete Chat</span>
                 </button>
 
                 <div className="h-px bg-slate-100 my-1" />
@@ -1375,13 +1441,13 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
             )}
 
             <form onSubmit={handleSendMessage} className="flex items-center gap-1 sm:gap-1.5 w-full">
-              {/* File Attachment Input (hidden) */}
+              {/* File Attachment Input (hidden strictly png, jpg, jpeg, pdf) */}
               <input
                 type="file"
                 ref={fileInputRef}
                 onChange={handleFileSelect}
                 className="hidden"
-                accept="image/*,.pdf,.doc,.docx,.txt"
+                accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf"
               />
 
               {/* File Attachment Button */}
@@ -1390,7 +1456,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
                 onClick={() => fileInputRef.current?.click()}
                 disabled={uploadingFile}
                 className="p-2 sm:p-2.5 text-stone-500 hover:text-[#0c2217] hover:bg-[#f0ece1] rounded-xl sm:rounded-2xl transition-colors cursor-pointer shrink-0"
-                title="Attach Document or Image"
+                title="Attach Image or PDF (PNG, JPG, JPEG, PDF only)"
               >
                 <Paperclip className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>

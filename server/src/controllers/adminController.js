@@ -864,6 +864,55 @@ exports.getConversationTranscript = async (req, res) => {
   }
 };
 
+// @desc    Delete Conversation by Admin
+// @route   DELETE /api/admin/chats/:conversationId
+exports.deleteAdminConversation = async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const parts = (conversationId || '').split('_');
+    let query = { conversationId };
+
+    if (parts.length === 2 && parts[0] && parts[1]) {
+      const p0 = parts[0];
+      const p1 = parts[1];
+      const altConvId = `${p1}_${p0}`;
+      query = {
+        $or: [
+          { conversationId },
+          { conversationId: altConvId },
+          { sender: p0, recipient: p1 },
+          { sender: p1, recipient: p0 }
+        ]
+      };
+    }
+
+    const deleteResult = await Message.deleteMany(query);
+
+    await logAction(req.user.id, 'DELETE_CHAT_CONVERSATION', 'deal', conversationId, { conversationId, deletedCount: deleteResult.deletedCount }, req);
+
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`conv_${conversationId}`).emit('conversation-deleted', { conversationId });
+      if (parts.length === 2) {
+        io.to(`user_${parts[0]}`).emit('conversation-deleted', { conversationId });
+        io.to(`user_${parts[1]}`).emit('conversation-deleted', { conversationId });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Chat conversation permanently deleted by admin',
+      deletedCount: deleteResult.deletedCount
+    });
+  } catch (error) {
+    console.error('Error admin deleting conversation:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error deleting conversation'
+    });
+  }
+};
+
 // @desc    Get All Reviews for Moderation & Override
 // @route   GET /api/admin/reviews
 exports.getAllReviews = async (req, res) => {

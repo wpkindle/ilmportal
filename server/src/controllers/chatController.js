@@ -888,5 +888,114 @@ exports.uploadChatFile = async (req, res) => {
   }
 };
 
+// @desc    Delete a conversation (User deletes chat messages in conversation)
+// @route   DELETE /api/chat/:conversationId
+exports.deleteConversation = async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const userId = req.user.id.toString();
+
+    const parts = (conversationId || '').split('_');
+    let query = { conversationId };
+
+    if (parts.length === 2 && parts[0] && parts[1]) {
+      const p0 = parts[0];
+      const p1 = parts[1];
+      const altConvId = `${p1}_${p0}`;
+
+      // Ensure user is one of the participants
+      if (p0 !== userId && p1 !== userId && req.user.role !== 'admin') {
+        return res.status(403).json({ success: false, message: 'Not authorized to delete this conversation' });
+      }
+
+      query = {
+        $or: [
+          { conversationId },
+          { conversationId: altConvId },
+          { sender: p0, recipient: p1 },
+          { sender: p1, recipient: p0 }
+        ]
+      };
+    } else {
+      if (req.user.role !== 'admin') {
+        query = {
+          conversationId,
+          $or: [{ sender: userId }, { recipient: userId }]
+        };
+      }
+    }
+
+    const deleteResult = await Message.deleteMany(query);
+
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`conv_${conversationId}`).emit('conversation-deleted', { conversationId });
+      if (parts.length === 2) {
+        io.to(`user_${parts[0]}`).emit('conversation-deleted', { conversationId });
+        io.to(`user_${parts[1]}`).emit('conversation-deleted', { conversationId });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Conversation deleted successfully',
+      deletedCount: deleteResult.deletedCount
+    });
+  } catch (error) {
+    console.error('Error deleting conversation:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error deleting conversation'
+    });
+  }
+};
+
+// @desc    Admin delete conversation
+// @route   DELETE /api/chat/admin/:conversationId
+exports.adminDeleteConversation = async (req, res) => {
+  try {
+    const { conversationId } = req.params;
+    const parts = (conversationId || '').split('_');
+    let query = { conversationId };
+
+    if (parts.length === 2 && parts[0] && parts[1]) {
+      const p0 = parts[0];
+      const p1 = parts[1];
+      const altConvId = `${p1}_${p0}`;
+      query = {
+        $or: [
+          { conversationId },
+          { conversationId: altConvId },
+          { sender: p0, recipient: p1 },
+          { sender: p1, recipient: p0 }
+        ]
+      };
+    }
+
+    const deleteResult = await Message.deleteMany(query);
+
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`conv_${conversationId}`).emit('conversation-deleted', { conversationId });
+      if (parts.length === 2) {
+        io.to(`user_${parts[0]}`).emit('conversation-deleted', { conversationId });
+        io.to(`user_${parts[1]}`).emit('conversation-deleted', { conversationId });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Conversation permanently deleted by admin',
+      deletedCount: deleteResult.deletedCount
+    });
+  } catch (error) {
+    console.error('Error admin deleting conversation:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error deleting conversation'
+    });
+  }
+};
+
 
 

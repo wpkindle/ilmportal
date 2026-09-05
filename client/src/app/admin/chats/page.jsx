@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import AdminSidebar from '../../../components/admin/AdminSidebar';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import { api } from '../../../services/api';
-import { MessageSquare, Eye, X, User } from 'lucide-react';
+import { MessageSquare, Eye, X, User, Trash2, FileText, Download, ExternalLink } from 'lucide-react';
 
 export default function ChatAuditPage() {
   const [conversations, setConversations] = useState([]);
@@ -37,6 +37,29 @@ export default function ChatAuditPage() {
       alert(err.message || 'Error fetching transcript');
     } finally {
       setLoadingTranscript(false);
+    }
+  };
+
+  const handleDeleteConversation = async (conversationId) => {
+    if (!conversationId) return;
+    const ok = window.confirm(
+      'Are you sure you want to permanently delete this chat conversation as Admin?\n\nThis will remove all messages in this conversation for both student and tutor.'
+    );
+    if (!ok) return;
+
+    try {
+      const res = await api.adminDeleteConversation(conversationId);
+      if (res?.success) {
+        setConversations((prev) => prev.filter((c) => c.conversationId !== conversationId));
+        if (selectedConv?.conversationId === conversationId) {
+          setSelectedConv(null);
+          setTranscript([]);
+        }
+      } else {
+        alert(res?.message || 'Failed to delete conversation');
+      }
+    } catch (err) {
+      alert(err.message || 'Error deleting conversation');
     }
   };
 
@@ -87,13 +110,22 @@ export default function ChatAuditPage() {
                         {conv.messageCount} messages
                       </td>
                       <td className="p-4 text-right">
-                        <button
-                          onClick={() => openTranscript(conv)}
-                          className="px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-800 font-bold rounded-xl border border-purple-200 inline-flex items-center gap-1.5"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                          <span>View Transcript</span>
-                        </button>
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            onClick={() => openTranscript(conv)}
+                            className="px-3 py-1.5 bg-purple-50 hover:bg-purple-100 text-purple-800 font-bold rounded-xl border border-purple-200 inline-flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            <span>View Transcript</span>
+                          </button>
+                          <button
+                            onClick={() => handleDeleteConversation(conv.conversationId)}
+                            className="p-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 transition-colors cursor-pointer"
+                            title="Delete Conversation"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -118,12 +150,22 @@ export default function ChatAuditPage() {
                   Conv ID: {selectedConv.conversationId}
                 </p>
               </div>
-              <button
-                onClick={() => setSelectedConv(null)}
-                className="p-1 text-slate-400 hover:text-slate-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => handleDeleteConversation(selectedConv.conversationId)}
+                  className="px-3 py-1.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-200 text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  title="Delete this entire conversation"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                  <span>Delete Chat</span>
+                </button>
+                <button
+                  onClick={() => setSelectedConv(null)}
+                  className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
             </div>
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 rounded-2xl my-3">
@@ -140,7 +182,32 @@ export default function ChatAuditPage() {
                         {new Date(msg.createdAt).toLocaleString()}
                       </span>
                     </div>
-                    <p className="text-slate-700">{msg.text}</p>
+                    {msg.text && <p className="text-slate-700">{msg.text}</p>}
+                    {msg.fileUrl && (
+                      <div className="mt-1.5">
+                        {msg.fileType?.startsWith('image/') || /\.(png|jpg|jpeg)$/i.test(msg.fileName || msg.fileUrl) ? (
+                          <a href={msg.fileUrl} target="_blank" rel="noopener noreferrer">
+                            <img
+                              src={msg.fileUrl}
+                              alt={msg.fileName || 'Attachment'}
+                              className="max-h-48 max-w-full rounded-lg object-contain border border-slate-200"
+                            />
+                          </a>
+                        ) : (
+                          <a
+                            href={msg.fileUrl}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download={msg.fileName}
+                            className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-slate-100 border border-slate-200 hover:bg-slate-200 text-slate-700 text-xs transition-colors"
+                          >
+                            <FileText className="w-4 h-4 text-red-500" />
+                            <span className="font-semibold truncate">{msg.fileName || 'Document.pdf'}</span>
+                            <Download className="w-3.5 h-3.5 text-slate-400" />
+                          </a>
+                        )}
+                      </div>
+                    )}
                     {msg.dealOfferData && (
                       <div className="p-2 bg-[#f0ece1] border border-[#d4a359]/40 rounded-lg text-[11px] text-[#0c2217] font-medium mt-1">
                         Deal Offer: {msg.dealOfferData.subject} - PKR {msg.dealOfferData.price} ({msg.dealOfferData.mode})

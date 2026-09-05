@@ -34,8 +34,28 @@ import {
   HelpCircle,
   TrendingUp,
   Award,
-  Layers
+  Layers,
+  Paperclip,
+  Mail,
+  FileText,
+  Download
 } from 'lucide-react';
+
+const getFileUrl = (path) => {
+  if (!path) return '';
+  if (path.startsWith('blob:') || path.startsWith('data:') || path.startsWith('http://') || path.startsWith('https://')) {
+    return path;
+  }
+  const base = (process.env.NEXT_PUBLIC_API_URL || 'https://ilmportal-backend.onrender.com/api').replace(/\/api\/?$/, '');
+  return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
+};
+
+const formatFileSize = (bytes) => {
+  if (!bytes) return '';
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
 
 export default function AdminSupportDeskPage() {
   const { user } = useAuth();
@@ -55,6 +75,10 @@ export default function AdminSupportDeskPage() {
   const [messageText, setMessageText] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [filePreview, setFilePreview] = useState(null);
+  const [uploadingFile, setUploadingFile] = useState(false);
+  const fileInputRef = useRef(null);
   const messagesEndRef = useRef(null);
 
   // FAQ Knowledge Base State
@@ -236,18 +260,113 @@ export default function AdminSupportDeskPage() {
     }
   };
 
+  const handleFileSelect = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedMimeTypes = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'];
+    const allowedExtensions = ['.png', '.jpg', '.jpeg', '.pdf'];
+    const ext = '.' + (file.name.split('.').pop() || '').toLowerCase();
+    const isAllowed = allowedMimeTypes.includes(file.type) || allowedExtensions.includes(ext);
+
+    if (!isAllowed) {
+      alert('Only PNG, JPG, JPEG, and PDF files are allowed.');
+      e.target.value = '';
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      alert('File size exceeds the 10MB limit. Please choose a smaller file.');
+      e.target.value = '';
+      return;
+    }
+
+    setSelectedFile(file);
+    if (file.type.startsWith('image/')) {
+      const previewUrl = URL.createObjectURL(file);
+      setFilePreview(previewUrl);
+    } else {
+      setFilePreview(null);
+    }
+  };
+
+  const handleClearSelectedFile = () => {
+    if (filePreview) {
+      URL.revokeObjectURL(filePreview);
+    }
+    setSelectedFile(null);
+    setFilePreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  const handleDeleteSession = async (sessionIdToDelete) => {
+    const id = sessionIdToDelete || selectedSessionId;
+    if (!id) return;
+    const ok = window.confirm('Are you sure you want to permanently delete this support chat session? This action cannot be undone.');
+    if (!ok) return;
+
+    try {
+      const res = await api.adminDeleteSupportSession(id);
+      if (res?.success) {
+        if (selectedSessionId === id) {
+          setSelectedSessionId(null);
+          setSelectedSession(null);
+        }
+        fetchSessions();
+      } else {
+        alert(res?.message || 'Failed to delete support session');
+      }
+    } catch (err) {
+      alert(err.message || 'Error deleting support session');
+    }
+  };
+
   const handleSendMessage = async (e) => {
     e?.preventDefault();
-    if (!messageText.trim() || !selectedSessionId || isSending) return;
+    if ((!messageText.trim() && !selectedFile) || !selectedSessionId || isSending || uploadingFile) return;
 
     setIsSending(true);
     const text = messageText.trim();
+    let uploadedAttachment = null;
+
+    if (selectedFile) {
+      setUploadingFile(true);
+      try {
+        const formData = new FormData();
+        formData.append('file', selectedFile);
+        formData.append('sessionId', selectedSessionId);
+        const uploadRes = await api.uploadSupportFile(formData);
+        if (uploadRes?.success) {
+          uploadedAttachment = {
+            fileUrl: uploadRes.fileUrl,
+            fileName: uploadRes.fileName,
+            fileType: uploadRes.fileType,
+            fileSize: uploadRes.fileSize
+          };
+        }
+      } catch (uploadErr) {
+        console.error('Error uploading file in admin support:', uploadErr);
+        alert('Failed to upload file. Please try again.');
+        setUploadingFile(false);
+        setIsSending(false);
+        return;
+      }
+      setUploadingFile(false);
+    }
+
     setMessageText('');
+    handleClearSelectedFile();
 
     try {
       const res = await api.adminSendSupportMessage(selectedSessionId, {
         text,
-        senderName: user?.name || 'Administrator'
+        senderName: user?.name || 'Administrator',
+        fileUrl: uploadedAttachment?.fileUrl,
+        fileName: uploadedAttachment?.fileName,
+        fileType: uploadedAttachment?.fileType,
+        fileSize: uploadedAttachment?.fileSize
       });
 
       if (res.success) {
@@ -256,7 +375,11 @@ export default function AdminSupportDeskPage() {
             sessionId: selectedSessionId,
             text,
             sender: 'admin',
-            senderName: user?.name || 'Support Admin'
+            senderName: user?.name || 'Support Admin',
+            fileUrl: uploadedAttachment?.fileUrl || '',
+            fileName: uploadedAttachment?.fileName || '',
+            fileType: uploadedAttachment?.fileType || '',
+            fileSize: uploadedAttachment?.fileSize || 0
           });
         }
         fetchSessionTranscript(selectedSessionId);
@@ -527,16 +650,30 @@ export default function AdminSupportDeskPage() {
                               </span>
                             </div>
 
-                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
-                              isWaiting
-                                ? 'bg-rose-500/20 text-rose-400 border-rose-500/40 animate-pulse'
-                                : isLive
-                                ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
-                                : 'bg-slate-800 text-slate-400 border-slate-700'
-                            }`}>
-                              {isWaiting ? 'Waiting for Admin' : isLive ? 'In Progress' : s.status}
-                            </span>
+                            {s.isOfflineEmailMessage || s.status === 'offline_message' ? (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full border bg-amber-500/20 text-amber-400 border-amber-500/40 flex items-center gap-1">
+                                <Mail className="w-3 h-3" />
+                                <span>Email Note</span>
+                              </span>
+                            ) : (
+                              <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${
+                                isWaiting
+                                  ? 'bg-rose-500/20 text-rose-400 border-rose-500/40 animate-pulse'
+                                  : isLive
+                                  ? 'bg-emerald-500/20 text-emerald-400 border-emerald-500/40'
+                                  : 'bg-slate-800 text-slate-400 border-slate-700'
+                              }`}>
+                                {isWaiting ? 'Waiting for Admin' : isLive ? 'In Progress' : s.status}
+                              </span>
+                            )}
                           </div>
+
+                          {s.replyEmail && (
+                            <p className="text-[11px] text-amber-300 font-mono mb-1 truncate flex items-center gap-1">
+                              <Mail className="w-3 h-3 text-amber-400 shrink-0" />
+                              <span>{s.replyEmail}</span>
+                            </p>
+                          )}
 
                           <p className="text-xs text-slate-300 line-clamp-1 mb-2 font-mono">
                             {s.lastMessage || 'No messages'}
@@ -544,9 +681,22 @@ export default function AdminSupportDeskPage() {
 
                           <div className="flex items-center justify-between text-[10px] text-slate-500">
                             <span>{new Date(s.updatedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-                            {s.assignedAdmin && (
-                              <span className="text-emerald-400">Assigned: {s.assignedAdmin.name || 'Admin'}</span>
-                            )}
+                            <div className="flex items-center gap-2">
+                              {s.assignedAdmin && (
+                                <span className="text-emerald-400">Assigned: {s.assignedAdmin.name || 'Admin'}</span>
+                              )}
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDeleteSession(s.sessionId);
+                                }}
+                                className="p-1 rounded-md text-slate-500 hover:text-rose-400 hover:bg-rose-950/40 transition-colors cursor-pointer"
+                                title="Delete this session"
+                              >
+                                <Trash2 className="w-3 h-3" />
+                              </button>
+                            </div>
                           </div>
                         </div>
                       );
@@ -591,6 +741,17 @@ export default function AdminSupportDeskPage() {
                       </div>
 
                       <div className="flex items-center gap-2">
+                        {selectedSession?.replyEmail && (
+                          <a
+                            href={`mailto:${selectedSession.replyEmail}?subject=IlmiDunya Support - Inquiry Response&body=Dear ${selectedSession?.guestInfo?.name || selectedSession?.user?.name || 'Student'},%0D%0A%0D%0A`}
+                            className="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold flex items-center gap-1.5 transition-colors"
+                            title="Reply via Email Client"
+                          >
+                            <Mail className="w-3.5 h-3.5" />
+                            <span className="hidden sm:inline">Email:</span> {selectedSession.replyEmail}
+                          </a>
+                        )}
+
                         {selectedSession?.status === 'human_requested' && (
                           <button
                             onClick={handleJoinSession}
@@ -610,6 +771,15 @@ export default function AdminSupportDeskPage() {
                             <span>Resolve</span>
                           </button>
                         )}
+
+                        <button
+                          onClick={() => handleDeleteSession(selectedSessionId)}
+                          className="p-1.5 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-xs font-bold flex items-center gap-1 transition-all cursor-pointer"
+                          title="Delete this support session"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                          <span className="hidden sm:inline">Delete</span>
+                        </button>
                       </div>
                     </div>
 
@@ -645,7 +815,41 @@ export default function AdminSupportDeskPage() {
                                   {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                 </span>
                               </div>
-                              <div className="whitespace-pre-wrap font-sans">{m.text}</div>
+                              {m.text && <div className="whitespace-pre-wrap font-sans">{m.text}</div>}
+
+                              {/* Attachment rendering */}
+                              {m.fileUrl && (
+                                <div className="mt-2">
+                                  {m.fileType?.startsWith('image/') || /\.(png|jpg|jpeg)$/i.test(m.fileName || m.fileUrl) ? (
+                                    <div className="rounded-xl overflow-hidden border border-white/20">
+                                      <a href={getFileUrl(m.fileUrl)} target="_blank" rel="noopener noreferrer">
+                                        <img
+                                          src={getFileUrl(m.fileUrl)}
+                                          alt={m.fileName || 'Attachment'}
+                                          className="max-h-60 max-w-full rounded-xl object-contain bg-black/40 hover:opacity-95 transition-opacity"
+                                        />
+                                      </a>
+                                    </div>
+                                  ) : (
+                                    <a
+                                      href={getFileUrl(m.fileUrl)}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      download={m.fileName || 'document.pdf'}
+                                      className="flex items-center gap-2.5 p-2.5 rounded-xl bg-black/30 border border-white/20 hover:border-emerald-400/60 transition-colors"
+                                    >
+                                      <div className="p-2 rounded-lg bg-red-950/60 text-red-400 shrink-0">
+                                        <FileText className="w-5 h-5" />
+                                      </div>
+                                      <div className="min-w-0 flex-1">
+                                        <p className="font-bold text-xs truncate text-white">{m.fileName || 'Document.pdf'}</p>
+                                        <p className="text-[10px] text-slate-300">{formatFileSize(m.fileSize)} &bull; PDF Document</p>
+                                      </div>
+                                      <Download className="w-4 h-4 text-slate-400 hover:text-white shrink-0" />
+                                    </a>
+                                  )}
+                                </div>
+                              )}
                             </div>
                           </div>
                         );
@@ -654,27 +858,72 @@ export default function AdminSupportDeskPage() {
                     </div>
 
                     {/* Live Reply Footer */}
-                    <form onSubmit={handleSendMessage} className="p-3 bg-slate-950 border-t border-slate-800 flex items-center gap-2 shrink-0">
+                    <div className="p-3 bg-slate-950 border-t border-slate-800 space-y-2 shrink-0">
+                      {/* Attachment preview chip before sending */}
+                      {selectedFile && (
+                        <div className="p-2 bg-slate-900 border border-emerald-500/40 rounded-xl flex items-center justify-between gap-2">
+                          <div className="flex items-center gap-2 min-w-0">
+                            {filePreview ? (
+                              <img src={filePreview} alt="Preview" className="w-8 h-8 rounded-lg object-cover shrink-0" />
+                            ) : (
+                              <FileText className="w-5 h-5 text-emerald-400 shrink-0" />
+                            )}
+                            <div className="min-w-0">
+                              <p className="text-xs font-bold text-white truncate">{selectedFile.name}</p>
+                              <p className="text-[10px] text-slate-400">{formatFileSize(selectedFile.size)} &bull; Ready to send</p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={handleClearSelectedFile}
+                            className="p-1 text-slate-400 hover:text-rose-400 cursor-pointer shrink-0"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      )}
+
                       <input
-                        type="text"
-                        value={messageText}
-                        onChange={(e) => setMessageText(e.target.value)}
-                        placeholder={
-                          selectedSession?.status === 'admin_joined'
-                            ? 'Reply directly to user as live staff...'
-                            : 'Click "Join as Support Staff" to take over live chat...'
-                        }
-                        disabled={selectedSession?.status !== 'admin_joined' || isSending}
-                        className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileSelect}
+                        accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf"
+                        className="hidden"
                       />
-                      <button
-                        type="submit"
-                        disabled={selectedSession?.status !== 'admin_joined' || isSending || !messageText.trim()}
-                        className="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white transition-all cursor-pointer shrink-0"
-                      >
-                        <Send className="w-4 h-4" />
-                      </button>
-                    </form>
+
+                      <form onSubmit={handleSendMessage} className="flex items-center gap-2">
+                        <button
+                          type="button"
+                          onClick={() => fileInputRef.current?.click()}
+                          disabled={selectedSession?.status !== 'admin_joined' || isSending || uploadingFile}
+                          className="p-2.5 rounded-xl text-slate-400 hover:text-emerald-400 hover:bg-slate-900 transition-colors cursor-pointer shrink-0 disabled:opacity-40"
+                          title="Attach file (PNG, JPG, JPEG, PDF only)"
+                        >
+                          <Paperclip className="w-4 h-4" />
+                        </button>
+
+                        <input
+                          type="text"
+                          value={messageText}
+                          onChange={(e) => setMessageText(e.target.value)}
+                          placeholder={
+                            selectedSession?.status === 'admin_joined'
+                              ? selectedFile ? 'Add caption (optional)...' : 'Reply directly to user as live staff...'
+                              : 'Click "Join as Support Staff" to take over live chat...'
+                          }
+                          disabled={selectedSession?.status !== 'admin_joined' || isSending || uploadingFile}
+                          className="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                        />
+
+                        <button
+                          type="submit"
+                          disabled={selectedSession?.status !== 'admin_joined' || isSending || uploadingFile || (!messageText.trim() && !selectedFile)}
+                          className="p-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 text-white transition-all cursor-pointer shrink-0"
+                        >
+                          {uploadingFile ? <Clock className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
+                        </button>
+                      </form>
+                    </div>
                   </>
                 )}
               </div>
@@ -739,15 +988,24 @@ export default function AdminSupportDeskPage() {
                           <td className="p-3.5 text-slate-300 max-w-xs truncate">{s.lastMessage}</td>
                           <td className="p-3.5 text-slate-500 text-[11px]">{new Date(s.updatedAt).toLocaleDateString()}</td>
                           <td className="p-3.5 text-right">
-                            <button
-                              onClick={() => {
-                                setSelectedSessionId(s.sessionId);
-                                setActiveMode('inbox');
-                              }}
-                              className="px-2.5 py-1 rounded-lg bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white transition-all text-[11px] font-bold"
-                            >
-                              Inspect
-                            </button>
+                            <div className="flex items-center justify-end gap-1.5">
+                              <button
+                                onClick={() => {
+                                  setSelectedSessionId(s.sessionId);
+                                  setActiveMode('inbox');
+                                }}
+                                className="px-2.5 py-1 rounded-lg bg-emerald-600/20 text-emerald-400 hover:bg-emerald-600 hover:text-white transition-all text-[11px] font-bold cursor-pointer"
+                              >
+                                Inspect
+                              </button>
+                              <button
+                                onClick={() => handleDeleteSession(s.sessionId)}
+                                className="p-1.5 rounded-lg bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 transition-colors cursor-pointer"
+                                title="Delete this support session"
+                              >
+                                <Trash2 className="w-3.5 h-3.5" />
+                              </button>
+                            </div>
                           </td>
                         </tr>
                       ))}

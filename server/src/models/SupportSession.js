@@ -16,7 +16,23 @@ const messageItemSchema = new mongoose.Schema({
   },
   text: {
     type: String,
-    required: true
+    default: ''
+  },
+  fileUrl: {
+    type: String,
+    default: ''
+  },
+  fileName: {
+    type: String,
+    default: ''
+  },
+  fileType: {
+    type: String,
+    default: ''
+  },
+  fileSize: {
+    type: Number,
+    default: 0
   },
   thoughts: {
     type: String,
@@ -51,9 +67,17 @@ const supportSessionSchema = new mongoose.Schema({
     city: { type: String, default: '' },
     ip: { type: String, default: '' }
   },
+  isOfflineEmailMessage: {
+    type: Boolean,
+    default: false
+  },
+  replyEmail: {
+    type: String,
+    default: ''
+  },
   status: {
     type: String,
-    enum: ['ai_active', 'human_requested', 'admin_joined', 'resolved', 'closed'],
+    enum: ['ai_active', 'human_requested', 'admin_joined', 'offline_message', 'resolved', 'closed'],
     default: 'ai_active',
     index: true
   },

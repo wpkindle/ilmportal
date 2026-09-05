@@ -16,6 +16,7 @@ const {
   restrictDealAccess,
   getAllConversations,
   getConversationTranscript,
+  deleteAdminConversation,
   getAllReviews,
   overrideReview,
   deleteReview,
@@ -61,6 +62,7 @@ router.put('/deals/:id/restrict', restrictDealAccess);
 // Chat Oversight
 router.get('/chats', getAllConversations);
 router.get('/chats/:conversationId/transcript', getConversationTranscript);
+router.delete('/chats/:conversationId', deleteAdminConversation);
 
 // Reviews Moderation & Override
 router.get('/reviews', getAllReviews);

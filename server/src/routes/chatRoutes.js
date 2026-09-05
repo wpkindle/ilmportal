@@ -10,9 +10,11 @@ const {
   getChatRequests,
   respondChatRequest,
   getStudentProfileForTutor,
-  uploadChatFile
+  uploadChatFile,
+  deleteConversation,
+  adminDeleteConversation
 } = require('../controllers/chatController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, authorize } = require('../middleware/authMiddleware');
 const multer = require('multer');
 
 // Use memory storage so files are available regardless of filesystem (works on Render/ephemeral)
@@ -21,16 +23,13 @@ const upload = multer({
   limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
   fileFilter: (req, file, cb) => {
     const allowed = [
-      'image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif',
-      'application/pdf',
-      'application/msword',
-      'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-      'text/plain'
+      'image/jpeg', 'image/jpg', 'image/png',
+      'application/pdf'
     ];
     if (allowed.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Supported: JPG, PNG, WEBP, GIF, PDF, DOC, DOCX, TXT'), false);
+      cb(new Error('Invalid file type. Only PNG, JPG, JPEG, and PDF files are allowed.'), false);
     }
   }
 });
@@ -42,6 +41,8 @@ router.get('/:conversationId/messages', getMessages);
 router.post('/send', sendMessage);
 router.post('/upload', upload.single('file'), uploadChatFile);
 router.post('/send-invitation-email', sendChatInvitationEmail);
+router.delete('/:conversationId', deleteConversation);
+router.delete('/admin/:conversationId', authorize('admin'), adminDeleteConversation);
 
 // Chat Request workflow for Female Tutors
 router.post('/request', sendChatRequest);

@@ -381,6 +381,10 @@ export const api = {
     headers: getHeaders(),
     body: JSON.stringify(body)
   }).then(handleResponse),
+  deleteConversation: (conversationId) => fetch(`${API_BASE}/chat/${conversationId}`, {
+    method: 'DELETE',
+    headers: getHeaders()
+  }).then(handleResponse),
 
   // Female Tutor Chat Requests & Student Profile
   sendChatRequest: (body) => fetch(`${API_BASE}/chat/request`, {
@@ -520,6 +524,11 @@ export const api = {
   }).then(handleResponse),
 
   getAdminTranscript: (conversationId) => fetch(`${API_BASE}/admin/chats/${conversationId}/transcript`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  adminDeleteConversation: (conversationId) => fetch(`${API_BASE}/admin/chats/${conversationId}`, {
+    method: 'DELETE',
     headers: getHeaders()
   }).then(handleResponse),
 
@@ -685,28 +694,52 @@ export const api = {
     headers: getHeaders()
   }).then(handleResponse),
 
-  getAdminSupportSessions: (params) => fetch(`${API_BASE}/ai/support/sessions?${new URLSearchParams(params || {})}`, {
+  getAdminSupportSessions: (params) => fetch(`${API_BASE}/support-chat/admin/sessions?${new URLSearchParams(params || {})}`, {
     headers: getHeaders()
   }).then(handleResponse),
 
-  getAdminSupportSession: (id) => fetch(`${API_BASE}/ai/support/sessions/${id}`, {
+  getAdminSupportSession: (id) => fetch(`${API_BASE}/support-chat/admin/sessions/${id}`, {
     headers: getHeaders()
   }).then(handleResponse),
 
-  adminJoinSupportSession: (id) => fetch(`${API_BASE}/ai/support/sessions/${id}/join`, {
+  adminJoinSupportSession: (id) => fetch(`${API_BASE}/support-chat/admin/sessions/${id}/join`, {
     method: 'POST',
     headers: getHeaders()
   }).then(handleResponse),
 
-  adminSendSupportMessage: (id, body) => fetch(`${API_BASE}/ai/support/sessions/${id}/message`, {
+  adminSendSupportMessage: (id, body) => fetch(`${API_BASE}/support-chat/admin/sessions/${id}/message`, {
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify(body)
   }).then(handleResponse),
 
-  adminResolveSupportSession: (id) => fetch(`${API_BASE}/ai/support/sessions/${id}/resolve`, {
+  adminResolveSupportSession: (id) => fetch(`${API_BASE}/support-chat/admin/sessions/${id}/resolve`, {
     method: 'POST',
     headers: getHeaders()
+  }).then(handleResponse),
+
+  adminDeleteSupportSession: (id) => fetch(`${API_BASE}/support-chat/admin/sessions/${id}`, {
+    method: 'DELETE',
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  deleteSupportSession: (sessionId) => fetch(`${API_BASE}/support-chat/session/${sessionId}`, {
+    method: 'DELETE',
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  getAdminOnlineStatus: () => fetch(`${API_BASE}/support-chat/admin-status`).then(handleResponse),
+
+  sendOfflineSupportMessage: (body) => fetch(`${API_BASE}/support-chat/offline-message`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  uploadSupportFile: (formData) => fetch(`${API_BASE}/support-chat/upload`, {
+    method: 'POST',
+    headers: getHeaders(true),
+    body: formData
   }).then(handleResponse),
 
   // AI Support Chat Agent & Knowledge Base

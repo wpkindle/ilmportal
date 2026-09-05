@@ -30,7 +30,9 @@ const initSocket = (io) => {
           const registeredUser = await User.findById(idStr).select('role');
           if (registeredUser && registeredUser.role === 'admin') {
             socket.join('admins');
+            socket.isAdmin = true;
             console.log(`🛡️ Admin ${idStr} joined socket room 'admins'`);
+            io.emit('admin-online-status', { isOnline: true });
           }
         } catch (adminCheckErr) {
           console.warn('Admin check note on socket registration:', adminCheckErr.message);
@@ -171,7 +173,7 @@ const initSocket = (io) => {
     // Send 1:1 Chat Message
     socket.on('send-message', async (data) => {
       try {
-        let { conversationId, senderId, recipientId, text, messageType, dealId, dealOfferData, voiceData, voiceDuration } = data;
+        let { conversationId, senderId, recipientId, text, messageType, dealId, dealOfferData, voiceData, voiceDuration, fileUrl, fileName, fileSize, fileType } = data;
         
         const recipientIdStr = (recipientId?._id || recipientId)?.toString();
         const senderIdStr = (senderId?._id || senderId)?.toString();
@@ -266,9 +268,13 @@ const initSocket = (io) => {
           recipient: recipientId,
           deal: dealId || null,
           text: text || '',
-          messageType: messageType || (voiceData ? 'voice' : 'text'),
+          messageType: messageType || (voiceData ? 'voice' : (fileUrl ? 'file' : 'text')),
           voiceData: voiceData || '',
           voiceDuration: voiceDuration || 0,
+          fileUrl: fileUrl || '',
+          fileName: fileName || '',
+          fileSize: fileSize || 0,
+          fileType: fileType || '',
           dealOfferData: dealOfferData || undefined,
           isDelivered: isRecipientOnline,
           deliveredAt: isRecipientOnline ? new Date() : undefined,
@@ -287,7 +293,7 @@ const initSocket = (io) => {
 
         const alertPayload = {
           title: `New Message from ${populatedMsg.sender.name}`,
-          message: voiceData ? 'Sent a voice message' : (text ? text.slice(0, 70) : 'Sent a course offer'),
+          message: voiceData ? 'Sent a voice message' : (fileUrl ? `Sent a file: ${fileName || 'Attachment'}` : (text ? text.slice(0, 70) : 'Sent a course offer')),
           type: 'new_message',
           conversationId,
           senderAvatar: populatedMsg.sender.avatar || '/icon.png',
@@ -436,10 +442,21 @@ const initSocket = (io) => {
       }
     });
 
+    // Check if any admin is currently online in 'admins' room
+    socket.on('check-admin-online-status', (callback) => {
+      const adminRoom = io.sockets.adapter.rooms.get('admins');
+      const isOnline = Boolean(adminRoom && adminRoom.size > 0);
+      if (typeof callback === 'function') {
+        callback({ isOnline });
+      } else {
+        socket.emit('admin-online-status', { isOnline });
+      }
+    });
+
     socket.on('send-support-message', async (data) => {
       try {
-        const { sessionId, text, sender, senderName, senderAvatar } = data;
-        if (!sessionId || !text || !text.trim()) return;
+        const { sessionId, text, sender, senderName, senderAvatar, fileUrl, fileName, fileType, fileSize } = data;
+        if (!sessionId || (!text?.trim() && !fileUrl)) return;
 
         let session = await SupportSession.findOne({ sessionId });
         if (!session) {
@@ -454,12 +471,16 @@ const initSocket = (io) => {
           sender: sender || 'user',
           senderName: senderName || (sender === 'admin' ? 'Support Specialist' : 'User'),
           senderAvatar: senderAvatar || '',
-          text: text.trim(),
+          text: (text || '').trim(),
+          fileUrl: fileUrl || '',
+          fileName: fileName || '',
+          fileType: fileType || '',
+          fileSize: fileSize || 0,
           createdAt: new Date()
         };
 
         session.messages.push(newMsg);
-        session.lastMessage = text.trim().slice(0, 140);
+        session.lastMessage = (text || '').trim().slice(0, 140) || (fileName ? `[File: ${fileName}]` : '[Attachment]');
         session.lastSender = sender || 'user';
 
         if (sender === 'admin') {
@@ -485,14 +506,14 @@ const initSocket = (io) => {
           }
           io.to('admins').emit('support-session-updated', {
             sessionId,
-            lastMessage: text.trim().slice(0, 140),
+            lastMessage: session.lastMessage,
             lastSender: sender || 'user',
             unreadAdminCount: session.unreadAdminCount
           });
           io.to('admins').emit('human-support-alert', {
             sessionId,
             userName: senderName || 'Website Visitor',
-            message: text.trim(),
+            message: session.lastMessage,
             timestamp: new Date()
           });
         }
@@ -528,6 +549,16 @@ const initSocket = (io) => {
           console.log(`👤 User socket closed: ${socket.userId} (${userSockets.size} remaining)`);
         }
       }
+
+      // Check if admin went offline
+      if (socket.isAdmin) {
+        setTimeout(() => {
+          const adminRoom = io.sockets.adapter.rooms.get('admins');
+          const isOnline = Boolean(adminRoom && adminRoom.size > 0);
+          io.emit('admin-online-status', { isOnline });
+        }, 1000);
+      }
+
       if (socket.roomId && roomParticipants.has(socket.roomId)) {
         roomParticipants.get(socket.roomId).delete(socket.id);
         socket.to(`class_${socket.roomId}`).emit('peer-left', {

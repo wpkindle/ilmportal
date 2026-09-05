@@ -26,8 +26,6 @@ import {
   X,
   Maximize2,
   Minimize2,
-  Expand,
-  Shrink,
   Sliders
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
@@ -123,7 +121,6 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
   // Google Meet Layout Controls:
   const [isSwapped, setIsSwapped] = useState(false); // When true: local stream is on big stage, remote is in PiP
   const [isSelfMinimized, setIsSelfMinimized] = useState(false); // Minimized self floating card
-  const [objectFitMode, setObjectFitMode] = useState('cover'); // 'cover' or 'contain' for main stage
   const [showVolumePopover, setShowVolumePopover] = useState(false);
 
   // Video Refs
@@ -884,9 +881,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                 autoPlay
                 muted
                 playsInline
-                className={`w-full h-full ${
-                  objectFitMode === 'cover' ? 'object-cover' : 'object-contain'
-                } transition-all ${
+                className={`w-full h-full object-cover transition-all ${
                   (!isSwapped ? (!peerConnected || !isRemoteCameraOn) : !isCameraOn) ? 'hidden' : ''
                 } ${isSwapped && isBackgroundBlurred ? 'filter blur-[5px] scale-105' : ''}`}
               />
@@ -947,17 +942,6 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                   </span>
                 </div>
               )}
-
-              {/* Fit / Fill Aspect Toggle Button (Google Meet Style) */}
-              <button
-                type="button"
-                onClick={() => setObjectFitMode(objectFitMode === 'cover' ? 'contain' : 'cover')}
-                className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 px-3 py-1.5 rounded-xl bg-black/60 hover:bg-black/80 backdrop-blur-md border border-white/15 text-slate-200 hover:text-white text-[11px] font-semibold flex items-center gap-1.5 opacity-80 hover:opacity-100 transition-opacity z-20 cursor-pointer shadow-lg"
-                title={objectFitMode === 'cover' ? 'Fit full camera sensor to screen' : 'Fill entire video card'}
-              >
-                {objectFitMode === 'cover' ? <Shrink className="w-3.5 h-3.5" /> : <Expand className="w-3.5 h-3.5" />}
-                <span className="hidden sm:inline">{objectFitMode === 'cover' ? 'Fit Frame' : 'Fill Screen'}</span>
-              </button>
 
               {/* Opponent / Main Stage Participant Name Capsule */}
               <div className="absolute bottom-5 right-5 sm:bottom-6 sm:right-6 px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/15 text-white flex items-center gap-2.5 z-20 shadow-xl">

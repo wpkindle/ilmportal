@@ -19,3 +19,4 @@ router.post('/chat', aiLimiter, aiController.chat);
 router.get('/health', aiController.health);
 
 module.exports = router;
+

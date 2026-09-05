@@ -284,6 +284,18 @@ BEHAVIORAL RULES:
 // CHAT EXECUTION LOGIC
 // ==========================================
 
+// Helper for resilient API calls against transient socket resets
+async function executeWithRetry(fn, maxRetries = 2, delayMs = 600) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    try {
+      return await fn();
+    } catch (err) {
+      if (attempt === maxRetries) throw err;
+      await new Promise(resolve => setTimeout(resolve, delayMs));
+    }
+  }
+}
+
 async function generateChatResponse({ message, history = [] }) {
   const gemini = getGeminiClient();
 
@@ -305,15 +317,16 @@ async function generateChatResponse({ message, history = [] }) {
       // Add the current user message
       formattedContents.push({ role: 'user', parts: [{ text: message }] });
 
-      // Call Gemini model
-      const response = await gemini.models.generateContent({
-        model: 'gemini-2.5-flash',
+      // Call Gemini model (gemini-3.6-flash) with retry
+      const modelId = process.env.GEMINI_MODEL || 'gemini-3.6-flash';
+      const response = await executeWithRetry(() => gemini.models.generateContent({
+        model: modelId,
         contents: formattedContents,
         config: {
           systemInstruction: SYSTEM_INSTRUCTION,
           tools: [{ functionDeclarations }]
         }
-      });
+      }));
 
       // Check if model returned function calls
       const candidates = response.candidates || [];
@@ -340,25 +353,27 @@ async function generateChatResponse({ message, history = [] }) {
           toolResponses.push({
             functionResponse: {
               name: call.name,
+              id: call.id,
               response: { output: result }
             }
           });
         }
 
         // Send tool results back to the model for final natural language synthesis
+        // preserving firstCandidate.content (including thoughtSignature)
         const followUpContents = [
           ...formattedContents,
-          { role: 'model', parts: functionCalls.map(fc => ({ functionCall: fc.functionCall })) },
+          firstCandidate.content,
           { role: 'user', parts: toolResponses }
         ];
 
-        const finalResponse = await gemini.models.generateContent({
-          model: 'gemini-2.5-flash',
+        const finalResponse = await executeWithRetry(() => gemini.models.generateContent({
+          model: modelId,
           contents: followUpContents,
           config: {
             systemInstruction: SYSTEM_INSTRUCTION
           }
-        });
+        }));
 
         const replyText = finalResponse.text || "I have retrieved the latest information from our database for you.";
         return { reply: replyText, source: 'gemini-function-calling' };
@@ -453,3 +468,4 @@ module.exports = {
   executeGetPlatformPolicy,
   executeGetPlatformStats
 };
+

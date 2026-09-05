@@ -1,4 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
+const WebSocket = require('ws');
 
 let supabaseInstance = null;
 
@@ -19,6 +20,9 @@ const getSupabaseClient = () => {
       auth: {
         persistSession: false,
         autoRefreshToken: false
+      },
+      realtime: {
+        transport: WebSocket
       }
     });
     console.log('✅ Supabase PostgreSQL Client initialized successfully');
@@ -32,3 +36,4 @@ const getSupabaseClient = () => {
 module.exports = {
   getSupabaseClient
 };
+

@@ -32,7 +32,7 @@ export const metadata = {
       { url: '/icon.png', type: 'image/png' },
     ],
     shortcut: '/favicon.ico',
-    apple: '/icon.png',
+    apple: '/apple-touch-icon.png',
   },
   appleWebApp: {
     capable: true,

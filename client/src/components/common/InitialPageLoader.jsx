@@ -31,32 +31,37 @@ export default function InitialPageLoader() {
       {/* Background Decorative Glow */}
       <div className="absolute w-72 h-72 bg-[#d4a359]/20 rounded-full blur-[100px] pointer-events-none animate-pulse" />
 
-      <div className="relative z-10 flex flex-col items-center space-y-6">
-        {/* Animated Brand Emblem */}
-        <div className="relative">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-[#d4a359] via-[#fde047] to-[#d4a359] p-0.5 shadow-2xl shadow-[#d4a359]/30 animate-bounce">
-            <div className="w-full h-full bg-[#0c2217] rounded-[22px] flex items-center justify-center">
-              <BookOpen className="w-9 h-9 text-[#d4a359]" />
+      <div className="relative z-10 flex flex-col items-center space-y-6 select-none">
+        {/* Animated Brand Emblem with Rotating Spinner Ring */}
+        <div className="relative flex items-center justify-center">
+          {/* Outer rotating glowing ring */}
+          <div className="w-28 h-28 rounded-full border-[3px] border-[#d4a359]/20 border-t-[#ba4c18] border-r-[#d4a359] animate-spin" />
+
+          {/* Center Brand Emblem Badge Card */}
+          <div className="absolute inset-0 flex items-center justify-center p-3">
+            <div className="w-20 h-20 rounded-2xl bg-white/95 p-1.5 shadow-2xl shadow-black/50 flex items-center justify-center border border-[#d4a359]/30">
+              <img
+                src="/icon.png"
+                alt="IlmiDunya Pakistan"
+                width={72}
+                height={72}
+                className="w-full h-full object-contain select-none"
+              />
             </div>
-          </div>
-          <div className="absolute -top-1 -right-1 w-6 h-6 rounded-full bg-[#b85d34] text-white flex items-center justify-center shadow-lg animate-spin">
-            <Sparkles className="w-3.5 h-3.5 text-white" />
           </div>
         </div>
 
         {/* Brand Text */}
         <div className="text-center space-y-1.5">
           <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white flex items-center justify-center gap-2">
-            <span>Ilm</span>
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#d4a359] via-[#fde047] to-[#d4a359]">
-              Portal
-            </span>
-            <span className="text-[10px] uppercase font-black tracking-widest px-2 py-0.5 bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40 rounded-full">
+            <span>ilmi</span>
+            <span className="text-[#ba4c18]">Dunya</span>
+            <span className="text-[10px] uppercase font-black tracking-widest px-2 py-0.5 bg-[#10b981]/20 text-[#10b981] border border-[#10b981]/30 rounded-full">
               Pakistan
             </span>
           </h1>
           <p className="text-xs text-stone-300 tracking-wide">
-            Verified Quran & Academic Tutoring Platform
+            1-on-1 Quran &amp; Academic LMS • Direct Dealing
           </p>
         </div>
 

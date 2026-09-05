@@ -1,53 +1,257 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000" width="100%" height="100%">
   <defs>
-    <linearGradient id="ilmGrad" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse">
-      <stop offset="0%" stop-color="#07150e" />
-      <stop offset="50%" stop-color="#0c2217" />
-      <stop offset="100%" stop-color="#143d2b" />
-    </linearGradient>
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-color="#000000" flood-opacity="0.25" />
-    </filter>
+    <style>
+      @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&amp;family=Plus+Jakarta+Sans:wght@700;800;900&amp;display=swap');
+      .brand-ilmi {
+        font-family: 'Playfair Display', 'Times New Roman', Georgia, serif;
+        font-size: 110px;
+        font-weight: 800;
+        fill: #222D34;
+        letter-spacing: -0.02em;
+      }
+      .brand-dunya {
+        font-family: 'Playfair Display', 'Times New Roman', Georgia, serif;
+        font-size: 110px;
+        font-weight: 800;
+        fill: #BA4C18;
+        letter-spacing: -0.02em;
+      }
+      .tagline {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        font-size: 31px;
+        font-weight: 800;
+        fill: #222D34;
+        letter-spacing: 0.16em;
+      }
+    </style>
   </defs>
 
-  <!-- Background rounded squircle -->
-  <rect width="64" height="64" rx="16" fill="url(#ilmGrad)" stroke="#d4a359" stroke-width="1.5" />
+  <!-- 1. Background Shield (Outer Fill White) -->
+  <!-- Outer Shield Path -->
+  <path d="M 500,75
+           C 500,75 490,78 475,85
+           L 205,218
+           C 185,228 172,248 172,270
+           L 172,435
+           C 172,448 165,460 154,467
+           L 142,475
+           C 128,484 120,499 120,516
+           L 120,670
+           C 120,690 131,709 148,720
+           L 480,915
+           C 492,922 508,922 520,915
+           L 852,720
+           C 869,709 880,690 880,670
+           L 880,516
+           C 880,499 872,484 858,475
+           L 846,467
+           C 835,460 828,448 828,435
+           L 828,270
+           C 828,248 815,228 795,218
+           L 525,85
+           C 510,78 500,75 500,75 Z"
+        fill="#FFFFFF"
+        stroke="#BA4C18"
+        stroke-width="16"
+        stroke-linejoin="round"
+        stroke-linecap="round" />
 
-  <!-- Open Book Symbol -->
-  <g filter="url(#shadow)">
-    <!-- Left Page -->
-    <path
-      d="M32 46C26 42 18 42 14 43V21C18 20 26 20 32 24V46Z"
-      fill="#FAF8F5"
-    />
-    <!-- Right Page -->
-    <path
-      d="M32 46C38 42 46 42 50 43V21C46 20 38 20 32 24V46Z"
-      fill="#F0ECE1"
-    />
-    <!-- Spine Line -->
-    <path
-      d="M32 24V46"
-      stroke="#d4a359"
-      stroke-width="1.5"
-      stroke-linecap="round"
-    />
-    <!-- Text Lines on Left Page -->
-    <path
-      d="M18 27C22 26.5 26 26.5 28 28.5M18 33C22 32.5 26 32.5 28 34.5M18 39C22 38.5 26 38.5 28 40.5"
-      stroke="#b85d34"
-      stroke-width="1.2"
-      stroke-linecap="round"
-    />
-    <!-- Text Lines on Right Page -->
-    <path
-      d="M46 27C42 26.5 38 26.5 36 28.5M46 33C42 32.5 38 32.5 36 34.5M46 39C42 38.5 38 38.5 36 40.5"
-      stroke="#b85d34"
-      stroke-width="1.2"
-      stroke-linecap="round"
-    />
-    <!-- Star / Beacon on top -->
-    <circle cx="32" cy="15" r="2.5" fill="#d4a359" />
+  <!-- 2. Inner Shield Border (Slate Navy) -->
+  <path d="M 500,105
+           C 500,105 492,107 480,113
+           L 220,238
+           C 205,246 195,261 195,278
+           L 195,432
+           C 195,453 183,472 165,483
+           L 155,490
+           C 147,495 142,504 142,514
+           L 142,662
+           C 142,676 150,689 162,697
+           L 485,888
+           C 494,893 506,893 515,888
+           L 838,697
+           C 850,689 858,676 858,662
+           L 858,514
+           C 858,504 853,495 845,490
+           L 835,483
+           C 817,472 805,453 805,432
+           L 805,278
+           C 805,261 795,246 780,238
+           L 520,113
+           C 508,107 500,105 500,105 Z"
+        fill="none"
+        stroke="#222D34"
+        stroke-width="4.5"
+        stroke-linejoin="round"
+        stroke-linecap="round" />
+
+  <!-- 3. Bottom Dark Wedge with Star -->
+  <g>
+    <!-- Dark Chevron -->
+    <path d="M 255,745
+             L 745,745
+             L 518,878
+             C 507,884 493,884 482,878
+             Z"
+          fill="#222D34" />
+
+    <!-- Five-Pointed Star -->
+    <!-- Center (500, 792), Outer Radius 36, Inner Radius 15 -->
+    <polygon points="
+      500,756
+      511,780
+      536,782
+      517,798
+      523,823
+      500,809
+      477,823
+      483,798
+      464,782
+      489,780"
+      fill="#BA4C18" />
+  </g>
+
+  <!-- 4. Floating Lightbulb & Light Rays -->
+  <g id="lightbulb">
+    <!-- Light Rays (7 Radiating Dashes) -->
+    <!-- Center of bulb is at (500, 260) -->
+    <!-- Ray 1: Top vertical -->
+    <line x1="500" y1="145" x2="500" y2="180" stroke="#BA4C18" stroke-width="7" stroke-linecap="round" />
+    <!-- Ray 2: Upper Left -->
+    <line x1="425" y1="175" x2="445" y2="198" stroke="#BA4C18" stroke-width="7" stroke-linecap="round" />
+    <!-- Ray 3: Mid Left -->
+    <line x1="390" y1="250" x2="425" y2="250" stroke="#BA4C18" stroke-width="7" stroke-linecap="round" />
+    <!-- Ray 4: Lower Left -->
+    <line x1="412" y1="324" x2="435" y2="308" stroke="#BA4C18" stroke-width="7" stroke-linecap="round" />
+    <!-- Ray 5: Upper Right -->
+    <line x1="575" y1="175" x2="555" y2="198" stroke="#BA4C18" stroke-width="7" stroke-linecap="round" />
+    <!-- Ray 6: Mid Right -->
+    <line x1="610" y1="250" x2="575" y2="250" stroke="#BA4C18" stroke-width="7" stroke-linecap="round" />
+    <!-- Ray 7: Lower Right -->
+    <line x1="588" y1="324" x2="565" y2="308" stroke="#BA4C18" stroke-width="7" stroke-linecap="round" />
+
+    <!-- Bulb Glass Outline -->
+    <path d="M 464,328
+             C 452,312 438,288 438,256
+             C 438,222 466,194 500,194
+             C 534,194 562,222 562,256
+             C 562,288 548,312 536,328
+             Z"
+          fill="#FFFFFF"
+          stroke="#BA4C18"
+          stroke-width="8"
+          stroke-linejoin="round" />
+
+    <!-- Bulb Filament (Inverted Heart/W Shape) -->
+    <path d="M 478,324
+             L 478,280
+             C 478,262 492,262 496,280
+             C 498,288 502,288 504,280
+             C 508,262 522,262 522,280
+             L 522,324"
+          fill="none"
+          stroke="#BA4C18"
+          stroke-width="5"
+          stroke-linecap="round"
+          stroke-linejoin="round" />
+
+    <!-- Screw Base (Metallic Threads in Dark Slate) -->
+    <!-- Thread 1 -->
+    <path d="M 470,338 Q 500,345 530,338 L 528,348 Q 500,355 472,348 Z" fill="#222D34" />
+    <!-- Thread 2 -->
+    <path d="M 473,353 Q 500,360 527,353 L 525,363 Q 500,370 475,363 Z" fill="#222D34" />
+    <!-- Thread 3 -->
+    <path d="M 478,368 Q 500,375 522,368 L 518,377 Q 500,383 482,377 Z" fill="#222D34" />
+    <!-- Bottom Contact Point -->
+    <path d="M 488,380 Q 500,389 512,380 Z" fill="#222D34" />
+  </g>
+
+  <!-- 5. The Open Book Motif -->
+  <g id="open-book">
+    <!-- LEFT BOOK PAGES -->
+    <!-- Upper Orange Wing Page 1 (Top Sweep) -->
+    <path d="M 500,470
+             C 440,430 350,348 290,330
+             C 325,348 400,392 485,445
+             Z"
+          fill="#BA4C18" />
+
+    <!-- Upper Orange Wing Page 2 (Main Orange Layer) -->
+    <path d="M 495,466
+             C 430,410 330,370 262,372
+             C 278,382 345,405 475,462
+             Z"
+          fill="#BA4C18" />
+
+    <!-- Lower Slate Wing Page (Lower Fan) -->
+    <path d="M 490,474
+             C 410,432 320,408 260,410
+             C 260,422 340,432 470,476
+             Z"
+          fill="#222D34" />
+
+    <!-- Lower Slate Wing Base (Bottom Border Page) -->
+    <path d="M 480,475
+             C 380,442 300,432 260,432
+             L 260,436
+             C 310,438 410,455 476,478
+             Z"
+          fill="#222D34" />
+
+    <!-- RIGHT BOOK PAGES (Symmetrical Mirror) -->
+    <!-- Upper Orange Wing Page 1 (Top Sweep) -->
+    <path d="M 500,470
+             C 560,430 650,348 710,330
+             C 675,348 600,392 515,445
+             Z"
+          fill="#BA4C18" />
+
+    <!-- Upper Orange Wing Page 2 (Main Orange Layer) -->
+    <path d="M 505,466
+             C 570,410 670,370 738,372
+             C 722,382 655,405 525,462
+             Z"
+          fill="#BA4C18" />
+
+    <!-- Lower Slate Wing Page (Lower Fan) -->
+    <path d="M 510,474
+             C 590,432 680,408 740,410
+             C 740,422 660,432 530,476
+             Z"
+          fill="#222D34" />
+
+    <!-- Lower Slate Wing Base (Bottom Border Page) -->
+    <path d="M 520,475
+             C 620,442 700,432 740,432
+             L 740,436
+             C 690,438 590,455 524,478
+             Z"
+          fill="#222D34" />
+
+    <!-- Central Spine Joint Arc -->
+    <path d="M 488,472 Q 500,466 512,472 Z" fill="#222D34" />
+  </g>
+
+  <!-- 6. Brand Wordmark: "ilmiDunya" -->
+  <g id="brand-typography">
+    <text x="500" y="582" text-anchor="middle">
+      <tspan class="brand-ilmi">ilmi</tspan>
+      <tspan class="brand-dunya">Dunya</tspan>
+    </text>
+  </g>
+
+  <!-- 7. Horizontal Divider with Center Dot -->
+  <g id="divider">
+    <!-- Left line -->
+    <line x1="172" y1="630" x2="480" y2="630" stroke="#BA4C18" stroke-width="3.5" stroke-linecap="round" />
+    <!-- Center Dot -->
+    <circle cx="500" cy="630" r="10" fill="#BA4C18" />
+    <!-- Right line -->
+    <line x1="520" y1="630" x2="828" y2="630" stroke="#BA4C18" stroke-width="3.5" stroke-linecap="round" />
+  </g>
+
+  <!-- 8. Tagline: "KNOWLEDGE. GROWTH. FUTURE." -->
+  <g id="tagline">
+    <text x="500" y="688" text-anchor="middle" class="tagline">KNOWLEDGE. GROWTH. FUTURE.</text>
   </g>
 </svg>
-

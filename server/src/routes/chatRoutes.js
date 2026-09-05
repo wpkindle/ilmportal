@@ -14,7 +14,8 @@ const {
   deleteConversation,
   adminDeleteConversation
 } = require('../controllers/chatController');
-const { protect, authorize } = require('../middleware/authMiddleware');
+const { protect } = require('../middleware/authMiddleware');
+const { authorize } = require('../middleware/roleMiddleware');
 const multer = require('multer');
 
 // Use memory storage so files are available regardless of filesystem (works on Render/ephemeral)

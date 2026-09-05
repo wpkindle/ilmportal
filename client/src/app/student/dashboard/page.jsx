@@ -163,7 +163,14 @@ export default function StudentDashboardPage() {
                         className="w-12 h-12 rounded-2xl object-cover border border-[#e6dfd5]"
                       />
                       <div>
-                        <h3 className="font-serif font-bold text-base text-stone-900">{deal.subject}</h3>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <h3 className="font-serif font-bold text-base text-stone-900">{deal.subject}</h3>
+                          {deal.status === 'completed' && (
+                            <span className="px-2.5 py-0.5 bg-[#eef5f0] text-[#143d2b] border border-[#c3dfcb] rounded-full text-[10px] font-bold uppercase tracking-wider">
+                              Course Completed
+                            </span>
+                          )}
+                        </div>
                         <p className="text-xs text-stone-500 mt-0.5">
                           Tutor: <strong className="text-stone-800">{deal.tutor?.name}</strong> &bull;{' '}
                           <span className="text-[#143d2b] font-medium">
@@ -174,7 +181,7 @@ export default function StudentDashboardPage() {
                     </div>
 
                     <div className="flex items-center gap-2 flex-wrap">
-                      {deal.mode !== 'in_person' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && !deal.accessRestricted && (
+                      {deal.status !== 'completed' && deal.mode !== 'in_person' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && !deal.accessRestricted && (
                         <Link
                           href={`/classroom/${[user?.id || user?._id, deal.tutor?._id].sort().join('_')}`}
                           className="px-4 py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-sm border border-[#d4a359]/30 transition-all"
@@ -184,17 +191,46 @@ export default function StudentDashboardPage() {
                         </Link>
                       )}
 
-                      <Link
-                        href={`/student/messages?conversation=${[user?.id || user?._id, deal.tutor?._id].sort().join('_')}`}
-                        className="px-4 py-2.5 bg-[#faf8f5] hover:bg-[#f3ede2] text-stone-800 border border-[#e6dfd5] font-bold text-xs rounded-xl flex items-center gap-1.5 transition-all"
-                      >
-                        <MessageSquare className="w-4 h-4 text-[#143d2b]" />
-                        <span>Chat</span>
-                      </Link>
+                      {deal.status !== 'completed' && (
+                        <Link
+                          href={`/student/messages?conversation=${[user?.id || user?._id, deal.tutor?._id].sort().join('_')}`}
+                          className="px-4 py-2.5 bg-[#faf8f5] hover:bg-[#f3ede2] text-stone-800 border border-[#e6dfd5] font-bold text-xs rounded-xl flex items-center gap-1.5 transition-all"
+                        >
+                          <MessageSquare className="w-4 h-4 text-[#143d2b]" />
+                          <span>Chat</span>
+                        </Link>
+                      )}
+
+                      {deal.status === 'completed' && (
+                        <div className="px-3 py-1.5 bg-[#f0ece1] border border-[#d4a359]/40 rounded-xl text-xs text-[#0c2217] font-semibold flex items-center gap-1.5">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
+                          <span>Completed &bull; Course Concluded</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
-                  <TrialBanner deal={deal} />
+                  {deal.status === 'completed' ? (
+                    <div className="p-4 bg-[#f0ece1] border border-[#d4a359]/40 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[#0c2217]">
+                      <div className="space-y-0.5">
+                        <span className="font-bold flex items-center gap-1.5 text-[#0c2217]">
+                          <CheckCircle2 className="w-4 h-4 text-[#d4a359]" />
+                          <span>Course Completed Successfully!</span>
+                        </span>
+                        <p className="text-[11px] text-stone-600">
+                          Tutoring sessions for this course have concluded. Thank you for learning on IlmiDunya!
+                        </p>
+                      </div>
+                      <Link
+                        href="/student/deals"
+                        className="px-3.5 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl shadow-xs transition-all shrink-0"
+                      >
+                        Rate &amp; Review Tutor
+                      </Link>
+                    </div>
+                  ) : (
+                    <TrialBanner deal={deal} />
+                  )}
                 </div>
               ))}
             </div>

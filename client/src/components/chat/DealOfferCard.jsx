@@ -80,15 +80,19 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
     setLoading(true);
     try {
       const res = await api.completeDeal(dealId);
-      if (res.success) {
-        setDealState(res.deal);
-        if (onDealUpdated) onDealUpdated(res.deal);
-        alert(res.message || 'Deal marked as completed! Conversation messages have been deleted to save storage.');
-      } else {
-        alert(res.message || 'Failed to complete deal');
-      }
+      const updated = res.deal || { ...dealState, status: 'completed' };
+      setDealState(updated);
+      if (onDealUpdated) onDealUpdated(updated);
+      alert(res.message || 'Deal marked as completed! Conversation messages have been deleted to save storage.');
     } catch (err) {
-      alert(err.message || 'Error completing deal');
+      if (err.message && err.message.toLowerCase().includes('already')) {
+        const updated = { ...dealState, status: 'completed' };
+        setDealState(updated);
+        if (onDealUpdated) onDealUpdated(updated);
+        alert('Deal is marked as completed! Conversation messages have been deleted to save storage.');
+      } else {
+        alert(err.message || 'Error completing deal');
+      }
     } finally {
       setLoading(false);
     }

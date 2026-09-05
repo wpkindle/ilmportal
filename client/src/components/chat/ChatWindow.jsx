@@ -862,15 +862,17 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                 if (!ok) return;
                 try {
                   const res = await api.completeDeal(partnerDeal._id);
-                  if (res.success) {
+                  setPartnerDeal({ ...partnerDeal, status: 'completed' });
+                  setMessages([]);
+                  alert(res?.message || 'Deal completed! Chat history deleted to optimize database storage.');
+                } catch (err) {
+                  if (err.message && err.message.toLowerCase().includes('already')) {
                     setPartnerDeal({ ...partnerDeal, status: 'completed' });
                     setMessages([]);
-                    alert(res.message || 'Deal completed! Chat history deleted to optimize database storage.');
+                    alert('Deal completed! Chat history deleted to optimize database storage.');
                   } else {
-                    alert(res.message || 'Error completing deal');
+                    alert(err.message || 'Error completing deal');
                   }
-                } catch (err) {
-                  alert(err.message || 'Error completing deal');
                 }
               }}
               className="p-2 sm:px-3 sm:py-2 bg-stone-900 hover:bg-black text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-stone-800"

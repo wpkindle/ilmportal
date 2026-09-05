@@ -152,7 +152,7 @@ export default function MyDealsPage() {
                       <span>Rate &amp; Review</span>
                     </button>
 
-                    {deal.status !== 'completed' && (
+                    {deal.status !== 'completed' ? (
                       <Link
                         href={`/student/messages?conversation=${[user?.id || user?._id, deal.tutor?._id].sort().join('_')}`}
                         className="px-3.5 py-2 bg-[#faf8f5] hover:bg-[#f3ede2] text-stone-700 font-bold text-xs rounded-xl border border-[#e6dfd5] transition-colors flex items-center gap-1.5"
@@ -160,6 +160,11 @@ export default function MyDealsPage() {
                         <MessageSquare className="w-3.5 h-3.5 text-[#143d2b]" />
                         <span>Chat</span>
                       </Link>
+                    ) : (
+                      <div className="px-3 py-1.5 bg-[#f0ece1] border border-[#d4a359]/40 rounded-xl text-xs text-[#0c2217] font-semibold flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
+                        <span>Completed &bull; Concluded</span>
+                      </div>
                     )}
                   </div>
                 </div>

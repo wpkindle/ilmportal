@@ -65,4 +65,6 @@ const optionalAuth = async (req, res, next) => {
   next();
 };
 
-module.exports = { protect, optionalAuth };
+const { authorize } = require('./roleMiddleware');
+
+module.exports = { protect, optionalAuth, authorize };

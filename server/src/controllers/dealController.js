@@ -869,7 +869,8 @@ exports.completeDeal = async (req, res) => {
 
     if (
       req.user.role !== 'admin' &&
-      deal.tutor._id.toString() !== req.user.id.toString()
+      deal.tutor?._id?.toString() !== req.user.id.toString() &&
+      deal.tutor?.toString() !== req.user.id.toString()
     ) {
       return res.status(403).json({
         success: false,
@@ -877,47 +878,60 @@ exports.completeDeal = async (req, res) => {
       });
     }
 
-    if (deal.status === 'completed') {
-      return res.status(400).json({
-        success: false,
-        message: 'This deal has already been marked as completed.'
-      });
-    }
+    const isAlreadyCompleted = deal.status === 'completed';
 
-    deal.status = 'completed';
-    deal.completedAt = new Date();
-    deal.completedBy = req.user.id;
-    if (req.body && req.body.notes) {
+    if (!isAlreadyCompleted) {
+      deal.status = 'completed';
+      deal.completedAt = new Date();
+      deal.completedBy = req.user.id;
+      if (req.body && req.body.notes) {
+        deal.completionNotes = req.body.notes;
+      }
+      await deal.save();
+    } else if (req.body && req.body.notes && !deal.completionNotes) {
       deal.completionNotes = req.body.notes;
+      await deal.save();
     }
-    await deal.save();
 
-    const tutorId = deal.tutor._id || deal.tutor;
-    const studentId = deal.student._id || deal.student;
+    const tutorId = (deal.tutor?._id || deal.tutor)?.toString();
+    const studentId = (deal.student?._id || deal.student)?.toString();
+    const tutorObjId = mongoose.Types.ObjectId.isValid(tutorId) ? new mongoose.Types.ObjectId(tutorId) : null;
+    const studentObjId = mongoose.Types.ObjectId.isValid(studentId) ? new mongoose.Types.ObjectId(studentId) : null;
+    const dealObjId = mongoose.Types.ObjectId.isValid(deal._id.toString()) ? new mongoose.Types.ObjectId(deal._id.toString()) : deal._id;
 
     // Delete all conversation messages between this tutor and student to free up database storage
-    const convId1 = [tutorId.toString(), studentId.toString()].sort().join('_');
+    const convId1 = [tutorId, studentId].sort().join('_');
     const convId2 = `${tutorId}_${studentId}`;
     const convId3 = `${studentId}_${tutorId}`;
 
-    const deleteResult = await Message.deleteMany({
-      $or: [
-        { conversationId: convId1 },
-        { conversationId: convId2 },
-        { conversationId: convId3 },
-        { sender: tutorId, recipient: studentId },
-        { sender: studentId, recipient: tutorId },
-        { deal: deal._id }
-      ]
-    });
+    const orConditions = [
+      { conversationId: convId1 },
+      { conversationId: convId2 },
+      { conversationId: convId3 },
+      { sender: tutorId, recipient: studentId },
+      { sender: studentId, recipient: tutorId },
+      { deal: deal._id },
+      { deal: dealObjId }
+    ];
+
+    if (tutorId && studentId) {
+      orConditions.push({ conversationId: { $regex: new RegExp(`(${tutorId}.*${studentId}|${studentId}.*${tutorId})`) } });
+    }
+
+    if (tutorObjId && studentObjId) {
+      orConditions.push({ sender: tutorObjId, recipient: studentObjId });
+      orConditions.push({ sender: studentObjId, recipient: tutorObjId });
+    }
+
+    const deleteResult = await Message.deleteMany({ $or: orConditions });
 
     console.log(`[completeDeal] Deal ${deal._id} marked completed. Deleted ${deleteResult.deletedCount} messages between tutor ${tutorId} and student ${studentId}.`);
 
     // Notify connected clients via Socket.IO
     const io = req.app.get('io');
     if (io) {
-      io.to(tutorId.toString()).emit('deal-completed', { dealId: deal._id, status: 'completed' });
-      io.to(studentId.toString()).emit('deal-completed', { dealId: deal._id, status: 'completed' });
+      io.to(tutorId).emit('deal-completed', { dealId: deal._id, status: 'completed' });
+      io.to(studentId).emit('deal-completed', { dealId: deal._id, status: 'completed' });
       io.to(`user_${tutorId}`).emit('deal-completed', { dealId: deal._id, status: 'completed' });
       io.to(`user_${studentId}`).emit('deal-completed', { dealId: deal._id, status: 'completed' });
 
@@ -930,18 +944,24 @@ exports.completeDeal = async (req, res) => {
     }
 
     // In-app notification to the student
-    await Notification.create({
-      recipient: studentId,
-      sender: req.user.id,
-      title: 'Course Deal Completed! 🎉',
-      message: `Tutor ${deal.tutor.name || 'Your tutor'} marked the course for "${deal.subject}" as completed. Thank you for learning on IlmiDunya!`,
-      type: 'deal_completed',
-      link: '/student/deals'
-    });
+    if (!isAlreadyCompleted && studentObjId) {
+      try {
+        await Notification.create({
+          recipient: studentObjId,
+          sender: req.user.id,
+          title: 'Course Deal Completed! 🎉',
+          message: `Tutor ${deal.tutor?.name || 'Your tutor'} marked the course for "${deal.subject}" as completed. Thank you for learning on IlmiDunya!`,
+          type: 'deal_completed',
+          link: '/student/deals'
+        });
+      } catch (notifErr) {
+        console.warn('[completeDeal] Notification creation note:', notifErr.message);
+      }
+    }
 
     return res.status(200).json({
       success: true,
-      message: `Deal marked as completed successfully. ${deleteResult.deletedCount} chat messages were permanently deleted to free database storage.`,
+      message: `Deal marked as completed successfully. ${deleteResult.deletedCount > 0 ? `${deleteResult.deletedCount} chat messages were permanently deleted to free database storage.` : 'Conversation messages cleared.'}`,
       deal,
       deletedMessagesCount: deleteResult.deletedCount
     });

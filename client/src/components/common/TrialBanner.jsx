@@ -35,6 +35,21 @@ const TrialBanner = ({ deal, onPayClick }) => {
 
   if (!deal) return null;
 
+  // Completed status
+  if (deal.status === 'completed') {
+    return (
+      <div className="p-3 bg-[#f0ece1] rounded-2xl border border-[#d4a359]/40 flex items-center justify-between text-xs text-[#0c2217] shadow-2xs">
+        <div className="flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
+          <div>
+            <span className="font-bold">Course Completed</span>
+            <span className="text-[#0c2217]/80 ml-1.5">&bull; Deal Concluded</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // If viewed by tutor, show the dedicated 72-hour clearance clock & access status
   if (isTutor) {
     return <Tutor72HourClock deal={deal} onPayClick={onPayClick} />;

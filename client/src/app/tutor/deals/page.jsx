@@ -37,26 +37,33 @@ export default function TutorDealsPage() {
 
   const handleCompleteDeal = async (e) => {
     e.preventDefault();
-    if (!dealToComplete) return;
+    if (!dealToComplete || completing) return;
 
     setCompleting(true);
     setFeedback(null);
     try {
       const res = await api.completeDeal(dealToComplete._id, { notes: completionNotes.trim() });
-      if (res.success) {
-        setFeedback({
-          type: 'success',
-          message: res.message || 'Deal marked as completed. Conversation messages removed to free storage.'
-        });
+      setDealToComplete(null);
+      setCompletionNotes('');
+      setFeedback({
+        type: 'success',
+        message: res?.message || 'Deal marked as completed. Conversation messages removed to free storage.'
+      });
+      await fetchDeals();
+      setTimeout(() => setFeedback(null), 6000);
+    } catch (err) {
+      if (err.message && err.message.toLowerCase().includes('already')) {
         setDealToComplete(null);
         setCompletionNotes('');
+        setFeedback({
+          type: 'success',
+          message: 'Deal is marked as completed. Conversation messages removed to free storage.'
+        });
         await fetchDeals();
         setTimeout(() => setFeedback(null), 6000);
       } else {
-        alert(res.message || 'Failed to complete deal');
+        alert(err.message || 'Error completing deal');
       }
-    } catch (err) {
-      alert(err.message || 'Error completing deal');
     } finally {
       setCompleting(false);
     }
@@ -186,11 +193,21 @@ export default function TutorDealsPage() {
                   </div>
                 </div>
 
-                {deal.status !== 'completed' && (
+                {deal.status !== 'completed' ? (
                   <Tutor72HourClock
                     deal={deal}
                     onPayClick={() => setSelectedDealForPay(deal)}
                   />
+                ) : (
+                  <div className="p-3.5 bg-[#f0ece1] border border-[#d4a359]/40 rounded-2xl flex items-center justify-between text-xs text-[#0c2217]">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
+                      <div>
+                        <span className="font-bold">Course Completed &bull; Closed</span>
+                        <p className="text-[11px] text-stone-600">All conversation messages, media attachments, and audio recordings have been cleared to save database storage.</p>
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
             ))}

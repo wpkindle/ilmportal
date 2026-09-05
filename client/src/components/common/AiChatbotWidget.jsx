@@ -17,7 +17,9 @@ import {
   AlertCircle,
   CheckCircle2,
   PhoneCall,
-  Clock
+  Clock,
+  ArrowLeft,
+  MessageSquare
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
@@ -26,8 +28,9 @@ import { useAuth } from '../../context/AuthContext';
 const QUICK_PROMPTS = [
   'Show verified female Alimahs for Quran & Tajweed',
   'Find Cambridge O/A Level subject teachers',
-  'How does direct dealing with tutors work?',
-  'Do you provide official course certificates?',
+  'How does the 3-day free trial work?',
+  'Do you have tutors in Peshawar or Lahore?',
+  'What payment methods are supported in Pakistan?',
   '🙋‍♂️ Talk to a Human Support Agent'
 ];
 
@@ -44,7 +47,8 @@ export default function AiChatbotWidget() {
     {
       id: 'welcome',
       sender: 'bot',
-      text: "Assalam-o-Alaikum! 🌟 Welcome to **IlmiDunya Support Hub**.\n\nI am your AI Academic Counselor, equipped with deep reasoning and connected directly to our live database.\n\nAsk me anything about verified Qaris, female Alimahs, Cambridge tutors, or platform policies. If you need human assistance, tap **'Talk to Human Support'** at any time!",
+      senderName: 'IlmiDunya Support Guide',
+      text: "Assalam-o-Alaikum! 🌟 Welcome to **IlmiDunya Support Hub**.\n\nI am your AI Academic Counselor & Support Guide, connected live to our database.\n\nAsk me anything about verified tutors, female Alimahs, Cambridge faculty, trial periods, or your active lessons. You can also tap **'Talk to Human'** at any time to reach our administration!",
       timestamp: new Date()
     }
   ]);
@@ -52,10 +56,11 @@ export default function AiChatbotWidget() {
   const [isLoading, setIsLoading] = useState(false);
   const [isRequestingHuman, setIsRequestingHuman] = useState(false);
   const [unreadCount, setUnreadCount] = useState(1);
+  const [isTyping, setIsTyping] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
 
-  // Initialize or retrieve persistent sessionId from localStorage
+  // 1. Initialize or restore persistent sessionId from localStorage
   useEffect(() => {
     if (typeof window !== 'undefined') {
       let storedId = localStorage.getItem('ilmidunya_support_session_id');
@@ -67,7 +72,28 @@ export default function AiChatbotWidget() {
     }
   }, []);
 
-  // Auto-scroll to latest message
+  // 2. Restore previous chat history for returning users/sessions
+  useEffect(() => {
+    if (!sessionId) return;
+    api.getSupportSessionHistory(sessionId).then((res) => {
+      if (res?.success && Array.isArray(res.messages) && res.messages.length > 0) {
+        setMessages(res.messages.map((m) => ({
+          id: m._id || (Date.now() + Math.random()).toString(),
+          sender: m.sender,
+          senderName: m.senderName || (m.sender === 'user' ? 'You' : 'IlmiDunya Counselor'),
+          senderAvatar: m.senderAvatar,
+          text: m.text,
+          thoughts: m.thoughts,
+          timestamp: new Date(m.createdAt || Date.now())
+        })));
+        if (res.session?.status) {
+          setSupportStatus(res.session.status);
+        }
+      }
+    }).catch(() => {});
+  }, [sessionId]);
+
+  // 3. Auto-scroll to latest message
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -80,7 +106,7 @@ export default function AiChatbotWidget() {
     }
   }, [isOpen, messages]);
 
-  // Connect to live support socket room
+  // 4. Connect to live support socket room
   useEffect(() => {
     if (!socket || !sessionId) return;
 
@@ -89,7 +115,6 @@ export default function AiChatbotWidget() {
     const handleMessageReceived = (data) => {
       if (data?.sessionId === sessionId && data?.message) {
         const incoming = data.message;
-        // Check if message is already present
         setMessages((prev) => {
           if (prev.some((m) => m.id === incoming._id || (m.text === incoming.text && m.sender === incoming.sender))) {
             return prev;
@@ -102,7 +127,7 @@ export default function AiChatbotWidget() {
             {
               id: incoming._id || (Date.now() + Math.random()).toString(),
               sender: incoming.sender,
-              senderName: incoming.senderName,
+              senderName: incoming.senderName || 'Staff Agent',
               senderAvatar: incoming.senderAvatar,
               text: incoming.text,
               thoughts: incoming.thoughts,
@@ -116,48 +141,55 @@ export default function AiChatbotWidget() {
     const handleAdminJoined = (data) => {
       if (data?.sessionId === sessionId) {
         setSupportStatus('admin_joined');
-        setAssignedAdmin(data.admin?.name || 'Support Specialist');
+        setAssignedAdmin(data.admin?.name || 'Official Staff');
         setMessages((prev) => [
           ...prev,
           {
-            id: (Date.now() + 1).toString(),
+            id: Date.now().toString(),
             sender: 'system',
-            text: `🟢 ${data.admin?.name || 'A Support Specialist'} has joined this conversation. You are now speaking directly with a human team member.`,
+            text: `🟢 **${data.admin?.name || 'A Support Specialist'} has joined the chat.** You are now speaking directly with our administrative team.`,
             timestamp: new Date()
           }
         ]);
-        if (!isOpen) setUnreadCount((c) => c + 1);
       }
     };
 
     const handleStatusChanged = (data) => {
-      if (data?.sessionId === sessionId && data?.status) {
+      if (data?.sessionId === sessionId && data.status) {
         setSupportStatus(data.status);
-        if (data.assignedAdmin) {
-          setAssignedAdmin(data.assignedAdmin);
-        }
+      }
+    };
+
+    const handleTyping = (data) => {
+      if (data?.sessionId === sessionId && data.sender === 'admin') {
+        setIsTyping(true);
+      }
+    };
+
+    const handleStopTyping = (data) => {
+      if (data?.sessionId === sessionId && data.sender === 'admin') {
+        setIsTyping(false);
       }
     };
 
     socket.on('support-message-received', handleMessageReceived);
     socket.on('admin-joined-support', handleAdminJoined);
     socket.on('support-status-changed', handleStatusChanged);
+    socket.on('support-typing', handleTyping);
+    socket.on('support-stop-typing', handleStopTyping);
 
     return () => {
       socket.off('support-message-received', handleMessageReceived);
       socket.off('admin-joined-support', handleAdminJoined);
       socket.off('support-status-changed', handleStatusChanged);
+      socket.off('support-typing', handleTyping);
+      socket.off('support-stop-typing', handleStopTyping);
     };
   }, [socket, sessionId, isOpen]);
 
-  // Hide on classroom routes to keep video calls distraction-free
-  if (pathname?.startsWith('/classroom')) {
-    return null;
-  }
-
-  // Request Human Support escalation
+  // 5. Explicit Human Support Handoff Trigger
   const handleRequestHuman = async () => {
-    if (isRequestingHuman || supportStatus === 'admin_joined') return;
+    if (isRequestingHuman) return;
     setIsRequestingHuman(true);
 
     try {
@@ -171,10 +203,10 @@ export default function AiChatbotWidget() {
         role: 'visitor'
       };
 
-      const res = await api.requestHumanSupport({
+      const res = await api.escalateSupportToHuman({
         sessionId,
         guestInfo,
-        note: 'User tapped Talk to Human Support button'
+        note: 'User clicked Talk to Human Support button'
       });
 
       if (res.success) {
@@ -184,7 +216,7 @@ export default function AiChatbotWidget() {
           {
             id: Date.now().toString(),
             sender: 'system',
-            text: "🙋‍♂️ **Human Support Requested!**\n\nWe have notified our administration team. An official support specialist will join this chat shortly. You can continue typing your questions below.",
+            text: "🙋‍♂️ **Human Support Staff Alerted!**\n\nWe have alerted our administration team. An official support specialist will join this chat shortly.\n\nYou can continue typing your questions below, or reach out on WhatsApp at **+92 317 1759093** if urgent.",
             timestamp: new Date()
           }
         ]);
@@ -195,17 +227,17 @@ export default function AiChatbotWidget() {
       }
     } catch (err) {
       console.error('Error requesting human support:', err);
-      alert('Unable to request human support at this moment. Please email contact@ilmidunya.pk or try again.');
     } finally {
       setIsRequestingHuman(false);
     }
   };
 
+  // 6. Handle User Message Dispatch
   const handleSend = async (textToSend) => {
     const text = (textToSend || inputValue).trim();
     if (!text || isLoading) return;
 
-    // Quick prompt check for human support
+    // Quick prompt check for human handoff
     if (text.includes('Talk to a Human') || text.includes('Human Support Agent')) {
       setInputValue('');
       await handleRequestHuman();
@@ -223,7 +255,7 @@ export default function AiChatbotWidget() {
     setMessages((prev) => [...prev, userMessage]);
     setInputValue('');
 
-    // If an admin has already joined the chat, route directly to human support via socket
+    // If an admin is connected live, route directly through WebSockets
     if (supportStatus === 'admin_joined') {
       if (socket) {
         socket.emit('send-support-message', {
@@ -236,7 +268,7 @@ export default function AiChatbotWidget() {
       return;
     }
 
-    // Otherwise, query Gemini 3.7 Flash thinking model
+    // Otherwise, dispatch to AI Support Agent with live RAG context
     setIsLoading(true);
 
     try {
@@ -258,7 +290,7 @@ export default function AiChatbotWidget() {
         role: 'visitor'
       };
 
-      const res = await api.sendAiChat({
+      const res = await api.sendSupportChatMessage({
         message: text,
         history,
         sessionId,
@@ -268,8 +300,8 @@ export default function AiChatbotWidget() {
       const botMessage = {
         id: (Date.now() + 1).toString(),
         sender: 'bot',
-        senderName: 'IlmiDunya AI Mentor',
-        text: res.reply || 'I have retrieved information from our database.',
+        senderName: 'IlmiDunya Counselor',
+        text: res.reply || 'Assalam-o-Alaikum! How can I assist you further?',
         thoughts: res.thoughts,
         source: res.source,
         timestamp: new Date()
@@ -277,90 +309,22 @@ export default function AiChatbotWidget() {
 
       setMessages((prev) => [...prev, botMessage]);
 
-      if (res.status && res.status !== supportStatus) {
-        setSupportStatus(res.status);
+      if (res.shouldEscalate) {
+        setSupportStatus('human_requested');
       }
     } catch (err) {
-      const errorMessage = {
-        id: (Date.now() + 1).toString(),
-        sender: 'bot',
-        senderName: 'IlmiDunya AI Mentor',
-        text: "I apologize, I am experiencing a brief connection delay with our AI reasoning service. You can ask again, or tap **'Talk to Human Support'** above to reach our team immediately.",
-        isError: true,
-        timestamp: new Date()
-      };
-      setMessages((prev) => [...prev, errorMessage]);
+      setMessages((prev) => [
+        ...prev,
+        {
+          id: (Date.now() + 1).toString(),
+          sender: 'system',
+          text: 'Assalam-o-Alaikum! Please tap **"🙋‍♂️ Talk to Human Support"** right above to connect directly with our administrative team.',
+          timestamp: new Date()
+        }
+      ]);
     } finally {
       setIsLoading(false);
     }
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
-    }
-  };
-
-  // Helper to render bold markdown and links
-  const renderFormattedText = (text) => {
-    if (!text) return null;
-
-    const lines = text.split('\n');
-    return lines.map((line, idx) => {
-      const isBullet = line.trim().startsWith('•') || line.trim().startsWith('* ') || line.trim().startsWith('- ');
-      const cleanLine = isBullet ? line.replace(/^[•*-]\s*/, '') : line;
-
-      // Link regex: [Title](url)
-      const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
-      const parts = [];
-      let lastIndex = 0;
-      let match;
-
-      while ((match = linkRegex.exec(cleanLine)) !== null) {
-        if (match.index > lastIndex) {
-          parts.push(cleanLine.substring(lastIndex, match.index));
-        }
-        parts.push(
-          <a
-            key={match.index}
-            href={match[2]}
-            className="text-[#d4a359] hover:underline font-bold inline-flex items-center gap-0.5 ml-1"
-            target={match[2].startsWith('http') ? '_blank' : '_self'}
-            rel="noopener noreferrer"
-          >
-            {match[1]}
-            <ExternalLink className="w-3 h-3 inline shrink-0" />
-          </a>
-        );
-        lastIndex = match.index + match[0].length;
-      }
-      if (lastIndex < cleanLine.length) {
-        parts.push(cleanLine.substring(lastIndex));
-      }
-
-      const formattedParts = parts.map((part, pIdx) => {
-        if (typeof part !== 'string') return part;
-        const boldParts = part.split(/(\*\*[^*]+\*\*)/g);
-        return boldParts.map((bPart, bIdx) => {
-          if (bPart.startsWith('**') && bPart.endsWith('**')) {
-            return <strong key={bIdx} className="text-white font-bold">{bPart.slice(2, -2)}</strong>;
-          }
-          return bPart;
-        });
-      });
-
-      if (!cleanLine.trim()) {
-        return <div key={idx} className="h-2" />;
-      }
-
-      return (
-        <p key={idx} className={`${isBullet ? 'pl-3 flex items-start gap-1.5' : ''} leading-relaxed`}>
-          {isBullet && <span className="text-[#d4a359] mt-0.5 shrink-0">•</span>}
-          <span>{formattedParts}</span>
-        </p>
-      );
-    });
   };
 
   const isAdminConnected = supportStatus === 'admin_joined';
@@ -368,15 +332,19 @@ export default function AiChatbotWidget() {
 
   return (
     <>
-      {/* 1. FLOATING SUPPORT TRIGGER BUTTON */}
-      <div className="fixed bottom-20 md:bottom-5 right-3 sm:right-6 z-40">
+      {/* 1. FLOATING BOTTOM-RIGHT SUPPORT TRIGGER PILL */}
+      <div className="fixed bottom-5 right-4 sm:bottom-6 sm:right-6 z-40 print:hidden">
         <button
-          onClick={() => setIsOpen(!isOpen)}
-          aria-label="Open IlmiDunya Support"
-          className="flex items-center gap-2.5 px-4 py-2.5 sm:px-4 sm:py-2.5 min-h-[44px] rounded-full shadow-[0_8px_30px_rgba(12,34,23,0.6)] bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#0c2217] hover:from-[#143d2b] hover:to-[#1a4a35] text-[#f5f0e6] border-2 border-[#10b981]/50 hover:border-[#d4a359] hover:scale-105 active:scale-95 transition-all duration-300 backdrop-blur-xl cursor-pointer group"
+          onClick={() => setIsOpen((prev) => !prev)}
+          className="group relative flex items-center gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#0c2217] border-2 border-[#d4a359]/60 shadow-[0_10px_30px_rgba(12,34,23,0.55)] hover:shadow-[0_15px_35px_rgba(212,163,89,0.35)] hover:scale-105 transition-all duration-300 cursor-pointer"
+          aria-label="Open IlmiDunya Support Chat"
         >
-          <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-[#10b981] via-[#d4a359] to-[#ba4c18] flex items-center justify-center text-white shrink-0 shadow-sm shadow-black/40 group-hover:rotate-12 transition-transform">
-            <Headphones className="w-3.5 h-3.5 text-white" />
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#d4a359]/20 border border-[#d4a359]/40 flex items-center justify-center text-[#d4a359] group-hover:bg-[#d4a359] group-hover:text-[#0c2217] transition-colors shrink-0">
+            {isAdminConnected ? (
+              <Headphones className="w-4 h-4 text-emerald-400 group-hover:text-[#0c2217]" />
+            ) : (
+              <Headphones className="w-4 h-4" />
+            )}
           </div>
           <span className="text-xs sm:text-sm font-extrabold tracking-tight text-white flex items-center gap-1.5">
             <span>Support</span>
@@ -393,13 +361,20 @@ export default function AiChatbotWidget() {
         </button>
       </div>
 
-      {/* 2. SUPPORT CHAT WINDOW DIALOG */}
+      {/* 2. SUPPORT CHAT PANEL (Full-Screen on Mobile, Floating Drawer on Desktop) */}
       {isOpen && (
-        <div className="fixed bottom-24 md:bottom-20 right-2 sm:right-6 z-50 w-[94vw] sm:w-[420px] max-h-[84vh] h-[580px] flex flex-col rounded-2xl sm:rounded-3xl bg-[#07150e]/95 border-2 border-[#d4a359]/35 shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 sm:inset-auto sm:bottom-20 sm:right-6 z-50 w-full sm:w-[440px] h-[100dvh] sm:h-[620px] sm:max-h-[85vh] flex flex-col rounded-none sm:rounded-3xl bg-[#07150e]/95 border-0 sm:border-2 border-[#d4a359]/35 shadow-[0_20px_50px_rgba(0,0,0,0.85)] backdrop-blur-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           
           {/* Header */}
           <div className="px-4 py-3 sm:py-3.5 bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#07150e] border-b border-[#d4a359]/25 flex items-center justify-between shrink-0">
             <div className="flex items-center gap-2.5">
+              <button
+                onClick={() => setIsOpen(false)}
+                className="sm:hidden p-1.5 -ml-1 text-stone-300 hover:text-white"
+                aria-label="Back"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
               <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#10b981] via-[#d4a359] to-[#b85d34] p-0.5 flex items-center justify-center shadow-md">
                 <div className="w-full h-full bg-[#0c2217] rounded-[10px] flex items-center justify-center">
                   {isAdminConnected ? (
@@ -416,13 +391,13 @@ export default function AiChatbotWidget() {
                   </h3>
                   <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-300 bg-emerald-950/80 px-1.5 py-0.5 rounded-full border border-emerald-500/40">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                    {isAdminConnected ? 'Live Agent' : isHumanRequested ? 'Alerting Admin' : 'Gemini 3.7'}
+                    {isAdminConnected ? 'Live Staff' : isHumanRequested ? 'Connecting Staff' : 'AI Counselor'}
                   </span>
                 </div>
                 <p className="text-[10px] text-stone-300">
                   {isAdminConnected
                     ? 'Connected with human support specialist'
-                    : '1:1 Tutors • Direct Dealing • Certificates • Safety'}
+                    : '1:1 Tutors • Direct Dealing • 3-Day Trial • Safety'}
                 </p>
               </div>
             </div>
@@ -430,16 +405,24 @@ export default function AiChatbotWidget() {
             <div className="flex items-center gap-1">
               <button
                 onClick={() => setIsOpen(false)}
-                className="p-1.5 rounded-lg text-stone-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
+                className="hidden sm:flex p-1.5 rounded-lg text-stone-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer"
                 title="Minimize chat"
                 aria-label="Minimize chat"
               >
                 <ChevronDown className="w-5 h-5" />
               </button>
+              <button
+                onClick={() => setIsOpen(false)}
+                className="sm:hidden p-1.5 rounded-lg text-stone-400 hover:text-white hover:bg-white/10 transition-colors"
+                title="Close chat"
+                aria-label="Close chat"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
           </div>
 
-          {/* Human Escalation Banner / Action */}
+          {/* Persistent Human Escalation Banner */}
           {!isAdminConnected && (
             <div className="px-3.5 py-2 bg-[#0c2217]/90 border-b border-white/5 flex items-center justify-between gap-2 shrink-0">
               <div className="flex items-center gap-1.5 text-[11px] text-stone-300">
@@ -451,172 +434,153 @@ export default function AiChatbotWidget() {
                 ) : (
                   <span className="flex items-center gap-1 text-stone-300 text-[10.5px]">
                     <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
-                    AI Thinking Model Active
+                    AI Support Counselor Active
                   </span>
                 )}
               </div>
 
-              {!isHumanRequested && (
+              {!isHumanRequested ? (
                 <button
                   onClick={handleRequestHuman}
                   disabled={isRequestingHuman}
-                  className="px-2.5 py-1 rounded-lg bg-emerald-900/60 hover:bg-emerald-800 border border-emerald-500/40 text-emerald-200 hover:text-white text-[10px] sm:text-[11px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
+                  className="px-2.5 py-1 rounded-full bg-[#ba4c18]/90 hover:bg-[#ba4c18] text-white text-[11px] font-bold flex items-center gap-1 transition-transform hover:scale-105 shadow-sm border border-[#d4a359]/30 cursor-pointer"
                 >
-                  <Headphones className="w-3 h-3 text-emerald-400" />
+                  <Headphones className="w-3 h-3" />
                   <span>Talk to Human</span>
                 </button>
+              ) : (
+                <span className="text-[10px] text-amber-200/80 font-mono">Live Queue: #1</span>
               )}
             </div>
           )}
 
-          {/* Quick Prompts Carousel Bar (Only in AI Mode) */}
-          {!isAdminConnected && (
-            <div className="px-3 py-1.5 bg-[#0c2217]/50 border-b border-white/5 overflow-x-auto flex items-center gap-1.5 scrollbar-none text-[11px] shrink-0">
-              {QUICK_PROMPTS.map((prompt, idx) => (
-                <button
-                  key={idx}
-                  onClick={() => handleSend(prompt)}
-                  disabled={isLoading}
-                  className="px-2.5 py-1 rounded-full bg-[#143d2b]/60 hover:bg-[#143d2b] border border-[#d4a359]/25 hover:border-[#d4a359] text-stone-200 hover:text-white transition-all whitespace-nowrap shrink-0 text-[10px] sm:text-[10.5px] cursor-pointer"
-                >
-                  {prompt}
-                </button>
-              ))}
-            </div>
-          )}
-
-          {/* Messages Area */}
-          <div className="flex-1 p-3.5 sm:p-4 overflow-y-auto space-y-3.5 text-xs text-stone-200 overscroll-contain">
-            {messages.map((msg) => {
-              const isUser = msg.sender === 'user';
-              const isBot = msg.sender === 'bot';
-              const isAdmin = msg.sender === 'admin';
-              const isSystem = msg.sender === 'system';
+          {/* Messages Scroll Area */}
+          <div className="flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-4 space-y-3 scrollbar-thin scrollbar-thumb-stone-700">
+            {messages.map((m) => {
+              const isUser = m.sender === 'user';
+              const isSystem = m.sender === 'system';
+              const isAdmin = m.sender === 'admin';
 
               if (isSystem) {
                 return (
-                  <div key={msg.id} className="flex justify-center my-2">
-                    <div className="max-w-[90%] text-center text-[10.5px] font-medium text-amber-200/90 bg-amber-950/60 border border-amber-800/40 px-3.5 py-1.5 rounded-2xl leading-relaxed">
-                      {renderFormattedText(msg.text)}
+                  <div key={m.id} className="p-3 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-amber-200 text-xs leading-relaxed space-y-1">
+                    <div className="whitespace-pre-wrap font-sans">{m.text}</div>
+                    <div className="text-[9px] text-amber-400/60 text-right">
+                      {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
                   </div>
                 );
               }
 
               return (
-                <div
-                  key={msg.id}
-                  className={`flex gap-2.5 ${isUser ? 'justify-end' : 'justify-start'}`}
-                >
+                <div key={m.id} className={`flex gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
                   {!isUser && (
-                    <div
-                      className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 mt-1 border ${
-                        isAdmin
-                          ? 'bg-[#10b981] border-white/40 text-white'
-                          : 'bg-[#143d2b] border-[#d4a359]/40 text-[#d4a359]'
-                      }`}
-                    >
-                      {isAdmin ? <Headphones className="w-3.5 h-3.5 text-white" /> : <Bot className="w-3.5 h-3.5" />}
+                    <div className="w-6 h-6 rounded-full bg-[#d4a359]/20 border border-[#d4a359]/40 flex items-center justify-center shrink-0 mt-1">
+                      {isAdmin ? (
+                        <Headphones className="w-3.5 h-3.5 text-emerald-400" />
+                      ) : (
+                        <Bot className="w-3.5 h-3.5 text-[#d4a359]" />
+                      )}
                     </div>
                   )}
 
-                  <div className="max-w-[85%] space-y-1">
-                    {/* Sender Tag */}
-                    {isAdmin && (
-                      <span className="text-[9.5px] font-bold text-emerald-400 pl-1 flex items-center gap-1">
-                        <span>Staff Support Specialist</span>
+                  <div className={`max-w-[85%] sm:max-w-[80%] rounded-2xl p-3 text-xs leading-relaxed ${
+                    isUser
+                      ? 'bg-gradient-to-r from-[#ba4c18] to-[#963b10] text-white rounded-br-xs shadow-md'
+                      : isAdmin
+                      ? 'bg-emerald-950/80 border border-emerald-500/30 text-emerald-100 rounded-bl-xs shadow-md'
+                      : 'bg-[#102a1d]/90 border border-[#d4a359]/20 text-stone-200 rounded-bl-xs shadow-md'
+                  }`}>
+                    <div className="flex items-center justify-between gap-2 mb-1">
+                      <span className="text-[10px] font-bold opacity-75">
+                        {isUser ? 'You' : isAdmin ? `Staff (${m.senderName || 'Admin'})` : 'IlmiDunya Counselor'}
                       </span>
-                    )}
+                      <span className="text-[9px] opacity-60">
+                        {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                      </span>
+                    </div>
 
-                    {/* Gemini Thinking Accordion */}
-                    {msg.thoughts && (
-                      <details className="text-[10px] bg-[#0c2217]/90 border border-[#d4a359]/30 rounded-xl p-2 text-stone-300 space-y-1">
-                        <summary className="font-bold text-[#d4a359] cursor-pointer flex items-center gap-1 select-none">
-                          <BrainCircuit className="w-3 h-3 text-[#d4a359]" />
-                          <span>AI Reasoned with Database</span>
-                        </summary>
-                        <p className="mt-1 whitespace-pre-wrap font-mono text-[9.5px] text-stone-400 leading-relaxed border-t border-white/10 pt-1">
-                          {msg.thoughts}
-                        </p>
-                      </details>
-                    )}
-
-                    <div
-                      className={`rounded-2xl px-3.5 py-2.5 text-xs sm:text-[13px] leading-relaxed shadow-sm ${
-                        isUser
-                          ? 'bg-gradient-to-r from-[#b85d34] to-[#9e4e2a] text-white rounded-br-none'
-                          : isAdmin
-                          ? 'bg-gradient-to-r from-[#143d2b] to-[#0c2217] border-2 border-[#10b981]/50 text-stone-100 rounded-bl-none shadow-md'
-                          : msg.isError
-                          ? 'bg-rose-950/70 border border-rose-500/40 text-rose-200 rounded-bl-none'
-                          : 'bg-[#143d2b]/60 border border-[#d4a359]/25 text-stone-200 rounded-bl-none'
-                      }`}
-                    >
-                      {renderFormattedText(msg.text)}
+                    <div className="whitespace-pre-wrap font-sans space-y-1">
+                      {m.text}
                     </div>
                   </div>
-
-                  {isUser && (
-                    <div className="w-6 h-6 rounded-full bg-[#b85d34] flex items-center justify-center text-white shrink-0 mt-1">
-                      <User className="w-3.5 h-3.5" />
-                    </div>
-                  )}
                 </div>
               );
             })}
 
+            {isTyping && (
+              <div className="flex items-center gap-2 text-xs text-stone-400 italic">
+                <div className="flex gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-bounce" style={{ animationDelay: '300ms' }} />
+                </div>
+                <span>Staff agent is typing...</span>
+              </div>
+            )}
+
             {isLoading && (
-              <div className="flex gap-2.5 justify-start">
-                <div className="w-6 h-6 rounded-full bg-[#143d2b] border border-[#d4a359]/40 flex items-center justify-center text-[#d4a359] shrink-0 mt-1">
-                  <Bot className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-2 text-xs text-[#d4a359] italic">
+                <div className="flex gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#d4a359] animate-bounce" style={{ animationDelay: '0ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#d4a359] animate-bounce" style={{ animationDelay: '150ms' }} />
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#d4a359] animate-bounce" style={{ animationDelay: '300ms' }} />
                 </div>
-                <div className="bg-[#143d2b]/60 border border-[#d4a359]/25 rounded-2xl rounded-bl-none px-4 py-3 text-xs flex items-center gap-2 text-stone-300">
-                  <BrainCircuit className="w-4 h-4 text-[#d4a359] animate-pulse" />
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#d4a359] animate-bounce" />
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#d4a359] animate-bounce [animation-delay:0.2s]" />
-                  <div className="w-1.5 h-1.5 rounded-full bg-[#d4a359] animate-bounce [animation-delay:0.4s]" />
-                  <span className="text-[11px] text-stone-300 pl-1 font-medium">
-                    Reasoning through inquiry with live database...
-                  </span>
-                </div>
+                <span>Retrieving verified platform data...</span>
               </div>
             )}
 
             <div ref={messagesEndRef} />
           </div>
 
-          {/* Footer Input Bar */}
-          <div className="p-2.5 sm:p-3 bg-[#07150e] border-t border-[#d4a359]/20 shrink-0">
-            <div className="relative flex items-center">
+          {/* Quick Prompts Bar */}
+          <div className="px-3 py-2 bg-[#0c2217]/70 border-t border-white/5 overflow-x-auto whitespace-nowrap scrollbar-none flex gap-1.5 shrink-0">
+            {QUICK_PROMPTS.map((prompt, idx) => (
+              <button
+                key={idx}
+                onClick={() => handleSend(prompt)}
+                disabled={isLoading}
+                className="px-2.5 py-1 rounded-full bg-white/5 hover:bg-[#d4a359]/20 text-stone-300 hover:text-[#d4a359] text-[10.5px] border border-white/10 transition-colors shrink-0 cursor-pointer"
+              >
+                {prompt}
+              </button>
+            ))}
+          </div>
+
+          {/* Input & Send Footer */}
+          <div className="p-3 bg-[#0c2217] border-t border-[#d4a359]/25 shrink-0">
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                handleSend();
+              }}
+              className="flex items-center gap-2"
+            >
               <input
                 ref={inputRef}
                 type="text"
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
-                onKeyDown={handleKeyDown}
                 placeholder={
                   isAdminConnected
-                    ? `Message ${assignedAdmin || 'Support Staff'} live...`
-                    : 'Ask about tutors, fees, or request human support...'
+                    ? 'Message support staff directly...'
+                    : 'Ask about tutors, trials, fees, or your lessons...'
                 }
-                className="w-full bg-[#0c2217] border border-[#d4a359]/30 rounded-xl pl-3.5 pr-11 py-2.5 text-xs sm:text-sm text-white placeholder:text-stone-500 focus:outline-none focus:ring-2 focus:ring-[#d4a359] focus:border-transparent transition-all"
+                className="flex-1 bg-black/40 border border-white/15 rounded-xl px-3.5 py-2 text-xs text-white placeholder:text-stone-400 focus:outline-none focus:border-[#d4a359] transition-colors"
                 disabled={isLoading}
               />
               <button
-                onClick={() => handleSend()}
-                disabled={!inputValue.trim() || isLoading}
+                type="submit"
+                disabled={isLoading || !inputValue.trim()}
+                className="p-2 rounded-xl bg-gradient-to-r from-[#ba4c18] to-[#963b10] hover:scale-105 disabled:opacity-40 disabled:hover:scale-100 text-white transition-all cursor-pointer shrink-0"
                 aria-label="Send message"
-                className="absolute right-1.5 p-2 rounded-lg bg-gradient-to-r from-[#10b981] to-[#059669] hover:from-[#059669] hover:to-[#047857] text-white disabled:opacity-40 disabled:hover:from-[#10b981] transition-all cursor-pointer"
               >
-                <Send className="w-3.5 h-3.5" />
+                <Send className="w-4 h-4" />
               </button>
-            </div>
-            <div className="flex items-center justify-between text-[10px] text-stone-400 pt-1.5 px-1">
-              <span className="flex items-center gap-1">
-                <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
-                100% Direct Dealing &bull; Female Safe
-              </span>
-              <span>English &bull; اردو</span>
+            </form>
+            <div className="mt-1.5 flex items-center justify-between text-[9.5px] text-stone-400">
+              <span>IlmiDunya Pakistan • AI & Live Support Desk</span>
+              <span className="text-emerald-400/80">Support: contact@ilmidunya.pk</span>
             </div>
           </div>
 

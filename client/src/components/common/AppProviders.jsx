@@ -8,6 +8,7 @@ import { NotificationProvider } from '../../context/NotificationContext';
 import InitialPageLoader from './InitialPageLoader';
 import SupportPlatformWidget from './SupportPlatformWidget';
 import InAppNotificationToast from './InAppNotificationToast';
+import AiChatbotWidget from './AiChatbotWidget';
 
 export default function AppProviders({ children }) {
   const router = useRouter();
@@ -66,6 +67,7 @@ export default function AppProviders({ children }) {
           <InitialPageLoader />
           <InAppNotificationToast />
           <SupportPlatformWidget />
+          <AiChatbotWidget />
           {children}
         </NotificationProvider>
       </SocketProvider>

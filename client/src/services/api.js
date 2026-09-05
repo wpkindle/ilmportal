@@ -755,5 +755,47 @@ export const api = {
   adminResolveSupportSession: (id) => fetch(`${API_BASE}/ai/support/sessions/${id}/resolve`, {
     method: 'POST',
     headers: getHeaders()
+  }).then(handleResponse),
+
+  // AI Support Chat Agent & Knowledge Base
+  sendSupportChatMessage: (body) => fetch(`${API_BASE}/support-chat/message`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  getSupportSessionHistory: (sessionId) => fetch(`${API_BASE}/support-chat/session/${sessionId}`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  escalateSupportToHuman: (body) => fetch(`${API_BASE}/support-chat/escalate`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  getSupportFaqs: (category) => fetch(`${API_BASE}/support-chat/faqs${category ? `?category=${category}` : ''}`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  adminCreateSupportFaq: (body) => fetch(`${API_BASE}/support-chat/admin/faqs`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  adminUpdateSupportFaq: (id, body) => fetch(`${API_BASE}/support-chat/admin/faqs/${id}`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  adminDeleteSupportFaq: (id) => fetch(`${API_BASE}/support-chat/admin/faqs/${id}`, {
+    method: 'DELETE',
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  getSupportAnalytics: () => fetch(`${API_BASE}/support-chat/admin/analytics`, {
+    headers: getHeaders()
   }).then(handleResponse)
 };

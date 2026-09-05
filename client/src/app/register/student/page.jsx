@@ -70,10 +70,6 @@ export default function StudentRegisterPage() {
           <Link href="/" className="inline-flex items-center gap-3 group">
             <BrandLogo variant="light" size="md" />
           </Link>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40 text-xs font-bold shadow-xs">
-            <GraduationCap className="w-3.5 h-3.5 text-[#d4a359]" />
-            <span>Student Registration &bull; Female Privacy Protected</span>
-          </div>
           <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#0c2217] tracking-tight">
             Create Student Account
           </h1>
@@ -104,7 +100,7 @@ export default function StudentRegisterPage() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Hamza Khan / Ayesha Bibi"
+                  placeholder="Enter your full name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white font-medium"
@@ -123,7 +119,7 @@ export default function StudentRegisterPage() {
                 <input
                   type="email"
                   required
-                  placeholder="student@example.com"
+                  placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white font-medium"
@@ -141,7 +137,7 @@ export default function StudentRegisterPage() {
                 <input
                   type="tel"
                   required
-                  placeholder="0300-1234567"
+                  placeholder="Enter your mobile or WhatsApp number"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white font-medium"
@@ -159,7 +155,7 @@ export default function StudentRegisterPage() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
-                  placeholder="Create password (min 6 chars)"
+                  placeholder="Enter your password (min 6 characters)"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-10 pr-10 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white font-medium"
@@ -203,7 +199,7 @@ export default function StudentRegisterPage() {
             <p className="text-stone-600 font-medium">
               Already registered as a student?{' '}
               <Link href="/login?role=student" className="font-bold text-[#b85d34] hover:text-[#9e4e2a] hover:underline">
-                Sign In to Student Portal
+                Sign In
               </Link>
             </p>
           </div>

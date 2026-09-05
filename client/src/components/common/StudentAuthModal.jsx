@@ -471,7 +471,7 @@ export default function StudentAuthModal({
                     type="text"
                     required
                     autoComplete="off"
-                    placeholder="e.g. Hamza Khan"
+                    placeholder="Enter your full name"
                     value={registerForm.name}
                     onChange={(e) => setRegisterForm({ ...registerForm, name: e.target.value })}
                     className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 font-medium"
@@ -490,7 +490,7 @@ export default function StudentAuthModal({
                     type="tel"
                     required
                     autoComplete="off"
-                    placeholder="0300-1234567"
+                    placeholder="Enter your mobile or WhatsApp number"
                     value={registerForm.phone}
                     onChange={(e) => setRegisterForm({ ...registerForm, phone: e.target.value })}
                     className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 font-medium"
@@ -509,7 +509,7 @@ export default function StudentAuthModal({
                     type="email"
                     required
                     autoComplete="off"
-                    placeholder="student@example.com"
+                    placeholder="Enter your email address"
                     value={registerForm.email}
                     onChange={(e) => setRegisterForm({ ...registerForm, email: e.target.value })}
                     className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 font-medium"
@@ -528,7 +528,7 @@ export default function StudentAuthModal({
                     type={showRegisterPassword ? 'text' : 'password'}
                     required
                     autoComplete="new-password"
-                    placeholder="Minimum 6 characters"
+                    placeholder="Enter your password (min 6 characters)"
                     value={registerForm.password}
                     onChange={(e) => setRegisterForm({ ...registerForm, password: e.target.value })}
                     className="w-full pl-8 pr-8 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 font-medium"

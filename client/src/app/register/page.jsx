@@ -280,7 +280,7 @@ function RegisterContent() {
                 <input
                   type="text"
                   required
-                  placeholder={role === 'tutor' ? 'e.g. Qari Huzaifa Ahmed' : 'e.g. Hamza Khan'}
+                  placeholder="Enter your full name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white focus:ring-1 focus:ring-[#0c2217] font-medium"
@@ -347,7 +347,7 @@ function RegisterContent() {
                 <input
                   type="email"
                   required
-                  placeholder="name@example.com"
+                  placeholder="Enter your email address"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white focus:ring-1 focus:ring-[#0c2217] font-medium"
@@ -365,7 +365,7 @@ function RegisterContent() {
                 <input
                   type={showPassword ? 'text' : 'password'}
                   required
-                  placeholder="Create a strong password (min 6 chars)"
+                  placeholder="Enter your password (min 6 characters)"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-10 pr-10 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white focus:ring-1 focus:ring-[#0c2217] font-medium"
@@ -407,7 +407,7 @@ function RegisterContent() {
                   <input
                     type="tel"
                     required={role === 'tutor'}
-                    placeholder="0300-1234567"
+                    placeholder="Enter your mobile or WhatsApp number"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white focus:ring-1 focus:ring-[#0c2217]"

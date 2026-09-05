@@ -74,23 +74,9 @@ function LoginContent() {
           <Link href="/" className="inline-flex items-center gap-3 group">
             <BrandLogo variant="light" size="md" />
           </Link>
-
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40 text-xs font-bold mx-auto shadow-xs">
-            {isTutorMode ? (
-              <>
-                <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-                <span>Tutor Portal</span>
-              </>
-            ) : (
-              <>
-                <GraduationCap className="w-3.5 h-3.5 text-[#d4a359]" />
-                <span>Student Portal</span>
-              </>
-            )}
-          </div>
           
           <h1 className="text-2xl sm:text-3xl font-serif font-bold text-[#0c2217] tracking-tight">
-            {isTutorMode ? 'Tutor Portal Sign In' : 'Student Portal Sign In'}
+            {isTutorMode ? 'Tutor Sign In' : 'Student Sign In'}
           </h1>
           <p className="text-xs text-stone-600 max-w-sm mx-auto leading-relaxed">
             {isTutorMode
@@ -111,7 +97,7 @@ function LoginContent() {
           <form onSubmit={handleSubmit} autoComplete="off" className="space-y-4">
             <div>
               <label className="text-xs font-bold text-stone-800 block mb-1">
-                {isTutorMode ? 'Tutor Email or Username' : 'Student Email or Username'}
+                {isTutorMode ? 'Tutor Email or Mobile' : 'Student Email or Mobile'}
               </label>
               <div className="relative">
                 <Mail className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
@@ -119,7 +105,7 @@ function LoginContent() {
                   type="text"
                   required
                   autoComplete="off"
-                  placeholder={isTutorMode ? 'tutor@example.com or username' : 'student@example.com or username'}
+                  placeholder="Enter your email or mobile number"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
@@ -140,7 +126,7 @@ function LoginContent() {
                   type={showPassword ? 'text' : 'password'}
                   required
                   autoComplete="new-password"
-                  placeholder="••••••••"
+                  placeholder="Enter your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="w-full pl-10 pr-10 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
@@ -165,7 +151,7 @@ function LoginContent() {
                 <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
               ) : (
                 <>
-                  <span>{isTutorMode ? 'Sign In to Tutor Portal' : 'Sign In to Student Portal'}</span>
+                  <span>{isTutorMode ? 'Sign In as Tutor' : 'Sign In as Student'}</span>
                   <ArrowRight className="w-4 h-4 text-[#d4a359]" />
                 </>
               )}

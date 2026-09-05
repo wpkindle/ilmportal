@@ -236,7 +236,7 @@ export default function ContactUsPage() {
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#b85d34] focus:bg-white"
-                      placeholder="e.g. 0300 1234567"
+                      placeholder="Enter Your Number"
                     />
                   </div>
                 </div>

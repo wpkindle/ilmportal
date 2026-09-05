@@ -407,7 +407,7 @@ function RegisterContent() {
                   <input
                     type="tel"
                     required={role === 'tutor'}
-                    placeholder="Enter your mobile or WhatsApp number"
+                    placeholder="Enter Your Number"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white focus:ring-1 focus:ring-[#0c2217]"

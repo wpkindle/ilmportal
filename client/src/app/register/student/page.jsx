@@ -137,7 +137,7 @@ export default function StudentRegisterPage() {
                 <input
                   type="tel"
                   required
-                  placeholder="Enter your mobile or WhatsApp number"
+                  placeholder="Enter Your Number"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white font-medium"

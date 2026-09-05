@@ -31,6 +31,7 @@ import ChatRequestModal from '../../../components/common/ChatRequestModal';
 import { calculateClientCompletion } from '../../../components/common/ProfileCompletionMeter';
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
+import { getTutorAvatar } from '../../../utils/tutorHelpers';
 
 export default function TutorProfileClient({ tutor, reviews = [] }) {
   const router = useRouter();
@@ -41,14 +42,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
 
   const tutorUser = tutor?.user || {};
   const tutorName = tutorUser.name || 'Verified Tutor';
-  const isAyesha = tutorName?.toLowerCase().includes('ayesha');
-  const rawAvatar = tutorUser.avatar;
-  const tutorAvatar =
-    isAyesha
-      ? '/images/dr-ayesha.jpg'
-      : (rawAvatar && !rawAvatar.includes('594824813575'))
-        ? rawAvatar
-        : `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=0c2217&color=d4a359`;
+  const tutorAvatar = getTutorAvatar(tutor || tutorUser, tutorName);
 
   React.useEffect(() => {
     const fetchCourses = async () => {
@@ -131,11 +125,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                   alt={tutorName}
                   onError={(e) => {
                     e.currentTarget.onerror = null;
-                    if (isAyesha) {
-                      e.currentTarget.src = '/images/dr-ayesha.jpg';
-                    } else {
-                      e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=0c2217&color=d4a359`;
-                    }
+                    e.currentTarget.src = getTutorAvatar({ name: tutorName }, tutorName);
                   }}
                   className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl object-cover border-2 border-[#e6ded1] shadow-sm"
                 />

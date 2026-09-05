@@ -12,6 +12,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import { api } from '../../services/api';
+import { getTutorAvatar } from '../../utils/tutorHelpers';
 
 export default function ChatRequestModal({
   isOpen,
@@ -29,7 +30,7 @@ export default function ChatRequestModal({
 
   const tutorUser = tutor?.user || tutor || {};
   const tutorName = tutorUser.name || tutor?.name || 'Female Tutor';
-  const tutorAvatar = tutorUser.avatar || tutor?.avatar || '/images/dr-ayesha.jpg';
+  const tutorAvatar = getTutorAvatar(tutor || tutorUser, tutorName);
   const tutorTargetId = tutorUser._id || tutorUser.id || tutor?._id;
 
   const handleSubmit = async (e) => {

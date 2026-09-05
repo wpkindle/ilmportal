@@ -28,6 +28,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { allPakistaniCities } from '../../data/pakistanAreas';
+import { getTutorAvatar } from '../../utils/tutorHelpers';
 
 const pakistaniCities = allPakistaniCities;
 
@@ -85,7 +86,7 @@ export default function StudentAuthModal({
   const data = tutor || {};
   const tutorUser = data.user || {};
   const tutorName = tutorUser.name || data.name || 'Verified Faculty';
-  const tutorAvatar = tutorUser.avatar || data.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=0c2217&color=d4a359`;
+  const tutorAvatar = getTutorAvatar(data || tutorUser, tutorName);
   const tutorRate = data.hourlyRate ? `PKR ${data.hourlyRate}/hr` : 'Custom Agreed Fee';
   const tutorTargetId = tutorUser._id || tutorUser.id || data._id;
   const tutorCity = tutorUser.city || data.city || 'Pakistan';
@@ -490,7 +491,7 @@ export default function StudentAuthModal({
                     type="tel"
                     required
                     autoComplete="off"
-                    placeholder="Enter your mobile or WhatsApp number"
+                    placeholder="Enter Your Number"
                     value={registerForm.phone}
                     onChange={(e) => setRegisterForm({ ...registerForm, phone: e.target.value })}
                     className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 font-medium"

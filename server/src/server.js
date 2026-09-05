@@ -116,6 +116,28 @@ const startServer = async () => {
         console.warn('Profile defaults cleanup note:', cleanupErr.message);
       }
 
+      // Ensure verified faculty have authoritative cultural portraits
+      try {
+        await User.updateMany(
+          { $or: [{ name: { $regex: /huzaifa/i } }, { email: 'qari.huzaifa@example.com' }] },
+          { $set: { avatar: '/images/tutors/qari-huzaifa.jpg' } }
+        );
+        await User.updateMany(
+          { $or: [{ name: { $regex: /fatima|zahra/i } }, { email: 'alimah.fatima@example.com' }] },
+          { $set: { avatar: '/images/tutors/alimah-fatima.jpg' } }
+        );
+        await User.updateMany(
+          { $or: [{ name: { $regex: /abdul r[ea]hman/i } }, { email: 'abdul.rahman@example.com' }] },
+          { $set: { avatar: '/images/tutors/ustadh-abdul-rehman.jpg' } }
+        );
+        await User.updateMany(
+          { $or: [{ name: { $regex: /ayesha/i } }, { email: 'dr.ayesha@example.com' }] },
+          { $set: { avatar: '/images/dr-ayesha.jpg' } }
+        );
+      } catch (avatarSyncErr) {
+        console.warn('Avatar sync note:', avatarSyncErr.message);
+      }
+
       server.on('error', (e) => {
         if (e.code === 'EADDRINUSE') {
           console.error(`Port ${PORT} is currently in use. Exiting for clean supervisor restart...`);

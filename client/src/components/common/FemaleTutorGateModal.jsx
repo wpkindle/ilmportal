@@ -11,6 +11,7 @@ import {
   Lock
 } from 'lucide-react';
 import { calculateClientCompletion } from './ProfileCompletionMeter';
+import { getTutorAvatar } from '../../utils/tutorHelpers';
 
 export default function FemaleTutorGateModal({
   isOpen,
@@ -61,8 +62,12 @@ export default function FemaleTutorGateModal({
           {/* Tutor Info Preview */}
           <div className="p-3.5 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] flex items-center gap-3">
             <img
-              src={tutorAvatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(tutorName)}&background=0c2217&color=d4a359`}
+              src={getTutorAvatar(tutorAvatar ? { avatar: tutorAvatar, name: tutorName } : { name: tutorName }, tutorName)}
               alt={tutorName}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = getTutorAvatar({ name: tutorName }, tutorName);
+              }}
               className="w-12 h-12 rounded-xl object-cover border border-white shadow-xs"
             />
             <div className="min-w-0 flex-1">

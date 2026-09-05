@@ -618,7 +618,7 @@ function TutorProfileContent() {
                     <input
                       type="tel"
                       required
-                      placeholder="0300-1234567"
+                      placeholder="Enter Your Number"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
                       className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-medium"

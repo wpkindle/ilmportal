@@ -31,6 +31,7 @@ import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import TutorCard from '../../../components/tutor/TutorCard';
+import { getTutorAvatar } from '../../../utils/tutorHelpers';
 
 export default function CourseDetailPage() {
   const params = useParams();
@@ -254,8 +255,12 @@ export default function CourseDetailPage() {
                 {course.instructor && (
                   <div className="p-3 bg-white/5 rounded-2xl border border-white/10 flex items-center gap-3">
                     <img
-                      src={course.instructor.avatar || '/images/tutors/qari-huzaifa.jpg'}
+                      src={getTutorAvatar(course.instructor, course.instructor?.name)}
                       alt={course.instructor.name}
+                      onError={(e) => {
+                        e.currentTarget.onerror = null;
+                        e.currentTarget.src = getTutorAvatar({ name: course.instructor.name }, course.instructor.name);
+                      }}
                       className="w-12 h-12 rounded-xl object-cover border border-[#d4a359]/40 shrink-0"
                     />
                     <div className="min-w-0">

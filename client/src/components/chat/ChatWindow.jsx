@@ -38,6 +38,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import { useNotifications } from '../../context/NotificationContext';
 import { soundEngine } from '../../utils/soundEffects';
+import { getTutorAvatar } from '../../utils/tutorHelpers';
 import { showNativeNotification } from '../../utils/notificationManager';
 import DealOfferCard from './DealOfferCard';
 import DealOfferModal from '../tutor/DealOfferModal';
@@ -735,8 +736,12 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack }) => {
           )}
           <div className="relative shrink-0">
             <img
-              src={partner?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(partner?.name || 'User')}&background=0c2217&color=d4a359`}
+              src={getTutorAvatar(partner, partner?.name || 'User')}
               alt={partner?.name}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = getTutorAvatar({ name: partner?.name }, partner?.name || 'User');
+              }}
               className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl object-cover border-2 border-white shadow-sm"
             />
             {isPartnerOnline ? (

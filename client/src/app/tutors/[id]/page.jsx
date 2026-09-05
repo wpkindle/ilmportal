@@ -18,6 +18,7 @@ import RatingStars from '../../../components/common/RatingStars';
 import SanadBadge, { SanadModal } from '../../../components/common/SanadBadge';
 import { api } from '../../../services/api';
 import TutorProfileClient from './TutorProfileClient';
+import { getTutorAvatar } from '../../../utils/tutorHelpers';
 
 export const revalidate = 60; // ISR revalidate every 60 seconds
 
@@ -37,7 +38,7 @@ export async function generateMetadata({ params }) {
         openGraph: {
           title: `${tutorName} - Certified Tutor | IlmiDunya`,
           description: tutor.bio?.slice(0, 160) || 'Verified Quran & Academic Tutor on IlmiDunya Pakistan.',
-          images: [tutor.user?.avatar || '/images/tutors/qari-huzaifa.jpg'],
+          images: [getTutorAvatar(tutor.user || tutor, tutorName)],
         }
       };
     }
@@ -92,7 +93,7 @@ export default async function TutorProfilePage({ params }) {
         name: tutorName,
         jobTitle: tutor.qualifications || 'Verified Educator',
         description: tutor.bio || `${tutorName} is a verified tutor on IlmiDunya Pakistan offering personalized 1:1 online classes.`,
-        image: tutorUser.avatar || undefined,
+        image: getTutorAvatar(tutorUser, tutorName),
         address: {
           '@type': 'PostalAddress',
           addressLocality: tutorUser.city || 'Pakistan',

@@ -179,7 +179,7 @@ export default function TutorRegisterPage() {
             {/* Profile Setup Notice */}
             <p className="text-[11px] text-stone-700 bg-[#faf8f5] p-3.5 rounded-2xl border border-[#e6dfd5] leading-relaxed flex items-start gap-2">
               <Info className="w-4 h-4 text-[#d4a359] shrink-0 mt-0.5" />
-              <span><strong>Sanad Verification:</strong> You can upload your Wafaq / university degree, set your teaching disciplines, hourly fee, and profile photo directly in your Tutor Workspace after signing up.</span>
+              <span><strong>Sanad Verification:</strong> You can upload your Wafaq / university degree, set your teaching disciplines, hourly fee, and profile photo directly in your Tutor Profile after signing up.</span>
             </p>
 
             {/* Submit Button */}

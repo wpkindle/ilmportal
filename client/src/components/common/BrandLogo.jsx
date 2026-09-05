@@ -21,11 +21,18 @@ export default function BrandLogo({
   const isDark = variant === 'dark';
   const isIconOnly = variant === 'icon';
 
+  const sizeClasses = {
+    xs: 'h-6 sm:h-7',
+    sm: 'h-7 sm:h-9',
+    md: 'h-8 sm:h-10 md:h-12',
+    lg: 'h-10 sm:h-12 md:h-16'
+  };
+
   const heights = {
-    xs: 32,
-    sm: 44,
-    md: 52,
-    lg: 68
+    xs: 28,
+    sm: 36,
+    md: 48,
+    lg: 64
   };
 
   const currentHeight = heights[size] || heights.md;
@@ -38,8 +45,7 @@ export default function BrandLogo({
           alt="IlmiDunya Icon"
           width={currentHeight}
           height={currentHeight}
-          className="object-contain select-none transition-transform group-hover:scale-105"
-          style={{ height: currentHeight, width: currentHeight }}
+          className={`${sizeClasses[size] || 'h-8 sm:h-10'} w-auto object-contain select-none transition-transform group-hover:scale-105`}
         />
       </div>
     );
@@ -48,17 +54,16 @@ export default function BrandLogo({
   const logoSrc = isDark ? '/logo-dark.svg' : '/logo.svg';
 
   return (
-    <div className={`inline-flex items-center gap-2 select-none ${className}`}>
+    <div className={`inline-flex items-center gap-1.5 sm:gap-2 select-none shrink-0 ${className}`}>
       <img
         src={logoSrc}
         alt="IlmiDunya Pakistan"
         height={currentHeight}
-        className="h-auto object-contain select-none transition-transform group-hover:scale-[1.02]"
-        style={{ height: currentHeight, width: 'auto' }}
+        className={`${sizeClasses[size] || 'h-8 sm:h-10'} w-auto object-contain select-none transition-transform group-hover:scale-[1.02]`}
       />
       {withBadge && (
         <span
-          className={`px-1.5 py-0.5 rounded text-[8.5px] sm:text-[9.5px] font-extrabold uppercase tracking-wider ${
+          className={`px-1.5 py-0.5 rounded text-[7.5px] sm:text-[9px] font-extrabold uppercase tracking-wider shrink-0 ${
             isDark
               ? 'bg-[#c25d33] text-white border border-[#c25d33]/50 shadow-xs'
               : 'bg-[#c25d33] text-white shadow-2xs'

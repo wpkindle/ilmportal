@@ -267,7 +267,7 @@ const Navbar = () => {
           <div className="flex items-center justify-between h-14 sm:h-16">
           
           {/* Brand Logo & Tagline */}
-          <Link href="/" className="flex items-center group py-1" title="IlmiDunya Pakistan">
+          <Link href="/" className="flex items-center group py-1 shrink-0" title="IlmiDunya Pakistan">
             <BrandLogo variant="light" size="sm" withUrdu={true} withBadge={true} />
           </Link>
 
@@ -377,9 +377,9 @@ const Navbar = () => {
           </nav>
 
           {/* Right Action Buttons & User Menu */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
             {isAuthenticated ? (
-              <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
                 {/* Active Portal Badge Link */}
                 <Link
                   href={getDashboardRoute()}
@@ -391,10 +391,10 @@ const Navbar = () => {
                   </span>
                 </Link>
 
-                {/* Messages Link with Counter Badge */}
+                {/* Messages Link with Counter Badge (Desktop & Tablet only; mobile has bottom nav) */}
                 <Link
                   href={isTutor ? '/tutor/messages' : isStudent ? '/student/messages' : '/admin/chats'}
-                  className="p-2.5 rounded-xl text-stone-700 hover:text-[#0c2217] hover:bg-[#faf8f5] relative transition-colors"
+                  className="hidden md:flex p-2.5 rounded-xl text-stone-700 hover:text-[#0c2217] hover:bg-[#faf8f5] relative transition-colors"
                   title="Messages & Discussions"
                 >
                   <MessageSquare className="w-5 h-5" />
@@ -409,12 +409,12 @@ const Navbar = () => {
                 <div className="relative" ref={notifMenuRef}>
                   <button
                     onClick={() => setNotifMenuOpen(!notifMenuOpen)}
-                    className="p-2.5 rounded-xl text-stone-700 hover:text-[#0c2217] hover:bg-[#faf8f5] relative transition-colors cursor-pointer"
+                    className="p-1.5 sm:p-2.5 rounded-xl text-stone-700 hover:text-[#0c2217] hover:bg-[#faf8f5] relative transition-colors cursor-pointer"
                     title="Notifications & Safety Alerts"
                   >
                     <Bell className="w-5 h-5" />
                     {unreadNotifCount > 0 && (
-                      <span className="absolute -top-0.5 -right-0.5 px-1 min-w-[18px] h-[18px] bg-[#b85d34] text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-pulse">
+                      <span className="absolute -top-0.5 -right-0.5 px-1 min-w-[17px] h-[17px] sm:min-w-[18px] sm:h-[18px] bg-[#b85d34] text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-pulse">
                         {unreadNotifCount > 99 ? '99+' : unreadNotifCount}
                       </span>
                     )}
@@ -558,7 +558,7 @@ const Navbar = () => {
                     aria-label="User account menu"
                   >
                     {/* Mobile: Edge-to-edge avatar box with ZERO inner padding */}
-                    <div className="sm:hidden w-9 h-9 rounded-2xl overflow-hidden ring-2 ring-[#d4a359]/40 hover:ring-[#d4a359] active:scale-95 transition-all shadow-xs relative shrink-0">
+                    <div className="sm:hidden w-8 h-8 rounded-xl overflow-hidden ring-2 ring-[#d4a359]/40 hover:ring-[#d4a359] active:scale-95 transition-all shadow-xs relative shrink-0">
                       <img
                         src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=0c2217&color=d4a359`}
                         alt={user?.name}
@@ -704,13 +704,13 @@ const Navbar = () => {
               </div>
             )}
 
-            {/* Mobile Menu Toggle Button (44x44px touch target) */}
+            {/* Mobile Menu Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-2.5 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-xl text-slate-700 hover:bg-[#f0eae1] active:scale-95 transition-all"
+              className="lg:hidden p-1.5 sm:p-2.5 min-h-[38px] min-w-[38px] sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center rounded-xl text-slate-700 hover:bg-[#f0eae1] active:scale-95 transition-all"
               aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
             >
-              {mobileMenuOpen ? <X className="w-6 h-6 text-[#0c2217]" /> : <Menu className="w-6 h-6 text-[#0c2217]" />}
+              {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#0c2217]" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-[#0c2217]" />}
             </button>
           </div>
 

@@ -14,9 +14,7 @@ import {
   Clock,
   ShieldCheck,
   CheckCircle2,
-  BookOpen,
   Send,
-  LayoutGrid,
   RefreshCw,
   Sparkles,
   Volume2,
@@ -850,47 +848,6 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
             <span>E2EE 1:1 Safe Room</span>
           </div>
 
-          {/* View Mode Switcher Pills */}
-          <div className="flex items-center bg-[#242526] p-0.5 rounded-xl border border-white/10 text-xs font-semibold">
-            <button
-              onClick={() => setViewMode('meet')}
-              className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                viewMode === 'meet'
-                  ? 'bg-[#0c2217] text-[#d4a359] font-bold shadow-xs border border-[#d4a359]/40'
-                  : 'text-slate-300 hover:text-white'
-              }`}
-              title="Google Meet Spotlight Layout (Opponent Bigger)"
-            >
-              <Users className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Google Meet</span>
-            </button>
-
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                viewMode === 'grid'
-                  ? 'bg-[#0c2217] text-[#d4a359] font-bold shadow-xs border border-[#d4a359]/40'
-                  : 'text-slate-300 hover:text-white'
-              }`}
-              title="50/50 Dual Conference Grid"
-            >
-              <LayoutGrid className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Dual Grid</span>
-            </button>
-
-            <button
-              onClick={() => setViewMode('quran')}
-              className={`px-2.5 py-1 rounded-lg transition-all flex items-center gap-1.5 cursor-pointer ${
-                viewMode === 'quran'
-                  ? 'bg-[#0c2217] text-[#d4a359] font-bold shadow-xs border border-[#d4a359]/40'
-                  : 'text-slate-300 hover:text-white'
-              }`}
-              title="Split Screen Tajweed & Quran Reader"
-            >
-              <BookOpen className="w-3.5 h-3.5 text-[#d4a359]" />
-              <span className="hidden sm:inline">Quran Reader</span>
-            </button>
-          </div>
 
           {/* Emergency Safety Flag Button */}
           <button
@@ -1003,7 +960,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               </button>
 
               {/* Opponent / Main Stage Participant Name Capsule */}
-              <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/15 text-white flex items-center gap-2.5 z-20 shadow-xl">
+              <div className="absolute bottom-3 right-3 sm:bottom-4 sm:right-4 px-3.5 py-1.5 rounded-full bg-black/65 backdrop-blur-md border border-white/15 text-white flex items-center gap-2.5 z-20 shadow-xl">
                 <span className="flex items-center justify-center">
                   {(!isSwapped ? !isRemoteMicOn : !isMicOn) ? (
                     <span className="w-6 h-6 rounded-full bg-red-500/20 text-red-400 flex items-center justify-center">
@@ -1030,11 +987,11 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
               </div>
             </div>
 
-            {/* FLOATING SELF PiP CARD (Google Meet Floating Tile in Corner) */}
+            {/* FLOATING SELF PiP CARD (Corner Video Tile) */}
             {isSelfMinimized ? (
               <div
                 onClick={() => setIsSelfMinimized(false)}
-                className="absolute bottom-20 sm:bottom-24 right-4 sm:right-6 px-3.5 py-2 rounded-full bg-black/80 hover:bg-black/95 backdrop-blur-md border border-white/20 text-white text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-2xl z-30 transition-all hover:scale-105"
+                className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 px-3.5 py-2 rounded-full bg-black/80 hover:bg-black/95 backdrop-blur-md border border-white/20 text-white text-xs font-semibold flex items-center gap-2 cursor-pointer shadow-2xl z-30 transition-all hover:scale-105"
                 title="Expand your video preview"
               >
                 <div className="w-2.5 h-2.5 rounded-full bg-[#d4a359]" />
@@ -1042,7 +999,7 @@ const WebRTCVideoClassroom = ({ roomId, sessionData }) => {
                 <Maximize2 className="w-3.5 h-3.5 text-[#d4a359]" />
               </div>
             ) : (
-              <div className="absolute bottom-20 sm:bottom-24 right-4 sm:right-6 w-44 sm:w-60 md:w-68 aspect-video rounded-2xl overflow-hidden shadow-2xl border-2 border-white/25 hover:border-[#d4a359] bg-[#202124] z-30 transition-all duration-200 group">
+              <div className="absolute bottom-3 sm:bottom-4 left-3 sm:left-4 w-44 sm:w-60 md:w-68 aspect-video rounded-2xl overflow-hidden shadow-2xl border-2 border-white/25 hover:border-[#d4a359] bg-[#202124] z-30 transition-all duration-200 group">
                 <video
                   ref={(el) => {
                     pipVideoRef.current = el;

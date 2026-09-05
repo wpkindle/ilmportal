@@ -232,7 +232,7 @@ export default function SupportPlatformWidget() {
                   <div className="p-2.5 rounded-xl bg-[#0c2217] border border-[#d4a359]/60 text-left flex items-center justify-between gap-2">
                     <div className="min-w-0 flex-1">
                       <p className="text-[9px] uppercase tracking-wider font-bold text-[#a3b8b0]">
-                        Account / Mobile / Raast ID
+                        {selectedMethod.id === 'meezan' ? 'Account Number' : 'Account Number / Raast ID'}
                       </p>
                       <p className="text-xs sm:text-sm font-black text-[#d4a359] mt-0.5 font-mono tracking-wider truncate">
                         {selectedMethod.accountNumber}

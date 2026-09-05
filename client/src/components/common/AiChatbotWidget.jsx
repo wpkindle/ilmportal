@@ -14,7 +14,8 @@ import {
   Clock,
   PhoneCall,
   ShieldCheck,
-  ExternalLink
+  ExternalLink,
+  Sparkles
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
@@ -28,6 +29,40 @@ const QUICK_INQUIRIES = [
   'Tutor verification & registration help',
   'Chat on WhatsApp (+92 317 1759093)'
 ];
+
+const renderFormattedText = (content) => {
+  if (!content) return null;
+
+  // Split by markdown links [label](url)
+  const parts = content.split(/(\[[^\]]+\]\([^)]+\))/g);
+  return parts.map((part, i) => {
+    const linkMatch = part.match(/^\[([^\]]+)\]\(([^)]+)\)$/);
+    if (linkMatch) {
+      const [, label, url] = linkMatch;
+      return (
+        <a
+          key={i}
+          href={url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1 font-bold text-[#d4a359] hover:underline bg-[#0c2217]/70 px-2 py-0.5 rounded-md border border-[#d4a359]/30 my-0.5"
+        >
+          <span>{label}</span>
+          <ExternalLink className="w-3 h-3 text-[#d4a359]" />
+        </a>
+      );
+    }
+
+    // Bold formatting **text**
+    const boldParts = part.split(/(\*\*[^*]+\*\*)/g);
+    return boldParts.map((bPart, bi) => {
+      if (bPart.startsWith('**') && bPart.endsWith('**')) {
+        return <strong key={bi} className="font-bold text-white">{bPart.slice(2, -2)}</strong>;
+      }
+      return bPart;
+    });
+  });
+};
 
 export default function LiveSupportWidget() {
   const pathname = usePathname();
@@ -432,13 +467,13 @@ export default function LiveSupportWidget() {
           <div className="flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-4 space-y-3 scrollbar-thin scrollbar-thumb-stone-700">
             {messages.map((m) => {
               const isUser = m.sender === 'user';
-              const isSystem = m.sender === 'system';
+              const isAssistant = m.sender === 'assistant';
               const isAdmin = m.sender === 'admin';
 
               if (isSystem) {
                 return (
                   <div key={m.id} className="p-3 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-emerald-200 text-xs leading-relaxed space-y-1">
-                    <div className="whitespace-pre-wrap font-sans">{m.text}</div>
+                    <div className="whitespace-pre-wrap font-sans">{renderFormattedText(m.text)}</div>
                     <div className="text-[9px] text-emerald-400/60 text-right">
                       {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </div>
@@ -449,19 +484,34 @@ export default function LiveSupportWidget() {
               return (
                 <div key={m.id} className={`flex gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
                   {!isUser && (
-                    <div className="w-6 h-6 rounded-full bg-[#d4a359]/20 border border-[#d4a359]/40 flex items-center justify-center shrink-0 mt-1">
-                      <Headphones className="w-3.5 h-3.5 text-emerald-400" />
+                    <div className={`w-6 h-6 rounded-full border flex items-center justify-center shrink-0 mt-1 ${
+                      isAssistant
+                        ? 'bg-[#d4a359]/20 border-[#d4a359]/50 text-[#d4a359]'
+                        : 'bg-emerald-500/20 border-emerald-500/40 text-emerald-400'
+                    }`}>
+                      {isAssistant ? <Sparkles className="w-3.5 h-3.5" /> : <Headphones className="w-3.5 h-3.5" />}
                     </div>
                   )}
 
                   <div className={`max-w-[85%] sm:max-w-[80%] rounded-2xl p-3 text-xs leading-relaxed ${
                     isUser
                       ? 'bg-gradient-to-r from-[#ba4c18] to-[#963b10] text-white rounded-br-xs shadow-md'
-                      : 'bg-emerald-950/80 border border-emerald-500/30 text-emerald-100 rounded-bl-xs shadow-md'
+                      : isAssistant
+                        ? 'bg-[#0c2217] border border-[#d4a359]/35 text-stone-100 rounded-bl-xs shadow-lg'
+                        : 'bg-emerald-950/80 border border-emerald-500/30 text-emerald-100 rounded-bl-xs shadow-md'
                   }`}>
                     <div className="flex items-center justify-between gap-2 mb-1">
-                      <span className="text-[10px] font-bold opacity-75">
-                        {isUser ? 'You' : `Staff (${m.senderName || 'Admin Desk'})`}
+                      <span className="text-[10px] font-bold opacity-85">
+                        {isUser ? (
+                          'You'
+                        ) : isAssistant ? (
+                          <span className="text-[#d4a359] font-extrabold flex items-center gap-1">
+                            <Sparkles className="w-2.5 h-2.5 text-[#d4a359]" />
+                            IlmiDunya Counselor
+                          </span>
+                        ) : (
+                          `Staff (${m.senderName || 'Admin Desk'})`
+                        )}
                       </span>
                       <span className="text-[9px] opacity-60">
                         {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -469,7 +519,7 @@ export default function LiveSupportWidget() {
                     </div>
 
                     <div className="whitespace-pre-wrap font-sans space-y-1">
-                      {m.text}
+                      {renderFormattedText(m.text)}
                     </div>
                   </div>
                 </div>

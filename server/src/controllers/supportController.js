@@ -1,4 +1,5 @@
 const { getKnowledgeBaseFAQs, saveSupportFAQ } = require('../config/supabaseClient');
+const { generateSupportChatResponse } = require('../services/aiTutorAgentService');
 const SupportSession = require('../models/SupportSession');
 const Notification = require('../models/Notification');
 const FAQ = require('../models/FAQ');
@@ -63,7 +64,7 @@ exports.sendMessage = async (req, res) => {
 
     await session.save();
 
-    // Broadcast via socket to both the session room and the admin desk
+    // Broadcast user message via socket
     const io = req.app.get('io');
     if (io) {
       io.to(`support_${sid}`).emit('support-message-received', {
@@ -84,6 +85,37 @@ exports.sendMessage = async (req, res) => {
         message: message.trim(),
         timestamp: new Date()
       });
+    }
+
+    // If an administrator has not joined yet, generate instant accurate AI counselor response
+    let aiMsg = null;
+    if (session.status !== 'admin_joined') {
+      try {
+        const aiResponse = await generateSupportChatResponse(message.trim(), session.messages);
+        if (aiResponse && aiResponse.reply) {
+          aiMsg = {
+            sender: 'assistant',
+            senderName: 'IlmiDunya Counselor',
+            text: aiResponse.reply,
+            createdAt: new Date()
+          };
+          session.messages.push(aiMsg);
+          session.lastMessage = aiMsg.text.slice(0, 140);
+          session.lastSender = 'assistant';
+          await session.save();
+
+          if (io) {
+            setTimeout(() => {
+              io.to(`support_${sid}`).emit('support-message-received', {
+                sessionId: sid,
+                message: aiMsg
+              });
+            }, 300);
+          }
+        }
+      } catch (agentErr) {
+        console.warn('AI Tutor Counselor response warning:', agentErr.message);
+      }
     }
 
     // Notify admins in DB if this is a newly requested session

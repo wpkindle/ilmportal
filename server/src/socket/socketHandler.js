@@ -4,6 +4,7 @@ const Deal = require('../models/Deal');
 const ChatRequest = require('../models/ChatRequest');
 const TutorProfile = require('../models/TutorProfile');
 const SupportSession = require('../models/SupportSession');
+const { generateSupportChatResponse } = require('../services/aiTutorAgentService');
 
 const initSocket = (io) => {
   const onlineUsers = new Map(); // userId -> Set of socketIds
@@ -495,6 +496,34 @@ const initSocket = (io) => {
             message: text.trim(),
             timestamp: new Date()
           });
+
+          // If admin has not joined, send instant grounded AI counselor response
+          if (session.status !== 'admin_joined') {
+            try {
+              const aiResponse = await generateSupportChatResponse(text.trim(), session.messages);
+              if (aiResponse && aiResponse.reply) {
+                const aiMsg = {
+                  sender: 'assistant',
+                  senderName: 'IlmiDunya Counselor',
+                  text: aiResponse.reply,
+                  createdAt: new Date()
+                };
+                session.messages.push(aiMsg);
+                session.lastMessage = aiMsg.text.slice(0, 140);
+                session.lastSender = 'assistant';
+                await session.save();
+
+                setTimeout(() => {
+                  io.to(`support_${sessionId}`).emit('support-message-received', {
+                    sessionId,
+                    message: aiMsg
+                  });
+                }, 300);
+              }
+            } catch (agentErr) {
+              console.warn('Socket AI Counselor warning:', agentErr.message);
+            }
+          }
         }
       } catch (err) {
         console.error('Socket send-support-message error:', err);

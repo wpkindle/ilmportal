@@ -22,10 +22,10 @@ export default function BrandLogo({
   const isIconOnly = variant === 'icon';
 
   const heights = {
-    xs: 26,
-    sm: 32,
-    md: 40,
-    lg: 52
+    xs: 32,
+    sm: 44,
+    md: 52,
+    lg: 68
   };
 
   const currentHeight = heights[size] || heights.md;

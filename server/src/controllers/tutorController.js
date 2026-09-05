@@ -286,7 +286,7 @@ exports.uploadSanad = async (req, res) => {
 
     const fileUrl = `/uploads/${req.file.filename}`;
     const newDoc = {
-      title: req.body.title || 'Sanad / Degree Certificate',
+      title: req.body.title || 'Sanad / Degree Document',
       fileUrl,
       fileType: req.file.mimetype,
       uploadedAt: new Date()

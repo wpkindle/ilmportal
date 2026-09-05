@@ -199,7 +199,7 @@ export default function SafetyShowcase() {
                   </div>
                   <h4 className="font-bold text-sm text-white">Manual Document Verification</h4>
                   <p className="text-xs text-[#a3b8b0] leading-relaxed">
-                    We review CNIC cards, Wafaq-ul-Madaris Sanad degrees, and HEC-recognized certificates before approval.
+                    We review CNIC cards, Wafaq-ul-Madaris Sanad degrees, and HEC-recognized qualifications before approval.
                   </p>
                 </div>
                 <Link

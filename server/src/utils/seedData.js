@@ -14,7 +14,6 @@ const Notification = require('../models/Notification');
 const SystemConfig = require('../models/SystemConfig');
 const AuditLog = require('../models/AuditLog');
 const Course = require('../models/Course');
-const Certificate = require('../models/Certificate');
 const Page = require('../models/Page');
 const defaultPages = require('./defaultPages');
 
@@ -275,7 +274,6 @@ const seedDatabase = async () => {
     await AuditLog.deleteMany({});
     await SystemConfig.deleteMany({});
     await Course.deleteMany({});
-    await Certificate.deleteMany({});
 
     console.log('🧹 Cleaned existing database collections');
 
@@ -434,7 +432,7 @@ const seedDatabase = async () => {
       ratingCount: 22,
       isFeatured: true,
       sanadDocuments: [{
-        title: 'MS Degree Certificate (NUST)',
+        title: 'MS Degree Document (NUST)',
         fileUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600',
         fileType: 'image/jpeg',
         uploadedAt: new Date()
@@ -501,7 +499,7 @@ const seedDatabase = async () => {
       ratingAverage: 4.8,
       ratingCount: 15,
       sanadDocuments: [{
-        title: 'Sanad-e-Faraghat & MA Certificate',
+        title: 'MA Arabic Degree Document',
         fileUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600',
         fileType: 'image/jpeg',
         uploadedAt: new Date()
@@ -532,7 +530,7 @@ const seedDatabase = async () => {
       gender: 'male',
       verificationStatus: 'pending',
       sanadDocuments: [{
-        title: 'Hifz Certificate (Wifaq)',
+        title: 'Hifz Sanad Document (Wifaq)',
         fileUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600',
         fileType: 'image/jpeg',
         uploadedAt: new Date()
@@ -869,7 +867,7 @@ const seedDatabase = async () => {
               { lessonNumber: 4, title: 'Letters 13–16 (Sheen, Sad, Dad, Ta)', content: 'Heavy vs light letter articulation.', approach: 'Slow-paced guided repetition with visual mouth position hints' },
               { lessonNumber: 5, title: 'Letters 17–20 (Zha, Ain, Ghain, Fa)', content: 'Deep throat letters mastery.', approach: 'Focus on tricky throat letters (Ain, Ghain) with extra gentle repetition' },
               { lessonNumber: 6, title: 'Letters 21–24 (Qaf, Kaf, Lam, Meem)', content: 'Palate and lip letters pronunciation.', approach: 'Review + new letters, short quiz-style recap (point to letter, child names it)' },
-              { lessonNumber: 7, title: 'Letters 25–28 (Noon, Waw, Ha, Ya)', content: 'Completing the full 28 Arabic letters.', approach: 'Full alphabet celebratory rhyme and certificate of letters' },
+              { lessonNumber: 7, title: 'Letters 25–28 (Noon, Waw, Ha, Ya)', content: 'Completing the full 28 Arabic letters.', approach: 'Full alphabet celebratory rhyme and alphabet mastery' },
               { lessonNumber: 8, title: 'Full Alphabet Review & Speed Round', content: 'Comprehensive identification of all 28 letters.', approach: 'Random-order flashcards, fun low-stress speed challenge' },
               { lessonNumber: 9, title: 'Letter Shapes: Beginning of Word', content: 'How letters look when they start a word.', approach: 'Visual before-and-after comparison cards' },
               { lessonNumber: 10, title: 'Letter Shapes: Middle of Word', content: 'How letters look when joined on both sides.', approach: 'Connecting puzzle pieces exercise on digital board' },
@@ -916,7 +914,7 @@ const seedDatabase = async () => {
             name: 'Stage 4: First Real Quran Reading (Short Surahs)',
             description: 'Transitioning to the Holy Mushaf with the 4 most familiar short Surahs.',
             lessonCount: 10,
-            badgeReward: 'Junior Qari Gold Certificate 🏆',
+            badgeReward: 'Junior Qari Gold Milestone 🏆',
             lessons: [
               { lessonNumber: 1, title: 'Surah Al-Fatiha — Word by Word', content: 'Ayat 1–4 pronunciation and meaning overview.', approach: 'Word by word, correct pronunciation' },
               { lessonNumber: 2, title: 'Surah Al-Fatiha — Full Recitation Practice', content: 'Connecting the entire Surah smoothly.', approach: 'Full recitation practice with melody' },
@@ -927,7 +925,7 @@ const seedDatabase = async () => {
               { lessonNumber: 7, title: 'Surah Al-Ikhlas — Word by Word', content: 'The oneness of Allah (Tawheed).', approach: 'Word by word, correct pronunciation' },
               { lessonNumber: 8, title: 'Surah Al-Ikhlas — Full Recitation', content: 'Complete recitation of Surah Al-Ikhlas.', approach: 'Full recitation practice' },
               { lessonNumber: 9, title: 'Combined Review of All 4 Surahs', content: 'Reciting Fatiha, Nas, Falaq, and Ikhlas in sequence.', approach: 'All 4 Surahs recited in sequence' },
-              { lessonNumber: 10, title: 'Celebration Lesson & Certification', content: 'Child recites all learned Surahs for tutor and parent.', approach: 'Child recites all learned Surahs for tutor + parent; mark course-stage completion badge/certificate on platform' }
+              { lessonNumber: 10, title: 'Celebration Lesson & Completion', content: 'Child recites all learned Surahs for tutor and parent.', approach: 'Child recites all learned Surahs for tutor + parent; mark course-stage completion badge on platform' }
             ]
           }
         ]
@@ -1009,7 +1007,7 @@ const seedDatabase = async () => {
         platformMapping: {
           sessionLengthDefault: '30–45 minutes',
           trialPeriodCoverage: '3-Day Free Trial covers Makharij assessment & Lesson 1',
-          badgeSystem: 'Advanced Tajweed Certification upon completion'
+          badgeSystem: 'Advanced Tajweed Milestone Badges upon completion'
         },
         stages: [
           {
@@ -1017,7 +1015,7 @@ const seedDatabase = async () => {
             name: 'Stage 1: Makharij al-Huroof (Articulation Points)',
             description: 'Precision in throat, tongue, palate, and lip points of articulation.',
             lessonCount: 8,
-            badgeReward: 'Makharij Certificate',
+            badgeReward: 'Makharij Milestone Award',
             lessons: [
               { lessonNumber: 1, title: 'Introduction to the 5 Primary Articulation Regions', content: 'Throat, oral cavity, tongue, lips, nasal cavity.', approach: 'Anatomical diagrams & sound emission analysis' },
               { lessonNumber: 2, title: 'Throat Letters (Halqiyyah) - Hamzah, Ha, Ain, Ha, Ghain, Kha', content: 'Deep, middle, and upper throat sounds.', approach: 'Vocal cord placement exercises' }
@@ -1336,23 +1334,6 @@ const seedDatabase = async () => {
 
     const seededCourses = await Course.insertMany(coursesData);
     console.log(`✅ Seeded ${seededCourses.length} Structured Courses assigned to verified tutors`);
-
-    // 12. Seed Sample Course Completion Certificate for Demo Student
-    await Certificate.create({
-      certificateId: 'ILM-CERT-2026-89412',
-      student: student1._id,
-      studentName: student1.name,
-      studentEmail: student1.email,
-      course: seededCourses[0]._id,
-      courseTitle: seededCourses[0].title,
-      instructor: tutor1User._id,
-      instructorName: tutor1User.name,
-      completionGrade: 'Distinction (Sanad Verified - 98%)',
-      totalLessonsCompleted: 38,
-      verificationCode: 'SANAD-QA-89412',
-      status: 'issued'
-    });
-    console.log('✅ Seeded Sample Course Completion Certificate for Hamza Khan');
 
     console.log('✅ Seeded Sample Messages, Reviews, and WebRTC Classroom Sessions');
 

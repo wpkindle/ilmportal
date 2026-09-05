@@ -131,7 +131,7 @@ function RegisterContent() {
         return;
       }
       if (!sanadFileUrl || !sanadTitle.trim()) {
-        setError('Educational degree or Sanad certificate upload with Title is required for tutor verification');
+        setError('Educational degree or Sanad document upload with Title is required for tutor verification');
         setLoading(false);
         return;
       }
@@ -442,7 +442,7 @@ function RegisterContent() {
 
                 <div>
                   <label className="text-[11px] font-bold text-stone-700 block mb-1">
-                    Upload Degree / Certificate (JPG, PNG, PDF) *
+                    Upload Degree / Sanad Document (JPG, PNG, PDF) *
                   </label>
                   <input
                     type="file"

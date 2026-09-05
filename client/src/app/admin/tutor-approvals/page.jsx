@@ -115,7 +115,7 @@ export default function TutorApprovalPage() {
               <div>
                 <h1 className="text-2xl font-black text-slate-900">Tutor Approval Queue</h1>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Inspect submitted Sanad certificates and approve/reject tutor applications.
+                  Inspect submitted Sanad documents and approve/reject tutor applications.
                 </p>
               </div>
 

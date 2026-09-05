@@ -170,7 +170,7 @@ export default function ContactUsPage() {
               <div className="pt-6 border-t border-slate-100 space-y-3">
                 <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Common Questions</h4>
                 <div className="space-y-2 text-xs text-slate-600">
-                  <p><strong>Are you a tutor looking to teach?</strong> Register and upload your Sanad certificate on the Tutor Portal.</p>
+                  <p><strong>Are you a tutor looking to teach?</strong> Register and upload your Sanad documents on the Tutor Portal.</p>
                   <p><strong>Looking for female Alimahs?</strong> Female teachers are available for female students and kids nationwide across all of Pakistan.</p>
                   <p><strong>Payment confirmation?</strong> Submit your JazzCash/EasyPaisa TID on your active deal card for 2–4 hour verification.</p>
                 </div>

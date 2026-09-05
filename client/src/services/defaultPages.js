@@ -6,7 +6,7 @@ export const defaultPageData = {
     content: `### 1. Information We Collect
 We collect information you provide directly during student or tutor registration:
 * **Account Credentials**: Name, email address, phone/WhatsApp number, city, and password.
-* **Tutor Qualifications**: Sanad degree certificates, educational background, years of experience, and CNIC/identity details for verification.
+* **Tutor Qualifications**: Sanad degrees, educational background, years of experience, and CNIC/identity details for verification.
 * **Student & Parent Information**: Grade level, learning goals, preferred schedule, and guardian contact details for minors.
 
 ---
@@ -20,7 +20,7 @@ Protecting young learners is our highest responsibility:
 ---
 
 ### 3. Sanad & Document Protection
-All uploaded academic certificates and Sanad degrees are stored in private encrypted storage and accessible solely to authorized administration staff in Lahore for verification purposes.
+All uploaded academic credentials and Sanad degrees are stored in private encrypted storage and accessible solely to authorized administration staff in Lahore for verification purposes.
 
 ---
 
@@ -66,7 +66,7 @@ IlmiDunya Pakistan operates as an educational technology platform and directory 
 ---
 
 ### 2. Scope of Sanad & Profile Verification
-* The "Sanad Verified" badge certifies that our administration in Lahore reviewed submitted certificates, Ijazahs, or degrees at the time of verification.
+* The "Sanad Verified" badge certifies that our administration in Lahore reviewed submitted Sanad documents, Ijazahs, or degrees at the time of verification.
 * Parents and students are encouraged to conduct their own assessment during the 3-day free trial.
 
 ---

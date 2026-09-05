@@ -18,7 +18,6 @@ import {
   ShieldCheck,
   AlertTriangle,
   FileText,
-  Award,
   LogOut,
   Headphones
 } from 'lucide-react';
@@ -95,7 +94,6 @@ const AdminSidebar = () => {
     { to: '/admin/categories', label: 'CMS Categories & Subjects', icon: BookOpen },
     { to: '/admin/locations', label: 'CMS Cities & Locations', icon: MapPin },
     { to: '/admin/deals', label: 'Deals & Payment Verification', icon: Handshake },
-    { to: '/admin/certificates', label: 'Certificate Approvals', icon: Award },
     { to: '/admin/chats', label: 'Chat Oversight Transcripts', icon: MessageSquare },
     { to: '/admin/reviews', label: 'Ratings & Reviews Control', icon: Star },
     { to: '/admin/sessions', label: 'Session & Classroom Logs', icon: Video },

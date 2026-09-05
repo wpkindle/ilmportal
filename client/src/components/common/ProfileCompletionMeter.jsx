@@ -13,7 +13,6 @@ import {
   AlertCircle,
   ArrowRight,
   MessageSquare,
-  Award,
   Search,
   User,
   GraduationCap
@@ -98,7 +97,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       },
       {
         key: 'sanad',
-        label: 'Sanad / Degree Certificate',
+        label: 'Sanad / Degree Document',
         weight: 10,
         done: Array.isArray(tutorProfile?.sanadDocuments) && tutorProfile.sanadDocuments.length > 0,
         link: '/tutor/profile#profile-sanads',
@@ -290,7 +289,7 @@ export default function ProfileCompletionMeter({
                   href="/tutor/profile"
                   className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-[#faf8f5] font-semibold text-xs rounded-xl transition-all flex items-center gap-2 border border-white/20 hover:scale-[1.02] cursor-pointer"
                 >
-                  <Award className="w-4 h-4 text-[#d4a359]" />
+                  <GraduationCap className="w-4 h-4 text-[#d4a359]" />
                   <span>Edit Profile &amp; Sanad</span>
                 </Link>
               </>
@@ -302,13 +301,6 @@ export default function ProfileCompletionMeter({
                 >
                   <Search className="w-4 h-4" />
                   <span>Browse Verified Tutors</span>
-                </Link>
-                <Link
-                  href="/student/certificates"
-                  className="px-4 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2 hover:scale-[1.02] cursor-pointer"
-                >
-                  <Award className="w-4 h-4 text-white" />
-                  <span>My Certificates</span>
                 </Link>
                 <Link
                   href="/student/messages"

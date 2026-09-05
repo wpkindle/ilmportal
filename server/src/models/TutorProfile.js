@@ -42,7 +42,7 @@ const tutorProfileSchema = new mongoose.Schema({
     default: ''
   },
   sanadDocuments: [{
-    title: { type: String, default: 'Sanad / Certificate' },
+    title: { type: String, default: 'Sanad / Degree Document' },
     fileUrl: { type: String, required: true },
     fileType: { type: String, default: 'image/jpeg' },
     uploadedAt: { type: Date, default: Date.now }

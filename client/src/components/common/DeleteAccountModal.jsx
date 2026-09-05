@@ -62,7 +62,7 @@ export default function DeleteAccountModal({ isOpen, onClose, role = 'student', 
           <p className="text-[11px] text-rose-900">
             {role === 'tutor'
               ? 'Your public teacher profile, courses, Sanad documents, and student chat histories will be permanently removed from IlmiDunya Pakistan.'
-              : 'Your enrolled courses, progress certificates, chat messages, and learning records will be permanently erased.'}
+              : 'Your enrolled courses, milestones, chat messages, and learning records will be permanently erased.'}
           </p>
         </div>
 

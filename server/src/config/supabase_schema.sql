@@ -1,3 +1,4 @@
+
 -- ==============================================================================
 -- ILMIDUNYA PAKISTAN - COMPLETE SUPABASE POSTGRESQL PRODUCTION SCHEMA
 -- Includes pgvector Extension, Relational Foreign Keys, Indexes & RLS

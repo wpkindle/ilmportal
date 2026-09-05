@@ -9,7 +9,7 @@ import {
   EyeOff,
   Video,
   MessageSquare,
-  Award,
+  GraduationCap,
   AlertTriangle,
   CheckCircle2,
   Users,
@@ -70,14 +70,14 @@ export default function SafetyPage() {
     },
     {
       id: 'sanad-verification',
-      icon: Award,
+      icon: GraduationCap,
       badge: 'Rigorous Background Checks',
       title: 'Sanad Degrees & Identity Verification',
       color: 'bg-[#f0ece1] text-[#0c2217] border-[#d4a359]/40',
       description:
         'We do not allow anonymous or unvetted teachers. Every educator on IlmiDunya undergoes multi-step manual credential checks.',
       features: [
-        'Wafaq-ul-Madaris Sanad Authentication: Quranic Qaris and Alimahs submit authenticated Shahadat-ul-Alimiyyah and Tajweed certificates.',
+        'Wafaq-ul-Madaris Sanad Authentication: Quranic Qaris and Alimahs submit authenticated Shahadat-ul-Alimiyyah and Tajweed Sanad documents.',
         'Academic Degrees: Cambridge O/A-Level and Matric/FSc tutors must provide verified transcripts and university degrees.',
         'CNIC & Identity Validation: Tutors are physically identified through Government CNIC records.',
         '256-Bit Encrypted Document Vault: All sensitive educator identity documents are stored in encrypted vaults and never made public.'
@@ -118,7 +118,7 @@ export default function SafetyPage() {
             This web portal is built with female safety as our highest priority. Whether you are a female student seeking a certified Alimah, a mother enrolling her daughter for Tajweed, or a female educator teaching from home — your dignity, privacy, and personal information are 100% protected.
           </p>
 
-          {/* Trust Certifications Banner */}
+          {/* Trust & Safety Badges Banner */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-6 max-w-4xl mx-auto">
             {trustBadges.map((badge, idx) => (
               <div

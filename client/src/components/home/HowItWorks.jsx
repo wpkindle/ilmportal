@@ -19,7 +19,7 @@ const steps = [
     step: '01',
     title: 'Browse & Filter by Subject, Gender, or City',
     highlight: 'Female Alimahs & Cambridge Tutors',
-    description: 'Explore verified teacher profiles with authenticated CNIC and Sanad certificates. Filter for female teachers for daughters, or academic specialists in your city.',
+    description: 'Explore verified teacher profiles with authenticated CNIC and Sanad documents. Filter for female teachers for daughters, or academic specialists in your city.',
     detail: 'Over 20+ disciplines across Pakistan',
     icon: Search,
     modalTitle: '1. Browse & Filter Verified Teachers',
@@ -27,7 +27,7 @@ const steps = [
     features: [
       {
         title: 'Authentic Sanad & CNIC Verification',
-        desc: 'Every teacher profile is verified by platform administrators against their official degree certificates (Wafaq-ul-Madaris, Tanzeem-ul-Madaris, HEC universities).'
+        desc: 'Every teacher profile is verified by platform administrators against their official degree credentials (Wafaq-ul-Madaris, Tanzeem-ul-Madaris, HEC universities).'
       },
       {
         title: '100% Female Privacy & Alimahs for Girls',

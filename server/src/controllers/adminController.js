@@ -258,7 +258,7 @@ exports.contactTutor = async (req, res) => {
     }
 
     tutor.verificationStatus = 'contact_needed';
-    tutor.contactNotes = notes || 'Please upload a clearer scan of your Sanad certificate.';
+    tutor.contactNotes = notes || 'Please upload a clearer scan of your Sanad / degree document.';
     await tutor.save();
 
     await Notification.create({

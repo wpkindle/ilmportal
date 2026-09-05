@@ -132,7 +132,7 @@ VALUES
     'How does tutor verification and Sanad authentication work?',
     'Every tutor undergoes rigorous manual verification before their profile is published. Quran and Islamic scholars must submit authentic Sanad credentials (from Wifaq-ul-Madaris or recognized Jamias), while academic mentors submit university degrees (KEMU, NUST, etc.). Profiles display verifiable Sanad badges.',
     'tutors',
-    ARRAY['tutor verification', 'sanad', 'certificate', 'wifaq', 'degree', 'background check'],
+    ARRAY['tutor verification', 'sanad', 'credentials', 'wifaq', 'degree', 'background check'],
     5
 ),
 (
@@ -143,10 +143,10 @@ VALUES
     6
 ),
 (
-    'Do you provide verifiable course completion certificates?',
-    'Yes! Upon completing any Quranic milestone (Nazra Quran, Tajweed al-Quran, Hifz al-Quran) or academic grade with your tutor, official digital completion certificates and Sanad documents with unique authentication QR codes are issued to students.',
+    'How do students track learning milestones and course progress?',
+    'Students track lesson progress directly through their interactive LMS dashboard with completed chapters, homework assignments, diagnostic tests, and milestone achievements awarded by their dedicated tutor.',
     'courses',
-    ARRAY['certificate', 'sanad', 'diploma', 'verification', 'exam', 'completion'],
+    ARRAY['milestones', 'progress', 'lms', 'homework', 'tests', 'completion'],
     7
 ),
 (

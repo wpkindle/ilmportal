@@ -16,7 +16,6 @@ import {
   Layers,
   Sparkles,
   BookMarked,
-  Award,
   Code,
   CheckCircle2,
   Clock,
@@ -620,14 +619,6 @@ const Navbar = () => {
                               <span>My Courses & Subscriptions</span>
                             </Link>
                             <Link
-                              href="/student/certificates"
-                              onClick={() => setUserMenuOpen(false)}
-                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-stone-700 hover:bg-[#faf8f5] hover:text-[#0c2217] rounded-2xl transition-colors"
-                            >
-                              <Award className="w-4 h-4 text-[#0c2217]" />
-                              <span>My Certificates</span>
-                            </Link>
-                            <Link
                               href="/student/profile"
                               onClick={() => setUserMenuOpen(false)}
                               className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-stone-700 hover:bg-[#faf8f5] hover:text-[#0c2217] rounded-2xl transition-colors"
@@ -655,14 +646,6 @@ const Navbar = () => {
                             >
                               <CreditCard className="w-4 h-4 text-[#0c2217]" />
                               <span>Student Deals & Trials</span>
-                            </Link>
-                            <Link
-                              href="/tutor/certificates"
-                              onClick={() => setUserMenuOpen(false)}
-                              className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-stone-700 hover:bg-[#faf8f5] hover:text-[#0c2217] rounded-2xl transition-colors"
-                            >
-                              <Award className="w-4 h-4 text-[#0c2217]" />
-                              <span>Student Certificates</span>
                             </Link>
                             <Link
                               href="/tutor/profile"

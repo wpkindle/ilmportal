@@ -467,7 +467,7 @@ export default function Hero() {
                 <span>100% CNIC &amp; Sanad Audited</span>
               </div>
               <p className="text-xs text-[#a3b8b0] leading-relaxed">
-                National ID cards, degrees, and Qirat certificates checked by administration before any tutor is listed.
+                National ID cards, degrees, and Qirat credentials checked by administration before any tutor is listed.
               </p>
             </div>
 

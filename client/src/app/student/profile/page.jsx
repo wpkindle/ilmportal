@@ -590,7 +590,7 @@ function StudentProfileContent() {
               </div>
 
               <p className="text-xs text-slate-600 leading-relaxed">
-                Deleting your account will erase your profile information, chat histories, active course deals, and certificate records. This action cannot be reversed.
+                Deleting your account will erase your profile information, chat histories, active course deals, and learning progress records. This action cannot be reversed.
               </p>
 
               <div>

@@ -274,54 +274,6 @@ export const api = {
     headers: getHeaders()
   }).then(handleResponse),
 
-  // Certificates
-  getCertificate: (id) => fetch(`${API_BASE}/certificates/${id}`).then(handleResponse),
-  getMyCertificates: () => fetch(`${API_BASE}/certificates/student/my-certificates`, {
-    headers: getHeaders()
-  }).then(handleResponse),
-  studentRequestCertificate: (body) => fetch(`${API_BASE}/certificates/request`, {
-    method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify(body)
-  }).then(handleResponse),
-  tutorEvaluateCertificate: (id, body) => fetch(`${API_BASE}/certificates/${id}/tutor-evaluate`, {
-    method: 'PUT',
-    headers: getHeaders(),
-    body: JSON.stringify(body)
-  }).then(handleResponse),
-  getTutorCertificateRequests: () => fetch(`${API_BASE}/certificates/tutor/my-requests`, {
-    headers: getHeaders()
-  }).then(handleResponse),
-  getAdminCertificateRequests: (params = {}) => {
-    const query = new URLSearchParams(params).toString();
-    return fetch(`${API_BASE}/certificates/admin/requests?${query}`, {
-      headers: getHeaders()
-    }).then(handleResponse);
-  },
-  adminSetCertificatePrice: (id, price, adminNotes) => fetch(`${API_BASE}/certificates/${id}/set-price`, {
-    method: 'PUT',
-    headers: getHeaders(),
-    body: JSON.stringify({ price, adminNotes })
-  }).then(handleResponse),
-  studentSubmitCertificatePayment: (id, body) => fetch(`${API_BASE}/certificates/${id}/submit-payment`, {
-    method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify(body)
-  }).then(handleResponse),
-  adminApproveCertificate: (id) => fetch(`${API_BASE}/certificates/${id}/approve`, {
-    method: 'PUT',
-    headers: getHeaders()
-  }).then(handleResponse),
-  adminRejectCertificatePayment: (id, reason) => fetch(`${API_BASE}/certificates/${id}/reject-proof`, {
-    method: 'PUT',
-    headers: getHeaders(),
-    body: JSON.stringify({ reason })
-  }).then(handleResponse),
-  issueCertificate: (body) => fetch(`${API_BASE}/certificates/issue`, {
-    method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify(body)
-  }).then(handleResponse),
 
   // Tutors
   getPublicTutors: (params = {}) => {

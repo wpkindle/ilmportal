@@ -13,7 +13,7 @@ import {
   CheckCircle2,
   AlertCircle,
   ShieldCheck,
-  Award,
+  GraduationCap,
   Upload,
   FileText,
   Sparkles,
@@ -156,7 +156,7 @@ function TutorProfileContent() {
   const handleUploadSanadSubmit = async (e) => {
     e.preventDefault();
     if (!newSanadFileUrl) {
-      setSanadError('Please choose a certificate / degree image or PDF');
+      setSanadError('Please choose a Sanad / degree document image or PDF');
       return;
     }
 
@@ -711,7 +711,7 @@ function TutorProfileContent() {
               <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
                 <div>
                   <h2 className="text-sm font-black text-slate-900 flex items-center gap-2">
-                    <Award className="w-4 h-4 text-[#b85d34]" />
+                    <GraduationCap className="w-4 h-4 text-[#b85d34]" />
                     <span>Sanad & Educational Degrees</span>
                   </h2>
                   <p className="text-xs text-slate-500 mt-0.5">
@@ -760,10 +760,10 @@ function TutorProfileContent() {
                       >
                         <div className="flex items-center gap-3 overflow-hidden">
                           <div className="w-10 h-10 rounded-xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center shrink-0">
-                            <Award className="w-5 h-5" />
+                            <GraduationCap className="w-5 h-5" />
                           </div>
                           <div className="truncate">
-                            <p className="font-bold text-xs text-slate-900 truncate">{doc.title || 'Sanad / Certificate'}</p>
+                            <p className="font-bold text-xs text-slate-900 truncate">{doc.title || 'Sanad / Degree Document'}</p>
                             <span className="text-[10px] text-slate-400">
                               Uploaded {new Date(doc.uploadedAt || Date.now()).toLocaleDateString()}
                             </span>
@@ -807,7 +807,7 @@ function TutorProfileContent() {
 
                   <div>
                     <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Select Certificate File (JPG, PNG, PDF) *
+                      Select Sanad / Degree File (JPG, PNG, PDF) *
                     </label>
                     <input
                       type="file"

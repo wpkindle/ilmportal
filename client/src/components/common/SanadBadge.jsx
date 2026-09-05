@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { ShieldCheck, Award, FileText, ExternalLink, X } from 'lucide-react';
+import { ShieldCheck, GraduationCap, FileText, ExternalLink, X } from 'lucide-react';
 
 const SanadBadge = ({ documents = [], isVerified = true, onClick }) => {
   if (!documents || documents.length === 0) return null;
@@ -12,11 +12,11 @@ const SanadBadge = ({ documents = [], isVerified = true, onClick }) => {
       type="button"
       onClick={onClick}
       className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 hover:bg-[#e6dfd5] transition-colors shadow-sm cursor-pointer"
-      title="Click to view verified Sanad / Certificate"
+      title="Click to view verified Sanad / Degree"
     >
       <ShieldCheck className="w-3.5 h-3.5 text-[#0c2217]" />
       <span>Sanad / Degree Verified</span>
-      <Award className="w-3 h-3 text-[#b85d34] ml-0.5" />
+      <GraduationCap className="w-3 h-3 text-[#b85d34] ml-0.5" />
     </button>
   );
 };
@@ -36,7 +36,7 @@ export const SanadModal = ({ isOpen, onClose, documents = [], tutorName = '' }) 
         <div className="flex items-center justify-between pb-4 border-b border-stone-200">
           <div className="flex items-center gap-2.5">
             <div className="p-2 bg-[#0c2217] text-[#d4a359] rounded-xl">
-              <Award className="w-5 h-5" />
+              <GraduationCap className="w-5 h-5" />
             </div>
             <div>
               <h3 className="text-lg font-serif font-bold text-[#0c2217]">
@@ -78,7 +78,7 @@ export const SanadModal = ({ isOpen, onClose, documents = [], tutorName = '' }) 
                 {doc.fileUrl.endsWith('.pdf') ? (
                   <div className="p-8 text-center text-slate-600">
                     <FileText className="w-12 h-12 mx-auto text-red-500 mb-2" />
-                    <p className="text-sm font-medium">PDF Certificate Document</p>
+                    <p className="text-sm font-medium">PDF Sanad / Degree Document</p>
                     <a
                       href={doc.fileUrl}
                       target="_blank"
@@ -91,7 +91,7 @@ export const SanadModal = ({ isOpen, onClose, documents = [], tutorName = '' }) 
                 ) : (
                   <img
                     src={doc.fileUrl}
-                    alt={doc.title || 'Sanad Certificate'}
+                    alt={doc.title || 'Sanad / Degree Document'}
                     className="max-h-96 w-auto object-contain rounded shadow-sm"
                   />
                 )}

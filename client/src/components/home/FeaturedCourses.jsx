@@ -46,7 +46,7 @@ const fallbackCourses = [
     thumbnail: 'https://images.unsplash.com/photo-1584281722572-887498c87103?w=800&q=80',
     priceSuggested: { amount: 4500, unit: 'month' },
     stages: [
-      { name: 'Stage 1: Makharij al-Huroof', lessonCount: 8, badgeReward: 'Makharij Certificate' },
+      { name: 'Stage 1: Makharij al-Huroof', lessonCount: 8, badgeReward: 'Makharij Milestone' },
       { name: 'Stage 2: Ahkam Noon & Meem', lessonCount: 8, badgeReward: 'Tajweed Intermediate' },
       { name: 'Stage 3: Advanced Qirat & Melody', lessonCount: 8, badgeReward: 'Master Qari Award' }
     ]

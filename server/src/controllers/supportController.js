@@ -312,7 +312,7 @@ exports.getSupportAnalytics = async (req, res) => {
       { topic: 'Tutor & Alimah Search', count: Math.round(totalSessions * 0.45) },
       { topic: 'Admission & 3-Day Trial', count: Math.round(totalSessions * 0.25) },
       { topic: 'Payment Methods (Meezan/JazzCash)', count: Math.round(totalSessions * 0.18) },
-      { topic: 'Certificates & Sanad', count: Math.round(totalSessions * 0.12) }
+      { topic: 'Tutor Sanad & Vetting', count: Math.round(totalSessions * 0.12) }
     ];
 
     res.status(200).json({

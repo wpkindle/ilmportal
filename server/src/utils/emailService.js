@@ -591,7 +591,7 @@ const sendTutorStatusEmail = async (to, name, status, reason = '') => {
                     </div>
 
                     <p style="margin: 0 0 20px 0; font-size: 13px; line-height: 1.6; color: #475569;">
-                      You can easily update your profile, upload clearer certificate images (JPG, PNG, or PDF), and re-submit for prompt re-evaluation:
+                      You can easily update your profile, upload clearer Sanad / degree documents (JPG, PNG, or PDF), and re-submit for prompt re-evaluation:
                     </p>
 
                     <!-- Re-submit Action CTA -->
@@ -762,118 +762,6 @@ const sendDedicatedChatInvitationEmail = async ({
     subject,
     html,
     text: `Your dedicated chat room with ${isStudent ? tutorName : studentName} is open at: ${chatUrl}`
-  });
-};
-
-// ==========================================
-// 4. COURSE COMPLETION CERTIFICATE EMAIL
-// ==========================================
-const sendCertificateIssuedEmail = async ({ to, studentName, courseTitle, instructorName, certificateId, verificationUrl }) => {
-  const subject = `🎓 Mubarak! Your Course Completion Certificate: ${courseTitle}`;
-
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Official Certificate</title>
-    </head>
-    <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f1f5f9; padding: 30px 10px;">
-        <tr>
-          <td align="center">
-            
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 650px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); border: 2px solid #059669;">
-              
-              <!-- Brand Header -->
-              <tr>
-                <td align="center" style="padding: 35px 30px 25px 30px; background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #d97706 100%); color: #ffffff;">
-                  <div style="width: 60px; height: 60px; background: rgba(255, 255, 255, 0.2); border: 2px solid rgba(255, 255, 255, 0.5); border-radius: 18px; display: inline-flex; align-items: center; justify-content: center; line-height: 60px; font-size: 30px; margin-bottom: 12px;">
-                    🎓
-                  </div>
-                  <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; color: #ffffff;">Official Certificate Awarded</h1>
-                  <p style="margin: 4px 0 0 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #fef3c7;">IlmiDunya Pakistan Credential</p>
-                </td>
-              </tr>
-
-              <!-- Content Body -->
-              <tr>
-                <td style="padding: 35px 35px 25px 35px;">
-                  <div style="text-align: center; margin-bottom: 25px;">
-                    <h2 style="margin: 0 0 8px 0; font-size: 22px; font-weight: 900; color: #065f46;">
-                      Mubarak & Congratulations!
-                    </h2>
-                    <p style="margin: 0; font-size: 14px; color: #475569; line-height: 1.5;">
-                      This official certificate acknowledges that <strong>${studentName}</strong> has successfully completed the curriculum requirements for:
-                    </p>
-                    <div style="margin: 18px 0; padding: 14px 20px; background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 12px; font-size: 18px; font-weight: 800; color: #065f46;">
-                      ${courseTitle}
-                    </div>
-                    <p style="margin: 0; font-size: 13px; color: #64748b;">
-                      Supervised by Sanad-Certified Instructor: <strong style="color: #0f172a;">${instructorName}</strong>
-                    </p>
-                  </div>
-
-                  <!-- Metadata Table -->
-                  <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 14px; padding: 18px; margin: 24px 0;">
-                    <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
-                      <tr>
-                        <td style="padding: 6px 0; color: #64748b;">Certificate ID:</td>
-                        <td style="padding: 6px 0; font-weight: 800; text-align: right; font-family: monospace; color: #0f172a;">
-                          ${certificateId}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 6px 0; color: #64748b;">Issue Date:</td>
-                        <td style="padding: 6px 0; font-weight: 700; text-align: right; color: #0f172a;">
-                          ${new Date().toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}
-                        </td>
-                      </tr>
-                      <tr>
-                        <td style="padding: 6px 0; color: #64748b;">Verification Status:</td>
-                        <td style="padding: 6px 0; font-weight: 800; text-align: right; color: #059669;">
-                          Authentic & Verified
-                        </td>
-                      </tr>
-                    </table>
-                  </div>
-
-                  <!-- Download Button -->
-                  <div style="text-align: center; margin: 30px 0;">
-                    <a href="${verificationUrl}" style="display: inline-block; padding: 15px 36px; background-color: #059669; color: #ffffff; font-size: 15px; font-weight: 800; text-decoration: none; border-radius: 14px; box-shadow: 0 5px 15px rgba(5, 150, 105, 0.35);">
-                      View & Download PDF Certificate →
-                    </a>
-                  </div>
-                </td>
-              </tr>
-
-              <!-- Footer -->
-              <tr>
-                <td style="padding: 25px 35px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
-                  <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #334155;">
-                    IlmiDunya Pakistan &bull; Quality Quranic & Academic Education
-                  </p>
-                  <p style="margin: 0; font-size: 11px; color: #94a3b8;">
-                    You can verify this certificate at any time using the link above.
-                  </p>
-                </td>
-              </tr>
-
-            </table>
-            
-          </td>
-        </tr>
-      </table>
-    </body>
-    </html>
-  `;
-
-  return sendEmail({
-    to,
-    subject,
-    html,
-    text: `Congratulations ${studentName}! You have earned your completion certificate for "${courseTitle}". Download it at: ${verificationUrl}`
   });
 };
 
@@ -1374,7 +1262,6 @@ module.exports = {
   sendEmailDetailed,
   sendVerificationOtpEmail,
   sendTutorStatusEmail,
-  sendCertificateIssuedEmail,
   sendDedicatedChatInvitationEmail,
   sendAccountWarningEmail,
   sendAccountStatusEmail,

@@ -281,7 +281,7 @@ export default function CourseDetailPage() {
                 <div className="space-y-2.5 text-xs text-slate-300">
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
-                    <span>1-on-1 Dedicated Sanad-Certified Teacher</span>
+                    <span>1-on-1 Dedicated Sanad-Verified Teacher</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
@@ -289,7 +289,7 @@ export default function CourseDetailPage() {
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
-                    <span>Digital Stage Badges & Certificate</span>
+                    <span>Digital Learning Milestone Badges</span>
                   </div>
                   <div className="flex items-center gap-2">
                     <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />

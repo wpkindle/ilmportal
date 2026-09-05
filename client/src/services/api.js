@@ -716,14 +716,44 @@ export const api = {
     body: JSON.stringify(body)
   }).then(handleResponse),
 
-  // AI Chatbot Agent
+  // AI Support & Human Live Desk
   sendAiChat: (body) => fetch(`${API_BASE}/ai/chat`, {
     method: 'POST',
     headers: getHeaders(),
     body: JSON.stringify(body)
   }).then(handleResponse),
 
+  requestHumanSupport: (body) => fetch(`${API_BASE}/ai/human-support`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
   getAiHealth: () => fetch(`${API_BASE}/ai/health`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  getAdminSupportSessions: (params) => fetch(`${API_BASE}/ai/support/sessions?${new URLSearchParams(params || {})}`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  getAdminSupportSession: (id) => fetch(`${API_BASE}/ai/support/sessions/${id}`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  adminJoinSupportSession: (id) => fetch(`${API_BASE}/ai/support/sessions/${id}/join`, {
+    method: 'POST',
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  adminSendSupportMessage: (id, body) => fetch(`${API_BASE}/ai/support/sessions/${id}/message`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  adminResolveSupportSession: (id) => fetch(`${API_BASE}/ai/support/sessions/${id}/resolve`, {
+    method: 'POST',
     headers: getHeaders()
   }).then(handleResponse)
 };

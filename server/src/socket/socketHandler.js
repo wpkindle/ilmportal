@@ -3,6 +3,7 @@ const User = require('../models/User');
 const Deal = require('../models/Deal');
 const ChatRequest = require('../models/ChatRequest');
 const TutorProfile = require('../models/TutorProfile');
+const SupportSession = require('../models/SupportSession');
 
 const initSocket = (io) => {
   const onlineUsers = new Map(); // userId -> Set of socketIds
@@ -23,6 +24,17 @@ const initSocket = (io) => {
         }
         onlineUsers.get(idStr).add(socket.id);
         console.log(`👤 User registered on socket: ${idStr} (${socket.id}) - total connections: ${onlineUsers.get(idStr).size}`);
+
+        // If user is admin, join the dedicated 'admins' room for live support & safety alerts
+        try {
+          const registeredUser = await User.findById(idStr).select('role');
+          if (registeredUser && registeredUser.role === 'admin') {
+            socket.join('admins');
+            console.log(`🛡️ Admin ${idStr} joined socket room 'admins'`);
+          }
+        } catch (adminCheckErr) {
+          console.warn('Admin check note on socket registration:', adminCheckErr.message);
+        }
 
         // 1. Send all currently online user IDs to the newly connected user
         socket.emit('initial-online-users', Array.from(onlineUsers.keys()));
@@ -404,6 +416,90 @@ const initSocket = (io) => {
         user
       });
       console.log(`👋 User left classroom: ${roomId}`);
+    });
+
+    // ==========================================
+    // Live Human Support & Support Desk Signaling
+    // ==========================================
+
+    socket.on('join-support-session', ({ sessionId }) => {
+      if (sessionId) {
+        socket.join(`support_${sessionId}`);
+        console.log(`🎧 Socket ${socket.id} joined support session: support_${sessionId}`);
+      }
+    });
+
+    socket.on('leave-support-session', ({ sessionId }) => {
+      if (sessionId) {
+        socket.leave(`support_${sessionId}`);
+        console.log(`👋 Socket ${socket.id} left support session: support_${sessionId}`);
+      }
+    });
+
+    socket.on('send-support-message', async (data) => {
+      try {
+        const { sessionId, text, sender, senderName, senderAvatar } = data;
+        if (!sessionId || !text || !text.trim()) return;
+
+        let session = await SupportSession.findOne({ sessionId });
+        if (!session) {
+          session = new SupportSession({
+            sessionId,
+            status: sender === 'admin' ? 'admin_joined' : 'human_requested',
+            messages: []
+          });
+        }
+
+        const newMsg = {
+          sender: sender || 'user',
+          senderName: senderName || (sender === 'admin' ? 'Support Specialist' : 'User'),
+          senderAvatar: senderAvatar || '',
+          text: text.trim(),
+          createdAt: new Date()
+        };
+
+        session.messages.push(newMsg);
+        session.lastMessage = text.trim().slice(0, 140);
+        session.lastSender = sender || 'user';
+
+        if (sender === 'admin') {
+          session.unreadUserCount = (session.unreadUserCount || 0) + 1;
+        } else {
+          session.unreadAdminCount = (session.unreadAdminCount || 0) + 1;
+        }
+
+        await session.save();
+
+        // Broadcast to the support session room (both user and admin receive this)
+        io.to(`support_${sessionId}`).emit('support-message-received', {
+          sessionId,
+          message: newMsg
+        });
+
+        // If user sent it, notify all admins on the support desk
+        if (sender !== 'admin') {
+          io.to('admins').emit('support-session-updated', {
+            sessionId,
+            lastMessage: text.trim().slice(0, 140),
+            lastSender: sender || 'user',
+            unreadAdminCount: session.unreadAdminCount
+          });
+        }
+      } catch (err) {
+        console.error('Socket send-support-message error:', err);
+      }
+    });
+
+    socket.on('support-typing', ({ sessionId, senderName }) => {
+      if (sessionId) {
+        socket.to(`support_${sessionId}`).emit('support-user-typing', { senderName });
+      }
+    });
+
+    socket.on('support-stop-typing', ({ sessionId }) => {
+      if (sessionId) {
+        socket.to(`support_${sessionId}`).emit('support-user-stopped-typing');
+      }
     });
 
     // Disconnect handler

@@ -19,7 +19,8 @@ import {
   AlertTriangle,
   FileText,
   Award,
-  LogOut
+  LogOut,
+  Headphones
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
@@ -30,36 +31,58 @@ const AdminSidebar = () => {
   const { socket } = useSocket();
   const { logout } = useAuth();
   const [pendingReportsCount, setPendingReportsCount] = useState(0);
+  const [pendingSupportCount, setPendingSupportCount] = useState(0);
 
-  const fetchReportCounts = async () => {
+  const fetchCounts = async () => {
     try {
       const res = await api.getReports({ status: 'pending' });
       if (res.success) {
         setPendingReportsCount(res.count || (res.reports ? res.reports.length : 0));
       }
-    } catch (e) {
-      // Silently catch
-    }
+    } catch (e) {}
+
+    try {
+      const supRes = await api.getAdminSupportSessions({ status: 'human_requested' });
+      if (supRes.success) {
+        setPendingSupportCount(supRes.counts?.human_requested || (supRes.sessions ? supRes.sessions.length : 0));
+      }
+    } catch (e) {}
   };
 
   useEffect(() => {
-    fetchReportCounts();
+    fetchCounts();
   }, [pathname]);
 
-  // Socket listener for new reports
+  // Socket listener for new reports and human support requests
   useEffect(() => {
     if (!socket) return;
     const handleAlert = (data) => {
-      if (data?.type === 'safety_report') {
-        fetchReportCounts();
+      if (data?.type === 'safety_report' || data?.type === 'human_support_request') {
+        fetchCounts();
       }
     };
+    const handleSupportAlert = () => fetchCounts();
+
     socket.on('notification-alert', handleAlert);
-    return () => socket.off('notification-alert', handleAlert);
+    socket.on('human-support-alert', handleSupportAlert);
+    socket.on('support-session-updated', handleSupportAlert);
+
+    return () => {
+      socket.off('notification-alert', handleAlert);
+      socket.off('human-support-alert', handleSupportAlert);
+      socket.off('support-session-updated', handleSupportAlert);
+    };
   }, [socket]);
 
   const navItems = [
     { to: '/admin', label: 'Analytics & Overview', icon: LayoutDashboard, exact: true },
+    {
+      to: '/admin/support',
+      label: 'Live Support Desk',
+      icon: Headphones,
+      badge: pendingSupportCount > 0 ? `${pendingSupportCount} Waiting` : null,
+      badgeColor: 'bg-emerald-500 text-white animate-pulse'
+    },
     { to: '/admin/users', label: 'Users & Moderation', icon: Users },
     {
       to: '/admin/reports',

@@ -1,4 +1,4 @@
-const { GoogleGenAI } = require('@google/genai');
+chaconst { GoogleGenAI } = require('@google/genai');
 const TutorProfile = require('../models/TutorProfile');
 const User = require('../models/User');
 const Course = require('../models/Course');

@@ -340,11 +340,11 @@ const Navbar = () => {
                   <div className="col-span-1 md:col-span-3 pt-2.5 border-t border-[#e6ded1] flex items-center justify-between text-xs">
                     <span className="text-slate-500 font-medium">Over 20+ subjects &amp; courses</span>
                     <Link
-                      href="/courses"
+                      href="/tutors"
                       onClick={() => setSubjectsDropdownOpen(false)}
                       className="font-bold text-[#b85d34] hover:underline flex items-center gap-1"
                     >
-                      <span>View All Courses</span>
+                      <span>View All Tutors</span>
                       <ArrowRight className="w-3.5 h-3.5" />
                     </Link>
                   </div>

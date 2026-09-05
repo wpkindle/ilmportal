@@ -5,7 +5,6 @@ import { useRouter } from 'next/navigation';
 import { AuthProvider } from '../../context/AuthContext';
 import { SocketProvider } from '../../context/SocketContext';
 import { NotificationProvider } from '../../context/NotificationContext';
-import InitialPageLoader from './InitialPageLoader';
 import SupportPlatformWidget from './SupportPlatformWidget';
 import InAppNotificationToast from './InAppNotificationToast';
 import AiChatbotWidget from './AiChatbotWidget';
@@ -64,7 +63,6 @@ export default function AppProviders({ children }) {
     <AuthProvider>
       <SocketProvider>
         <NotificationProvider>
-          <InitialPageLoader />
           <InAppNotificationToast />
           <SupportPlatformWidget />
           <AiChatbotWidget />

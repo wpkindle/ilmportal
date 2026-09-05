@@ -4,7 +4,7 @@
   "description": "Pakistan's #1 verified platform for Quran Qaris and Academic Tutors with in-platform WebRTC classroom.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#07150E",
+  "background_color": "#FFFFFF",
   "theme_color": "#0C2217",
   "orientation": "portrait",
   "icons": [

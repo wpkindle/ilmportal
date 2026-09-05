@@ -468,6 +468,7 @@ export default function LiveSupportWidget() {
             {messages.map((m) => {
               const isUser = m.sender === 'user';
               const isAssistant = m.sender === 'assistant';
+              const isSystem = m.sender === 'system';
               const isAdmin = m.sender === 'admin';
 
               if (isSystem) {

@@ -8,7 +8,7 @@ import { useAuth } from '../../context/AuthContext';
 
 export default function InAppNotificationToast() {
   const router = useRouter();
-  const { toastAlert, permissionStatus, requestPermission } = useNotifications();
+  const { toastAlert, clearToast } = useNotifications();
   const { user } = useAuth();
 
   if (!toastAlert) return null;
@@ -25,7 +25,7 @@ export default function InAppNotificationToast() {
   return (
     <aside
       aria-label="New Message Notification"
-      className="fixed top-4 right-4 z-50 max-w-sm w-[calc(100%-2rem)] sm:w-96 animate-in slide-in-from-top-4 fade-in duration-300"
+      className="fixed bottom-20 right-4 sm:bottom-6 sm:right-6 z-50 max-w-sm w-[calc(100%-2rem)] sm:w-96 animate-in slide-in-from-bottom-4 fade-in duration-300 pointer-events-auto"
     >
       <div 
         onClick={handleOpen}
@@ -33,6 +33,19 @@ export default function InAppNotificationToast() {
       >
         {/* Top gold accent line */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#d4a359] via-[#fde047] to-[#d4a359]" />
+
+        {/* Dismiss X Button */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            if (clearToast) clearToast();
+          }}
+          className="absolute top-2.5 right-2.5 p-1 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors z-10 cursor-pointer"
+          aria-label="Close notification"
+        >
+          <X className="w-4 h-4" />
+        </button>
 
         <div className="flex items-start gap-3">
           {/* Avatar / Icon */}

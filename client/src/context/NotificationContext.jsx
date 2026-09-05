@@ -145,6 +145,7 @@ export const NotificationProvider = ({ children }) => {
         testChime,
         markAsRead,
         markAllAsRead,
+        clearToast: () => setToastAlert(null),
         refreshNotifications: fetchNotifications
       }}
     >
@@ -157,6 +158,7 @@ export const useNotifications = () => useContext(NotificationContext) || {
   notifications: [],
   unreadCount: 0,
   toastAlert: null,
+  clearToast: () => {},
   permissionStatus: 'default',
   soundEnabled: true,
   requestPermission: async () => {},

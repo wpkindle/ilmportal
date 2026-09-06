@@ -122,3 +122,4 @@ emailThreadSchema.index({ category: 1, lastMessageAt: -1 });
 emailThreadSchema.index({ 'from.address': 1 });
 
 module.exports = mongoose.model('EmailThread', emailThreadSchema);
+

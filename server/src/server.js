@@ -55,6 +55,7 @@ app.use('/api/courses', require('./routes/courseRoutes'));
 app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
 app.use('/api/support-chat', require('./routes/supportRoutes'));
+app.use('/api/emails', require('./routes/emailRoutes'));
 
 // Root status endpoint
 app.get('/', (req, res) => {

@@ -19,7 +19,8 @@ import {
   AlertTriangle,
   FileText,
   LogOut,
-  Headphones
+  Headphones,
+  Mail
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
@@ -31,6 +32,7 @@ const AdminSidebar = () => {
   const { logout } = useAuth();
   const [pendingReportsCount, setPendingReportsCount] = useState(0);
   const [pendingSupportCount, setPendingSupportCount] = useState(0);
+  const [unreadEmailCount, setUnreadEmailCount] = useState(0);
 
   const fetchCounts = async () => {
     try {
@@ -44,6 +46,13 @@ const AdminSidebar = () => {
       const supRes = await api.getAdminSupportSessions({ status: 'human_requested' });
       if (supRes.success) {
         setPendingSupportCount(supRes.counts?.human_requested || (supRes.sessions ? supRes.sessions.length : 0));
+      }
+    } catch (e) {}
+
+    try {
+      const emailRes = await api.getEmailCounts();
+      if (emailRes.success) {
+        setUnreadEmailCount(emailRes.counts?.unread || 0);
       }
     } catch (e) {}
   };
@@ -61,20 +70,30 @@ const AdminSidebar = () => {
       }
     };
     const handleSupportAlert = () => fetchCounts();
+    const handleEmailAlert = () => fetchCounts();
 
     socket.on('notification-alert', handleAlert);
     socket.on('human-support-alert', handleSupportAlert);
     socket.on('support-session-updated', handleSupportAlert);
+    socket.on('email-received', handleEmailAlert);
 
     return () => {
       socket.off('notification-alert', handleAlert);
       socket.off('human-support-alert', handleSupportAlert);
       socket.off('support-session-updated', handleSupportAlert);
+      socket.off('email-received', handleEmailAlert);
     };
   }, [socket]);
 
   const navItems = [
     { to: '/admin', label: 'Analytics & Overview', icon: LayoutDashboard, exact: true },
+    {
+      to: '/admin/inbox',
+      label: 'Business Mailbox',
+      icon: Mail,
+      badge: unreadEmailCount > 0 ? `${unreadEmailCount} New` : null,
+      badgeColor: 'bg-[#d4a359] text-stone-950 font-black animate-pulse'
+    },
     {
       to: '/admin/support',
       label: 'Live Support Desk',

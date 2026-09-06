@@ -782,5 +782,49 @@ export const api = {
 
   getSupportAnalytics: () => fetch(`${API_BASE}/support-chat/admin/analytics`, {
     headers: getHeaders()
+  }).then(handleResponse),
+
+  // Business Email & Resend Inbox (info@ilmidunya.com)
+  getEmailCounts: () => fetch(`${API_BASE}/emails/counts`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  getEmailThreads: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return fetch(`${API_BASE}/emails/threads${query ? `?${query}` : ''}`, {
+      headers: getHeaders()
+    }).then(handleResponse);
+  },
+
+  getEmailThread: (id) => fetch(`${API_BASE}/emails/threads/${id}`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  replyEmailThread: (id, body) => fetch(`${API_BASE}/emails/threads/${id}/reply`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  composeEmail: (body) => fetch(`${API_BASE}/emails/compose`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  updateEmailThreadStatus: (id, body) => fetch(`${API_BASE}/emails/threads/${id}/status`, {
+    method: 'PATCH',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  deleteEmailThread: (id) => fetch(`${API_BASE}/emails/threads/${id}`, {
+    method: 'DELETE',
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  seedDemoEmails: () => fetch(`${API_BASE}/emails/seed-demo`, {
+    method: 'POST',
+    headers: getHeaders()
   }).then(handleResponse)
 };

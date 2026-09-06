@@ -1052,7 +1052,7 @@ exports.registerEarlyTutor = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: 'Welcome to the IlmiDunya Founding Faculty! Your dedication to spreading Ilm is deeply honored. You have secured VIP Priority Placement for direct student matching on launch day — our faculty team will connect with you shortly with exclusive onboarding details and early perks!',
+      message: 'Welcome to the IlmiDunya teaching family! You are now placed on our VIP priority list for launch day. When we go live, students will be connected directly with you with 0% commission. We will contact you soon with all the details!',
       tutor: {
         name: user.name,
         email: user.email,

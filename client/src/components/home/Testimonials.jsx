@@ -66,31 +66,31 @@ export default function Testimonials() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
           
           {/* Featured Large Card (7 cols) */}
-          <div className="lg:col-span-7 p-7 sm:p-9 rounded-3xl bg-[#0c2217] text-white border border-[#d4a359]/30 shadow-xl flex flex-col justify-between space-y-6 relative overflow-hidden">
-            <div className="absolute top-6 right-6 text-7xl font-serif font-black text-white/5 select-none pointer-events-none">
+          <div className="lg:col-span-7 p-7 sm:p-9 rounded-3xl bg-white text-[#141c19] border-2 border-[#d4a359]/50 shadow-xl flex flex-col justify-between space-y-6 relative overflow-hidden">
+            <div className="absolute top-6 right-6 text-7xl font-serif font-black text-[#d4a359]/15 select-none pointer-events-none">
               “
             </div>
 
             <div className="space-y-4 relative z-10">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40">
+                <span className="text-[10px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[#f5f0e6] text-[#b85d34] border border-[#d4a359]/50 shadow-2xs">
                   {featured.highlight}
                 </span>
                 <RatingStars rating={featured.rating} size="sm" />
               </div>
 
-              <p className="text-sm sm:text-base text-[#e5f3ec] font-serif leading-relaxed italic">
+              <p className="text-sm sm:text-base text-[#2c4035] font-serif leading-relaxed italic">
                 &ldquo;{featured.review}&rdquo;
               </p>
             </div>
 
-            <div className="pt-4 border-t border-[#143d2b] flex items-center justify-between relative z-10">
+            <div className="pt-4 border-t border-[#ebe3d3] flex items-center justify-between relative z-10">
               <div>
-                <h4 className="font-bold text-sm text-white">{featured.name}</h4>
-                <p className="text-xs text-[#a3b8b0]">{featured.role} &bull; {featured.location}</p>
+                <h4 className="font-bold text-sm text-[#0c2217]">{featured.name}</h4>
+                <p className="text-xs text-[#4a5e55]">{featured.role} &bull; {featured.location}</p>
               </div>
-              <div className="flex items-center gap-1.5 text-xs text-[#d4a359] font-bold">
-                <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
+              <div className="flex items-center gap-1.5 text-xs text-[#059669] font-bold">
+                <ShieldCheck className="w-4 h-4 text-[#059669]" />
                 <span>Verified Family</span>
               </div>
             </div>

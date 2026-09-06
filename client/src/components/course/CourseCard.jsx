@@ -129,7 +129,7 @@ export default function CourseCard({ course }) {
 
           <Link
             href={`/courses/${course.slug}`}
-            className="px-3.5 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-white rounded-xl font-bold text-xs shadow-sm flex items-center gap-1.5 group-hover:gap-2 transition-all"
+            className="px-3.5 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-xl font-bold text-xs shadow-md flex items-center gap-1.5 group-hover:gap-2 transition-all cursor-pointer"
           >
             <span>Outline</span>
             <ArrowRight className="w-3.5 h-3.5" />

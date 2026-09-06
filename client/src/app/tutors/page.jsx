@@ -241,7 +241,7 @@ function TutorSearchContent() {
                 </p>
                 <button
                   onClick={handleReset}
-                  className="px-5 py-3 min-h-[44px] bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] text-xs font-bold rounded-xl active:scale-95 transition-all cursor-pointer shadow-sm"
+                  className="px-5 py-3 min-h-[44px] bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-bold rounded-xl active:scale-95 transition-all cursor-pointer shadow-sm"
                 >
                   Clear All Filters
                 </button>
@@ -261,13 +261,13 @@ function TutorSearchContent() {
 
       {/* Mobile Slide-Over Filter Drawer */}
       {mobileFiltersOpen && (
-        <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end bg-black/70 backdrop-blur-xs animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 lg:hidden flex flex-col justify-end bg-black/35 backdrop-blur-sm animate-in fade-in duration-200">
           <div className="w-full max-h-[85vh] bg-white rounded-t-3xl shadow-2xl flex flex-col overflow-hidden animate-in slide-in-from-bottom duration-250">
-            <div className="p-4 bg-[#0c2217] text-white flex items-center justify-between">
+            <div className="p-4 bg-[#faf8f5] border-b border-[#ebe3d3] text-[#0c2217] flex items-center justify-between">
               <span className="text-sm font-bold font-serif">Filter Pakistani Tutors</span>
               <button
                 onClick={() => setMobileFiltersOpen(false)}
-                className="px-3 py-1.5 min-h-[44px] text-xs font-bold text-slate-300 hover:text-white"
+                className="px-3 py-1.5 min-h-[44px] text-xs font-bold text-[#b85d34] hover:text-[#9e4e2a]"
               >
                 Done
               </button>
@@ -283,10 +283,10 @@ function TutorSearchContent() {
               />
             </div>
 
-            <div className="p-4 border-t border-[#e6ded1] bg-[#faf8f5] pb-safe">
+            <div className="p-4 border-t border-[#ebe3d3] bg-[#faf8f5] pb-safe">
               <button
                 onClick={() => setMobileFiltersOpen(false)}
-                className="w-full py-3.5 min-h-[44px] bg-[#0c2217] hover:bg-[#143d2b] text-white font-bold text-xs rounded-2xl shadow-lg transition-all"
+                className="w-full py-3.5 min-h-[44px] bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-2xl shadow-md transition-all cursor-pointer"
               >
                 View {tutors.length} Tutors
               </button>

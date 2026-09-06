@@ -99,28 +99,28 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
   };
 
   return (
-    <div className="my-3 max-w-md w-full bg-gradient-to-br from-[#0c2217] via-[#143d2b] to-[#07150e] text-white rounded-3xl p-5 border border-[#d4a359]/30 shadow-xl space-y-4">
+    <div className="my-3 max-w-md w-full bg-white text-[#141c19] rounded-3xl p-5 border-2 border-[#d4a359]/60 shadow-xl space-y-4">
       
       {/* Header */}
-      <div className="flex items-center justify-between pb-3 border-b border-white/10">
+      <div className="flex items-center justify-between pb-3 border-b border-[#ebe3d3]">
         <div className="flex items-center gap-2.5">
-          <div className="p-2 bg-[#d4a359]/20 text-[#d4a359] rounded-xl border border-[#d4a359]/30">
+          <div className="p-2 bg-[#f5f0e6] text-[#b85d34] rounded-xl border border-[#d4a359]/30">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <span className="text-[10px] uppercase font-bold tracking-widest text-[#d4a359] block">
+            <span className="text-[10px] uppercase font-bold tracking-widest text-[#b85d34] block">
               Official Course Offer
             </span>
-            <h4 className="font-serif font-bold text-sm text-white">{dealState.subject}</h4>
+            <h4 className="font-serif font-bold text-sm text-[#0c2217]">{dealState.subject}</h4>
           </div>
         </div>
 
         <span className={`text-[10px] font-bold uppercase px-2.5 py-1 rounded-full ${
           isAccepted
-            ? 'bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/40'
+            ? 'bg-emerald-50 text-emerald-800 border border-emerald-300'
             : isDeclined
-            ? 'bg-red-500/20 text-red-300 border border-red-500/40'
-            : 'bg-[#d4a359]/20 text-[#d4a359] border border-[#d4a359]/40 animate-pulse'
+            ? 'bg-rose-50 text-rose-800 border border-rose-300'
+            : 'bg-amber-50 text-amber-800 border border-amber-300 animate-pulse'
         }`}>
           {isAccepted ? 'Active Course' : isDeclined ? 'Declined' : 'Pending Acceptance'}
         </span>
@@ -128,35 +128,44 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
 
       {/* Details Box */}
       <div className="grid grid-cols-2 gap-2 text-xs">
-        <div className="p-3 bg-white/5 rounded-2xl border border-white/5 space-y-0.5">
-          <span className="text-[10px] uppercase font-bold text-stone-400">Tuition Fee</span>
-          <p className="font-bold text-[#d4a359] font-mono text-sm">
+        <div className="p-3 bg-[#faf8f5] rounded-2xl border border-[#ebe3d3] space-y-0.5">
+          <span className="text-[10px] uppercase font-bold text-stone-500">Tuition Fee</span>
+          <p className="font-bold text-[#0c2217] font-mono text-sm">
             PKR {dealState.price?.toLocaleString()}
-            <span className="text-[10px] font-normal text-stone-400"> / {dealState.priceUnit === 'per_hour' ? 'hr' : 'mo'}</span>
+            <span className="text-[10px] font-normal text-stone-500"> / {dealState.priceUnit === 'per_hour' ? 'hr' : 'mo'}</span>
           </p>
         </div>
 
-        <div className="p-3 bg-white/5 rounded-2xl border border-white/5 space-y-0.5">
-          <span className="text-[10px] uppercase font-bold text-stone-400">Teaching Mode</span>
-          <p className="font-bold text-stone-200 capitalize flex items-center gap-1.5">
-            <Video className="w-3.5 h-3.5 text-[#d4a359]" />
-            <span>{dealState.mode === 'online' ? 'Live WebRTC' : 'In-Person'}</span>
+        <div className="p-3 bg-[#faf8f5] rounded-2xl border border-[#ebe3d3] space-y-0.5">
+          <span className="text-[10px] uppercase font-bold text-stone-500">Teaching Mode</span>
+          <p className="font-bold text-[#0c2217] flex items-center gap-1">
+            {dealState.mode === 'online' ? (
+              <>
+                <Video className="w-3.5 h-3.5 text-[#b85d34]" />
+                <span>Online Video</span>
+              </>
+            ) : (
+              <>
+                <Home className="w-3.5 h-3.5 text-[#b85d34]" />
+                <span>In-Person</span>
+              </>
+            )}
           </p>
         </div>
       </div>
 
-      {/* Schedule Summary */}
+      {/* Schedule Box */}
       {(dealState.scheduleDetails || dealState.schedule) && (
-        <div className="p-3 bg-white/5 rounded-2xl border border-white/5 text-xs text-stone-300 space-y-1">
-          <span className="text-[10px] uppercase font-bold text-stone-400 block">Agreed Class Schedule</span>
-          <p className="font-medium text-stone-200">{dealState.scheduleDetails || dealState.schedule}</p>
+        <div className="p-3 bg-[#faf8f5] rounded-2xl border border-[#ebe3d3] text-xs text-stone-700 space-y-1">
+          <span className="text-[10px] uppercase font-bold text-stone-500 block">Agreed Class Schedule</span>
+          <p className="font-medium text-stone-800">{dealState.scheduleDetails || dealState.schedule}</p>
         </div>
       )}
 
       {/* 3-Day Free Trial Notice for Student */}
       {isPending && isStudentUser && (
-        <div className="p-3 bg-[#0c2217]/80 border border-[#d4a359]/30 rounded-2xl text-[11px] text-[#faf8f5] flex items-start gap-2">
-          <ShieldCheck className="w-4 h-4 text-[#d4a359] shrink-0 mt-0.5" />
+        <div className="p-3 bg-emerald-50/70 border border-emerald-300 rounded-2xl text-[11px] text-emerald-950 flex items-start gap-2">
+          <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
           <p className="leading-snug">
             Accepting unlocks your <strong>3-Day Free Trial</strong> immediately. No payment is required until you complete your trial classes.
           </p>
@@ -170,7 +179,7 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
             type="button"
             onClick={() => handleResponse('decline')}
             disabled={loading}
-            className="w-1/3 py-2.5 bg-white/10 hover:bg-white/20 text-stone-300 text-xs font-bold rounded-xl transition-all cursor-pointer disabled:opacity-50"
+            className="w-1/3 py-2.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-xs font-bold rounded-xl transition-all cursor-pointer disabled:opacity-50"
           >
             Decline
           </button>
@@ -178,7 +187,7 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
             type="button"
             onClick={() => handleResponse('accept')}
             disabled={loading}
-            className="w-2/3 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+            className="w-2/3 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
             <CheckCircle2 className="w-4 h-4 text-white" />
             <span>{loading ? 'Activating...' : 'Accept & Start 3-Day Trial'}</span>
@@ -188,20 +197,20 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
 
       {/* Tutor Pending Indicator */}
       {isPending && !isStudentUser && (
-        <div className="p-2.5 bg-amber-950/40 border border-[#d4a359]/30 rounded-2xl text-[11px] text-[#d4a359] text-center font-medium flex items-center justify-center gap-2">
-          <Clock className="w-3.5 h-3.5 text-[#d4a359] animate-spin" />
+        <div className="p-2.5 bg-amber-50 border border-amber-300 rounded-2xl text-[11px] text-amber-900 text-center font-medium flex items-center justify-center gap-2">
+          <Clock className="w-3.5 h-3.5 text-amber-700 animate-spin" />
           <span>Offer dispatched to student. Waiting for acceptance.</span>
         </div>
       )}
 
       {/* Active Trial & Continuation Decision Area */}
       {currentStatus === 'active_trial' && isStudentUser && (
-        <div className="p-3.5 bg-[#0c2217]/90 border border-[#d4a359]/40 rounded-2xl space-y-2.5">
+        <div className="p-3.5 bg-amber-50/80 border border-amber-300 rounded-2xl space-y-2.5">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-[#d4a359] animate-ping" />
-            <span className="text-xs font-bold text-[#d4a359]">Free Trial In Progress</span>
+            <span className="w-2 h-2 rounded-full bg-amber-600 animate-ping" />
+            <span className="text-xs font-bold text-amber-900">Free Trial In Progress</span>
           </div>
-          <p className="text-[11px] text-stone-300 leading-relaxed">
+          <p className="text-[11px] text-stone-700 leading-relaxed">
             Are you satisfied with your trial classes? Choose whether you would like to continue regular tutoring with this teacher:
           </p>
           <div className="flex items-center gap-2 pt-1">
@@ -265,12 +274,12 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
 
       {/* Continuation Agreed - Notice for Student */}
       {currentStatus === 'continuation_agreed' && isStudentUser && (
-        <div className="p-3.5 bg-amber-950/60 border border-amber-500/40 rounded-2xl space-y-1.5 text-xs text-amber-200">
+        <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-2xl space-y-1.5 text-xs text-emerald-950">
           <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
-            <span className="font-bold text-amber-300">Continuation Confirmed!</span>
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span className="font-bold text-emerald-900">Continuation Confirmed!</span>
           </div>
-          <p className="text-[11px] text-slate-300 leading-relaxed">
+          <p className="text-[11px] text-stone-700 leading-relaxed">
             You have chosen to continue regular classes. Live classes are active.
           </p>
         </div>
@@ -278,20 +287,20 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
 
       {/* Active Paid Classes */}
       {currentStatus === 'active_paid' && (
-        <div className="p-3 bg-[#0c2217]/90 rounded-2xl border border-[#d4a359]/40 text-center text-xs font-bold text-[#d4a359] flex items-center justify-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-[#d4a359]" />
+        <div className="p-3 bg-emerald-50 rounded-2xl border border-emerald-300 text-center text-xs font-bold text-emerald-900 flex items-center justify-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           <span>Active Paid Classes &bull; Payment Cleared by Admin</span>
         </div>
       )}
 
       {/* Restricted Classes */}
       {(currentStatus === 'restricted' || dealState.accessRestricted) && (
-        <div className="p-3.5 bg-rose-950/80 rounded-2xl border border-rose-500/50 text-xs text-rose-200 space-y-1">
-          <div className="flex items-center gap-2 font-bold text-rose-300">
-            <XCircle className="w-4 h-4 text-rose-400 shrink-0" />
+        <div className="p-3.5 bg-rose-50 rounded-2xl border border-rose-300 text-xs text-rose-950 space-y-1">
+          <div className="flex items-center gap-2 font-bold text-rose-800">
+            <XCircle className="w-4 h-4 text-rose-600 shrink-0" />
             <span>Classroom Access Suspended</span>
           </div>
-          <p className="text-[11px] text-stone-300 leading-relaxed">
+          <p className="text-[11px] text-stone-700 leading-relaxed">
             Classes are temporarily paused pending tutor platform fee clearance with admin.
           </p>
         </div>
@@ -299,24 +308,24 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
 
       {/* Course Completed / Deal Closed Indicator */}
       {currentStatus === 'completed' && (
-        <div className="p-3 bg-[#0c2217]/90 rounded-2xl border border-[#d4a359]/40 text-center text-xs font-bold text-[#d4a359] flex items-center justify-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-[#d4a359]" />
+        <div className="p-3 bg-stone-100 rounded-2xl border border-stone-200 text-center text-xs font-bold text-stone-700 flex items-center justify-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
           <span>Course Completed &bull; Deal Closed</span>
         </div>
       )}
 
       {/* Tutor Action: Mark Deal Completed / Closed */}
       {isTutorUser && ['active_trial', 'continuation_agreed', 'active_paid'].includes(currentStatus) && (
-        <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-3">
-          <span className="text-[10.5px] text-stone-400">Course completed?</span>
+        <div className="pt-2 border-t border-[#ebe3d3] flex items-center justify-between gap-3">
+          <span className="text-[10.5px] text-stone-500">Course completed?</span>
           <button
             type="button"
             onClick={handleComplete}
             disabled={loading}
-            className="px-3.5 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50 border border-[#d4a359]/40"
+            className="px-3.5 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50"
             title="Mark this deal as completed and permanently delete chat to free storage"
           >
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
+            <CheckCircle2 className="w-3.5 h-3.5 text-white" />
             <span>Mark Completed</span>
           </button>
         </div>

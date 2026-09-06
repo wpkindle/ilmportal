@@ -46,7 +46,7 @@ export default function ChromeAppInstallModal({ isOpen, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 overflow-y-auto p-3 sm:p-6 flex items-center justify-center bg-[#07150e]/85 backdrop-blur-md animate-in fade-in duration-200"
+      className="fixed inset-0 z-50 overflow-y-auto p-3 sm:p-6 flex items-center justify-center bg-black/35 backdrop-blur-sm animate-in fade-in duration-200"
       onClick={(e) => {
         if (e.target === e.currentTarget) onClose();
       }}
@@ -61,7 +61,7 @@ export default function ChromeAppInstallModal({ isOpen, onClose }) {
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-[#143d2b] border border-[#d4a359]/40 px-2 py-0.5 rounded-full">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#b85d34] bg-[#f5f0e6] border border-[#d4a359]/40 px-2 py-0.5 rounded-full">
                   Google Chrome App
                 </span>
                 <span className="text-[10px] text-stone-500 font-medium">Fast &amp; Offline Ready</span>
@@ -101,9 +101,9 @@ export default function ChromeAppInstallModal({ isOpen, onClose }) {
               <button
                 type="button"
                 onClick={handleInstallClick}
-                className="w-full py-3.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] border border-[#d4a359]/40 font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-[#0c2217]/20 flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95"
+                className="w-full py-3.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-[#b85d34]/25 flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-95"
               >
-                <Download className="w-4 h-4 text-[#d4a359]" />
+                <Download className="w-4 h-4 text-white" />
                 <span>{deferredPrompt ? '1-Click Install Chrome App' : 'How to Install Chrome App'}</span>
               </button>
 

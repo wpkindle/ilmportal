@@ -47,61 +47,61 @@ export default function HeroClassroomCard() {
       <div className="absolute -inset-1.5 bg-gradient-to-r from-[#d4a359]/30 via-[#b85d34]/20 to-[#d4a359]/30 rounded-3xl blur-2xl opacity-80 animate-pulse-glow pointer-events-none" />
 
       {/* Main Glassmorphism Live Classroom Simulation Container */}
-      <div className="relative rounded-3xl bg-[#0c2217]/90 border border-[#d4a359]/40 shadow-2xl backdrop-blur-2xl overflow-hidden p-4 sm:p-5 space-y-4">
+      <div className="relative rounded-3xl bg-white/95 border-2 border-[#d4a359]/50 shadow-2xl backdrop-blur-2xl overflow-hidden p-4 sm:p-5 space-y-4">
         
         {/* Top Window Bar with Live Indicator & Running Clock */}
-        <div className="flex items-center justify-between border-b border-white/10 pb-3">
+        <div className="flex items-center justify-between border-b border-[#ebe3d3] pb-3">
           <div className="flex items-center gap-2">
             <div className="flex gap-1.5">
               <div className="w-3 h-3 rounded-full bg-rose-500/80" />
               <div className="w-3 h-3 rounded-full bg-amber-500/80" />
               <div className="w-3 h-3 rounded-full bg-[#d4a359]" />
             </div>
-            <div className="h-4 w-px bg-white/20 ml-1" />
-            <div className="flex items-center gap-1.5 bg-[#143d2b] border border-[#d4a359]/40 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-[#d4a359]">
-              <Radio className="w-3 h-3 text-[#d4a359] animate-pulse" />
+            <div className="h-4 w-px bg-stone-300 ml-1" />
+            <div className="flex items-center gap-1.5 bg-[#f5f0e6] border border-[#d4a359]/50 px-2.5 py-0.5 rounded-full text-[10px] font-bold text-[#b85d34]">
+              <Radio className="w-3 h-3 text-[#b85d34] animate-pulse" />
               <span>LIVE 1:1 WEBRTC CLASSROOM</span>
             </div>
           </div>
 
           {/* Session Running Clock (1 True Second per second) */}
-          <div className="flex items-center gap-2 text-[#d1dbd6] text-xs font-mono bg-black/50 px-2.5 py-1 rounded-xl border border-white/10">
-            <Clock className="w-3.5 h-3.5 text-[#d4a359]" />
+          <div className="flex items-center gap-2 text-[#0c2217] text-xs font-mono bg-[#faf8f5] px-2.5 py-1 rounded-xl border border-[#ebe3d3] shadow-xs">
+            <Clock className="w-3.5 h-3.5 text-[#b85d34]" />
             <span>{formatTimer(seconds)}</span>
           </div>
         </div>
 
         {/* Video Stage & Quran Reader Hybrid Interface */}
-        <div className="relative rounded-2xl overflow-hidden bg-slate-950 border border-white/10 aspect-[16/10] group">
+        <div className="relative rounded-2xl overflow-hidden bg-stone-900 border border-[#ebe3d3] aspect-[16/10] group">
           {/* Main Simulated Video Feed (Tutor Camera) */}
           <img
             src="/images/tutors/qari-huzaifa.jpg"
             alt="Qari Muhammad Huzaifa Live Session"
-            className="w-full h-full object-cover object-top opacity-90 transition-transform duration-700 group-hover:scale-105"
+            className="w-full h-full object-cover object-top opacity-95 transition-transform duration-700 group-hover:scale-105"
           />
 
           {/* Vignette Gradients */}
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-transparent" />
-          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/70 via-transparent to-slate-950/40" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/50 via-transparent to-black/30" />
 
           {/* Floating Tajweed Quran Verse Viewer at Top */}
-          <div className="absolute top-3 left-3 right-3 p-2.5 rounded-xl bg-[#0c2217]/95 border border-[#d4a359]/30 backdrop-blur-md flex items-center justify-between">
+          <div className="absolute top-3 left-3 right-3 p-2.5 rounded-xl bg-white/95 border border-[#ebe3d3] backdrop-blur-md shadow-md flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="p-1.5 bg-[#143d2b] text-[#d4a359] rounded-lg">
+              <div className="p-1.5 bg-[#f5f0e6] text-[#b85d34] rounded-lg">
                 <BookOpen className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-[11px] font-bold text-white leading-tight">Surah Al-Fatihah (Ayah 1-2)</p>
-                <p className="text-[9px] text-[#d4a359] font-medium">Makhraj &amp; Tajweed Rule: Al-Idgham</p>
+                <p className="text-[11px] font-bold text-[#0c2217] leading-tight">Surah Al-Fatihah (Ayah 1-2)</p>
+                <p className="text-[9px] text-[#b85d34] font-semibold">Makhraj &amp; Tajweed Rule: Al-Idgham</p>
               </div>
             </div>
-            <span className="text-sm font-arabic text-[#faf8f5] font-bold" dir="rtl">
+            <span className="text-sm font-arabic text-[#0c2217] font-bold" dir="rtl">
               بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
             </span>
           </div>
 
           {/* Student Picture-in-Picture (PiP) Window */}
-          <div className="absolute bottom-3 right-3 w-24 h-16 sm:w-28 sm:h-20 rounded-xl overflow-hidden border-2 border-[#d4a359]/80 shadow-2xl bg-slate-900">
+          <div className="absolute bottom-3 right-3 w-24 h-16 sm:w-28 sm:h-20 rounded-xl overflow-hidden border-2 border-[#d4a359] shadow-2xl bg-stone-900">
             <img
               src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200&q=80"
               alt="Student PiP"
@@ -114,17 +114,17 @@ export default function HeroClassroomCard() {
 
           {/* Tutor Info Overlay at Bottom Left */}
           <div className="absolute bottom-3 left-3 space-y-1.5">
-            <div className="flex items-center gap-1.5 bg-[#0c2217]/90 px-2.5 py-1 rounded-xl border border-[#d4a359]/30 backdrop-blur-md">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-              <span className="text-xs font-bold text-white">Qari Muhammad Huzaifa</span>
-              <span className="text-[9px] px-1.5 py-0.2 bg-[#143d2b] text-[#d4a359] rounded font-black uppercase">
+            <div className="flex items-center gap-1.5 bg-white/95 px-2.5 py-1 rounded-xl border border-[#ebe3d3] backdrop-blur-md shadow-md">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
+              <span className="text-xs font-bold text-[#0c2217]">Qari Muhammad Huzaifa</span>
+              <span className="text-[9px] px-1.5 py-0.5 bg-[#f5f0e6] text-[#0c2217] border border-[#ebe3d3] rounded font-bold uppercase">
                 Sanad Verified Tutor
               </span>
             </div>
 
             {/* Live Audio Waveform */}
-            <div className="flex items-center gap-1 bg-[#0c2217]/90 px-2.5 py-1 rounded-xl border border-[#d4a359]/30 w-fit backdrop-blur-md">
-              <Mic className="w-3 h-3 text-[#d4a359] shrink-0" />
+            <div className="flex items-center gap-1 bg-white/95 px-2.5 py-1 rounded-xl border border-[#ebe3d3] w-fit backdrop-blur-md shadow-md">
+              <Mic className="w-3 h-3 text-[#b85d34] shrink-0" />
               <div className="flex items-end gap-0.5 h-3.5 px-1">
                 {waveform.map((val, idx) => (
                   <div
@@ -134,35 +134,35 @@ export default function HeroClassroomCard() {
                   />
                 ))}
               </div>
-              <span className="text-[9px] font-mono text-[#d4a359]">HD 48kHz</span>
+              <span className="text-[9px] font-mono font-semibold text-[#b85d34]">HD 48kHz</span>
             </div>
           </div>
         </div>
 
         {/* Live Metrics & Feature Strip */}
         <div className="grid grid-cols-3 gap-2 pt-1 text-center">
-          <div className="p-2.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-            <div className="flex items-center justify-center gap-1 text-amber-400 font-black text-xs">
-              <Star className="w-3.5 h-3.5 fill-amber-400" />
+          <div className="p-2.5 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] shadow-xs">
+            <div className="flex items-center justify-center gap-1 text-amber-600 font-black text-xs">
+              <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
               <span>5.0 / 5.0</span>
             </div>
-            <p className="text-[10px] text-stone-300 font-medium mt-0.5">1,450+ Verified Reviews</p>
+            <p className="text-[10px] text-[#52665b] font-semibold mt-0.5">1,450+ Verified Reviews</p>
           </div>
 
-          <div className="p-2.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-            <div className="flex items-center justify-center gap-1 text-[#d4a359] font-black text-xs">
+          <div className="p-2.5 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] shadow-xs">
+            <div className="flex items-center justify-center gap-1 text-[#b85d34] font-black text-xs">
               <Users className="w-3.5 h-3.5" />
               <span>All Over Pakistan</span>
             </div>
-            <p className="text-[10px] text-stone-300 font-medium mt-0.5">Nationwide &amp; Overseas</p>
+            <p className="text-[10px] text-[#52665b] font-semibold mt-0.5">Nationwide &amp; Overseas</p>
           </div>
 
-          <div className="p-2.5 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+          <div className="p-2.5 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] shadow-xs">
             <div className="flex items-center justify-center gap-1 text-[#b85d34] font-black text-xs">
               <Sparkles className="w-3.5 h-3.5" />
               <span>3-Day Free</span>
             </div>
-            <p className="text-[10px] text-stone-300 font-medium mt-0.5">Trial on All Courses</p>
+            <p className="text-[10px] text-[#52665b] font-semibold mt-0.5">Trial on All Courses</p>
           </div>
         </div>
 

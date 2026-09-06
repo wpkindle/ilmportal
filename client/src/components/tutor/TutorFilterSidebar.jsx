@@ -120,11 +120,11 @@ const TutorFilterSidebar = ({
             onClick={() => onFilterChange('sortBy', 'popular')}
             className={`py-1.5 px-2 rounded-xl text-center text-[11px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-1 border ${
               (filters.sortBy || 'popular') === 'popular'
-                ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217] shadow-xs'
+                ? 'bg-[#b85d34] text-white border-[#b85d34] shadow-xs font-bold'
                 : 'bg-[#f4efe8] border-[#e6dfd5] text-stone-700 hover:bg-[#eae3d8]'
             }`}
           >
-            <Sparkles className="w-3 h-3 text-[#d4a359]" />
+            <Sparkles className={`w-3 h-3 ${(filters.sortBy || 'popular') === 'popular' ? 'text-white' : 'text-[#b85d34]'}`} />
             <span>Most Popular</span>
           </button>
 
@@ -133,11 +133,11 @@ const TutorFilterSidebar = ({
             onClick={() => onFilterChange('sortBy', 'newest')}
             className={`py-1.5 px-2 rounded-xl text-center text-[11px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-1 border ${
               filters.sortBy === 'newest'
-                ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217] shadow-xs'
+                ? 'bg-[#b85d34] text-white border-[#b85d34] shadow-xs font-bold'
                 : 'bg-[#f4efe8] border-[#e6dfd5] text-stone-700 hover:bg-[#eae3d8]'
             }`}
           >
-            <Clock className="w-3 h-3 text-[#d4a359]" />
+            <Clock className={`w-3 h-3 ${filters.sortBy === 'newest' ? 'text-white' : 'text-[#b85d34]'}`} />
             <span>Newly Joined</span>
           </button>
         </div>
@@ -225,7 +225,7 @@ const TutorFilterSidebar = ({
               onClick={() => onFilterChange('mode', m.val)}
               className={`py-2 px-2 rounded-xl text-center transition-all cursor-pointer ${
                 (filters.mode || '') === m.val
-                  ? 'bg-[#0c2217] text-[#d4a359] font-bold shadow-sm border border-[#0c2217]'
+                  ? 'bg-[#b85d34] text-white font-bold shadow-sm border border-[#b85d34]'
                   : 'bg-[#f4efe8] text-stone-700 hover:bg-[#eae3d8] border border-[#e6dfd5]'
               }`}
             >
@@ -238,7 +238,7 @@ const TutorFilterSidebar = ({
       {/* 6. Gender Preference Filter */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-          <User className="w-3.5 h-3.5 text-[#0c2217]" />
+          <User className="w-3.5 h-3.5 text-[#b85d34]" />
           <span>Tutor Gender</span>
         </label>
         <div className="grid grid-cols-3 gap-1.5 text-xs font-semibold">
@@ -253,7 +253,7 @@ const TutorFilterSidebar = ({
               onClick={() => onFilterChange('gender', g.val)}
               className={`py-2 px-2 rounded-xl text-center transition-all cursor-pointer ${
                 (filters.gender || '') === g.val
-                  ? 'bg-[#0c2217] text-[#d4a359] font-bold shadow-sm border border-[#0c2217]'
+                  ? 'bg-[#b85d34] text-white font-bold shadow-sm border border-[#b85d34]'
                   : 'bg-[#f4efe8] text-stone-700 hover:bg-[#eae3d8] border border-[#e6dfd5]'
               }`}
             >

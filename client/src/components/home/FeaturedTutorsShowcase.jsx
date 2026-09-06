@@ -112,7 +112,7 @@ export default function FeaturedTutorsShowcase({ initialTutors = [] }) {
             </p>
             <Link
               href="/tutors"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] text-xs font-bold rounded-xl shadow-sm transition-all"
+              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer"
             >
               <span>Explore All Tutors</span>
               <ArrowRight className="w-3.5 h-3.5" />

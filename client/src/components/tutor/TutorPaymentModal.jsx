@@ -160,13 +160,13 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/80 backdrop-blur-xs p-2 sm:p-4 flex items-center justify-center animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/35 backdrop-blur-sm p-2 sm:p-4 flex items-center justify-center animate-in fade-in duration-200">
       <div className="relative w-full max-w-lg md:max-w-4xl lg:max-w-5xl bg-white rounded-2xl sm:rounded-3xl shadow-2xl border border-stone-200 flex flex-col max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-2.5rem)] overflow-hidden">
 
         {/* Modal Header - Pinned at top */}
         <div className="flex items-center justify-between px-4 py-3 sm:px-5 sm:py-3.5 border-b border-stone-200 shrink-0 bg-white z-10">
           <div className="flex items-center gap-2.5 sm:gap-3">
-            <div className="p-1.5 sm:p-2 bg-[#0c2217] text-[#d4a359] rounded-xl sm:rounded-2xl shrink-0">
+            <div className="p-1.5 sm:p-2 bg-[#f5f0e6] text-[#b85d34] border border-[#d4a359]/30 rounded-xl sm:rounded-2xl shrink-0">
               <CreditCard className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="min-w-0">
@@ -223,7 +223,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                             onClick={() => setSelectedMethod(acc.id)}
                             className={`py-1.5 px-1.5 rounded-lg text-[11px] sm:text-xs font-bold transition-all cursor-pointer text-center truncate ${
                               isSelected
-                                ? 'bg-[#0c2217] text-[#d4a359] shadow-xs border border-[#0c2217]'
+                                ? 'bg-[#b85d34] text-white shadow-xs'
                                 : 'text-stone-600 hover:text-stone-900 hover:bg-stone-200/60'
                             }`}
                           >
@@ -347,7 +347,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                   <div className="p-2.5 sm:p-3 bg-[#faf8f5] border border-[#d4a359]/30 rounded-2xl">
                     <div className="flex items-center justify-between gap-3">
                       <div className="flex items-center gap-2 min-w-0">
-                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#0c2217] text-[#d4a359] flex items-center justify-center shrink-0 shadow-xs">
+                        <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-[#f5f0e6] text-[#b85d34] border border-[#d4a359]/30 flex items-center justify-center shrink-0 shadow-xs">
                           <Percent className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
                         </div>
                         <div className="min-w-0">
@@ -404,9 +404,9 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                     ) : (
                       <div
                         onClick={() => fileInputRef.current?.click()}
-                        className="border-2 border-dashed border-[#d4a359]/50 hover:border-[#0c2217] bg-[#faf8f5] hover:bg-[#f0ece1] rounded-2xl p-3 sm:p-3.5 text-center transition-all cursor-pointer group"
+                        className="border-2 border-dashed border-[#d4a359]/50 hover:border-[#b85d34] bg-[#faf8f5] hover:bg-[#f0ece1] rounded-2xl p-3 sm:p-3.5 text-center transition-all cursor-pointer group"
                       >
-                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#0c2217] text-[#d4a359] flex items-center justify-center mx-auto mb-1 group-hover:scale-110 transition-transform shadow-xs">
+                        <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-[#f5f0e6] text-[#b85d34] border border-[#d4a359]/30 flex items-center justify-center mx-auto mb-1 group-hover:scale-110 transition-transform shadow-xs">
                           <Upload className="w-4 h-4" />
                         </div>
                         <p className="text-[11.5px] sm:text-xs font-bold text-stone-800 group-hover:text-[#0c2217]">

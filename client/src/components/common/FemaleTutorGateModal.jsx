@@ -26,31 +26,31 @@ export default function FemaleTutorGateModal({
   const missingItems = items.filter(item => !item.done);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-sm animate-in fade-in duration-200">
       <div
         className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-[#e6ded1] overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header Banner */}
-        <div className="bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#07150e] text-white p-6 relative">
+        <div className="bg-[#faf8f5] border-b border-[#ebe3d3] text-[#0c2217] p-6 relative">
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 text-slate-400 hover:text-white rounded-full hover:bg-white/10 transition-colors"
+            className="absolute top-4 right-4 p-2 text-stone-400 hover:text-[#0c2217] rounded-full hover:bg-black/5 transition-colors"
             title="Close"
           >
             <X className="w-5 h-5" />
           </button>
 
           <div className="flex items-center gap-3">
-            <div className="p-3 bg-[#d4a359]/20 border border-[#d4a359]/30 rounded-2xl text-[#d4a359]">
+            <div className="p-3 bg-[#f5f0e6] border border-[#d4a359]/40 rounded-2xl text-[#b85d34]">
               <ShieldCheck className="w-6 h-6" />
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-[#0c2217] px-2.5 py-0.5 rounded-full border border-[#d4a359]/30">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#b85d34] bg-[#f5f0e6] px-2.5 py-0.5 rounded-full border border-[#d4a359]/30">
                 Safety &amp; Privacy Protocol
               </span>
-              <h2 className="text-lg font-black text-white mt-1 font-serif">
+              <h2 className="text-lg font-black text-[#0c2217] mt-1 font-serif">
                 100% Profile Strength Required
               </h2>
             </div>
@@ -132,10 +132,10 @@ export default function FemaleTutorGateModal({
                   <Link
                     href={item.link}
                     onClick={onClose}
-                    className="inline-flex items-center gap-1 px-3 py-1 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] border border-[#d4a359]/30 rounded-lg font-bold text-[11px] shadow-xs transition-colors shrink-0"
+                    className="inline-flex items-center gap-1 px-3 py-1 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white rounded-lg font-bold text-[11px] shadow-xs transition-colors shrink-0 cursor-pointer"
                   >
                     <span>{item.actionLabel}</span>
-                    <ArrowRight className="w-3 h-3" />
+                    <ArrowRight className="w-3 h-3 text-white" />
                   </Link>
                 </div>
               ))}

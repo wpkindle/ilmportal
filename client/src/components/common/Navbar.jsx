@@ -383,9 +383,9 @@ const Navbar = () => {
                 {/* Active Portal Badge Link */}
                 <Link
                   href={getDashboardRoute()}
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0c2217] text-[#d4a359] border border-[#0c2217] text-xs font-bold hover:bg-[#143d2b] transition-colors shadow-2xs"
+                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#f5f0e6] text-[#0c2217] border border-[#d4a359]/40 text-xs font-bold hover:bg-[#ebe3d3] transition-colors shadow-xs"
                 >
-                  <Layers className="w-3.5 h-3.5 text-[#d4a359]" />
+                  <Layers className="w-3.5 h-3.5 text-[#b85d34]" />
                   <span>
                     {isAdmin ? 'Admin Portal' : isTutor ? 'Tutor Portal' : 'Student Portal'}
                   </span>
@@ -688,9 +688,9 @@ const Navbar = () => {
               <div className="hidden lg:flex items-center gap-1.5 sm:gap-2">
                 <Link
                   href="/login?role=student"
-                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] text-xs font-bold rounded-xl shadow-xs transition-all border border-[#d4a359]/40"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#f5f0e6] hover:bg-[#ebe3d3] active:bg-[#e0d6c4] text-[#0c2217] text-xs font-bold rounded-xl shadow-xs transition-all border border-[#d4a359]/40 cursor-pointer"
                 >
-                  <GraduationCap className="w-3.5 h-3.5 text-[#d4a359]" />
+                  <GraduationCap className="w-3.5 h-3.5 text-[#b85d34]" />
                   <span>Student Portal</span>
                 </Link>
 
@@ -724,9 +724,9 @@ const Navbar = () => {
                 <Link
                   href="/login?role=student"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 py-3 min-h-[44px] bg-[#0c2217] active:bg-[#07150e] text-[#faf8f5] rounded-2xl text-xs font-bold text-center transition-transform active:scale-95 shadow-sm border border-[#d4a359]/40"
+                  className="flex items-center justify-center gap-2 py-3 min-h-[44px] bg-[#f5f0e6] active:bg-[#ebe3d3] text-[#0c2217] rounded-2xl text-xs font-bold text-center transition-transform active:scale-95 shadow-xs border border-[#d4a359]/40"
                 >
-                  <GraduationCap className="w-4 h-4 text-[#d4a359]" />
+                  <GraduationCap className="w-4 h-4 text-[#b85d34]" />
                   <span>Student Portal</span>
                 </Link>
                 <Link

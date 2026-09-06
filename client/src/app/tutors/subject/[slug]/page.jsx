@@ -77,15 +77,15 @@ export default async function SubjectTutorsPage({ params }) {
         </Link>
 
         {/* Subject Hero Header */}
-        <div className="bg-[#0c2217] text-white rounded-3xl p-6 sm:p-10 shadow-xl border border-[#d4a359]/30 space-y-3">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#d4a359]/20 text-[#d4a359] text-xs font-bold border border-[#d4a359]/30">
+        <div className="bg-white text-[#141c19] rounded-3xl p-6 sm:p-10 shadow-xl border-2 border-[#d4a359]/40 space-y-3">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#f5f0e6] text-[#b85d34] text-xs font-bold border border-[#d4a359]/30">
             <BookOpen className="w-3.5 h-3.5" />
             <span>Discipline Specialization</span>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black text-white font-serif">
+          <h1 className="text-2xl sm:text-4xl font-black text-[#0c2217] font-serif">
             {formattedName} Tutors in Pakistan
           </h1>
-          <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#52665b] max-w-2xl leading-relaxed">
             Find certified specialists for {formattedName}. Coordinate schedules, discuss tuition fees in 1:1 chat, and join live video classroom sessions.
           </p>
         </div>

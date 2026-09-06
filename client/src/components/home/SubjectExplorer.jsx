@@ -73,7 +73,7 @@ const SubjectExplorer = () => {
               onClick={() => setActiveTab('quran')}
               className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
                 activeTab === 'quran'
-                  ? 'bg-[#143d2b] text-white shadow-sm'
+                  ? 'bg-[#b85d34] text-white shadow-sm'
                   : 'text-[#2d3a37] hover:text-[#141c19]'
               }`}
             >
@@ -83,7 +83,7 @@ const SubjectExplorer = () => {
               onClick={() => setActiveTab('academic')}
               className={`px-4 py-2 rounded-xl transition-all cursor-pointer ${
                 activeTab === 'academic'
-                  ? 'bg-[#143d2b] text-white shadow-sm'
+                  ? 'bg-[#b85d34] text-white shadow-sm'
                   : 'text-[#2d3a37] hover:text-[#141c19]'
               }`}
             >
@@ -94,19 +94,19 @@ const SubjectExplorer = () => {
 
         {/* Featured Course Banner for Quranic Studies */}
         {activeTab === 'quran' && (
-          <div className="p-6 rounded-3xl bg-[#0c2217] text-white border-2 border-[#d4a359]/40 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="p-6 rounded-3xl bg-white text-[#141c19] border-2 border-[#d4a359]/50 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#143d2b] border border-[#d4a359]/40 flex items-center justify-center shrink-0">
-                <Sparkles className="w-6 h-6 text-[#d4a359]" />
+              <div className="w-12 h-12 rounded-2xl bg-[#f5f0e6] border border-[#d4a359]/40 flex items-center justify-center shrink-0">
+                <Sparkles className="w-6 h-6 text-[#b85d34]" />
               </div>
               <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-[#d4a359] bg-[#143d2b] px-2.5 py-0.5 rounded border border-[#d4a359]/40">
+                <span className="text-[10px] font-black uppercase tracking-wider text-[#b85d34] bg-[#f5f0e6] px-2.5 py-0.5 rounded border border-[#ebe3d3]">
                   Recommended for Beginners
                 </span>
-                <h3 className="text-base sm:text-lg font-serif font-black text-white mt-1">
+                <h3 className="text-base sm:text-lg font-serif font-black text-[#0c2217] mt-1">
                   Noorani Qaida &amp; Makharij for Children (Ages 5–12)
                 </h3>
-                <p className="text-xs text-[#a3b8b0] leading-snug">
+                <p className="text-xs text-[#52665b] leading-snug">
                   Gentle, patient 1-on-1 recitation with correct Arabic letters and vocal articulation points.
                 </p>
               </div>

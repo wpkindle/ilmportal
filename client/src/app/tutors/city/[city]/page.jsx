@@ -157,28 +157,28 @@ export default async function CityTutorsPage({ params }) {
         </nav>
 
         {/* City Hero Header */}
-        <div className="bg-[#0c2217] text-white rounded-3xl p-6 sm:p-10 shadow-xl space-y-4 border border-[#143d2b]">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#143d2b] text-[#d4a359] text-xs font-bold border border-[#d4a359]/40">
+        <div className="bg-white text-[#141c19] rounded-3xl p-6 sm:p-10 shadow-xl space-y-4 border-2 border-[#d4a359]/40">
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#f5f0e6] text-[#b85d34] text-xs font-bold border border-[#d4a359]/40">
             <MapPin className="w-3.5 h-3.5" />
             <span>{formattedCity}, Pakistan &bull; Online &amp; Home Tutoring</span>
           </div>
           
-          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-black text-white leading-tight">
+          <h1 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-black text-[#0c2217] leading-tight">
             Verified Quran &amp; Academic Tutors in {formattedCity}
           </h1>
 
-          <p className="text-xs sm:text-sm text-[#d1dbd6] max-w-3xl leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#52665b] max-w-3xl leading-relaxed">
             {context.description}
           </p>
 
           {/* Local Insights Strip */}
-          <div className="pt-3 border-t border-[#143d2b] grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-[#a3b8b0]">
+          <div className="pt-3 border-t border-[#ebe3d3] grid grid-cols-1 md:grid-cols-2 gap-3 text-xs text-stone-600">
             <div>
-              <strong className="text-white block font-semibold mb-0.5">Popular Areas in {formattedCity}:</strong>
+              <strong className="text-[#0c2217] block font-semibold mb-0.5">Popular Areas in {formattedCity}:</strong>
               <span>{context.areas}</span>
             </div>
             <div>
-              <strong className="text-white block font-semibold mb-0.5">Exam Boards &amp; Curricula:</strong>
+              <strong className="text-[#0c2217] block font-semibold mb-0.5">Exam Boards &amp; Curricula:</strong>
               <span>{context.boards}</span>
             </div>
           </div>

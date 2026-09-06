@@ -204,12 +204,12 @@ export default function HowItWorks() {
         </div>
 
         {/* Callout Strip */}
-        <div className="p-6 rounded-3xl bg-[#143d2b] text-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-lg">
+        <div className="p-6 rounded-3xl bg-white text-[#141c19] border-2 border-[#d4a359]/50 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
           <div className="space-y-1 text-center sm:text-left">
-            <h4 className="font-serif font-bold text-base">
+            <h4 className="font-serif font-bold text-base text-[#0c2217]">
               Ready to find a teacher for your child?
             </h4>
-            <p className="text-xs text-[#d1dbd6]">
+            <p className="text-xs text-[#52665b]">
               Browse verified Quran Qaris and academic educators with full profiles and Sanad degrees.
             </p>
           </div>
@@ -226,7 +226,7 @@ export default function HowItWorks() {
       {/* Step Detail Explanation Modal */}
       {activeModalStep && (
         <div
-          className="fixed inset-0 z-50 overflow-y-auto p-3 sm:p-6 flex items-center justify-center bg-[#07150e]/85 backdrop-blur-md animate-in fade-in duration-200"
+          className="fixed inset-0 z-50 overflow-y-auto p-3 sm:p-6 flex items-center justify-center bg-black/35 backdrop-blur-sm animate-in fade-in duration-200"
           onClick={(e) => {
             if (e.target === e.currentTarget) setActiveModalStep(null);
           }}
@@ -240,7 +240,7 @@ export default function HowItWorks() {
                   {activeModalStep.step}
                 </span>
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-[#143d2b] border border-[#d4a359]/40 px-2 py-0.5 rounded-full">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[#b85d34] bg-[#f5f0e6] border border-[#d4a359]/40 px-2 py-0.5 rounded-full">
                     {activeModalStep.highlight}
                   </span>
                   <h3 className="text-base sm:text-lg font-serif font-bold text-[#0c2217] mt-0.5 leading-snug">
@@ -286,10 +286,10 @@ export default function HowItWorks() {
                 <Link
                   href={activeModalStep.actionHref}
                   onClick={() => setActiveModalStep(null)}
-                  className="w-full py-3.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] border border-[#d4a359]/40 font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-[#0c2217]/20 flex items-center justify-center gap-2 transition-all cursor-pointer"
+                  className="w-full py-3.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md shadow-[#b85d34]/25 flex items-center justify-center gap-2 transition-all cursor-pointer"
                 >
                   <span>{activeModalStep.actionText}</span>
-                  <ArrowRight className="w-4 h-4 text-[#d4a359]" />
+                  <ArrowRight className="w-4 h-4 text-white" />
                 </Link>
               </div>
             </div>

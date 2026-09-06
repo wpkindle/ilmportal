@@ -227,15 +227,15 @@ export default function ProfileCompletionMeter({
   if (showGreeting) {
     return (
       <div
-        className={`bg-[#0c2217] text-[#faf8f5] rounded-3xl p-6 sm:p-8 border border-[#d4a359]/30 shadow-[0_8px_30px_rgba(12,34,23,0.12)] relative overflow-hidden space-y-5 ${className}`}
+        className={`bg-white text-[#141c19] rounded-3xl p-6 sm:p-8 border-2 border-[#d4a359]/40 shadow-xl relative overflow-hidden space-y-5 ${className}`}
       >
         {/* Top Gold Shimmer Line */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#d4a359] via-[#b85d34] to-[#d4a359]" />
 
         {/* Ambient Effects & Islamic Star Watermark */}
-        <div className="absolute -right-16 -bottom-16 w-64 h-64 rounded-full bg-[#143d2b]/40 blur-3xl pointer-events-none animate-pulse-glow" />
-        <div className="absolute top-0 right-1/4 w-32 h-32 rounded-full bg-[#d4a359]/15 blur-2xl pointer-events-none animate-float-slow" />
-        <div className="absolute -right-12 -top-12 w-48 h-48 pointer-events-none opacity-15 animate-spin-slow">
+        <div className="absolute -right-16 -bottom-16 w-64 h-64 rounded-full bg-[#f5f0e6] blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-32 h-32 rounded-full bg-[#d4a359]/10 blur-2xl pointer-events-none" />
+        <div className="absolute -right-12 -top-12 w-48 h-48 pointer-events-none opacity-10 animate-spin-slow">
           <svg viewBox="0 0 200 200" className="w-full h-full" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="100" cy="100" r="90" stroke="#d4a359" strokeWidth="1" strokeDasharray="4 6" />
             <rect x="55" y="55" width="90" height="90" stroke="#d4a359" strokeWidth="1" />
@@ -249,12 +249,12 @@ export default function ProfileCompletionMeter({
             {/* Role Assurance Badge */}
             <div className="flex items-center gap-2 flex-wrap">
               {isTutor ? (
-                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#d4a359] text-[#0c2217] shadow-xs">
-                  <ShieldCheck className="w-3.5 h-3.5" />
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-[#f5f0e6] text-[#0c2217] border border-[#d4a359]/40 shadow-xs">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
                   {isApproved ? 'Verified Sanad Tutor • IlmiDunya Pakistan' : 'Sanad Verification Pending'}
                 </span>
               ) : (
-                <span className="text-[11px] font-bold uppercase tracking-wider text-[#d4a359] bg-white/10 px-3 py-1 rounded-full backdrop-blur-sm flex items-center gap-1.5 border border-[#d4a359]/20">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-[#b85d34] bg-[#f5f0e6] px-3 py-1 rounded-full flex items-center gap-1.5 border border-[#d4a359]/30">
                   <GraduationCap className="w-3.5 h-3.5" />
                   Talib-e-Ilm &bull; Learning Space
                 </span>
@@ -262,7 +262,7 @@ export default function ProfileCompletionMeter({
             </div>
 
             {/* Profile User Name */}
-            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-[#faf8f5] tracking-tight">
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl font-serif font-bold text-[#0c2217] tracking-tight">
               {user?.name || (isTutor ? 'Mu’allim' : 'Talib-e-Ilm')}
             </h1>
           </div>
@@ -273,23 +273,23 @@ export default function ProfileCompletionMeter({
               <>
                 <Link
                   href="/tutor/messages"
-                  className="px-4 py-2.5 bg-[#d4a359] hover:bg-[#c39248] text-[#0c2217] font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2 hover:scale-[1.02] cursor-pointer"
+                  className="px-4 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2 hover:scale-[1.02] cursor-pointer"
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>Chat &amp; Send Offers</span>
                 </Link>
                 <Link
                   href={`/tutors/${user?.username || user?._id}`}
-                  className="px-4 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2 hover:scale-[1.02] cursor-pointer"
+                  className="px-4 py-2.5 bg-[#f5f0e6] hover:bg-[#ebe3d3] text-[#0c2217] font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-2 border border-[#ebe3d3] hover:scale-[1.02] cursor-pointer"
                 >
-                  <User className="w-4 h-4" />
+                  <User className="w-4 h-4 text-[#b85d34]" />
                   <span>View Public Profile</span>
                 </Link>
                 <Link
                   href="/tutor/profile"
-                  className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-[#faf8f5] font-semibold text-xs rounded-xl transition-all flex items-center gap-2 border border-white/20 hover:scale-[1.02] cursor-pointer"
+                  className="px-4 py-2.5 bg-white hover:bg-stone-50 text-[#0c2217] font-semibold text-xs rounded-xl transition-all flex items-center gap-2 border border-stone-300 hover:scale-[1.02] cursor-pointer"
                 >
-                  <GraduationCap className="w-4 h-4 text-[#d4a359]" />
+                  <GraduationCap className="w-4 h-4 text-[#b85d34]" />
                   <span>Edit Profile &amp; Sanad</span>
                 </Link>
               </>
@@ -297,16 +297,16 @@ export default function ProfileCompletionMeter({
               <>
                 <Link
                   href="/tutors"
-                  className="px-4 py-2.5 bg-[#d4a359] hover:bg-[#c39248] active:bg-[#b08139] text-[#0c2217] font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2 hover:scale-[1.02] cursor-pointer"
+                  className="px-4 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white font-bold text-xs rounded-xl shadow-sm transition-all flex items-center gap-2 hover:scale-[1.02] cursor-pointer"
                 >
                   <Search className="w-4 h-4" />
                   <span>Browse Verified Tutors</span>
                 </Link>
                 <Link
                   href="/student/messages"
-                  className="px-4 py-2.5 bg-white/10 hover:bg-white/20 text-[#faf8f5] font-semibold text-xs rounded-xl transition-all flex items-center gap-2 border border-white/20 hover:scale-[1.02] cursor-pointer"
+                  className="px-4 py-2.5 bg-[#f5f0e6] hover:bg-[#ebe3d3] text-[#0c2217] font-semibold text-xs rounded-xl transition-all flex items-center gap-2 border border-[#ebe3d3] hover:scale-[1.02] cursor-pointer"
                 >
-                  <MessageSquare className="w-4 h-4 text-[#d4a359]" />
+                  <MessageSquare className="w-4 h-4 text-[#b85d34]" />
                   <span>Messages &amp; Class</span>
                 </Link>
               </>
@@ -315,24 +315,24 @@ export default function ProfileCompletionMeter({
         </div>
 
         {/* ── Lower Section: Profile Strength & Progress Bar (on SAME tab) ── */}
-        <div className="pt-4 border-t border-[#d4a359]/20 space-y-3 relative z-10">
+        <div className="pt-4 border-t border-[#ebe3d3] space-y-3 relative z-10">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
             <div className="flex items-center gap-2.5 flex-wrap">
-              <span className="text-xs sm:text-sm font-bold text-white flex items-center gap-2">
+              <span className="text-xs sm:text-sm font-bold text-[#0c2217] flex items-center gap-2">
                 <span>Profile Strength</span>
               </span>
               {getStatusBadge(true)}
             </div>
 
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono font-bold text-[#d4a359]">
+              <span className="text-xs font-mono font-bold text-[#b85d34]">
                 {percentage >= 100 ? 'Peak Visibility: 100 / 100' : `${percentage} / 100`}
               </span>
               {remainingItems.length > 0 && (
                 <button
                   type="button"
                   onClick={() => setDetailsOpen(!detailsOpen)}
-                  className="p-1 px-2.5 rounded-lg bg-white/10 hover:bg-white/20 text-stone-200 transition-colors flex items-center gap-1 text-[11px] font-bold cursor-pointer border border-white/15"
+                  className="p-1 px-2.5 rounded-lg bg-[#faf8f5] hover:bg-[#f5f0e6] text-stone-700 transition-colors flex items-center gap-1 text-[11px] font-bold cursor-pointer border border-[#ebe3d3]"
                 >
                   <span>{detailsOpen ? 'Hide Checklist' : `Missing Fields (${remainingItems.length})`}</span>
                   {detailsOpen ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
@@ -342,7 +342,7 @@ export default function ProfileCompletionMeter({
           </div>
 
           {/* Progress Bar */}
-          <div className="w-full bg-stone-900/80 h-2.5 rounded-full overflow-hidden p-0.5 border border-[#d4a359]/30">
+          <div className="w-full bg-stone-100 h-2.5 rounded-full overflow-hidden p-0.5 border border-stone-200">
             <div
               className={`h-full rounded-full bg-gradient-to-r ${getBarColor(percentage)} transition-all duration-500 shadow-sm`}
               style={{ width: `${Math.max(percentage, 5)}%` }}
@@ -352,22 +352,22 @@ export default function ProfileCompletionMeter({
           {/* Quick Action Badges for Remaining Items (if < 100%) */}
           {remainingItems.length > 0 && (
             <div className="flex flex-wrap items-center gap-2 pt-1">
-              <span className="text-[11px] font-medium text-stone-400">Complete to reach 100%:</span>
+              <span className="text-[11px] font-medium text-stone-500">Complete to reach 100%:</span>
               {remainingItems.slice(0, 4).map((item) => (
                 <Link
                   key={item.key}
                   href={item.link}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#143d2b] hover:bg-[#1e543c] text-[#d4a359] text-[11px] font-bold border border-[#d4a359]/40 transition-all cursor-pointer"
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#faf8f5] hover:bg-[#f5f0e6] text-[#0c2217] text-[11px] font-bold border border-[#ebe3d3] transition-all cursor-pointer shadow-xs"
                 >
                   <span>{item.actionLabel}</span>
-                  <ArrowRight className="w-3 h-3 text-[#d4a359]" />
+                  <ArrowRight className="w-3 h-3 text-[#b85d34]" />
                 </Link>
               ))}
               {remainingItems.length > 4 && (
                 <button
                   type="button"
                   onClick={() => setDetailsOpen(true)}
-                  className="text-[11px] font-bold text-[#d4a359] hover:underline cursor-pointer"
+                  className="text-[11px] font-bold text-[#b85d34] hover:underline cursor-pointer"
                 >
                   +{remainingItems.length - 4} more
                 </button>
@@ -379,18 +379,18 @@ export default function ProfileCompletionMeter({
           {isTutor && (
             <div className="pt-1">
               {tutorProfile?.verificationStatus === 'approved' ? (
-                <div className="p-2.5 bg-[#143d2b]/60 rounded-xl border border-[#d4a359]/40 flex items-center gap-2 text-xs font-medium text-stone-200">
-                  <ShieldCheck className="w-4 h-4 text-[#d4a359] shrink-0" />
+                <div className="p-2.5 bg-emerald-50 rounded-xl border border-emerald-300 flex items-center gap-2 text-xs font-medium text-emerald-900">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>Verified Sanad &amp; Degree: Your profile is Approved and publicly visible across Pakistan.</span>
                 </div>
               ) : tutorProfile?.verificationStatus === 'rejected' ? (
-                <div className="p-2.5 bg-rose-950/60 rounded-xl border border-rose-500/40 flex items-center gap-2 text-xs font-medium text-rose-200">
-                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                <div className="p-2.5 bg-rose-50 rounded-xl border border-rose-300 flex items-center gap-2 text-xs font-medium text-rose-900">
+                  <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
                   <span>Application Clarification: {tutorProfile?.rejectionReason || 'Please re-upload clear educational degrees for review.'}</span>
                 </div>
               ) : (
-                <div className="p-2.5 bg-[#143d2b]/40 rounded-xl border border-[#d4a359]/20 flex items-center gap-2 text-xs font-medium text-stone-300">
-                  <Clock className="w-4 h-4 text-[#d4a359] shrink-0" />
+                <div className="p-2.5 bg-amber-50 rounded-xl border border-amber-300 flex items-center gap-2 text-xs font-medium text-amber-900">
+                  <Clock className="w-4 h-4 text-amber-600 shrink-0" />
                   <span>Pending Verification: Your degrees are in the verification queue before full public listing.</span>
                 </div>
               )}
@@ -399,30 +399,30 @@ export default function ProfileCompletionMeter({
 
           {/* Detailed Checklist Accordion */}
           {detailsOpen && (
-            <div className="pt-3 border-t border-[#d4a359]/20 grid grid-cols-1 sm:grid-cols-2 gap-2 animate-in fade-in">
+            <div className="pt-3 border-t border-[#ebe3d3] grid grid-cols-1 sm:grid-cols-2 gap-2 animate-in fade-in">
               {items.map((item) => (
                 <div
                   key={item.key}
                   className={`p-2.5 rounded-xl border text-xs flex items-center justify-between gap-2 transition-all ${
                     item.done
-                      ? 'bg-[#143d2b]/50 border-[#d4a359]/30 text-stone-200'
-                      : 'bg-white/5 border-amber-400/30 text-stone-200'
+                      ? 'bg-emerald-50/70 border-emerald-200 text-emerald-900'
+                      : 'bg-[#faf8f5] border-[#ebe3d3] text-stone-800'
                   }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     {item.done ? (
-                      <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                     ) : (
-                      <Circle className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                      <Circle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                     )}
-                    <span className={`truncate ${item.done ? 'font-medium text-stone-300' : 'font-bold text-white'}`}>
+                    <span className={`truncate ${item.done ? 'font-medium text-stone-600' : 'font-bold text-[#0c2217]'}`}>
                       {item.label}
                     </span>
                   </div>
 
                   <div className="flex items-center gap-1.5 shrink-0">
                     {item.done ? (
-                      <span className="text-[10px] font-bold text-[#d4a359] bg-[#143d2b] border border-[#d4a359]/30 px-2 py-0.5 rounded-full">
+                      <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/80 border border-emerald-300 px-2 py-0.5 rounded-full">
                         Done
                       </span>
                     ) : (

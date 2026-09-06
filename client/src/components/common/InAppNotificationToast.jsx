@@ -29,10 +29,10 @@ export default function InAppNotificationToast() {
     >
       <div 
         onClick={handleOpen}
-        className="p-4 rounded-2xl bg-[#0c2217]/95 text-white border border-[#d4a359]/40 shadow-2xl backdrop-blur-xl cursor-pointer hover:border-[#d4a359] transition-all group relative overflow-hidden"
+        className="p-4 rounded-2xl bg-white/95 text-[#141c19] border-2 border-[#d4a359]/60 shadow-2xl backdrop-blur-xl cursor-pointer hover:border-[#b85d34] transition-all group relative overflow-hidden"
       >
         {/* Top gold accent line */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#d4a359] via-[#fde047] to-[#d4a359]" />
+        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#d4a359] via-[#b85d34] to-[#d4a359]" />
 
         {/* Dismiss X Button */}
         <button
@@ -41,7 +41,7 @@ export default function InAppNotificationToast() {
             e.stopPropagation();
             if (clearToast) clearToast();
           }}
-          className="absolute top-2.5 right-2.5 p-1 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors z-10 cursor-pointer"
+          className="absolute top-2.5 right-2.5 p-1 text-stone-400 hover:text-stone-800 rounded-lg hover:bg-stone-100 transition-colors z-10 cursor-pointer"
           aria-label="Close notification"
         >
           <X className="w-4 h-4" />
@@ -56,26 +56,26 @@ export default function InAppNotificationToast() {
               className="w-10 h-10 rounded-xl object-cover border border-[#d4a359]/40 shadow-sm"
               onError={(e) => { e.target.src = '/icon.png'; }}
             />
-            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#d4a359] border-2 border-slate-900 rounded-full" />
+            <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-[#b85d34] border-2 border-white rounded-full" />
           </div>
 
           <div className="flex-1 min-w-0 pr-6">
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold text-[#d4a359] uppercase tracking-wider">
+              <span className="text-xs font-bold text-[#b85d34] uppercase tracking-wider">
                 {isMessage ? 'New Chat Message' : 'Notification'}
               </span>
             </div>
 
-            <h4 className="font-extrabold text-sm text-white truncate mt-0.5">
+            <h4 className="font-extrabold text-sm text-[#0c2217] truncate mt-0.5">
               {toastAlert.title || 'Incoming Message'}
             </h4>
 
-            <p className="text-xs text-slate-300 mt-0.5 line-clamp-2 leading-relaxed">
+            <p className="text-xs text-stone-600 mt-0.5 line-clamp-2 leading-relaxed">
               {toastAlert.message || 'You received a new message on IlmiDunya.'}
             </p>
 
             <div className="mt-2.5 flex items-center gap-2">
-              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#d4a359] group-hover:text-white transition-colors">
+              <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#b85d34] group-hover:text-[#9e4e2a] transition-colors">
                 <span>Open in Chat</span>
                 <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-1" />
               </span>

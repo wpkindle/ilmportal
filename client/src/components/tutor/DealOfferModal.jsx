@@ -153,13 +153,13 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
   };
 
   return (
-    <div className="fixed inset-0 z-[70] overflow-y-auto bg-slate-950/80 backdrop-blur-md p-2 sm:p-4 md:p-6 flex items-start sm:items-center justify-center animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-[70] overflow-y-auto bg-black/35 backdrop-blur-sm p-2 sm:p-4 md:p-6 flex items-start sm:items-center justify-center animate-in fade-in duration-200">
       <div className="bg-white rounded-2xl sm:rounded-3xl max-w-2xl w-full shadow-2xl relative border border-slate-200/90 flex flex-col max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-2.5rem)] overflow-hidden my-auto">
         
         {/* Modal Header (Pinned at Top, 100% visible) */}
         <div className="p-3 sm:p-4 md:p-5 border-b border-slate-100 flex items-center justify-between bg-white shrink-0 z-10">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <div className="p-1.5 sm:p-2.5 bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/40 rounded-xl sm:rounded-2xl shadow-md shrink-0">
+            <div className="p-1.5 sm:p-2.5 bg-[#f5f0e6] text-[#b85d34] border border-[#d4a359]/40 rounded-xl sm:rounded-2xl shadow-md shrink-0">
               <Sparkles className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
             <div className="min-w-0">
@@ -265,7 +265,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                 onClick={() => setMode('online')}
                 className={`py-2.5 px-3 rounded-2xl text-center border transition-all cursor-pointer flex items-center justify-center gap-2 ${
                   mode === 'online'
-                    ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217] shadow-sm font-bold'
+                    ? 'bg-[#b85d34] text-white border-[#b85d34] shadow-sm font-bold'
                     : 'bg-[#f4efe8] border-[#e6dfd5] text-stone-700 hover:bg-[#eae3d8]'
                 }`}
               >
@@ -277,7 +277,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                 onClick={() => setMode('physical')}
                 className={`py-2.5 px-3 rounded-2xl text-center border transition-all cursor-pointer flex items-center justify-center gap-2 ${
                   mode === 'physical'
-                    ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217] shadow-sm font-bold'
+                    ? 'bg-[#b85d34] text-white border-[#b85d34] shadow-sm font-bold'
                     : 'bg-[#f4efe8] border-[#e6dfd5] text-stone-700 hover:bg-[#eae3d8]'
                 }`}
               >
@@ -378,7 +378,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                       onClick={() => setPeriod('AM')}
                       className={`px-2 py-1 transition-colors cursor-pointer text-[11px] font-extrabold ${
                         period === 'AM'
-                          ? 'bg-[#0c2217] text-[#d4a359]'
+                          ? 'bg-[#b85d34] text-white'
                           : 'bg-white text-slate-600 hover:bg-slate-100'
                       }`}
                     >
@@ -389,7 +389,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                       onClick={() => setPeriod('PM')}
                       className={`px-2 py-1 transition-colors cursor-pointer text-[11px] font-extrabold ${
                         period === 'PM'
-                          ? 'bg-[#0c2217] text-[#d4a359]'
+                          ? 'bg-[#b85d34] text-white'
                           : 'bg-white text-slate-600 hover:bg-slate-100'
                       }`}
                     >
@@ -450,7 +450,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                       onClick={() => toggleDay(day.key)}
                       className={`py-1.5 sm:py-2 text-[11px] sm:text-xs font-bold rounded-lg sm:rounded-xl border transition-all cursor-pointer ${
                         isSelected
-                          ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217] shadow-xs'
+                          ? 'bg-[#b85d34] text-white border-[#b85d34] shadow-xs'
                           : 'bg-white text-slate-600 border-slate-200 hover:border-slate-300'
                       }`}
                     >

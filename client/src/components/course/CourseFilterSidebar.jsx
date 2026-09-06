@@ -104,11 +104,11 @@ export default function CourseFilterSidebar({
             onClick={() => onFilterChange('sortBy', 'popular')}
             className={`py-1.5 px-2 rounded-xl text-center text-[11px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-1 border ${
               filters.sortBy === 'popular'
-                ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217] font-bold shadow-xs'
+                ? 'bg-[#b85d34] text-white border-[#b85d34] font-bold shadow-xs'
                 : 'bg-[#f4efe8] text-stone-700 border-[#e6dfd5] hover:bg-[#eae3d8]'
             }`}
           >
-            <Sparkles className="w-3 h-3 text-[#d4a359]" />
+            <Sparkles className={`w-3 h-3 ${filters.sortBy === 'popular' ? 'text-white' : 'text-[#b85d34]'}`} />
             <span>Most Popular</span>
           </button>
 
@@ -117,11 +117,11 @@ export default function CourseFilterSidebar({
             onClick={() => onFilterChange('sortBy', 'newest')}
             className={`py-1.5 px-2 rounded-xl text-center text-[11px] font-semibold transition-all cursor-pointer flex items-center justify-center gap-1 border ${
               filters.sortBy === 'newest'
-                ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217] font-bold shadow-xs'
+                ? 'bg-[#b85d34] text-white border-[#b85d34] font-bold shadow-xs'
                 : 'bg-[#f4efe8] text-stone-700 border-[#e6dfd5] hover:bg-[#eae3d8]'
             }`}
           >
-            <Clock className="w-3 h-3 text-[#d4a359]" />
+            <Clock className={`w-3 h-3 ${filters.sortBy === 'newest' ? 'text-white' : 'text-[#b85d34]'}`} />
             <span>Newly Added</span>
           </button>
         </div>

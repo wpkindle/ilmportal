@@ -61,10 +61,10 @@ export default function CustomSelect({
 
   // Variant-specific styling
   const variantStyles = {
-    hero: 'bg-transparent text-slate-900 font-semibold text-xs sm:text-sm py-2 px-2.5 rounded-full hover:bg-slate-100/90',
-    default: 'bg-[#0c2217] border border-white/20 text-white font-medium text-xs sm:text-sm py-2.5 px-3.5 rounded-2xl hover:border-[#d4a359]/50 shadow-md',
-    filter: 'bg-[#0c2217] border border-[#d4a359]/40 text-slate-100 font-medium text-xs py-2 px-3 rounded-xl hover:border-[#d4a359] shadow-sm',
-    form: 'bg-[#0c2217] border border-slate-700 text-slate-100 font-medium text-sm py-2.5 px-3.5 rounded-xl hover:border-[#d4a359] focus-within:border-[#d4a359]'
+    hero: 'bg-transparent text-stone-900 font-semibold text-xs sm:text-sm py-2 px-2.5 rounded-full hover:bg-stone-100/90',
+    default: 'bg-white border border-[#ebe3d3] text-[#141c19] font-medium text-xs sm:text-sm py-2.5 px-3.5 rounded-2xl hover:border-[#d4a359]/70 shadow-xs',
+    filter: 'bg-white border border-[#ebe3d3] text-[#141c19] font-medium text-xs py-2 px-3 rounded-xl hover:border-[#d4a359] shadow-xs',
+    form: 'bg-white border border-stone-300 text-[#141c19] font-medium text-sm py-2.5 px-3.5 rounded-xl hover:border-[#d4a359] focus-within:border-[#d4a359] shadow-xs'
   };
 
   const placementClass = placement === 'top'
@@ -88,16 +88,16 @@ export default function CustomSelect({
         }`}
       >
         <div className="flex items-center gap-2 min-w-0 flex-1 truncate text-left">
-          {Icon && <Icon className="w-4 h-4 text-[#d4a359] shrink-0" />}
-          <span className={`truncate text-left ${selectedOption ? 'font-bold' : 'text-slate-300 font-normal'}`}>
+          {Icon && <Icon className="w-4 h-4 text-[#b85d34] shrink-0" />}
+          <span className={`truncate text-left ${selectedOption ? 'font-bold text-[#141c19]' : 'text-stone-400 font-normal'}`}>
             {selectedOption ? selectedOption.label : placeholder}
           </span>
         </div>
 
         <ChevronDown
           className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
-            variant === 'hero' ? 'text-slate-600' : 'text-slate-400'
-          } ${isOpen ? (placement === 'top' ? '-rotate-180 text-[#d4a359]' : 'rotate-180 text-[#d4a359]') : ''}`}
+            variant === 'hero' ? 'text-stone-600' : 'text-stone-400'
+          } ${isOpen ? (placement === 'top' ? '-rotate-180 text-[#b85d34]' : 'rotate-180 text-[#b85d34]') : ''}`}
         />
       </button>
 
@@ -105,26 +105,25 @@ export default function CustomSelect({
       {isOpen && (
         <div
           role="listbox"
-          className={`absolute left-0 right-0 ${placementClass} z-50 rounded-2xl bg-[#0c2217] border-2 border-[#d4a359]/50 shadow-2xl shadow-black text-white text-left overflow-hidden animate-in fade-in zoom-in-95 duration-150 min-w-[260px] max-w-[320px]`}
-          style={{ backgroundColor: '#0c2217' }}
+          className={`absolute left-0 right-0 ${placementClass} z-50 rounded-2xl bg-white border-2 border-[#d4a359]/60 shadow-2xl text-[#141c19] text-left overflow-hidden animate-in fade-in zoom-in-95 duration-150 min-w-[260px] max-w-[320px]`}
         >
           {/* Search Bar */}
           {searchable && (
-            <div className="p-2.5 border-b border-white/10 bg-[#143d2b] sticky top-0 z-10 flex items-center gap-2 text-left">
-              <Search className="w-3.5 h-3.5 text-[#d4a359] shrink-0 ml-1" />
+            <div className="p-2.5 border-b border-[#ebe3d3] bg-[#faf8f5] sticky top-0 z-10 flex items-center gap-2 text-left">
+              <Search className="w-3.5 h-3.5 text-[#b85d34] shrink-0 ml-1" />
               <input
                 ref={searchInputRef}
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder="Search..."
-                className="w-full bg-transparent text-xs text-white placeholder:text-slate-400 outline-none font-medium py-1 px-1 text-left"
+                className="w-full bg-transparent text-xs text-[#141c19] placeholder:text-stone-400 outline-none font-medium py-1 px-1 text-left"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="text-slate-400 hover:text-white p-1 rounded-md cursor-pointer hover:bg-white/10"
+                  className="text-stone-400 hover:text-stone-700 p-1 rounded-md cursor-pointer hover:bg-stone-200/50"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -133,9 +132,9 @@ export default function CustomSelect({
           )}
 
           {/* Options List */}
-          <div className="max-h-56 overflow-y-auto p-1.5 space-y-1 custom-scrollbar text-left bg-[#0c2217]">
+          <div className="max-h-56 overflow-y-auto p-1.5 space-y-1 custom-scrollbar text-left bg-white">
             {filteredOptions.length === 0 ? (
-              <div className="p-4 text-center text-xs text-slate-400 font-medium">
+              <div className="p-4 text-center text-xs text-stone-500 font-medium">
                 No matching options found
               </div>
             ) : (
@@ -153,15 +152,15 @@ export default function CustomSelect({
                     className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-between gap-2.5 cursor-pointer text-left ${
                       isSelected
                         ? 'bg-[#b85d34] text-white font-bold shadow-md'
-                        : 'text-slate-200 hover:bg-[#143d2b] hover:text-[#d4a359]'
+                        : 'text-stone-800 hover:bg-[#f5f0e6] hover:text-[#0c2217]'
                     }`}
                   >
                     <div className="flex flex-col min-w-0 text-left">
-                      <span className="font-semibold text-white truncate text-left">
+                      <span className={`font-semibold truncate text-left ${isSelected ? 'text-white' : 'text-[#141c19]'}`}>
                         {opt.label}
                       </span>
                       {opt.sublabel && (
-                        <span className={`text-[10px] truncate text-left ${isSelected ? 'text-white/90' : 'text-slate-400'}`}>
+                        <span className={`text-[10px] truncate text-left ${isSelected ? 'text-white/90' : 'text-stone-500'}`}>
                           {opt.sublabel}
                         </span>
                       )}
@@ -169,7 +168,7 @@ export default function CustomSelect({
 
                     <div className="flex items-center gap-1.5 shrink-0">
                       {opt.sublabel && !isSelected && (
-                        <span className="text-[9px] font-semibold px-2 py-0.5 rounded-md bg-white/10 text-slate-300 border border-white/10">
+                        <span className="text-[9px] font-semibold px-2 py-0.5 rounded-md bg-[#faf8f5] text-stone-600 border border-[#ebe3d3]">
                           {opt.sublabel.split(' ')[0]}
                         </span>
                       )}

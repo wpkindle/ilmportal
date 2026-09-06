@@ -235,20 +235,20 @@ export default function StudentAuthModal({
   if (!isOpen || !mounted) return null;
 
   return createPortal(
-    <div className="fixed inset-0 z-[9999] bg-slate-950/75 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto">
+    <div className="fixed inset-0 z-[9999] bg-black/35 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 md:p-6 overflow-y-auto">
       
       {/* Landscape Modal Container */}
-      <div className="bg-white rounded-3xl max-w-3xl md:max-w-4xl w-full max-h-[92dvh] overflow-y-auto border border-slate-200 shadow-2xl relative flex flex-col md:flex-row my-auto animate-in zoom-in-95 duration-150">
+      <div className="bg-white rounded-3xl max-w-3xl md:max-w-4xl w-full max-h-[92dvh] overflow-y-auto border border-[#ebe3d3] shadow-2xl relative flex flex-col md:flex-row my-auto animate-in zoom-in-95 duration-150">
         
         {/* ======================================================== */}
         {/* LEFT COLUMN: TUTOR SPOTLIGHT & BENEFITS (COMPACT)         */}
         {/* ======================================================== */}
-        <div className="md:w-5/12 bg-gradient-to-br from-[#0c2217] via-[#143d2b] to-[#07150e] text-white p-5 sm:p-6 flex flex-col justify-between shrink-0 relative overflow-hidden">
+        <div className="md:w-5/12 bg-[#faf8f5] text-[#141c19] border-b md:border-b-0 md:border-r border-[#ebe3d3] p-5 sm:p-6 flex flex-col justify-between shrink-0 relative overflow-hidden">
           
           <div className="space-y-4 relative z-10">
             {/* Top Badge */}
-            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#d4a359]/20 text-[#d4a359] border border-[#d4a359]/40 text-[10px] font-black uppercase tracking-wider">
-              <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
+            <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-[#f5f0e6] text-[#b85d34] border border-[#d4a359]/40 text-[10px] font-black uppercase tracking-wider">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
               <span>Direct 1:1 Inquiry</span>
             </div>
 
@@ -260,65 +260,65 @@ export default function StudentAuthModal({
                   alt={tutorName}
                   className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl object-cover border-2 border-[#d4a359]/50 shadow-md"
                 />
-                <div className="absolute -bottom-1 -right-1 p-0.5 bg-[#d4a359] text-[#0c2217] rounded-full ring-2 ring-[#0c2217]">
+                <div className="absolute -bottom-1 -right-1 p-0.5 bg-[#d4a359] text-white rounded-full ring-2 ring-white">
                   <ShieldCheck className="w-3 h-3" />
                 </div>
               </div>
 
               <div className="min-w-0">
-                <h3 className="text-base font-bold text-white truncate">
+                <h3 className="text-base font-bold text-[#0c2217] truncate">
                   {tutorName}
                 </h3>
-                <p className="text-[11px] text-[#d4a359] truncate font-medium">
+                <p className="text-[11px] text-[#b85d34] truncate font-semibold">
                   {tutorSubject}
                 </p>
-                <p className="text-[11px] text-slate-300 font-mono mt-0.5">
-                  {tutorCity} &bull; <strong className="text-[#d4a359]">{tutorRate}</strong>
+                <p className="text-[11px] text-stone-600 font-mono mt-0.5">
+                  {tutorCity} &bull; <strong className="text-[#0c2217] font-bold">{tutorRate}</strong>
                 </p>
               </div>
             </div>
 
             {/* Platform Trust Highlights */}
-            <div className="space-y-2 pt-3 border-t border-white/15 text-xs text-slate-200">
+            <div className="space-y-2 pt-3 border-t border-[#ebe3d3] text-xs text-stone-700">
               <div className="flex items-start gap-2">
-                <div className="p-1 rounded-md bg-[#d4a359]/20 text-[#d4a359] shrink-0 mt-0.5">
+                <div className="p-1 rounded-md bg-[#f5f0e6] text-[#b85d34] shrink-0 mt-0.5">
                   <MessageSquare className="w-3.5 h-3.5" />
                 </div>
                 <div className="text-[11px]">
-                  <span className="font-bold text-white block">Private Chat & Voice Notes</span>
-                  <span className="text-slate-300">Directly discuss syllabus & timings.</span>
+                  <span className="font-bold text-[#0c2217] block">Private Chat & Voice Notes</span>
+                  <span className="text-stone-500">Directly discuss syllabus & timings.</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-2">
-                <div className="p-1 rounded-md bg-[#d4a359]/20 text-[#d4a359] shrink-0 mt-0.5">
+                <div className="p-1 rounded-md bg-[#f5f0e6] text-[#b85d34] shrink-0 mt-0.5">
                   <Award className="w-3.5 h-3.5" />
                 </div>
                 <div className="text-[11px]">
-                  <span className="font-bold text-white block">3-Day Free Trial Session</span>
-                  <span className="text-slate-300">Zero advance fee before trial completion.</span>
+                  <span className="font-bold text-[#0c2217] block">3-Day Free Trial Session</span>
+                  <span className="text-stone-500">Zero advance fee before trial completion.</span>
                 </div>
               </div>
 
               <div className="flex items-start gap-2">
-                <div className="p-1 rounded-md bg-[#d4a359]/20 text-[#d4a359] shrink-0 mt-0.5">
+                <div className="p-1 rounded-md bg-[#f5f0e6] text-[#b85d34] shrink-0 mt-0.5">
                   <Video className="w-3.5 h-3.5" />
                 </div>
                 <div className="text-[11px]">
-                  <span className="font-bold text-white block">Live WebRTC Video Classroom</span>
-                  <span className="text-slate-300">HD interactive video & recitations.</span>
+                  <span className="font-bold text-[#0c2217] block">Live WebRTC Video Classroom</span>
+                  <span className="text-stone-500">HD interactive video & recitations.</span>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="pt-3 mt-3 border-t border-white/15 space-y-2">
-            <div className="text-[10px] text-slate-300 flex items-center justify-between">
+          <div className="pt-3 mt-3 border-t border-[#ebe3d3] space-y-2">
+            <div className="text-[10px] text-stone-600 flex items-center justify-between">
               <span>IlmiDunya Trust &amp; Safety</span>
-              <span className="text-[#d4a359] font-mono font-bold">Verified Faculty</span>
+              <span className="text-[#b85d34] font-mono font-bold">Verified Faculty</span>
             </div>
-            <div className="flex items-center justify-between text-[9px] text-slate-300 font-semibold pt-1 border-t border-white/10">
-              <span className="flex items-center gap-1 text-[#d4a359]">
+            <div className="flex items-center justify-between text-[9px] text-stone-500 font-semibold pt-1 border-t border-[#ebe3d3]">
+              <span className="flex items-center gap-1 text-[#b85d34]">
                 <ShieldCheck className="w-3 h-3" />
                 <span>SSL Secured</span>
               </span>
@@ -603,7 +603,7 @@ export default function StudentAuthModal({
                 <button
                   type="submit"
                   disabled={loading || otpCode.length < 6}
-                  className="w-full py-2 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl shadow-md border border-[#d4a359]/40 transition-all disabled:opacity-50"
+                  className="w-full py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white font-bold text-xs rounded-xl shadow-md transition-all disabled:opacity-50 cursor-pointer"
                 >
                   <span>{loading ? 'Verifying...' : 'Verify & Open 1:1 Chat'}</span>
                 </button>

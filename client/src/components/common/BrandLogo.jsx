@@ -23,9 +23,9 @@ export default function BrandLogo({
 
   const sizeClasses = {
     xs: 'h-6 sm:h-7',
-    sm: 'h-7 sm:h-9',
-    md: 'h-8 sm:h-10 md:h-12',
-    lg: 'h-10 sm:h-12 md:h-16'
+    sm: 'h-8 sm:h-9',
+    md: 'h-9 sm:h-11 md:h-12',
+    lg: 'h-11 sm:h-13 md:h-16'
   };
 
   const heights = {
@@ -45,7 +45,7 @@ export default function BrandLogo({
           alt="IlmiDunya Icon"
           width={currentHeight}
           height={currentHeight}
-          className={`${sizeClasses[size] || 'h-8 sm:h-10'} w-auto object-contain select-none transition-transform group-hover:scale-105`}
+          className={`${sizeClasses[size] || 'h-9 sm:h-11'} w-auto object-contain select-none transition-transform group-hover:scale-105`}
         />
       </div>
     );
@@ -54,24 +54,13 @@ export default function BrandLogo({
   const logoSrc = isDark ? '/logo-dark.svg' : '/logo.svg';
 
   return (
-    <div className={`inline-flex items-center gap-1.5 sm:gap-2 select-none shrink-0 ${className}`}>
+    <div className={`inline-flex items-center select-none shrink-0 ${className}`}>
       <img
         src={logoSrc}
-        alt="IlmiDunya Pakistan"
+        alt="IlmiDunya"
         height={currentHeight}
-        className={`${sizeClasses[size] || 'h-8 sm:h-10'} w-auto object-contain select-none transition-transform group-hover:scale-[1.02]`}
+        className={`${sizeClasses[size] || 'h-9 sm:h-11'} w-auto object-contain select-none transition-transform group-hover:scale-[1.02]`}
       />
-      {withBadge && (
-        <span
-          className={`px-1.5 py-0.5 rounded text-[7.5px] sm:text-[9px] font-extrabold uppercase tracking-wider shrink-0 ${
-            isDark
-              ? 'bg-[#c25d33] text-white border border-[#c25d33]/50 shadow-xs'
-              : 'bg-[#c25d33] text-white shadow-2xs'
-          }`}
-        >
-          Pakistan
-        </span>
-      )}
     </div>
   );
 }

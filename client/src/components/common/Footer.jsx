@@ -95,8 +95,8 @@ const Footer = () => {
           
           {/* Col 1: Brand, Mission & Female Safety Focus */}
           <div className="lg:col-span-2 space-y-4">
-            <Link href="/" className="inline-flex items-center group py-1" title="IlmiDunya Pakistan">
-              <BrandLogo variant="dark" size="md" withUrdu={true} withBadge={true} />
+            <Link href="/" className="inline-flex items-center group py-1" title="IlmiDunya">
+              <BrandLogo variant="dark" size="md" withUrdu={true} />
             </Link>
 
             <p className="text-xs text-[#a3b8b0] leading-relaxed max-w-sm">

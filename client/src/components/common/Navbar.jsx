@@ -267,8 +267,8 @@ const Navbar = () => {
           <div className="flex items-center justify-between h-14 sm:h-16">
           
           {/* Brand Logo & Tagline */}
-          <Link href="/" className="flex items-center group py-1 shrink-0" title="IlmiDunya Pakistan">
-            <BrandLogo variant="light" size="sm" withUrdu={true} withBadge={true} />
+          <Link href="/" className="flex items-center group py-1 shrink-0" title="IlmiDunya">
+            <BrandLogo variant="light" size="md" />
           </Link>
 
           {/* Desktop Nav Links */}
@@ -391,15 +391,15 @@ const Navbar = () => {
                   </span>
                 </Link>
 
-                {/* Messages Link with Counter Badge (Desktop & Tablet only; mobile has bottom nav) */}
+                {/* Messages Link with Counter Badge */}
                 <Link
                   href={isTutor ? '/tutor/messages' : isStudent ? '/student/messages' : '/admin/chats'}
-                  className="hidden md:flex p-2.5 rounded-xl text-stone-700 hover:text-[#0c2217] hover:bg-[#faf8f5] relative transition-colors"
+                  className="flex p-1.5 sm:p-2.5 rounded-xl text-stone-700 hover:text-[#0c2217] hover:bg-[#faf8f5] relative transition-colors"
                   title="Messages & Discussions"
                 >
                   <MessageSquare className="w-5 h-5" />
                   {unreadMessagesCount > 0 && (
-                    <span className="absolute -top-0.5 -right-0.5 px-1 min-w-[18px] h-[18px] bg-[#b85d34] text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-pulse">
+                    <span className="absolute -top-0.5 -right-0.5 px-1 min-w-[17px] h-[17px] sm:min-w-[18px] sm:h-[18px] bg-[#b85d34] text-white font-black text-[10px] rounded-full flex items-center justify-center border-2 border-white shadow-sm animate-pulse">
                       {unreadMessagesCount > 99 ? '99+' : unreadMessagesCount}
                     </span>
                   )}

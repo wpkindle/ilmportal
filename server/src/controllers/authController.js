@@ -5,8 +5,7 @@ const {
   sendVerificationOtpEmail,
   sendEmailDetailed,
   sendPasswordResetEmail,
-  sendEarlyTutorRegistrationAdminAlert,
-  sendEarlyTutorNoticeEmail
+  sendEarlyTutorRegistrationAdminAlert
 } = require('../utils/emailService');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -177,10 +176,12 @@ exports.register = async (req, res) => {
       }
     }
 
-    // Send Verification Email asynchronously in background (non-blocking for fast <100ms response)
-    sendVerificationOtpEmail(user.email, user.name, otp, verificationToken).catch((err) => {
-      console.error('Async email dispatch notification:', err?.message || err);
-    });
+    // Send Verification Email asynchronously in background for non-tutor users (tutors are contacted directly by admin)
+    if (userRole !== 'tutor') {
+      sendVerificationOtpEmail(user.email, user.name, otp, verificationToken).catch((err) => {
+        console.error('Async email dispatch notification:', err?.message || err);
+      });
+    }
 
     res.status(201).json({
       success: true,
@@ -1022,7 +1023,8 @@ exports.registerEarlyTutor = async (req, res) => {
       });
     }
 
-    // 1. Send detailed email with tutor data to abdulkhaliqwebdeveloper@gmail.com
+    // Send detailed email with tutor data to abdulkhaliqwebdeveloper@gmail.com
+    // (Registrar does NOT receive any email; admin will follow up manually with info@ilmidunya.com)
     sendEarlyTutorRegistrationAdminAlert({
       name: user.name,
       email: user.email,
@@ -1033,14 +1035,6 @@ exports.registerEarlyTutor = async (req, res) => {
       gender: user.gender || userGender
     }).catch((err) => {
       console.error('Admin early tutor registration alert email error:', err.message);
-    });
-
-    // 2. Send notice email to the tutor: "thanks for showing your interest, you will be contacted with further details when the platform goes live"
-    sendEarlyTutorNoticeEmail({
-      to: user.email,
-      name: user.name
-    }).catch((err) => {
-      console.error('Tutor confirmation notice email error:', err.message);
     });
 
     // Notify admin in database

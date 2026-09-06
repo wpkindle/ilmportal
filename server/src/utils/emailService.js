@@ -1416,7 +1416,7 @@ const sendEarlyTutorRegistrationAdminAlert = async ({
 // 14. EARLY TUTOR REGISTRATION CONFIRMATION NOTICE
 // ==========================================
 const sendEarlyTutorNoticeEmail = async ({ to, name }) => {
-  const emailSubject = `🎓 IlmiDunya Faculty Registration - Welcome ${name}`;
+  const emailSubject = `🌟 Welcome to IlmiDunya Founding Faculty, ${name}! (VIP Priority Secured)`;
   const html = `
     <!DOCTYPE html>
     <html>
@@ -1426,21 +1426,24 @@ const sendEarlyTutorNoticeEmail = async ({ to, name }) => {
         <tr>
           <td style="background-color: #0c2217; padding: 26px; text-align: center;">
             <h2 style="color: #d4a359; margin: 0; font-size: 22px; font-weight: 800;">IlmiDunya Pakistan</h2>
-            <p style="color: #ffffff; margin: 6px 0 0 0; font-size: 13px;">Faculty & Educator Network</p>
+            <p style="color: #ffffff; margin: 6px 0 0 0; font-size: 13px;">Founding Faculty & Educator Network</p>
           </td>
         </tr>
         <tr>
           <td style="padding: 28px; color: #1e293b; font-size: 15px; line-height: 1.7;">
             <p style="margin-top: 0;">Dear <strong>${name}</strong>,</p>
             
-            <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 18px; border-radius: 10px; margin: 20px 0;">
-              <p style="margin: 0; color: #065f46; font-size: 15px; font-weight: 700; line-height: 1.5;">
-                Thanks for showing your interest, you will be contacted with further details when the platform goes live.
+            <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 20px; border-radius: 10px; margin: 20px 0;">
+              <h3 style="margin: 0 0 8px 0; color: #065f46; font-size: 17px; font-weight: 800;">
+                Welcome to the IlmiDunya Founding Faculty! 🌟
+              </h3>
+              <p style="margin: 0; color: #166534; font-size: 15px; font-weight: 600; line-height: 1.6;">
+                Your dedication to spreading Ilm is deeply honored. You have secured <strong>VIP Priority Placement</strong> for direct student matching on launch day — our faculty team will connect with you shortly with exclusive onboarding details and early perks!
               </p>
             </div>
 
             <p style="color: #475569; font-size: 14px; line-height: 1.6;">
-              Our academic faculty coordinator is reviewing educator submissions to organize curriculum categories and prepare verified tutor placements.
+              Our academic faculty coordinator is reviewing educator submissions to organize curriculum categories, assign verified badges, and prepare direct student connections.
             </p>
 
             <div style="text-align: center; margin: 26px 0 10px 0;">
@@ -1464,7 +1467,7 @@ const sendEarlyTutorNoticeEmail = async ({ to, name }) => {
     to,
     subject: emailSubject,
     html,
-    text: `Dear ${name},\n\nThanks for showing your interest, you will be contacted with further details when the platform goes live.\n\nIlmiDunya Pakistan`
+    text: `Dear ${name},\n\nWelcome to the IlmiDunya Founding Faculty! Your dedication to spreading Ilm is deeply honored. You have secured VIP Priority Placement for direct student matching on launch day — our faculty team will connect with you shortly with exclusive onboarding details and early perks!\n\nIlmiDunya Pakistan`
   });
 };
 

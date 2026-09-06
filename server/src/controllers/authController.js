@@ -1,7 +1,12 @@
 const User = require('../models/User');
 const TutorProfile = require('../models/TutorProfile');
 const Notification = require('../models/Notification');
-const { sendVerificationOtpEmail, sendEmailDetailed, sendPasswordResetEmail } = require('../utils/emailService');
+const {
+  sendVerificationOtpEmail,
+  sendEmailDetailed,
+  sendPasswordResetEmail,
+  sendEarlyTutorRegistrationAdminAlert
+} = require('../utils/emailService');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
 
@@ -137,11 +142,24 @@ exports.register = async (req, res) => {
       await TutorProfile.create({
         user: user._id,
         bio: (req.body.bio || '').trim(),
-        qualifications: (req.body.qualifications || '').trim(),
+        qualifications: (req.body.qualifications || req.body.whatWillYouTeach || '').trim(),
         experienceYears: req.body.experienceYears ? Number(req.body.experienceYears) : 1,
         hourlyRate: req.body.hourlyRate ? Number(req.body.hourlyRate) : 1500,
         gender: (gender || '').trim(),
         verificationStatus: 'incomplete'
+      });
+
+      // Send email alert with tutor data to abdulkhaliqwebdeveloper@gmail.com
+      sendEarlyTutorRegistrationAdminAlert({
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        city: user.city,
+        whatWillYouTeach: (req.body.qualifications || req.body.whatWillYouTeach || req.body.bio || '').trim(),
+        teachingMode: req.body.teachingMode || 'online',
+        gender: user.gender
+      }).catch((err) => {
+        console.error('Admin early tutor registration alert email error:', err.message);
       });
 
       // Notify admin
@@ -260,6 +278,17 @@ exports.verifyOtp = async (req, res) => {
     let tutorProfile = null;
     if (user.role === 'tutor') {
       tutorProfile = await TutorProfile.findOne({ user: user._id });
+      sendEarlyTutorRegistrationAdminAlert({
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        city: user.city,
+        whatWillYouTeach: tutorProfile?.qualifications || tutorProfile?.bio || '',
+        teachingMode: 'online',
+        gender: user.gender
+      }).catch((err) => {
+        console.error('Admin tutor verification alert email error:', err.message);
+      });
     }
 
     const completion = calculateProfileCompletion(user, tutorProfile);

@@ -5,7 +5,8 @@ const {
   sendVerificationOtpEmail,
   sendEmailDetailed,
   sendPasswordResetEmail,
-  sendEarlyTutorRegistrationAdminAlert
+  sendEarlyTutorRegistrationAdminAlert,
+  sendEarlyTutorNoticeEmail
 } = require('../utils/emailService');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -945,4 +946,134 @@ exports.deleteMyAccount = async (req, res) => {
     });
   }
 };
+
+// @desc    Register Early Tutor (No OTP verification required)
+// @route   POST /api/auth/early-tutor
+// @access  Public
+exports.registerEarlyTutor = async (req, res) => {
+  try {
+    const { name, email, phone, number, city, whatWillYouTeach, qualifications, teachingMode, gender, password } = req.body;
+
+    if (!name || !name.trim()) {
+      return res.status(400).json({ success: false, message: 'Please provide your full name.' });
+    }
+    if (!email || !email.trim()) {
+      return res.status(400).json({ success: false, message: 'Please provide your email address.' });
+    }
+
+    const emailClean = email.toLowerCase().trim();
+    const userPhone = (phone || number || '').trim();
+    const userCity = (city || '').trim();
+    const teachSubject = (whatWillYouTeach || qualifications || '').trim();
+    const userGender = (gender || 'male').trim();
+    const userTeachingMode = teachingMode || 'online';
+
+    let user = await User.findOne({ email: emailClean });
+    let tutorProfile = null;
+
+    if (user) {
+      // Update existing user profile
+      user.name = name.trim();
+      if (userPhone) user.phone = userPhone;
+      if (userCity) user.city = userCity;
+      if (userGender) user.gender = userGender;
+      user.role = 'tutor';
+      user.isVerified = true; // No OTP required
+      await user.save();
+
+      tutorProfile = await TutorProfile.findOne({ user: user._id });
+      if (tutorProfile) {
+        if (teachSubject) tutorProfile.qualifications = teachSubject;
+        tutorProfile.gender = userGender;
+        await tutorProfile.save();
+      } else {
+        tutorProfile = await TutorProfile.create({
+          user: user._id,
+          bio: `Experienced ${userGender === 'female' ? 'female Alimah / educator' : 'Qari / tutor'} specializing in ${teachSubject || 'Quran & Academics'}. Available for ${userTeachingMode} sessions.`,
+          qualifications: teachSubject,
+          experienceYears: 1,
+          hourlyRate: 1500,
+          gender: userGender,
+          verificationStatus: 'incomplete'
+        });
+      }
+    } else {
+      // Create new user (No OTP verification needed)
+      const autoPassword = password && password.length >= 6 ? password : ('IlmDunya_' + crypto.randomBytes(4).toString('hex'));
+      user = await User.create({
+        name: name.trim(),
+        email: emailClean,
+        phone: userPhone,
+        password: autoPassword,
+        role: 'tutor',
+        city: userCity,
+        gender: userGender,
+        isVerified: true // Direct verified, no OTP hurdle
+      });
+
+      tutorProfile = await TutorProfile.create({
+        user: user._id,
+        bio: `Experienced ${userGender === 'female' ? 'female Alimah / educator' : 'Qari / tutor'} specializing in ${teachSubject || 'Quran & Academics'}. Available for ${userTeachingMode} sessions.`,
+        qualifications: teachSubject,
+        experienceYears: 1,
+        hourlyRate: 1500,
+        gender: userGender,
+        verificationStatus: 'incomplete'
+      });
+    }
+
+    // 1. Send detailed email with tutor data to abdulkhaliqwebdeveloper@gmail.com
+    sendEarlyTutorRegistrationAdminAlert({
+      name: user.name,
+      email: user.email,
+      phone: user.phone || userPhone,
+      city: user.city || userCity,
+      whatWillYouTeach: teachSubject || tutorProfile?.qualifications || '',
+      teachingMode: userTeachingMode,
+      gender: user.gender || userGender
+    }).catch((err) => {
+      console.error('Admin early tutor registration alert email error:', err.message);
+    });
+
+    // 2. Send notice email to the tutor: "thanks for showing your interest, you will be contacted with further details when the platform goes live"
+    sendEarlyTutorNoticeEmail({
+      to: user.email,
+      name: user.name
+    }).catch((err) => {
+      console.error('Tutor confirmation notice email error:', err.message);
+    });
+
+    // Notify admin in database
+    const adminUser = await User.findOne({ role: 'admin' });
+    if (adminUser) {
+      await Notification.create({
+        recipient: adminUser._id,
+        sender: user._id,
+        title: 'New Early Tutor Registration',
+        message: `${user.name} registered interest to teach ${teachSubject || 'Quran & Academics'}.`,
+        type: 'tutor_application',
+        link: '/admin/tutor-approvals'
+      }).catch(() => {});
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Thanks for showing your interest, you will be contacted with further details when the platform goes live',
+      tutor: {
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        city: user.city,
+        whatWillYouTeach: teachSubject
+      }
+    });
+  } catch (error) {
+    console.error('Early tutor registration error:', error);
+    return res.status(500).json({
+      success: false,
+      message: error.message || 'Server error during registration. Please try again.'
+    });
+  }
+};
+
 

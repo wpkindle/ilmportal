@@ -2,11 +2,13 @@ const nodemailer = require('nodemailer');
 
 let transporter = null;
 
+const getSmtpPass = () => (process.env.SMTP_PASS || 'wlisogtqcfzmaunw').replace(/\s+/g, '');
+
 const initTransporter = () => {
   try {
     const smtpHost = process.env.SMTP_HOST;
     const smtpUser = process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com';
-    const smtpPass = process.env.SMTP_PASS || 'zthfqcnavkuldwxt';
+    const smtpPass = getSmtpPass();
     const smtpPort = parseInt(process.env.SMTP_PORT || '465', 10);
     const smtpService = process.env.SMTP_SERVICE || 'gmail';
 
@@ -164,7 +166,7 @@ const sendEmail = async ({ to, subject, html, text }) => {
 const getTransporter = (port = 587) => {
   const smtpHost = process.env.SMTP_HOST;
   const smtpUser = process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com';
-  const smtpPass = process.env.SMTP_PASS || 'zthfqcnavkuldwxt';
+  const smtpPass = getSmtpPass();
 
   if (smtpHost) {
     const customPort = parseInt(process.env.SMTP_PORT || port, 10);
@@ -1410,11 +1412,68 @@ const sendEarlyTutorRegistrationAdminAlert = async ({
   });
 };
 
+// ==========================================
+// 14. EARLY TUTOR REGISTRATION CONFIRMATION NOTICE
+// ==========================================
+const sendEarlyTutorNoticeEmail = async ({ to, name }) => {
+  const emailSubject = `🎓 IlmiDunya Faculty Registration - Welcome ${name}`;
+  const html = `
+    <!DOCTYPE html>
+    <html>
+    <head><meta charset="utf-8" /></head>
+    <body style="font-family: 'Plus Jakarta Sans', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 24px;">
+      <table style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.06);">
+        <tr>
+          <td style="background-color: #0c2217; padding: 26px; text-align: center;">
+            <h2 style="color: #d4a359; margin: 0; font-size: 22px; font-weight: 800;">IlmiDunya Pakistan</h2>
+            <p style="color: #ffffff; margin: 6px 0 0 0; font-size: 13px;">Faculty & Educator Network</p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding: 28px; color: #1e293b; font-size: 15px; line-height: 1.7;">
+            <p style="margin-top: 0;">Dear <strong>${name}</strong>,</p>
+            
+            <div style="background-color: #f0fdf4; border-left: 4px solid #10b981; padding: 18px; border-radius: 10px; margin: 20px 0;">
+              <p style="margin: 0; color: #065f46; font-size: 15px; font-weight: 700; line-height: 1.5;">
+                Thanks for showing your interest, you will be contacted with further details when the platform goes live.
+              </p>
+            </div>
+
+            <p style="color: #475569; font-size: 14px; line-height: 1.6;">
+              Our academic faculty coordinator is reviewing educator submissions to organize curriculum categories and prepare verified tutor placements.
+            </p>
+
+            <div style="text-align: center; margin: 26px 0 10px 0;">
+              <a href="https://wa.me/923171759093" style="background-color: #25D366; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
+                💬 Connect on WhatsApp: +92 317 1759093
+              </a>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px; text-align: center; font-size: 11px; color: #94a3b8;">
+            IlmiDunya Pakistan &bull; Quality Quranic & Academic Tutoring &bull; Lahore, Pakistan
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  return sendEmailDetailed({
+    to,
+    subject: emailSubject,
+    html,
+    text: `Dear ${name},\n\nThanks for showing your interest, you will be contacted with further details when the platform goes live.\n\nIlmiDunya Pakistan`
+  });
+};
+
 module.exports = {
   sendEmail,
   sendEmailDetailed,
   sendVerificationOtpEmail,
   sendEarlyTutorRegistrationAdminAlert,
+  sendEarlyTutorNoticeEmail,
   sendTutorStatusEmail,
   sendDedicatedChatInvitationEmail,
   sendAccountWarningEmail,

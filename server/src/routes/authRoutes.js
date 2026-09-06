@@ -2,6 +2,7 @@ const express = require('express');
 const router = express.Router();
 const {
   register,
+  registerEarlyTutor,
   verifyOtp,
   verifyToken,
   resendOtp,
@@ -17,6 +18,8 @@ const {
 const { protect } = require('../middleware/authMiddleware');
 
 router.post('/register', register);
+router.post('/early-tutor', registerEarlyTutor);
+router.post('/early-tutor-register', registerEarlyTutor);
 router.post('/verify-otp', verifyOtp);
 router.post('/verify-token', verifyToken);
 router.get('/verify-token', verifyToken);

@@ -24,7 +24,7 @@ const pageSchema = new mongoose.Schema({
     default: ''
   },
   contactDetails: {
-    email: { type: String, default: 'support@pakistanlms.pk' },
+    email: { type: String, default: 'info@ilmidunya.com' },
     phone: { type: String, default: '+92 300 1234567' },
     whatsapp: { type: String, default: '+92 300 1234567' },
     address: { type: String, default: 'Lahore, Punjab, Pakistan' },

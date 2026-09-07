@@ -310,7 +310,7 @@ const seedDatabase = async () => {
         instructionsNotes: 'Transfer fee via JazzCash, EasyPaisa, or Online Bank Transfer and submit the Transaction ID (TID) below. Payments verified within 2–4 hours.'
       },
       platformNotice: 'Welcome to Pakistan’s premier Quran & Academic Tutoring Platform. All live classes feature full HD video & interactive whiteboard.',
-      supportEmail: 'support@pakistanlms.pk',
+      supportEmail: 'info@ilmidunya.com',
       supportPhone: '+92 300 1234567'
     });
     console.log('✅ Seeded System Configuration (3-day trial, JazzCash, EasyPaisa, Meezan Bank)');

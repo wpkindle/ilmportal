@@ -105,7 +105,7 @@ const TrialBanner = ({ deal, onPayClick }) => {
             <p className="text-[11px] text-rose-700">
               {isTutor
                 ? `The 72-hour grace period expired without payment clearance. Please submit the platform fee (${feeText}) to reactivate live classes.`
-                : 'Live classes are paused pending tutor platform clearance with administration. Official Support: contact@ilmidunya.pk.'}
+                : 'Live classes are paused pending tutor platform clearance with administration. Official Support: info@ilmidunya.com.'}
             </p>
           </div>
         </div>

@@ -593,7 +593,7 @@ exports.respondToTrialContinuation = async (req, res) => {
           studentName: deal.student.name,
           subject: deal.subject,
           feeDueDate: dueDateStr,
-          adminContactEmail: 'contact@ilmidunya.pk'
+          adminContactEmail: 'info@ilmidunya.com'
         });
       } catch (mailErr) {
         console.error('Failed to send tutor continuation email:', mailErr);

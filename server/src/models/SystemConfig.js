@@ -25,7 +25,7 @@ const systemConfigSchema = new mongoose.Schema({
   },
   supportEmail: {
     type: String,
-    default: 'support@pakistanlms.pk'
+    default: 'info@ilmidunya.com'
   },
   supportPhone: {
     type: String,

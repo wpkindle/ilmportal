@@ -109,8 +109,8 @@ const Footer = () => {
                 <div className="w-7 h-7 rounded-lg bg-[#f5f0e6] border border-[#d4a359]/40 flex items-center justify-center text-[#b85d34] shrink-0">
                   <Mail className="w-3.5 h-3.5" />
                 </div>
-                <a href="mailto:contact@ilmidunya.pk" className="text-[#0c2217] hover:text-[#b85d34] font-semibold transition-colors">
-                  contact@ilmidunya.pk
+                <a href="mailto:info@ilmidunya.com" className="text-[#0c2217] hover:text-[#b85d34] font-semibold transition-colors">
+                  info@ilmidunya.com
                 </a>
               </div>
             </div>

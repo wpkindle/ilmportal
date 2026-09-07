@@ -64,7 +64,7 @@ const orgSchema = {
       description: 'Pakistan’s dedicated platform for 1-on-1 verified Quran and academic tutoring with camera-off privacy.',
       contactPoint: {
         '@type': 'ContactPoint',
-        email: 'contact@ilmidunya.pk',
+        email: 'info@ilmidunya.com',
         contactType: 'customer support',
         areaServed: 'PK',
         availableLanguage: ['Urdu', 'English']

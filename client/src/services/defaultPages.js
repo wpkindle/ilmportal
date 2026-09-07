@@ -107,7 +107,7 @@ Guided by the timeless Hadith: *"The best of you are those who learn the Quran a
     subtitle: 'We are here to assist students, parents, and tutors across Pakistan.',
     metaDescription: 'Get in touch with IlmiDunya Pakistan.',
     contactDetails: {
-      email: 'contact@ilmidunya.pk',
+      email: 'info@ilmidunya.com',
       phone: '',
       whatsapp: '',
       address: 'Lahore, Punjab, Pakistan',
@@ -119,7 +119,7 @@ Have questions about finding a verified Qari, scheduling 3-day free trials, requ
 ---
 
 ### Our Communication Channels
-* **Email Support**: Official assistance for student enrollment, tutor onboarding, and Sanad submissions at [contact@ilmidunya.pk](mailto:contact@ilmidunya.pk).
+* **Email Support**: Official assistance for student enrollment, tutor onboarding, and Sanad submissions at [info@ilmidunya.com](mailto:info@ilmidunya.com).
 * **Headquarters**: Lahore, Punjab, Pakistan, serving students nationwide across Pakistan & overseas.`
   }
 };

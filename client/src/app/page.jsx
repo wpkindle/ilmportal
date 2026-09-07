@@ -32,7 +32,7 @@ const homeStructuredData = {
       url: 'https://pakistanlms.pk',
       logo: 'https://pakistanlms.pk/icon.svg',
       description: 'Pakistan’s premier educational network connecting families with verified Quran Qaris, female Alimahs, and Playgroup to FSc tutors.',
-      email: 'contact@ilmidunya.pk',
+      email: 'info@ilmidunya.com',
       address: {
         '@type': 'PostalAddress',
         addressLocality: 'Lahore',

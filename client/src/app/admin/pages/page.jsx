@@ -90,7 +90,7 @@ export default function AdminCMSPagesPage() {
       subtitle: 'We are here to assist students, parents, and tutors across Pakistan.',
       metaDescription: 'Get in touch with IlmiDunya Pakistan. Contact our Lahore administration via WhatsApp, phone, or direct online inquiry.',
       contactDetails: {
-        email: 'support@pakistanlms.pk',
+        email: 'info@ilmidunya.com',
         phone: '+92 300 1234567',
         whatsapp: '+92 300 1234567',
         address: 'Lahore, Punjab, Pakistan',

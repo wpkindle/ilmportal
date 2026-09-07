@@ -77,7 +77,7 @@ export default function ContactUsPage() {
   };
 
   const contact = page?.contactDetails || {
-    email: 'contact@ilmidunya.pk',
+    email: 'info@ilmidunya.com',
     workingHours: 'Monday – Saturday: 9:00 AM – 9:00 PM PKT'
   };
 
@@ -123,8 +123,8 @@ export default function ContactUsPage() {
               </div>
               <h4 className="text-xs font-bold text-slate-500 uppercase tracking-wider">Email Support</h4>
               <p className="text-sm font-black text-slate-900">
-                <a href="mailto:contact@ilmidunya.pk" className="hover:text-[#b85d34] transition-colors">
-                  contact@ilmidunya.pk
+                <a href="mailto:info@ilmidunya.com" className="hover:text-[#b85d34] transition-colors">
+                  info@ilmidunya.com
                 </a>
               </p>
               <p className="text-[11px] text-slate-500">Official support &amp; Sanad verified tutor inquiries</p>

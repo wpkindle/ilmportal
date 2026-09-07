@@ -144,11 +144,11 @@ export default function SafetyPage() {
             </Link>
 
             <a
-              href="mailto:contact@ilmportal.org"
+              href="mailto:info@ilmidunya.com"
               className="w-full sm:w-auto px-6 py-3.5 bg-[#143d2b] hover:bg-[#1e543c] text-[#f5f0e6] font-bold text-xs sm:text-sm rounded-xl border border-[#d4a359]/40 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <Mail className="w-4 h-4 text-[#d4a359]" />
-              <span>Safety Helpline: contact@ilmportal.org</span>
+              <span>Safety Helpline: info@ilmidunya.com</span>
             </a>
           </div>
 
@@ -318,10 +318,10 @@ export default function SafetyPage() {
           </p>
           <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs">
             <a
-              href="mailto:contact@ilmportal.org"
+              href="mailto:info@ilmidunya.com"
               className="px-5 py-2.5 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold transition-all shadow-md"
             >
-              Email Safety Team: contact@ilmportal.org
+              Email Safety Team: info@ilmidunya.com
             </a>
           </div>
         </div>

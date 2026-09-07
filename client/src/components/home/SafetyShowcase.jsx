@@ -228,7 +228,7 @@ export default function SafetyShowcase() {
                 Official Administration Support &amp; Incident Monitoring
               </h4>
               <p className="text-xs text-[#4a5e55]">
-                Immediate review for any family inquiry or feedback: <a href="mailto:contact@ilmidunya.pk" className="text-[#b85d34] underline font-bold">contact@ilmidunya.pk</a>
+                Immediate review for any family inquiry or feedback: <a href="mailto:info@ilmidunya.com" className="text-[#b85d34] underline font-bold">info@ilmidunya.com</a>
               </p>
             </div>
           </div>

@@ -519,7 +519,7 @@ const sendTutorStatusEmail = async (to, name, status, reason = '') => {
                       IlmiDunya Pakistan &bull; Quality Quranic & Academic Education
                     </p>
                     <p style="margin: 0; font-size: 11px; color: #94a3b8;">
-                      Need assistance? Contact our instructor support team at support@pakistanlms.pk
+                      Need assistance? Contact our instructor support team at info@ilmidunya.com
                     </p>
                   </td>
                 </tr>
@@ -610,7 +610,7 @@ const sendTutorStatusEmail = async (to, name, status, reason = '') => {
                       IlmiDunya Pakistan &bull; Quality Quranic & Academic Education
                     </p>
                     <p style="margin: 0; font-size: 11px; color: #94a3b8;">
-                      If you have questions, please reach out to admin@pakistanlms.pk
+                      If you have questions, please reach out to info@ilmidunya.com
                     </p>
                   </td>
                 </tr>
@@ -1129,7 +1129,7 @@ const sendTrialContinuationTutorEmail = async ({
                     <p style="color: #166534; font-size: 12px; margin: 0;">
                       Meezan Bank: <strong>96010105435308</strong> (Abdul Khaliq)<br>
                       Raast ID / EasyPaisa / JazzCash: <strong>03171759093</strong><br>
-                      Official Support: <strong>contact@ilmidunya.pk</strong>
+                      Official Support: <strong>info@ilmidunya.com</strong>
                     </p>
                   </div>
 

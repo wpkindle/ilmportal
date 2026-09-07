@@ -20,7 +20,9 @@ export default function SafetyShowcase() {
   const [cameraDemoState, setCameraDemoState] = useState(false);
 
   return (
-    <section className="py-16 sm:py-24 relative overflow-hidden bg-[#f5f0e6] text-[#141c19] border-b border-[#ebe3d3]">
+    <section className="py-16 sm:py-24 relative overflow-hidden border-b border-[#ebe3d3]" style={{background: 'linear-gradient(160deg, #f5f0e6 0%, #fdf8f0 35%, #f8f2e8 70%, #f5eedd 100%)'}}>
+      {/* Diagonal stripe texture overlay */}
+      <div className="absolute inset-0 bg-diagonal-stripes pointer-events-none" />
       {/* Ambient Deep Emerald & Gold Glows */}
       <div className="absolute top-1/4 -left-32 w-[550px] h-[550px] bg-[#10b981]/8 rounded-full blur-[120px] pointer-events-none animate-pulse-glow" />
       <div className="absolute -bottom-24 right-10 w-[600px] h-[600px] bg-[#d4a359]/12 rounded-full blur-[130px] pointer-events-none animate-float-slow" />

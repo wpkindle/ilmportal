@@ -40,9 +40,14 @@ export default function Testimonials() {
   const supporting = testimonials.slice(1);
 
   return (
-    <section className="py-16 sm:py-24 relative overflow-hidden bg-[#faf8f5] border-b border-[#ebe3d3]">
-      {/* Subtle warm glow */}
-      <div className="absolute top-1/4 right-10 w-96 h-96 bg-[#d4a359]/10 rounded-full blur-[130px] pointer-events-none" />
+    <section className="py-16 sm:py-24 relative overflow-hidden bg-section-testimonials border-b border-[#d8dff0]">
+      {/* Blue dot grid texture */}
+      <div className="absolute inset-0 bg-dot-grid-blue pointer-events-none" />
+      {/* Blue-indigo glow orbs */}
+      <div className="absolute top-1/4 right-10 w-96 h-96 bg-[#6366f1]/8 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-10 left-10 w-72 h-72 bg-[#3b82f6]/6 rounded-full blur-[110px] pointer-events-none" />
+      {/* Giant quote watermark */}
+      <div className="absolute top-8 left-6 text-[18rem] font-serif font-black text-[#6366f1]/5 select-none pointer-events-none leading-none">"</div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
         

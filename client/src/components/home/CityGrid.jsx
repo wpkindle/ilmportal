@@ -23,10 +23,20 @@ const CityGrid = () => {
   const majorCities = locations.filter(l => l.isMajorCity).slice(0, 8);
 
   return (
-    <section className="py-16 sm:py-24 relative overflow-hidden bg-[#faf8f5] border-b border-[#ebe3d3]">
-      {/* Subtle warm glow */}
-      <div className="absolute top-1/2 left-10 w-96 h-96 bg-[#1e543c]/5 rounded-full blur-[120px] pointer-events-none" />
+    <section className="py-16 sm:py-24 relative overflow-hidden bg-section-cities border-b border-[#d8ead0]">
+      {/* Green dot grid texture */}
+      <div className="absolute inset-0 bg-dot-grid-green pointer-events-none" />
+      {/* Green glow orbs */}
+      <div className="absolute top-1/2 left-10 w-96 h-96 bg-[#059669]/8 rounded-full blur-[120px] pointer-events-none" />
       <div className="absolute top-10 right-10 w-80 h-80 bg-[#d4a359]/10 rounded-full blur-[100px] pointer-events-none" />
+      {/* Large crescent watermark — Pakistan identity motif */}
+      <div className="absolute -right-16 top-1/2 -translate-y-1/2 w-[340px] h-[340px] opacity-[0.04] pointer-events-none animate-spin-slow">
+        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
+          <circle cx="100" cy="100" r="90" stroke="#0c5a2e" strokeWidth="3" />
+          <circle cx="130" cy="100" r="70" fill="#0c5a2e" />
+          <polygon points="105,55 108,70 120,60 112,73 128,75 114,82 120,97 107,88 105,104 100,89 88,104 88,88 75,97 82,82 68,75 84,73 76,60 92,70" fill="#d4a359" />
+        </svg>
+      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 relative z-10">
         

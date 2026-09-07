@@ -58,6 +58,20 @@ const heroSlides = [
   },
   {
     id: 1,
+    tabLabel: 'Cambridge Prep',
+    tabIcon: GraduationCap,
+    badgeText: 'Playgroup to FSc Academic',
+    badgeIcon: GraduationCap,
+    badgeColor: 'text-[#faf8f5]',
+    dotColor: 'bg-[#b85d34]',
+    tag: 'O/A Level & STEM',
+    title: '1:1 Male Academic Tutor & High-School Student',
+    desc: 'Expert male subject specialists visiting your home or teaching online for O/A Level, FSc, and Matric exams in Mathematics, Physics & Sciences.',
+    image: '/images/hero-academic-tutoring.jpg',
+    alt: 'Pakistani male Cambridge academic tutor guiding a high-school boy student through O/A Level physics and mathematics at study desk'
+  },
+  {
+    id: 2,
     tabLabel: 'Alimah (WebRTC)',
     tabIcon: Video,
     badgeText: '100% WebRTC Only • Female Alimahs',
@@ -71,7 +85,7 @@ const heroSlides = [
     alt: 'Pakistani girl student attending 1:1 online WebRTC video call with female Alimah in Naqab'
   },
   {
-    id: 2,
+    id: 3,
     tabLabel: 'Online Quran',
     tabIcon: BookOpen,
     badgeText: 'Interactive Digital Quran WebRTC',
@@ -83,20 +97,6 @@ const heroSlides = [
     desc: 'Direct in-browser page-by-page digital Quran recitation, Noorani Qaida articulation points, and tajweed correction on any screen.',
     image: '/images/hero-webrtc-quran.jpg',
     alt: 'Pakistani student with headphones attending online WebRTC Quran recitation class with digital Quran on laptop screen'
-  },
-  {
-    id: 3,
-    tabLabel: 'Cambridge Prep',
-    tabIcon: GraduationCap,
-    badgeText: 'Playgroup to FSc Academic',
-    badgeIcon: GraduationCap,
-    badgeColor: 'text-[#faf8f5]',
-    dotColor: 'bg-[#b85d34]',
-    tag: 'O/A Level & STEM',
-    title: '1:1 Male Academic Tutor & High-School Student',
-    desc: 'Expert male subject specialists visiting your home or teaching online for O/A Level, FSc, and Matric exams in Mathematics, Physics & Sciences.',
-    image: '/images/hero-academic-tutoring.jpg',
-    alt: 'Pakistani male Cambridge academic tutor guiding a high-school boy student through O/A Level physics and mathematics at study desk'
   }
 ];
 

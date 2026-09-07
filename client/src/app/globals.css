@@ -334,3 +334,80 @@
   box-shadow: 0 12px 24px -6px rgba(12, 34, 23, 0.08);
 }
 
+/* ─── Per-Section Background Gradients ─────────────────────────── */
+
+/* FeaturedTutors: Soft navy-to-cream diagonal */
+.bg-section-tutors {
+  background: linear-gradient(135deg, #eef2f8 0%, #faf8f5 45%, #f5f0e6 100%);
+}
+
+/* SubjectExplorer: Warm amber sunrise */
+.bg-section-subjects {
+  background: linear-gradient(180deg, #faf8f5 0%, #fdf6e8 55%, #f5f0e6 100%);
+}
+
+/* CityGrid: Forest green tinted parchment */
+.bg-section-cities {
+  background: linear-gradient(160deg, #f0f7f2 0%, #faf8f5 40%, #f5f0e6 100%);
+}
+
+/* HowItWorks: Deep emerald dark */
+.bg-section-howitworks {
+  background: linear-gradient(145deg, #081811 0%, #0d2a1c 50%, #0f3322 100%);
+}
+
+/* Testimonials: Soft blue-slate tinted */
+.bg-section-testimonials {
+  background: linear-gradient(150deg, #f0f4fb 0%, #faf8f5 50%, #f5f5f0 100%);
+}
+
+/* FAQ: Rich gold-parchment */
+.bg-section-faq {
+  background: linear-gradient(180deg, #faf8f5 0%, #fdf6e4 60%, #f9f0d8 100%);
+}
+
+/* Diagonal stripe overlay (overlay, not background) */
+.bg-diagonal-stripes {
+  background-image: repeating-linear-gradient(
+    -55deg,
+    transparent,
+    transparent 28px,
+    rgba(212, 163, 89, 0.04) 28px,
+    rgba(212, 163, 89, 0.04) 29px
+  );
+}
+
+/* Fine dot grid overlay */
+.bg-dot-grid-warm {
+  background-image: radial-gradient(rgba(180, 120, 60, 0.07) 1px, transparent 1px);
+  background-size: 22px 22px;
+}
+
+/* Green dot grid for CityGrid */
+.bg-dot-grid-green {
+  background-image: radial-gradient(rgba(16, 90, 55, 0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Dark mesh for HowItWorks */
+.bg-dark-mesh {
+  background-image:
+    linear-gradient(rgba(16, 185, 129, 0.04) 1px, transparent 1px),
+    linear-gradient(to right, rgba(16, 185, 129, 0.04) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* Subtle line grid for subjects */
+.bg-line-grid-amber {
+  background-image:
+    linear-gradient(rgba(212, 163, 89, 0.06) 1px, transparent 1px),
+    linear-gradient(to right, rgba(212, 163, 89, 0.06) 1px, transparent 1px);
+  background-size: 36px 36px;
+}
+
+/* Blue dot grid for testimonials */
+.bg-dot-grid-blue {
+  background-image: radial-gradient(rgba(99, 130, 200, 0.06) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+

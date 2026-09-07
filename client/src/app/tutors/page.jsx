@@ -304,7 +304,7 @@ function TutorSearchContent() {
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-[#faf8f5] py-6 sm:py-12 pb-24 md:pb-12">
+    <div className="min-h-screen bg-transparent py-6 sm:py-12 pb-24 md:pb-12">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         
         {/* Top Header & Search Bar */}

@@ -878,6 +878,8 @@ const Navbar = () => {
           </div>
         )}
 
+        {/* Luminous Multi-stop Accent Line */}
+        <div className="absolute inset-x-0 bottom-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#d4a359]/40 via-[#10b981]/30 to-transparent pointer-events-none" />
       </div>
     </header>
     </>

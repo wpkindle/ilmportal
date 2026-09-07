@@ -408,43 +408,80 @@
 
 /* ─── Clean, Decent Section Background Gradients ─────────────────────────── */
 
-/* 1. Hero: Pure ivory melting into soft warm parchment */
+/* Global Site Canvas: Deep multi-layered ambient gradient mesh */
+.bg-site-canvas {
+  background-color: #faf6ef;
+  background-image: 
+    radial-gradient(ellipse 90% 50% at 50% 0%, rgba(212, 163, 89, 0.12), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 90% 20%, rgba(16, 185, 129, 0.08), transparent 60%),
+    radial-gradient(ellipse 70% 60% at 10% 45%, rgba(212, 163, 89, 0.09), transparent 65%),
+    radial-gradient(ellipse 80% 50% at 85% 75%, rgba(16, 185, 129, 0.07), transparent 60%),
+    radial-gradient(ellipse 90% 60% at 50% 100%, rgba(184, 93, 52, 0.06), transparent 70%),
+    linear-gradient(180deg, #fdfbf7 0%, #faf5ec 25%, #f6f0e4 50%, #f7f2ea 75%, #f4eee2 100%);
+  background-attachment: fixed;
+}
+
+/* 1. Hero: Pure ivory melting into soft warm parchment with golden peaks */
 .bg-section-hero {
-  background: linear-gradient(180deg, #fefdfb 0%, #faf5ec 48%, #f3ede0 100%);
+  background: 
+    radial-gradient(ellipse 80% 60% at 50% 20%, rgba(212, 163, 89, 0.12), transparent 70%),
+    radial-gradient(ellipse 60% 50% at 15% 45%, rgba(16, 185, 129, 0.08), transparent 60%),
+    linear-gradient(180deg, #fefdfb 0%, #faf5ec 48%, #f3ede0 100%);
 }
 
-/* 2. Safety & Trust: Gentle soft-sage/mint warmth */
+/* 2. Safety & Trust: Gentle soft-sage/mint warmth with dual radial glows */
 .bg-section-safety {
-  background: linear-gradient(180deg, #f3ede0 0%, #f0f7f2 50%, #f6f1e8 100%);
+  background: 
+    radial-gradient(ellipse 65% 55% at 15% 30%, rgba(16, 185, 129, 0.10), transparent 70%),
+    radial-gradient(ellipse 55% 60% at 85% 70%, rgba(212, 163, 89, 0.11), transparent 70%),
+    linear-gradient(180deg, #f3ede0 0%, #edf7f0 50%, #f6f1e8 100%);
 }
 
-/* 3. Verified Tutors: Pristine ivory with warm highlights */
+/* 3. Verified Tutors: Warm ivory with glowing gold and emerald halos */
 .bg-section-tutors {
-  background: linear-gradient(180deg, #f6f1e8 0%, #fdfbf9 50%, #f6efe4 100%);
+  background: 
+    radial-gradient(ellipse 65% 50% at 80% 25%, rgba(212, 163, 89, 0.13), transparent 65%),
+    radial-gradient(ellipse 50% 50% at 15% 75%, rgba(16, 185, 129, 0.08), transparent 65%),
+    linear-gradient(180deg, #f6f1e8 0%, #fdf9f2 50%, #f5eee2 100%);
 }
 
 /* 4. Subject Explorer: Warm honey-amber scholarship tone */
 .bg-section-subjects {
-  background: linear-gradient(180deg, #f6efe4 0%, #fef8ed 50%, #f5eee2 100%);
+  background: 
+    radial-gradient(ellipse 65% 55% at 20% 35%, rgba(212, 163, 89, 0.14), transparent 70%),
+    radial-gradient(ellipse 50% 50% at 85% 65%, rgba(184, 93, 52, 0.08), transparent 65%),
+    linear-gradient(180deg, #f5eee2 0%, #fef7ec 50%, #f4eee0 100%);
 }
 
 /* 5. City Coverage: Pale Pakistani green-tinged ivory */
 .bg-section-cities {
-  background: linear-gradient(180deg, #f5eee2 0%, #edf7ee 50%, #f3ece0 100%);
+  background: 
+    radial-gradient(ellipse 60% 50% at 80% 30%, rgba(16, 185, 129, 0.11), transparent 70%),
+    radial-gradient(ellipse 55% 55% at 15% 70%, rgba(212, 163, 89, 0.10), transparent 70%),
+    linear-gradient(180deg, #f4eee0 0%, #eaf5ed 50%, #f4efe2 100%);
 }
 
-/* 6. How It Works: Warm, calm parchment */
+/* 6. How It Works: Warm, calm parchment with illuminated milestones */
 .bg-section-howitworks {
-  background: linear-gradient(180deg, #f3ece0 0%, #fbf6ee 50%, #f2ebd8 100%);
+  background: 
+    radial-gradient(ellipse 60% 50% at 25% 40%, rgba(212, 163, 89, 0.12), transparent 70%),
+    radial-gradient(ellipse 55% 50% at 85% 70%, rgba(16, 185, 129, 0.08), transparent 65%),
+    linear-gradient(180deg, #f4efe2 0%, #fbf5eb 50%, #f1ebd8 100%);
 }
 
-/* 7. Testimonials: Serene, peaceful soft slate-ivory */
+/* 7. Testimonials: Serene, peaceful soft slate-ivory with emerald tint */
 .bg-section-testimonials {
-  background: linear-gradient(180deg, #f2ebd8 0%, #f3f6fb 50%, #f7f3ea 100%);
+  background: 
+    radial-gradient(ellipse 60% 55% at 85% 30%, rgba(16, 185, 129, 0.09), transparent 70%),
+    radial-gradient(ellipse 50% 50% at 15% 70%, rgba(212, 163, 89, 0.10), transparent 65%),
+    linear-gradient(180deg, #f1ebd8 0%, #f2f7f9 50%, #f6f2e8 100%);
 }
 
-/* 8. FAQ: Warm golden parchment closing */
+/* 8. FAQ: Warm golden parchment closing into the dark footer */
 .bg-section-faq {
-  background: linear-gradient(180deg, #f7f3ea 0%, #fbf6ec 55%, #f4eee2 100%);
+  background: 
+    radial-gradient(ellipse 60% 60% at 50% 30%, rgba(212, 163, 89, 0.13), transparent 70%),
+    radial-gradient(ellipse 50% 40% at 20% 80%, rgba(16, 185, 129, 0.08), transparent 65%),
+    linear-gradient(180deg, #f6f2e8 0%, #faf3e8 55%, #eae0ce 100%);
 }
 

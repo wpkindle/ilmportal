@@ -41,8 +41,24 @@ export default function Testimonials() {
 
   return (
     <section className="py-16 sm:py-24 relative overflow-hidden bg-section-testimonials border-b border-[#ebe3d3]">
-      {/* Soft, static ambient glow */}
-      <div className="absolute top-1/4 right-10 w-96 h-96 bg-[#6366f1]/3 rounded-full blur-[140px] pointer-events-none" />
+      {/* Precision architectural grid overlay */}
+      <div className="absolute inset-0 architectural-grid opacity-35 pointer-events-none" />
+
+      {/* Subtle top accent line */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#d4a359]/35 to-transparent pointer-events-none" />
+
+      {/* Animated floating ambient glows */}
+      <div className="absolute top-1/4 right-10 w-[500px] h-[500px] bg-[#10b981]/6 rounded-full blur-[140px] pointer-events-none animate-float-slow" />
+      <div className="absolute bottom-10 left-10 w-[450px] h-[450px] bg-[#d4a359]/8 rounded-full blur-[130px] pointer-events-none animate-float-reverse" />
+
+      {/* Drifting horizontal light sweep */}
+      <div className="absolute top-1/2 inset-x-12 h-px bg-gradient-to-r from-transparent via-[#10b981]/25 via-[#d4a359]/25 to-transparent pointer-events-none animate-light-sweep" />
+
+      {/* Precision architectural coordinate crosshairs */}
+      <div className="hidden sm:block absolute top-6 left-6 text-[#d4a359]/40 font-mono text-[10px] pointer-events-none select-none">+</div>
+      <div className="hidden sm:block absolute top-6 right-6 text-[#d4a359]/40 font-mono text-[10px] pointer-events-none select-none">+</div>
+      <div className="hidden sm:block absolute bottom-6 left-6 text-[#10b981]/40 font-mono text-[10px] pointer-events-none select-none">+</div>
+      <div className="hidden sm:block absolute bottom-6 right-6 text-[#10b981]/40 font-mono text-[10px] pointer-events-none select-none">+</div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
         
@@ -129,6 +145,9 @@ export default function Testimonials() {
         </div>
 
       </div>
+
+      {/* Subtle Bottom Accent Ribbon */}
+      <div className="absolute inset-x-0 bottom-0 section-divider-ribbon-subtle" />
     </section>
   );
 }

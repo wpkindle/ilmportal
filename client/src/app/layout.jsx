@@ -4,6 +4,7 @@ import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
 import MobileBottomNav from '../components/common/MobileBottomNav';
 import NotificationPermissionPrompt from '../components/common/NotificationPermissionPrompt';
+import SiteAmbientBackdrop from '../components/common/SiteAmbientBackdrop';
 
 export const viewport = {
   width: 'device-width',
@@ -106,7 +107,8 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
         />
       </head>
-      <body className="min-h-screen flex flex-col bg-[#faf8f5] text-[#1c2826] font-sans antialiased selection:bg-[#143d2b] selection:text-white">
+      <body className="min-h-screen flex flex-col bg-site-canvas text-[#1c2826] font-sans antialiased selection:bg-[#143d2b] selection:text-white relative">
+        <SiteAmbientBackdrop />
         <AppProviders>
           <Navbar />
           <main className="flex-1 pb-16 md:pb-0">

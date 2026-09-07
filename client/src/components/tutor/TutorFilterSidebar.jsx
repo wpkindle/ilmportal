@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Filter, RotateCcw, MapPin, BookOpen, User, UserCheck, Video, ShieldCheck, Navigation, ArrowUpDown, Sparkles, Clock, Star, Award } from 'lucide-react';
+import { Filter, RotateCcw, MapPin, BookOpen, User, UserCheck, Video, ShieldCheck, Check, Navigation, ArrowUpDown, Sparkles, Clock, Star, Award } from 'lucide-react';
 import CustomSelect from '../common/CustomSelect';
 import { pakistaniCityAreas } from '../../data/pakistanAreas';
 
@@ -102,7 +102,7 @@ const TutorFilterSidebar = ({
         </div>
 
         <div className="grid grid-cols-1 gap-1.5">
-          {/* 1. Female Tutors (All Subjects) */}
+          {/* 1. Female Tutors */}
           <button
             type="button"
             onClick={() => {
@@ -123,16 +123,12 @@ const TutorFilterSidebar = ({
               <UserCheck className={`w-4 h-4 ${filters.gender === 'female' && !filters.faculty ? 'text-white' : 'text-[#b85d34]'}`} />
               <span>Female Tutors</span>
             </div>
-            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
-              filters.gender === 'female' && !filters.faculty
-                ? 'bg-white/20 text-white'
-                : 'bg-[#f5ebe6] text-[#b85d34]'
-            }`}>
-              {filters.gender === 'female' && !filters.faculty ? 'Active' : 'All Subjects'}
-            </span>
+            {filters.gender === 'female' && !filters.faculty && (
+              <Check className="w-4 h-4 text-white shrink-0" />
+            )}
           </button>
 
-          {/* 2. Female Alimahs (Quran & Islamic Studies) */}
+          {/* 2. Female Alimahs */}
           <button
             type="button"
             onClick={() => {
@@ -154,13 +150,9 @@ const TutorFilterSidebar = ({
               <ShieldCheck className={`w-4 h-4 ${filters.faculty === 'alimah' ? 'text-[#d4a359]' : 'text-[#0c2217]'}`} />
               <span>Female Alimahs</span>
             </div>
-            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold uppercase tracking-wider ${
-              filters.faculty === 'alimah'
-                ? 'bg-emerald-800 text-emerald-100'
-                : 'bg-[#edf6f0] text-[#0c2217]'
-            }`}>
-              {filters.faculty === 'alimah' ? 'Active' : 'Quran Scholars'}
-            </span>
+            {filters.faculty === 'alimah' && (
+              <Check className="w-4 h-4 text-[#d4a359] shrink-0" />
+            )}
           </button>
         </div>
       </div>

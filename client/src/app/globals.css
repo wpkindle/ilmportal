@@ -284,6 +284,43 @@
   animation: geometricPulse 10s ease-in-out infinite;
 }
 
+@keyframes beamDrift {
+  0% {
+    transform: translateX(-30%) skewX(-15deg);
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 0.75;
+  }
+  100% {
+    transform: translateX(30%) skewX(-15deg);
+    opacity: 0.3;
+  }
+}
+
+@keyframes lightSweep {
+  0% {
+    opacity: 0.25;
+    transform: translateY(0) scaleX(0.95);
+  }
+  50% {
+    opacity: 0.65;
+    transform: translateY(-8px) scaleX(1.05);
+  }
+  100% {
+    opacity: 0.25;
+    transform: translateY(0) scaleX(0.95);
+  }
+}
+
+.animate-beam-drift {
+  animation: beamDrift 14s ease-in-out infinite alternate;
+}
+
+.animate-light-sweep {
+  animation: lightSweep 10s ease-in-out infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-float-slow,
   .animate-float-reverse,
@@ -293,7 +330,9 @@
   .animate-spin-reverse,
   .animate-radar,
   .animate-particle-drift,
-  .animate-geometric-pulse {
+  .animate-geometric-pulse,
+  .animate-beam-drift,
+  .animate-light-sweep {
     animation: none !important;
   }
 }
@@ -309,6 +348,39 @@
 .bg-dot-matrix {
   background-image: radial-gradient(rgba(15, 23, 42, 0.08) 1.2px, transparent 1.2px);
   background-size: 20px 20px;
+}
+
+/* Precision Architectural Grid with Elliptical Radial Mask */
+.architectural-grid {
+  background-image: 
+    linear-gradient(to right, rgba(12, 34, 23, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(12, 34, 23, 0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+  -webkit-mask-image: radial-gradient(ellipse 85% 70% at 50% 30%, black 20%, transparent 85%);
+  mask-image: radial-gradient(ellipse 85% 70% at 50% 30%, black 20%, transparent 85%);
+}
+
+/* Luminous Multi-Color Section Divider Ribbon */
+.section-divider-ribbon {
+  height: 2px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(212, 163, 89, 0.2) 15%, rgba(212, 163, 89, 0.85) 50%, rgba(16, 185, 129, 0.6) 80%, transparent 100%);
+}
+
+.section-divider-ribbon-subtle {
+  height: 1px;
+  width: 100%;
+  background: linear-gradient(90deg, transparent 0%, rgba(212, 163, 89, 0.4) 30%, rgba(16, 185, 129, 0.35) 70%, transparent 100%);
+}
+
+/* Rich Dark Islamic Geometry Pattern for Footer */
+.footer-dark-pattern {
+  background-color: #081a11;
+  background-image: 
+    radial-gradient(rgba(212, 163, 89, 0.16) 1px, transparent 1px),
+    radial-gradient(rgba(16, 185, 129, 0.12) 1px, transparent 1px);
+  background-size: 28px 28px, 56px 56px;
+  background-position: 0 0, 14px 14px;
 }
 
 .bg-honeycomb-dark {
@@ -338,41 +410,41 @@
 
 /* 1. Hero: Pure ivory melting into soft warm parchment */
 .bg-section-hero {
-  background: linear-gradient(180deg, #fefdfb 0%, #faf6ef 55%, #f4eee2 100%);
+  background: linear-gradient(180deg, #fefdfb 0%, #faf5ec 48%, #f3ede0 100%);
 }
 
 /* 2. Safety & Trust: Gentle soft-sage/mint warmth */
 .bg-section-safety {
-  background: linear-gradient(180deg, #f4eee2 0%, #f0f7f2 50%, #f5f1e8 100%);
+  background: linear-gradient(180deg, #f3ede0 0%, #f0f7f2 50%, #f6f1e8 100%);
 }
 
 /* 3. Verified Tutors: Pristine ivory with warm highlights */
 .bg-section-tutors {
-  background: linear-gradient(180deg, #f5f1e8 0%, #fcfbfa 50%, #f6f0e4 100%);
+  background: linear-gradient(180deg, #f6f1e8 0%, #fdfbf9 50%, #f6efe4 100%);
 }
 
 /* 4. Subject Explorer: Warm honey-amber scholarship tone */
 .bg-section-subjects {
-  background: linear-gradient(180deg, #f6f0e4 0%, #fdf7ec 50%, #f4ece0 100%);
+  background: linear-gradient(180deg, #f6efe4 0%, #fef8ed 50%, #f5eee2 100%);
 }
 
 /* 5. City Coverage: Pale Pakistani green-tinged ivory */
 .bg-section-cities {
-  background: linear-gradient(180deg, #f4ece0 0%, #edf6ee 50%, #f3ede2 100%);
+  background: linear-gradient(180deg, #f5eee2 0%, #edf7ee 50%, #f3ece0 100%);
 }
 
 /* 6. How It Works: Warm, calm parchment */
 .bg-section-howitworks {
-  background: linear-gradient(180deg, #f3ede2 0%, #faf6ee 50%, #f2ebd9 100%);
+  background: linear-gradient(180deg, #f3ece0 0%, #fbf6ee 50%, #f2ebd8 100%);
 }
 
 /* 7. Testimonials: Serene, peaceful soft slate-ivory */
 .bg-section-testimonials {
-  background: linear-gradient(180deg, #f2ebd9 0%, #f4f6fa 50%, #f7f3eb 100%);
+  background: linear-gradient(180deg, #f2ebd8 0%, #f3f6fb 50%, #f7f3ea 100%);
 }
 
 /* 8. FAQ: Warm golden parchment closing */
 .bg-section-faq {
-  background: linear-gradient(180deg, #f7f3eb 0%, #faf5ea 55%, #f4eee2 100%);
+  background: linear-gradient(180deg, #f7f3ea 0%, #fbf6ec 55%, #f4eee2 100%);
 }
 

@@ -565,6 +565,9 @@ export default function Hero() {
 
       </div>
 
+      {/* Precision Bottom Gradient Accent Ribbon */}
+      <div className="absolute inset-x-0 bottom-0 section-divider-ribbon" />
+
       <ChromeAppInstallModal
         isOpen={chromeModalOpen}
         onClose={() => setChromeModalOpen(false)}

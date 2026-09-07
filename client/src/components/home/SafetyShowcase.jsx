@@ -21,7 +21,13 @@ export default function SafetyShowcase() {
 
   return (
     <section className="py-16 sm:py-24 relative overflow-hidden bg-section-safety border-b border-[#ebe3d3]">
-      {/* Soft, static, elegant ambient glows */}
+      {/* Precision architectural grid overlay */}
+      <div className="absolute inset-0 architectural-grid opacity-50 pointer-events-none" />
+
+      {/* Subtle top accent bar */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#d4a359]/40 to-transparent pointer-events-none" />
+
+      {/* Soft elegant ambient glows */}
       <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-[#10b981]/5 rounded-full blur-[130px] pointer-events-none" />
       <div className="absolute -bottom-24 right-10 w-[550px] h-[550px] bg-[#d4a359]/7 rounded-full blur-[140px] pointer-events-none" />
 
@@ -212,6 +218,9 @@ export default function SafetyShowcase() {
         </div>
 
       </div>
+
+      {/* Subtle Bottom Accent Ribbon */}
+      <div className="absolute inset-x-0 bottom-0 section-divider-ribbon-subtle" />
     </section>
   );
 }

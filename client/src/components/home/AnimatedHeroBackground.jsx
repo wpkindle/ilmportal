@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
-import { BookOpen, GraduationCap, Award } from 'lucide-react';
+import { GraduationCap, Award } from 'lucide-react';
 
 // Deterministic particle coordinates & timings with larger sizes (5px to 9px) and high-visibility colors
 const STARDUST_PARTICLES = [
@@ -210,16 +210,6 @@ export default function AnimatedHeroBackground() {
       </div>
 
       {/* 8. Floating Educational Knowledge Motifs */}
-      <div className="absolute top-24 left-[3%] animate-float-slow hidden lg:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/95 border border-[#d4a359]/40 text-[#0c2217] shadow-[0_8px_30px_rgba(12,49,30,0.06)] backdrop-blur-md">
-        <div className="p-1.5 bg-[#d4a359]/20 text-[#b85d34] rounded-xl">
-          <BookOpen className="w-4 h-4" />
-        </div>
-        <div className="text-left">
-          <span className="text-[11px] font-bold block text-[#0c2217]">Quran &amp; Tajweed</span>
-          <span className="text-[9px] text-[#b85d34] block font-mono">Wafaq Alimah &amp; Qari</span>
-        </div>
-      </div>
-
       <div className="absolute top-20 right-[4%] animate-float-reverse hidden lg:flex items-center gap-2.5 px-3.5 py-2 rounded-2xl bg-white/95 border border-[#d4a359]/40 text-[#0c2217] shadow-[0_8px_30px_rgba(12,49,30,0.06)] backdrop-blur-md">
         <div className="p-1.5 bg-[#b85d34]/20 text-[#b85d34] rounded-xl">
           <GraduationCap className="w-4 h-4" />

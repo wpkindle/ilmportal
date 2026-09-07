@@ -188,7 +188,6 @@ exports.register = async (req, res) => {
       message: 'Registration successful! A verification link has been sent to your email.',
       email: user.email,
       username: user.username,
-      verificationToken,
       isVerified: false,
       user: {
         id: user._id,

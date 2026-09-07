@@ -48,8 +48,7 @@ export default function StudentRegisterPage() {
       const res = await api.register(payload);
 
       if (res.requiresVerification || res.isVerified === false || res.message?.toLowerCase().includes('otp') || res.message?.toLowerCase().includes('verification') || res.success) {
-        const tokenQuery = res.verificationToken ? `&token=${encodeURIComponent(res.verificationToken)}` : '';
-        router.push(`/verify-email?email=${encodeURIComponent(email.trim())}&role=student${tokenQuery}`);
+        router.push(`/verify-email?email=${encodeURIComponent(email.trim())}&role=student`);
       } else {
         router.push('/login?role=student&registered=true');
       }

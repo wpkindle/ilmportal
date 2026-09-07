@@ -101,7 +101,7 @@ const TutorFilterSidebar = ({
         </div>
 
         <div className="grid grid-cols-1 gap-1.5">
-          {/* 1. Female Academic Tutor */}
+          {/* 1. Female Academic Tutors */}
           <button
             type="button"
             onClick={() => {
@@ -120,14 +120,14 @@ const TutorFilterSidebar = ({
           >
             <div className="flex items-center gap-2">
               <GraduationCap className={`w-4 h-4 ${filters.faculty === 'female_academic' ? 'text-white' : 'text-[#b85d34]'}`} />
-              <span>Female Academic Tutor</span>
+              <span>Female Academic Tutors</span>
             </div>
             {filters.faculty === 'female_academic' && (
               <Check className="w-4 h-4 text-white shrink-0" />
             )}
           </button>
 
-          {/* 2. Female Quran Tutor */}
+          {/* 2. Female Quran Tutors */}
           <button
             type="button"
             onClick={() => {
@@ -146,7 +146,7 @@ const TutorFilterSidebar = ({
           >
             <div className="flex items-center gap-2">
               <ShieldCheck className={`w-4 h-4 ${filters.faculty === 'alimah' || filters.faculty === 'female_quran' ? 'text-[#d4a359]' : 'text-[#0c2217]'}`} />
-              <span>Female Quran Tutor</span>
+              <span>Female Quran Tutors</span>
             </div>
             {(filters.faculty === 'alimah' || filters.faculty === 'female_quran') && (
               <Check className="w-4 h-4 text-[#d4a359] shrink-0" />

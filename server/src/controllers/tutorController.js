@@ -74,6 +74,24 @@ exports.getPublicTutors = async (req, res) => {
         { bio: { $regex: /alimah|wifaq|wafaq|dars-e-nizami|sanad|tajweed|hafiz|quran|islamic/i } },
         { subjects: { $in: quranCatIds } }
       ];
+    } else if (faculty === 'male_quran' || faculty === 'qari') {
+      query.gender = 'male';
+      const quranCats = await Category.find({ type: 'quran' }, '_id');
+      const quranCatIds = quranCats.map(c => c._id);
+      query.$or = [
+        { qualifications: { $regex: /qari|hafiz|sanad|wifaq|wafaq|dars-e-nizami|tajweed|quran/i } },
+        { bio: { $regex: /qari|hafiz|sanad|wifaq|wafaq|dars-e-nizami|tajweed|quran|islamic/i } },
+        { subjects: { $in: quranCatIds } }
+      ];
+    } else if (faculty === 'male_academic') {
+      query.gender = 'male';
+      const acadCats = await Category.find({ type: 'academic' }, '_id');
+      const acadCatIds = acadCats.map(c => c._id);
+      query.$or = [
+        { qualifications: { $regex: /bs|ms|msc|mphil|phd|b\.ed|m\.ed|o.level|a.level|matric|fsc|engineer|master|bachelor|academic/i } },
+        { bio: { $regex: /math|physics|chemistry|biology|science|english|computer|accounting|economics|matric|cambridge|academic|school/i } },
+        { subjects: { $in: acadCatIds } }
+      ];
     } else if (gender && gender !== 'all') {
       query.gender = gender;
     }

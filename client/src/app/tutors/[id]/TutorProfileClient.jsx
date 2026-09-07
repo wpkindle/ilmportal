@@ -70,6 +70,14 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
     (Array.isArray(tutor?.subjects) &&
       tutor.subjects.some((s) => s?.type === 'quran' || /quran|tajweed|hifz|islamic/i.test(s?.name || s?.slug || '')));
 
+  const isMaleTutor = tutor?.gender === 'male' || tutorUser?.gender === 'male';
+  const isMaleQuran =
+    /qari|hafiz|sanad|wifaq|wafaq|dars-e-nizami|tajweed|quran/i.test(tutor?.qualifications || '') ||
+    /qari|hafiz|sanad|wifaq|wafaq|dars-e-nizami|tajweed|quran|islamic/i.test(tutor?.bio || '') ||
+    /qari|hafiz/i.test(tutorUser?.name || tutor?.name || '') ||
+    (Array.isArray(tutor?.subjects) &&
+      tutor.subjects.some((s) => s?.type === 'quran' || /quran|tajweed|hifz|islamic/i.test(s?.name || s?.slug || '')));
+
   const tutorTargetId = tutorUser._id || tutorUser.id || tutor._id;
   const myId = user?.id || user?._id;
   const conversationId = [myId, tutorTargetId].sort().join('_');
@@ -150,6 +158,10 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-[#f5ebe6] text-[#b85d34] border border-[#b85d34]/30">
                       <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
                       <span>{isAlimah ? 'Verified Female Alimah' : 'Verified Female Tutor'}</span>
+                    </span>
+                  ) : isMaleTutor ? (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40">
+                      <span>{isMaleQuran ? 'Male Quran Tutor' : 'Male Academic Tutor'}</span>
                     </span>
                   ) : (
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-[#f0eae1] text-[#0c2217]">

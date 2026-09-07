@@ -306,7 +306,15 @@ const TutorFilterSidebar = ({
             <button
               key={g.val}
               type="button"
-              onClick={() => onFilterChange('gender', g.val)}
+              onClick={() => {
+                onFilterChange('gender', g.val);
+                if (g.val !== 'female' && filters.faculty === 'alimah') {
+                  onFilterChange('faculty', '');
+                }
+                if (g.val !== 'male' && (filters.faculty === 'male_quran' || filters.faculty === 'male_academic')) {
+                  onFilterChange('faculty', '');
+                }
+              }}
               className={`py-2 px-2 rounded-xl text-center transition-all cursor-pointer ${
                 (filters.gender || '') === g.val
                   ? 'bg-[#b85d34] text-white font-bold shadow-sm border border-[#b85d34]'

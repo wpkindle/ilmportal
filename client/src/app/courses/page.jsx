@@ -1,311 +1,109 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import React from 'react';
+import Link from 'next/link';
 import {
   BookOpen,
-  Search,
-  ArrowUpDown,
   Sparkles,
-  Layers,
-  X,
-  Filter
+  ArrowRight,
+  ShieldCheck,
+  Award
 } from 'lucide-react';
-import CourseCard from '../../components/course/CourseCard';
-import CourseFilterSidebar from '../../components/course/CourseFilterSidebar';
-import CustomSelect from '../../components/common/CustomSelect';
-import LoadingSpinner from '../../components/common/LoadingSpinner';
-import { api } from '../../services/api';
 
-const sortOptions = [
-  { value: 'popular', label: 'Most Popular', sublabel: 'Highest Lessons & Enrolled' },
-  { value: 'newest', label: 'Newly Added', sublabel: 'Freshly Published Courses' },
-  { value: 'price_low', label: 'Tuition: Low to High', sublabel: 'Budget Friendly' },
-  { value: 'price_high', label: 'Tuition: High to Low', sublabel: 'Advanced Masterclasses' }
-];
-
-function CourseSearchContent() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-
-  const [courses, setCourses] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
-
-  // Filters State
-  const [filters, setFilters] = useState({
-    search: searchParams.get('q') || '',
-    category: searchParams.get('category') || '',
-    track: searchParams.get('track') || 'all',
-    targetAudience: searchParams.get('audience') || '',
-    duration: searchParams.get('duration') || '',
-    tuitionRange: searchParams.get('tuition') || '',
-    sortBy: searchParams.get('sort') || 'popular'
-  });
-
-  // Sync with URL query params
-  useEffect(() => {
-    setFilters(prev => ({
-      ...prev,
-      search: searchParams.get('q') || '',
-      category: searchParams.get('category') || '',
-      track: searchParams.get('track') || 'all',
-      targetAudience: searchParams.get('audience') || '',
-      duration: searchParams.get('duration') || '',
-      tuitionRange: searchParams.get('tuition') || '',
-      sortBy: searchParams.get('sort') || 'popular'
-    }));
-  }, [searchParams]);
-
-  // Initial metadata fetch (Categories)
-  useEffect(() => {
-    const fetchMetadata = async () => {
-      try {
-        const catRes = await api.getCategories();
-        if (catRes.success) setCategories(catRes.categories || []);
-      } catch (err) {
-        console.error('Error fetching course metadata:', err);
-      }
-    };
-    fetchMetadata();
-  }, []);
-
-  // Fetch Courses with filters
-  const fetchCourses = async () => {
-    setLoading(true);
-    try {
-      const queryParams = {};
-      if (filters.search) queryParams.search = filters.search;
-      if (filters.category) queryParams.category = filters.category;
-      if (filters.track && filters.track !== 'all') queryParams.track = filters.track;
-      if (filters.targetAudience) queryParams.targetAudience = filters.targetAudience;
-      if (filters.sortBy) queryParams.sortBy = filters.sortBy;
-
-      const res = await api.getCourses(queryParams);
-      if (res.success) {
-        let list = res.courses || [];
-
-        // Client-side post-filter for duration if selected
-        if (filters.duration) {
-          list = list.filter(c => c.sessionDuration && c.sessionDuration.includes(filters.duration));
-        }
-
-        // Client-side post-filter for tuitionRange if selected
-        if (filters.tuitionRange === 'under_3500') {
-          list = list.filter(c => (c.priceSuggested?.amount || 0) <= 3500);
-        } else if (filters.tuitionRange === '3500_5500') {
-          list = list.filter(c => (c.priceSuggested?.amount || 0) >= 3500 && (c.priceSuggested?.amount || 0) <= 5500);
-        } else if (filters.tuitionRange === 'above_5500') {
-          list = list.filter(c => (c.priceSuggested?.amount || 0) > 5500);
-        }
-
-        setCourses(list);
-      }
-    } catch (err) {
-      console.error('Error fetching filtered courses:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchCourses();
-  }, [filters]);
-
-  const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
-
-  const handleReset = () => {
-    setFilters({
-      search: '',
-      category: '',
-      track: 'all',
-      targetAudience: '',
-      duration: '',
-      tuitionRange: '',
-      sortBy: 'popular'
-    });
-    router.push('/courses');
-  };
-
-  const hasActiveFilters =
-    Boolean(filters.search) ||
-    Boolean(filters.category) ||
-    filters.track !== 'all' ||
-    Boolean(filters.targetAudience) ||
-    Boolean(filters.duration) ||
-    Boolean(filters.tuitionRange);
-
+export default function CoursesPage() {
   return (
-    <div className="min-h-screen bg-[#faf8f5] py-8 sm:py-12">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <div className="min-h-screen bg-[#faf8f5] py-8 sm:py-16">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
         
-        {/* Top Header & Search Bar Banner */}
-        <div className="bg-white rounded-3xl border border-[#e6ded1] p-6 sm:p-8 shadow-sm space-y-5">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div>
-              <div className="flex items-center gap-2 text-xs font-bold text-[#b85d34] uppercase tracking-wider mb-1">
-                <BookOpen className="w-4 h-4 text-[#b85d34]" />
-                <span>Verified Curriculums • Home-Friendly Tutoring</span>
-              </div>
-              <h1 className="text-2xl sm:text-3xl font-serif font-black text-slate-900 tracking-tight">
-                Explore Quranic &amp; Academic Curriculums
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-600 mt-1">
-                Structured Noorani Qaida, Tajweed, Hifz, and Playgroup to FSc syllabuses designed for Pakistani students with 1-on-1 verified tutor guidance.
-              </p>
-            </div>
-
-            <button
-              type="button"
-              onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
-              className="lg:hidden px-4 py-2.5 bg-[#f5ebe6] text-[#b85d34] border border-[#b85d34]/30 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 cursor-pointer"
-            >
-              <Filter className="w-4 h-4 text-[#b85d34]" />
-              <span>{mobileFilterOpen ? 'Hide Filters' : 'Filter & Sort Courses'}</span>
-            </button>
+        {/* Top Header */}
+        <div className="text-center space-y-3 max-w-2xl mx-auto">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#f5f0e6] text-[#b85d34] border border-[#d4a359]/40 text-xs font-black tracking-wide shadow-2xs">
+            <Sparkles className="w-3.5 h-3.5 text-[#b85d34]" />
+            <span>Structured Learning Curriculums</span>
           </div>
-
-          {/* Search Bar + Sort Dropdown */}
-          <div className="flex flex-col sm:flex-row gap-3">
-            <div className="relative flex-1">
-              <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-              <input
-                type="text"
-                placeholder="Search course title, syllabus topics (Nazra, Tajweed, Physics, Biology)..."
-                value={filters.search}
-                onChange={(e) => handleFilterChange('search', e.target.value)}
-                className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#e6ded1] rounded-2xl text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#b85d34] shadow-xs font-medium"
-              />
-              {filters.search && (
-                <button
-                  onClick={() => handleFilterChange('search', '')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1"
-                >
-                  <X className="w-3.5 h-3.5" />
-                </button>
-              )}
-            </div>
-
-            {/* Custom Sort Dropdown */}
-            <div className="w-full sm:w-64">
-              <CustomSelect
-                options={sortOptions}
-                value={filters.sortBy}
-                onChange={(val) => handleFilterChange('sortBy', val)}
-                icon={ArrowUpDown}
-                variant="filter"
-              />
-            </div>
-          </div>
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-serif font-black text-[#0c2217] tracking-tight">
+            Courses Portal Launching Soon
+          </h1>
+          <p className="text-sm sm:text-base text-[#4a5e55] leading-relaxed">
+            We are preparing comprehensive, stage-by-stage learning tracks with milestone badges, short kid-friendly lessons, and dedicated 1-on-1 verified teachers.
+          </p>
         </div>
 
-        {/* 2-Column Responsive Layout: Sidebar Filter + Courses Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-          
-          {/* Left Column: Filter Sidebar (Desktop + Mobile Toggle) */}
-          <div className={`lg:col-span-4 xl:col-span-3 ${mobileFilterOpen ? 'block' : 'hidden lg:block'}`}>
-            <CourseFilterSidebar
-              filters={filters}
-              categories={categories}
-              onFilterChange={handleFilterChange}
-              onReset={handleReset}
-            />
-          </div>
+        {/* Main Courses Portal Announcement Showcase */}
+        <div className="bg-white rounded-3xl border-2 border-[#d4a359]/40 p-8 sm:p-12 shadow-xl relative overflow-hidden space-y-8">
+          <div className="absolute top-0 right-0 w-80 h-80 bg-[#d4a359]/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-80 h-80 bg-[#b85d34]/10 rounded-full blur-3xl pointer-events-none" />
 
-          {/* Right Column: Courses Results Grid */}
-          <div className="lg:col-span-8 xl:col-span-9 space-y-4">
-            
-            {/* Header: Result Counts and Active Filter Badges */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 px-1">
-              <p className="text-xs sm:text-sm font-bold text-slate-700">
-                Showing <span className="text-[#0c2217] font-black">{courses.length}</span> Structured Courses
+          {/* Feature Highlights Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
+            <div className="p-6 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] space-y-3 text-center sm:text-left">
+              <div className="w-12 h-12 rounded-2xl bg-[#f5f0e6] text-[#b85d34] flex items-center justify-center mx-auto sm:mx-0">
+                <BookOpen className="w-6 h-6" />
+              </div>
+              <h3 className="font-serif font-bold text-base text-[#0c2217]">
+                Structured Roadmaps
+              </h3>
+              <p className="text-xs text-[#52665b] leading-relaxed">
+                Step-by-step syllabuses for Noorani Qaida, Tajweed Mastery, Hifz al-Quran, and Playgroup to FSc Academic subjects.
               </p>
-
-              {hasActiveFilters && (
-                <div className="flex items-center gap-2 flex-wrap">
-                  {filters.category && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 rounded-lg text-[11px] font-semibold">
-                      <span>Category: {filters.category}</span>
-                      <button onClick={() => handleFilterChange('category', '')} className="hover:text-black font-bold">×</button>
-                    </span>
-                  )}
-                  {filters.track !== 'all' && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 rounded-lg text-[11px] font-semibold">
-                      <span>Track: {filters.track}</span>
-                      <button onClick={() => handleFilterChange('track', 'all')} className="hover:text-black font-bold">×</button>
-                    </span>
-                  )}
-                  {filters.targetAudience && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 rounded-lg text-[11px] font-semibold">
-                      <span>Audience: {filters.targetAudience}</span>
-                      <button onClick={() => handleFilterChange('targetAudience', '')} className="hover:text-black font-bold">×</button>
-                    </span>
-                  )}
-                  {filters.duration && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 rounded-lg text-[11px] font-semibold">
-                      <span>Duration: {filters.duration}m</span>
-                      <button onClick={() => handleFilterChange('duration', '')} className="hover:text-black font-bold">×</button>
-                    </span>
-                  )}
-                  {filters.tuitionRange && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 rounded-lg text-[11px] font-semibold">
-                      <span>Tuition Filtered</span>
-                      <button onClick={() => handleFilterChange('tuitionRange', '')} className="hover:text-black font-bold">×</button>
-                    </span>
-                  )}
-                  <button
-                    onClick={handleReset}
-                    className="text-[11px] font-bold text-rose-600 hover:text-rose-800 underline underline-offset-2 ml-1 cursor-pointer"
-                  >
-                    Clear All
-                  </button>
-                </div>
-              )}
             </div>
 
-            {/* Courses Display Grid */}
-            {loading ? (
-              <div className="py-20 flex justify-center">
-                <LoadingSpinner />
+            <div className="p-6 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] space-y-3 text-center sm:text-left">
+              <div className="w-12 h-12 rounded-2xl bg-[#f5f0e6] text-[#b85d34] flex items-center justify-center mx-auto sm:mx-0">
+                <Award className="w-6 h-6" />
               </div>
-            ) : courses.length === 0 ? (
-              <div className="bg-white rounded-3xl border border-[#e6ded1] p-12 text-center space-y-3 shadow-sm">
-                <BookOpen className="w-12 h-12 text-slate-300 mx-auto" />
-                <h3 className="text-base font-bold text-slate-800 font-serif">No courses match your filter criteria</h3>
-                <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                  Try changing your discipline selection, expanding the target audience, or resetting active search filters.
-                </p>
-                <button
-                  onClick={handleReset}
-                  className="px-5 py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] text-xs font-bold rounded-xl transition-all cursor-pointer shadow-sm"
-                >
-                  Clear All Filters
-                </button>
-              </div>
-            ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-                {courses.map((course) => (
-                  <CourseCard key={course._id} course={course} />
-                ))}
-              </div>
-            )}
+              <h3 className="font-serif font-bold text-base text-[#0c2217]">
+                Milestones &amp; Badges
+              </h3>
+              <p className="text-xs text-[#52665b] leading-relaxed">
+                Rewarding progression badges for students at every stage to keep motivation high and track real recitation progress.
+              </p>
+            </div>
 
+            <div className="p-6 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] space-y-3 text-center sm:text-left">
+              <div className="w-12 h-12 rounded-2xl bg-[#f5f0e6] text-[#b85d34] flex items-center justify-center mx-auto sm:mx-0">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h3 className="font-serif font-bold text-base text-[#0c2217]">
+                Verified 1-on-1 Guidance
+              </h3>
+              <p className="text-xs text-[#52665b] leading-relaxed">
+                Sanad-certified Qaris, female Alimahs from Wafaq-ul-Madaris, and top academic educators with camera-off privacy by default.
+              </p>
+            </div>
+          </div>
+
+          {/* Action Callout */}
+          <div className="pt-6 border-t border-[#ebe3d3] flex flex-col sm:flex-row items-center justify-between gap-6 relative z-10">
+            <div className="space-y-1 text-center sm:text-left">
+              <h4 className="font-serif font-bold text-lg text-[#0c2217]">
+                Looking for 1-on-1 Tuition Right Now?
+              </h4>
+              <p className="text-xs text-[#52665b]">
+                You can browse and connect directly with verified teachers across Pakistan today.
+              </p>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 shrink-0">
+              <Link
+                href="/tutors"
+                className="px-6 py-3.5 rounded-2xl bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs sm:text-sm shadow-md transition-all flex items-center gap-2 cursor-pointer"
+              >
+                <span>Explore Verified Tutors</span>
+                <ArrowRight className="w-4 h-4 text-[#d4a359]" />
+              </Link>
+              <Link
+                href="/"
+                className="px-5 py-3.5 rounded-2xl bg-[#faf8f5] hover:bg-[#f5f0e6] text-[#0c2217] font-bold text-xs sm:text-sm border border-[#ebe3d3] transition-all cursor-pointer"
+              >
+                <span>Back to Home</span>
+              </Link>
+            </div>
           </div>
 
         </div>
 
       </div>
     </div>
-  );
-}
-
-export default function CoursesPage() {
-  return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center"><LoadingSpinner /></div>}>
-      <CourseSearchContent />
-    </Suspense>
   );
 }

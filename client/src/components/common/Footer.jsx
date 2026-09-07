@@ -174,7 +174,7 @@ const Footer = () => {
               <li>
                 <Link href="/courses" className="hover:text-[#0c2217] transition-colors flex items-center gap-2">
                   <BookOpen className="w-3.5 h-3.5 text-[#d4a359]" />
-                  <span>Curriculum Courses</span>
+                  <span>Courses Portal (Soon)</span>
                 </Link>
               </li>
               <li>

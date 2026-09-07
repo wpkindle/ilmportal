@@ -92,35 +92,33 @@ const SubjectExplorer = () => {
           </div>
         </div>
 
-        {/* Featured Course Banner for Quranic Studies */}
-        {activeTab === 'quran' && (
-          <div className="p-6 rounded-3xl bg-white text-[#141c19] border-2 border-[#d4a359]/50 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-[#f5f0e6] border border-[#d4a359]/40 flex items-center justify-center shrink-0">
-                <Sparkles className="w-6 h-6 text-[#b85d34]" />
-              </div>
-              <div>
-                <span className="text-[10px] font-black uppercase tracking-wider text-[#b85d34] bg-[#f5f0e6] px-2.5 py-0.5 rounded border border-[#ebe3d3]">
-                  Recommended for Beginners
-                </span>
-                <h3 className="text-base sm:text-lg font-serif font-black text-[#0c2217] mt-1">
-                  Noorani Qaida &amp; Makharij for Children (Ages 5–12)
-                </h3>
-                <p className="text-xs text-[#52665b] leading-snug">
-                  Gentle, patient 1-on-1 recitation with correct Arabic letters and vocal articulation points.
-                </p>
-              </div>
+        {/* Course Section Banner */}
+        <div className="p-6 rounded-3xl bg-white text-[#141c19] border-2 border-[#d4a359]/50 shadow-xl flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-[#f5f0e6] border border-[#d4a359]/40 flex items-center justify-center shrink-0">
+              <Sparkles className="w-6 h-6 text-[#b85d34]" />
             </div>
-
-            <Link
-              href="/courses/nazra-quran-kids"
-              className="px-5 py-2.5 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs shadow-md shrink-0 flex items-center gap-2 transition-all cursor-pointer"
-            >
-              <span>Explore Course</span>
-              <ArrowRight className="w-4 h-4" />
-            </Link>
+            <div>
+              <span className="text-[10px] font-black uppercase tracking-wider text-[#b85d34] bg-[#f5f0e6] px-2.5 py-0.5 rounded border border-[#ebe3d3]">
+                Launching Soon
+              </span>
+              <h3 className="text-base sm:text-lg font-serif font-black text-[#0c2217] mt-1">
+                Courses Portal Launching Soon
+              </h3>
+              <p className="text-xs text-[#52665b] leading-snug">
+                Structured curriculum roadmaps, interactive exercises, and milestone certificates are in active preparation.
+              </p>
+            </div>
           </div>
-        )}
+
+          <Link
+            href="/tutors"
+            className="px-5 py-2.5 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs shadow-md shrink-0 flex items-center gap-2 transition-all cursor-pointer"
+          >
+            <span>Explore Verified Tutors</span>
+            <ArrowRight className="w-4 h-4" />
+          </Link>
+        </div>
 
         {/* Categories Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">

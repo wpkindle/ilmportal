@@ -246,11 +246,8 @@ const Navbar = () => {
       icon: BookMarked,
       color: 'text-amber-600 bg-amber-50',
       items: [
-        { name: 'Nazra Quran for Kids (Ages 5–12)', link: '/courses/nazra-quran-kids' },
-        { name: 'Tajweed Mastery Masterclass', link: '/courses' },
-        { name: 'Noorani Qaida for Beginners', link: '/courses' },
-        { name: 'Cambridge O-Level Mathematics', link: '/courses' },
-        { name: 'Browse All LMS Courses →', link: '/courses' }
+        { name: 'Courses Portal Launching Soon', link: '/courses' },
+        { name: 'Find Verified 1-on-1 Tutors', link: '/tutors' }
       ]
     }
   ];
@@ -283,7 +280,7 @@ const Navbar = () => {
             >
               <span>Courses</span>
               <span className="px-1.5 py-0.2 rounded text-[9px] font-black bg-[#b85d34] text-white">
-                New
+                Soon
               </span>
             </Link>
 

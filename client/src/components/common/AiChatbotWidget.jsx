@@ -477,7 +477,6 @@ export default function LiveSupportWidget() {
       setUploadingFile(false);
     }
 
-    const isAlreadyConnected = supportStatus === 'admin_joined';
     const localMessage = {
       id: Date.now().toString(),
       sender: 'user',
@@ -488,8 +487,8 @@ export default function LiveSupportWidget() {
       fileType: uploadedAttachment?.fileType,
       fileSize: uploadedAttachment?.fileSize,
       delivered: true,
-      seen: isAlreadyConnected,
-      seenAt: isAlreadyConnected ? new Date() : null,
+      seen: false,
+      seenAt: null,
       timestamp: new Date()
     };
 

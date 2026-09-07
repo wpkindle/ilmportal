@@ -207,6 +207,28 @@ export default function AdminSupportDeskPage() {
         socket.emit('support-seen', { sessionId: selectedSessionId });
       }
     }
+    return () => {
+      if (selectedSessionId && socket) {
+        socket.emit('leave-support-session', { sessionId: selectedSessionId });
+      }
+    };
+  }, [selectedSessionId, socket]);
+
+  // When admin switches tabs or refocuses window while having a session open, mark it seen
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (typeof document !== 'undefined' && !document.hidden && selectedSessionId && socket) {
+        socket.emit('support-seen', { sessionId: selectedSessionId });
+        fetchSessions();
+      }
+    };
+
+    window.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('focus', handleVisibilityChange);
+    return () => {
+      window.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('focus', handleVisibilityChange);
+    };
   }, [selectedSessionId, socket]);
 
   useEffect(() => {
@@ -232,6 +254,11 @@ export default function AdminSupportDeskPage() {
             messages: [...prev.messages, data.message]
           };
         });
+
+        // Only mark seen if this is a user message AND admin is actively looking at this screen
+        if (data.message?.sender === 'user' && typeof document !== 'undefined' && !document.hidden && socket) {
+          socket.emit('support-seen', { sessionId: selectedSessionId });
+        }
       }
       fetchSessions();
     };
@@ -640,6 +667,11 @@ export default function AdminSupportDeskPage() {
                               <span className="text-[10px] text-slate-400 capitalize px-1.5 py-0.5 rounded-md bg-slate-800">
                                 {s.guestInfo?.role || s.user?.role || 'visitor'}
                               </span>
+                              {s.unreadAdminCount > 0 && (
+                                <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-rose-500 text-white animate-pulse">
+                                  {s.unreadAdminCount} new
+                                </span>
+                              )}
                             </div>
 
                             {s.isOfflineEmailMessage || s.status === 'offline_message' ? (

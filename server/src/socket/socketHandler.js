@@ -469,7 +469,6 @@ const initSocket = (io) => {
 
         const now = new Date();
         const isAdminSender = sender === 'admin';
-        const isAlreadySeen = !isAdminSender && session.status === 'admin_joined';
 
         const newMsg = {
           sender: sender || 'user',
@@ -481,8 +480,8 @@ const initSocket = (io) => {
           fileType: fileType || '',
           fileSize: fileSize || 0,
           delivered: true,
-          seen: isAdminSender ? false : isAlreadySeen,
-          seenAt: isAlreadySeen ? now : null,
+          seen: false,
+          seenAt: null,
           createdAt: now
         };
 
@@ -619,6 +618,10 @@ const initSocket = (io) => {
         io.to(`support_${sessionId}`).emit('support-messages-seen', {
           sessionId,
           seenAt: now
+        });
+        io.to('admins').emit('support-session-updated', {
+          sessionId,
+          unreadAdminCount: 0
         });
       } catch (err) {
         console.error('Socket support-seen error:', err);

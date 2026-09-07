@@ -21,7 +21,6 @@ exports.sendMessage = async (req, res) => {
     const senderName = req.user?.name || guestInfo?.name || 'Website Visitor';
     const senderAvatar = req.user?.avatar || '';
     const now = new Date();
-    const isSeenByAdmin = session?.status === 'admin_joined';
 
     const newMsg = {
       sender: 'user',
@@ -33,8 +32,8 @@ exports.sendMessage = async (req, res) => {
       fileType: fileType || '',
       fileSize: fileSize || 0,
       delivered: true,
-      seen: isSeenByAdmin,
-      seenAt: isSeenByAdmin ? now : null,
+      seen: false,
+      seenAt: null,
       createdAt: now
     };
 

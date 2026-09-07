@@ -54,6 +54,25 @@ exports.sendMessage = async (req, res) => {
         unreadAdminCount: 1
       });
     } else {
+      // Server-side de-duplication: check if identical message was added within last 5 seconds
+      if (session.messages?.length > 0) {
+        const lastMsg = session.messages[session.messages.length - 1];
+        if (
+          lastMsg &&
+          lastMsg.sender === 'user' &&
+          lastMsg.text === (message || '').trim() &&
+          (lastMsg.fileName || '') === (fileName || '') &&
+          (Date.now() - new Date(lastMsg.createdAt).getTime()) < 5000
+        ) {
+          return res.status(200).json({
+            success: true,
+            sessionId: sid,
+            message: lastMsg,
+            status: session.status
+          });
+        }
+      }
+
       session.messages.push(newMsg);
       session.lastMessage = previewText;
       session.lastSender = 'user';
@@ -729,6 +748,20 @@ exports.adminSendMessage = async (req, res) => {
     };
 
     const previewText = (text || `[Attachment: ${fileName || 'File'}]`).trim().slice(0, 140);
+
+    // Server-side de-duplication: check if identical message was added within last 5 seconds
+    if (session.messages?.length > 0) {
+      const lastMsg = session.messages[session.messages.length - 1];
+      if (
+        lastMsg &&
+        lastMsg.sender === 'admin' &&
+        lastMsg.text === (text || '').trim() &&
+        (lastMsg.fileName || '') === (fileName || '') &&
+        (Date.now() - new Date(lastMsg.createdAt).getTime()) < 5000
+      ) {
+        return res.status(200).json({ success: true, message: lastMsg, session });
+      }
+    }
 
     session.messages.push(newMsg);
     session.lastMessage = previewText;

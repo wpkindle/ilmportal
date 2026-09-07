@@ -479,6 +479,20 @@ const initSocket = (io) => {
           createdAt: new Date()
         };
 
+        // Server-side de-duplication: check if identical message was added within last 5 seconds
+        if (session.messages?.length > 0) {
+          const lastMsg = session.messages[session.messages.length - 1];
+          if (
+            lastMsg &&
+            lastMsg.sender === (sender || 'user') &&
+            lastMsg.text === (text || '').trim() &&
+            (lastMsg.fileName || '') === (fileName || '') &&
+            (Date.now() - new Date(lastMsg.createdAt).getTime()) < 5000
+          ) {
+            return;
+          }
+        }
+
         session.messages.push(newMsg);
         session.lastMessage = (text || '').trim().slice(0, 140) || (fileName ? `[File: ${fileName}]` : '[Attachment]');
         session.lastSender = sender || 'user';

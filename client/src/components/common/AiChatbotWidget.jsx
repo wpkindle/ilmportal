@@ -99,8 +99,8 @@ export default function LiveSupportWidget() {
     {
       id: 'welcome',
       sender: 'admin',
-      senderName: 'IlmiDunya Support Desk',
-      text: "Assalam-o-Alaikum! Welcome to IlmiDunya Live Support. 👋\n\nHow can we help you today? Send your inquiry below and our administrative team will respond right here in real-time.\n\nIf staff is away, you can also leave a message with your email and our team will get back to you.",
+      senderName: 'IlmiDunya Helpline',
+      text: "Assalam-o-Alaikum! Welcome to IlmiDunya Helpline. 👋\n\nHow can we help you today? Send your inquiry below and we will assist you right away.\n\nIf we are away, you can also leave your email and message, and our team will get back to you promptly.",
       timestamp: new Date()
     }
   ]);
@@ -169,18 +169,30 @@ export default function LiveSupportWidget() {
     if (!sessionId) return;
     api.getSupportSessionHistory(sessionId).then((res) => {
       if (res?.success && Array.isArray(res.messages) && res.messages.length > 0) {
-        setMessages(res.messages.map((m) => ({
-          id: m._id || (Date.now() + Math.random()).toString(),
-          sender: m.sender,
-          senderName: m.senderName || (m.sender === 'user' ? 'You' : 'Staff Admin'),
-          senderAvatar: m.senderAvatar,
-          text: m.text,
-          fileUrl: m.fileUrl,
-          fileName: m.fileName,
-          fileType: m.fileType,
-          fileSize: m.fileSize,
-          timestamp: new Date(m.createdAt || Date.now())
-        })));
+        const cleanMessages = [];
+        for (const m of res.messages) {
+          const isDup = cleanMessages.some(
+            (prev) =>
+              (m._id && (prev.id === m._id || prev._id === m._id)) ||
+              (prev.text === m.text && prev.sender === m.sender && Math.abs(new Date(prev.timestamp) - new Date(m.createdAt)) < 5000)
+          );
+          if (!isDup) {
+            cleanMessages.push({
+              id: m._id || (Date.now() + Math.random()).toString(),
+              _id: m._id,
+              sender: m.sender,
+              senderName: m.senderName || (m.sender === 'user' ? 'You' : 'IlmiDunya Helpline'),
+              senderAvatar: m.senderAvatar,
+              text: m.text,
+              fileUrl: m.fileUrl,
+              fileName: m.fileName,
+              fileType: m.fileType,
+              fileSize: m.fileSize,
+              timestamp: new Date(m.createdAt || Date.now())
+            });
+          }
+        }
+        setMessages(cleanMessages);
         if (res.session?.status) {
           setSupportStatus(res.session.status);
         }
@@ -242,9 +254,27 @@ export default function LiveSupportWidget() {
       if (data?.sessionId === sessionId && data?.message) {
         const incoming = data.message;
         setMessages((prev) => {
-          // Avoid duplicate appends
-          if (prev.some((m) => m.id === incoming._id || (m.text === incoming.text && m.sender === incoming.sender && Math.abs(new Date(m.timestamp) - new Date(incoming.createdAt)) < 2000))) {
-            return prev;
+          // Avoid duplicate appends:
+          // Check if message ID already exists or if exact same sender/text/attachment was added recently
+          const isDuplicate = prev.some((m) => {
+            if (incoming._id && (m.id === incoming._id || m._id === incoming._id)) return true;
+            if (m.sender === incoming.sender && m.text === incoming.text && (m.fileName || '') === (incoming.fileName || '')) {
+              const timeDiff = Math.abs(new Date(m.timestamp || Date.now()) - new Date(incoming.createdAt || Date.now()));
+              if (isNaN(timeDiff) || timeDiff < 30000) {
+                return true;
+              }
+            }
+            return false;
+          });
+
+          if (isDuplicate) {
+            // Upgrade optimistic message id to incoming._id if applicable
+            return prev.map((m) => {
+              if (m.sender === incoming.sender && m.text === incoming.text && (m.fileName || '') === (incoming.fileName || '')) {
+                return { ...m, id: incoming._id || m.id, _id: incoming._id || m._id };
+              }
+              return m;
+            });
           }
 
           if (incoming.sender === 'admin') {
@@ -258,8 +288,9 @@ export default function LiveSupportWidget() {
             ...prev,
             {
               id: incoming._id || (Date.now() + Math.random()).toString(),
+              _id: incoming._id,
               sender: incoming.sender,
-              senderName: incoming.senderName || (incoming.sender === 'admin' ? 'Staff Specialist' : 'You'),
+              senderName: incoming.senderName || (incoming.sender === 'admin' ? 'IlmiDunya Helpline' : 'You'),
               senderAvatar: incoming.senderAvatar,
               text: incoming.text,
               fileUrl: incoming.fileUrl,
@@ -276,13 +307,13 @@ export default function LiveSupportWidget() {
     const handleAdminJoined = (data) => {
       if (data?.sessionId === sessionId) {
         setSupportStatus('admin_joined');
-        setAssignedAdmin(data.admin?.name || 'Support Staff');
+        setAssignedAdmin(data.admin?.name || 'Representative');
         setMessages((prev) => [
           ...prev,
           {
             id: Date.now().toString(),
             sender: 'system',
-            text: `🟢 **${data.admin?.name || 'A Support Administrator'} has joined this chat.** You are now speaking directly in real-time.`,
+            text: `🟢 **IlmiDunya Helpline is now connected with you live.** How may we assist you today?`,
             timestamp: new Date()
           }
         ]);
@@ -445,22 +476,6 @@ export default function LiveSupportWidget() {
     }
 
     try {
-      // 1. Send via WebSocket for instant delivery to admins
-      if (socket) {
-        socket.emit('send-support-message', {
-          sessionId,
-          text,
-          sender: 'user',
-          senderName,
-          senderAvatar,
-          fileUrl: uploadedAttachment?.fileUrl || '',
-          fileName: uploadedAttachment?.fileName || '',
-          fileType: uploadedAttachment?.fileType || '',
-          fileSize: uploadedAttachment?.fileSize || 0
-        });
-      }
-
-      // 2. Also persist via REST API fallback to guarantee DB write & admin alert
       const guestInfo = user ? {
         name: user.name,
         email: user.email,
@@ -471,7 +486,7 @@ export default function LiveSupportWidget() {
         role: 'visitor'
       };
 
-      await api.sendSupportChatMessage({
+      const res = await api.sendSupportChatMessage({
         message: text,
         sessionId,
         guestInfo,
@@ -480,6 +495,12 @@ export default function LiveSupportWidget() {
         fileType: uploadedAttachment?.fileType,
         fileSize: uploadedAttachment?.fileSize
       });
+
+      if (res?.success && res.message?._id) {
+        setMessages((prev) =>
+          prev.map((m) => (m.id === localMessage.id ? { ...m, id: res.message._id, _id: res.message._id } : m))
+        );
+      }
     } catch (err) {
       console.warn('Support message sync notice:', err);
     } finally {
@@ -545,7 +566,7 @@ export default function LiveSupportWidget() {
           {
             id: (Date.now() + 1).toString(),
             sender: 'system',
-            text: `📬 **Email Inquiry Received.** Our administrative team has been notified at **${offlineEmail.trim()}**. We will reply to your inbox as soon as an administrator is online.`,
+            text: `📬 **Email Inquiry Received.** We have received your inquiry for **${offlineEmail.trim()}**. Our team will reply to your email promptly.`,
             timestamp: new Date()
           }
         ]);
@@ -566,7 +587,7 @@ export default function LiveSupportWidget() {
   // Clear / Delete Chat History
   const handleDeleteChat = async () => {
     const ok = window.confirm(
-      'Are you sure you want to delete this chat session?\n\nThis will permanently delete all messages in this support conversation.'
+      'Are you sure you want to delete this chat session?\n\nThis will permanently delete all messages in this conversation.'
     );
     if (!ok) return;
 
@@ -585,8 +606,8 @@ export default function LiveSupportWidget() {
       {
         id: 'welcome',
         sender: 'admin',
-        senderName: 'IlmiDunya Support Desk',
-        text: "Assalam-o-Alaikum! Welcome to IlmiDunya Live Support. 👋\n\nHow can we help you today? Send your inquiry below and our administrative team will respond right here in real-time.\n\nIf staff is away, you can also leave a message with your email and our team will get back to you.",
+        senderName: 'IlmiDunya Helpline',
+        text: "Assalam-o-Alaikum! Welcome to IlmiDunya Helpline. 👋\n\nHow can we help you today? Send your inquiry below and we will assist you right away.\n\nIf we are away, you can also leave your email and message, and our team will get back to you promptly.",
         timestamp: new Date()
       }
     ]);
@@ -621,8 +642,8 @@ export default function LiveSupportWidget() {
         <button
           onClick={handleToggleWidget}
           className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-[#b85d34] to-[#d4a359] text-white shadow-[0_8px_24px_rgba(184,93,52,0.35)] hover:shadow-[0_12px_28px_rgba(184,93,52,0.45)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border-2 border-white"
-          aria-label={isOpen ? "Close Support Chat" : "Open Live Support Chat"}
-          title={isOpen ? "Close Support Chat" : (isAdminOnline ? "Chat with Live Support" : "Leave an Email Message")}
+          aria-label={isOpen ? "Close Helpline" : "Open IlmiDunya Helpline"}
+          title={isOpen ? "Close Helpline" : (isAdminOnline ? "Chat with IlmiDunya Helpline" : "Leave an Email Message")}
         >
           {isOpen ? (
             <X className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
@@ -678,26 +699,24 @@ export default function LiveSupportWidget() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <h3 className="text-xs sm:text-sm font-extrabold text-[#0c2217] leading-tight truncate">
-                    {isAdminConnected ? `Staff (${assignedAdmin || 'Active'})` : 'IlmiDunya Live Support'}
+                    IlmiDunya Helpline
                   </h3>
                   {isAdminOnline ? (
                     <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-300 shrink-0">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      Staff Online
+                      Online
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-300 shrink-0">
                       <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                      Staff Away
+                      Away
                     </span>
                   )}
                 </div>
                 <p className="text-[10.5px] text-[#4a5e55] truncate">
-                  {isAdminConnected
-                    ? 'Speaking live with administration specialist'
-                    : isAdminOnline
-                    ? 'Admissions • Verified Tutors • Free Trial'
-                    : 'Leave message • Admin will reply via email'}
+                  {isAdminOnline
+                    ? 'How can we help you today?'
+                    : 'Leave a message • We will reply via email'}
                 </p>
               </div>
             </div>
@@ -739,22 +758,22 @@ export default function LiveSupportWidget() {
               {isAdminConnected ? (
                 <span className="flex items-center gap-1 text-emerald-800 font-semibold truncate">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span className="truncate">Live with Admin ({assignedAdmin})</span>
+                  <span className="truncate">Connected to Helpline ({assignedAdmin || 'Active'})</span>
                 </span>
               ) : isWaitingForAdmin ? (
                 <span className="flex items-center gap-1 text-amber-800 font-semibold truncate">
                   <Clock className="w-3.5 h-3.5 animate-spin text-amber-600 shrink-0" />
-                  <span className="truncate">Desk notified • Staff connecting...</span>
+                  <span className="truncate">Connecting you to Helpline...</span>
                 </span>
               ) : isAdminOnline ? (
                 <span className="flex items-center gap-1 text-[#2c4035] truncate">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34] shrink-0" />
-                  <span className="truncate">Official Live Support Desk</span>
+                  <span className="truncate">Official IlmiDunya Helpline</span>
                 </span>
               ) : (
                 <span className="flex items-center gap-1 text-amber-800 font-medium truncate">
                   <Mail className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                  <span className="truncate">Admin currently away • Leave email note</span>
+                  <span className="truncate">Currently away • Leave an email note</span>
                 </span>
               )}
             </div>
@@ -778,10 +797,10 @@ export default function LiveSupportWidget() {
               <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-1 shadow-2xs">
                 <div className="flex items-center gap-1.5 font-bold text-amber-900">
                   <Mail className="w-4 h-4 text-amber-700" />
-                  <span>Admin is currently offline</span>
+                  <span>Helpline is currently away</span>
                 </div>
                 <p className="text-[11px] text-amber-800 leading-relaxed">
-                  Leave your message and contact email below. When an administrator comes online, they will review your inquiry and reach out to you directly via email.
+                  Leave your message and contact email below. We will review your inquiry and reach out to you directly via email.
                 </p>
               </div>
 
@@ -792,7 +811,7 @@ export default function LiveSupportWidget() {
                   </div>
                   <h4 className="font-bold text-sm text-[#0c2217]">Message Sent Successfully!</h4>
                   <p className="text-xs text-stone-600 leading-relaxed">
-                    Our administrative team has received your message and will reach out to you via email shortly.
+                    Our team has received your message and will reach out to you via email shortly.
                   </p>
                   <div className="flex items-center justify-center gap-2 pt-1">
                     <button
@@ -957,7 +976,7 @@ export default function LiveSupportWidget() {
                       }`}>
                         <div className="flex items-center justify-between gap-2">
                           <span className={`text-[10px] font-bold ${isUser ? 'text-white/90' : 'text-[#0c2217]'}`}>
-                            {isUser ? 'You' : (m.senderName || 'IlmiDunya Support Desk')}
+                            {isUser ? 'You' : (m.senderName || 'IlmiDunya Helpline')}
                           </span>
                           <span className={`text-[9px] ${isUser ? 'text-white/70' : 'text-stone-500'}`}>
                             {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -1029,7 +1048,7 @@ export default function LiveSupportWidget() {
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-bounce" style={{ animationDelay: '150ms' }} />
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
-                    <span>Support staff is typing a reply...</span>
+                    <span>IlmiDunya Helpline is typing...</span>
                   </div>
                 )}
 
@@ -1106,7 +1125,7 @@ export default function LiveSupportWidget() {
                     type="text"
                     value={inputValue}
                     onChange={handleInputChange}
-                    placeholder={selectedFile ? 'Add caption (optional)...' : 'Type your message to support team...'}
+                    placeholder={selectedFile ? 'Add caption (optional)...' : 'Type your message here...'}
                     className="flex-1 min-w-0 bg-white border border-stone-300 rounded-xl px-3.5 py-2 text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-[#d4a359] transition-colors shadow-2xs"
                     disabled={isSending || uploadingFile}
                   />
@@ -1115,7 +1134,7 @@ export default function LiveSupportWidget() {
                     type="submit"
                     disabled={isSending || uploadingFile || (!inputValue.trim() && !selectedFile)}
                     className="p-2 rounded-xl bg-gradient-to-r from-[#ba4c18] to-[#963b10] hover:scale-105 disabled:opacity-40 disabled:hover:scale-100 text-white transition-all cursor-pointer shrink-0 shadow-xs"
-                    aria-label="Send message to support"
+                    aria-label="Send message"
                   >
                     {uploadingFile ? (
                       <Clock className="w-4 h-4 animate-spin" />
@@ -1126,7 +1145,7 @@ export default function LiveSupportWidget() {
                 </form>
 
                 <div className="flex items-center justify-between text-[9.5px] text-stone-500">
-                  <span>IlmiDunya Pakistan • Official Live Support Desk</span>
+                  <span>IlmiDunya Helpline • Quick &amp; Friendly Assistance</span>
                   <span className="text-stone-400">Only PNG, JPG, PDF supported</span>
                 </div>
               </div>

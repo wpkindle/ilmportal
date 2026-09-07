@@ -370,18 +370,6 @@ export default function AdminSupportDeskPage() {
       });
 
       if (res.success) {
-        if (socket) {
-          socket.emit('send-support-message', {
-            sessionId: selectedSessionId,
-            text,
-            sender: 'admin',
-            senderName: user?.name || 'Support Admin',
-            fileUrl: uploadedAttachment?.fileUrl || '',
-            fileName: uploadedAttachment?.fileName || '',
-            fileType: uploadedAttachment?.fileType || '',
-            fileSize: uploadedAttachment?.fileSize || 0
-          });
-        }
         fetchSessionTranscript(selectedSessionId);
       }
     } catch (err) {

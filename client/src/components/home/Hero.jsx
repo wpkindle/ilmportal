@@ -206,9 +206,10 @@ export default function Hero() {
             </div>
 
             {/* Main Editorial Headline with Dramatic Contrast */}
-            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-black tracking-tight text-[#0c2217] leading-[1.12]">
-              Verified Qaris, Alimahs &amp; Academic Tutors{' '}
-              <span className="hand-drawn-underline text-[#0c2217]">Across Pakistan.</span>
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-black tracking-tight text-[#0c2217] leading-[1.15]">
+              Verified Qaris, Alimas <br />
+              &amp; Academic Tutors <br />
+              <span className="hand-drawn-underline text-[#0c2217]">Across Pakistan</span>
             </h1>
 
             {/* Humanized, Colloquial Pakistani Copy */}

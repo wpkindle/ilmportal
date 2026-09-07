@@ -44,7 +44,7 @@ const initialTutorCities = [
 const heroSlides = [
   {
     id: 0,
-    tabLabel: 'Home (Male 1:1)',
+    tabLabel: 'Home 1:1',
     tabIcon: Home,
     badgeText: '1:1 In-Home • Male Tutors Only',
     badgeIcon: Home,
@@ -58,7 +58,7 @@ const heroSlides = [
   },
   {
     id: 1,
-    tabLabel: 'Cambridge Prep',
+    tabLabel: 'Cambridge',
     tabIcon: GraduationCap,
     badgeText: 'Playgroup to FSc Academic',
     badgeIcon: GraduationCap,
@@ -72,7 +72,7 @@ const heroSlides = [
   },
   {
     id: 2,
-    tabLabel: 'Alimah (WebRTC)',
+    tabLabel: 'Alimah Live',
     tabIcon: Video,
     badgeText: '100% WebRTC Only • Female Alimahs',
     badgeIcon: Video,
@@ -188,7 +188,7 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full space-y-12">
         
         {/* Asymmetric 2-Column Editorial Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
           {/* Left Column (7 cols): Editorial Typography & Direct Action */}
           <div className="lg:col-span-7 space-y-5 text-left">
@@ -310,50 +310,22 @@ export default function Hero() {
                   </Link>
                 ))}
               </div>
-            </div>
 
-            {/* Dual Gateway Buttons & Quick Female Directory Trigger */}
-            <div className="pt-2 flex flex-col gap-2.5 max-w-md">
-              <div className="flex flex-col sm:flex-row items-center gap-3">
-                <Link
-                  href="/register/student"
-                  className="w-full sm:w-1/2 px-5 py-3 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#b85d34]/40"
-                >
-                  <GraduationCap className="w-4 h-4" />
-                  <span>Join as Student</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </Link>
-                <Link
-                  href="/register/tutor"
-                  className="w-full sm:w-1/2 px-5 py-3 rounded-xl bg-white hover:bg-[#f5f0e6] text-[#0c2217] font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border-2 border-[#d4a359]/60"
-                >
-                  <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
-                  <span>Apply as Tutor</span>
-                  <ArrowRight className="w-3.5 h-3.5 text-[#d4a359]" />
-                </Link>
+              {/* Quick Trust Guarantees below search */}
+              <div className="mt-4 pt-3 border-t border-[#ebe3d3]/60 flex flex-wrap items-center gap-x-4 gap-y-1.5 text-xs text-[#5c6e69]">
+                <span className="inline-flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#059669]" />
+                  <span>Direct fee agreement in chat</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#059669]" />
+                  <span>Zero agency commission</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#059669]" />
+                  <span>Free trial class</span>
+                </span>
               </div>
-
-              {/* Direct Female Tutors Hero Action Button */}
-              <Link
-                href="/tutors?gender=female"
-                className="w-full py-2.5 px-4 rounded-xl bg-[#f5ebe6] hover:bg-[#ede0d8] text-[#b85d34] hover:text-[#9e4e2a] border border-[#b85d34]/40 font-bold text-xs flex items-center justify-center gap-2 shadow-2xs transition-all active:scale-98 cursor-pointer"
-              >
-                <UserCheck className="w-4 h-4 text-[#b85d34]" />
-                <span>Browse Verified Female Tutors &amp; Alimahs</span>
-                <ChevronRight className="w-3.5 h-3.5 text-[#b85d34]" />
-              </Link>
-            </div>
-
-            {/* Chrome App Download trigger */}
-            <div className="pt-1">
-              <button
-                type="button"
-                onClick={() => setChromeModalOpen(true)}
-                className="inline-flex items-center gap-2 text-xs font-semibold text-[#4a5e55] hover:text-[#0c2217] transition-colors cursor-pointer"
-              >
-                <Chrome className="w-3.5 h-3.5 text-[#d4a359]" />
-                <span>Install IlmiDunya App for Chrome / Windows / Android (Free PWA)</span>
-              </button>
             </div>
 
           </div>
@@ -361,6 +333,23 @@ export default function Hero() {
           {/* Right Column (5 cols): Asymmetric Visual Composition with Tutoring Slider */}
           <div className="lg:col-span-5 relative mt-4 lg:mt-0">
             
+            {/* Top Slideshow Header: Mode Indicator & Privacy Status */}
+            <div className="flex items-center justify-between gap-2 mb-2 px-1">
+              <div className="flex items-center gap-2">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-600" />
+                </span>
+                <span className="text-xs font-bold text-[#0c2217] tracking-tight">
+                  Interactive Tutoring Modes
+                </span>
+              </div>
+              <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-[#b85d34] bg-[#f5ebe6] px-2.5 py-0.5 rounded-full border border-[#b85d34]/30">
+                <Video className="w-3 h-3 text-[#b85d34]" />
+                <span>Camera-Off by Default</span>
+              </span>
+            </div>
+
             {/* Quick Segmented Mode Switcher Tabs */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-1 p-1 mb-3.5 bg-[#f5f0e6]/95 backdrop-blur-md rounded-2xl border border-[#d4a359]/40 max-w-lg mx-auto shadow-sm">
               {heroSlides.map((slide, idx) => {
@@ -473,6 +462,50 @@ export default function Hero() {
                 </div>
               </div>
 
+            </div>
+
+            {/* Bottom Actions: Enrollment Gateways & Female Directory Trigger */}
+            <div className="mt-3.5 space-y-2.5 max-w-md mx-auto lg:max-w-none">
+              <div className="flex flex-col sm:flex-row items-center gap-2.5">
+                <Link
+                  href="/register/student"
+                  className="w-full sm:w-1/2 py-3 px-4 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#b85d34]/40 active:scale-98"
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  <span>Join as Student</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link
+                  href="/register/tutor"
+                  className="w-full sm:w-1/2 py-3 px-4 rounded-xl bg-white hover:bg-[#f5f0e6] text-[#0c2217] font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border-2 border-[#d4a359]/60 active:scale-98"
+                >
+                  <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
+                  <span>Apply as Tutor</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-[#d4a359]" />
+                </Link>
+              </div>
+
+              {/* Direct Female Tutors Hero Action Button */}
+              <Link
+                href="/tutors?gender=female"
+                className="w-full py-2.5 px-4 rounded-xl bg-[#f5ebe6] hover:bg-[#ede0d8] text-[#b85d34] hover:text-[#9e4e2a] border border-[#b85d34]/40 font-bold text-xs flex items-center justify-center gap-2 shadow-2xs transition-all active:scale-98 cursor-pointer"
+              >
+                <UserCheck className="w-4 h-4 text-[#b85d34]" />
+                <span>Browse Verified Female Tutors &amp; Alimahs</span>
+                <ChevronRight className="w-3.5 h-3.5 text-[#b85d34]" />
+              </Link>
+
+              {/* Chrome App Download trigger */}
+              <div className="text-center pt-0.5">
+                <button
+                  type="button"
+                  onClick={() => setChromeModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#4a5e55] hover:text-[#0c2217] transition-colors cursor-pointer"
+                >
+                  <Chrome className="w-3.5 h-3.5 text-[#d4a359]" />
+                  <span>Install IlmiDunya App for Chrome / Windows / Android (Free PWA)</span>
+                </button>
+              </div>
             </div>
 
           </div>

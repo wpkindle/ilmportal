@@ -7,7 +7,7 @@ import TutorFilterSidebar from '../../components/tutor/TutorFilterSidebar';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import CustomSelect from '../../components/common/CustomSelect';
 import { api } from '../../services/api';
-import { Search, Users, ArrowUpDown, ShieldCheck } from 'lucide-react';
+import { Search, Users, UserCheck, ArrowUpDown, ShieldCheck } from 'lucide-react';
 
 const sortOptions = [
   { value: 'popular', label: 'Most Popular', sublabel: 'Top Enrolled & Active' },
@@ -26,24 +26,32 @@ function TutorSearchContent() {
   const [loading, setLoading] = useState(true);
 
   // Filters State
+  const initialFaculty = searchParams.get('faculty') || '';
+  const initialGender = searchParams.get('gender') || (initialFaculty === 'alimah' ? 'female' : '');
+
   const [filters, setFilters] = useState({
     search: searchParams.get('q') || '',
     category: searchParams.get('category') || '',
     city: searchParams.get('city') || '',
     area: searchParams.get('area') || '',
     mode: searchParams.get('mode') || '',
-    gender: searchParams.get('gender') || '',
+    gender: initialGender,
+    faculty: initialFaculty,
     sortBy: 'rating'
   });
 
   // Sync with URL params
   useEffect(() => {
+    const paramFaculty = searchParams.get('faculty') || '';
+    const paramGender = searchParams.get('gender') || (paramFaculty === 'alimah' ? 'female' : '');
     setFilters(prev => ({
       ...prev,
       search: searchParams.get('q') || '',
       category: searchParams.get('category') || '',
       city: searchParams.get('city') || '',
-      area: searchParams.get('area') || ''
+      area: searchParams.get('area') || '',
+      gender: paramGender,
+      faculty: paramFaculty
     }));
   }, [searchParams]);
 
@@ -109,6 +117,7 @@ function TutorSearchContent() {
       if (!queryParams.city) delete queryParams.city;
       if (!queryParams.mode) delete queryParams.mode;
       if (!queryParams.gender) delete queryParams.gender;
+      if (!queryParams.faculty) delete queryParams.faculty;
       if (!queryParams.sanadVerified) delete queryParams.sanadVerified;
 
       // If specific local area is chosen, factor it into search
@@ -119,7 +128,37 @@ function TutorSearchContent() {
 
       const res = await api.getTutors(queryParams);
       if (res.success) {
-        setTutors(res.tutors);
+        let list = res.tutors || [];
+        if (filters.faculty === 'alimah') {
+          list = list.filter((t) => {
+            const isFemale = t.gender === 'female' || t.user?.gender === 'female';
+            if (!isFemale) return false;
+            const qual = (t.qualifications || '').toLowerCase();
+            const bio = (t.bio || '').toLowerCase();
+            const name = (t.user?.name || '').toLowerCase();
+            const hasQuranSubject = t.subjects?.some((s) => {
+              const sName = (s.name || s.slug || '').toLowerCase();
+              return (
+                sName.includes('quran') ||
+                sName.includes('tajweed') ||
+                sName.includes('qaida') ||
+                sName.includes('hifz') ||
+                sName.includes('islamic')
+              );
+            });
+            return (
+              qual.includes('alimah') ||
+              qual.includes('wafaq') ||
+              qual.includes('wifaq') ||
+              qual.includes('dars-e-nizami') ||
+              qual.includes('sanad') ||
+              name.includes('alimah') ||
+              bio.includes('alimah') ||
+              hasQuranSubject
+            );
+          });
+        }
+        setTutors(list);
       }
     } catch (err) {
       console.error('Error fetching tutors:', err);
@@ -144,6 +183,7 @@ function TutorSearchContent() {
       area: '',
       mode: '',
       gender: '',
+      faculty: '',
       sanadVerified: false,
       sortBy: 'rating'
     });
@@ -204,6 +244,81 @@ function TutorSearchContent() {
               <span>Filter Tutors &amp; Cities</span>
             </button>
           </div>
+
+          {/* Quick Priority Faculty Filter Pills */}
+          <div className="flex flex-wrap items-center gap-1.5 pt-1 text-xs">
+            <span className="text-[11px] font-bold text-slate-500 mr-1">Quick Filters:</span>
+            <button
+              type="button"
+              onClick={() => {
+                handleFilterChange('gender', '');
+                handleFilterChange('faculty', '');
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer border ${
+                !filters.gender && !filters.faculty
+                  ? 'bg-[#0c2217] text-white border-[#0c2217] shadow-2xs'
+                  : 'bg-white text-slate-700 hover:bg-slate-50 border-slate-200'
+              }`}
+            >
+              All Faculty
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (filters.gender === 'female' && !filters.faculty) {
+                  handleFilterChange('gender', '');
+                } else {
+                  handleFilterChange('gender', 'female');
+                  handleFilterChange('faculty', '');
+                }
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer border inline-flex items-center gap-1 ${
+                filters.gender === 'female' && !filters.faculty
+                  ? 'bg-[#b85d34] text-white border-[#b85d34] shadow-2xs'
+                  : 'bg-[#f5ebe6] text-[#b85d34] hover:bg-[#ebdcd3] border-[#b85d34]/30'
+              }`}
+            >
+              <UserCheck className="w-3.5 h-3.5" />
+              <span>Female Tutors</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (filters.faculty === 'alimah') {
+                  handleFilterChange('faculty', '');
+                  handleFilterChange('gender', '');
+                } else {
+                  handleFilterChange('gender', 'female');
+                  handleFilterChange('faculty', 'alimah');
+                }
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer border inline-flex items-center gap-1 ${
+                filters.faculty === 'alimah'
+                  ? 'bg-[#0c2217] text-white border-[#0c2217] shadow-2xs'
+                  : 'bg-white text-[#0c2217] hover:bg-[#edf6f0] border-[#0c2217]/30'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
+              <span>Female Alimahs</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                handleFilterChange('gender', filters.gender === 'male' ? '' : 'male');
+                handleFilterChange('faculty', '');
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer border inline-flex items-center gap-1 ${
+                filters.gender === 'male'
+                  ? 'bg-[#0c2217] text-white border-[#0c2217] shadow-2xs'
+                  : 'bg-white text-slate-700 hover:bg-slate-50 border-slate-200'
+              }`}
+            >
+              <span>Male Qaris</span>
+            </button>
+          </div>
         </div>
 
         {/* 2-Column Layout */}
@@ -224,7 +339,14 @@ function TutorSearchContent() {
           <div className="lg:col-span-8 xl:col-span-9 space-y-4">
             <div className="flex items-center justify-between px-1">
               <p className="text-xs sm:text-sm font-bold text-slate-700">
-                Showing <span className="text-[#0c2217] font-black">{tutors.length}</span> Verified Tutors
+                Showing <span className="text-[#0c2217] font-black">{tutors.length}</span>{' '}
+                {filters.faculty === 'alimah'
+                  ? 'Verified Female Alimahs'
+                  : filters.gender === 'female'
+                  ? 'Verified Female Tutors'
+                  : filters.gender === 'male'
+                  ? 'Verified Male Qaris & Tutors'
+                  : 'Verified Tutors'}
               </p>
             </div>
 

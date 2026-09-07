@@ -16,6 +16,7 @@ exports.getPublicTutors = async (req, res) => {
       province,
       mode,
       gender,
+      faculty,
       minRating,
       maxPrice,
       sortBy = 'rating',
@@ -63,8 +64,17 @@ exports.getPublicTutors = async (req, res) => {
       query.teachingModes = { $in: [modeKey, 'online', 'in_person'] };
     }
 
-    // Filter by Gender
-    if (gender && gender !== 'all') {
+    // Filter by Faculty / Gender
+    if (faculty === 'alimah' || faculty === 'female_alimah') {
+      query.gender = 'female';
+      const quranCats = await Category.find({ type: 'quran' }, '_id');
+      const quranCatIds = quranCats.map(c => c._id);
+      query.$or = [
+        { qualifications: { $regex: /alimah|wifaq|wafaq|dars-e-nizami|sanad|tajweed|hafiz|quran/i } },
+        { bio: { $regex: /alimah|wifaq|wafaq|dars-e-nizami|sanad|tajweed|hafiz|quran|islamic/i } },
+        { subjects: { $in: quranCatIds } }
+      ];
+    } else if (gender && gender !== 'all') {
       query.gender = gender;
     }
 

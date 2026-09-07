@@ -82,6 +82,13 @@ const TutorCard = ({ tutor, tutorProfile }) => {
   const hasInPerson = modes.includes('in_person');
 
   const isFemaleTutor = data.gender === 'female' || tutorUser.gender === 'female';
+  const isAlimah =
+    /alimah|wifaq|wafaq|dars-e-nizami|sanad|tajweed|hafiz/i.test(data.qualifications || '') ||
+    /alimah|wifaq|wafaq|dars-e-nizami|sanad|tajweed|hafiz|quran|islamic/i.test(data.bio || '') ||
+    /alimah/i.test(tutorName || '') ||
+    (Array.isArray(data.subjects) &&
+      data.subjects.some((s) => s?.type === 'quran' || /quran|tajweed|hifz|islamic/i.test(s?.name || s?.slug || '')));
+
   const tutorTargetId = tutorUser._id || tutorUser.id || data._id;
   const myId = user?.id || user?._id;
   const conversationId = [myId, tutorTargetId].sort().join('_');
@@ -173,10 +180,10 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                     {tutorCity}
                   </span>
                   <span className="text-slate-300">·</span>
-                  {data.gender === 'female' ? (
+                  {isFemaleTutor ? (
                     <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#b85d34] bg-[#f5ebe6] px-2 py-0.5 rounded-full border border-[#b85d34]/30">
                       <ShieldCheck className="w-3 h-3 text-[#b85d34]" />
-                      <span>Verified Female Alimah</span>
+                      <span>{isAlimah ? 'Verified Female Alimah' : 'Verified Female Tutor'}</span>
                     </span>
                   ) : (
                     <span className="capitalize text-slate-600 font-medium">{data.gender || 'Tutor'}</span>

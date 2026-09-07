@@ -63,6 +63,13 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
   const [chatRequestModalOpen, setChatRequestModalOpen] = useState(false);
 
   const isFemaleTutor = tutor?.gender === 'female' || tutorUser?.gender === 'female';
+  const isAlimah =
+    /alimah|wifaq|wafaq|dars-e-nizami|sanad|tajweed|hafiz/i.test(tutor?.qualifications || '') ||
+    /alimah|wifaq|wafaq|dars-e-nizami|sanad|tajweed|hafiz|quran|islamic/i.test(tutor?.bio || '') ||
+    /alimah/i.test(tutorUser?.name || tutor?.name || '') ||
+    (Array.isArray(tutor?.subjects) &&
+      tutor.subjects.some((s) => s?.type === 'quran' || /quran|tajweed|hifz|islamic/i.test(s?.name || s?.slug || '')));
+
   const tutorTargetId = tutorUser._id || tutorUser.id || tutor._id;
   const myId = user?.id || user?._id;
   const conversationId = [myId, tutorTargetId].sort().join('_');
@@ -142,7 +149,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                   {isFemaleTutor ? (
                     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-[#f5ebe6] text-[#b85d34] border border-[#b85d34]/30">
                       <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
-                      <span>Verified Female Alimah</span>
+                      <span>{isAlimah ? 'Verified Female Alimah' : 'Verified Female Tutor'}</span>
                     </span>
                   ) : (
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-[#f0eae1] text-[#0c2217]">

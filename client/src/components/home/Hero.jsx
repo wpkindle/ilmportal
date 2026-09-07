@@ -12,6 +12,7 @@ import {
   Video,
   Sparkles,
   Users,
+  UserCheck,
   CheckCircle2,
   ArrowRight,
   ChevronRight,
@@ -279,13 +280,22 @@ export default function Hero() {
                 </button>
               </form>
 
-              {/* Quick Topic Chips */}
+              {/* Quick Topic Chips & Female Faculty Filters */}
               <div className="mt-3.5 flex flex-wrap items-center gap-1.5 text-xs">
                 <Link
                   href="/tutors?gender=female"
-                  className="px-3 py-1 rounded-full bg-white hover:bg-[#f5f0e6] text-[#b85d34] font-bold border border-[#d4a359]/40 shadow-2xs transition-all inline-flex items-center gap-1"
+                  className="px-3.5 py-1.5 rounded-full bg-[#f5ebe6] hover:bg-[#ede0d8] text-[#b85d34] font-bold border border-[#b85d34]/40 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group"
+                  title="Browse verified female tutors across all academic & Quran subjects"
                 >
-                  <ShieldCheck className="w-3 h-3" />
+                  <UserCheck className="w-3.5 h-3.5 text-[#b85d34]" />
+                  <span>Female Tutors</span>
+                </Link>
+                <Link
+                  href="/tutors?gender=female&faculty=alimah"
+                  className="px-3.5 py-1.5 rounded-full bg-white hover:bg-[#f5f0e6] text-[#0c2217] font-bold border border-[#d4a359]/50 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group"
+                  title="Browse verified female Alimahs for Quran, Tajweed & Islamic studies"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
                   <span>Female Alimahs</span>
                 </Link>
                 <span className="text-[#6b7f76] text-xs font-semibold ml-1">Popular:</span>
@@ -301,23 +311,35 @@ export default function Hero() {
               </div>
             </div>
 
-            {/* Dual Gateway Buttons */}
-            <div className="pt-2 flex flex-col sm:flex-row items-center gap-3 max-w-md">
+            {/* Dual Gateway Buttons & Quick Female Directory Trigger */}
+            <div className="pt-2 flex flex-col gap-2.5 max-w-md">
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <Link
+                  href="/register/student"
+                  className="w-full sm:w-1/2 px-5 py-3 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#b85d34]/40"
+                >
+                  <GraduationCap className="w-4 h-4" />
+                  <span>Join as Student</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </Link>
+                <Link
+                  href="/register/tutor"
+                  className="w-full sm:w-1/2 px-5 py-3 rounded-xl bg-white hover:bg-[#f5f0e6] text-[#0c2217] font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border-2 border-[#d4a359]/60"
+                >
+                  <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
+                  <span>Apply as Tutor</span>
+                  <ArrowRight className="w-3.5 h-3.5 text-[#d4a359]" />
+                </Link>
+              </div>
+
+              {/* Direct Female Tutors Hero Action Button */}
               <Link
-                href="/register/student"
-                className="w-full sm:w-1/2 px-5 py-3 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#b85d34]/40"
+                href="/tutors?gender=female"
+                className="w-full py-2.5 px-4 rounded-xl bg-[#f5ebe6] hover:bg-[#ede0d8] text-[#b85d34] hover:text-[#9e4e2a] border border-[#b85d34]/40 font-bold text-xs flex items-center justify-center gap-2 shadow-2xs transition-all active:scale-98 cursor-pointer"
               >
-                <GraduationCap className="w-4 h-4" />
-                <span>Join as Student</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </Link>
-              <Link
-                href="/register/tutor"
-                className="w-full sm:w-1/2 px-5 py-3 rounded-xl bg-white hover:bg-[#f5f0e6] text-[#0c2217] font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border-2 border-[#d4a359]/60"
-              >
-                <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
-                <span>Apply as Tutor</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#d4a359]" />
+                <UserCheck className="w-4 h-4 text-[#b85d34]" />
+                <span>Browse Verified Female Tutors &amp; Alimahs</span>
+                <ChevronRight className="w-3.5 h-3.5 text-[#b85d34]" />
               </Link>
             </div>
 

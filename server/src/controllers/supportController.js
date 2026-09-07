@@ -20,6 +20,8 @@ exports.sendMessage = async (req, res) => {
     let session = await SupportSession.findOne({ sessionId: sid });
     const senderName = req.user?.name || guestInfo?.name || 'Website Visitor';
     const senderAvatar = req.user?.avatar || '';
+    const now = new Date();
+    const isSeenByAdmin = session?.status === 'admin_joined';
 
     const newMsg = {
       sender: 'user',
@@ -30,7 +32,10 @@ exports.sendMessage = async (req, res) => {
       fileName: fileName || '',
       fileType: fileType || '',
       fileSize: fileSize || 0,
-      createdAt: new Date()
+      delivered: true,
+      seen: isSeenByAdmin,
+      seenAt: isSeenByAdmin ? now : null,
+      createdAt: now
     };
 
     const isNewSession = !session;
@@ -138,7 +143,7 @@ exports.sendMessage = async (req, res) => {
     console.error('Error in live support sendMessage:', error);
     res.status(500).json({
       success: false,
-      message: 'Failed to send support message.'
+      message: error.message || 'Error processing live support message'
     });
   }
 };
@@ -154,6 +159,22 @@ exports.getSessionHistory = async (req, res) => {
       return res.status(200).json({ success: true, session: null, messages: [] });
     }
 
+    const cleanMessages = (session.messages || []).map((m) => ({
+      _id: m._id,
+      sender: m.sender,
+      senderName: m.sender === 'user' ? (m.senderName || 'You') : (m.sender === 'system' ? (m.senderName || 'System Notice') : 'IlmiDunya Helpdesk'),
+      senderAvatar: m.senderAvatar,
+      text: m.text,
+      fileUrl: m.fileUrl,
+      fileName: m.fileName,
+      fileType: m.fileType,
+      fileSize: m.fileSize,
+      delivered: m.delivered !== false,
+      seen: !!m.seen,
+      seenAt: m.seenAt || null,
+      createdAt: m.createdAt
+    }));
+
     res.status(200).json({
       success: true,
       session: {
@@ -162,7 +183,7 @@ exports.getSessionHistory = async (req, res) => {
         assignedAdmin: session.assignedAdmin,
         updatedAt: session.updatedAt
       },
-      messages: session.messages || []
+      messages: cleanMessages
     });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -463,6 +484,9 @@ exports.leaveOfflineMessage = async (req, res) => {
       fileName: fileName || '',
       fileType: fileType || '',
       fileSize: fileSize || 0,
+      delivered: true,
+      seen: false,
+      seenAt: null,
       createdAt: new Date()
     };
 
@@ -646,15 +670,35 @@ exports.getAdminSession = async (req, res) => {
       ].filter(Boolean)
     })
       .populate('user', 'name email role avatar city')
-      .populate('assignedAdmin', 'name email avatar')
-      .lean();
+      .populate('assignedAdmin', 'name email avatar');
 
     if (!session) {
       return res.status(404).json({ success: false, message: 'Support session not found' });
     }
 
-    // Reset unread count for admin
-    await SupportSession.updateOne({ _id: session._id }, { unreadAdminCount: 0 });
+    const now = new Date();
+    let updatedAnySeen = false;
+    if (session.messages && session.messages.length > 0) {
+      for (const msg of session.messages) {
+        if (msg.sender === 'user' && !msg.seen) {
+          msg.seen = true;
+          msg.seenAt = now;
+          updatedAnySeen = true;
+        }
+      }
+    }
+
+    session.unreadAdminCount = 0;
+    session.lastSeenByAdminAt = now;
+    await session.save();
+
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`support_${session.sessionId}`).emit('support-messages-seen', {
+        sessionId: session.sessionId,
+        seenAt: now
+      });
+    }
 
     res.status(200).json({ success: true, session });
   } catch (error) {
@@ -680,15 +724,28 @@ exports.adminJoinSession = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Support session not found' });
     }
 
+    const now = new Date();
     session.assignedAdmin = req.user._id;
     session.status = 'admin_joined';
-    session.assignedAt = new Date();
+    session.assignedAt = now;
+    session.unreadAdminCount = 0;
+    session.lastSeenByAdminAt = now;
+
+    // Mark all user messages as seen
+    if (session.messages && session.messages.length > 0) {
+      for (const msg of session.messages) {
+        if (msg.sender === 'user' && !msg.seen) {
+          msg.seen = true;
+          msg.seenAt = now;
+        }
+      }
+    }
 
     const systemMsg = {
       sender: 'system',
       senderName: 'System Notice',
-      text: `🟢 **${req.user.name || 'A Support Administrator'} has joined this chat.** You are now speaking directly in real-time.`,
-      createdAt: new Date()
+      text: `🟢 **IlmiDunya Helpdesk has joined this chat.** How may we assist you today?`,
+      createdAt: now
     };
     session.messages.push(systemMsg);
 
@@ -698,11 +755,15 @@ exports.adminJoinSession = async (req, res) => {
     if (io) {
       io.to(`support_${session.sessionId}`).emit('admin-joined-support', {
         sessionId: session.sessionId,
-        admin: { _id: req.user._id, name: req.user.name, role: req.user.role }
+        admin: { _id: req.user._id, name: 'IlmiDunya Helpdesk', role: req.user.role }
       });
       io.to(`support_${session.sessionId}`).emit('support-status-changed', {
         sessionId: session.sessionId,
         status: 'admin_joined'
+      });
+      io.to(`support_${session.sessionId}`).emit('support-messages-seen', {
+        sessionId: session.sessionId,
+        seenAt: now
       });
     }
 
@@ -718,7 +779,7 @@ exports.adminJoinSession = async (req, res) => {
 exports.adminSendMessage = async (req, res) => {
   try {
     const { id } = req.params;
-    const { text, fileUrl, fileName, fileType, fileSize, senderName } = req.body;
+    const { text, fileUrl, fileName, fileType, fileSize } = req.body;
 
     if ((!text || !text.trim()) && !fileUrl) {
       return res.status(400).json({ success: false, message: 'Message or attachment is required' });
@@ -735,16 +796,19 @@ exports.adminSendMessage = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Support session not found' });
     }
 
+    const now = new Date();
     const newMsg = {
       sender: 'admin',
-      senderName: senderName || req.user?.name || 'Support Specialist',
+      senderName: 'IlmiDunya Helpdesk',
       senderAvatar: req.user?.avatar || '',
       text: (text || '').trim(),
       fileUrl: fileUrl || '',
       fileName: fileName || '',
       fileType: fileType || '',
       fileSize: fileSize || 0,
-      createdAt: new Date()
+      delivered: true,
+      seen: false,
+      createdAt: now
     };
 
     const previewText = (text || `[Attachment: ${fileName || 'File'}]`).trim().slice(0, 140);
@@ -763,10 +827,22 @@ exports.adminSendMessage = async (req, res) => {
       }
     }
 
+    // Mark previous user messages as seen
+    if (session.messages && session.messages.length > 0) {
+      for (const msg of session.messages) {
+        if (msg.sender === 'user' && !msg.seen) {
+          msg.seen = true;
+          msg.seenAt = now;
+        }
+      }
+    }
+
     session.messages.push(newMsg);
     session.lastMessage = previewText;
     session.lastSender = 'admin';
     session.unreadUserCount = (session.unreadUserCount || 0) + 1;
+    session.unreadAdminCount = 0;
+    session.lastSeenByAdminAt = now;
     if (session.status !== 'admin_joined') {
       session.status = 'admin_joined';
       session.assignedAdmin = req.user._id;
@@ -779,6 +855,10 @@ exports.adminSendMessage = async (req, res) => {
       io.to(`support_${session.sessionId}`).emit('support-message-received', {
         sessionId: session.sessionId,
         message: newMsg
+      });
+      io.to(`support_${session.sessionId}`).emit('support-messages-seen', {
+        sessionId: session.sessionId,
+        seenAt: now
       });
     }
 

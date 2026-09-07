@@ -19,19 +19,13 @@ import {
   Mail,
   FileText,
   Download,
-  AlertCircle
+  AlertCircle,
+  Check,
+  CheckCheck
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
 import { useAuth } from '../../context/AuthContext';
-
-const QUICK_INQUIRIES = [
-  'Inquire about 3-Day Free Trial',
-  'Find verified female Quran Alimah',
-  'Find Cambridge O/A Level tutor',
-  'Tuition fees & payment methods',
-  'Tutor verification & registration help'
-];
 
 const getFileUrl = (path) => {
   if (!path) return '';
@@ -99,8 +93,8 @@ export default function LiveSupportWidget() {
     {
       id: 'welcome',
       sender: 'admin',
-      senderName: 'IlmiDunya Helpline',
-      text: "Assalam-o-Alaikum! Welcome to IlmiDunya Helpline. 👋\n\nHow can we help you today? Send your inquiry below and we will assist you right away.\n\nIf we are away, you can also leave your email and message, and our team will get back to you promptly.",
+      senderName: 'IlmiDunya Helpdesk',
+      text: "Assalam-o-Alaikum! Welcome to IlmiDunya Helpdesk. 👋\n\nHow can we help you today? Send your inquiry below and we will assist you right away.\n\nIf we are away, you can also leave your email and message, and our team will get back to you promptly.",
       timestamp: new Date()
     }
   ]);
@@ -181,13 +175,16 @@ export default function LiveSupportWidget() {
               id: m._id || (Date.now() + Math.random()).toString(),
               _id: m._id,
               sender: m.sender,
-              senderName: m.senderName || (m.sender === 'user' ? 'You' : 'IlmiDunya Helpline'),
+              senderName: m.sender === 'user' ? 'You' : 'IlmiDunya Helpdesk',
               senderAvatar: m.senderAvatar,
               text: m.text,
               fileUrl: m.fileUrl,
               fileName: m.fileName,
               fileType: m.fileType,
               fileSize: m.fileSize,
+              delivered: m.delivered !== false,
+              seen: !!m.seen,
+              seenAt: m.seenAt || null,
               timestamp: new Date(m.createdAt || Date.now())
             });
           }
@@ -271,11 +268,23 @@ export default function LiveSupportWidget() {
             // Upgrade optimistic message id to incoming._id if applicable
             return prev.map((m) => {
               if (m.sender === incoming.sender && m.text === incoming.text && (m.fileName || '') === (incoming.fileName || '')) {
-                return { ...m, id: incoming._id || m.id, _id: incoming._id || m._id };
+                return {
+                  ...m,
+                  id: incoming._id || m.id,
+                  _id: incoming._id || m._id,
+                  delivered: incoming.delivered !== false,
+                  seen: !!incoming.seen,
+                  seenAt: incoming.seenAt || m.seenAt
+                };
               }
               return m;
             });
           }
+
+          // If incoming message is from admin, mark all existing user messages as seen
+          const updatedPrev = incoming.sender === 'admin'
+            ? prev.map((m) => (m.sender === 'user' ? { ...m, seen: true, delivered: true } : m))
+            : prev;
 
           if (incoming.sender === 'admin') {
             playMessageChime();
@@ -285,22 +294,35 @@ export default function LiveSupportWidget() {
           }
 
           return [
-            ...prev,
+            ...updatedPrev,
             {
               id: incoming._id || (Date.now() + Math.random()).toString(),
               _id: incoming._id,
               sender: incoming.sender,
-              senderName: incoming.senderName || (incoming.sender === 'admin' ? 'IlmiDunya Helpline' : 'You'),
+              senderName: incoming.sender === 'admin' ? 'IlmiDunya Helpdesk' : 'You',
               senderAvatar: incoming.senderAvatar,
               text: incoming.text,
               fileUrl: incoming.fileUrl,
               fileName: incoming.fileName,
               fileType: incoming.fileType,
               fileSize: incoming.fileSize,
+              delivered: incoming.delivered !== false,
+              seen: !!incoming.seen,
+              seenAt: incoming.seenAt || null,
               timestamp: new Date(incoming.createdAt || Date.now())
             }
           ];
         });
+      }
+    };
+
+    const handleMessagesSeen = (data) => {
+      if (data?.sessionId === sessionId) {
+        setMessages((prev) =>
+          prev.map((m) =>
+            m.sender === 'user' ? { ...m, seen: true, delivered: true, seenAt: data.seenAt || new Date() } : m
+          )
+        );
       }
     };
 
@@ -309,11 +331,11 @@ export default function LiveSupportWidget() {
         setSupportStatus('admin_joined');
         setAssignedAdmin(data.admin?.name || 'Representative');
         setMessages((prev) => [
-          ...prev,
+          ...prev.map((m) => (m.sender === 'user' ? { ...m, seen: true, delivered: true } : m)),
           {
             id: Date.now().toString(),
             sender: 'system',
-            text: `🟢 **IlmiDunya Helpline is now connected with you live.** How may we assist you today?`,
+            text: `🟢 **IlmiDunya Helpdesk is now connected with you live.** How may we assist you today?`,
             timestamp: new Date()
           }
         ]);
@@ -340,6 +362,7 @@ export default function LiveSupportWidget() {
     };
 
     socket.on('support-message-received', handleMessageReceived);
+    socket.on('support-messages-seen', handleMessagesSeen);
     socket.on('admin-joined-support', handleAdminJoined);
     socket.on('support-status-changed', handleStatusChanged);
     socket.on('support-typing', handleTyping);
@@ -348,6 +371,7 @@ export default function LiveSupportWidget() {
     return () => {
       socket.off('admin-online-status', handleAdminOnlineStatus);
       socket.off('support-message-received', handleMessageReceived);
+      socket.off('support-messages-seen', handleMessagesSeen);
       socket.off('admin-joined-support', handleAdminJoined);
       socket.off('support-status-changed', handleStatusChanged);
       socket.off('support-typing', handleTyping);
@@ -453,6 +477,7 @@ export default function LiveSupportWidget() {
       setUploadingFile(false);
     }
 
+    const isAlreadyConnected = supportStatus === 'admin_joined';
     const localMessage = {
       id: Date.now().toString(),
       sender: 'user',
@@ -462,6 +487,9 @@ export default function LiveSupportWidget() {
       fileName: uploadedAttachment?.fileName,
       fileType: uploadedAttachment?.fileType,
       fileSize: uploadedAttachment?.fileSize,
+      delivered: true,
+      seen: isAlreadyConnected,
+      seenAt: isAlreadyConnected ? new Date() : null,
       timestamp: new Date()
     };
 
@@ -498,7 +526,18 @@ export default function LiveSupportWidget() {
 
       if (res?.success && res.message?._id) {
         setMessages((prev) =>
-          prev.map((m) => (m.id === localMessage.id ? { ...m, id: res.message._id, _id: res.message._id } : m))
+          prev.map((m) =>
+            m.id === localMessage.id
+              ? {
+                  ...m,
+                  id: res.message._id,
+                  _id: res.message._id,
+                  delivered: res.message.delivered !== false,
+                  seen: !!res.message.seen,
+                  seenAt: res.message.seenAt || null
+                }
+              : m
+          )
         );
       }
     } catch (err) {
@@ -606,8 +645,8 @@ export default function LiveSupportWidget() {
       {
         id: 'welcome',
         sender: 'admin',
-        senderName: 'IlmiDunya Helpline',
-        text: "Assalam-o-Alaikum! Welcome to IlmiDunya Helpline. 👋\n\nHow can we help you today? Send your inquiry below and we will assist you right away.\n\nIf we are away, you can also leave your email and message, and our team will get back to you promptly.",
+        senderName: 'IlmiDunya Helpdesk',
+        text: "Assalam-o-Alaikum! Welcome to IlmiDunya Helpdesk. 👋\n\nHow can we help you today? Send your inquiry below and we will assist you right away.\n\nIf we are away, you can also leave your email and message, and our team will get back to you promptly.",
         timestamp: new Date()
       }
     ]);
@@ -642,8 +681,8 @@ export default function LiveSupportWidget() {
         <button
           onClick={handleToggleWidget}
           className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-[#b85d34] to-[#d4a359] text-white shadow-[0_8px_24px_rgba(184,93,52,0.35)] hover:shadow-[0_12px_28px_rgba(184,93,52,0.45)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border-2 border-white"
-          aria-label={isOpen ? "Close Helpline" : "Open IlmiDunya Helpline"}
-          title={isOpen ? "Close Helpline" : (isAdminOnline ? "Chat with IlmiDunya Helpline" : "Leave an Email Message")}
+          aria-label={isOpen ? "Close Helpdesk" : "Open IlmiDunya Helpdesk"}
+          title={isOpen ? "Close Helpdesk" : (isAdminOnline ? "Chat with IlmiDunya Helpdesk" : "Leave an Email Message")}
         >
           {isOpen ? (
             <X className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
@@ -699,7 +738,7 @@ export default function LiveSupportWidget() {
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
                   <h3 className="text-xs sm:text-sm font-extrabold text-[#0c2217] leading-tight truncate">
-                    IlmiDunya Helpline
+                    IlmiDunya Helpdesk
                   </h3>
                   {isAdminOnline ? (
                     <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-300 shrink-0">
@@ -758,17 +797,17 @@ export default function LiveSupportWidget() {
               {isAdminConnected ? (
                 <span className="flex items-center gap-1 text-emerald-800 font-semibold truncate">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span className="truncate">Connected to Helpline ({assignedAdmin || 'Active'})</span>
+                  <span className="truncate">Connected to IlmiDunya Helpdesk ({assignedAdmin || 'Active'})</span>
                 </span>
               ) : isWaitingForAdmin ? (
                 <span className="flex items-center gap-1 text-amber-800 font-semibold truncate">
                   <Clock className="w-3.5 h-3.5 animate-spin text-amber-600 shrink-0" />
-                  <span className="truncate">Connecting you to Helpline...</span>
+                  <span className="truncate">Connecting you to IlmiDunya Helpdesk...</span>
                 </span>
               ) : isAdminOnline ? (
                 <span className="flex items-center gap-1 text-[#2c4035] truncate">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34] shrink-0" />
-                  <span className="truncate">Official IlmiDunya Helpline</span>
+                  <span className="truncate">Official IlmiDunya Helpdesk</span>
                 </span>
               ) : (
                 <span className="flex items-center gap-1 text-amber-800 font-medium truncate">
@@ -797,7 +836,7 @@ export default function LiveSupportWidget() {
               <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-1 shadow-2xs">
                 <div className="flex items-center gap-1.5 font-bold text-amber-900">
                   <Mail className="w-4 h-4 text-amber-700" />
-                  <span>Helpline is currently away</span>
+                  <span>Helpdesk is currently away</span>
                 </div>
                 <p className="text-[11px] text-amber-800 leading-relaxed">
                   Leave your message and contact email below. We will review your inquiry and reach out to you directly via email.
@@ -976,11 +1015,42 @@ export default function LiveSupportWidget() {
                       }`}>
                         <div className="flex items-center justify-between gap-2">
                           <span className={`text-[10px] font-bold ${isUser ? 'text-white/90' : 'text-[#0c2217]'}`}>
-                            {isUser ? 'You' : (m.senderName || 'IlmiDunya Helpline')}
+                            {isUser ? 'You' : 'IlmiDunya Helpdesk'}
                           </span>
-                          <span className={`text-[9px] ${isUser ? 'text-white/70' : 'text-stone-500'}`}>
-                            {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                          </span>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <span className={`text-[9px] ${isUser ? 'text-white/70' : 'text-stone-500'}`}>
+                              {new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                            {isUser && (
+                              <span className="inline-flex items-center gap-0.5">
+                                {m.seen ? (
+                                  <span
+                                    className="inline-flex items-center gap-0.5 text-[9px] text-emerald-200 font-semibold"
+                                    title={m.seenAt ? `Seen at ${new Date(m.seenAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : 'Seen by IlmiDunya Helpdesk'}
+                                  >
+                                    <CheckCheck className="w-3.5 h-3.5 text-emerald-300 stroke-[2.5]" />
+                                    <span>Seen</span>
+                                  </span>
+                                ) : m.delivered !== false ? (
+                                  <span
+                                    className="inline-flex items-center gap-0.5 text-[9px] text-white/75 font-medium"
+                                    title="Delivered to IlmiDunya Helpdesk"
+                                  >
+                                    <CheckCheck className="w-3.5 h-3.5 text-white/75 stroke-[2]" />
+                                    <span>Delivered</span>
+                                  </span>
+                                ) : (
+                                  <span
+                                    className="inline-flex items-center gap-0.5 text-[9px] text-white/60 font-medium"
+                                    title="Sending..."
+                                  >
+                                    <Clock className="w-3 h-3 text-white/70 animate-spin" />
+                                    <span>Sending</span>
+                                  </span>
+                                )}
+                              </span>
+                            )}
+                          </div>
                         </div>
 
                         {/* File Attachment Render */}
@@ -1048,25 +1118,11 @@ export default function LiveSupportWidget() {
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-bounce" style={{ animationDelay: '150ms' }} />
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 animate-bounce" style={{ animationDelay: '300ms' }} />
                     </div>
-                    <span>IlmiDunya Helpline is typing...</span>
+                    <span>IlmiDunya Helpdesk is typing...</span>
                   </div>
                 )}
 
                 <div ref={messagesEndRef} />
-              </div>
-
-              {/* Quick Inquiries Bar (Light Theme) */}
-              <div className="px-3 py-2 bg-[#faf8f5] border-t border-[#ebe3d3] overflow-x-auto whitespace-nowrap scrollbar-none flex gap-1.5 shrink-0">
-                {QUICK_INQUIRIES.map((prompt, idx) => (
-                  <button
-                    key={idx}
-                    onClick={() => handleSend(prompt)}
-                    disabled={isSending}
-                    className="px-2.5 py-1 rounded-full bg-white hover:bg-[#f0ece1] text-[#0c2217] text-[10.5px] font-medium border border-[#ebe3d3] transition-colors shrink-0 cursor-pointer disabled:opacity-50 shadow-2xs"
-                  >
-                    {prompt}
-                  </button>
-                ))}
               </div>
 
               {/* Input & Send Footer (Light Theme) */}
@@ -1145,7 +1201,7 @@ export default function LiveSupportWidget() {
                 </form>
 
                 <div className="flex items-center justify-between text-[9.5px] text-stone-500">
-                  <span>IlmiDunya Helpline • Quick &amp; Friendly Assistance</span>
+                  <span>IlmiDunya Helpdesk • Quick &amp; Friendly Assistance</span>
                   <span className="text-stone-400">Only PNG, JPG, PDF supported</span>
                 </div>
               </div>

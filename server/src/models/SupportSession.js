@@ -42,6 +42,18 @@ const messageItemSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  delivered: {
+    type: Boolean,
+    default: true
+  },
+  seen: {
+    type: Boolean,
+    default: false
+  },
+  seenAt: {
+    type: Date,
+    default: null
+  },
   createdAt: {
     type: Date,
     default: Date.now
@@ -114,6 +126,10 @@ const supportSessionSchema = new mongoose.Schema({
   unreadUserCount: {
     type: Number,
     default: 0
+  },
+  lastSeenByAdminAt: {
+    type: Date,
+    default: null
   }
 }, {
   timestamps: true

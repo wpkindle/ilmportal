@@ -202,8 +202,12 @@ export default function AdminSupportDeskPage() {
   useEffect(() => {
     if (selectedSessionId) {
       fetchSessionTranscript(selectedSessionId);
+      if (socket) {
+        socket.emit('join-support-session', { sessionId: selectedSessionId });
+        socket.emit('support-seen', { sessionId: selectedSessionId });
+      }
     }
-  }, [selectedSessionId]);
+  }, [selectedSessionId, socket]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -362,7 +366,7 @@ export default function AdminSupportDeskPage() {
     try {
       const res = await api.adminSendSupportMessage(selectedSessionId, {
         text,
-        senderName: user?.name || 'Administrator',
+        senderName: 'IlmiDunya Helpdesk',
         fileUrl: uploadedAttachment?.fileUrl,
         fileName: uploadedAttachment?.fileName,
         fileType: uploadedAttachment?.fileType,
@@ -797,7 +801,7 @@ export default function AdminSupportDeskPage() {
                             }`}>
                               <div className="flex items-center justify-between gap-2 mb-1">
                                 <span className="font-bold text-[10px] opacity-80">
-                                  {isUser ? m.senderName || 'User' : isAdmin ? `Staff (${m.senderName || 'Admin'})` : (m.senderName || 'Support Staff')}
+                                  {isUser ? m.senderName || 'User' : 'IlmiDunya Helpdesk'}
                                 </span>
                                 <span className="text-[9px] opacity-60">
                                   {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}

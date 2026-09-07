@@ -467,16 +467,23 @@ const initSocket = (io) => {
           });
         }
 
+        const now = new Date();
+        const isAdminSender = sender === 'admin';
+        const isAlreadySeen = !isAdminSender && session.status === 'admin_joined';
+
         const newMsg = {
           sender: sender || 'user',
-          senderName: senderName || (sender === 'admin' ? 'Support Specialist' : 'User'),
+          senderName: isAdminSender ? 'IlmiDunya Helpdesk' : (senderName || 'User'),
           senderAvatar: senderAvatar || '',
           text: (text || '').trim(),
           fileUrl: fileUrl || '',
           fileName: fileName || '',
           fileType: fileType || '',
           fileSize: fileSize || 0,
-          createdAt: new Date()
+          delivered: true,
+          seen: isAdminSender ? false : isAlreadySeen,
+          seenAt: isAlreadySeen ? now : null,
+          createdAt: now
         };
 
         // Server-side de-duplication: check if identical message was added within last 5 seconds
@@ -493,12 +500,24 @@ const initSocket = (io) => {
           }
         }
 
+        // If admin sent message, mark all prior user messages as seen
+        if (isAdminSender && session.messages?.length > 0) {
+          for (const m of session.messages) {
+            if (m.sender === 'user' && !m.seen) {
+              m.seen = true;
+              m.seenAt = now;
+            }
+          }
+        }
+
         session.messages.push(newMsg);
         session.lastMessage = (text || '').trim().slice(0, 140) || (fileName ? `[File: ${fileName}]` : '[Attachment]');
         session.lastSender = sender || 'user';
 
-        if (sender === 'admin') {
+        if (isAdminSender) {
           session.unreadUserCount = (session.unreadUserCount || 0) + 1;
+          session.unreadAdminCount = 0;
+          session.lastSeenByAdminAt = now;
         } else {
           session.unreadAdminCount = (session.unreadAdminCount || 0) + 1;
         }
@@ -511,8 +530,15 @@ const initSocket = (io) => {
           message: newMsg
         });
 
+        if (isAdminSender) {
+          io.to(`support_${sessionId}`).emit('support-messages-seen', {
+            sessionId,
+            seenAt: now
+          });
+        }
+
         // If user sent it, notify all admins on the support desk
-        if (sender !== 'admin') {
+        if (!isAdminSender) {
           if (session.status !== 'admin_joined') {
             session.status = 'human_requested';
             session.requestedAt = new Date();
@@ -533,6 +559,69 @@ const initSocket = (io) => {
         }
       } catch (err) {
         console.error('Socket send-support-message error:', err);
+      }
+    });
+
+    socket.on('admin-join-support', async ({ sessionId }) => {
+      try {
+        if (!sessionId) return;
+        const now = new Date();
+        const session = await SupportSession.findOne({ sessionId });
+        if (session) {
+          session.status = 'admin_joined';
+          session.unreadAdminCount = 0;
+          session.lastSeenByAdminAt = now;
+          if (session.messages?.length > 0) {
+            for (const m of session.messages) {
+              if (m.sender === 'user' && !m.seen) {
+                m.seen = true;
+                m.seenAt = now;
+              }
+            }
+          }
+          await session.save();
+        }
+        io.to(`support_${sessionId}`).emit('admin-joined-support', {
+          sessionId,
+          admin: { name: 'IlmiDunya Helpdesk' }
+        });
+        io.to(`support_${sessionId}`).emit('support-status-changed', {
+          sessionId,
+          status: 'admin_joined'
+        });
+        io.to(`support_${sessionId}`).emit('support-messages-seen', {
+          sessionId,
+          seenAt: now
+        });
+      } catch (err) {
+        console.error('Socket admin-join-support error:', err);
+      }
+    });
+
+    socket.on('support-seen', async ({ sessionId }) => {
+      try {
+        if (!sessionId) return;
+        const now = new Date();
+        await SupportSession.updateOne(
+          { sessionId },
+          {
+            $set: {
+              unreadAdminCount: 0,
+              lastSeenByAdminAt: now,
+              "messages.$[elem].seen": true,
+              "messages.$[elem].seenAt": now
+            }
+          },
+          {
+            arrayFilters: [{ "elem.sender": "user", "elem.seen": { $ne: true } }]
+          }
+        );
+        io.to(`support_${sessionId}`).emit('support-messages-seen', {
+          sessionId,
+          seenAt: now
+        });
+      } catch (err) {
+        console.error('Socket support-seen error:', err);
       }
     });
 

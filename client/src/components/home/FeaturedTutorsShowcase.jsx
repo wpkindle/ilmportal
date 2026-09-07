@@ -71,13 +71,13 @@ export default function FeaturedTutorsShowcase({ initialTutors = [] }) {
               href="/tutors?gender=female"
               className="px-4 py-2.5 bg-[#f5f0e6] hover:bg-[#ebe3d3] text-[#0c2217] border border-[#ebe3d3] font-bold text-xs rounded-xl transition-all"
             >
-              Female Teachers
+              Female Tutors
             </Link>
             <Link
               href="/tutors"
               className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl transition-all shadow-md group"
             >
-              <span>View All Teachers</span>
+              <span>View All Tutors</span>
               <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>

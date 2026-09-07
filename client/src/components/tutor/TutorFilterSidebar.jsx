@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Filter, RotateCcw, MapPin, BookOpen, User, UserCheck, Video, ShieldCheck, Check, Navigation, ArrowUpDown, Sparkles, Clock, Star, Award } from 'lucide-react';
+import { Filter, RotateCcw, MapPin, BookOpen, User, UserCheck, Video, ShieldCheck, Check, Navigation, ArrowUpDown, Sparkles, Clock, Star, Award, GraduationCap } from 'lucide-react';
 import CustomSelect from '../common/CustomSelect';
 import { pakistaniCityAreas } from '../../data/pakistanAreas';
 
@@ -87,11 +87,10 @@ const TutorFilterSidebar = ({
             <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
             <span>Female Safety Filters</span>
           </span>
-          {(filters.gender === 'female' || filters.faculty === 'alimah') && (
+          {(filters.faculty === 'female_academic' || filters.faculty === 'alimah' || filters.faculty === 'female_quran') && (
             <button
               type="button"
               onClick={() => {
-                onFilterChange('gender', '');
                 onFilterChange('faculty', '');
               }}
               className="text-[10px] text-stone-500 hover:text-[#b85d34] font-semibold underline cursor-pointer"
@@ -102,55 +101,54 @@ const TutorFilterSidebar = ({
         </div>
 
         <div className="grid grid-cols-1 gap-1.5">
-          {/* 1. Female Tutors */}
+          {/* 1. Female Academic Tutor */}
           <button
             type="button"
             onClick={() => {
-              if (filters.gender === 'female' && !filters.faculty) {
-                onFilterChange('gender', '');
+              if (filters.faculty === 'female_academic') {
+                onFilterChange('faculty', '');
               } else {
                 onFilterChange('gender', 'female');
-                onFilterChange('faculty', '');
+                onFilterChange('faculty', 'female_academic');
               }
             }}
             className={`w-full p-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
-              filters.gender === 'female' && !filters.faculty
+              filters.faculty === 'female_academic'
                 ? 'bg-[#b85d34] text-white border-[#b85d34] shadow-xs'
                 : 'bg-white hover:bg-[#ede0d8] text-[#0c2217] border-[#e6ded1]'
             }`}
           >
             <div className="flex items-center gap-2">
-              <UserCheck className={`w-4 h-4 ${filters.gender === 'female' && !filters.faculty ? 'text-white' : 'text-[#b85d34]'}`} />
-              <span>Female Tutors</span>
+              <GraduationCap className={`w-4 h-4 ${filters.faculty === 'female_academic' ? 'text-white' : 'text-[#b85d34]'}`} />
+              <span>Female Academic Tutor</span>
             </div>
-            {filters.gender === 'female' && !filters.faculty && (
+            {filters.faculty === 'female_academic' && (
               <Check className="w-4 h-4 text-white shrink-0" />
             )}
           </button>
 
-          {/* 2. Female Alimahs */}
+          {/* 2. Female Quran Tutor */}
           <button
             type="button"
             onClick={() => {
-              if (filters.faculty === 'alimah') {
+              if (filters.faculty === 'alimah' || filters.faculty === 'female_quran') {
                 onFilterChange('faculty', '');
-                onFilterChange('gender', '');
               } else {
                 onFilterChange('gender', 'female');
                 onFilterChange('faculty', 'alimah');
               }
             }}
             className={`w-full p-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
-              filters.faculty === 'alimah'
+              filters.faculty === 'alimah' || filters.faculty === 'female_quran'
                 ? 'bg-[#0c2217] text-white border-[#0c2217] shadow-xs'
                 : 'bg-white hover:bg-[#edf6f0] text-[#0c2217] border-[#e6ded1]'
             }`}
           >
             <div className="flex items-center gap-2">
-              <ShieldCheck className={`w-4 h-4 ${filters.faculty === 'alimah' ? 'text-[#d4a359]' : 'text-[#0c2217]'}`} />
-              <span>Female Alimahs</span>
+              <ShieldCheck className={`w-4 h-4 ${filters.faculty === 'alimah' || filters.faculty === 'female_quran' ? 'text-[#d4a359]' : 'text-[#0c2217]'}`} />
+              <span>Female Quran Tutor</span>
             </div>
-            {filters.faculty === 'alimah' && (
+            {(filters.faculty === 'alimah' || filters.faculty === 'female_quran') && (
               <Check className="w-4 h-4 text-[#d4a359] shrink-0" />
             )}
           </button>
@@ -308,12 +306,7 @@ const TutorFilterSidebar = ({
               type="button"
               onClick={() => {
                 onFilterChange('gender', g.val);
-                if (g.val !== 'female' && filters.faculty === 'alimah') {
-                  onFilterChange('faculty', '');
-                }
-                if (g.val !== 'male' && (filters.faculty === 'male_quran' || filters.faculty === 'male_academic')) {
-                  onFilterChange('faculty', '');
-                }
+                onFilterChange('faculty', '');
               }}
               className={`py-2 px-2 rounded-xl text-center transition-all cursor-pointer ${
                 (filters.gender || '') === g.val

@@ -28,7 +28,7 @@ function TutorSearchContent() {
   // Helper to infer gender from faculty parameter
   const resolveGender = (fac, gen) => {
     if (gen) return gen;
-    if (fac === 'alimah' || fac === 'female_alimah' || fac === 'female_tutor') return 'female';
+    if (fac === 'alimah' || fac === 'female_alimah' || fac === 'female_tutor' || fac === 'female_academic' || fac === 'female_quran') return 'female';
     if (fac === 'male_quran' || fac === 'male_academic' || fac === 'qari') return 'male';
     return '';
   };
@@ -137,7 +137,7 @@ function TutorSearchContent() {
       const res = await api.getTutors(queryParams);
       if (res.success) {
         let list = res.tutors || [];
-        if (filters.faculty === 'alimah') {
+        if (filters.faculty === 'alimah' || filters.faculty === 'female_quran') {
           list = list.filter((t) => {
             const isFemale = t.gender === 'female' || t.user?.gender === 'female';
             if (!isFemale) return false;
@@ -163,6 +163,40 @@ function TutorSearchContent() {
               name.includes('alimah') ||
               bio.includes('alimah') ||
               hasQuranSubject
+            );
+          });
+        } else if (filters.faculty === 'female_academic') {
+          list = list.filter((t) => {
+            const isFemale = t.gender === 'female' || t.user?.gender === 'female';
+            if (!isFemale) return false;
+            const qual = (t.qualifications || '').toLowerCase();
+            const bio = (t.bio || '').toLowerCase();
+            const hasAcademicSubject = t.subjects?.some((s) => {
+              const sType = (s.type || '').toLowerCase();
+              const sName = (s.name || s.slug || '').toLowerCase();
+              return sType === 'academic' || (!sName.includes('quran') && !sName.includes('tajweed') && !sName.includes('qaida') && !sName.includes('hifz'));
+            });
+            return (
+              hasAcademicSubject ||
+              qual.includes('bs') ||
+              qual.includes('ms') ||
+              qual.includes('msc') ||
+              qual.includes('mphil') ||
+              qual.includes('phd') ||
+              qual.includes('engineer') ||
+              qual.includes('doctor') ||
+              qual.includes('mbbs') ||
+              qual.includes('matric') ||
+              qual.includes('o level') ||
+              qual.includes('academic') ||
+              bio.includes('math') ||
+              bio.includes('physics') ||
+              bio.includes('chemistry') ||
+              bio.includes('biology') ||
+              bio.includes('science') ||
+              bio.includes('english') ||
+              bio.includes('academic') ||
+              bio.includes('school')
             );
           });
         } else if (filters.faculty === 'male_quran' || filters.faculty === 'qari') {
@@ -227,6 +261,11 @@ function TutorSearchContent() {
               bio.includes('school')
             );
           });
+        } else if (filters.gender === 'female') {
+          // Display ALL female tutors including alimahs
+          list = list.filter((t) => t.gender === 'female' || t.user?.gender === 'female');
+        } else if (filters.gender === 'male') {
+          list = list.filter((t) => t.gender === 'male' || t.user?.gender === 'male');
         }
         setTutors(list);
       }
@@ -350,13 +389,34 @@ function TutorSearchContent() {
               }`}
             >
               <UserCheck className="w-3.5 h-3.5" />
-              <span>Female Tutors</span>
+              <span>All Female Tutors</span>
             </button>
 
             <button
               type="button"
               onClick={() => {
-                if (filters.faculty === 'alimah') {
+                if (filters.faculty === 'female_academic') {
+                  handleFilterChange('faculty', '');
+                  handleFilterChange('gender', '');
+                } else {
+                  handleFilterChange('gender', 'female');
+                  handleFilterChange('faculty', 'female_academic');
+                }
+              }}
+              className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer border inline-flex items-center gap-1 ${
+                filters.faculty === 'female_academic'
+                  ? 'bg-[#b85d34] text-white border-[#b85d34] shadow-2xs'
+                  : 'bg-white text-slate-700 hover:bg-slate-50 border-slate-200'
+              }`}
+            >
+              <GraduationCap className="w-3.5 h-3.5 text-[#b85d34]" />
+              <span>Female Academic Tutors</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => {
+                if (filters.faculty === 'alimah' || filters.faculty === 'female_quran') {
                   handleFilterChange('faculty', '');
                   handleFilterChange('gender', '');
                 } else {
@@ -365,13 +425,13 @@ function TutorSearchContent() {
                 }
               }}
               className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer border inline-flex items-center gap-1 ${
-                filters.faculty === 'alimah'
+                filters.faculty === 'alimah' || filters.faculty === 'female_quran'
                   ? 'bg-[#0c2217] text-white border-[#0c2217] shadow-2xs'
                   : 'bg-white text-[#0c2217] hover:bg-[#edf6f0] border-[#0c2217]/30'
               }`}
             >
               <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-              <span>Female Alimahs</span>
+              <span>Female Quran Tutors</span>
             </button>
 
             <button
@@ -437,10 +497,12 @@ function TutorSearchContent() {
             <div className="flex items-center justify-between px-1">
               <p className="text-xs sm:text-sm font-bold text-slate-700">
                 Showing <span className="text-[#0c2217] font-black">{tutors.length}</span>{' '}
-                {filters.faculty === 'alimah'
-                  ? 'Verified Female Alimahs'
+                {filters.faculty === 'female_academic'
+                  ? 'Verified Female Academic Tutors'
+                  : filters.faculty === 'alimah' || filters.faculty === 'female_quran'
+                  ? 'Verified Female Quran Tutors (Alimahs)'
                   : filters.gender === 'female'
-                  ? 'Verified Female Tutors'
+                  ? 'Verified Female Tutors (All)'
                   : filters.faculty === 'male_quran'
                   ? 'Verified Male Quran Tutors'
                   : filters.faculty === 'male_academic'

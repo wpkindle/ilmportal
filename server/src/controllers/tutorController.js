@@ -65,14 +65,35 @@ exports.getPublicTutors = async (req, res) => {
     }
 
     // Filter by Faculty / Gender
-    if (faculty === 'alimah' || faculty === 'female_alimah') {
-      query.gender = 'female';
+    if (faculty === 'alimah' || faculty === 'female_alimah' || faculty === 'female_quran') {
       const quranCats = await Category.find({ type: 'quran' }, '_id');
       const quranCatIds = quranCats.map(c => c._id);
-      query.$or = [
-        { qualifications: { $regex: /alimah|wifaq|wafaq|dars-e-nizami|sanad|tajweed|hafiz|quran/i } },
-        { bio: { $regex: /alimah|wifaq|wafaq|dars-e-nizami|sanad|tajweed|hafiz|quran|islamic/i } },
-        { subjects: { $in: quranCatIds } }
+      const femaleUsers = await User.find({ gender: 'female' }, '_id');
+      const femaleUserIds = femaleUsers.map(u => u._id);
+      query.$and = [
+        { $or: [{ gender: 'female' }, { user: { $in: femaleUserIds } }] },
+        {
+          $or: [
+            { qualifications: { $regex: /alimah|wifaq|wafaq|dars-e-nizami|sanad|tajweed|hafiz|quran/i } },
+            { bio: { $regex: /alimah|wifaq|wafaq|dars-e-nizami|sanad|tajweed|hafiz|quran|islamic/i } },
+            { subjects: { $in: quranCatIds } }
+          ]
+        }
+      ];
+    } else if (faculty === 'female_academic') {
+      const acadCats = await Category.find({ type: 'academic' }, '_id');
+      const acadCatIds = acadCats.map(c => c._id);
+      const femaleUsers = await User.find({ gender: 'female' }, '_id');
+      const femaleUserIds = femaleUsers.map(u => u._id);
+      query.$and = [
+        { $or: [{ gender: 'female' }, { user: { $in: femaleUserIds } }] },
+        {
+          $or: [
+            { qualifications: { $regex: /bs|ms|msc|mphil|phd|b\.ed|m\.ed|o.level|a.level|matric|fsc|engineer|master|bachelor|academic|doctor|mbbs/i } },
+            { bio: { $regex: /math|physics|chemistry|biology|science|english|computer|accounting|economics|matric|cambridge|academic|school/i } },
+            { subjects: { $in: acadCatIds } }
+          ]
+        }
       ];
     } else if (faculty === 'male_quran' || faculty === 'qari') {
       query.gender = 'male';
@@ -93,7 +114,12 @@ exports.getPublicTutors = async (req, res) => {
         { subjects: { $in: acadCatIds } }
       ];
     } else if (gender && gender !== 'all') {
-      query.gender = gender;
+      const usersWithGender = await User.find({ gender: gender }, '_id');
+      const userIdsWithGender = usersWithGender.map(u => u._id);
+      query.$or = [
+        { gender: gender },
+        { user: { $in: userIdsWithGender } }
+      ];
     }
 
     // Filter by Minimum Rating

@@ -187,7 +187,8 @@ function TutorSearchContent() {
               qual.includes('doctor') ||
               qual.includes('mbbs') ||
               qual.includes('matric') ||
-              qual.includes('o level') ||
+              qual.includes('board') ||
+              qual.includes('fsc') ||
               qual.includes('academic') ||
               bio.includes('math') ||
               bio.includes('physics') ||
@@ -250,7 +251,8 @@ function TutorSearchContent() {
               qual.includes('phd') ||
               qual.includes('engineer') ||
               qual.includes('matric') ||
-              qual.includes('o level') ||
+              qual.includes('board') ||
+              qual.includes('fsc') ||
               qual.includes('academic') ||
               bio.includes('math') ||
               bio.includes('physics') ||
@@ -325,7 +327,7 @@ function TutorSearchContent() {
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
                 type="text"
-                placeholder="Search tutor name, subject (Tajweed, Math, O-Level)..."
+                placeholder="Search tutor name, subject (Tajweed, Math, Board Prep)..."
                 value={filters.search}
                 onChange={(e) => handleFilterChange('search', e.target.value)}
                 className="w-full pl-10 pr-4 py-3 sm:py-2.5 min-h-[44px] bg-white border border-[#e6ded1] rounded-2xl text-xs sm:text-sm text-slate-800 placeholder:text-slate-400 outline-none focus:border-[#b85d34] shadow-xs"

@@ -244,13 +244,13 @@ const Footer = () => {
             </div>
             <ul className="space-y-2 text-xs text-[#4a5e55]">
               <li>
-                <Link href="/tutors?category=o-level-cambridge" className="hover:text-[#0c2217] transition-colors block">
-                  Cambridge O-Level Coaching
+                <Link href="/tutors?category=board-exam-prep" className="hover:text-[#0c2217] transition-colors block">
+                  Board Exam Preparation
                 </Link>
               </li>
               <li>
-                <Link href="/tutors?category=a-level-cambridge" className="hover:text-[#0c2217] transition-colors block">
-                  Cambridge A-Level Coaching
+                <Link href="/tutors?category=middle-school-academic" className="hover:text-[#0c2217] transition-colors block">
+                  Middle School Academic (6th-8th)
                 </Link>
               </li>
               <li>

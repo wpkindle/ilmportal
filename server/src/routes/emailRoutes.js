@@ -493,7 +493,7 @@ router.post('/seed-demo', async (req, res) => {
       },
       {
         threadId: `th_demo_academic_3`,
-        subject: 'Cambridge O-Level Physics & Additional Maths Tutor',
+        subject: 'Federal Board (FBISE) Physics & Mathematics Tutor',
         from: { name: 'Hamza Bilal', address: 'hamza.bilal.isb@gmail.com' },
         to: [{ name: 'IlmiDunya Support', address: 'info@ilmidunya.com' }],
         status: 'replied',
@@ -501,15 +501,15 @@ router.post('/seed-demo', async (req, res) => {
         priority: 'normal',
         isStarred: false,
         userRole: 'guest',
-        lastMessageSnippet: 'Thank you for connecting me with Sir Usman for Cambridge Physics.',
+        lastMessageSnippet: 'Thank you for connecting me with Sir Usman for Federal Board Physics.',
         messages: [
           {
             messageId: 'msg_demo_3a',
             direction: 'inbound',
             from: { name: 'Hamza Bilal', address: 'hamza.bilal.isb@gmail.com' },
             to: [{ name: 'IlmiDunya Support', address: 'info@ilmidunya.com' }],
-            subject: 'Cambridge O-Level Physics & Additional Maths Tutor',
-            text: 'Salam, looking for an experienced Cambridge O-Level Physics tutor for May/June series exam preparation in Islamabad.',
+            subject: 'Federal Board (FBISE) Physics & Mathematics Tutor',
+            text: 'Salam, looking for an experienced Federal Board (FBISE) Physics tutor for upcoming board exam preparation in Islamabad.',
             createdAt: new Date(Date.now() - 3600000 * 24)
           },
           {
@@ -517,8 +517,8 @@ router.post('/seed-demo', async (req, res) => {
             direction: 'outbound',
             from: { name: 'IlmiDunya Faculty Support', address: 'info@ilmidunya.com' },
             to: [{ name: 'Hamza Bilal', address: 'hamza.bilal.isb@gmail.com' }],
-            subject: 'Re: Cambridge O-Level Physics & Additional Maths Tutor',
-            text: 'Wa Alaikum Assalam Hamza,\n\nWe have verified Cambridge educators available in Islamabad and online via our WebRTC classroom. You can book a free 30-minute demo session directly from our tutors directory.\n\nWarm regards,\nIlmiDunya Academic Faculty Team',
+            subject: 'Re: Federal Board (FBISE) Physics & Mathematics Tutor',
+            text: 'Wa Alaikum Assalam Hamza,\n\nWe have verified Federal Board educators available in Islamabad and online via our WebRTC classroom. You can book a free 30-minute demo session directly from our tutors directory.\n\nWarm regards,\nIlmiDunya Academic Faculty Team',
             createdAt: new Date(Date.now() - 3600000 * 18)
           }
         ]

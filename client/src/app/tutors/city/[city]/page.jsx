@@ -9,21 +9,21 @@ export const revalidate = 60;
 const cityLocalContext = {
   lahore: {
     areas: 'DHA, Gulberg, Johar Town, Model Town, Bahria Town & Cantt',
-    boards: 'BISE Lahore, Federal Board (FBISE), and Cambridge CAIE (O/A Levels)',
-    popularSubjects: 'Tajweed al-Quran with Sanad, O-Level Physics/Math, FSc Pre-Medical, Noorani Qaida for Kids',
+    boards: 'BISE Lahore, Federal Board (FBISE), and Punjab Provincial Boards',
+    popularSubjects: 'Tajweed al-Quran with Sanad, Matric/FSc Physics/Math, Pre-Medical, Noorani Qaida for Kids',
     description: 'Lahore is a historic center of academic excellence and Islamic scholarship. IlmiDunya connects families across Lahore with verified local Qaris, qualified female Alimahs for daughters, and top Playgroup to FSc tuition specialists offering camera-off live 1:1 sessions.'
   },
   karachi: {
     areas: 'Clifton, DHA, Gulshan-e-Iqbal, PECHS, North Nazimabad & Malir Cantt',
-    boards: 'BSEK Karachi, BIEK, Aga Khan University Board (AKU-EB), and Cambridge CAIE',
-    popularSubjects: 'Cambridge CAIE O/A Levels, MDCAT Chemistry, Tajweed & Hifz Revision, Matric Science',
+    boards: 'BSEK Karachi, BIEK, and Federal Board (FBISE)',
+    popularSubjects: 'Matric Science, FSc / Intermediate, MDCAT Chemistry, Tajweed & Hifz Revision',
     description: 'Eliminate lengthy commutes across Shahrah-e-Faisal and University Road. Find vetted Karachi-based Quran teachers and school educators who deliver live interactive lessons directly to your home with complete family privacy.'
   },
   islamabad: {
     areas: 'Sectors F-6, F-7, F-8, F-10, F-11, G-11, DHA Islamabad & Bahria Town',
-    boards: 'Federal Board (FBISE) and Cambridge International (CAIE)',
-    popularSubjects: 'Noorani Qaida for Children, O/A Level Mathematics, HSSC Physics, Female Quran Teachers',
-    description: 'Families in Islamabad and the twin cities trust IlmiDunya for certified Quran Qaris with authenticated Sanads, and university scholars for Cambridge & Federal Board tutoring.'
+    boards: 'Federal Board (FBISE) and Rawalpindi Board (BISE)',
+    popularSubjects: 'Noorani Qaida for Children, Board Mathematics, HSSC Physics, Female Quran Teachers',
+    description: 'Families in Islamabad and the twin cities trust IlmiDunya for certified Quran Qaris with authenticated Sanads, and university scholars for Federal & Provincial Board tutoring.'
   },
   rawalpindi: {
     areas: 'Bahria Town, Westridge, Saddar, Chaklala, Satellite Town & Askari',
@@ -33,7 +33,7 @@ const cityLocalContext = {
   },
   peshawar: {
     areas: 'Hayatabad, University Town, Peshawar Cantt & Warsak Road',
-    boards: 'BISE Peshawar and Cambridge CAIE',
+    boards: 'BISE Peshawar and Federal Board (FBISE)',
     popularSubjects: 'Tajweed-ul-Quran, Pre-Medical Biology, Noorani Qaida, Matric English',
     description: 'Verified Quran Qaris and subject specialists teaching students in Peshawar with genuine dedication, safe audio/video sessions, and camera-off privacy guarantees.'
   },
@@ -76,7 +76,7 @@ export default async function CityTutorsPage({ params }) {
   const formattedCity = rawCity.charAt(0).toUpperCase() + rawCity.slice(1);
   const context = cityLocalContext[cityKey] || {
     areas: `Central areas and online students in ${formattedCity}`,
-    boards: 'Matriculation, Intermediate Boards & Cambridge CAIE',
+    boards: 'Matriculation (SSC) & Intermediate (HSSC) Boards',
     popularSubjects: 'Tajweed al-Quran, Noorani Qaida, School Sciences & Math',
     description: `Connect with verified Pakistani Quran Qaris, female Alimahs, and Playgroup to FSc subject tutors available for students in ${formattedCity} and nationwide.`
   };
@@ -200,10 +200,10 @@ export default async function CityTutorsPage({ params }) {
             Quran Tajweed Tutors
           </Link>
           <Link
-            href={`/tutors?city=${formattedCity}&category=o-level-cambridge`}
+            href={`/tutors?city=${formattedCity}&category=board-exam-prep`}
             className="px-3.5 py-1.5 rounded-full bg-white hover:bg-[#f5f0e6] text-[#2d3a37] border border-[#ebe3d3] font-medium transition-all"
           >
-            Cambridge O/A Level
+            Board Exam Preparation
           </Link>
         </div>
 

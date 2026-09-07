@@ -20,7 +20,7 @@ export const metadata = {
     template: '%s | IlmiDunya Pakistan',
   },
   description: 'Connect with verified Pakistani Quran Qaris, female Alimahs, and Playgroup to FSc subject tutors. 1-on-1 live video classes with camera-off privacy from Lahore, Karachi, Islamabad & across Pakistan.',
-  keywords: 'Quran tutor Pakistan, Tajweed tutor Lahore, O Level tutor Karachi, Online Quran Academy, Hifz tutor, Matric science tutor, Female Quran teacher Pakistan, In-platform WebRTC classroom',
+  keywords: 'Quran tutor Pakistan, Tajweed tutor Lahore, Board tutor Karachi, Online Quran Academy, Hifz tutor, Matric science tutor, FSc tutor, Female Quran teacher Pakistan, In-platform WebRTC classroom',
   alternates: {
     canonical: '/',
   },

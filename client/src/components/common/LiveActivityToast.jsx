@@ -22,7 +22,7 @@ const activities = [
     studentName: 'Zainab Malik',
     city: 'Islamabad',
     action: 'just booked a 3-Day Free Trial for',
-    subject: 'Cambridge O-Level Physics',
+    subject: 'Board Exam Physics (SSC & HSSC)',
     tutor: 'Engr. Bilal Ahmad',
     avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80',
     timeAgo: 'Just now',
@@ -70,7 +70,7 @@ const activities = [
     studentName: 'Ali Raza',
     city: 'Quetta',
     action: 'left a 5-Star Verified Review on',
-    subject: 'Cambridge A-Level Mathematics',
+    subject: 'Board Mathematics & Algebra',
     tutor: 'Engr. Bilal Ahmad',
     avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=120&q=80',
     timeAgo: 'Just now',
@@ -154,11 +154,11 @@ const activities = [
     studentName: 'Danyal Shah',
     city: 'Muzaffarabad (AJK)',
     action: 'booked live home & online tutoring for',
-    subject: 'Cambridge IGCSE Computer Science',
+    subject: 'Board Computer Science & Coding',
     tutor: 'Engr. Bilal Ahmad',
     avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&q=80',
     timeAgo: '2 mins ago',
-    typeLabel: 'O/A Level',
+    typeLabel: 'Academic',
     badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/30'
   }
 ];

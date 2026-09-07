@@ -17,11 +17,11 @@ const testimonials = [
     featured: false,
     name: 'Hamza Rizvi',
     location: 'Gulshan-e-Iqbal, Karachi',
-    role: 'Cambridge O-Level Physics Student',
+    role: 'Board Physics & Mathematics Student',
     rating: 5,
-    highlight: 'CAIE Past Paper Problem Solving',
+    highlight: 'Board Exam Past Paper Problem Solving',
     review:
-      'I was struggling with CAIE kinematics and paper-2 numericals. My tutor Sir Bilal explains everything on the digital whiteboard in the browser. No commuting through Shahrah-e-Faisal traffic, and I save 2 hours daily.'
+      'I was struggling with Board kinematics and physics numericals. My tutor Sir Bilal explains everything on the digital whiteboard in the browser. No commuting through Shahrah-e-Faisal traffic, and I save 2 hours daily.'
   },
   {
     featured: false,

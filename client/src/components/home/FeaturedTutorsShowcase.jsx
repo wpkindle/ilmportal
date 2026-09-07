@@ -62,7 +62,7 @@ export default function FeaturedTutorsShowcase({ initialTutors = [] }) {
             </h2>
 
             <p className="text-xs sm:text-sm text-[#5c6e69] leading-relaxed">
-              Every teacher holds verified CNIC records and authenticated credentials — from Wafaq-ul-Madaris Tajweed Sanads to Cambridge O/A Level and FSc university honors.
+              Every teacher holds verified CNIC records and authenticated credentials — from Wafaq-ul-Madaris Tajweed Sanads to Board Matric/FSc and university honors.
             </p>
           </div>
 

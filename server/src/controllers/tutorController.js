@@ -89,8 +89,8 @@ exports.getPublicTutors = async (req, res) => {
         { $or: [{ gender: 'female' }, { user: { $in: femaleUserIds } }] },
         {
           $or: [
-            { qualifications: { $regex: /bs|ms|msc|mphil|phd|b\.ed|m\.ed|o.level|a.level|matric|fsc|engineer|master|bachelor|academic|doctor|mbbs/i } },
-            { bio: { $regex: /math|physics|chemistry|biology|science|english|computer|accounting|economics|matric|cambridge|academic|school/i } },
+            { qualifications: { $regex: /bs|ms|msc|mphil|phd|b\.ed|m\.ed|board|matric|fsc|engineer|master|bachelor|academic|doctor|mbbs/i } },
+            { bio: { $regex: /math|physics|chemistry|biology|science|english|computer|accounting|economics|matric|board|academic|school/i } },
             { subjects: { $in: acadCatIds } }
           ]
         }
@@ -109,8 +109,8 @@ exports.getPublicTutors = async (req, res) => {
       const acadCats = await Category.find({ type: 'academic' }, '_id');
       const acadCatIds = acadCats.map(c => c._id);
       query.$or = [
-        { qualifications: { $regex: /bs|ms|msc|mphil|phd|b\.ed|m\.ed|o.level|a.level|matric|fsc|engineer|master|bachelor|academic/i } },
-        { bio: { $regex: /math|physics|chemistry|biology|science|english|computer|accounting|economics|matric|cambridge|academic|school/i } },
+        { qualifications: { $regex: /bs|ms|msc|mphil|phd|b\.ed|m\.ed|board|matric|fsc|engineer|master|bachelor|academic/i } },
+        { bio: { $regex: /math|physics|chemistry|biology|science|english|computer|accounting|economics|matric|board|academic|school/i } },
         { subjects: { $in: acadCatIds } }
       ];
     } else if (gender && gender !== 'all') {

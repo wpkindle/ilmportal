@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'Quran & Academic Curriculums | IlmiDunya Pakistan',
-  description: 'Structured Quran memorization (Hifz), Tajweed, Noorani Qaida, Cambridge O/A Levels, and Matric/FSc courses designed for Pakistani students.',
+  description: 'Structured Quran memorization (Hifz), Tajweed, Noorani Qaida, Federal/Provincial Board examinations, and Matric/FSc courses designed for Pakistani students.',
   alternates: {
     canonical: 'https://pakistanlms.pk/courses',
   },

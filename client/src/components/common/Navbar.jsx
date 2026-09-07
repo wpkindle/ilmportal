@@ -236,8 +236,8 @@ const Navbar = () => {
       items: [
         { name: 'Matric / SSC Science & Arts', link: '/tutors?category=matric-ssc-science' },
         { name: 'FSc Pre-Medical & Engineering', link: '/tutors?category=fsc-pre-engineering' },
-        { name: 'Cambridge O Level Coaching', link: '/tutors?category=o-level-cambridge' },
-        { name: 'Cambridge A Level Coaching', link: '/tutors?category=a-level-cambridge' },
+        { name: 'Board Exam Preparation', link: '/tutors?category=board-exam-prep' },
+        { name: 'Middle School Academic (Class 6-8)', link: '/tutors?category=middle-school-academic' },
         { name: 'MDCAT & ECAT Entry Prep', link: '/tutors?category=entry-test-prep' }
       ]
     },
@@ -787,11 +787,11 @@ const Navbar = () => {
                 &bull; School &amp; College Academics
               </Link>
               <Link
-                href="/tutors?category=o-level-cambridge"
+                href="/tutors?category=board-exam-prep"
                 onClick={() => setMobileMenuOpen(false)}
                 className="block px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-700 hover:bg-[#ede6db] transition-colors"
               >
-                &bull; Cambridge O &amp; A Levels
+                &bull; Board Exam Preparation
               </Link>
               <Link
                 href="/how-it-works"

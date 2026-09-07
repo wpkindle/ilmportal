@@ -64,7 +64,7 @@ function extractQueryFilters(text = '') {
     { key: 'nazra', match: ['nazra', 'recitation', 'reading'] },
     { key: 'noorani qaida', match: ['qaida', 'noorani', 'beginner', 'alphabet'] },
     { key: 'quran', match: ['quran', 'arabic', 'tarjuma', 'tafseer'] },
-    { key: 'cambridge', match: ['cambridge', 'o-level', 'a-level', 'igcse', 'caie'] },
+    { key: 'board', match: ['board', 'fbise', 'bise', 'academic', 'school'] },
     { key: 'fsc', match: ['fsc', 'pre-medical', 'pre-engineering', 'intermediate', '11th', '12th'] },
     { key: 'matric', match: ['matric', '9th', '10th', 'ssc'] },
     { key: 'physics', match: ['physics'] },
@@ -257,7 +257,7 @@ async function buildRagContext({ message, user = null }) {
 - Total Verified Tutors: ${liveStats.totalTutors}
 - Certified Female Alimahs (with Sanad): ${liveStats.femaleAlimahs}
 - Specialized Male Qaris & Mentors: ${liveStats.maleQaris}
-- Official Courses: ${liveStats.totalCourses} (Noorani Qaida, Nazra, Tajweed, Cambridge, FSc, Matric)
+- Official Courses: ${liveStats.totalCourses} (Noorani Qaida, Nazra, Tajweed, Board Prep, FSc, Matric)
 - Core Platform Standard: 100% Direct Dealing (Zero Middlemen / No cuts).
 - Payment Methods: Meezan Bank (Islamic Banking), JazzCash, EasyPaisa, Raast ID.
 - Female Safety: Certified female Alimahs teach exclusively online via encrypted WebRTC with camera-off privacy. In-person home visits are male-only.

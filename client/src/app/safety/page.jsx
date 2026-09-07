@@ -78,7 +78,7 @@ export default function SafetyPage() {
         'We do not allow anonymous or unvetted teachers. Every educator on IlmiDunya undergoes multi-step manual credential checks.',
       features: [
         'Wafaq-ul-Madaris Sanad Authentication: Quranic Qaris and Alimahs submit authenticated Shahadat-ul-Alimiyyah and Tajweed Sanad documents.',
-        'Academic Degrees: Cambridge O/A-Level and Matric/FSc tutors must provide verified transcripts and university degrees.',
+        'Academic Degrees: Board (FBISE/BISE) Matric/FSc and university tutors must provide verified transcripts and degrees.',
         'CNIC & Identity Validation: Tutors are physically identified through Government CNIC records.',
         '256-Bit Encrypted Document Vault: All sensitive educator identity documents are stored in encrypted vaults and never made public.'
       ]

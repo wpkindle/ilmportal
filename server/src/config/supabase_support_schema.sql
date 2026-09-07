@@ -151,9 +151,9 @@ VALUES
 ),
 (
     'What Quran and Academic subjects are offered?',
-    'We offer complete Quranic disciplines (Noorani Qaida for beginners, Nazra Quran, Tajweed al-Quran with articulation points, Hifz al-Quran, and Dars-e-Nizami Islamic studies) alongside Cambridge O/A-Levels, Matric (SSC), FSc Pre-Medical & Pre-Engineering, and MDCAT entry test preparation.',
+    'We offer complete Quranic disciplines (Noorani Qaida for beginners, Nazra Quran, Tajweed al-Quran with articulation points, Hifz al-Quran, and Dars-e-Nizami Islamic studies) alongside Federal and Provincial Board Exam preparation (FBISE, BISE), Matric (SSC), FSc Pre-Medical & Pre-Engineering, and MDCAT entry test preparation.',
     'courses',
-    ARRAY['subjects', 'courses', 'tajweed', 'hifz', 'nazra', 'cambridge', 'fsc', 'matric'],
+    ARRAY['subjects', 'courses', 'tajweed', 'hifz', 'nazra', 'board', 'fsc', 'matric'],
     8
 )
 ON CONFLICT DO NOTHING;

@@ -63,7 +63,7 @@ const SubjectExplorer = () => {
               Two paths: Sacred Quranic sciences &amp; academic excellence.
             </h2>
             <p className="text-xs sm:text-sm text-[#5c6e69] leading-relaxed">
-              From gentle Noorani Qaida for young children to rigorous Cambridge CAIE O/A Levels and FSc Board prep, find specialized educators for every milestone.
+              From gentle Noorani Qaida for young children to rigorous Federal and Provincial Board prep (Matric &amp; FSc), find specialized educators for every milestone.
             </p>
           </div>
 

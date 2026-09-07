@@ -223,20 +223,20 @@ const categoriesData = [
     subtopics: ['Physics 11 & 12', 'Chemistry 11 & 12', 'Biology / Higher Math', 'Entry Test Prep (MDCAT/ECAT)']
   },
   {
-    name: 'O-Level / IGCSE Cambridge',
-    slug: 'o-level-cambridge',
+    name: 'Federal & Provincial Board Exam Prep',
+    slug: 'board-exam-prep',
     type: 'academic',
     icon: 'Award',
-    description: 'Past papers solving, examiner tips, and syllabus mastery for Cambridge CAIE O-Levels.',
-    subtopics: ['Math Syllabus D (4024)', 'Physics (5054)', 'Chemistry (5070)', 'Islamiyat & Pak Studies (2058/2059)']
+    description: 'Past papers solving, model papers, and syllabus mastery for FBISE, BISE Lahore, BSEK, and all boards.',
+    subtopics: ['FBISE Federal Board Mastery', 'Punjab Boards (BISE)', 'Sindh Boards & BSEK', 'Model Papers & Schemes']
   },
   {
-    name: 'A-Level Cambridge',
-    slug: 'a-level-cambridge',
+    name: 'Middle & Primary School Academic (Class 1 - 8)',
+    slug: 'middle-school-academic',
     type: 'academic',
-    icon: 'Award',
-    description: 'Advanced Level CAIE coaching: Pure Math, Mechanics, Physics, Chemistry, and Economics.',
-    subtopics: ['Pure Mathematics (P1, P3, M1, S1)', 'A-Level Physics', 'A-Level Chemistry', 'Computer Science (9618)']
+    icon: 'BookOpen',
+    description: 'Foundation building in Mathematics, General Science, English, and Urdu for middle and primary grades.',
+    subtopics: ['Middle School Math (Class 6-8)', 'General Science Foundation', 'English Grammar & Comprehension', 'Urdu & Social Studies']
   },
   {
     name: 'Computer Science & Coding',
@@ -405,7 +405,7 @@ const seedDatabase = async () => {
       }]
     });
 
-    // Tutor 3: Engr. Bilal Ahmad (Karachi - O/A Level Math & Physics)
+    // Tutor 3: Engr. Bilal Ahmad (Karachi - Board Math & Physics)
     const tutor3User = await User.create({
       name: 'Engr. Bilal Ahmad',
       email: 'bilal.ahmad@example.com',
@@ -419,11 +419,11 @@ const seedDatabase = async () => {
 
     const tutor3Profile = await TutorProfile.create({
       user: tutor3User._id,
-      bio: 'NUST graduate with 7 years of specialized coaching for Cambridge CAIE O/A Levels and FSc. Focus on conceptual clarity, rigorous past-paper practice, and exam strategies that yield A* grades.',
-      qualifications: 'MS Electrical Engineering (NUST), Cambridge Certified Tutor',
+      bio: 'NUST graduate with 7 years of specialized coaching for Federal and Provincial Board Exams (Matric & FSc). Focus on conceptual clarity, rigorous past-paper practice, and exam strategies that yield top board marks.',
+      qualifications: 'MS Electrical Engineering (NUST), Board Exam Specialist',
       experienceYears: 7,
       hourlyRate: 2500, // PKR
-      subjects: [catMap['o-level-cambridge'], catMap['a-level-cambridge'], catMap['fsc-hssc']],
+      subjects: [catMap['board-exam-prep'], catMap['middle-school-academic'], catMap['fsc-hssc']],
       cities: [locMap['Karachi'], locMap['Hyderabad']],
       teachingModes: ['online', 'in_person'],
       gender: 'male',
@@ -457,7 +457,7 @@ const seedDatabase = async () => {
       qualifications: 'MBBS (King Edward Medical University), Gold Medalist',
       experienceYears: 5,
       hourlyRate: 3000,
-      subjects: [catMap['fsc-hssc'], catMap['matric-ssc-science'], catMap['o-level-cambridge']],
+      subjects: [catMap['fsc-hssc'], catMap['matric-ssc-science'], catMap['board-exam-prep']],
       cities: [locMap['Lahore']],
       teachingModes: ['online'],
       gender: 'female',
@@ -616,7 +616,7 @@ const seedDatabase = async () => {
     const deal3 = await Deal.create({
       student: student3._id,
       tutor: tutor3User._id,
-      subject: 'O-Level Mathematics (4024)',
+      subject: 'Board Mathematics & Algebra (Class 9-12)',
       mode: 'online',
       price: 7500,
       priceUnit: 'per_month',
@@ -1147,16 +1147,16 @@ const seedDatabase = async () => {
         ]
       },
 
-      // Course 5: Engr. Bilal Ahmed - Cambridge O-Level Physics
+      // Course 5: Engr. Bilal Ahmed - Board Physics
       {
         instructor: tutor3User._id,
         tutorProfile: tutor3Profile._id,
-        title: 'Cambridge O-Level Physics (5054): Complete Mechanics',
-        slug: 'o-level-physics-mechanics',
+        title: 'Board Physics (Matric & FSc): Complete Mechanics',
+        slug: 'board-physics-mechanics',
         subtitle: 'Master Kinematics, Dynamics, Forces, and Past Paper Problem-Solving with an MS Electrical Engineer.',
-        description: 'Comprehensive CAIE syllabus coverage designed to turn B/C grades into solid A*s. Includes formula sheets, graphical motion analysis, and step-by-step past paper problem breakdowns.',
+        description: 'Comprehensive Federal & Provincial Board syllabus coverage designed to secure A+ grades and top positions. Includes formula sheets, graphical motion analysis, and step-by-step past paper problem breakdowns.',
         category: 'academic',
-        targetAudience: 'Cambridge O-Level Students',
+        targetAudience: 'Matric & FSc Board Students (FBISE / BISE)',
         ageRange: '14–17 Years',
         track: 'academic',
         sessionDuration: '45–60 minutes',

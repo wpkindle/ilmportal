@@ -18,7 +18,7 @@ const steps = [
   {
     step: '01',
     title: 'Browse & Filter by Subject, Gender, or City',
-    highlight: 'Female Alimahs & Cambridge Tutors',
+    highlight: 'Female Alimahs & Academic Tutors',
     description: 'Explore verified teacher profiles with authenticated CNIC and Sanad documents. Filter for female teachers for daughters, or academic specialists in your city.',
     detail: 'Over 20+ disciplines across Pakistan',
     icon: Search,

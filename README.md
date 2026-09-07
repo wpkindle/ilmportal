@@ -16,7 +16,7 @@ A modern, production-grade **Learning Management System (LMS)** designed specifi
 ### 2. Pakistani-Centric Search & Multi-Faceted Filters
 - **Location Coverage**: Filter by all Pakistani provinces and major cities (Lahore, Karachi, Islamabad, Rawalpindi, Peshawar, Quetta, Faisalabad, Muzaffarabad, Gilgit, etc.).
 - **Islamic Disciplines**: Nazra Quran, Tajweed al-Quran, Hifz al-Quran, Quran Translation & Tafseer, Noorani Qaida for Kids, Islamic Studies & Fiqh/Hadith, Arabic Grammar.
-- **Academic Tutoring**: Matric / SSC Science (Class 9 & 10), FSc Pre-Medical & Pre-Engineering, Cambridge CAIE O-Level / IGCSE, Cambridge A-Level, Computer Science & Coding, Spoken English & IELTS.
+- **Academic Tutoring**: Matric / SSC Science (Class 9 & 10), FSc Pre-Medical & Pre-Engineering, Board Exam Preparation (Federal FBISE & Provincial BISE), Middle School Academic, Computer Science & Coding, Spoken English & IELTS.
 - **Tutoring Modes**: Online (Livestream) / In-Person (Home Tutoring) / Both.
 - **Gender & Price Filters**: Gender preference filter for female Quran teachers/students, and price slider in PKR.
 
@@ -84,7 +84,7 @@ Visit the application at **`http://localhost:5173`**.
 | **Administrator** | `admin@pakistanlms.pk` | `Admin@12345` | Full admin control, approvals queue, CMS, payment verification |
 | **Qari / Tutor** | `qari.huzaifa@example.com` | `Password@123` | Verified Hafiz & Tajweed Qari (Lahore) |
 | **Alimah / Tutor** | `alimah.fatima@example.com` | `Password@123` | Verified Alimah & Noorani Qaida teacher (Islamabad) |
-| **Academic Tutor** | `bilal.ahmad@example.com` | `Password@123` | Verified O/A Level Math & Physics coach (Karachi) |
+| **Academic Tutor** | `bilal.ahmad@example.com` | `Password@123` | Verified Board Exam Math & Physics coach (Karachi) |
 | **Student** | `student.hamza@example.com` | `Password@123` | Active student with 3-day trial deal |
 
 ---

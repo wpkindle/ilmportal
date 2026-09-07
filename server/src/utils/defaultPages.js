@@ -76,7 +76,7 @@ IlmiDunya Pakistan operates as an educational technology platform and directory 
 ---
 
 ### 3. Academic & Board Exam Outcomes
-While our faculty strives for excellence in Cambridge CAIE (O/A Levels), Matric/FSc, and Quran memorization (Hifz), student academic performance depends upon individual dedication, regular attendance, and home study.`
+While our faculty strives for excellence in Federal and Provincial Board examinations (Matric & FSc), and Quran memorization (Hifz), student academic performance depends upon individual dedication, regular attendance, and home study.`
   },
 
   'about-us': {
@@ -101,7 +101,7 @@ Guided by the timeless Hadith: *"The best of you are those who learn the Quran a
 ---
 
 ### What Sets IlmiDunya Apart
-* **Sanad-Verified Faculty**: Only tutors with authentic degrees from recognized institutions (Wifaq-ul-Madaris, Tanzeem-ul-Madaris, HEC-recognized universities, and Cambridge-certified coaches) are approved.
+* **Sanad-Verified Faculty**: Only tutors with authentic degrees from recognized institutions (Wifaq-ul-Madaris, Tanzeem-ul-Madaris, HEC-recognized universities, and certified academic educators) are approved.
 * **Female Faculty for Families**: Certified Alimahs and female academic teachers available across Pakistan for girls and young learners.
 * **3-Day Risk-Free Trial**: Try classes with zero financial commitment before committing to a monthly deal.
 * **In-Platform WebRTC Classroom**: No external video links needed; students and teachers learn directly on our safe, monitored platform.`

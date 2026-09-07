@@ -28,8 +28,8 @@ const subjectOptions = [
   { value: 'Arabic Grammar & Spoken Arabic (Sarf o Nahw)', label: 'Arabic Grammar & Spoken Arabic (Sarf o Nahw)', sublabel: 'Arabic Language', badge: 'Arabic' },
 
   // Academic Sciences & Mathematics
-  { value: 'Mathematics (Matric / FSc / O-Level / A-Level)', label: 'Mathematics (Matric / FSc / O-Level / A-Level)', sublabel: 'Algebra, Calculus & Geometry', badge: 'Academic' },
-  { value: 'Physics (Theory & Numericals)', label: 'Physics (Theory & Numericals)', sublabel: 'Matric / FSc / Cambridge', badge: 'Academic' },
+  { value: 'Mathematics (Matric / FSc / Board)', label: 'Mathematics (Matric / FSc / Board)', sublabel: 'Algebra, Calculus & Geometry', badge: 'Academic' },
+  { value: 'Physics (Theory & Numericals)', label: 'Physics (Theory & Numericals)', sublabel: 'Matric / FSc / Board', badge: 'Academic' },
   { value: 'Chemistry (Organic & Inorganic)', label: 'Chemistry (Organic & Inorganic)', sublabel: 'Matric / FSc / MDCAT', badge: 'Academic' },
   { value: 'Biology & Medical Sciences (MDCAT Prep)', label: 'Biology & Medical Sciences (MDCAT Prep)', sublabel: 'Pre-Medical Curriculum', badge: 'Academic' },
   { value: 'Computer Science & Programming (Python/Web)', label: 'Computer Science & Programming (Python/Web)', sublabel: 'Coding & ICS', badge: 'Academic' },
@@ -214,7 +214,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
               <input
                 type="text"
                 required
-                placeholder="Enter custom course or subject name (e.g. Advanced Arabic Sarf, Cambridge O-Level Accounting)..."
+                placeholder="Enter custom course or subject name (e.g. Advanced Arabic Sarf, Federal Board Accounting)..."
                 value={customSubjectText}
                 onChange={(e) => setCustomSubjectText(e.target.value)}
                 className="w-full mt-2 p-2.5 bg-slate-50 border border-[#d4a359]/60 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:bg-white animate-in fade-in"

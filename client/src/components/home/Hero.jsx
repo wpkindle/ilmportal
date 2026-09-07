@@ -58,17 +58,17 @@ const heroSlides = [
   },
   {
     id: 1,
-    tabLabel: 'Cambridge',
+    tabLabel: 'Academic',
     tabIcon: GraduationCap,
     badgeText: 'Playgroup to FSc Academic',
     badgeIcon: GraduationCap,
     badgeColor: 'text-[#faf8f5]',
     dotColor: 'bg-[#b85d34]',
-    tag: 'O/A Level & STEM',
+    tag: 'Board & Academic STEM',
     title: '1:1 Male Academic Tutor & High-School Student',
-    desc: 'Expert male subject specialists visiting your home or teaching online for O/A Level, FSc, and Matric exams in Mathematics, Physics & Sciences.',
+    desc: 'Expert male subject specialists visiting your home or teaching online for Board exams, FSc, and Matric in Mathematics, Physics & Sciences.',
     image: '/images/hero-academic-tutoring.jpg',
-    alt: 'Pakistani male Cambridge academic tutor guiding a high-school boy student through O/A Level physics and mathematics at study desk'
+    alt: 'Pakistani male academic tutor guiding a high-school boy student through board exam physics and mathematics at study desk'
   },
   {
     id: 2,
@@ -175,7 +175,7 @@ export default function Hero() {
     { label: 'Tajweed al-Quran', slug: 'tajweed-al-quran' },
     { label: 'Noorani Qaida', slug: 'noorani-qaida' },
     { label: 'Hifz Memorization', slug: 'hifz-al-quran' },
-    { label: 'Cambridge O/A Level', slug: 'o-level-cambridge' },
+    { label: 'Board Exam Prep', slug: 'board-exam-prep' },
     { label: 'FSc Pre-Medical', slug: 'fsc-hssc' },
     { label: 'Matric Science', slug: 'matric-ssc-science' }
   ];
@@ -248,7 +248,7 @@ export default function Hero() {
                   <Search className="w-4 h-4 text-slate-400 shrink-0" />
                   <input
                     type="text"
-                    placeholder="Search subject (Tajweed, Math, O-Level...)"
+                    placeholder="Search subject (Tajweed, Math, Physics...)"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     className="w-full bg-transparent text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 font-medium outline-none"

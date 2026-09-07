@@ -47,7 +47,7 @@ const tuitionOptions = [
   { value: '', label: 'All Tuition Ranges', sublabel: 'Any monthly fee' },
   { value: 'under_3500', label: 'Under PKR 3,500/mo', sublabel: 'Economy Tracks' },
   { value: '3500_5500', label: 'PKR 3,500 – 5,500/mo', sublabel: 'Standard Courses' },
-  { value: 'above_5500', label: 'Above PKR 5,500/mo', sublabel: 'MDCAT & Cambridge Prep' }
+  { value: 'above_5500', label: 'Above PKR 5,500/mo', sublabel: 'MDCAT & Board Prep' }
 ];
 
 export default function CourseFilterSidebar({
@@ -59,7 +59,7 @@ export default function CourseFilterSidebar({
   const categoryOptions = [
     { value: '', label: 'All Disciplines & Subjects', sublabel: 'Quranic & Academic' },
     { value: 'quran', label: 'Quran & Islamic Sciences', sublabel: 'Tajweed, Qaida, Hifz' },
-    { value: 'academic', label: 'Academic & School Subjects', sublabel: 'Matric, FSc, O/A Levels' },
+    { value: 'academic', label: 'Academic & School Subjects', sublabel: 'Matric, FSc & Board' },
     ...categories.map((c) => ({
       value: c.slug,
       label: c.name,

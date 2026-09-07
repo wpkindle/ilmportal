@@ -602,7 +602,7 @@ export default function CourseDetailPage() {
                       Sign In
                     </Link>
                     <Link
-                      href={`/register?redirect=/courses/${slug}`}
+                      href={`/login?mode=signup&redirect=/courses/${slug}`}
                       className="px-3 py-1.5 bg-white border border-purple-300 text-purple-800 font-bold rounded-xl hover:bg-purple-50 transition-all text-[11px]"
                     >
                       Register Free
@@ -671,7 +671,7 @@ export default function CourseDetailPage() {
                             Sign In to Access
                           </Link>
                           <Link
-                            href={`/register?redirect=/courses/${slug}`}
+                            href={`/login?mode=signup&redirect=/courses/${slug}`}
                             className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl font-bold text-[11px] transition-all"
                           >
                             Register Free
@@ -702,7 +702,7 @@ export default function CourseDetailPage() {
                       Sign In
                     </Link>
                     <Link
-                      href={`/register?redirect=/courses/${slug}`}
+                      href={`/login?mode=signup&redirect=/courses/${slug}`}
                       className="px-3 py-1.5 bg-white border border-blue-300 text-blue-800 font-bold rounded-xl hover:bg-blue-50 transition-all text-[11px]"
                     >
                       Register Free
@@ -764,7 +764,7 @@ export default function CourseDetailPage() {
                             Sign In to Access
                           </Link>
                           <Link
-                            href={`/register?redirect=/courses/${slug}`}
+                            href={`/login?mode=signup&redirect=/courses/${slug}`}
                             className="px-3 py-1.5 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 rounded-xl font-bold text-[11px] transition-all"
                           >
                             Register Free

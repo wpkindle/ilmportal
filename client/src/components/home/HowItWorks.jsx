@@ -65,7 +65,7 @@ const steps = [
       }
     ],
     actionText: 'Start Direct Chat as Student',
-    actionHref: '/register/student'
+    actionHref: '/login?role=student&mode=signup'
   },
   {
     step: '03',

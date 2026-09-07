@@ -90,7 +90,7 @@ const Footer = () => {
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/register/tutor"
+                href="/login?role=tutor&mode=signup"
                 className="px-5 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm rounded-xl border-2 border-[#d4a359]/60 transition-all flex items-center gap-2 cursor-pointer shadow-md backdrop-blur-xs"
               >
                 <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
@@ -164,15 +164,15 @@ const Footer = () => {
             </div>
             <ul className="space-y-2 text-xs text-[#a3bcaf]">
               <li>
-                <Link href="/register/student" className="hover:text-white transition-colors flex items-center gap-2">
+                <Link href="/login?role=student" className="hover:text-white transition-colors flex items-center gap-2">
                   <GraduationCap className="w-3.5 h-3.5 text-[#d4a359]" />
                   <span>Student Portal</span>
                 </Link>
               </li>
               <li>
-                <Link href="/register/tutor" className="hover:text-white transition-colors flex items-center gap-2">
+                <Link href="/login?role=tutor" className="hover:text-white transition-colors flex items-center gap-2">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-                  <span>Tutor Registration</span>
+                  <span>Tutor Portal</span>
                 </Link>
               </li>
               <li>

@@ -468,7 +468,7 @@ export default function Hero() {
             <div className="mt-3.5 space-y-2.5 max-w-md mx-auto lg:max-w-none">
               <div className="flex flex-col sm:flex-row items-center gap-2.5">
                 <Link
-                  href="/register/student"
+                  href="/login?role=student&mode=signup"
                   className="w-full sm:w-1/2 py-3 px-4 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#b85d34]/40 active:scale-98"
                 >
                   <GraduationCap className="w-4 h-4" />
@@ -476,7 +476,7 @@ export default function Hero() {
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
                 <Link
-                  href="/register/tutor"
+                  href="/login?role=tutor&mode=signup"
                   className="w-full sm:w-1/2 py-3 px-4 rounded-xl bg-white hover:bg-[#f5f0e6] text-[#0c2217] font-bold text-xs sm:text-sm shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border-2 border-[#d4a359]/60 active:scale-98"
                 >
                   <ShieldCheck className="w-4 h-4 text-[#d4a359]" />

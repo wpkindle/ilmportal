@@ -143,7 +143,7 @@ export default function AboutUsPage() {
                   <ArrowRight className="w-3.5 h-3.5" />
                 </Link>
                 <Link
-                  href="/register/tutor"
+                  href="/login?role=tutor&mode=signup"
                   className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-800 font-bold text-xs rounded-xl transition-all"
                 >
                   <span>Join as Tutor</span>

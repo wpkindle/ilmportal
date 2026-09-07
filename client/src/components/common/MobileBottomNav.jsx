@@ -54,7 +54,7 @@ const MobileBottomNav = () => {
       { label: 'Find Tutors', href: '/tutors', icon: Compass },
       { label: 'Courses', href: '/courses', icon: BookOpen },
       { label: 'Student', href: '/login?role=student', icon: GraduationCap },
-      { label: 'Teach', href: '/register/tutor', icon: ShieldCheck, highlight: true }
+      { label: 'Teach', href: '/login?role=tutor&mode=signup', icon: ShieldCheck, highlight: true }
     ];
   } else if (user.role === 'student') {
     navItems = [

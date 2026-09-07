@@ -306,7 +306,7 @@ function LoginContent() {
                     type="text"
                     required
                     autoComplete="username"
-                    placeholder="Enter your email or mobile number"
+                    placeholder="Enter Your Email Address"
                     value={signInEmail}
                     onChange={(e) => setSignInEmail(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
@@ -330,7 +330,7 @@ function LoginContent() {
                     type={showSignInPassword ? 'text' : 'password'}
                     required
                     autoComplete="current-password"
-                    placeholder="Enter your password"
+                    placeholder="Enter Your Password"
                     value={signInPassword}
                     onChange={(e) => setSignInPassword(e.target.value)}
                     className="w-full pl-10 pr-10 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
@@ -364,23 +364,6 @@ function LoginContent() {
                   </>
                 )}
               </button>
-
-              {/* Quick Switch to Sign Up */}
-              <div className="pt-2 text-center text-xs">
-                <p className="text-stone-500">
-                  Don't have an account yet?{' '}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode('signup');
-                      setError('');
-                    }}
-                    className="font-bold text-[#b85d34] hover:text-[#9e4e2a] underline cursor-pointer ml-1"
-                  >
-                    Sign Up here
-                  </button>
-                </p>
-              </div>
             </form>
           )}
 
@@ -399,7 +382,7 @@ function LoginContent() {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Fatima Ali / Muhammad Usman"
+                    placeholder="Enter Your Name"
                     value={signUpName}
                     onChange={(e) => setSignUpName(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
@@ -417,7 +400,7 @@ function LoginContent() {
                   <input
                     type="email"
                     required
-                    placeholder="name@domain.com"
+                    placeholder="Enter Your Email Address"
                     value={signUpEmail}
                     onChange={(e) => setSignUpEmail(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
@@ -428,14 +411,14 @@ function LoginContent() {
               {/* WhatsApp / Phone */}
               <div>
                 <label className="text-xs font-bold text-stone-800 block mb-1">
-                  WhatsApp / Mobile Number *
+                  WhatsApp or Phone Number *
                 </label>
                 <div className="relative">
                   <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
                   <input
                     type="tel"
                     required
-                    placeholder="0300 1234567"
+                    placeholder="Enter Your WhatsApp or Phone Number"
                     value={signUpPhone}
                     onChange={(e) => setSignUpPhone(e.target.value)}
                     className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
@@ -446,33 +429,33 @@ function LoginContent() {
                 </p>
               </div>
 
-              {/* Gender Choice (Female / Male) */}
-              <div>
-                <label className="text-xs font-bold text-stone-800 block mb-1">
-                  {isTutorMode ? 'Teacher Gender *' : 'Student / Learner Gender *'}
+              {/* Gender (Male / Female in single line) */}
+              <div className="flex items-center justify-between gap-3 py-1">
+                <label className="text-xs font-bold text-stone-800 shrink-0">
+                  Gender:
                 </label>
-                <div className="grid grid-cols-2 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setSignUpGender('female')}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1.5 cursor-pointer ${
-                      signUpGender === 'female'
-                        ? 'bg-[#f5ebe6] border-[#b85d34] text-[#b85d34] shadow-2xs'
-                        : 'bg-[#faf8f5] border-[#e6dfd5] text-stone-600 hover:bg-stone-50'
-                    }`}
-                  >
-                    <span>Female ({isTutorMode ? 'Alimah / Tutor' : 'Daughter / Mother'})</span>
-                  </button>
+                <div className="flex items-center gap-2 flex-1 max-w-xs">
                   <button
                     type="button"
                     onClick={() => setSignUpGender('male')}
-                    className={`py-2 px-3 rounded-xl text-xs font-bold transition-all border flex items-center justify-center gap-1.5 cursor-pointer ${
+                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all border text-center cursor-pointer ${
                       signUpGender === 'male'
-                        ? 'bg-[#eef5f1] border-[#0c2217] text-[#0c2217] shadow-2xs'
-                        : 'bg-[#faf8f5] border-[#e6dfd5] text-stone-600 hover:bg-stone-50'
+                        ? 'bg-[#0c2217] text-white border-[#0c2217] shadow-xs'
+                        : 'bg-[#faf8f5] text-stone-700 border-[#e6dfd5] hover:bg-stone-50'
                     }`}
                   >
-                    <span>Male ({isTutorMode ? 'Qari / Tutor' : 'Son / Student'})</span>
+                    Male
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setSignUpGender('female')}
+                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all border text-center cursor-pointer ${
+                      signUpGender === 'female'
+                        ? 'bg-[#0c2217] text-white border-[#0c2217] shadow-xs'
+                        : 'bg-[#faf8f5] text-stone-700 border-[#e6dfd5] hover:bg-stone-50'
+                    }`}
+                  >
+                    Female
                   </button>
                 </div>
               </div>
@@ -507,7 +490,7 @@ function LoginContent() {
                     type={showSignUpPassword ? 'text' : 'password'}
                     required
                     autoComplete="new-password"
-                    placeholder="At least 6 characters"
+                    placeholder="Enter Your Password"
                     value={signUpPassword}
                     onChange={(e) => setSignUpPassword(e.target.value)}
                     className="w-full pl-10 pr-10 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
@@ -553,23 +536,6 @@ function LoginContent() {
                   </>
                 )}
               </button>
-
-              {/* Quick Switch to Sign In */}
-              <div className="pt-2 text-center text-xs">
-                <p className="text-stone-500">
-                  Already have an account?{' '}
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMode('signin');
-                      setError('');
-                    }}
-                    className="font-bold text-[#b85d34] hover:text-[#9e4e2a] underline cursor-pointer ml-1"
-                  >
-                    Sign In here
-                  </button>
-                </p>
-              </div>
             </form>
           )}
 

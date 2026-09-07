@@ -598,39 +598,57 @@ export default function LiveSupportWidget() {
     }
   };
 
+  const handleToggleWidget = () => {
+    if (!isOpen) {
+      if (!isAdminOnline) {
+        setIsOfflineView(true);
+      } else {
+        setIsOfflineView(false);
+      }
+      setIsOpen(true);
+    } else {
+      setIsOpen(false);
+    }
+  };
+
   const isAdminConnected = supportStatus === 'admin_joined';
   const isWaitingForAdmin = supportStatus === 'human_requested' && !isAdminConnected;
 
   return (
     <>
-      {/* 1. FLOATING BOTTOM-RIGHT SUPPORT TRIGGER PILL */}
-      <div className="fixed bottom-20 right-4 sm:bottom-20 sm:right-6 md:bottom-6 md:right-6 z-40 print:hidden">
+      {/* 1. FLOATING BOTTOM-RIGHT SUPPORT TRIGGER BUTTON */}
+      <div className="fixed bottom-20 right-4 sm:bottom-20 sm:right-6 md:bottom-6 md:right-6 z-[9998] print:hidden">
         <button
-          onClick={() => setIsOpen((prev) => !prev)}
-          className="group relative flex items-center gap-2.5 px-3.5 sm:px-4 py-2.5 sm:py-3 rounded-full bg-white border-2 border-[#d4a359]/70 shadow-[0_10px_30px_rgba(12,34,23,0.15)] hover:shadow-[0_15px_35px_rgba(212,163,89,0.3)] hover:scale-105 transition-all duration-300 cursor-pointer"
-          aria-label="Open IlmiDunya Live Support Chat"
+          onClick={handleToggleWidget}
+          className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-[#b85d34] to-[#d4a359] text-white shadow-[0_8px_24px_rgba(184,93,52,0.35)] hover:shadow-[0_12px_28px_rgba(184,93,52,0.45)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border-2 border-white"
+          aria-label={isOpen ? "Close Support Chat" : "Open Live Support Chat"}
+          title={isOpen ? "Close Support Chat" : (isAdminOnline ? "Chat with Live Support" : "Leave an Email Message")}
         >
-          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-amber-50 border border-[#d4a359]/40 flex items-center justify-center text-[#b85d34] group-hover:bg-[#d4a359] group-hover:text-white transition-colors shrink-0">
-            <Headphones className="w-4 h-4 text-[#b85d34] group-hover:text-white" />
-          </div>
-          <span className="text-xs sm:text-sm font-extrabold tracking-tight text-[#0c2217] flex items-center gap-1.5">
-            <span>Support</span>
-            {isAdminOnline ? (
-              <span className="hidden sm:inline-flex items-center gap-1 text-[10px] text-emerald-800 font-semibold px-2 py-0.5 bg-emerald-50 rounded-full border border-emerald-300">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                Live Staff
-              </span>
-            ) : (
-              <span className="hidden sm:inline-flex items-center gap-1 text-[10px] text-amber-800 font-semibold px-2 py-0.5 bg-amber-50 rounded-full border border-amber-300">
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                Leave Email
-              </span>
-            )}
-          </span>
+          {isOpen ? (
+            <X className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
+          ) : (
+            <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-white transition-transform duration-200 group-hover:scale-110" />
+          )}
+
+          {/* Online/Offline Status Indicator Dot */}
+          {!isOpen && (
+            <span className="absolute top-0 right-0 -mt-0.5 -mr-0.5 flex h-3.5 w-3.5">
+              {isAdminOnline ? (
+                <>
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white shadow-xs" />
+                </>
+              ) : (
+                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-500 border-2 border-white shadow-xs" />
+              )}
+            </span>
+          )}
+
+          {/* Unread Message Count Badge */}
           {unreadCount > 0 && !isOpen && (
-            <span className="flex h-3 w-3 relative">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-3 w-3 bg-rose-500 text-[9px] text-white font-bold items-center justify-center">
+            <span className="absolute -top-1 -left-1 flex h-5 w-5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-5 w-5 bg-rose-500 text-[10px] text-white font-black items-center justify-center border-2 border-white shadow-xs">
                 {unreadCount}
               </span>
             </span>
@@ -640,7 +658,7 @@ export default function LiveSupportWidget() {
 
       {/* 2. SUPPORT CHAT PANEL (Full-Screen on Mobile, Floating Drawer on Desktop) */}
       {isOpen && (
-        <div className="fixed inset-0 sm:inset-auto sm:bottom-20 sm:right-6 z-50 w-full sm:w-[450px] h-[100dvh] sm:h-[640px] sm:max-h-[85vh] flex flex-col rounded-none sm:rounded-3xl bg-white border-0 sm:border-2 border-[#d4a359]/60 shadow-[0_20px_50px_rgba(12,34,23,0.2)] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 sm:inset-auto sm:bottom-20 sm:right-6 z-[9999] w-full sm:w-[450px] h-[100dvh] sm:h-[640px] sm:max-h-[85vh] flex flex-col rounded-none sm:rounded-3xl bg-white border-0 sm:border-2 border-[#d4a359]/60 shadow-[0_20px_50px_rgba(12,34,23,0.2)] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
           
           {/* Header */}
           <div className="px-4 py-3 sm:py-3.5 bg-[#faf8f5] border-b border-[#ebe3d3] flex items-center justify-between shrink-0">
@@ -776,16 +794,25 @@ export default function LiveSupportWidget() {
                   <p className="text-xs text-stone-600 leading-relaxed">
                     Our administrative team has received your message and will reach out to you via email shortly.
                   </p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setOfflineSubmitted(false);
-                      setIsOfflineView(false);
-                    }}
-                    className="px-4 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-600 text-white font-bold text-xs transition-colors cursor-pointer shadow-xs"
-                  >
-                    Back to Chat
-                  </button>
+                  <div className="flex items-center justify-center gap-2 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setOfflineSubmitted(false)}
+                      className="px-3.5 py-2 rounded-xl bg-[#b85d34] hover:bg-[#a04e28] text-white font-bold text-xs transition-colors cursor-pointer shadow-xs"
+                    >
+                      Send Another Message
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOfflineSubmitted(false);
+                        setIsOfflineView(false);
+                      }}
+                      className="px-3.5 py-2 rounded-xl bg-stone-100 hover:bg-stone-200 text-[#0c2217] font-bold text-xs transition-colors cursor-pointer"
+                    >
+                      Back to Chat
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <form onSubmit={handleSendOfflineMessage} className="space-y-3">

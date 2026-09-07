@@ -88,7 +88,7 @@ const heroSlides = [
     id: 3,
     tabLabel: 'Cambridge Prep',
     tabIcon: GraduationCap,
-    badgeText: 'Cambridge & Matric Academic',
+    badgeText: 'Playgroup to FSc Academic',
     badgeIcon: GraduationCap,
     badgeColor: 'text-[#faf8f5]',
     dotColor: 'bg-[#b85d34]',

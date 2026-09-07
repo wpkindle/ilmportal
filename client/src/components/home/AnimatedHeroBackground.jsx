@@ -225,7 +225,7 @@ export default function AnimatedHeroBackground() {
           <GraduationCap className="w-4 h-4" />
         </div>
         <div className="text-left">
-          <span className="text-[11px] font-bold block text-[#0c2217]">Cambridge &amp; Matric</span>
+          <span className="text-[11px] font-bold block text-[#0c2217]">Playgroup to FSc</span>
           <span className="text-[9px] text-[#b85d34] block font-mono">Pre-Medical &amp; Pre-Eng</span>
         </div>
       </div>

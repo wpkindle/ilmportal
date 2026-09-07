@@ -67,7 +67,7 @@ const Footer = () => {
                 Verified Qaris, Alimahs &amp; School Tutors for Your Children
               </h3>
               <p className="text-xs sm:text-sm text-[#4a5e55] max-w-xl leading-relaxed">
-                Connect with Wafaq-ul-Madaris certified teachers, female Alimahs for daughters, and Cambridge/Matric specialists. 1-on-1 live classes with camera-off privacy by default.
+                Connect with Wafaq-ul-Madaris certified teachers, female Alimahs for daughters, and Playgroup to FSc specialists. 1-on-1 live classes with camera-off privacy by default.
               </p>
             </div>
 

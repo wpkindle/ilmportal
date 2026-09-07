@@ -154,7 +154,7 @@ function CourseSearchContent() {
                 Explore Quranic &amp; Academic Curriculums
               </h1>
               <p className="text-xs sm:text-sm text-slate-600 mt-1">
-                Structured Noorani Qaida, Tajweed, Hifz, and Cambridge/Matric syllabuses designed for Pakistani students with 1-on-1 verified tutor guidance.
+                Structured Noorani Qaida, Tajweed, Hifz, and Playgroup to FSc syllabuses designed for Pakistani students with 1-on-1 verified tutor guidance.
               </p>
             </div>
 

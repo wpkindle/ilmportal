@@ -277,7 +277,7 @@ function TutorSearchContent() {
               Verified Qaris, Alimahs &amp; Academic Tutors
             </h1>
             <p className="text-xs sm:text-sm text-slate-600 mt-1">
-              Connect with certified Quran teachers, verified female Alimahs for daughters, and Cambridge/Matric specialists. 1-on-1 classes with camera-off privacy by default.
+              Connect with certified Quran teachers, verified female Alimahs for daughters, and Playgroup to FSc specialists. 1-on-1 classes with camera-off privacy by default.
             </p>
           </div>
 

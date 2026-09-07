@@ -11,13 +11,13 @@ import { api } from '../services/api';
 
 export const metadata = {
   title: 'Verified Qaris, Alimahs & Academic Tutors in Pakistan | Female-Safe | IlmiDunya',
-  description: 'Connect with verified Pakistani Quran Qaris, certified female Alimahs, and Cambridge/Matric tutors. Designed especially for female privacy & comfort with camera-off classes by default.',
+  description: 'Connect with verified Pakistani Quran Qaris, certified female Alimahs, and Playgroup to FSc tutors. Designed especially for female privacy & comfort with camera-off classes by default.',
   alternates: {
     canonical: '/',
   },
   openGraph: {
     title: 'Verified Qaris, Alimahs & Academic Tutors in Pakistan | IlmiDunya',
-    description: 'Connect with verified Pakistani Quran Qaris, female Alimahs, and Cambridge/Matric educators with camera-off privacy by default.',
+    description: 'Connect with verified Pakistani Quran Qaris, female Alimahs, and Playgroup to FSc educators with camera-off privacy by default.',
     url: 'https://pakistanlms.pk',
   },
 };
@@ -31,7 +31,7 @@ const homeStructuredData = {
       name: 'IlmiDunya Pakistan',
       url: 'https://pakistanlms.pk',
       logo: 'https://pakistanlms.pk/icon.svg',
-      description: 'Pakistan’s premier educational network connecting families with verified Quran Qaris, female Alimahs, and Cambridge/Matric tutors.',
+      description: 'Pakistan’s premier educational network connecting families with verified Quran Qaris, female Alimahs, and Playgroup to FSc tutors.',
       email: 'contact@ilmidunya.pk',
       address: {
         '@type': 'PostalAddress',

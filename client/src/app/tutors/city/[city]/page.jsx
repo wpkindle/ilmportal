@@ -11,7 +11,7 @@ const cityLocalContext = {
     areas: 'DHA, Gulberg, Johar Town, Model Town, Bahria Town & Cantt',
     boards: 'BISE Lahore, Federal Board (FBISE), and Cambridge CAIE (O/A Levels)',
     popularSubjects: 'Tajweed al-Quran with Sanad, O-Level Physics/Math, FSc Pre-Medical, Noorani Qaida for Kids',
-    description: 'Lahore is a historic center of academic excellence and Islamic scholarship. IlmiDunya connects families across Lahore with verified local Qaris, qualified female Alimahs for daughters, and top Cambridge/Matric tuition specialists offering camera-off live 1:1 sessions.'
+    description: 'Lahore is a historic center of academic excellence and Islamic scholarship. IlmiDunya connects families across Lahore with verified local Qaris, qualified female Alimahs for daughters, and top Playgroup to FSc tuition specialists offering camera-off live 1:1 sessions.'
   },
   karachi: {
     areas: 'Clifton, DHA, Gulshan-e-Iqbal, PECHS, North Nazimabad & Malir Cantt',
@@ -53,8 +53,8 @@ export async function generateMetadata({ params }) {
 
   const title = `Online Quran & Academic Tutors in ${formattedCity} | IlmiDunya Pakistan`;
   const description = context
-    ? `Connect with verified Quran Qaris, female Alimahs, and Cambridge/Matric tutors in ${formattedCity}. Serving ${context.areas}. Safe 1:1 classes with camera-off privacy.`
-    : `Find top-rated Quran teachers, female Alimahs, and Cambridge/Matric academic tutors available for live online classes and home tutoring in ${formattedCity}, Pakistan.`;
+    ? `Connect with verified Quran Qaris, female Alimahs, and Playgroup to FSc tutors in ${formattedCity}. Serving ${context.areas}. Safe 1:1 classes with camera-off privacy.`
+    : `Find top-rated Quran teachers, female Alimahs, and Playgroup to FSc academic tutors available for live online classes and home tutoring in ${formattedCity}, Pakistan.`;
 
   return {
     title,
@@ -78,7 +78,7 @@ export default async function CityTutorsPage({ params }) {
     areas: `Central areas and online students in ${formattedCity}`,
     boards: 'Matriculation, Intermediate Boards & Cambridge CAIE',
     popularSubjects: 'Tajweed al-Quran, Noorani Qaida, School Sciences & Math',
-    description: `Connect with verified Pakistani Quran Qaris, female Alimahs, and Cambridge/Matric subject tutors available for students in ${formattedCity} and nationwide.`
+    description: `Connect with verified Pakistani Quran Qaris, female Alimahs, and Playgroup to FSc subject tutors available for students in ${formattedCity} and nationwide.`
   };
 
   let tutors = [];

@@ -1,6 +1,6 @@
 export const metadata = {
   title: 'Verified Tutors in Pakistan | Female Quran Scholars & Academic Teachers',
-  description: 'Connect with verified Quran and academic tutors across Pakistan. In-home and 1:1 online live classes with Wafaq-ul-Madaris certified teachers and Cambridge/Matric specialists.',
+  description: 'Connect with verified Quran and academic tutors across Pakistan. In-home and 1:1 online live classes with Wafaq-ul-Madaris certified teachers and Playgroup to FSc specialists.',
   alternates: {
     canonical: 'https://pakistanlms.pk/tutors',
   },

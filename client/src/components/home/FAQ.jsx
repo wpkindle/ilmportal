@@ -43,18 +43,14 @@ export default function FAQ() {
   const [openIdx, setOpenIdx] = useState(0);
 
   return (
-    <section className="py-16 sm:py-24 relative overflow-hidden bg-section-faq border-b border-[#e8d8a0]">
+    <section className="py-16 sm:py-24 relative overflow-hidden bg-section-faq border-b border-[#ebe3d3]">
       {/* Embedded FAQPage Schema for Rich Search Results */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
-      {/* Warm dot matrix texture */}
-      <div className="absolute inset-0 bg-dot-grid-warm pointer-events-none opacity-70" />
-      {/* Gold radial glows */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[700px] h-[500px] bg-[#d4a359]/8 rounded-full blur-[140px] pointer-events-none" />
-      <div className="absolute bottom-0 left-0 w-64 h-64 bg-[#b85d34]/6 rounded-full blur-[100px] pointer-events-none" />
-      <div className="absolute top-0 right-0 w-64 h-64 bg-[#d4a359]/10 rounded-full blur-[100px] pointer-events-none" />
+      {/* Soft, static ambient glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[650px] h-[450px] bg-[#d4a359]/5 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 relative z-10">
         

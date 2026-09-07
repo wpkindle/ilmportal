@@ -125,44 +125,30 @@ export default function HowItWorks() {
   const [activeModalStep, setActiveModalStep] = useState(null);
 
   return (
-    <section className="py-16 sm:py-24 relative overflow-hidden bg-section-howitworks border-b border-[#0a3d20]">
-      {/* Dark mesh grid texture */}
-      <div className="absolute inset-0 bg-dark-mesh pointer-events-none" />
-      {/* Emerald glow orbs */}
-      <div className="absolute top-1/3 left-1/4 w-[500px] h-[300px] bg-[#10b981]/12 rounded-full blur-[120px] pointer-events-none" />
-      <div className="absolute bottom-0 right-10 w-[400px] h-[400px] bg-[#059669]/10 rounded-full blur-[140px] pointer-events-none" />
-      {/* Gold accent glow top-right */}
-      <div className="absolute -top-10 right-1/3 w-64 h-64 bg-[#d4a359]/10 rounded-full blur-[90px] pointer-events-none" />
-      {/* Rotating sacred geometry — visible on dark */}
-      <div className="absolute -left-24 top-1/2 -translate-y-1/2 w-[320px] h-[320px] opacity-[0.06] pointer-events-none animate-spin-reverse">
-        <svg viewBox="0 0 300 300" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-full h-full">
-          <circle cx="150" cy="150" r="140" stroke="#10b981" strokeWidth="1.5" strokeDasharray="6 8" />
-          <circle cx="150" cy="150" r="110" stroke="#d4a359" strokeWidth="1" />
-          <circle cx="150" cy="150" r="80" stroke="#10b981" strokeWidth="1.5" strokeDasharray="3 5" />
-          <rect x="90" y="90" width="120" height="120" stroke="#d4a359" strokeWidth="1.5" />
-          <rect x="90" y="90" width="120" height="120" transform="rotate(45 150 150)" stroke="#10b981" strokeWidth="1" />
-        </svg>
-      </div>
+    <section className="py-16 sm:py-24 relative overflow-hidden bg-section-howitworks border-b border-[#ebe3d3]">
+      {/* Soft, static ambient glows */}
+      <div className="absolute top-1/3 left-1/4 w-[500px] h-[300px] bg-[#d4a359]/6 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-0 right-10 w-[400px] h-[400px] bg-[#10b981]/4 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12 relative z-10">
         
-        {/* Editorial Section Header — light text on dark */}
+        {/* Editorial Section Header */}
         <div className="max-w-3xl space-y-3 text-left">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#10b981]/15 border border-[#10b981]/30 text-[#6ee7b7] text-xs font-bold">
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#10b981]" />
+          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#ebe3d3] text-[#143d2b] text-xs font-bold shadow-2xs">
+            <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
             <span>Transparent 4-Step Process</span>
           </div>
 
-          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-black text-white tracking-tight leading-[1.15]">
+          <h2 className="text-2xl sm:text-4xl lg:text-5xl font-serif font-black text-[#141c19] tracking-tight leading-[1.15]">
             How Pakistani families get started in 4 calm steps.
           </h2>
 
-          <p className="text-xs sm:text-sm text-[#86a89a] leading-relaxed">
+          <p className="text-xs sm:text-sm text-[#5c6e69] leading-relaxed">
             No upfront agency commissions, no pushy sales calls. You talk directly with certified teachers, test compatibility, and start lessons with complete family dignity.
           </p>
         </div>
 
-        {/* Varied Editorial Step Flow — dark cards */}
+        {/* Varied Editorial Step Flow */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {steps.map((s, idx) => {
             const Icon = s.icon;
@@ -170,35 +156,35 @@ export default function HowItWorks() {
               <div
                 key={idx}
                 onClick={() => setActiveModalStep(s)}
-                className="p-5 sm:p-7 rounded-3xl bg-white/[0.06] border border-white/10 hover:border-[#10b981]/50 shadow-2xs hover:shadow-emerald-900/30 hover:shadow-lg transition-all space-y-4 relative flex flex-col justify-between group cursor-pointer backdrop-blur-sm"
+                className="p-5 sm:p-7 rounded-3xl bg-[#faf8f5] border border-[#ebe3d3] hover:border-[#143d2b] shadow-2xs hover:shadow-md transition-all space-y-4 relative flex flex-col justify-between group cursor-pointer"
               >
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="font-mono font-black text-2xl sm:text-3xl text-[#d4a359]">
+                    <span className="font-mono font-black text-2xl sm:text-3xl text-[#b85d34]">
                       {s.step}
                     </span>
-                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#10b981]/10 text-[#6ee7b7] border border-[#10b981]/20">
+                    <span className="text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[#f0ece1] text-[#5e4e37]">
                       {s.highlight}
                     </span>
                   </div>
 
                   <div className="flex items-start gap-3 pt-1">
-                    <div className="p-2.5 rounded-2xl bg-[#10b981]/10 text-[#10b981] group-hover:bg-[#10b981] group-hover:text-white transition-colors shrink-0 mt-0.5">
+                    <div className="p-2.5 rounded-2xl bg-[#f5f0e6] text-[#143d2b] group-hover:bg-[#143d2b] group-hover:text-white transition-colors shrink-0 mt-0.5">
                       <Icon className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="font-serif font-bold text-base sm:text-lg text-white group-hover:text-[#6ee7b7] transition-colors leading-snug">
+                      <h3 className="font-serif font-bold text-base sm:text-lg text-[#141c19] group-hover:text-[#143d2b] transition-colors leading-snug">
                         {s.title}
                       </h3>
-                      <p className="text-xs text-[#86a89a] mt-2 leading-relaxed font-normal">
+                      <p className="text-xs text-[#5c6e69] mt-2 leading-relaxed font-normal">
                         {s.description}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="pt-3 border-t border-white/8 flex flex-wrap items-center justify-between gap-2 text-xs">
-                  <span className="text-[11px] font-semibold text-[#5a7a6e]">
+                <div className="pt-3 border-t border-[#ebe3d3]/80 flex flex-wrap items-center justify-between gap-2 text-xs">
+                  <span className="text-[11px] font-semibold text-[#81928e]">
                     &bull; {s.detail}
                   </span>
                   <button
@@ -207,10 +193,10 @@ export default function HowItWorks() {
                       e.stopPropagation();
                       setActiveModalStep(s);
                     }}
-                    className="text-[#6ee7b7] hover:text-[#d4a359] font-bold flex items-center gap-1.5 group-hover:translate-x-1 transition-all cursor-pointer p-1 -m-1"
+                    className="text-[#143d2b] hover:text-[#b85d34] font-bold flex items-center gap-1.5 group-hover:translate-x-1 transition-all cursor-pointer p-1 -m-1"
                   >
                     <span>Learn more</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-3.5 h-3.5 text-[#d4a359]" />
                   </button>
                 </div>
               </div>
@@ -218,13 +204,13 @@ export default function HowItWorks() {
           })}
         </div>
 
-        {/* Callout Strip — dark-themed */}
-        <div className="p-6 rounded-3xl bg-[#d4a359]/10 border-2 border-[#d4a359]/30 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl backdrop-blur-sm">
+        {/* Callout Strip */}
+        <div className="p-6 rounded-3xl bg-white text-[#141c19] border-2 border-[#d4a359]/50 flex flex-col sm:flex-row items-center justify-between gap-4 shadow-xl">
           <div className="space-y-1 text-center sm:text-left">
-            <h4 className="font-serif font-bold text-base text-white">
+            <h4 className="font-serif font-bold text-base text-[#0c2217]">
               Ready to find a teacher for your child?
             </h4>
-            <p className="text-xs text-[#86a89a]">
+            <p className="text-xs text-[#52665b]">
               Browse verified Quran Qaris and academic educators with full profiles and Sanad degrees.
             </p>
           </div>

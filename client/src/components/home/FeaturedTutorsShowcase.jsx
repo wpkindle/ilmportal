@@ -42,15 +42,10 @@ export default function FeaturedTutorsShowcase({ initialTutors = [] }) {
   }, [initialTutors]);
 
   return (
-    <section className="py-16 sm:py-24 relative overflow-hidden bg-section-tutors border-b border-[#dde5f0]">
-      {/* Dot grid texture overlay */}
-      <div className="absolute inset-0 bg-dot-grid-warm pointer-events-none" />
-      {/* Top-left cool navy accent glow */}
-      <div className="absolute -top-20 -left-20 w-[480px] h-[480px] bg-[#3b5bdb]/7 rounded-full blur-[130px] pointer-events-none" />
-      {/* Bottom-right warm amber glow */}
-      <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#d4a359]/10 rounded-full blur-[110px] pointer-events-none" />
-      {/* Faint diagonal accent line */}
-      <div className="absolute inset-0 bg-diagonal-stripes pointer-events-none opacity-60" />
+    <section className="py-16 sm:py-24 relative overflow-hidden bg-section-tutors border-b border-[#ebe3d3]">
+      {/* Soft, static ambient glows */}
+      <div className="absolute top-0 right-1/4 w-96 h-96 bg-[#d4a359]/5 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute bottom-0 left-10 w-96 h-96 bg-[#1e543c]/4 rounded-full blur-[120px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         

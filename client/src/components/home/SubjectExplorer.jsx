@@ -45,14 +45,10 @@ const SubjectExplorer = () => {
   const filteredCategories = categories.filter(c => c.type === activeTab);
 
   return (
-    <section className="py-16 sm:py-24 relative overflow-hidden bg-section-subjects border-b border-[#e8dcc0]">
-      {/* Amber line grid texture */}
-      <div className="absolute inset-0 bg-line-grid-amber pointer-events-none" />
-      {/* Warm amber sunrise orbs */}
-      <div className="absolute top-1/4 -left-20 w-80 h-80 bg-[#d4a359]/15 rounded-full blur-[90px] pointer-events-none" />
-      <div className="absolute bottom-10 -right-20 w-96 h-96 bg-[#b85d34]/10 rounded-full blur-[110px] pointer-events-none" />
-      {/* Centered top highlight glow */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-48 bg-[#fbbf24]/8 rounded-full blur-[80px] pointer-events-none" />
+    <section className="py-16 sm:py-24 relative overflow-hidden bg-section-subjects border-b border-[#ebe3d3]">
+      {/* Soft, static ambient glows */}
+      <div className="absolute top-1/4 -left-20 w-80 h-80 bg-[#1e543c]/4 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-10 -right-20 w-96 h-96 bg-[#d4a359]/6 rounded-full blur-[130px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 relative z-10">
         

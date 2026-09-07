@@ -20,42 +20,10 @@ export default function SafetyShowcase() {
   const [cameraDemoState, setCameraDemoState] = useState(false);
 
   return (
-    <section className="py-16 sm:py-24 relative overflow-hidden border-b border-[#ebe3d3]" style={{background: 'linear-gradient(160deg, #f5f0e6 0%, #fdf8f0 35%, #f8f2e8 70%, #f5eedd 100%)'}}>
-      {/* Diagonal stripe texture overlay */}
-      <div className="absolute inset-0 bg-diagonal-stripes pointer-events-none" />
-      {/* Ambient Deep Emerald & Gold Glows */}
-      <div className="absolute top-1/4 -left-32 w-[550px] h-[550px] bg-[#10b981]/8 rounded-full blur-[120px] pointer-events-none animate-pulse-glow" />
-      <div className="absolute -bottom-24 right-10 w-[600px] h-[600px] bg-[#d4a359]/12 rounded-full blur-[130px] pointer-events-none animate-float-slow" />
-
-      {/* Rotating Sacred Geometry Trust Motif (High Visibility) */}
-      <div className="absolute -top-20 -right-20 w-[480px] h-[480px] sm:w-[580px] sm:h-[580px] pointer-events-none opacity-30 sm:opacity-40 animate-spin-slow">
-        <svg viewBox="0 0 400 400" className="w-full h-full drop-shadow-[0_0_12px_rgba(212,163,89,0.35)]" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <circle cx="200" cy="200" r="185" stroke="#d4a359" strokeWidth="1.75" strokeDasharray="6 8" />
-          <circle cx="200" cy="200" r="155" stroke="#d4a359" strokeWidth="1.5" />
-          <circle cx="200" cy="200" r="125" stroke="#d4a359" strokeWidth="1" strokeDasharray="3 5" />
-          <rect x="110" y="110" width="180" height="180" stroke="#d4a359" strokeWidth="1.75" />
-          <rect x="110" y="110" width="180" height="180" transform="rotate(45 200 200)" stroke="#b85d34" strokeWidth="1.75" />
-        </svg>
-      </div>
-
-      {/* Floating Stardust Points in Safety Showcase */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        <span className="absolute top-16 left-[15%] w-2 h-2 rounded-full bg-[#fbbf24] shadow-[0_0_12px_#fbbf24] animate-particle-drift pointer-events-none flex items-center justify-center" style={{ animationDelay: '0.5s', animationDuration: '8s' }}>
-          <span className="w-1 h-1 rounded-full bg-white block" />
-        </span>
-        <span className="absolute top-1/2 left-[5%] w-2.5 h-2.5 rounded-full bg-[#d4a359] shadow-[0_0_14px_#d4a359] animate-particle-drift pointer-events-none flex items-center justify-center" style={{ animationDelay: '1.8s', animationDuration: '10s' }}>
-          <span className="w-1 h-1 rounded-full bg-white block" />
-        </span>
-        <span className="absolute bottom-20 right-[15%] w-2 h-2 rounded-full bg-[#f59e0b] shadow-[0_0_12px_#f59e0b] animate-particle-drift pointer-events-none flex items-center justify-center" style={{ animationDelay: '2.5s', animationDuration: '7.5s' }}>
-          <span className="w-1 h-1 rounded-full bg-white block" />
-        </span>
-        <span className="absolute top-1/3 right-[10%] w-2 h-2 rounded-full bg-[#fbbf24] shadow-[0_0_12px_#fbbf24] animate-particle-drift pointer-events-none flex items-center justify-center" style={{ animationDelay: '3.2s', animationDuration: '9s' }}>
-          <span className="w-1 h-1 rounded-full bg-white block" />
-        </span>
-      </div>
-
-      {/* Tasteful subtle grid */}
-      <div className="absolute inset-0 bg-[radial-gradient(#d4a359_0.75px,transparent_0.75px)] [background-size:28px_28px] opacity-15 pointer-events-none" />
+    <section className="py-16 sm:py-24 relative overflow-hidden bg-section-safety border-b border-[#ebe3d3]">
+      {/* Soft, static, elegant ambient glows */}
+      <div className="absolute top-1/4 -left-32 w-[500px] h-[500px] bg-[#10b981]/5 rounded-full blur-[130px] pointer-events-none" />
+      <div className="absolute -bottom-24 right-10 w-[550px] h-[550px] bg-[#d4a359]/7 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 space-y-12">
         

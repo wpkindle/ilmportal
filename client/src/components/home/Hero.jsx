@@ -181,8 +181,8 @@ export default function Hero() {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-[#faf8f5] text-[#141c19] pt-10 pb-16 sm:pt-14 sm:pb-20 border-b border-[#ebe3d3]">
-      {/* Dynamic Animated Background: Living Aurora, Sacred Geometry, Mouse Spotlight & Stardust */}
+    <section className="relative overflow-hidden bg-section-hero text-[#141c19] pt-10 pb-16 sm:pt-14 sm:pb-20 border-b border-[#ebe3d3]">
+      {/* Decent, elegant static gradient background */}
       <AnimatedHeroBackground />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full space-y-12">

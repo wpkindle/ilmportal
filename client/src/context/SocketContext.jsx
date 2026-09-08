@@ -132,13 +132,6 @@ export const SocketProvider = ({ children }) => {
           if (id) map[id.toString()] = true;
         });
         setOnlineStatusMap(map);
-
-        // If literally zero authenticated users are online anywhere on the server,
-        // an admin CANNOT be online!
-        if (usersList.length === 0 && (!userRef.current || userRef.current.role !== 'admin')) {
-          setIsAdminOnline(false);
-          setOnlineAdminsCount(0);
-        }
       }
     });
 
@@ -165,8 +158,17 @@ export const SocketProvider = ({ children }) => {
       if (newSocket.connected) {
         newSocket.emit('unregister-user');
       }
-      setIsAdminOnline(false);
-      setOnlineAdminsCount(0);
+      if (userRef.current?.role === 'admin') {
+        newSocket.emit('check-admin-online-status', (res) => {
+          if (res && typeof res.isOnline === 'boolean') {
+            setIsAdminOnline(res.isOnline);
+            setOnlineAdminsCount(res.onlineAdmins || 0);
+          } else {
+            setIsAdminOnline(false);
+            setOnlineAdminsCount(0);
+          }
+        });
+      }
     };
     window.addEventListener('ilmidunya:logout', handleImmediateLogout);
 

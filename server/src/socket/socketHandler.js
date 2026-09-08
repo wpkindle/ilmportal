@@ -12,13 +12,13 @@ const initSocket = (io, app) => {
   const roomParticipants = new Map(); // roomId -> Set of user socketIds
 
   const broadcastAdminStatus = () => {
-    const isOnline = onlineAdminUserIds.size > 0;
-    const onlineAdmins = onlineAdminUserIds.size;
+    const isOnline = onlineAdminUserIds.size > 0 || supportDutyAdmins.size > 0;
+    const onlineAdmins = Math.max(onlineAdminUserIds.size, supportDutyAdmins.size);
     io.emit('admin-online-status', { isOnline, onlineAdmins });
   };
 
   if (app) {
-    app.set('getOnlineAdminCount', () => onlineAdminUserIds.size);
+    app.set('getOnlineAdminCount', () => Math.max(onlineAdminUserIds.size, supportDutyAdmins.size));
   }
 
   io.on('connection', (socket) => {
@@ -488,8 +488,8 @@ const initSocket = (io, app) => {
 
     // Check if any admin or support agent is currently online
     socket.on('check-admin-online-status', (callback) => {
-      const isOnline = onlineAdminUserIds.size > 0;
-      const onlineAdmins = onlineAdminUserIds.size;
+      const isOnline = onlineAdminUserIds.size > 0 || supportDutyAdmins.size > 0;
+      const onlineAdmins = Math.max(onlineAdminUserIds.size, supportDutyAdmins.size);
       if (typeof callback === 'function') {
         callback({ isOnline, onlineAdmins });
       } else {

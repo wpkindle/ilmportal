@@ -80,7 +80,7 @@ const renderFormattedText = (content) => {
 export default function LiveSupportWidget() {
   const pathname = usePathname();
   const { user } = useAuth();
-  const { socket, onlineUsers, isAdminOnline: socketAdminOnline } = useSocket();
+  const { socket, isAdminOnline: socketAdminOnline } = useSocket();
 
   const [isOpen, setIsOpen] = useState(false);
   const [sessionId, setSessionId] = useState('');
@@ -89,13 +89,34 @@ export default function LiveSupportWidget() {
   const [serverAdminOnline, setServerAdminOnline] = useState(false);
   const [isOfflineView, setIsOfflineView] = useState(false);
 
+  // Query REST admin status on mount and on a 15-second heartbeat as reliable presence fallback
+  useEffect(() => {
+    let isMounted = true;
+    const checkServerAdminStatus = async () => {
+      try {
+        const res = await api.getAdminOnlineStatus();
+        if (isMounted && res && typeof res.isOnline === 'boolean') {
+          setServerAdminOnline(res.isOnline);
+        }
+      } catch (err) {
+        // silent fallback
+      }
+    };
+    checkServerAdminStatus();
+    const interval = setInterval(checkServerAdminStatus, 15000);
+    return () => {
+      isMounted = false;
+      clearInterval(interval);
+    };
+  }, []);
+
   // Determine if admin is online:
   // 1. Current logged-in user is an admin
-  // 2. OR socket reported admin is online (when online authenticated users exist)
-  // 3. OR REST endpoint reported online (cross-checked so 0 online users never falsely claims online)
+  // 2. OR socket reported admin is online via real-time event or check query
+  // 3. OR REST endpoint confirmed an active admin is online
   const isCurrentUserAdmin = user?.role === 'admin';
-  const isAdminOnline = isCurrentUserAdmin || Boolean(
-    (socketAdminOnline || serverAdminOnline) && (onlineUsers?.length > 0 || !socket?.connected)
+  const isAdminOnline = Boolean(
+    isCurrentUserAdmin || socketAdminOnline || serverAdminOnline
   );
 
   const [messages, setMessages] = useState([
@@ -208,24 +229,6 @@ export default function LiveSupportWidget() {
       }
     }).catch(() => {});
   }, [sessionId]);
-
-  // 3. Query initial Admin Online Status via REST
-  useEffect(() => {
-    api.getAdminOnlineStatus()
-      .then((res) => {
-        if (res && typeof res.isOnline === 'boolean') {
-          // If socket is connected and there are 0 online users on platform, do not trust stale true
-          if (res.isOnline && (onlineUsers?.length > 0 || !socket?.connected)) {
-            setServerAdminOnline(true);
-          } else {
-            setServerAdminOnline(false);
-          }
-        }
-      })
-      .catch(() => {
-        setServerAdminOnline(false);
-      });
-  }, [socket, onlineUsers]);
 
   // 3. Auto-scroll to latest message
   const scrollToBottom = () => {
@@ -772,7 +775,7 @@ export default function LiveSupportWidget() {
           <div
             onClick={handleToggleWidget}
             className={`hidden sm:flex items-center gap-2 px-3.5 py-2 mr-3 rounded-2xl bg-[#0c2217]/95 hover:bg-[#0c2217] text-white border ${
-              isAdminOnline ? 'border-emerald-400/70 shadow-[0_10px_25px_rgba(16,185,129,0.25)]' : 'border-[#d4a359]/60 shadow-[0_10px_25px_rgba(12,34,23,0.3)]'
+              isAdminOnline ? 'border-emerald-400/70 shadow-[0_10px_25px_rgba(16,185,129,0.25)]' : 'border-emerald-500/30 shadow-[0_10px_25px_rgba(12,34,23,0.3)]'
             } cursor-pointer select-none transition-all hover:scale-105 active:scale-95 group/bubble animate-widget-bounce`}
             title="Click to start live conversation"
           >
@@ -801,16 +804,16 @@ export default function LiveSupportWidget() {
               {/* Outer expanding radar wave */}
               <span className={`absolute -inset-2.5 sm:-inset-3 rounded-full border-2 ${isAdminOnline ? 'border-emerald-400/60' : 'border-emerald-400/40'} animate-radar-wave pointer-events-none`} />
               {/* Second offset radar wave */}
-              <span className={`absolute -inset-3.5 sm:-inset-4 rounded-full border ${isAdminOnline ? 'border-emerald-300/50' : 'border-[#d4a359]/60'} animate-radar-wave pointer-events-none`} style={{ animationDelay: '1.1s' }} />
+              <span className={`absolute -inset-3.5 sm:-inset-4 rounded-full border ${isAdminOnline ? 'border-emerald-300/50' : 'border-emerald-400/30'} animate-radar-wave pointer-events-none`} style={{ animationDelay: '1.1s' }} />
               {/* Radiant blurred ambient aura glow */}
-              <span className={`absolute -inset-2 sm:-inset-2.5 rounded-full ${isAdminOnline ? 'bg-gradient-to-tr from-emerald-500/50 via-teal-400/40 to-[#0c2217]/30' : 'bg-gradient-to-tr from-emerald-500/40 via-[#d4a359]/40 to-[#0c2217]/30'} blur-md animate-attractor-halo pointer-events-none`} />
+              <span className={`absolute -inset-2 sm:-inset-2.5 rounded-full ${isAdminOnline ? 'bg-gradient-to-tr from-emerald-500/50 via-teal-400/40 to-[#0c2217]/30' : 'bg-gradient-to-tr from-emerald-500/30 via-teal-500/20 to-[#0c2217]/30'} blur-md animate-attractor-halo pointer-events-none`} />
             </>
           )}
 
           <button
             onClick={handleToggleWidget}
             className={`group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#0c2217] hover:bg-[#123323] text-white shadow-[0_10px_25px_rgba(12,34,23,0.35)] hover:shadow-[0_14px_32px_rgba(12,34,23,0.5)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border-2 ${
-              isAdminOnline ? 'border-emerald-400 ring-2 ring-emerald-500/30' : 'border-[#d4a359]/70 ring-2 ring-[#0c2217]/20'
+              isAdminOnline ? 'border-emerald-400 ring-2 ring-emerald-500/30' : 'border-emerald-500/40 ring-2 ring-[#0c2217]/20'
             } ${!isOpen ? 'animate-widget-bounce' : ''}`}
             aria-label={isOpen ? "Close Helpdesk" : "Open IlmiDunya Support Desk"}
             title={isOpen ? "Close Support Desk" : (isAdminOnline ? "Chat with Support Desk (Online)" : "Support Desk (Offline • Leave an Email Note)")}
@@ -828,14 +831,14 @@ export default function LiveSupportWidget() {
                 {/* Secondary dialogue bubble */}
                 <path
                   d="M17 8.5H18.5C19.8807 8.5 21 9.61929 21 11V15C21 16.3807 19.8807 17.5 18.5 17.5H17.5V20L14.5 17.5H13"
-                  stroke={isAdminOnline ? '#10b981' : '#d4a359'}
+                  stroke={isAdminOnline ? '#10b981' : '#ffffff'}
                   strokeWidth="1.75"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
                 {/* Primary dialogue bubble */}
                 <path
-                  d="M3 6.5C3 5.11929 4.11929 4 5.5 4H14.5C15.8807 4 17 5.11929 17 6.5V12.5C17 13.8807 15.8807 15 14.5 15H8L4 18.5V15C3.4 14.5 3 13.5 3 12.5V6.5Z"
+                  d="M3 6.5C3 5.11929 4.11929 4 5.5 4H14.5C15.8807 4 17 5.11929 17 6.5V12C17 13.8807 15.8807 15 14.5 15H8L4 18.5V15C3.4 14.5 3 13.5 3 12.5V6.5Z"
                   fill={isAdminOnline ? '#10b981' : 'white'}
                   fillOpacity={isAdminOnline ? '0.2' : '0.12'}
                   stroke={isAdminOnline ? '#34d399' : 'white'}
@@ -844,9 +847,9 @@ export default function LiveSupportWidget() {
                   strokeLinejoin="round"
                 />
                 {/* 3 conversation dots */}
-                <circle cx="7" cy="9.5" r="1" fill={isAdminOnline ? '#10b981' : '#d4a359'} />
-                <circle cx="10" cy="9.5" r="1" fill={isAdminOnline ? '#10b981' : '#d4a359'} />
-                <circle cx="13" cy="9.5" r="1" fill={isAdminOnline ? '#10b981' : '#d4a359'} />
+                <circle cx="7" cy="9.5" r="1" fill={isAdminOnline ? '#10b981' : '#ffffff'} />
+                <circle cx="10" cy="9.5" r="1" fill={isAdminOnline ? '#10b981' : '#ffffff'} />
+                <circle cx="13" cy="9.5" r="1" fill={isAdminOnline ? '#10b981' : '#ffffff'} />
               </svg>
             )}
 
@@ -884,7 +887,7 @@ export default function LiveSupportWidget() {
           aria-modal="true"
           aria-label="IlmiDunya Live Support Helpdesk"
           style={viewportHeight && typeof window !== 'undefined' && window.innerWidth < 640 ? { height: `${viewportHeight}px`, top: `${viewportOffsetTop}px` } : undefined}
-          className="fixed inset-0 sm:inset-auto sm:bottom-[88px] sm:right-6 z-[99999] w-full sm:w-[450px] h-[100dvh] sm:h-[640px] sm:max-h-[calc(100vh-104px)] flex flex-col rounded-none sm:rounded-3xl bg-white border-0 sm:border-2 border-[#d4a359]/60 shadow-[0_20px_50px_rgba(12,34,23,0.2)] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+          className="fixed inset-0 sm:inset-auto sm:bottom-[88px] sm:right-6 z-[99999] w-full sm:w-[450px] h-[100dvh] sm:h-[640px] sm:max-h-[calc(100vh-104px)] flex flex-col rounded-none sm:rounded-3xl bg-white border-0 sm:border-2 border-emerald-500/30 shadow-[0_20px_50px_rgba(12,34,23,0.2)] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
         >
           
           {/* Header */}
@@ -897,7 +900,7 @@ export default function LiveSupportWidget() {
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <div className={`w-9 h-9 rounded-xl ${isAdminOnline ? 'bg-emerald-950 border border-emerald-500/70' : 'bg-[#0c2217] border border-[#d4a359]/60'} flex items-center justify-center shadow-xs shrink-0`}>
+              <div className={`w-9 h-9 rounded-xl ${isAdminOnline ? 'bg-emerald-950 border border-emerald-500/70' : 'bg-[#0c2217] border border-emerald-500/40'} flex items-center justify-center shadow-xs shrink-0`}>
                 <svg
                   className="w-5 h-5"
                   viewBox="0 0 24 24"
@@ -907,7 +910,7 @@ export default function LiveSupportWidget() {
                 >
                   <path
                     d="M16 8.5H17.5C18.8807 8.5 20 9.61929 20 11V14.5C20 15.8807 18.8807 17 17.5 17H16.5V19.5L13.8 17H12.5"
-                    stroke={isAdminOnline ? '#10b981' : '#d4a359'}
+                    stroke={isAdminOnline ? '#10b981' : '#ffffff'}
                     strokeWidth="1.7"
                     strokeLinecap="round"
                     strokeLinejoin="round"
@@ -921,9 +924,9 @@ export default function LiveSupportWidget() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
-                  <circle cx="7" cy="9.25" r="0.9" fill={isAdminOnline ? '#10b981' : '#d4a359'} />
-                  <circle cx="10" cy="9.25" r="0.9" fill={isAdminOnline ? '#10b981' : '#d4a359'} />
-                  <circle cx="13" cy="9.25" r="0.9" fill={isAdminOnline ? '#10b981' : '#d4a359'} />
+                  <circle cx="7" cy="9.25" r="0.9" fill={isAdminOnline ? '#10b981' : '#ffffff'} />
+                  <circle cx="10" cy="9.25" r="0.9" fill={isAdminOnline ? '#10b981' : '#ffffff'} />
+                  <circle cx="13" cy="9.25" r="0.9" fill={isAdminOnline ? '#10b981' : '#ffffff'} />
                 </svg>
               </div>
               <div className="min-w-0">

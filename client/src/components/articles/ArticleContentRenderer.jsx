@@ -109,15 +109,15 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
     if (currentList) {
       if (currentList.type === 'ul') {
         elements.push(
-          <ul key={`ul-${keyCounter++}`} className="my-3 space-y-1.5 pl-1 sm:pl-2">
+          <ul key={`ul-${keyCounter++}`} className="my-4 space-y-2.5 pl-1 sm:pl-2">
             {currentList.items.map((item, idx) => (
               <li
                 key={idx}
-                className={`flex items-start gap-2.5 text-xs sm:text-sm md:text-[15px] leading-relaxed ${
+                className={`flex items-start gap-3 text-sm sm:text-[15px] md:text-base leading-[1.8] ${
                   isDark ? 'text-slate-300' : 'text-stone-700'
                 }`}
               >
-                <span className="text-stone-400 font-bold select-none mt-0.5">•</span>
+                <span className={`font-black select-none mt-0.5 ${isDark ? 'text-amber-400' : 'text-[#d4a359]'}`}>•</span>
                 <div className="flex-1">{parseInline(item, isDark)}</div>
               </li>
             ))}
@@ -125,20 +125,20 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
         );
       } else if (currentList.type === 'ol') {
         elements.push(
-          <ol key={`ol-${keyCounter++}`} className="my-3 space-y-2 pl-1 sm:pl-2">
+          <ol key={`ol-${keyCounter++}`} className="my-4 space-y-2.5 pl-1 sm:pl-2">
             {currentList.items.map((item, idx) => (
               <li
                 key={idx}
-                className={`flex items-start gap-2.5 text-xs sm:text-sm md:text-[15px] leading-relaxed ${
+                className={`flex items-start gap-3 text-sm sm:text-[15px] md:text-base leading-[1.8] ${
                   isDark ? 'text-slate-300' : 'text-stone-700'
                 }`}
               >
                 <span
-                  className={`text-xs font-bold shrink-0 mt-0.5 ${
-                    isDark ? 'text-emerald-400' : 'text-emerald-800'
+                  className={`text-xs font-black shrink-0 mt-0.5 px-2 py-0.5 rounded-full border ${
+                    isDark ? 'bg-slate-800 text-amber-300 border-slate-700' : 'bg-[#f5efe4] text-[#0c2217] border-[#e5dcce]'
                   }`}
                 >
-                  {item.num || idx + 1}.
+                  {item.num || idx + 1}
                 </span>
                 <div className="flex-1">{parseInline(item.text, isDark)}</div>
               </li>
@@ -194,16 +194,16 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
         elements.push(
           <div
             key={`bismillah-${keyCounter++}`}
-            className={`my-4 p-3.5 sm:p-4 rounded-xl text-center border ${
+            className={`my-6 p-5 sm:p-6 rounded-2xl text-center border ${
               isDark
                 ? 'bg-slate-900 border-slate-800 text-amber-200'
-                : 'bg-[#f7f5f0] border-[#ebe5d8] text-emerald-900'
-            }`}
+                : 'bg-[#faf6ee] border-[#ebe1ce] text-[#0c2217]'
+            } shadow-2xs`}
           >
-            <div className="text-lg sm:text-xl font-serif font-black tracking-wide">
+            <div className={`text-xl sm:text-2xl font-serif font-black tracking-wide ${isDark ? 'text-amber-200' : 'text-[#0c2217]'}`}>
               بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
             </div>
-            <div className="text-[11px] sm:text-xs text-stone-500 font-medium mt-0.5">
+            <div className="text-xs text-stone-500 font-medium mt-1">
               In the Name of Allah, Most Gracious, Most Merciful
             </div>
           </div>
@@ -217,8 +217,8 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
           <h4
             key={`h4-${keyCounter++}`}
             id={headingId}
-            className={`text-xs sm:text-sm font-bold uppercase tracking-wider mt-5 mb-2 scroll-mt-20 ${
-              isDark ? 'text-amber-300' : 'text-emerald-800'
+            className={`text-xs sm:text-sm font-extrabold uppercase tracking-wider mt-7 sm:mt-8 mb-3 leading-relaxed scroll-mt-20 ${
+              isDark ? 'text-amber-300' : 'text-[#b85d34]'
             }`}
           >
             {parseInline(headingText, isDark)}
@@ -233,8 +233,8 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
           <h3
             key={`h3-${keyCounter++}`}
             id={headingId}
-            className={`text-sm sm:text-base font-bold text-stone-900 mt-5 mb-2 tracking-tight scroll-mt-20 ${
-              isDark ? 'text-slate-100' : 'text-stone-900'
+            className={`text-base sm:text-lg lg:text-xl font-bold font-serif mt-8 sm:mt-10 mb-3.5 leading-[1.4] tracking-tight scroll-mt-20 ${
+              isDark ? 'text-slate-100' : 'text-[#0c2217]'
             }`}
           >
             {parseInline(headingText, isDark)}
@@ -249,8 +249,8 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
           <h2
             key={`h2-${keyCounter++}`}
             id={headingId}
-            className={`text-base sm:text-lg lg:text-xl font-bold text-stone-900 mt-7 sm:mt-8 mb-2.5 tracking-tight scroll-mt-20 ${
-              isDark ? 'text-white' : 'text-stone-900'
+            className={`text-xl sm:text-2xl lg:text-[26px] font-black font-serif mt-10 sm:mt-14 mb-4 sm:mb-5 leading-[1.35] tracking-tight scroll-mt-20 border-b pb-3 ${
+              isDark ? 'text-white border-slate-800' : 'text-[#0c2217] border-[#ebe3d3]'
             }`}
           >
             {parseInline(headingText, isDark)}
@@ -267,10 +267,10 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
       elements.push(
         <blockquote
           key={`quote-${keyCounter++}`}
-          className={`my-4 p-4 rounded-xl border-l-4 border-emerald-600 text-xs sm:text-sm italic leading-relaxed ${
+          className={`my-6 p-5 sm:p-6 rounded-2xl border-l-4 italic leading-[1.8] text-sm sm:text-base ${
             isDark
-              ? 'bg-slate-900/90 text-slate-300'
-              : 'bg-stone-50 text-stone-700'
+              ? 'bg-slate-900/90 text-slate-300 border-amber-400'
+              : 'bg-[#faf6ee] text-[#0c2217] border-[#d4a359]'
           }`}
         >
           {parseInline(quoteMatch[1], isDark)}
@@ -307,8 +307,8 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
       elements.push(
         <div
           key={`signature-${keyCounter++}`}
-          className={`mt-6 pt-3 border-t text-xs sm:text-sm font-semibold ${
-            isDark ? 'border-slate-800 text-slate-400' : 'border-stone-200 text-stone-600'
+          className={`mt-8 pt-4 border-t text-sm sm:text-base font-serif font-bold ${
+            isDark ? 'border-slate-800 text-slate-400' : 'border-[#ebe3d3] text-[#0c2217]'
           }`}
         >
           {parseInline(line, isDark)}
@@ -322,7 +322,7 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
     elements.push(
       <p
         key={`p-${keyCounter++}`}
-        className={`my-2.5 text-xs sm:text-sm md:text-[15px] leading-relaxed ${
+        className={`my-3.5 sm:my-4 text-sm sm:text-[15px] md:text-base leading-[1.85] sm:leading-[1.9] ${
           isDark ? 'text-slate-300' : 'text-stone-700'
         }`}
       >

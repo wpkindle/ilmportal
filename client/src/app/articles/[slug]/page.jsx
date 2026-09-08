@@ -1,6 +1,7 @@
 import React from 'react';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { BookOpen, ShieldCheck, Sparkles, ArrowRight } from 'lucide-react';
 import { api } from '../../../services/api';
 import {
   getEditorialArticles,
@@ -159,73 +160,119 @@ export default async function ArticleDetailPage({ params }) {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] py-5 sm:py-8 text-stone-900">
+    <div className="min-h-screen bg-[#faf8f5] py-6 sm:py-10 text-stone-900 relative overflow-hidden">
+      {/* Precision architectural grid overlay */}
+      <div className="absolute inset-0 architectural-grid opacity-25 pointer-events-none" />
+
+      {/* Subtle top accent gold line */}
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#d4a359]/35 to-transparent pointer-events-none" />
+
+      {/* Ambient floating glows */}
+      <div className="absolute top-1/4 -left-28 w-[450px] h-[450px] bg-[#d4a359]/8 rounded-full blur-[140px] pointer-events-none" />
+      <div className="absolute top-2/3 -right-28 w-[450px] h-[450px] bg-[#10b981]/6 rounded-full blur-[140px] pointer-events-none" />
+
       {/* Schema Injection */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
       />
 
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-4 sm:space-y-5">
+      <div className="max-w-3xl mx-auto px-4 sm:px-6 space-y-5 sm:space-y-6 relative z-10">
         
-        {/* Minimal Clean Breadcrumb */}
+        {/* Breadcrumb Navigation */}
         <nav aria-label="Breadcrumb" className="text-xs text-stone-500 flex items-center gap-1.5 px-1 font-medium">
-          <Link href="/articles" className="hover:text-stone-900 transition-colors shrink-0">
+          <Link href="/" className="hover:text-[#0c2217] transition-colors shrink-0">
+            Home
+          </Link>
+          <span className="text-stone-300 select-none">/</span>
+          <Link href="/articles" className="hover:text-[#0c2217] transition-colors shrink-0">
             Blog &amp; Articles
           </Link>
-          <span className="text-stone-400 select-none">/</span>
+          <span className="text-stone-300 select-none">/</span>
           <span className="text-stone-700 truncate font-normal">
             {article.title}
           </span>
         </nav>
 
         {/* 1. Article Header Card */}
-        <header className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/80 p-6 sm:p-8 shadow-xs space-y-3.5">
-          <div className="text-[11px] font-extrabold uppercase tracking-wider text-emerald-800">
-            {article.category || 'STUDENTS & PARENTS'}
+        <header className="bg-white rounded-3xl border border-[#ebe3d3] p-6 sm:p-10 shadow-xs space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] sm:text-[11px] font-black uppercase tracking-wider bg-[#0c2217] text-[#f5d996] border border-[#d4a359]/30">
+              <Sparkles className="w-3 h-3 text-[#d4a359]" />
+              {article.category || 'STUDENTS & PARENTS'}
+            </span>
+            <span className="text-[11px] font-semibold text-stone-400">
+              {article.readTime || '5 min read'}
+            </span>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl lg:text-[34px] font-extrabold text-stone-900 tracking-tight leading-tight">
+          <h1 className="text-2xl sm:text-3xl lg:text-[38px] font-black text-[#0c2217] font-serif leading-[1.28] sm:leading-[1.22] tracking-tight">
             {article.title}
           </h1>
 
           {article.excerpt && (
-            <p className="text-xs sm:text-sm text-stone-600 leading-relaxed font-normal">
+            <p className="text-sm sm:text-base text-stone-600 leading-[1.75] font-normal pt-1">
               {article.excerpt}
             </p>
           )}
 
           {/* Metadata Pills */}
-          <div className="flex flex-wrap items-center gap-2 pt-2 text-[11px] text-stone-600 font-medium">
-            <span className="px-3 py-1 rounded-md bg-stone-100/90 text-stone-700">
-              {article.readTime || '5 min read'}
+          <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-[#f0e8dc] text-xs">
+            <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[#0c2217] text-[#f5d996] border border-[#d4a359]/40 font-bold text-xs shadow-2xs">
+              {article.author === 'Abdul Khaliq' && '👑 '}
+              {article.author === 'Mrs. Abdul Khaliq' && '🌸 '}
+              {article.author === 'Guest Author' && '✍️ '}
+              {article.author}
             </span>
-            <span className="px-3 py-1 rounded-md bg-stone-100/90 text-stone-700">
+            <span className="px-3 py-1 rounded-full bg-[#f6f2e9] text-stone-700 border border-[#ebe3d3] font-medium">
               Published {formattedPublishedDate}
             </span>
             {formattedUpdatedDate && (
-              <span className="px-3 py-1 rounded-md bg-stone-100/90 text-stone-700">
+              <span className="px-3 py-1 rounded-full bg-[#f6f2e9] text-stone-700 border border-[#ebe3d3] font-medium hidden sm:inline-block">
                 Updated {formattedUpdatedDate}
               </span>
             )}
-            <span className="px-3 py-1 rounded-md bg-emerald-50 text-emerald-800 border border-emerald-100 font-semibold">
-              Author: {article.author}
-            </span>
           </div>
         </header>
 
-        {/* 2. Article Body Content Card */}
-        <main className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/80 p-6 sm:p-10 shadow-xs text-stone-800">
+        {/* 2. Featured Image Card */}
+        {article.coverImage && (
+          <div className="rounded-3xl overflow-hidden border border-[#ebe3d3] shadow-sm bg-[#f5efe4] relative group">
+            <div className="relative h-64 sm:h-80 md:h-[420px] w-full overflow-hidden">
+              <img
+                src={article.coverImage}
+                alt={article.title}
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-102"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-transparent opacity-70" />
+              <div className="absolute bottom-4 left-5 right-5 flex items-center justify-between text-white/95 text-xs font-semibold">
+                <span className="backdrop-blur-md bg-black/40 px-3.5 py-1 rounded-full border border-white/20 flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-[#f5d996]" />
+                  <span>IlmiDunya Editorial</span>
+                </span>
+                <span className="backdrop-blur-md bg-black/40 px-3.5 py-1 rounded-full border border-white/20 flex items-center gap-1.5">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Verified Safe Learning</span>
+                </span>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* 3. Article Body Content Card */}
+        <main className="bg-white rounded-3xl border border-[#ebe3d3] p-6 sm:p-10 lg:p-12 shadow-xs text-stone-800">
           <ArticleContentRenderer content={article.content} variant="light" />
 
           {/* Tags */}
           {article.tags && article.tags.length > 0 && (
-            <div className="pt-6 mt-8 border-t border-stone-100 flex flex-wrap items-center gap-2">
-              <span className="text-[11px] font-bold text-stone-400 uppercase tracking-wider">Topics:</span>
+            <div className="pt-8 mt-10 border-t border-[#ebe3d3] flex flex-wrap items-center gap-2">
+              <span className="text-[11px] font-extrabold text-stone-400 uppercase tracking-wider">
+                Topics:
+              </span>
               {article.tags.map((tag, i) => (
                 <span
                   key={i}
-                  className="px-2.5 py-0.5 rounded-lg text-xs font-medium bg-stone-100 text-stone-700"
+                  className="px-3 py-1 rounded-full text-xs font-semibold bg-[#f6f2e9] hover:bg-[#ede5d5] text-[#0c2217] border border-[#ebe3d3] transition-colors"
                 >
                   #{tag}
                 </span>
@@ -234,72 +281,101 @@ export default async function ArticleDetailPage({ params }) {
           )}
         </main>
 
-        {/* 3. FAQs Card (Collapsible Accordion) */}
+        {/* 4. FAQs Card (Collapsible Accordion) */}
         {faqs && faqs.length > 0 && (
           <ArticleFaqAccordion faqs={faqs} />
         )}
 
-        {/* 4. Primary Action Banner */}
-        <div className="bg-white rounded-2xl sm:rounded-3xl border-2 border-emerald-500/25 hover:border-emerald-500/45 p-4 sm:p-5 shadow-xs transition-colors flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-          <div className="text-xs sm:text-sm font-semibold text-stone-900">
-            Post your tuition need to compare relevant verified tutors.
+        {/* 5. Primary Action Banner */}
+        <div className="bg-gradient-to-r from-[#0c2217] via-[#143928] to-[#0c2217] rounded-3xl border border-[#d4a359]/40 p-6 sm:p-7 shadow-md text-white flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left">
+          <div className="space-y-1">
+            <div className="text-base sm:text-lg font-bold font-serif text-white tracking-tight">
+              Post your tuition need to compare relevant verified tutors.
+            </div>
+            <div className="text-xs text-[#f5d996]/90 font-medium">
+              Camera-off preference, verified female teachers, and structured monthly progress.
+            </div>
           </div>
           <Link
             href="/tutors"
-            className="px-5 py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-900 text-white font-bold text-xs sm:text-sm shrink-0 transition-all flex items-center gap-1.5 shadow-xs"
+            className="px-6 py-3 rounded-xl bg-[#d4a359] hover:bg-[#e0b26c] text-[#0c2217] font-extrabold text-xs sm:text-sm shrink-0 transition-all flex items-center gap-2 shadow-sm group cursor-pointer"
           >
-            <span>Continue</span>
-            <span>→</span>
+            <span>Continue to Tutors</span>
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
           </Link>
         </div>
 
-        {/* 5. Practical Next Steps / Support Card */}
-        <div className="bg-white rounded-2xl sm:rounded-3xl border border-stone-200/80 p-4 sm:p-5 shadow-xs text-xs text-stone-600 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
-          <p>
-            Need practical next steps? Read our <Link href="/safety" className="text-emerald-700 font-bold underline hover:text-emerald-800">Female Safety Charter</Link>, learn <Link href="/how-it-works" className="text-emerald-700 font-bold underline hover:text-emerald-800">How Classes Work</Link>, or contact support.
+        {/* 6. Practical Next Steps / Support Card */}
+        <div className="bg-white rounded-3xl border border-[#ebe3d3] p-5 sm:p-6 shadow-xs text-xs sm:text-sm text-stone-600 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
+          <p className="leading-relaxed">
+            Need practical next steps? Read our <Link href="/safety" className="text-[#0c2217] font-bold underline decoration-[#d4a359] hover:text-[#b85d34]">Female Safety Charter</Link>, learn <Link href="/how-it-works" className="text-[#0c2217] font-bold underline decoration-[#d4a359] hover:text-[#b85d34]">How Classes Work</Link>, or contact support.
           </p>
           <a
             href="https://wa.me/923171759093?text=Assalamu%20Alaikum%20I%20have%20a%20question%20regarding%20IlmiDunya"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs font-bold text-emerald-800 hover:text-emerald-900 shrink-0"
+            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold hover:bg-emerald-100 transition-colors shrink-0 shadow-2xs"
           >
-            <span>WhatsApp help</span>
+            <span>WhatsApp Help</span>
             <span>↗</span>
           </a>
         </div>
 
-        {/* 6. Related Articles in 2-Column Grid */}
+        {/* 7. Related Articles in 2-Column Grid */}
         {relatedArticles.length > 0 && (
-          <section aria-labelledby="related-articles-heading" className="space-y-3 pt-2">
-            <h2 id="related-articles-heading" className="text-base sm:text-lg font-bold text-stone-900 px-1">
-              Related articles
-            </h2>
+          <section aria-labelledby="related-articles-heading" className="space-y-4 pt-2">
+            <div className="flex items-center justify-between px-1">
+              <h2 id="related-articles-heading" className="text-xl sm:text-2xl font-black font-serif text-[#0c2217]">
+                Related Educational Articles
+              </h2>
+              <Link href="/articles" className="text-xs font-bold text-[#0c2217] hover:text-[#b85d34] flex items-center gap-1">
+                <span>View All</span>
+                <ArrowRight className="w-3 h-3" />
+              </Link>
+            </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 sm:gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
               {relatedArticles.map((rel) => (
                 <article
                   key={rel._id || rel.slug}
-                  className="bg-white rounded-2xl border border-stone-200/80 p-5 hover:border-stone-400/80 hover:shadow-xs transition-all space-y-2.5 flex flex-col justify-between"
+                  className="bg-white rounded-3xl border border-[#ebe3d3] overflow-hidden hover:border-[#d4a359]/60 hover:shadow-md transition-all duration-300 flex flex-col justify-between group"
                 >
-                  <div className="space-y-1.5">
-                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-emerald-800">
-                      {rel.category || 'SAFETY & TRUST'}
-                    </span>
-                    <h3 className="text-xs sm:text-sm font-bold text-stone-900 leading-snug">
-                      <Link href={`/articles/${rel.slug}`} className="hover:text-emerald-800 transition-colors">
-                        {rel.title}
-                      </Link>
-                    </h3>
-                    {rel.excerpt && (
-                      <p className="text-xs text-stone-500 line-clamp-2 leading-relaxed font-normal">
-                        {rel.excerpt}
-                      </p>
-                    )}
-                  </div>
+                  {rel.coverImage && (
+                    <Link href={`/articles/${rel.slug}`} className="h-36 sm:h-40 w-full overflow-hidden bg-stone-100 block relative">
+                      <img
+                        src={rel.coverImage}
+                        alt={rel.title}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                      <div className="absolute top-3 left-3 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-[#0c2217]/90 text-[#f5d996] border border-[#d4a359]/30 backdrop-blur-xs">
+                        {rel.category || 'ACADEMICS'}
+                      </div>
+                    </Link>
+                  )}
 
-                  <div className="pt-2 text-[11px] text-stone-400 font-medium">
-                    <span>{rel.readTime || '5 min read'}</span>
+                  <div className="p-5 sm:p-6 space-y-2 flex-1 flex flex-col justify-between">
+                    <div className="space-y-2">
+                      {!rel.coverImage && (
+                        <span className="inline-block text-[10px] font-black uppercase tracking-wider text-[#0c2217] bg-[#f5efe4] px-2.5 py-0.5 rounded-full border border-[#e5dcce]">
+                          {rel.category || 'ACADEMICS'}
+                        </span>
+                      )}
+                      <h3 className="text-sm sm:text-base font-bold font-serif text-[#0c2217] group-hover:text-[#b85d34] transition-colors leading-snug line-clamp-2">
+                        <Link href={`/articles/${rel.slug}`}>
+                          {rel.title}
+                        </Link>
+                      </h3>
+                      {rel.excerpt && (
+                        <p className="text-xs text-stone-600 line-clamp-2 leading-relaxed font-normal">
+                          {rel.excerpt}
+                        </p>
+                      )}
+                    </div>
+
+                    <div className="pt-3 border-t border-[#f0e8dc] flex items-center justify-between text-[11px] text-stone-400 font-medium">
+                      <span className="font-semibold text-stone-600">{rel.author}</span>
+                      <span>{rel.readTime || '5 min read'}</span>
+                    </div>
                   </div>
                 </article>
               ))}

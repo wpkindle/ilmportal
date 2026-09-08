@@ -233,12 +233,12 @@ export default async function ArticleDetailPage({ params }) {
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h4 className="font-bold text-sm text-[#0c2217]">
+                  <span className="font-bold text-sm text-[#0c2217]">
                     {article.author === 'Abdul Khaliq' && '👑 '}
                     {article.author === 'Mrs. Abdul Khaliq' && '🌸 '}
                     {article.author === 'Guest Author' && '✍️ '}
                     {article.author}
-                  </h4>
+                  </span>
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#f0e8dc] text-[#0c2217] font-black">
                     {authorRole}
                   </span>
@@ -300,7 +300,7 @@ export default async function ArticleDetailPage({ params }) {
           </div>
           <div className="space-y-1.5 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <h4 className="text-base font-bold text-[#0c2217]">About {article.author}</h4>
+              <h3 className="text-base font-bold text-[#0c2217]">About the Author: {article.author}</h3>
               <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black bg-[#0c2217] text-[#f5d996]">
                 {authorRole}
               </span>
@@ -320,9 +320,9 @@ export default async function ArticleDetailPage({ params }) {
               <span>Sanad Verified Scholars &amp; Academic Educators</span>
             </div>
 
-            <h3 className="text-xl sm:text-3xl font-black text-white font-serif">
+            <h2 className="text-xl sm:text-3xl font-black text-white font-serif">
               Ready to Learn with a Verified Teacher?
-            </h3>
+            </h2>
 
             <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
               Connect with certified Quran Qaris, female Alimahs, and school educators across Pakistan. Enjoy 1-on-1 classes with camera-off privacy and a 3-day risk-free trial.
@@ -343,9 +343,9 @@ export default async function ArticleDetailPage({ params }) {
         {/* Related Articles */}
         {relatedArticles.length > 0 && (
           <div className="space-y-6 pt-6">
-            <h3 className="text-xl font-bold text-[#0c2217] font-serif">
+            <h2 className="text-xl font-bold text-[#0c2217] font-serif">
               Related Educational Articles
-            </h3>
+            </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
               {relatedArticles.map((rel) => (
@@ -364,11 +364,11 @@ export default async function ArticleDetailPage({ params }) {
                   <div className="p-4 flex-1 flex flex-col justify-between space-y-2">
                     <div>
                       <span className="text-[10px] font-bold text-[#b85d34] uppercase">{rel.category}</span>
-                      <h4 className="text-xs sm:text-sm font-bold text-[#0c2217] font-serif line-clamp-2 mt-1 group-hover:text-[#b85d34] transition-colors">
+                      <h3 className="text-xs sm:text-sm font-bold text-[#0c2217] font-serif line-clamp-2 mt-1 group-hover:text-[#b85d34] transition-colors">
                         <Link href={`/articles/${rel.slug}`}>
                           {rel.title}
                         </Link>
-                      </h4>
+                      </h3>
                     </div>
 
                     <div className="pt-2 border-t border-[#f0e8dc] flex items-center justify-between text-[11px] text-stone-400">

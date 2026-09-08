@@ -787,11 +787,27 @@ export default function AdminArticlesPage() {
                   <div className="flex flex-wrap items-center gap-1.5 p-2 bg-slate-950 border border-slate-800 rounded-xl">
                     <button
                       type="button"
-                      onClick={() => insertFormatting('### ')}
-                      className="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-md"
-                      title="Heading 3"
+                      onClick={() => insertFormatting('## ')}
+                      className="px-2.5 py-1 bg-amber-500/20 text-[#f5d996] hover:bg-amber-500/30 border border-amber-500/40 text-xs font-black rounded-md"
+                      title="H2 - Major Section Heading (Recommended for SEO)"
                     >
-                      H3
+                      H2 (Section)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => insertFormatting('### ')}
+                      className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold rounded-md"
+                      title="H3 - Subsection Heading"
+                    >
+                      H3 (Sub)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => insertFormatting('#### ')}
+                      className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-medium rounded-md"
+                      title="H4 - Topic / Minor Heading"
+                    >
+                      H4 (Topic)
                     </button>
                     <button
                       type="button"

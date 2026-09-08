@@ -3,13 +3,22 @@
 import React from 'react';
 
 /**
+ * Creates URL-friendly slug ID for SEO anchor jump links
+ */
+function slugifyHeading(text) {
+  return String(text || '')
+    .toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-');
+}
+
+/**
  * Parses inline formatting: **bold**, *italic*, `code`, [link](url)
  */
 function parseInline(text, isDark = false) {
   if (!text) return null;
 
-  // Split by markdown inline tokens: **bold**, *italic*, `code`, [label](url)
-  // We use a regex tokenizer
   const tokens = [];
   let remaining = text;
   let keyIdx = 0;
@@ -88,8 +97,9 @@ function parseInline(text, isDark = false) {
 }
 
 /**
- * ArticleContentRenderer: Transforms article markdown into beautifully styled HTML elements.
- * Eliminates raw markdown tokens (e.g. ###, **, *) and renders bold headings, lists, and quotes.
+ * ArticleContentRenderer: Transforms article markdown into SEO-optimized semantic HTML elements (H2, H3, H4, P, UL, OL, BLOCKQUOTE).
+ * Preserves strict heading hierarchy (Page Title is H1 -> Body sections are H2 -> Subsections are H3 -> Topic items are H4).
+ * Strips raw markdown tokens (###, ##, #, ####, **) and generates anchor IDs for search engine jump links.
  */
 export default function ArticleContentRenderer({ content = '', variant = 'light' }) {
   if (!content) return null;
@@ -107,7 +117,7 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
     if (currentList) {
       if (currentList.type === 'ul') {
         elements.push(
-          <ul key={`ul-${keyCounter++}`} className="my-4 space-y-2 pl-1">
+          <ul key={`ul-${keyCounter++}`} className="my-4 space-y-2.5 pl-1">
             {currentList.items.map((item, idx) => (
               <li
                 key={idx}
@@ -172,16 +182,22 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
       continue;
     }
 
-    // 2. Headings (###, ##, #)
+    // 2. SEO Headings (H2, H3, H4)
+    // In strict SEO, Page Title is the singular H1. In-body headers are H2 (sections), H3 (subsections), H4 (topics).
+    const h4Match = line.match(/^####\s+(.*)/);
     const h3Match = line.match(/^###\s+(.*)/);
     const h2Match = line.match(/^##\s+(.*)/);
     const h1Match = line.match(/^#\s+(.*)/);
 
-    if (h3Match || h2Match || h1Match) {
+    if (h4Match || h3Match || h2Match || h1Match) {
       flushList();
-      const headingText = (h3Match ? h3Match[1] : h2Match ? h2Match[1] : h1Match[1]).trim();
+      const headingText = (
+        h4Match ? h4Match[1] : h3Match ? h3Match[1] : h2Match ? h2Match[1] : h1Match[1]
+      ).trim();
 
-      // Special handling for Bismillah
+      const headingId = slugifyHeading(headingText);
+
+      // Special handling for Bismillah / Calligraphy
       if (
         headingText.toLowerCase().includes('bismillah') ||
         headingText.includes('بسم الله')
@@ -206,15 +222,31 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
         continue;
       }
 
-      // Normal H3
+      // H4: Detailed Sub-topic Heading (####)
+      if (h4Match) {
+        elements.push(
+          <h4
+            key={`h4-${keyCounter++}`}
+            id={headingId}
+            className={`text-sm sm:text-base font-bold font-serif uppercase tracking-wider mt-6 mb-2.5 flex items-center gap-2 scroll-mt-20 ${
+              isDark ? 'text-[#f5d996]' : 'text-[#b85d34]'
+            }`}
+          >
+            <span className="text-[#d4a359] text-xs">◈</span>
+            <span>{parseInline(headingText, isDark)}</span>
+          </h4>
+        );
+        continue;
+      }
+
+      // H3: Subsection Heading (###)
       if (h3Match) {
         elements.push(
           <h3
             key={`h3-${keyCounter++}`}
-            className={`text-lg sm:text-2xl font-black font-serif mt-8 mb-3.5 tracking-tight border-b pb-2 ${
-              isDark
-                ? 'text-white border-slate-800'
-                : 'text-[#0c2217] border-[#ebe3d3]'
+            id={headingId}
+            className={`text-lg sm:text-xl lg:text-2xl font-black font-serif mt-8 mb-3 tracking-tight scroll-mt-20 ${
+              isDark ? 'text-white' : 'text-[#0c2217]'
             }`}
           >
             {parseInline(headingText, isDark)}
@@ -223,34 +255,21 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
         continue;
       }
 
-      // Normal H2
-      if (h2Match) {
+      // H2: Major Section Heading (## or in-body # to maintain singular H1)
+      if (h2Match || h1Match) {
         elements.push(
           <h2
             key={`h2-${keyCounter++}`}
-            className={`text-xl sm:text-3xl font-black font-serif mt-10 mb-4 tracking-tight border-b pb-2.5 ${
+            id={headingId}
+            className={`text-xl sm:text-2xl lg:text-3xl font-black font-serif mt-10 mb-4 tracking-tight border-b pb-3 scroll-mt-20 flex items-center gap-2.5 ${
               isDark
                 ? 'text-white border-slate-800'
                 : 'text-[#0c2217] border-[#ebe3d3]'
             }`}
           >
-            {parseInline(headingText, isDark)}
+            <div className="w-1.5 h-5 rounded-full bg-[#d4a359] shrink-0" />
+            <span>{parseInline(headingText, isDark)}</span>
           </h2>
-        );
-        continue;
-      }
-
-      // Normal H1
-      if (h1Match) {
-        elements.push(
-          <h1
-            key={`h1-${keyCounter++}`}
-            className={`text-2xl sm:text-4xl font-black font-serif mt-10 mb-4 tracking-tight ${
-              isDark ? 'text-white' : 'text-[#0c2217]'
-            }`}
-          >
-            {parseInline(headingText, isDark)}
-          </h1>
         );
         continue;
       }

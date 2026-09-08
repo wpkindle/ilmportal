@@ -395,44 +395,59 @@ Yet, over the past decade, as learning moved rapidly onto digital screens, Pakis
 
 ---
 
-### 1. The Dignity of Female Learners & Camera-Off Default
+## 1. The Dignity of Female Learners & Camera-Off Default
 
 For mothers, daughters, and female Quran scholars (Alimahs), appearing on video calls with unknown individuals can be a source of discomfort and anxiety. Many households refrained from online tutoring precisely because generic international platforms force cameras on by default.
 
-At **IlmiDunya**, we resolved this challenge at the architectural level:
-* **Audio-First & Screen-Share Whiteboard**: Real-time Tajweed correction requires crystal-clear sound and synchronized Quran mushaf viewing, not intrusive video cameras.
-* **Camera-Off by Default**: Every classroom starts with video feeds muted and disabled, allowing students to learn in their home clothes in complete dignity and peace of mind.
-* **Parent-Accessible Transparency**: Parents can review trial dates and chat logs without fear of unmonitored private contact.
+### Audio-First & Screen-Share Whiteboard Architecture
+Real-time Tajweed correction requires crystal-clear sound, acoustic resonance, and synchronized Quran mushaf viewing, not intrusive video cameras. Tutors listen to the exact articulation point of each letter while sharing high-resolution pages of the Holy Quran.
+
+### Complete Family Privacy in Home Clothes
+Every classroom on IlmiDunya starts with video feeds muted and disabled by default. Students can learn in their home clothes in complete dignity, comfort, and peace of mind without worrying about camera angles or background domestic activity.
+
+### Parent-Accessible Transparency
+Parents can review trial dates, lesson schedules, and chat logs at any time, eliminating unmonitored private contact and ensuring total accountability.
 
 ---
 
-### 2. Why Sanad Verification is Non-Negotiable
+## 2. Why Sanad Verification is Non-Negotiable
 
 Reciting the Holy Quran without authentic **Tajweed** can inadvertently alter the meanings of Divine words. Unfortunately, generic tutor directories allow anyone to claim credentials without presenting authentic institutional certificates.
 
-Before any Quran teacher is approved on IlmiDunya:
-1. **Official Sanad Verification**: We cross-reference degrees from recognized boards including *Wifaq-ul-Madaris Al-Arabia*, *Tanzeem-ul-Madaris*, and recognized HEC universities.
-2. **CNIC & Identity Verification**: Every tutor's national identity is securely validated to maintain a safe, accountable community.
-3. **Makharij & Tajweed Assessment**: Scholars are assessed for fluency in *Hafs 'an 'Asim* and child-friendly pedagogy.
+### Official Institutional Sanad Verification
+Before any Quran teacher is approved on IlmiDunya, we cross-reference degrees and certificates from recognized religious boards including:
+* **Wifaq-ul-Madaris Al-Arabia Pakistan**
+* **Tanzeem-ul-Madaris Ahl-e-Sunnat**
+* **Wifaq-ul-Madaris Al-Salafiyyah**
+* **HEC Recognized Islamic Universities**
+
+### CNIC & Identity Verification
+Every tutor's national identity card (CNIC) is securely validated to maintain an accountable, safe community for Pakistani parents.
+
+### Makharij & Tajweed Assessment
+Scholars are assessed for fluency in *Hafs 'an 'Asim* and child-friendly pedagogy before receiving their verified platform badge.
 
 ---
 
-### 3. Direct Parental Engagement & The 3-Day Free Trial
+## 3. Direct Parental Engagement & The 3-Day Free Trial
 
 Trust is not built on words alone — it is earned through experience. Every student and family on IlmiDunya is entitled to a **3-Day Risk-Free Trial**. 
 
-Parents can listen in on the introductory sessions, observe how the tutor handles recitation pacing, and agree upon a fair, direct fee without agency middlemen taking 40% cuts from hardworking Pakistani teachers.
+#### Practical Parent Monitoring Checkpoints
+* **Listen to Recitation Pacing**: Ensure the teacher corrects mispronunciations patiently rather than rushing through verses.
+* **Observe Child Comfort**: Confirm that your child feels encouraged, respected, and enthusiastic during the session.
+* **Agree on Direct Transparent Fees**: Agree upon a fair fee directly with the teacher without agency middlemen taking 40% commissions from hardworking Pakistani educators.
 
 ---
 
-### An Initiative Dedicated to Our Children's Future
+## An Initiative Dedicated to Our Children's Future
 
 When Mrs. Abdul Khaliq and I set out to build this platform from Lahore, our intention was singular: to create a trusted space where parents feel as secure as if the teacher were sitting right in their family living room.
 
 May Allah (SWT) bless our children with beneficial knowledge, make them the coolness of our eyes, and grant sincerity to all students and teachers seeking His pleasure.
 
 **— Abdul Khaliq**  
-*Co-Founder, IlmiDunya Pakistan*`
+*Co-Founder & Platform Director, IlmiDunya Pakistan*`
     });
 
     console.log('✅ Demo article seeded successfully:', demoArticle.title);

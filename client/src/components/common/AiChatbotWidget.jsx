@@ -623,7 +623,16 @@ export default function LiveSupportWidget() {
   // Submit Offline Email Message
   const handleSendOfflineMessage = async (e) => {
     e.preventDefault();
-    if (!offlineEmail.trim() || !offlineMessage.trim() || offlineSending) return;
+    if (offlineSending) return;
+
+    if (!offlineEmail.trim()) {
+      alert('Please enter your email address so our helpdesk can reply to you.');
+      return;
+    }
+    if (!offlineMessage.trim()) {
+      alert('Please write your message or inquiry before sending.');
+      return;
+    }
 
     setOfflineSending(true);
 
@@ -1014,7 +1023,7 @@ export default function LiveSupportWidget() {
 
           {/* OFFLINE EMAIL INQUIRY FORM VIEW (Light Theme) */}
           {isOfflineView ? (
-            <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#faf8f5] pb-20 sm:pb-[max(2rem,env(safe-area-inset-bottom))]">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#faf8f5] pb-[max(1.5rem,env(safe-area-inset-bottom))]">
               <div className="p-3.5 rounded-2xl bg-rose-50/80 border border-rose-200 text-rose-900 text-xs space-y-1 shadow-2xs">
                 <div className="flex items-center gap-1.5 font-bold text-rose-900">
                   <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
@@ -1121,38 +1130,38 @@ export default function LiveSupportWidget() {
                     </div>
                   )}
 
-                  {/* Hidden File Input strictly for PNG, JPG, JPEG, PDF */}
+                  {/* Accessible File Input strictly for PNG, JPG, JPEG, PDF */}
                   <input
+                    id="offline-support-file-input"
                     type="file"
                     ref={fileInputRef}
                     onChange={handleFileSelect}
                     accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf"
-                    className="hidden"
+                    className="sr-only"
                   />
 
-                  <div className="flex items-center justify-between pt-1">
-                    <button
-                      type="button"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="px-3 py-2 rounded-xl bg-[#f0ece1] hover:bg-[#ebe3d3] text-[#0c2217] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border border-[#ebe3d3]"
+                  <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
+                    <label
+                      htmlFor="offline-support-file-input"
+                      className="w-full sm:w-auto py-2.5 px-4 rounded-xl bg-[#f0ece1] hover:bg-[#ebe3d3] active:bg-[#e4dac7] text-[#0c2217] text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer border border-[#ebe3d3] min-h-[44px] select-none active:scale-[0.98]"
                     >
-                      <Paperclip className="w-3.5 h-3.5 text-emerald-700" />
-                      <span>{selectedFile ? 'Change File' : 'Attach File (PNG, JPG, PDF)'}</span>
-                    </button>
+                      <Paperclip className="w-4 h-4 text-emerald-700 shrink-0" />
+                      <span className="truncate">{selectedFile ? 'Change File' : 'Attach File (PNG, JPG, PDF)'}</span>
+                    </label>
 
                     <button
                       type="submit"
-                      disabled={offlineSending || !offlineEmail.trim() || !offlineMessage.trim()}
-                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-700 to-[#0c2217] hover:from-emerald-600 hover:to-[#123323] hover:scale-105 disabled:opacity-40 disabled:hover:scale-100 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
+                      disabled={offlineSending}
+                      className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-emerald-700 to-[#0c2217] hover:from-emerald-600 hover:to-[#123323] hover:scale-[1.01] active:scale-[0.98] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md min-h-[44px] disabled:opacity-50"
                     >
                       {offlineSending ? (
                         <>
-                          <Clock className="w-3.5 h-3.5 animate-spin" />
-                          <span>Sending...</span>
+                          <Clock className="w-4 h-4 animate-spin shrink-0" />
+                          <span>Sending Inquiry...</span>
                         </>
                       ) : (
                         <>
-                          <Send className="w-3.5 h-3.5" />
+                          <Send className="w-4 h-4 shrink-0" />
                           <span>Send Email Inquiry</span>
                         </>
                       )}
@@ -1333,13 +1342,14 @@ export default function LiveSupportWidget() {
                   </div>
                 )}
 
-                {/* Hidden File Input strictly for PNG, JPG, JPEG, PDF */}
+                {/* File Input strictly for PNG, JPG, JPEG, PDF */}
                 <input
+                  id="live-support-file-input"
                   type="file"
                   ref={fileInputRef}
                   onChange={handleFileSelect}
                   accept=".png,.jpg,.jpeg,.pdf,image/png,image/jpeg,application/pdf"
-                  className="hidden"
+                  className="sr-only"
                 />
 
                 <form
@@ -1349,14 +1359,13 @@ export default function LiveSupportWidget() {
                   }}
                   className="flex items-center gap-1.5"
                 >
-                  <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    className="p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-stone-400 hover:text-[#0c2217] hover:bg-stone-200/50 active:scale-95 transition-colors cursor-pointer shrink-0"
+                  <label
+                    htmlFor="live-support-file-input"
+                    className="p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-stone-500 hover:text-emerald-800 hover:bg-stone-200/50 active:scale-95 transition-colors cursor-pointer shrink-0"
                     title="Attach file (PNG, JPG, JPEG, PDF only)"
                   >
-                    <Paperclip className="w-4 h-4" />
-                  </button>
+                    <Paperclip className="w-4 h-4 text-emerald-700" />
+                  </label>
 
                   <input
                     ref={inputRef}

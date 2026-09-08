@@ -1,5 +1,5 @@
 // Built-in Editorial Articles for IlmiDunya
-// Fully SEO-optimized with H1 (page title), H2 (major sections), H3 (subsections), and H4 (actionable topics).
+// Fully SEO-optimized with H1 (page title), H2 (major sections), H3 (subsections), H4 (actionable topics), and FAQs.
 
 export const EDITORIAL_ARTICLES = [
   {
@@ -18,6 +18,24 @@ export const EDITORIAL_ARTICLES = [
     metaDescription: 'Discover how IlmiDunya protects Pakistani student privacy with camera-off video classes and authentic Wafaq-ul-Madaris Sanad verification.',
     tags: ['Quran Education', 'Tajweed', 'Family Privacy', 'Online Learning', 'Pakistan', 'Child Safety'],
     views: 184,
+    faqs: [
+      {
+        question: 'How many tutors should we compare before finalizing?',
+        answer: 'We recommend shortlisting 2 to 3 verified tutor profiles and scheduling introductory trial sessions. A quick comparison reveals differences in teaching structure, recitation pacing, and child rapport.'
+      },
+      {
+        question: 'Should we prioritize fee or teaching fit?',
+        answer: 'Always prioritize verified Tajweed Sanad credentials and teacher-student compatibility over the absolute lowest fee. Because IlmiDunya eliminates agency commissions, certified tutors charge fair, direct rates.'
+      },
+      {
+        question: 'Why is camera-off default important for female students and families?',
+        answer: 'Camera-off ensures complete family privacy and modesty, allowing students to learn comfortably in home clothes. The focus remains 100% on high-quality audio recitation and digital Quran whiteboard sharing.'
+      },
+      {
+        question: 'How does the 3-day free trial work?',
+        answer: 'Parents can schedule 3 trial lessons with any verified tutor. You observe the teaching pacing directly; if satisfied, you proceed with regular classes with zero middleman fee.'
+      }
+    ],
     content: `### Bismillah-ir-Rahman-ir-Rahim
 
 The quest for authentic knowledge is a sacred duty for every Muslim family. In our beloved Pakistan, parents have historically invested their utmost energy and finances to ensure their sons and daughters learn the Holy Quran with accurate **Tajweed (مخارج)** and receive top-notch academic guidance.
@@ -96,6 +114,20 @@ May Allah (SWT) bless our children with beneficial knowledge, make them the cool
     metaDescription: 'Mrs. Abdul Khaliq shares why certified female Alimahs provide the most nurturing, modest, and empowering environment for young Pakistani girls.',
     tags: ['Female Education', 'Alimah', 'Modesty', 'Child Safety', 'Mothers', 'Pakistan'],
     views: 231,
+    faqs: [
+      {
+        question: 'Why is a female Alimah recommended for adolescent daughters?',
+        answer: 'A qualified female scholar creates a warm, empathetic mentorship environment where young girls feel completely at ease reciting and asking questions regarding Taharah, salah rules, and personal female Islamic guidance.'
+      },
+      {
+        question: 'What credentials do your female Alimahs hold?',
+        answer: 'All female teachers hold verified Alimah certificates (Dars-e-Nizami) from recognized boards including Wifaq-ul-Madaris Al-Arabia Pakistan, Tanzeem-ul-Madaris, or recognized Islamic universities.'
+      },
+      {
+        question: 'Can mothers supervise the lessons?',
+        answer: 'Yes, mothers are encouraged to listen in and supervise lessons comfortably without needing to be camera-ready.'
+      }
+    ],
     content: `### Assalamu Alaikum wa Rahmatullah
 
 As a mother living in Pakistan, nothing brings greater peace of heart than seeing our daughters fall in love with the Holy Quran. Yet, as our daughters grow past early childhood into adolescence, their emotional and spiritual comfort during lessons becomes paramount.
@@ -161,6 +193,20 @@ Let us nurture our daughters with warmth, dignity, and sacred knowledge.
     metaDescription: 'Expert Tajweed guide addressing typical Urdu-influenced recitation errors including Makharij confusion, heavy letters, and improper elongation.',
     tags: ['Tajweed', 'Quran Recitation', 'Makharij', 'Tutor Tips', 'Noorani Qaida'],
     views: 168,
+    faqs: [
+      {
+        question: 'How long does it take to correct ingrained Makhraj habits?',
+        answer: 'With consistent 25-minute daily sessions under a certified Qari, most students demonstrate marked pronunciation improvements in heavy letters and Qalqalah within 4 to 6 weeks.'
+      },
+      {
+        question: 'Is Noorani Qaida suitable for older children and adults?',
+        answer: 'Yes, Noorani Qaida is the foundational gold standard across the Muslim world for retraining vocal articulation, whether for 6-year-olds or adults.'
+      },
+      {
+        question: 'How many times a week should a student take Tajweed classes?',
+        answer: 'For best muscle memory and vocal tract training, 4 to 5 short sessions of 30 minutes each week produce much faster results than long infrequent sessions.'
+      }
+    ],
     content: `### In the Name of Allah, Most Gracious, Most Merciful
 
 Reciting the Holy Quran with **Tajweed** is not merely an aesthetic embellishment; it is the correct preservation of how the Quran was revealed to Prophet Muhammad (peace and blessings be upon him).
@@ -252,4 +298,25 @@ export const getEditorialArticleBySlug = (slug) => {
 export const getRelatedEditorialArticles = (currentSlug, count = 2) => {
   const cleanSlug = String(currentSlug || '').trim().toLowerCase();
   return EDITORIAL_ARTICLES.filter((a) => a.slug.toLowerCase() !== cleanSlug).slice(0, count);
+};
+
+// Helper to get FAQs for an article
+export const getArticleFaqs = (article) => {
+  if (article && Array.isArray(article.faqs) && article.faqs.length > 0) {
+    return article.faqs;
+  }
+  return [
+    {
+      question: 'How many tutors should we compare before finalizing?',
+      answer: 'We recommend shortlisting 2 to 3 verified tutor profiles and scheduling introductory trial sessions. A quick comparison reveals differences in teaching structure, recitation pacing, and child rapport.'
+    },
+    {
+      question: 'Should we prioritize fee or teaching fit?',
+      answer: 'Always prioritize verified Tajweed Sanad credentials and teacher-student compatibility over the lowest fee. Because IlmiDunya eliminates agency commissions, certified tutors charge fair, direct rates.'
+    },
+    {
+      question: 'How does the 3-day risk-free trial work?',
+      answer: 'Parents can schedule 3 trial lessons with any verified tutor. You observe the teaching pacing directly; if satisfied, you proceed with regular classes with zero middleman fee.'
+    }
+  ];
 };

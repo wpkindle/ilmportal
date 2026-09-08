@@ -23,11 +23,6 @@ function parseInline(text, isDark = false) {
   let remaining = text;
   let keyIdx = 0;
 
-  // Pattern matches:
-  // 1: **bold**
-  // 2: *italic*
-  // 3: `code`
-  // 4: [label](url)
   const regex = /(\*\*([^*]+)\*\*|\*([^*]+)\*|`([^`]+)`|\[([^\]]+)\]\(([^)]+)\))/;
 
   while (remaining) {
@@ -48,7 +43,7 @@ function parseInline(text, isDark = false) {
       tokens.push(
         <strong
           key={keyIdx++}
-          className={`font-bold ${isDark ? 'text-white' : 'text-[#0c2217]'}`}
+          className={`font-bold ${isDark ? 'text-white' : 'text-stone-900'}`}
         >
           {match[2]}
         </strong>
@@ -83,7 +78,7 @@ function parseInline(text, isDark = false) {
           href={match[6]}
           target="_blank"
           rel="noopener noreferrer"
-          className="text-[#b85d34] underline font-medium hover:text-[#a04e27] transition-colors"
+          className="text-emerald-700 underline font-medium hover:text-emerald-800 transition-colors"
         >
           {match[5]}
         </a>
@@ -97,35 +92,32 @@ function parseInline(text, isDark = false) {
 }
 
 /**
- * ArticleContentRenderer: Transforms article markdown into SEO-optimized semantic HTML elements (H2, H3, H4, P, UL, OL, BLOCKQUOTE).
- * Preserves strict heading hierarchy (Page Title is H1 -> Body sections are H2 -> Subsections are H3 -> Topic items are H4).
- * Strips raw markdown tokens (###, ##, #, ####, **) and generates anchor IDs for search engine jump links.
+ * ArticleContentRenderer: Clean, readable typography inspired by modern editorial card layouts.
+ * Strictly maintains H1 (page title) -> H2 (major section) -> H3 (subsection) -> H4 (topic item).
  */
 export default function ArticleContentRenderer({ content = '', variant = 'light' }) {
   if (!content) return null;
 
   const isDark = variant === 'dark';
-
-  // Normalize line endings and split into paragraphs / blocks
   const rawLines = content.replace(/\r\n/g, '\n').split('\n');
 
   const elements = [];
-  let currentList = null; // for grouping lists
+  let currentList = null;
   let keyCounter = 0;
 
   const flushList = () => {
     if (currentList) {
       if (currentList.type === 'ul') {
         elements.push(
-          <ul key={`ul-${keyCounter++}`} className="my-4 space-y-2.5 pl-1">
+          <ul key={`ul-${keyCounter++}`} className="my-3 space-y-1.5 pl-1 sm:pl-2">
             {currentList.items.map((item, idx) => (
               <li
                 key={idx}
-                className={`flex items-start gap-3 text-sm sm:text-base leading-relaxed ${
-                  isDark ? 'text-slate-200' : 'text-[#2c3e35]'
+                className={`flex items-start gap-2.5 text-xs sm:text-sm md:text-[15px] leading-relaxed ${
+                  isDark ? 'text-slate-300' : 'text-stone-700'
                 }`}
               >
-                <span className="w-1.5 h-1.5 rounded-full bg-[#d4a359] mt-2.5 shrink-0" />
+                <span className="text-stone-400 font-bold select-none mt-0.5">•</span>
                 <div className="flex-1">{parseInline(item, isDark)}</div>
               </li>
             ))}
@@ -133,22 +125,20 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
         );
       } else if (currentList.type === 'ol') {
         elements.push(
-          <ol key={`ol-${keyCounter++}`} className="my-4 space-y-2.5 pl-1">
+          <ol key={`ol-${keyCounter++}`} className="my-3 space-y-2 pl-1 sm:pl-2">
             {currentList.items.map((item, idx) => (
               <li
                 key={idx}
-                className={`flex items-start gap-3 text-sm sm:text-base leading-relaxed ${
-                  isDark ? 'text-slate-200' : 'text-[#2c3e35]'
+                className={`flex items-start gap-2.5 text-xs sm:text-sm md:text-[15px] leading-relaxed ${
+                  isDark ? 'text-slate-300' : 'text-stone-700'
                 }`}
               >
                 <span
-                  className={`px-2 py-0.5 rounded-md text-xs font-bold shrink-0 mt-0.5 ${
-                    isDark
-                      ? 'bg-[#d4a359]/20 text-[#f5d996] border border-[#d4a359]/40'
-                      : 'bg-[#0c2217] text-[#f5d996]'
+                  className={`text-xs font-bold shrink-0 mt-0.5 ${
+                    isDark ? 'text-emerald-400' : 'text-emerald-800'
                   }`}
                 >
-                  {item.num || idx + 1}
+                  {item.num || idx + 1}.
                 </span>
                 <div className="flex-1">{parseInline(item.text, isDark)}</div>
               </li>
@@ -163,7 +153,6 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
   for (let i = 0; i < rawLines.length; i++) {
     const line = rawLines[i].trim();
 
-    // Empty line
     if (!line) {
       flushList();
       continue;
@@ -173,17 +162,17 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
     if (line === '---' || line === '***' || line === '___') {
       flushList();
       elements.push(
-        <div key={`hr-${keyCounter++}`} className="my-8 flex items-center justify-center gap-3">
-          <div className={`h-px flex-1 ${isDark ? 'bg-slate-800' : 'bg-[#ebe3d3]'}`} />
-          <span className="text-[#d4a359] text-xs font-serif select-none">✦</span>
-          <div className={`h-px flex-1 ${isDark ? 'bg-slate-800' : 'bg-[#ebe3d3]'}`} />
-        </div>
+        <hr
+          key={`hr-${keyCounter++}`}
+          className={`my-6 sm:my-8 border-t ${
+            isDark ? 'border-slate-800' : 'border-stone-200/80'
+          }`}
+        />
       );
       continue;
     }
 
     // 2. SEO Headings (H2, H3, H4)
-    // In strict SEO, Page Title is the singular H1. In-body headers are H2 (sections), H3 (subsections), H4 (topics).
     const h4Match = line.match(/^####\s+(.*)/);
     const h3Match = line.match(/^###\s+(.*)/);
     const h2Match = line.match(/^##\s+(.*)/);
@@ -197,7 +186,7 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
 
       const headingId = slugifyHeading(headingText);
 
-      // Special handling for Bismillah / Calligraphy
+      // Special handling for Bismillah
       if (
         headingText.toLowerCase().includes('bismillah') ||
         headingText.includes('بسم الله')
@@ -205,16 +194,16 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
         elements.push(
           <div
             key={`bismillah-${keyCounter++}`}
-            className={`my-6 p-4 sm:p-5 rounded-2xl border text-center shadow-xs ${
+            className={`my-4 p-3.5 sm:p-4 rounded-xl text-center border ${
               isDark
-                ? 'bg-[#0e271c] border-[#d4a359]/40 text-[#f5d996]'
-                : 'bg-gradient-to-r from-[#0c2217] via-[#123625] to-[#0c2217] border-[#d4a359]/40 text-[#f5d996]'
+                ? 'bg-slate-900 border-slate-800 text-amber-200'
+                : 'bg-[#f7f5f0] border-[#ebe5d8] text-emerald-900'
             }`}
           >
-            <div className="text-xl sm:text-2xl font-serif font-black tracking-wide">
+            <div className="text-lg sm:text-xl font-serif font-black tracking-wide">
               بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
             </div>
-            <div className="text-xs sm:text-sm text-[#d4a359] font-medium tracking-wide mt-1">
+            <div className="text-[11px] sm:text-xs text-stone-500 font-medium mt-0.5">
               In the Name of Allah, Most Gracious, Most Merciful
             </div>
           </div>
@@ -222,18 +211,17 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
         continue;
       }
 
-      // H4: Detailed Sub-topic Heading (####)
+      // H4: Detailed Topic / Minor Heading (####)
       if (h4Match) {
         elements.push(
           <h4
             key={`h4-${keyCounter++}`}
             id={headingId}
-            className={`text-sm sm:text-base font-bold font-serif uppercase tracking-wider mt-6 mb-2.5 flex items-center gap-2 scroll-mt-20 ${
-              isDark ? 'text-[#f5d996]' : 'text-[#b85d34]'
+            className={`text-xs sm:text-sm font-bold uppercase tracking-wider mt-5 mb-2 scroll-mt-20 ${
+              isDark ? 'text-amber-300' : 'text-emerald-800'
             }`}
           >
-            <span className="text-[#d4a359] text-xs">◈</span>
-            <span>{parseInline(headingText, isDark)}</span>
+            {parseInline(headingText, isDark)}
           </h4>
         );
         continue;
@@ -245,8 +233,8 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
           <h3
             key={`h3-${keyCounter++}`}
             id={headingId}
-            className={`text-lg sm:text-xl lg:text-2xl font-black font-serif mt-8 mb-3 tracking-tight scroll-mt-20 ${
-              isDark ? 'text-white' : 'text-[#0c2217]'
+            className={`text-sm sm:text-base font-bold text-stone-900 mt-5 mb-2 tracking-tight scroll-mt-20 ${
+              isDark ? 'text-slate-100' : 'text-stone-900'
             }`}
           >
             {parseInline(headingText, isDark)}
@@ -255,20 +243,17 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
         continue;
       }
 
-      // H2: Major Section Heading (## or in-body # to maintain singular H1)
+      // H2: Major Section Heading (## or body #)
       if (h2Match || h1Match) {
         elements.push(
           <h2
             key={`h2-${keyCounter++}`}
             id={headingId}
-            className={`text-xl sm:text-2xl lg:text-3xl font-black font-serif mt-10 mb-4 tracking-tight border-b pb-3 scroll-mt-20 flex items-center gap-2.5 ${
-              isDark
-                ? 'text-white border-slate-800'
-                : 'text-[#0c2217] border-[#ebe3d3]'
+            className={`text-base sm:text-lg lg:text-xl font-bold text-stone-900 mt-7 sm:mt-8 mb-2.5 tracking-tight scroll-mt-20 ${
+              isDark ? 'text-white' : 'text-stone-900'
             }`}
           >
-            <div className="w-1.5 h-5 rounded-full bg-[#d4a359] shrink-0" />
-            <span>{parseInline(headingText, isDark)}</span>
+            {parseInline(headingText, isDark)}
           </h2>
         );
         continue;
@@ -282,10 +267,10 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
       elements.push(
         <blockquote
           key={`quote-${keyCounter++}`}
-          className={`my-5 p-4 sm:p-5 rounded-2xl border-l-4 border-[#d4a359] text-sm sm:text-base italic leading-relaxed ${
+          className={`my-4 p-4 rounded-xl border-l-4 border-emerald-600 text-xs sm:text-sm italic leading-relaxed ${
             isDark
-              ? 'bg-slate-900/90 text-slate-200'
-              : 'bg-[#faf6ef] text-stone-700'
+              ? 'bg-slate-900/90 text-slate-300'
+              : 'bg-stone-50 text-stone-700'
           }`}
         >
           {parseInline(quoteMatch[1], isDark)}
@@ -316,19 +301,17 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
       continue;
     }
 
-    // 6. Author sign-off / signature line (e.g. "**— Abdul Khaliq**")
+    // 6. Signature line
     if (line.startsWith('**—') || line.startsWith('—') || line.startsWith('-—')) {
       flushList();
       elements.push(
         <div
           key={`signature-${keyCounter++}`}
-          className={`mt-8 pt-4 border-t ${
-            isDark ? 'border-slate-800 text-slate-300' : 'border-[#ebe3d3] text-stone-600'
+          className={`mt-6 pt-3 border-t text-xs sm:text-sm font-semibold ${
+            isDark ? 'border-slate-800 text-slate-400' : 'border-stone-200 text-stone-600'
           }`}
         >
-          <div className="text-sm font-serif font-black tracking-wide">
-            {parseInline(line, isDark)}
-          </div>
+          {parseInline(line, isDark)}
         </div>
       );
       continue;
@@ -339,8 +322,8 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
     elements.push(
       <p
         key={`p-${keyCounter++}`}
-        className={`my-3 text-sm sm:text-base leading-relaxed ${
-          isDark ? 'text-slate-200' : 'text-[#2c3e35]'
+        className={`my-2.5 text-xs sm:text-sm md:text-[15px] leading-relaxed ${
+          isDark ? 'text-slate-300' : 'text-stone-700'
         }`}
       >
         {parseInline(line, isDark)}
@@ -350,5 +333,5 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
 
   flushList();
 
-  return <div className="article-rendered-body space-y-1">{elements}</div>;
+  return <div className="article-body-content space-y-1">{elements}</div>;
 }

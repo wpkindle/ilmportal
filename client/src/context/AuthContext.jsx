@@ -129,6 +129,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    try {
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('ilmidunya:logout'));
+      }
+    } catch (e) {}
     localStorage.removeItem('ilm_token');
     setToken(null);
     setUser(null);

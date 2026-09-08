@@ -435,16 +435,18 @@ exports.uploadSupportFile = async (req, res) => {
  */
 exports.getAdminOnlineStatus = async (req, res) => {
   try {
-    const io = req.app.get('io');
-    let isOnline = false;
+    const getCount = req.app.get('getOnlineAdminCount');
     let count = 0;
-    if (io) {
-      const room = io.sockets.adapter.rooms.get('support-desk-agents');
-      if (room && room.size > 0) {
-        isOnline = true;
-        count = room.size;
+    if (typeof getCount === 'function') {
+      count = getCount();
+    } else {
+      const io = req.app.get('io');
+      if (io) {
+        const room = io.sockets.adapter.rooms.get('support-desk-agents') || io.sockets.adapter.rooms.get('admins');
+        count = room ? room.size : 0;
       }
     }
+    const isOnline = count > 0;
     return res.status(200).json({
       success: true,
       isOnline,

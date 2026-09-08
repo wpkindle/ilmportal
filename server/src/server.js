@@ -28,7 +28,7 @@ const io = new Server(server, {
 });
 
 // Attach socket handler
-initSocket(io);
+initSocket(io, app);
 app.set('io', io);
 
 // Middleware

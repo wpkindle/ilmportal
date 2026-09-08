@@ -31,12 +31,17 @@ export const SocketProvider = ({ children }) => {
   const [socket, setSocket] = useState(null);
   const [isConnected, setIsConnected] = useState(false);
   const [onlineStatusMap, setOnlineStatusMap] = useState({});
+  const [isAdminOnline, setIsAdminOnline] = useState(false);
+  const [onlineAdminsCount, setOnlineAdminsCount] = useState(0);
   const socketRef = useRef(null);
   const userRef = useRef(null);
 
   // Keep userRef current at all times
   useEffect(() => {
     userRef.current = user;
+    if (user?.role === 'admin') {
+      setIsAdminOnline(true);
+    }
   }, [user]);
 
   // Register user whenever user identity resolves OR cleanly unregister on logout
@@ -46,6 +51,9 @@ export const SocketProvider = ({ children }) => {
       const uId = (user._id || user.id)?.toString();
       if (uId && socketRef.current.connected) {
         socketRef.current.emit('register-user', uId);
+      }
+      if (user.role === 'admin') {
+        setIsAdminOnline(true);
       }
     } else {
       // User logged out or is unauthenticated guest — cleanly unregister from all rooms
@@ -83,15 +91,37 @@ export const SocketProvider = ({ children }) => {
       setIsConnected(true);
       console.log('[WebSocket] Connected successfully!');
       registerCurrentUser();
+
+      // Query admin status immediately on connection
+      newSocket.emit('check-admin-online-status', (res) => {
+        if (res && typeof res.isOnline === 'boolean') {
+          setIsAdminOnline(res.isOnline);
+          setOnlineAdminsCount(res.onlineAdmins || 0);
+        }
+      });
     });
 
     newSocket.io.on('reconnect', () => {
       console.log('[WebSocket] Reconnected to server');
       registerCurrentUser();
+      newSocket.emit('check-admin-online-status', (res) => {
+        if (res && typeof res.isOnline === 'boolean') {
+          setIsAdminOnline(res.isOnline);
+          setOnlineAdminsCount(res.onlineAdmins || 0);
+        }
+      });
     });
 
     newSocket.on('disconnect', () => {
       setIsConnected(false);
+    });
+
+    // Real-time admin presence broadcast from server
+    newSocket.on('admin-online-status', (data) => {
+      if (typeof data?.isOnline === 'boolean') {
+        setIsAdminOnline(data.isOnline);
+        setOnlineAdminsCount(data.onlineAdmins || 0);
+      }
     });
 
     // Receive full list of all currently online users upon connection
@@ -102,6 +132,13 @@ export const SocketProvider = ({ children }) => {
           if (id) map[id.toString()] = true;
         });
         setOnlineStatusMap(map);
+
+        // If literally zero authenticated users are online anywhere on the server,
+        // an admin CANNOT be online!
+        if (usersList.length === 0 && (!userRef.current || userRef.current.role !== 'admin')) {
+          setIsAdminOnline(false);
+          setOnlineAdminsCount(0);
+        }
       }
     });
 
@@ -123,11 +160,30 @@ export const SocketProvider = ({ children }) => {
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
 
+    // Instant logout listener
+    const handleImmediateLogout = () => {
+      if (newSocket.connected) {
+        newSocket.emit('unregister-user');
+      }
+      setIsAdminOnline(false);
+      setOnlineAdminsCount(0);
+    };
+    window.addEventListener('ilmidunya:logout', handleImmediateLogout);
+
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('ilmidunya:logout', handleImmediateLogout);
       newSocket.disconnect();
     };
   }, []);
+
+  const unregisterCurrentSocket = () => {
+    if (socketRef.current?.connected) {
+      socketRef.current.emit('unregister-user');
+    }
+    setIsAdminOnline(false);
+    setOnlineAdminsCount(0);
+  };
 
   const refreshUserOnlineStatus = (userIds) => {
     if (!socketRef.current || !socketRef.current.connected) return;
@@ -142,7 +198,16 @@ export const SocketProvider = ({ children }) => {
   const onlineUsers = Object.keys(onlineStatusMap).filter(k => onlineStatusMap[k]);
 
   return (
-    <SocketContext.Provider value={{ socket, isConnected, onlineStatusMap, onlineUsers, refreshUserOnlineStatus }}>
+    <SocketContext.Provider value={{
+      socket,
+      isConnected,
+      onlineStatusMap,
+      onlineUsers,
+      isAdminOnline,
+      onlineAdminsCount,
+      unregisterCurrentSocket,
+      refreshUserOnlineStatus
+    }}>
       {children}
     </SocketContext.Provider>
   );
@@ -152,5 +217,9 @@ export const useSocket = () => useContext(SocketContext) || {
   socket: null,
   isConnected: false,
   onlineUsers: [],
-  onlineStatusMap: {}
+  onlineStatusMap: {},
+  isAdminOnline: false,
+  onlineAdminsCount: 0,
+  unregisterCurrentSocket: () => {},
+  refreshUserOnlineStatus: () => {}
 };

@@ -80,14 +80,23 @@ const renderFormattedText = (content) => {
 export default function LiveSupportWidget() {
   const pathname = usePathname();
   const { user } = useAuth();
-  const { socket } = useSocket();
+  const { socket, onlineUsers, isAdminOnline: socketAdminOnline } = useSocket();
 
   const [isOpen, setIsOpen] = useState(false);
   const [sessionId, setSessionId] = useState('');
   const [supportStatus, setSupportStatus] = useState('open'); // 'open' | 'human_requested' | 'admin_joined' | 'resolved'
   const [assignedAdmin, setAssignedAdmin] = useState(null);
-  const [isAdminOnline, setIsAdminOnline] = useState(false);
+  const [serverAdminOnline, setServerAdminOnline] = useState(false);
   const [isOfflineView, setIsOfflineView] = useState(false);
+
+  // Determine if admin is online:
+  // 1. Current logged-in user is an admin
+  // 2. OR socket reported admin is online (when online authenticated users exist)
+  // 3. OR REST endpoint reported online (cross-checked so 0 online users never falsely claims online)
+  const isCurrentUserAdmin = user?.role === 'admin';
+  const isAdminOnline = isCurrentUserAdmin || Boolean(
+    (socketAdminOnline || serverAdminOnline) && (onlineUsers?.length > 0 || !socket?.connected)
+  );
 
   const [messages, setMessages] = useState([
     {
@@ -205,11 +214,18 @@ export default function LiveSupportWidget() {
     api.getAdminOnlineStatus()
       .then((res) => {
         if (res && typeof res.isOnline === 'boolean') {
-          setIsAdminOnline(res.isOnline);
+          // If socket is connected and there are 0 online users on platform, do not trust stale true
+          if (res.isOnline && (onlineUsers?.length > 0 || !socket?.connected)) {
+            setServerAdminOnline(true);
+          } else {
+            setServerAdminOnline(false);
+          }
         }
       })
-      .catch(() => {});
-  }, []);
+      .catch(() => {
+        setServerAdminOnline(false);
+      });
+  }, [socket, onlineUsers]);
 
   // 3. Auto-scroll to latest message
   const scrollToBottom = () => {
@@ -281,13 +297,13 @@ export default function LiveSupportWidget() {
     // Check online status via socket
     socket.emit('check-admin-online-status', (res) => {
       if (res && typeof res.isOnline === 'boolean') {
-        setIsAdminOnline(res.isOnline);
+        setServerAdminOnline(res.isOnline);
       }
     });
 
     const handleAdminOnlineStatus = (data) => {
       if (typeof data?.isOnline === 'boolean') {
-        setIsAdminOnline(data.isOnline);
+        setServerAdminOnline(data.isOnline);
       }
     };
 
@@ -729,26 +745,55 @@ export default function LiveSupportWidget() {
       <div id="ai-chatbot-widget-trigger" className={`fixed bottom-20 right-4 sm:bottom-20 sm:right-6 md:bottom-6 md:right-6 z-[9998] print:hidden transition-opacity duration-200 ${isOpen ? 'hidden' : 'block'}`}>
         <button
           onClick={handleToggleWidget}
-          className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-[#b85d34] to-[#d4a359] text-white shadow-[0_8px_24px_rgba(184,93,52,0.35)] hover:shadow-[0_12px_28px_rgba(184,93,52,0.45)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border-2 border-white"
-          aria-label={isOpen ? "Close Helpdesk" : "Open IlmiDunya Helpdesk"}
-          title={isOpen ? "Close Helpdesk" : (isAdminOnline ? "Chat with IlmiDunya Helpdesk" : "Leave an Email Message")}
+          className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#0c2217] hover:bg-[#123323] text-white shadow-[0_10px_25px_rgba(12,34,23,0.35)] hover:shadow-[0_14px_32px_rgba(12,34,23,0.5)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border-2 border-[#d4a359]/70 ring-2 ring-[#0c2217]/20"
+          aria-label={isOpen ? "Close Helpdesk" : "Open IlmiDunya Support Desk"}
+          title={isOpen ? "Close Helpdesk" : (isAdminOnline ? "Chat with Support Desk (Online)" : "Support Desk (Offline • Leave an Email Note)")}
         >
           {isOpen ? (
             <X className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
           ) : (
-            <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6 text-white transition-transform duration-200 group-hover:scale-110" />
+            <svg
+              className="w-5 h-5 sm:w-6 sm:h-6 text-white transition-transform duration-200 group-hover:scale-110"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+              aria-hidden="true"
+            >
+              {/* Secondary dialogue bubble in warm gold */}
+              <path
+                d="M17 8.5H18.5C19.8807 8.5 21 9.61929 21 11V15C21 16.3807 19.8807 17.5 18.5 17.5H17.5V20L14.5 17.5H13"
+                stroke="#d4a359"
+                strokeWidth="1.75"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              {/* Primary dialogue bubble in crisp white */}
+              <path
+                d="M3 6.5C3 5.11929 4.11929 4 5.5 4H14.5C15.8807 4 17 5.11929 17 6.5V12.5C17 13.8807 15.8807 15 14.5 15H8L4 18.5V15C3.4 14.5 3 13.5 3 12.5V6.5Z"
+                fill="white"
+                fillOpacity="0.12"
+                stroke="white"
+                strokeWidth="1.85"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+              {/* 3 warm conversation dots */}
+              <circle cx="7" cy="9.5" r="1" fill="#d4a359" />
+              <circle cx="10" cy="9.5" r="1" fill="#d4a359" />
+              <circle cx="13" cy="9.5" r="1" fill="#d4a359" />
+            </svg>
           )}
 
-          {/* Online/Offline Status Indicator Dot */}
+          {/* Online/Offline Status Indicator Dot (Green when Online, Red when Offline) */}
           {!isOpen && (
-            <span className="absolute top-0 right-0 -mt-0.5 -mr-0.5 flex h-3.5 w-3.5">
+            <span className="absolute top-0 right-0 -mt-0.5 -mr-0.5 flex h-3.5 w-3.5 pointer-events-none">
               {isAdminOnline ? (
                 <>
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                   <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white shadow-xs" />
                 </>
               ) : (
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-amber-500 border-2 border-white shadow-xs" />
+                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-rose-500 border-2 border-white shadow-xs" />
               )}
             </span>
           )}
@@ -785,10 +830,34 @@ export default function LiveSupportWidget() {
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-[#10b981] via-[#d4a359] to-[#b85d34] p-0.5 flex items-center justify-center shadow-xs shrink-0">
-                <div className="w-full h-full bg-[#f5f0e6] rounded-[10px] flex items-center justify-center">
-                  <Headphones className="w-4 h-4 text-[#0c2217]" />
-                </div>
+              <div className="w-9 h-9 rounded-xl bg-[#0c2217] flex items-center justify-center shadow-xs shrink-0 border border-[#d4a359]/60">
+                <svg
+                  className="w-5 h-5 text-white"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                  aria-hidden="true"
+                >
+                  <path
+                    d="M16 8.5H17.5C18.8807 8.5 20 9.61929 20 11V14.5C20 15.8807 18.8807 17 17.5 17H16.5V19.5L13.8 17H12.5"
+                    stroke="#d4a359"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <path
+                    d="M3.5 6.5C3.5 5.11929 4.61929 4 6 4H14C15.3807 4 16.5 5.11929 16.5 6.5V12C16.5 13.3807 15.3807 14.5 14 14.5H8L4.5 17.5V14.5C3.9 14.1 3.5 13.1 3.5 12V6.5Z"
+                    fill="white"
+                    fillOpacity="0.15"
+                    stroke="white"
+                    strokeWidth="1.7"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                  <circle cx="7" cy="9.25" r="0.9" fill="#d4a359" />
+                  <circle cx="10" cy="9.25" r="0.9" fill="#d4a359" />
+                  <circle cx="13" cy="9.25" r="0.9" fill="#d4a359" />
+                </svg>
               </div>
               <div className="min-w-0">
                 <div className="flex items-center gap-2">
@@ -796,21 +865,21 @@ export default function LiveSupportWidget() {
                     IlmiDunya Helpdesk
                   </h3>
                   {isAdminOnline ? (
-                    <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-300 shrink-0">
+                    <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-300 shrink-0 shadow-2xs">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                       Online
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 text-[9px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-300 shrink-0">
-                      <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
-                      Away
+                    <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-rose-800 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-300 shrink-0 shadow-2xs">
+                      <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
+                      Offline
                     </span>
                   )}
                 </div>
                 <p className="text-[10.5px] text-[#4a5e55] truncate">
                   {isAdminOnline
-                    ? 'How can we help you today?'
-                    : 'Leave a message • We will reply via email'}
+                    ? 'Live support • Typically replies within minutes'
+                    : 'Currently offline • Leave a message & email'}
                 </p>
               </div>
             </div>
@@ -852,22 +921,22 @@ export default function LiveSupportWidget() {
               {isAdminConnected ? (
                 <span className="flex items-center gap-1 text-emerald-800 font-semibold truncate">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span className="truncate">Connected to IlmiDunya Helpdesk ({assignedAdmin || 'Active'})</span>
+                  <span className="truncate">Connected to Support Desk ({assignedAdmin || 'Active'})</span>
                 </span>
               ) : isWaitingForAdmin ? (
                 <span className="flex items-center gap-1 text-amber-800 font-semibold truncate">
                   <Clock className="w-3.5 h-3.5 animate-spin text-amber-600 shrink-0" />
-                  <span className="truncate">Connecting you to IlmiDunya Helpdesk...</span>
+                  <span className="truncate">Connecting to Support Desk...</span>
                 </span>
               ) : isAdminOnline ? (
-                <span className="flex items-center gap-1 text-[#2c4035] truncate">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34] shrink-0" />
-                  <span className="truncate">Official IlmiDunya Helpdesk</span>
+                <span className="flex items-center gap-1.5 text-emerald-800 font-medium truncate">
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0 animate-pulse" />
+                  <span className="truncate">Support is Online • Live assistance available</span>
                 </span>
               ) : (
-                <span className="flex items-center gap-1 text-amber-800 font-medium truncate">
-                  <Mail className="w-3.5 h-3.5 text-amber-600 shrink-0" />
-                  <span className="truncate">Currently away • Leave an email note</span>
+                <span className="flex items-center gap-1.5 text-rose-800 font-medium truncate">
+                  <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+                  <span className="truncate">Support is currently offline • Leave an email note</span>
                 </span>
               )}
             </div>
@@ -888,13 +957,13 @@ export default function LiveSupportWidget() {
           {/* OFFLINE EMAIL INQUIRY FORM VIEW (Light Theme) */}
           {isOfflineView ? (
             <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#faf8f5] pb-[max(2rem,env(safe-area-inset-bottom))]">
-              <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-1 shadow-2xs">
-                <div className="flex items-center gap-1.5 font-bold text-amber-900">
-                  <Mail className="w-4 h-4 text-amber-700" />
-                  <span>Helpdesk is currently away</span>
+              <div className="p-3.5 rounded-2xl bg-rose-50/80 border border-rose-200 text-rose-900 text-xs space-y-1 shadow-2xs">
+                <div className="flex items-center gap-1.5 font-bold text-rose-900">
+                  <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
+                  <span>Helpdesk is currently offline</span>
                 </div>
-                <p className="text-[11px] text-amber-800 leading-relaxed">
-                  Leave your message and contact email below. We will review your inquiry and reach out to you directly via email.
+                <p className="text-[11px] text-rose-800 leading-relaxed">
+                  Leave your message and contact email below. Our team reviews all offline inquiries promptly and will reply directly to your email.
                 </p>
               </div>
 

@@ -20,7 +20,8 @@ import {
   FileText,
   LogOut,
   Headphones,
-  Mail
+  Mail,
+  Newspaper
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
@@ -118,6 +119,7 @@ const AdminSidebar = () => {
     { to: '/admin/sessions', label: 'Session & Classroom Logs', icon: Video },
     { to: '/admin/audit-logs', label: 'Audit Trail Logs', icon: History },
     { to: '/admin/pages', label: 'CMS Legal & Public Pages', icon: FileText },
+    { to: '/admin/articles', label: 'Articles & Editorial', icon: Newspaper },
     { to: '/admin/settings', label: 'System & Trial Settings', icon: Settings },
   ];
 

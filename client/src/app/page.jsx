@@ -5,8 +5,8 @@ import FeaturedTutorsShowcase from '../components/home/FeaturedTutorsShowcase';
 import SubjectExplorer from '../components/home/SubjectExplorer';
 import CityGrid from '../components/home/CityGrid';
 import HowItWorks from '../components/home/HowItWorks';
-import Testimonials from '../components/home/Testimonials';
 import FAQ from '../components/home/FAQ';
+import LatestArticlesSection from '../components/home/LatestArticlesSection';
 import { api } from '../services/api';
 
 export const metadata = {
@@ -84,8 +84,23 @@ async function getFeaturedTutors() {
   return [];
 }
 
+async function getLatestArticles() {
+  try {
+    const res = await api.getArticles({ limit: 3 });
+    if (res && res.success) {
+      return res.articles || [];
+    }
+  } catch (err) {
+    console.error('SSR fetch error for latest articles:', err);
+  }
+  return [];
+}
+
 export default async function HomePage() {
-  const featuredTutors = await getFeaturedTutors();
+  const [featuredTutors, latestArticles] = await Promise.all([
+    getFeaturedTutors(),
+    getLatestArticles()
+  ]);
 
   return (
     <div className="space-y-0">
@@ -104,19 +119,19 @@ export default async function HomePage() {
       {/* 3. Top Verified Tutors Showcase */}
       <FeaturedTutorsShowcase initialTutors={featuredTutors} />
 
-      {/* 3. Subject Disciplines Explorer */}
+      {/* 4. Subject Disciplines Explorer */}
       <SubjectExplorer />
 
-      {/* 4. Pakistan City Coverage Grid */}
+      {/* 5. Pakistan City Coverage Grid */}
       <CityGrid />
 
-      {/* 5. How It Works Flow */}
+      {/* 6. How It Works Flow */}
       <HowItWorks />
 
-      {/* 6. Authentic Testimonials */}
-      <Testimonials />
+      {/* 7. Founders' Articles & Insights */}
+      <LatestArticlesSection initialArticles={latestArticles} />
 
-      {/* 7. FAQs */}
+      {/* 8. FAQs */}
       <FAQ />
     </div>
   );

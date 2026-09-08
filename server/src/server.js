@@ -56,6 +56,7 @@ app.use('/api/admin', require('./routes/adminRoutes'));
 app.use('/api/reports', require('./routes/reportRoutes'));
 app.use('/api/support-chat', require('./routes/supportRoutes'));
 app.use('/api/emails', require('./routes/emailRoutes'));
+app.use('/api/articles', require('./routes/articleRoutes'));
 
 // Root status endpoint
 app.get('/', (req, res) => {
@@ -139,8 +140,12 @@ const startServer = async () => {
           { $or: [{ name: { $regex: /ayesha/i } }, { email: 'dr.ayesha@example.com' }] },
           { $set: { avatar: '/images/dr-ayesha.jpg' } }
         );
-      } catch (avatarSyncErr) {
-        console.warn('Avatar sync note:', avatarSyncErr.message);
+      // Ensure demo article exists
+      try {
+        const { seedDemoArticleIfEmpty } = require('./controllers/articleController');
+        await seedDemoArticleIfEmpty();
+      } catch (articleSeedErr) {
+        console.warn('Article seed note:', articleSeedErr.message);
       }
 
       server.on('error', (e) => {

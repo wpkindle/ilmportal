@@ -194,6 +194,12 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link href="/articles" className="hover:text-white transition-colors flex items-center gap-2">
+                  <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
+                  <span>Articles &amp; Editorial</span>
+                </Link>
+              </li>
+              <li>
                 <Link href="/how-it-works" className="hover:text-white transition-colors flex items-center gap-2">
                   <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
                   <span>How It Works</span>

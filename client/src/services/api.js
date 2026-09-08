@@ -831,5 +831,41 @@ export const api = {
   seedDemoEmails: () => fetch(`${API_BASE}/emails/seed-demo`, {
     method: 'POST',
     headers: getHeaders()
+  }).then(handleResponse),
+
+  // Articles & Editorial
+  getArticles: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return fetch(`${API_BASE}/articles${query ? `?${query}` : ''}`, {
+      headers: getHeaders()
+    }).then(handleResponse);
+  },
+
+  getArticleBySlug: (slug) => fetch(`${API_BASE}/articles/${slug}`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  adminGetArticles: (params = {}) => {
+    const query = new URLSearchParams(params).toString();
+    return fetch(`${API_BASE}/articles/admin/all${query ? `?${query}` : ''}`, {
+      headers: getHeaders()
+    }).then(handleResponse);
+  },
+
+  adminCreateArticle: (data) => fetch(`${API_BASE}/articles`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(data)
+  }).then(handleResponse),
+
+  adminUpdateArticle: (id, data) => fetch(`${API_BASE}/articles/${id}`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(data)
+  }).then(handleResponse),
+
+  adminDeleteArticle: (id) => fetch(`${API_BASE}/articles/${id}`, {
+    method: 'DELETE',
+    headers: getHeaders()
   }).then(handleResponse)
 };

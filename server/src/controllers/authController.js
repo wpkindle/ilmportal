@@ -173,12 +173,10 @@ exports.register = async (req, res) => {
       }
     }
 
-    // Send Verification Email asynchronously in background for non-tutor users (tutors are contacted directly by admin)
-    if (userRole !== 'tutor') {
-      sendVerificationOtpEmail(user.email, user.name, otp, verificationToken).catch((err) => {
-        console.error('Async email dispatch notification:', err?.message || err);
-      });
-    }
+    // Send Verification Email asynchronously in background
+    sendVerificationOtpEmail(user.email, user.name, otp, verificationToken, userRole).catch((err) => {
+      console.error('Async email dispatch notification:', err?.message || err);
+    });
 
     res.status(201).json({
       success: true,
@@ -452,7 +450,7 @@ exports.resendOtp = async (req, res) => {
     await user.save();
 
     // Send Verification Email asynchronously in background (non-blocking for fast <100ms response)
-    sendVerificationOtpEmail(user.email, user.name, otp, verificationToken).catch((err) => {
+    sendVerificationOtpEmail(user.email, user.name, otp, verificationToken, user.role).catch((err) => {
       console.error('Async email dispatch notification:', err?.message || err);
     });
 
@@ -515,7 +513,7 @@ exports.login = async (req, res) => {
       user.verificationTokenExpires = tokenExpires;
       await user.save();
 
-      sendVerificationOtpEmail(user.email, user.name, otp, verificationToken).catch((err) => {
+      sendVerificationOtpEmail(user.email, user.name, otp, verificationToken, user.role).catch((err) => {
         console.error('Async email dispatch notification:', err?.message || err);
       });
 

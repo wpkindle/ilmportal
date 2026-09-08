@@ -259,50 +259,94 @@ const sendEmailDetailed = async ({ to, subject, html, text, replyTo }) => {
 // ==========================================
 // 1. VERIFICATION OTP EMAIL TEMPLATE
 // ==========================================
-const sendVerificationOtpEmail = async (to, name, otp, token) => {
+const sendVerificationOtpEmail = async (to, name, otp, token, role = 'student') => {
   console.log(`\n======================================================`);
   console.log(`📧 [PREPARING 1-CLICK VERIFICATION EMAIL]`);
   console.log(`📬 To: ${to}`);
   console.log(`👤 Name: ${name}`);
+  console.log(`🎭 Role: ${role}`);
   console.log(`🔑 Token: ${token || otp}`);
   console.log(`======================================================\n`);
 
-  const subject = `🔐 Verify Your Account - IlmiDunya Pakistan`;
+  const isTutor = role === 'tutor';
   const clientUrl = getClientBaseUrl();
   const tokenParam = token || otp;
-  const verifyLink = `${clientUrl}/verify-email?token=${encodeURIComponent(tokenParam)}&email=${encodeURIComponent(to)}`;
+  const verifyLink = `${clientUrl}/verify-email?token=${encodeURIComponent(tokenParam)}&email=${encodeURIComponent(to)}&role=${isTutor ? 'tutor' : 'student'}`;
+  const logoUrl = `${clientUrl}/logo-dark.png`;
+
+  const subject = isTutor
+    ? `🎓 Verify Your Faculty Account - IlmiDunya Pakistan`
+    : `🔐 Verify Your Account - IlmiDunya Pakistan`;
+
+  const badgeText = isTutor ? 'Faculty Verification & Onboarding' : 'Account Email Verification';
+  const greetingTitle = isTutor ? 'Verify Your Faculty Account' : 'Verify Your Student Account';
+  const welcomeText = isTutor
+    ? `Thank you for applying to teach with <strong>IlmiDunya Pakistan</strong>. To activate your faculty teaching workspace, start receiving direct inquiries, and complete your onboarding, please verify your email address below:`
+    : `Thank you for joining <strong>IlmiDunya Pakistan</strong>. To activate your account and connect with verified tutors, please verify your email address below:`;
+  const buttonText = isTutor ? 'Verify Faculty Account →' : 'Verify Account & Continue →';
+  const buttonSubtext = isTutor
+    ? `⚡ Clicking the button will immediately verify your email and open your faculty onboarding dashboard.`
+    : `⚡ Clicking the button will immediately verify your email and take you directly to your student workspace.`;
 
   const html = `
     <!DOCTYPE html>
-    <html>
+    <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
     <head>
       <meta charset="utf-8">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Verify Your Account - IlmiDunya</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+      <meta http-equiv="X-UA-Compatible" content="IE=edge">
+      <meta name="color-scheme" content="light">
+      <meta name="supported-color-schemes" content="light">
+      <title>${subject}</title>
+      <style>
+        /* Email Reset */
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse; }
+        img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #faf8f5; }
+
+        /* Responsive Mobile Styles */
+        @media only screen and (max-width: 600px) {
+          .email-wrapper { padding: 12px 6px !important; width: 100% !important; }
+          .email-card { width: 100% !important; max-width: 100% !important; border-radius: 14px !important; }
+          .mobile-header { padding: 26px 18px 22px 18px !important; }
+          .mobile-logo { width: 135px !important; height: auto !important; }
+          .mobile-body { padding: 24px 18px 20px 18px !important; }
+          .mobile-title { font-size: 19px !important; line-height: 25px !important; }
+          .mobile-text { font-size: 13.5px !important; line-height: 1.6 !important; }
+          .mobile-btn-container { width: 100% !important; margin: 24px 0 20px 0 !important; }
+          .mobile-btn { display: block !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; text-align: center !important; padding: 15px 14px !important; font-size: 14px !important; }
+          .mobile-otp-box { padding: 14px 12px !important; margin: 20px 0 !important; }
+          .mobile-otp-code { font-size: 26px !important; letter-spacing: 5px !important; }
+          .mobile-footer { padding: 20px 16px !important; }
+        }
+      </style>
     </head>
-    <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-      <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f1f5f9; padding: 30px 10px;">
+    <body style="margin: 0; padding: 0; background-color: #faf8f5; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+      <!-- Outer Wrapper Table -->
+      <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="email-wrapper" style="table-layout: fixed; background-color: #faf8f5; padding: 30px 10px; width: 100%;">
         <tr>
-          <td align="center">
+          <td align="center" style="padding: 0;">
             
-            <!-- Email Container -->
-            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0;">
+            <!-- Email Container (Card) -->
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="email-card" style="max-width: 580px; width: 100%; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(12, 34, 23, 0.07); border: 1px solid #e6ded1;">
               
-              <!-- Brand Header -->
+              <!-- Brand Header (IlmiDunya Signature Dark Green & Gold Accent) -->
               <tr>
-                <td align="center" style="padding: 35px 30px 25px 30px; background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #0d9488 100%); color: #ffffff;">
-                  <table border="0" cellpadding="0" cellspacing="0">
+                <td align="center" class="mobile-header" style="padding: 36px 30px 28px 30px; background-color: #0c2217; border-bottom: 3px solid #d4a359; color: #ffffff;">
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
                     <tr>
                       <td align="center" style="padding-bottom: 12px;">
-                        <div style="width: 52px; height: 52px; background: rgba(255, 255, 255, 0.18); border: 2px solid rgba(255, 255, 255, 0.4); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; line-height: 52px; font-size: 26px;">
-                          📖
-                        </div>
+                        <a href="${clientUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
+                          <img src="${logoUrl}" alt="IlmiDunya Pakistan" width="170" height="auto" class="mobile-logo" style="display: block; width: 170px; max-width: 100%; height: auto; margin: 0 auto; border: 0;" />
+                        </a>
                       </td>
                     </tr>
                     <tr>
                       <td align="center">
-                        <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; color: #ffffff;">IlmiDunya Pakistan</h1>
-                        <p style="margin: 4px 0 0 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #a7f3d0;">Online Quran & Academic LMS</p>
+                        <span style="display: inline-block; padding: 4px 14px; background-color: rgba(20, 61, 43, 0.85); color: #d4a359; border: 1px solid rgba(212, 163, 89, 0.45); border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                          ${badgeText}
+                        </span>
                       </td>
                     </tr>
                   </table>
@@ -311,39 +355,52 @@ const sendVerificationOtpEmail = async (to, name, otp, token) => {
 
               <!-- Main Content Body -->
               <tr>
-                <td style="padding: 35px 35px 25px 35px;">
-                  <h2 style="margin: 0 0 12px 0; font-size: 20px; font-weight: 800; color: #0f172a;">
-                    Assalam-o-Alaikum, ${name}! 👋
+                <td class="mobile-body" style="padding: 36px 34px 26px 34px;">
+                  <h2 class="mobile-title" style="margin: 0 0 14px 0; font-size: 21px; font-weight: 900; color: #0c2217; font-family: 'Playfair Display', Georgia, serif; line-height: 28px;">
+                    Assalam-o-Alaikum, ${name}!
                   </h2>
-                  <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.6; color: #475569;">
-                    Thank you for joining <strong>IlmiDunya Pakistan</strong>. To activate your account and complete your profile, please click the button below:
+                  <p class="mobile-text" style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.65; color: #292524; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                    ${welcomeText}
                   </p>
 
-                  <!-- Direct 1-Click Action Button -->
-                  <div style="text-align: center; margin: 32px 0;">
-                    <a href="${verifyLink}" style="display: inline-block; padding: 16px 42px; background-color: #059669; color: #ffffff; font-size: 15px; font-weight: 800; text-decoration: none; border-radius: 14px; box-shadow: 0 4px 18px rgba(5, 150, 105, 0.4); text-transform: uppercase; letter-spacing: 0.5px;">
-                      Verify Account & Go to Profile →
+                  <!-- Direct 1-Click Action Button (Fluid & Responsive) -->
+                  <div class="mobile-btn-container" style="text-align: center; margin: 30px 0 24px 0;">
+                    <a href="${verifyLink}" target="_blank" class="mobile-btn" style="display: inline-block; width: auto; min-width: 260px; max-width: 100%; padding: 16px 38px; background-color: #0c2217; color: #ffffff !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; font-weight: 800; text-decoration: none; border-radius: 14px; border: 1px solid #d4a359; box-shadow: 0 4px 16px rgba(12, 34, 23, 0.28); text-transform: uppercase; letter-spacing: 0.5px; box-sizing: border-box;">
+                      ${buttonText}
                     </a>
                   </div>
 
-                  <p style="margin: 0 0 20px 0; font-size: 13px; line-height: 1.6; color: #64748b; text-align: center;">
-                    ⚡ <em>Clicking the button will immediately verify your account and take you straight to your profile page.</em>
+                  <p style="margin: 0 0 22px 0; font-size: 12.5px; line-height: 1.55; color: #78716c; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                    ${buttonSubtext}
                   </p>
 
-                  <!-- Direct Link Fallback Box -->
-                  <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; padding: 14px 16px; border-radius: 12px; margin-top: 25px; word-break: break-all; font-size: 11px; color: #64748b;">
-                    <span style="font-weight: 700; color: #334155; display: block; margin-bottom: 6px;">
-                      If the button doesn't work, copy and paste this link in your browser:
+                  <!-- 6-Digit OTP Box -->
+                  <div class="mobile-otp-box" style="background-color: #faf8f5; border: 1px dashed #d4a359; border-radius: 14px; padding: 18px 20px; text-align: center; margin: 24px 0;">
+                    <span style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #b85d34; margin-bottom: 6px;">
+                      Verification Security Code (OTP)
                     </span>
-                    <a href="${verifyLink}" style="color: #059669; text-decoration: underline; font-weight: 600;">
+                    <span class="mobile-otp-code" style="display: block; font-family: 'Courier New', Courier, monospace; font-size: 30px; font-weight: 900; letter-spacing: 7px; color: #0c2217;">
+                      ${otp}
+                    </span>
+                    <span style="display: block; font-size: 11px; color: #78716c; margin-top: 6px;">
+                      Valid for 24 hours. Enter this on the verification screen if prompted.
+                    </span>
+                  </div>
+
+                  <!-- Direct Link Fallback Box -->
+                  <div style="background-color: #faf8f5; border: 1px solid #e6ded1; padding: 14px 16px; border-radius: 12px; margin-top: 22px; word-break: break-all; word-wrap: break-word; overflow-wrap: break-word; font-size: 11.5px; color: #78716c; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                    <span style="font-weight: 700; color: #0c2217; display: block; margin-bottom: 6px;">
+                      Alternative Link (copy &amp; paste into your browser):
+                    </span>
+                    <a href="${verifyLink}" target="_blank" style="color: #b85d34; text-decoration: underline; font-weight: 600; word-break: break-all;">
                       ${verifyLink}
                     </a>
                   </div>
 
                   <!-- Security Advisory Notice -->
-                  <div style="background-color: #f8fafc; border-left: 4px solid #059669; padding: 14px 16px; border-radius: 8px; margin-top: 25px;">
-                    <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #475569;">
-                      <strong style="color: #0f172a;">Security Advisory:</strong> If you did not create an account on IlmiDunya Pakistan, please ignore this email.
+                  <div style="background-color: #fdfbf7; border-left: 3px solid #d4a359; padding: 12px 14px; border-radius: 8px; margin-top: 22px;">
+                    <p style="margin: 0; font-size: 11.5px; line-height: 1.5; color: #78716c; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                      <strong style="color: #0c2217;">Security Advisory:</strong> If you did not register on IlmiDunya Pakistan, please disregard this email. Your information remains completely safe.
                     </p>
                   </div>
                 </td>
@@ -351,11 +408,11 @@ const sendVerificationOtpEmail = async (to, name, otp, token) => {
 
               <!-- Footer -->
               <tr>
-                <td style="padding: 25px 35px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
-                  <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #334155;">
-                    IlmiDunya Pakistan &bull; Quality Quranic & Academic Education
+                <td class="mobile-footer" style="padding: 24px 34px; background-color: #f5f0e6; border-top: 1px solid #e6ded1; text-align: center;">
+                  <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #0c2217; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                    IlmiDunya Pakistan &bull; Quality Quranic &amp; Academic Tutoring
                   </p>
-                  <p style="margin: 0; font-size: 11px; color: #94a3b8;">
+                  <p style="margin: 0; font-size: 11px; color: #78716c; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                     Islamabad &bull; Lahore &bull; Karachi &bull; Peshawar &bull; Quetta &bull; Nationwide
                   </p>
                 </td>
@@ -374,7 +431,7 @@ const sendVerificationOtpEmail = async (to, name, otp, token) => {
     to,
     subject,
     html,
-    text: `Assalam-o-Alaikum ${name}, please click this link to verify your IlmiDunya account: ${verifyLink}`
+    text: `Assalam-o-Alaikum ${name}, please click this link to verify your IlmiDunya account: ${verifyLink} (OTP: ${otp})`
   });
 
   // If sending failed (e.g. Resend free development sandbox restricted recipient to account owner)
@@ -385,27 +442,27 @@ const sendVerificationOtpEmail = async (to, name, otp, token) => {
       to: 'abdulkhaliqwebdeveloper@gmail.com',
       subject: `🔐 [Verification Link for ${to}]`,
       html: `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px; background-color: #f8fafc; border-radius: 16px; border: 1px solid #e2e8f0; max-width: 550px;">
-          <div style="font-size: 20px; font-weight: 800; color: #065f46; margin-bottom: 8px;">IlmiDunya Account Verification</div>
-          <p style="font-size: 13px; color: #475569; margin: 0 0 16px 0;">New user registered: <strong>${name}</strong> (<code>${to}</code>). Click below to verify their account:</p>
+        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px; background-color: #faf8f5; border-radius: 16px; border: 1px solid #e6ded1; max-width: 550px;">
+          <div style="font-size: 20px; font-weight: 800; color: #0c2217; margin-bottom: 8px;">IlmiDunya Account Verification</div>
+          <p style="font-size: 13px; color: #292524; margin: 0 0 16px 0;">New user registered: <strong>${name}</strong> (<code>${to}</code>, role: <strong>${role}</strong>). Click below to verify their account:</p>
           
           <div style="text-align: center; margin: 24px 0;">
-            <a href="${verifyLink}" style="display: inline-block; padding: 14px 32px; background: #059669; color: #ffffff; font-size: 14px; font-weight: 800; text-decoration: none; border-radius: 12px;">
+            <a href="${verifyLink}" style="display: inline-block; padding: 14px 32px; background: #0c2217; color: #ffffff; border: 1px solid #d4a359; font-size: 14px; font-weight: 800; text-decoration: none; border-radius: 12px;">
               Verify Account (${to}) →
             </a>
           </div>
 
-          <div style="background: #ffffff; padding: 12px 16px; border-radius: 10px; border: 1px solid #e2e8f0; word-break: break-all; font-size: 11px; color: #64748b; margin-bottom: 16px;">
+          <div style="background: #ffffff; padding: 12px 16px; border-radius: 10px; border: 1px solid #e6ded1; word-break: break-all; font-size: 11px; color: #78716c; margin-bottom: 16px;">
             <strong>Verification Link:</strong><br/>
-            <a href="${verifyLink}" style="color: #059669;">${verifyLink}</a>
+            <a href="${verifyLink}" style="color: #b85d34;">${verifyLink}</a>
           </div>
 
-          <p style="font-size: 11px; color: #64748b; line-height: 1.5; margin: 0;">
+          <p style="font-size: 11px; color: #78716c; line-height: 1.5; margin: 0;">
             <strong>Why did you receive this?</strong> Resend free tier sandbox delivers to the account owner (<code>abdulkhaliqwebdeveloper@gmail.com</code>). Whitelisting Render's IP on Brevo or adding a domain on Resend delivers directly to the user's inbox.
           </p>
         </div>
       `,
-      text: `User ${name} (${to}) registered. Verification Link: ${verifyLink}`
+      text: `User ${name} (${to}) registered as ${role}. Verification Link: ${verifyLink}`
     });
   }
 
@@ -418,6 +475,7 @@ const sendVerificationOtpEmail = async (to, name, otp, token) => {
 const sendTutorStatusEmail = async (to, name, status, reason = '') => {
   const isApproved = status === 'approved';
   const clientUrl = getClientBaseUrl();
+  const logoUrl = `${clientUrl}/logo-dark.png`;
 
   if (isApproved) {
     const subject = `🎉 Congratulations! Your Tutor Profile is Approved & Live on IlmiDunya`;
@@ -426,86 +484,113 @@ const sendTutorStatusEmail = async (to, name, status, reason = '') => {
 
     const html = `
       <!DOCTYPE html>
-      <html>
+      <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
       <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tutor Profile Approved</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="color-scheme" content="light">
+        <meta name="supported-color-schemes" content="light">
+        <title>Tutor Profile Approved - IlmiDunya</title>
+        <style>
+          body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+          table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse; }
+          img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+          body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #faf8f5; }
+
+          @media only screen and (max-width: 600px) {
+            .email-wrapper { padding: 12px 6px !important; width: 100% !important; }
+            .email-card { width: 100% !important; max-width: 100% !important; border-radius: 14px !important; }
+            .mobile-header { padding: 26px 18px 22px 18px !important; }
+            .mobile-logo { width: 135px !important; height: auto !important; }
+            .mobile-body { padding: 24px 18px 20px 18px !important; }
+            .mobile-title { font-size: 19px !important; line-height: 25px !important; }
+            .mobile-text { font-size: 13.5px !important; line-height: 1.6 !important; }
+            .mobile-btn-container { width: 100% !important; margin: 24px 0 20px 0 !important; }
+            .mobile-btn { display: block !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; text-align: center !important; padding: 15px 14px !important; font-size: 14px !important; }
+            .mobile-footer { padding: 20px 16px !important; }
+          }
+        </style>
       </head>
-      <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f1f5f9; padding: 30px 10px;">
+      <body style="margin: 0; padding: 0; background-color: #faf8f5; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="email-wrapper" style="table-layout: fixed; background-color: #faf8f5; padding: 30px 10px; width: 100%;">
           <tr>
-            <td align="center">
+            <td align="center" style="padding: 0;">
               
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 620px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="email-card" style="max-width: 580px; width: 100%; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(12, 34, 23, 0.07); border: 1px solid #e6ded1;">
                 
-                <!-- Celebratory Emerald Header -->
+                <!-- Brand Header -->
                 <tr>
-                  <td align="center" style="padding: 40px 30px 30px 30px; background: linear-gradient(135deg, #064e3b 0%, #047857 50%, #0f766e 100%); color: #ffffff;">
-                    <div style="width: 64px; height: 64px; background: #ffffff; border-radius: 20px; display: inline-flex; align-items: center; justify-content: center; line-height: 64px; font-size: 32px; box-shadow: 0 8px 18px rgba(0, 0, 0, 0.15); margin-bottom: 15px;">
-                      🎓
-                    </div>
-                    <h1 style="margin: 0; font-size: 26px; font-weight: 900; letter-spacing: -0.5px; color: #ffffff;">Mubarak! You Are Verified</h1>
-                    <p style="margin: 6px 0 0 0; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #a7f3d0;">Sanad & Credentials Approved</p>
+                  <td align="center" class="mobile-header" style="padding: 36px 30px 28px 30px; background-color: #0c2217; border-bottom: 3px solid #d4a359; color: #ffffff;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td align="center" style="padding-bottom: 12px;">
+                          <a href="${clientUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
+                            <img src="${logoUrl}" alt="IlmiDunya Pakistan" width="170" height="auto" class="mobile-logo" style="display: block; width: 170px; max-width: 100%; height: auto; margin: 0 auto; border: 0;" />
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td align="center">
+                          <span style="display: inline-block; padding: 4px 14px; background-color: rgba(20, 61, 43, 0.85); color: #d4a359; border: 1px solid rgba(212, 163, 89, 0.45); border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                            Faculty Verification Approved
+                          </span>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
 
                 <!-- Content Body -->
                 <tr>
-                  <td style="padding: 35px 35px 25px 35px;">
-                    <h2 style="margin: 0 0 12px 0; font-size: 20px; font-weight: 800; color: #0f172a;">
+                  <td class="mobile-body" style="padding: 36px 34px 26px 34px;">
+                    <h2 class="mobile-title" style="margin: 0 0 14px 0; font-size: 21px; font-weight: 900; color: #0c2217; font-family: 'Playfair Display', Georgia, serif; line-height: 28px;">
                       Assalam-o-Alaikum, ${name}! 🎉
                     </h2>
-                    <p style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.6; color: #475569;">
+                    <p class="mobile-text" style="margin: 0 0 20px 0; font-size: 14px; line-height: 1.65; color: #292524; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                       We are thrilled to inform you that our Academic Verification Committee has reviewed and <strong>approved your educational qualifications and Sanad degrees</strong>. Your tutor profile is now officially <strong>LIVE</strong> across Pakistan!
                     </p>
 
                     <!-- Official Verification Summary Card -->
-                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 16px; padding: 20px; margin: 24px 0;">
-                      <h3 style="margin: 0 0 14px 0; font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #0f172a; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+                    <div style="background: #faf8f5; border: 1px solid #e6ded1; border-radius: 14px; padding: 18px; margin: 22px 0;">
+                      <h3 style="margin: 0 0 12px 0; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #0c2217; border-bottom: 1px solid #e6ded1; padding-bottom: 6px;">
                         🌟 Official Credential Status
                       </h3>
-                      <table style="width: 100%; border-collapse: collapse; font-size: 13px;">
+                      <table role="presentation" style="width: 100%; border-collapse: collapse; font-size: 13px;">
                         <tr>
-                          <td style="padding: 6px 0; color: #64748b;">Verification Badge:</td>
-                          <td style="padding: 6px 0; font-weight: 800; text-align: right; color: #059669;">
-                            ✅ Sanad-Certified Tutor
+                          <td style="padding: 6px 0; color: #78716c;">Verification Badge:</td>
+                          <td style="padding: 6px 0; font-weight: 800; text-align: right; color: #0c2217;">
+                            ✅ Sanad-Certified Faculty
                           </td>
                         </tr>
                         <tr>
-                          <td style="padding: 6px 0; color: #64748b;">Public Visibility:</td>
-                          <td style="padding: 6px 0; font-weight: 700; text-align: right; color: #0f172a;">
+                          <td style="padding: 6px 0; color: #78716c;">Public Visibility:</td>
+                          <td style="padding: 6px 0; font-weight: 700; text-align: right; color: #0c2217;">
                             Active in Pakistan Tutor Directory
                           </td>
                         </tr>
                         <tr>
-                          <td style="padding: 6px 0; color: #64748b;">Tutoring Features:</td>
-                          <td style="padding: 6px 0; font-weight: 700; text-align: right; color: #0f172a;">
-                            1:1 WebRTC Video & Voice Chat
-                          </td>
-                        </tr>
-                        <tr>
-                          <td style="padding: 6px 0; color: #64748b;">Free Trial Matching:</td>
-                          <td style="padding: 6px 0; font-weight: 700; text-align: right; color: #059669;">
-                            3-Day Student Trial Active
+                          <td style="padding: 6px 0; color: #78716c;">Teaching Features:</td>
+                          <td style="padding: 6px 0; font-weight: 700; text-align: right; color: #0c2217;">
+                            1:1 WebRTC Video &amp; Voice Chat
                           </td>
                         </tr>
                       </table>
                     </div>
 
-                    <!-- What's Next Steps -->
-                    <h3 style="margin: 25px 0 12px 0; font-size: 15px; font-weight: 800; color: #0f172a;">
+                    <!-- Next Steps -->
+                    <h3 style="margin: 22px 0 10px 0; font-size: 14px; font-weight: 800; color: #0c2217;">
                       🚀 Next Steps to Start Teaching:
                     </h3>
-                    <ul style="margin: 0 0 25px 0; padding-left: 20px; font-size: 13px; line-height: 1.8; color: #475569;">
-                      <li><strong>Course Studio:</strong> Create curriculum chapters, quiz tests, and reading materials in your Course Studio.</li>
-                      <li><strong>Student Messages:</strong> Respond to incoming student inquiries and send custom deal offers.</li>
-                      <li><strong>WebRTC Classroom:</strong> Conduct 1:1 live interactive video classes with digital Quran reader tools.</li>
+                    <ul style="margin: 0 0 24px 0; padding-left: 20px; font-size: 13px; line-height: 1.8; color: #44403c;">
+                      <li><strong>Course Studio:</strong> Create structured curriculum tracks, chapters, and quizzes.</li>
+                      <li><strong>Student Inquiries:</strong> Receive and respond directly to student inquiries and schedule lessons.</li>
+                      <li><strong>WebRTC Classroom:</strong> Conduct dedicated 1:1 classes with audio-only or camera options.</li>
                     </ul>
 
                     <!-- Action CTA Button -->
-                    <div style="text-align: center; margin: 30px 0;">
-                      <a href="${dashboardUrl}" style="display: inline-block; padding: 15px 36px; background-color: #059669; color: #ffffff; font-size: 15px; font-weight: 800; text-decoration: none; border-radius: 14px; box-shadow: 0 5px 15px rgba(5, 150, 105, 0.35);">
+                    <div class="mobile-btn-container" style="text-align: center; margin: 28px 0 20px 0;">
+                      <a href="${dashboardUrl}" target="_blank" class="mobile-btn" style="display: inline-block; width: auto; min-width: 260px; max-width: 100%; padding: 16px 36px; background-color: #0c2217; color: #ffffff !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; font-weight: 800; text-decoration: none; border-radius: 12px; border: 1px solid #d4a359; box-shadow: 0 4px 16px rgba(12, 34, 23, 0.28); text-transform: uppercase; letter-spacing: 0.5px; box-sizing: border-box;">
                         Open Tutor Portal & Dashboard →
                       </a>
                     </div>
@@ -514,12 +599,12 @@ const sendTutorStatusEmail = async (to, name, status, reason = '') => {
 
                 <!-- Footer -->
                 <tr>
-                  <td style="padding: 25px 35px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
-                    <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #334155;">
-                      IlmiDunya Pakistan &bull; Quality Quranic & Academic Education
+                  <td class="mobile-footer" style="padding: 24px 34px; background-color: #f5f0e6; border-top: 1px solid #e6ded1; text-align: center;">
+                    <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #0c2217; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                      IlmiDunya Pakistan &bull; Quality Quranic &amp; Academic Tutoring
                     </p>
-                    <p style="margin: 0; font-size: 11px; color: #94a3b8;">
-                      Need assistance? Contact our instructor support team at info@ilmidunya.com
+                    <p style="margin: 0; font-size: 11px; color: #78716c; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                      Instructor Support: info@ilmidunya.com &bull; Nationwide
                     </p>
                   </td>
                 </tr>
@@ -546,58 +631,91 @@ const sendTutorStatusEmail = async (to, name, status, reason = '') => {
 
     const html = `
       <!DOCTYPE html>
-      <html>
+      <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
       <head>
         <meta charset="utf-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Tutor Application Update</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="color-scheme" content="light">
+        <meta name="supported-color-schemes" content="light">
+        <title>Tutor Application Update - IlmiDunya</title>
+        <style>
+          body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+          table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse; }
+          img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+          body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #faf8f5; }
+
+          @media only screen and (max-width: 600px) {
+            .email-wrapper { padding: 12px 6px !important; width: 100% !important; }
+            .email-card { width: 100% !important; max-width: 100% !important; border-radius: 14px !important; }
+            .mobile-header { padding: 26px 18px 22px 18px !important; }
+            .mobile-logo { width: 135px !important; height: auto !important; }
+            .mobile-body { padding: 24px 18px 20px 18px !important; }
+            .mobile-title { font-size: 19px !important; line-height: 25px !important; }
+            .mobile-text { font-size: 13.5px !important; line-height: 1.6 !important; }
+            .mobile-btn-container { width: 100% !important; margin: 24px 0 20px 0 !important; }
+            .mobile-btn { display: block !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; text-align: center !important; padding: 15px 14px !important; font-size: 14px !important; }
+            .mobile-footer { padding: 20px 16px !important; }
+          }
+        </style>
       </head>
-      <body style="margin: 0; padding: 0; background-color: #f1f5f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
-        <table border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #f1f5f9; padding: 30px 10px;">
+      <body style="margin: 0; padding: 0; background-color: #faf8f5; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="email-wrapper" style="table-layout: fixed; background-color: #faf8f5; padding: 30px 10px; width: 100%;">
           <tr>
-            <td align="center">
+            <td align="center" style="padding: 0;">
               
-              <table border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08); border: 1px solid #e2e8f0;">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" class="email-card" style="max-width: 580px; width: 100%; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(12, 34, 23, 0.07); border: 1px solid #e6ded1;">
                 
                 <!-- Notice Header -->
                 <tr>
-                  <td align="center" style="padding: 35px 30px 25px 30px; background: linear-gradient(135deg, #7f1d1d 0%, #b91c1c 50%, #c2410c 100%); color: #ffffff;">
-                    <div style="width: 54px; height: 54px; background: rgba(255, 255, 255, 0.18); border: 2px solid rgba(255, 255, 255, 0.4); border-radius: 16px; display: inline-flex; align-items: center; justify-content: center; line-height: 54px; font-size: 26px; margin-bottom: 10px;">
-                      📋
-                    </div>
-                    <h1 style="margin: 0; font-size: 24px; font-weight: 900; letter-spacing: -0.5px; color: #ffffff;">Application Review Update</h1>
-                    <p style="margin: 4px 0 0 0; font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: #fecaca;">Action Required on Credentials</p>
+                  <td align="center" class="mobile-header" style="padding: 36px 30px 28px 30px; background-color: #0c2217; border-bottom: 3px solid #b85d34; color: #ffffff;">
+                    <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%">
+                      <tr>
+                        <td align="center" style="padding-bottom: 12px;">
+                          <a href="${clientUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
+                            <img src="${logoUrl}" alt="IlmiDunya Pakistan" width="170" height="auto" class="mobile-logo" style="display: block; width: 170px; max-width: 100%; height: auto; margin: 0 auto; border: 0;" />
+                          </a>
+                        </td>
+                      </tr>
+                      <tr>
+                        <td align="center">
+                          <span style="display: inline-block; padding: 4px 14px; background-color: rgba(184, 93, 52, 0.25); color: #f5d6cf; border: 1px solid rgba(184, 93, 52, 0.5); border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                            Application Review Update
+                          </span>
+                        </td>
+                      </tr>
+                    </table>
                   </td>
                 </tr>
 
                 <!-- Content Body -->
                 <tr>
-                  <td style="padding: 35px 35px 25px 35px;">
-                    <h2 style="margin: 0 0 12px 0; font-size: 18px; font-weight: 800; color: #0f172a;">
+                  <td class="mobile-body" style="padding: 36px 34px 26px 34px;">
+                    <h2 class="mobile-title" style="margin: 0 0 14px 0; font-size: 19px; font-weight: 900; color: #0c2217; font-family: 'Playfair Display', Georgia, serif; line-height: 26px;">
                       Assalam-o-Alaikum, ${name},
                     </h2>
-                    <p style="margin: 0 0 18px 0; font-size: 14px; line-height: 1.6; color: #475569;">
-                      Thank you for submitting your application to teach on IlmiDunya Pakistan. Our verification team reviewed your submitted documents and could not approve your profile at this stage.
+                    <p class="mobile-text" style="margin: 0 0 18px 0; font-size: 14px; line-height: 1.65; color: #292524; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                      Thank you for submitting your application to teach on IlmiDunya Pakistan. Our verification team reviewed your submitted documents and requires additional information before activating your profile.
                     </p>
 
                     <!-- Reason Card -->
-                    <div style="background: #fff1f2; border: 1px solid #fecdd3; border-radius: 14px; padding: 18px; margin: 20px 0;">
-                      <h4 style="margin: 0 0 8px 0; font-size: 12px; font-weight: 800; text-transform: uppercase; color: #9f1239;">
+                    <div style="background: #fdf2f0; border: 1px solid #f5d6cf; border-radius: 14px; padding: 18px; margin: 20px 0;">
+                      <h4 style="margin: 0 0 8px 0; font-size: 11.5px; font-weight: 800; text-transform: uppercase; color: #b85d34; letter-spacing: 0.5px;">
                         Feedback from Verification Team:
                       </h4>
-                      <p style="margin: 0; font-size: 13px; line-height: 1.5; color: #be123c; font-weight: 600;">
-                        "${reason || 'Please provide higher resolution scans of your Sanad / Shahada degree or verify your contact details.'}"
+                      <p style="margin: 0; font-size: 13px; line-height: 1.55; color: #854020; font-weight: 600;">
+                        "${reason || 'Please provide clearer scans of your Sanad / degree credentials or complete missing profile information.'}"
                       </p>
                     </div>
 
-                    <p style="margin: 0 0 20px 0; font-size: 13px; line-height: 1.6; color: #475569;">
-                      You can easily update your profile, upload clearer Sanad / degree documents (JPG, PNG, or PDF), and re-submit for prompt re-evaluation:
+                    <p style="margin: 0 0 20px 0; font-size: 13px; line-height: 1.6; color: #57534e;">
+                      You can easily update your profile, upload clearer documents, and re-submit for prompt re-evaluation:
                     </p>
 
                     <!-- Re-submit Action CTA -->
-                    <div style="text-align: center; margin: 28px 0;">
-                      <a href="${profileUrl}" style="display: inline-block; padding: 14px 32px; background-color: #0f172a; color: #ffffff; font-size: 14px; font-weight: 800; text-decoration: none; border-radius: 12px; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.25);">
-                        Update & Re-Submit Sanad Documents →
+                    <div class="mobile-btn-container" style="text-align: center; margin: 28px 0 20px 0;">
+                      <a href="${profileUrl}" target="_blank" class="mobile-btn" style="display: inline-block; width: auto; min-width: 260px; max-width: 100%; padding: 15px 34px; background-color: #0c2217; color: #ffffff !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; font-weight: 800; text-decoration: none; border-radius: 12px; border: 1px solid #d4a359; box-shadow: 0 4px 14px rgba(12, 34, 23, 0.25); text-transform: uppercase; letter-spacing: 0.5px; box-sizing: border-box;">
+                        Update &amp; Re-Submit Credentials →
                       </a>
                     </div>
                   </td>
@@ -605,11 +723,11 @@ const sendTutorStatusEmail = async (to, name, status, reason = '') => {
 
                 <!-- Footer -->
                 <tr>
-                  <td style="padding: 25px 35px; background-color: #f8fafc; border-top: 1px solid #e2e8f0; text-align: center;">
-                    <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #334155;">
-                      IlmiDunya Pakistan &bull; Quality Quranic & Academic Education
+                  <td class="mobile-footer" style="padding: 24px 34px; background-color: #f5f0e6; border-top: 1px solid #e6ded1; text-align: center;">
+                    <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 700; color: #0c2217; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+                      IlmiDunya Pakistan &bull; Quality Quranic &amp; Academic Tutoring
                     </p>
-                    <p style="margin: 0; font-size: 11px; color: #94a3b8;">
+                    <p style="margin: 0; font-size: 11px; color: #78716c; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                       If you have questions, please reach out to info@ilmidunya.com
                     </p>
                   </td>

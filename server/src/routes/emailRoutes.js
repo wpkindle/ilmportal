@@ -76,8 +76,8 @@ router.post('/webhook', async (req, res) => {
       rawTo = rawTo[0];
     }
     const subject = emailData.subject || '(No Subject)';
-    const text = emailData.text || '';
     const html = emailData.html || '';
+    const text = emailData.text || (html ? html.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim() : '');
 
     // Extract email and name
     let senderAddress = '';

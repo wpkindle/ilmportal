@@ -61,7 +61,7 @@ const emailThreadSchema = new mongoose.Schema({
   },
   from: {
     name: { type: String, default: '' },
-    address: { type: String, required: true, lowercase: true, trim: true, index: true }
+    address: { type: String, required: true, lowercase: true, trim: true }
   },
   to: [{
     name: { type: String, default: '' },

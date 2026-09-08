@@ -86,19 +86,46 @@ const sendEmail = async ({
  * Fetch inbound email details from Resend Receiving API
  */
 const getInboundEmail = async (emailId) => {
-  const client = getResendClient();
-  if (!client || !process.env.RESEND_API_KEY) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
     return null;
   }
 
+  const client = getResendClient();
+
+  // 1. Try Resend SDK receiving API
   try {
-    if (client.emails && typeof client.emails.get === 'function') {
-      const res = await client.emails.get(emailId);
-      return res.data || null;
+    if (client?.emails?.receiving && typeof client.emails.receiving.get === 'function') {
+      const res = await client.emails.receiving.get(emailId);
+      if (res?.data) {
+        return res.data;
+      }
     }
-  } catch (err) {
-    console.error('❌ [RESEND INBOUND GET ERROR]:', err.message);
+  } catch (sdkErr) {
+    console.warn('⚠️ [RESEND SDK INBOUND GET WARNING]:', sdkErr.message);
   }
+
+  // 2. Direct HTTPS REST API fallback
+  try {
+    const response = await fetch(`https://api.resend.com/emails/receiving/${emailId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      }
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      return data;
+    } else {
+      const errBody = await response.text();
+      console.error(`❌ [RESEND INBOUND REST GET ERROR] HTTP ${response.status}:`, errBody);
+    }
+  } catch (restErr) {
+    console.error('❌ [RESEND INBOUND REST EXCEPTION]:', restErr.message);
+  }
+
   return null;
 };
 

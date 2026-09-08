@@ -57,7 +57,7 @@ const getClientBaseUrl = () => process.env.CLIENT_URL || 'https://ilmportal.verc
 
 // Helper to get formatted from address
 const getFromAddress = () => {
-  const fromEmail = process.env.BREVO_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
+  const fromEmail = process.env.RESEND_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
   return `"IlmiDunya Pakistan" <${fromEmail}>`;
 };
 
@@ -65,58 +65,10 @@ const getFromAddress = () => {
 const sendViaHttpApi = async ({ to, subject, html, text }) => {
   let lastError = null;
 
-  // 1. Brevo HTTP API (https://brevo.com - Sends to ANY recipient)
-  if (process.env.BREVO_API_KEY) {
-    const primaryFrom = process.env.BREVO_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
-    const fallbackFrom = process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com';
-
-    const attemptBrevo = async (senderEmail) => {
-      const res = await fetch('https://api.brevo.com/v3/smtp/email', {
-        method: 'POST',
-        headers: {
-          'api-key': process.env.BREVO_API_KEY.trim(),
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          sender: { name: 'IlmiDunya Pakistan', email: senderEmail },
-          to: [{ email: to }],
-          replyTo: { name: 'IlmiDunya Support', email: 'info@ilmidunya.com' },
-          subject,
-          htmlContent: html,
-          textContent: text || html.replace(/<[^>]*>?/gm, '')
-        })
-      });
-      const data = await res.json();
-      return { ok: res.ok, status: res.status, data };
-    };
-
-    try {
-      // Attempt 1: Send from official custom domain address (info@ilmidunya.com)
-      let brevoResult = await attemptBrevo(primaryFrom);
-
-      // Attempt 2: If custom domain not yet verified in Brevo account, fallback to account owner email to guarantee delivery
-      if (!brevoResult.ok && primaryFrom !== fallbackFrom) {
-        console.warn(`⚠️ [BREVO SENDER] Attempt with ${primaryFrom} returned ${brevoResult.status} (${brevoResult.data?.message || 'Sender not authorized'}). Retrying with fallback ${fallbackFrom}...`);
-        brevoResult = await attemptBrevo(fallbackFrom);
-      }
-
-      if (brevoResult.ok) {
-        console.log(`📧 [LIVE EMAIL SENT VIA BREVO HTTP API] MessageId: ${brevoResult.data.messageId} to ${to}`);
-        return { success: true, messageId: brevoResult.data.messageId, provider: 'brevo', response: '250 OK via Brevo' };
-      } else {
-        console.error('Brevo HTTP API error:', brevoResult.data);
-        lastError = { success: false, error: brevoResult.data?.message || 'Brevo error', provider: 'brevo' };
-      }
-    } catch (err) {
-      console.error('Brevo fetch error:', err.message);
-      lastError = { success: false, error: err.message, provider: 'brevo' };
-    }
-  }
-
-  // 2. Resend HTTP API (https://resend.com)
+  // Resend HTTP API (https://resend.com)
   if (process.env.RESEND_API_KEY) {
     try {
-      const fromAddr = process.env.RESEND_FROM || `IlmiDunya <${process.env.SMTP_FROM || 'info@ilmidunya.com'}>`;
+      const fromAddr = process.env.RESEND_FROM || `IlmiDunya Pakistan <${process.env.SMTP_FROM || 'info@ilmidunya.com'}>`;
       const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -224,13 +176,13 @@ const getTransporter = (port = 587) => {
 };
 
 const sendEmailDetailed = async ({ to, subject, html, text, replyTo }) => {
-  // 1. High Priority: HTTP REST API (Brevo / Resend) - instant, never blocked by cloud firewalls
-  if (process.env.BREVO_API_KEY || process.env.RESEND_API_KEY) {
+  // 1. High Priority: HTTP REST API (Resend) - instant, never blocked by cloud firewalls
+  if (process.env.RESEND_API_KEY) {
     const httpResult = await sendViaHttpApi({ to, subject, html, text });
     if (httpResult && httpResult.success) {
       return httpResult;
     }
-    console.warn('⚠️ [EMAIL SERVICE] HTTP API dispatch failed, attempting SMTP fallback...');
+    console.warn('⚠️ [EMAIL SERVICE] Resend HTTP API dispatch failed, attempting SMTP fallback...');
   }
 
   const fromAddress = getFromAddress();
@@ -241,7 +193,7 @@ const sendEmailDetailed = async ({ to, subject, html, text, replyTo }) => {
     text: text || html.replace(/<[^>]*>?/gm, ''),
     html
   };
-  const replyToAddress = replyTo || process.env.BREVO_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
+  const replyToAddress = replyTo || process.env.RESEND_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
   if (replyToAddress) {
     mailPayload.replyTo = replyToAddress;
   }
@@ -491,7 +443,7 @@ const sendVerificationOtpEmail = async (to, name, otp, token, role = 'student') 
           </div>
 
           <p style="font-size: 11px; color: #78716c; line-height: 1.5; margin: 0;">
-            <strong>Why did you receive this?</strong> Resend free tier sandbox delivers to the account owner (<code>abdulkhaliqwebdeveloper@gmail.com</code>). Whitelisting Render's IP on Brevo or adding a domain on Resend delivers directly to the user's inbox.
+            <strong>Why did you receive this?</strong> In Resend testing mode, emails are routed to the account owner (<code>abdulkhaliqwebdeveloper@gmail.com</code>). Verifying your domain <strong>ilmidunya.com</strong> on Resend delivers directly to any user's inbox.
           </p>
         </div>
       `,

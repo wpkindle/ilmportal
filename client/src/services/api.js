@@ -7,7 +7,12 @@ const getApiBase = () => {
   if (process.env.NEXT_PUBLIC_API_URL) {
     return process.env.NEXT_PUBLIC_API_URL;
   }
-  if (window.location.hostname === 'ilmportal.vercel.app' || window.location.hostname.includes('vercel.app')) {
+  if (
+    window.location.hostname === 'ilmidunya.com' ||
+    window.location.hostname.endsWith('.ilmidunya.com') ||
+    window.location.hostname === 'ilmportal.vercel.app' ||
+    window.location.hostname.includes('vercel.app')
+  ) {
     return 'https://ilmportal-backend.onrender.com/api';
   }
   return '/api';

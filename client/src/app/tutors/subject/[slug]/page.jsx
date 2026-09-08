@@ -13,10 +13,10 @@ export async function generateMetadata({ params }) {
     title: `${formattedName} Tutors in Pakistan | IlmiDunya Pakistan`,
     description: `Find certified ${formattedName} tutors across Pakistan for personalized 1:1 live video classes. Authentic Sanad verified scholars & educators.`,
     alternates: {
-      canonical: `https://pakistanlms.pk/tutors/subject/${params.slug}`,
+      canonical: `https://ilmidunya.com/tutors/subject/${params.slug}`,
     },
     openGraph: {
-      title: `${formattedName} Tutors - IlmiDunya Pakistan`,
+      title: `${formattedName} Tutors - IlmiDunya`,
       description: `Learn ${formattedName} with certified tutors in Pakistan.`,
     }
   };
@@ -42,19 +42,19 @@ export default async function SubjectTutorsPage({ params }) {
         '@type': 'ListItem',
         position: 1,
         name: 'Home',
-        item: 'https://pakistanlms.pk'
+        item: 'https://ilmidunya.com'
       },
       {
         '@type': 'ListItem',
         position: 2,
         name: 'Tutors',
-        item: 'https://pakistanlms.pk/tutors'
+        item: 'https://ilmidunya.com/tutors'
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: `${formattedName} Tutors`,
-        item: `https://pakistanlms.pk/tutors/subject/${params.slug}`
+        item: `https://ilmidunya.com/tutors/subject/${params.slug}`
       }
     ]
   };

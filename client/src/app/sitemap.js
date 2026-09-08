@@ -1,5 +1,5 @@
 export default async function sitemap() {
-  const baseUrl = 'https://pakistanlms.pk';
+  const baseUrl = 'https://ilmidunya.com';
 
   const staticRoutes = [
     { route: '', priority: 1.0, changeFrequency: 'daily' },

@@ -11,7 +11,12 @@ const getSocketUrl = () => {
     return process.env.NEXT_PUBLIC_SOCKET_URL;
   }
   if (typeof window !== 'undefined') {
-    if (window.location.hostname === 'ilmportal.vercel.app' || window.location.hostname.includes('vercel.app')) {
+    if (
+      window.location.hostname === 'ilmidunya.com' ||
+      window.location.hostname.endsWith('.ilmidunya.com') ||
+      window.location.hostname === 'ilmportal.vercel.app' ||
+      window.location.hostname.includes('vercel.app')
+    ) {
       return 'https://ilmportal-backend.onrender.com';
     }
     if (window.location.port === '3000' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {

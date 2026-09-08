@@ -16,7 +16,7 @@ export default function robots() {
         ],
       },
     ],
-    sitemap: 'https://pakistanlms.pk/sitemap.xml',
+    sitemap: 'https://ilmidunya.com/sitemap.xml',
   };
 }
 

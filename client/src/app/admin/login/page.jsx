@@ -130,7 +130,7 @@ export default function AdminLoginPage() {
                   autoComplete="off"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@pakistanlms.pk"
+                  placeholder="admin@ilmidunya.com"
                   className="w-full pl-10 pr-4 py-2.5 bg-[#06120c] border border-[#1b4d36] rounded-2xl text-xs sm:text-sm text-[#faf8f5] placeholder:text-stone-500 outline-none focus:border-[#d4a359] focus:ring-1 focus:ring-[#d4a359]"
                 />
               </div>

@@ -18,7 +18,13 @@ export const metadata = {
   openGraph: {
     title: 'Verified Qaris, Alimahs & Academic Tutors in Pakistan | IlmiDunya',
     description: 'Connect with verified Pakistani Quran Qaris, female Alimahs, and Playgroup to FSc educators with camera-off privacy by default.',
-    url: 'https://pakistanlms.pk',
+    url: 'https://ilmidunya.com',
+    siteName: 'IlmiDunya',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Verified Qaris, Alimahs & Academic Tutors in Pakistan | IlmiDunya',
+    description: 'Connect with verified Pakistani Quran Qaris, female Alimahs, and Playgroup to FSc educators with camera-off privacy by default.',
   },
 };
 
@@ -27,10 +33,10 @@ const homeStructuredData = {
   '@graph': [
     {
       '@type': 'EducationalOrganization',
-      '@id': 'https://pakistanlms.pk/#organization',
-      name: 'IlmiDunya Pakistan',
-      url: 'https://pakistanlms.pk',
-      logo: 'https://pakistanlms.pk/icon.svg',
+      '@id': 'https://ilmidunya.com/#organization',
+      name: 'IlmiDunya',
+      url: 'https://ilmidunya.com',
+      logo: 'https://ilmidunya.com/icon.svg',
       description: 'Pakistan’s premier educational network connecting families with verified Quran Qaris, female Alimahs, and Playgroup to FSc tutors.',
       email: 'info@ilmidunya.com',
       address: {
@@ -57,7 +63,7 @@ const homeStructuredData = {
           '@type': 'ListItem',
           position: 1,
           name: 'Home',
-          item: 'https://pakistanlms.pk'
+          item: 'https://ilmidunya.com'
         }
       ]
     }

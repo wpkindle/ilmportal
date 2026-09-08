@@ -1,5 +1,5 @@
-// IlmPortal Service Worker - Handles Desktop & Mobile Push Notifications & Smooth Focusing
-const CACHE_NAME = 'ilmportal-cache-v1';
+// IlmiDunya Service Worker - Handles Desktop & Mobile Push Notifications & Smooth Focusing
+const CACHE_NAME = 'ilmidunya-cache-v1';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
@@ -17,7 +17,7 @@ self.addEventListener('notificationclick', (event) => {
 
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-      // 1. If an IlmPortal window is already open, focus it
+      // 1. If an IlmiDunya window is already open, focus it
       for (const client of clientList) {
         if (client.url.startsWith(self.location.origin) && 'focus' in client) {
           return client.focus().then((focusedClient) => {
@@ -48,7 +48,7 @@ self.addEventListener('push', (event) => {
   if (!event.data) return;
   try {
     const payload = event.data.json();
-    const title = payload.title || 'IlmPortal Notification';
+    const title = payload.title || 'IlmiDunya Notification';
     const options = {
       body: payload.body || 'You have a new update.',
       icon: payload.icon || '/icon.png',
@@ -57,7 +57,7 @@ self.addEventListener('push', (event) => {
       data: {
         url: payload.url || '/'
       },
-      tag: payload.tag || 'ilmportal-general'
+      tag: payload.tag || 'ilmidunya-general'
     };
     event.waitUntil(self.registration.showNotification(title, options));
   } catch (err) {

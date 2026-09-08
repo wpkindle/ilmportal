@@ -33,7 +33,7 @@ export async function generateMetadata({ params }) {
         title: `${tutorName} - Verified Tutor Profile | IlmiDunya Pakistan`,
         description: `${tutorName} (${tutor.user?.city || 'Pakistan'}) specializes in ${tutor.qualifications || 'Quran & Academic Tutoring'}. Rating: ${tutor.averageRating?.toFixed(1) || '5.0'}/5. In-platform live video classes available.`,
         alternates: {
-          canonical: `https://pakistanlms.pk/tutors/${params.id}`,
+          canonical: `https://ilmidunya.com/tutors/${params.id}`,
         },
         openGraph: {
           title: `${tutorName} - Certified Tutor | IlmiDunya`,
@@ -49,7 +49,7 @@ export async function generateMetadata({ params }) {
     title: 'Tutor Profile | IlmiDunya Pakistan',
     description: 'Find verified Quran and Academic tutors across Pakistan.',
     alternates: {
-      canonical: `https://pakistanlms.pk/tutors/${params.id}`,
+      canonical: `https://ilmidunya.com/tutors/${params.id}`,
     },
   };
 }
@@ -89,7 +89,7 @@ export default async function TutorProfilePage({ params }) {
     '@graph': [
       {
         '@type': 'Person',
-        '@id': `https://pakistanlms.pk/tutors/${params.id}#person`,
+        '@id': `https://ilmidunya.com/tutors/${params.id}#person`,
         name: tutorName,
         jobTitle: tutor.qualifications || 'Verified Educator',
         description: tutor.bio || `${tutorName} is a verified tutor on IlmiDunya Pakistan offering personalized 1:1 online classes.`,
@@ -103,13 +103,15 @@ export default async function TutorProfilePage({ params }) {
           ...(tutor.subjects || []),
           ...(tutor.qualifications ? [tutor.qualifications] : [])
         ],
-        aggregateRating: {
-          '@type': 'AggregateRating',
-          ratingValue: tutor.averageRating || 5.0,
-          reviewCount: reviews.length || 1,
-          bestRating: '5',
-          worstRating: '1'
-        }
+        ...(reviews.length > 0 ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: tutor.averageRating || 5.0,
+            reviewCount: reviews.length,
+            bestRating: '5',
+            worstRating: '1'
+          }
+        } : {})
       },
       {
         '@type': 'BreadcrumbList',
@@ -118,19 +120,19 @@ export default async function TutorProfilePage({ params }) {
             '@type': 'ListItem',
             position: 1,
             name: 'Home',
-            item: 'https://pakistanlms.pk'
+            item: 'https://ilmidunya.com'
           },
           {
             '@type': 'ListItem',
             position: 2,
             name: 'Tutors',
-            item: 'https://pakistanlms.pk/tutors'
+            item: 'https://ilmidunya.com/tutors'
           },
           {
             '@type': 'ListItem',
             position: 3,
             name: tutorName,
-            item: `https://pakistanlms.pk/tutors/${params.id}`
+            item: `https://ilmidunya.com/tutors/${params.id}`
           }
         ]
       }

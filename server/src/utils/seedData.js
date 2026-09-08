@@ -318,7 +318,7 @@ const seedDatabase = async () => {
     // 4. Seed Admin User
     const adminUser = await User.create({
       name: 'IlmiDunya Admin',
-      email: 'admin@pakistanlms.pk',
+      email: 'admin@ilmidunya.com',
       password: 'Admin@12345',
       role: 'admin',
       isVerified: true,
@@ -326,7 +326,7 @@ const seedDatabase = async () => {
       phone: '+92 300 1234567',
       avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'
     });
-    console.log('✅ Seeded Super Admin Account (admin@pakistanlms.pk / Admin@12345)');
+    console.log('✅ Seeded Super Admin Account (admin@ilmidunya.com / Admin@12345)');
 
     // 5. Seed Verified Tutors
     // Tutor 1: Qari Muhammad Huzaifa (Lahore - Quran & Tajweed)
@@ -1349,7 +1349,7 @@ const seedDatabase = async () => {
     console.log('\n======================================================');
     console.log('🎉 Database Seeding Complete!');
     console.log('Credentials Summary:');
-    console.log('Admin:   admin@pakistanlms.pk    / Admin@12345');
+    console.log('Admin:   admin@ilmidunya.com    / Admin@12345');
     console.log('Tutor:   qari.huzaifa@example.com / Password@123');
     console.log('Student: student.hamza@example.com / Password@123');
     console.log('======================================================\n');

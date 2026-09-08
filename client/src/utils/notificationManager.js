@@ -1,5 +1,5 @@
 /**
- * IlmPortal Desktop & Mobile OS Notification Manager
+ * IlmiDunya Desktop & Mobile OS Notification Manager
  * Handles native OS banners on Windows, Mac, Linux, Android, and iOS PWAs.
  */
 import { soundEngine } from './soundEffects';

@@ -65,7 +65,7 @@ export async function generateMetadata({ params }) {
     openGraph: {
       title: `Quran & Academic Tutors in ${formattedCity} - IlmiDunya`,
       description,
-      url: `https://pakistanlms.pk/tutors/city/${cityKey}`,
+      url: `https://ilmidunya.com/tutors/city/${cityKey}`,
     }
   };
 }
@@ -95,7 +95,7 @@ export default async function CityTutorsPage({ params }) {
       {
         '@type': 'EducationalOrganization',
         name: `IlmiDunya Tutoring Network - ${formattedCity}`,
-        url: `https://pakistanlms.pk/tutors/city/${cityKey}`,
+        url: `https://ilmidunya.com/tutors/city/${cityKey}`,
         description: `Verified Quran and academic tutoring service for families in ${formattedCity}, Pakistan.`,
         areaServed: {
           '@type': 'City',
@@ -118,19 +118,19 @@ export default async function CityTutorsPage({ params }) {
             '@type': 'ListItem',
             position: 1,
             name: 'Home',
-            item: 'https://pakistanlms.pk'
+            item: 'https://ilmidunya.com'
           },
           {
             '@type': 'ListItem',
             position: 2,
             name: 'Tutors Directory',
-            item: 'https://pakistanlms.pk/tutors'
+            item: 'https://ilmidunya.com/tutors'
           },
           {
             '@type': 'ListItem',
             position: 3,
             name: `${formattedCity} Tutors`,
-            item: `https://pakistanlms.pk/tutors/city/${cityKey}`
+            item: `https://ilmidunya.com/tutors/city/${cityKey}`
           }
         ]
       }

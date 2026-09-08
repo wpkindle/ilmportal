@@ -15,10 +15,10 @@ export const viewport = {
 };
 
 export const metadata = {
-  metadataBase: new URL('https://pakistanlms.pk'),
+  metadataBase: new URL('https://ilmidunya.com'),
   title: {
-    default: 'IlmiDunya Pakistan | Verified Quran & Academic Tutoring',
-    template: '%s | IlmiDunya Pakistan',
+    default: 'IlmiDunya | Verified Quran & Academic Tutoring in Pakistan',
+    template: '%s | IlmiDunya',
   },
   description: 'Connect with verified Pakistani Quran Qaris, female Alimahs, and Playgroup to FSc subject tutors. 1-on-1 live video classes with camera-off privacy from Lahore, Karachi, Islamabad & across Pakistan.',
   keywords: 'Quran tutor Pakistan, Tajweed tutor Lahore, Board tutor Karachi, Online Quran Academy, Hifz tutor, Matric science tutor, FSc tutor, Female Quran teacher Pakistan, In-platform WebRTC classroom',
@@ -38,18 +38,23 @@ export const metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'ilmidunya',
+    title: 'IlmiDunya',
   },
   other: {
     'mobile-web-app-capable': 'yes',
   },
   openGraph: {
-    title: 'IlmiDunya Pakistan | Verified Quran & Academic Tutoring',
+    title: 'IlmiDunya | Verified Quran & Academic Tutoring in Pakistan',
     description: 'Connect with verified Pakistani Quran Qaris and Playgroup to FSc educators for live 1:1 in-platform video classrooms with complete family privacy.',
-    url: 'https://pakistanlms.pk',
-    siteName: 'IlmiDunya Pakistan',
+    url: 'https://ilmidunya.com',
+    siteName: 'IlmiDunya',
     locale: 'en_PK',
     type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'IlmiDunya | Verified Quran & Academic Tutoring in Pakistan',
+    description: 'Connect with verified Pakistani Quran Qaris and Playgroup to FSc educators for live 1:1 in-platform video classrooms with complete family privacy.',
   },
 };
 
@@ -58,10 +63,10 @@ const orgSchema = {
   '@graph': [
     {
       '@type': 'Organization',
-      '@id': 'https://pakistanlms.pk/#organization',
-      name: 'IlmiDunya Pakistan',
-      url: 'https://pakistanlms.pk',
-      logo: 'https://pakistanlms.pk/logo.svg',
+      '@id': 'https://ilmidunya.com/#organization',
+      name: 'IlmiDunya',
+      url: 'https://ilmidunya.com',
+      logo: 'https://ilmidunya.com/logo.svg',
       description: 'Pakistan’s dedicated platform for 1-on-1 verified Quran and academic tutoring with camera-off privacy.',
       contactPoint: {
         '@type': 'ContactPoint',
@@ -77,15 +82,15 @@ const orgSchema = {
     },
     {
       '@type': 'WebSite',
-      '@id': 'https://pakistanlms.pk/#website',
-      url: 'https://pakistanlms.pk',
-      name: 'IlmiDunya Pakistan',
+      '@id': 'https://ilmidunya.com/#website',
+      url: 'https://ilmidunya.com',
+      name: 'IlmiDunya',
       publisher: {
-        '@id': 'https://pakistanlms.pk/#organization'
+        '@id': 'https://ilmidunya.com/#organization'
       },
       potentialAction: {
         '@type': 'SearchAction',
-        target: 'https://pakistanlms.pk/tutors?q={search_term_string}',
+        target: 'https://ilmidunya.com/tutors?q={search_term_string}',
         'query-input': 'required name=search_term_string'
       }
     }

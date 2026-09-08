@@ -110,13 +110,13 @@ export default function CourseDetailPage() {
     '@graph': [
       {
         '@type': 'Course',
-        '@id': `https://pakistanlms.pk/courses/${slug}#course`,
+        '@id': `https://ilmidunya.com/courses/${slug}#course`,
         name: course.title,
-        description: course.shortDescription || course.description || `${course.title} curriculum on IlmiDunya Pakistan`,
+        description: course.shortDescription || course.description || `${course.title} curriculum on IlmiDunya`,
         provider: {
           '@type': 'EducationalOrganization',
-          name: 'IlmiDunya Pakistan',
-          sameAs: 'https://pakistanlms.pk'
+          name: 'IlmiDunya',
+          sameAs: 'https://ilmidunya.com'
         },
         educationalLevel: course.targetAudience || 'All Ages',
         inLanguage: 'en',
@@ -134,19 +134,19 @@ export default function CourseDetailPage() {
             '@type': 'ListItem',
             position: 1,
             name: 'Home',
-            item: 'https://pakistanlms.pk'
+            item: 'https://ilmidunya.com'
           },
           {
             '@type': 'ListItem',
             position: 2,
             name: 'Courses',
-            item: 'https://pakistanlms.pk/courses'
+            item: 'https://ilmidunya.com/courses'
           },
           {
             '@type': 'ListItem',
             position: 3,
             name: course.title,
-            item: `https://pakistanlms.pk/courses/${slug}`
+            item: `https://ilmidunya.com/courses/${slug}`
           }
         ]
       }

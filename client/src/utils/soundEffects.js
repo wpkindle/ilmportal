@@ -1,5 +1,5 @@
 /**
- * IlmPortal Web Audio Chime Engine
+ * IlmiDunya Web Audio Chime Engine
  * Generates instant, crystal-clear audio notifications (like WhatsApp, Messenger, and TikTok)
  * using the browser's native Web Audio API (zero external assets, zero 404s, works offline & PWA).
  */

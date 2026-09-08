@@ -820,7 +820,9 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               )}
 
               <span className="text-stone-300 shrink-0">&bull;</span>
-              <span className="text-stone-500 truncate">{partner?.city || 'Pakistan'}</span>
+              <span className="text-stone-500 truncate">
+                {(partner?.localArea || partner?.area) ? `${partner.localArea || partner.area}, ${partner.city || 'Pakistan'}` : (partner?.city || 'Pakistan')}
+              </span>
             </div>
           </div>
         </div>

@@ -267,7 +267,7 @@ export default function CourseDetailPage() {
                       <span className="text-[10px] uppercase font-bold text-[#d4a359] block">Course Instructor</span>
                       <h4 className="font-extrabold text-sm text-white truncate">{course.instructor.name}</h4>
                       <p className="text-[11px] text-slate-300">
-                        <span>{course.instructor.city || 'Pakistan'}</span>
+                        <span>{(course.tutorProfile?.localArea || course.instructor?.area) ? `${course.tutorProfile?.localArea || course.instructor?.area}, ${course.instructor?.city || 'Pakistan'}` : (course.instructor?.city || 'Pakistan')}</span>
                         {course.tutorProfile?.isSanadVerified && (
                           <span className="text-[#d4a359] font-bold ml-1">
                             &bull; Sanad Verified Tutor

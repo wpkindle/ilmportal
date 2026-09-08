@@ -106,7 +106,7 @@ export default function TutorOnboardingPage() {
             Configure Your Teaching Disciplines
           </h1>
           <p className="text-xs text-stone-600 max-w-md mx-auto leading-relaxed">
-            Set your teaching disciplines, experience, and hourly rates to start receiving student bookings.
+            Set your teaching disciplines, qualifications, and teaching mode to start receiving student inquiries.
           </p>
         </div>
 
@@ -197,7 +197,7 @@ export default function TutorOnboardingPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="text-xs font-serif font-bold text-[#0c2217] block mb-1">Degree Title</label>
                   <input
@@ -222,18 +222,19 @@ export default function TutorOnboardingPage() {
                     className="w-full p-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] font-bold outline-none focus:border-[#0c2217] focus:bg-white"
                   />
                 </div>
+              </div>
 
+              <div className="p-3 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl flex items-center justify-between gap-3">
                 <div>
-                  <label className="text-xs font-serif font-bold text-[#0c2217] block mb-1">Hourly Rate (PKR)</label>
-                  <input
-                    type="number"
-                    min="500"
-                    step="100"
-                    required
-                    value={hourlyRate}
-                    onChange={(e) => setHourlyRate(e.target.value)}
-                    className="w-full p-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] font-bold outline-none focus:border-[#0c2217] focus:bg-white"
-                  />
+                  <span className="text-[10px] uppercase font-bold text-[#b85d34] tracking-wider block">
+                    Tuition Fee Model
+                  </span>
+                  <p className="text-xs font-serif font-bold text-[#0c2217] mt-0.5">
+                    Direct Agreement with Students
+                  </p>
+                  <p className="text-[11px] text-stone-600 mt-0.5">
+                    No fixed hourly pricing. You mutually agree on fee and schedule directly with the student or parent.
+                  </p>
                 </div>
               </div>
 

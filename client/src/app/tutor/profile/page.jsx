@@ -415,8 +415,8 @@ function TutorProfileContent() {
                   <span className="font-bold">{age ? `${age} Years` : 'Not set'}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">Rate / Hour:</span>
-                  <span className="font-bold text-[#0c2217] font-mono">Rs. {hourlyRate} PKR</span>
+                  <span className="text-slate-400">Tuition Pricing:</span>
+                  <span className="font-bold text-[#0c2217]">Direct Agreed Rate</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Experience:</span>
@@ -668,27 +668,8 @@ function TutorProfileContent() {
                   />
                 </div>
 
-                {/* Hourly Rate & Experience Years Row */}
+                {/* Teaching Experience & Tuition Model Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div id="profile-rate" className="scroll-mt-28">
-                    <label className="text-xs font-bold text-slate-700 block mb-1 flex items-center justify-between">
-                      <span>Hourly Tuition Fee (PKR) *</span>
-                    </label>
-                    <div className="relative">
-                      <span className="text-[11px] font-bold text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2 select-none">PKR</span>
-                      <input
-                        type="number"
-                        min="300"
-                        max="25000"
-                        step="100"
-                        required
-                        value={hourlyRate}
-                        onChange={(e) => setHourlyRate(e.target.value)}
-                        className="w-full pl-12 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-bold"
-                      />
-                    </div>
-                  </div>
-
                   <div>
                     <label className="text-xs font-bold text-slate-700 block mb-1">
                       Teaching Experience (Years) *
@@ -702,6 +683,18 @@ function TutorProfileContent() {
                       onChange={(e) => setExperienceYears(e.target.value)}
                       className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-bold"
                     />
+                  </div>
+
+                  <div className="p-3 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl flex flex-col justify-center">
+                    <span className="text-[10px] uppercase font-bold text-slate-400 block tracking-wide">
+                      Tuition Fee Agreement
+                    </span>
+                    <p className="text-xs font-bold text-[#0c2217] mt-0.5">
+                      Direct &amp; Flexible Agreement
+                    </p>
+                    <p className="text-[10.5px] text-slate-500 mt-0.5">
+                      No fixed hourly rates. Discuss and mutually agree on the monthly fee with students.
+                    </p>
                   </div>
                 </div>
 

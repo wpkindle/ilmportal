@@ -29,9 +29,12 @@ export async function generateMetadata({ params }) {
     if (res && res.success && res.tutor) {
       const tutor = res.tutor;
       const tutorName = tutor.user?.name || 'Verified Tutor';
+      const tutorArea = tutor.localArea || tutor.user?.area || '';
+      const tutorCity = tutor.user?.city || tutor.city || 'Pakistan';
+      const tutorLocation = tutorArea ? `${tutorArea}, ${tutorCity}` : tutorCity;
       return {
         title: `${tutorName} - Verified Tutor Profile | IlmiDunya Pakistan`,
-        description: `${tutorName} (${tutor.user?.city || 'Pakistan'}) specializes in ${tutor.qualifications || 'Quran & Academic Tutoring'}. Rating: ${tutor.averageRating?.toFixed(1) || '5.0'}/5. In-platform live video classes available.`,
+        description: `${tutorName} (${tutorLocation}) specializes in ${tutor.qualifications || 'Quran & Academic Tutoring'}. Rating: ${tutor.averageRating?.toFixed(1) || '5.0'}/5. In-platform live video classes available.`,
         alternates: {
           canonical: `https://ilmidunya.com/tutors/${params.id}`,
         },
@@ -96,7 +99,7 @@ export default async function TutorProfilePage({ params }) {
         image: getTutorAvatar(tutorUser, tutorName),
         address: {
           '@type': 'PostalAddress',
-          addressLocality: tutorUser.city || 'Pakistan',
+          addressLocality: (tutor.localArea || tutorUser.area) ? `${tutor.localArea || tutorUser.area}, ${tutorUser.city || 'Pakistan'}` : (tutorUser.city || 'Pakistan'),
           addressCountry: 'PK'
         },
         knowsAbout: [

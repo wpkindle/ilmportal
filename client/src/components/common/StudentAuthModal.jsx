@@ -87,9 +87,9 @@ export default function StudentAuthModal({
   const tutorUser = data.user || {};
   const tutorName = tutorUser.name || data.name || 'Verified Faculty';
   const tutorAvatar = getTutorAvatar(data || tutorUser, tutorName);
-  const tutorRate = data.hourlyRate ? `PKR ${data.hourlyRate}/hr` : 'Custom Agreed Fee';
   const tutorTargetId = tutorUser._id || tutorUser.id || data._id;
   const tutorCity = tutorUser.city || data.city || 'Pakistan';
+  const tutorArea = data.localArea || tutorUser.area || data.area || '';
   const tutorSubject = data.subjects?.[0]?.name || data.title || 'Quran & Academic Tutoring';
 
   const handleDispatchInvitation = async (studentUser) => {
@@ -272,8 +272,9 @@ export default function StudentAuthModal({
                 <p className="text-[11px] text-[#b85d34] truncate font-semibold">
                   {tutorSubject}
                 </p>
-                <p className="text-[11px] text-stone-600 font-mono mt-0.5">
-                  {tutorCity} &bull; <strong className="text-[#0c2217] font-bold">{tutorRate}</strong>
+                <p className="text-[11px] text-stone-600 font-medium flex items-center gap-1 mt-0.5 truncate">
+                  <MapPin className="w-3.5 h-3.5 text-[#b85d34] shrink-0" />
+                  <span>{tutorArea ? `${tutorArea}, ${tutorCity}` : tutorCity}</span>
                 </p>
               </div>
             </div>

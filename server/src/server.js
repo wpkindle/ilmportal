@@ -152,6 +152,32 @@ const startServer = async () => {
         console.warn('Article seed note:', articleSeedErr.message);
       }
 
+      // Sync contact-us CMS page (remove phone/address/office, add guest author content)
+      try {
+        const Page = require('./models/Page');
+        const defaultPages = require('./utils/defaultPages');
+        if (defaultPages['contact-us']) {
+          await Page.updateOne(
+            { slug: 'contact-us' },
+            {
+              $set: {
+                title: defaultPages['contact-us'].title,
+                subtitle: defaultPages['contact-us'].subtitle,
+                metaDescription: defaultPages['contact-us'].metaDescription,
+                content: defaultPages['contact-us'].content,
+                'contactDetails.email': 'info@ilmidunya.com',
+                'contactDetails.phone': '',
+                'contactDetails.whatsapp': '',
+                'contactDetails.address': '',
+                'contactDetails.workingHours': ''
+              }
+            }
+          );
+        }
+      } catch (contactSyncErr) {
+        console.warn('Contact page sync note:', contactSyncErr.message);
+      }
+
       server.on('error', (e) => {
         if (e.code === 'EADDRINUSE') {
           console.error(`Port ${PORT} is currently in use. Exiting for clean supervisor restart...`);

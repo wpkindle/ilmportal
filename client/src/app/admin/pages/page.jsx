@@ -13,10 +13,7 @@ import {
   AlertCircle,
   Shield,
   HelpCircle,
-  Phone,
   Mail,
-  MapPin,
-  Clock,
   Heart,
   Info
 } from 'lucide-react';
@@ -34,7 +31,7 @@ export default function AdminCMSPagesPage() {
   const [metaDescription, setMetaDescription] = useState('');
   const [content, setContent] = useState('');
   const [contactDetails, setContactDetails] = useState({
-    email: '',
+    email: 'info@ilmidunya.com',
     phone: '',
     whatsapp: '',
     address: '',
@@ -52,7 +49,7 @@ export default function AdminCMSPagesPage() {
     { slug: 'terms', label: 'Terms of Service', path: '/terms', icon: FileText },
     { slug: 'disclaimer', label: 'Platform Disclaimer', path: '/disclaimer', icon: HelpCircle },
     { slug: 'about-us', label: 'About Us', path: '/about-us', icon: Heart },
-    { slug: 'contact-us', label: 'Contact Us', path: '/contact-us', icon: Phone }
+    { slug: 'contact-us', label: 'Contact Us', path: '/contact-us', icon: Mail }
   ];
 
   const DEFAULT_PAGE_TEMPLATES = {
@@ -87,16 +84,16 @@ export default function AdminCMSPagesPage() {
     },
     'contact-us': {
       title: 'Contact IlmiDunya Pakistan',
-      subtitle: 'We are here to assist students, parents, and tutors across Pakistan.',
-      metaDescription: 'Get in touch with IlmiDunya Pakistan. Contact our Lahore administration via WhatsApp, phone, or direct online inquiry.',
+      subtitle: 'Reach out to our team for general inquiries or guest author article contributions.',
+      metaDescription: 'Get in touch with IlmiDunya Pakistan. Contact our team via email or submit a guest article proposal.',
       contactDetails: {
         email: 'info@ilmidunya.com',
-        phone: '+92 300 1234567',
-        whatsapp: '+92 300 1234567',
-        address: 'Lahore, Punjab, Pakistan',
-        workingHours: 'Monday – Saturday: 9:00 AM – 9:00 PM PKT'
+        phone: '',
+        whatsapp: '',
+        address: '',
+        workingHours: ''
       },
-      content: `### We Are Here to Support Your Learning Journey\nHave questions about finding a verified Qari, scheduling 3-day free trials, requesting a female Alimah, or joining our faculty? Our dedicated administrative team in Lahore is ready to assist you.\n\n---\n\n### Our Communication Channels\n* **WhatsApp Helpline**: Fast, direct assistance for student enrollment and tutor onboarding.\n* **Email Support**: For formal verification inquiries, institutional partnerships, and Sanad submissions.\n* **Headquarters**: Lahore, Punjab, Pakistan, serving students nationwide across Pakistan & overseas.`
+      content: `### Get in Touch with IlmiDunya\nHave questions about finding a verified tutor, need assistance with your classes, or want to contribute as a guest author? We are here to help you.\n\n---\n\n### Contribute as a Guest Author\nWe welcome Islamic scholars, Qaris, Alimahs, teachers, and educational writers to publish insightful articles on our platform.\n\n* **Topics We Cover**: Quranic sciences, Tajweed methodology, Islamic adab, character building, female scholarship, and academic coaching.\n* **How to Submit**: Send your article pitch or complete draft along with your author biography via the contact form or directly to [info@ilmidunya.com](mailto:info@ilmidunya.com).\n* **Author Attribution**: Published articles are featured on our [Articles Section](/articles) with full author bio and credentials.\n\n---\n\n### Official Email Channel\nFor all inquiries, official correspondence, and article submissions, please contact us at [info@ilmidunya.com](mailto:info@ilmidunya.com).`
     }
   };
 
@@ -348,78 +345,30 @@ export default function AdminCMSPagesPage() {
                   </div>
                 )}
 
-                {/* Specific Fields for Contact Us */}
+                {/* Specific Fields for Contact Us (Email Only) */}
                 {activeSlug === 'contact-us' && (
                   <div className="p-5 bg-blue-50/60 border border-blue-200/80 rounded-2xl space-y-4">
                     <h3 className="text-xs font-black text-blue-950 uppercase tracking-wider flex items-center gap-1.5">
-                      <Phone className="w-4 h-4 text-blue-600" />
-                      <span>Direct Contact Details & Working Hours</span>
+                      <Mail className="w-4 h-4 text-blue-600" />
+                      <span>Official Contact Channel</span>
                     </h3>
                     
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                          <Mail className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Support Email</span>
-                        </label>
-                        <input
-                          type="email"
-                          value={contactDetails.email}
-                          onChange={(e) => setContactDetails({ ...contactDetails, email: e.target.value })}
-                          className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-blue-500"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                          <Phone className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Phone Helpline</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={contactDetails.phone}
-                          onChange={(e) => setContactDetails({ ...contactDetails, phone: e.target.value })}
-                          className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-blue-500"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                          <Phone className="w-3.5 h-3.5 text-[#b85d34]" />
-                          <span>WhatsApp Helpline</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={contactDetails.whatsapp}
-                          onChange={(e) => setContactDetails({ ...contactDetails, whatsapp: e.target.value })}
-                          className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-blue-500"
-                        />
-                      </div>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                          <MapPin className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Office Address / City</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={contactDetails.address}
-                          onChange={(e) => setContactDetails({ ...contactDetails, address: e.target.value })}
-                          className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-blue-500"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
-                          <Clock className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Working Hours</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={contactDetails.workingHours}
-                          onChange={(e) => setContactDetails({ ...contactDetails, workingHours: e.target.value })}
-                          className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-blue-500"
-                        />
-                      </div>
+                    <div className="space-y-1.5">
+                      <label className="text-xs font-bold text-slate-800 flex items-center gap-1">
+                        <Mail className="w-3.5 h-3.5 text-slate-500" />
+                        <span>Official Support Email *</span>
+                      </label>
+                      <input
+                        type="email"
+                        required
+                        value={contactDetails.email}
+                        onChange={(e) => setContactDetails({ ...contactDetails, email: e.target.value })}
+                        className="w-full px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-blue-500"
+                        placeholder="info@ilmidunya.com"
+                      />
+                      <p className="text-[11px] text-slate-500">
+                        Primary communication channel for general inquiries, student support, tutor verification, and guest author article submissions.
+                      </p>
                     </div>
                   </div>
                 )}

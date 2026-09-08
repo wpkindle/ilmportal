@@ -151,7 +151,7 @@ exports.submitContactMessage = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Your inquiry has been received! Our support team in Lahore will respond promptly.'
+      message: 'Your message has been received! Our team will respond to your email promptly.'
     });
   } catch (error) {
     res.status(500).json({

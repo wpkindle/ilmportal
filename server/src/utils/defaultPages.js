@@ -110,23 +110,31 @@ Guided by the timeless Hadith: *"The best of you are those who learn the Quran a
   'contact-us': {
     slug: 'contact-us',
     title: 'Contact IlmiDunya Pakistan',
-    subtitle: 'We are here to assist students, parents, and tutors across Pakistan.',
-    metaDescription: 'Get in touch with IlmiDunya Pakistan.',
+    subtitle: 'Reach out to our team for general inquiries or guest author article contributions.',
+    metaDescription: 'Get in touch with IlmiDunya Pakistan. Contact our team via email or submit a guest article proposal.',
     contactDetails: {
       email: 'info@ilmidunya.com',
       phone: '',
       whatsapp: '',
-      address: 'Lahore, Punjab, Pakistan',
-      workingHours: 'Monday – Saturday: 9:00 AM – 9:00 PM PKT'
+      address: '',
+      workingHours: ''
     },
-    content: `### We Are Here to Support Your Learning Journey
-Have questions about finding a verified Qari, scheduling 3-day free trials, requesting a female Alimah, or joining our faculty? Our dedicated administrative team is ready to assist you.
+    content: `### Get in Touch with IlmiDunya
+Have questions about finding a verified tutor, need assistance with your classes, or want to contribute as a guest author? We are here to help you.
 
 ---
 
-### Our Communication Channels
-* **Email Support**: Official assistance for student enrollment, tutor onboarding, and Sanad submissions at [info@ilmidunya.com](mailto:info@ilmidunya.com).
-* **Headquarters**: Lahore, Punjab, Pakistan, serving students across 31+ Pakistani cities.`
+### Contribute as a Guest Author
+We welcome Islamic scholars, Qaris, Alimahs, teachers, and educational writers to publish insightful articles on our platform.
+
+* **Topics We Cover**: Quranic sciences, Tajweed methodology, Islamic adab, character building, female scholarship, and academic coaching.
+* **How to Submit**: Send your article pitch or complete draft along with your author biography via the contact form or directly to [info@ilmidunya.com](mailto:info@ilmidunya.com).
+* **Author Attribution**: Published articles are featured on our [Articles Section](/articles) with full author bio and credentials.
+
+---
+
+### Official Email Channel
+For all inquiries, official correspondence, and article submissions, please contact us at [info@ilmidunya.com](mailto:info@ilmidunya.com).`
   }
 };
 

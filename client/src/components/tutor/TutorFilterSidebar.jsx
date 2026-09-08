@@ -3,6 +3,7 @@
 import React from 'react';
 import { Filter, RotateCcw, MapPin, BookOpen, User, UserCheck, Video, ShieldCheck, Check, Navigation, ArrowUpDown, Sparkles, Clock, Star, Award, GraduationCap } from 'lucide-react';
 import CustomSelect from '../common/CustomSelect';
+import InPersonLocationPicker from './InPersonLocationPicker';
 import { pakistaniCityAreas } from '../../data/pakistanAreas';
 
 const sortSidebarOptions = [
@@ -213,59 +214,11 @@ const TutorFilterSidebar = ({
         />
       </div>
 
-      {/* 3. City / Province Filter */}
-      <div className="space-y-2">
-        <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-          <MapPin className="w-3.5 h-3.5 text-[#0c2217]" />
-          <span>Pakistani City / Region</span>
-        </label>
-        <CustomSelect
-          options={locationOptions}
-          value={filters.city || ''}
-          onChange={handleCityChange}
-          placeholder="All Cities (Pakistan)"
-          searchable={true}
-          variant="filter"
-        />
-      </div>
-
-      {/* 4. Local Area / Sector Filter (Dynamic per City) */}
-      <div className="space-y-2">
-        <div className="flex items-center justify-between">
-          <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
-            <Navigation className="w-3.5 h-3.5 text-[#0c2217]" />
-            <span>Local Area / Sector</span>
-          </label>
-          {activeCity && (
-            <span className="text-[10px] text-[#0c2217] font-bold px-1.5 py-0.5 rounded bg-[#f0ece1] border border-[#d4a359]/30">
-              {activeCity}
-            </span>
-          )}
-        </div>
-
-        {cityAreasList.length > 0 ? (
-          <CustomSelect
-            options={areaOptions}
-            value={filters.area || ''}
-            onChange={(val) => onFilterChange('area', val)}
-            placeholder={`Select Area in ${activeCity}`}
-            searchable={true}
-            variant="filter"
-          />
-        ) : (
-          <div className="p-2.5 rounded-xl bg-[#faf8f5] border border-[#e6ded1] text-[11px] text-stone-500 font-medium">
-            {activeCity
-              ? `General coverage across ${activeCity}`
-              : 'Select a major city above to filter by local area/sector'}
-          </div>
-        )}
-      </div>
-
-      {/* 5. Tutoring Mode Filter */}
+      {/* 3. Tutoring Mode Filter */}
       <div className="space-y-2">
         <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
           <Video className="w-3.5 h-3.5 text-[#0c2217]" />
-          <span>Tutoring Mode</span>
+          <span>Tutoring Delivery Mode</span>
         </label>
         <div className="grid grid-cols-3 gap-1.5 text-xs font-semibold">
           {[
@@ -288,6 +241,55 @@ const TutorFilterSidebar = ({
           ))}
         </div>
       </div>
+
+      {/* 4. Dynamic Location Picker - Appears when In-Person Tutoring is Selected */}
+      {filters.mode === 'physical' ? (
+        <InPersonLocationPicker
+          city={filters.city || ''}
+          area={filters.area || ''}
+          onLocationChange={(newCity, newArea) => {
+            onFilterChange('city', newCity);
+            onFilterChange('area', newArea);
+          }}
+          availableLocations={locations}
+          variant="sidebar"
+        />
+      ) : filters.mode === 'online' ? (
+        <div className="p-3 rounded-2xl bg-[#f4f9f6] border border-emerald-200/80 text-[11px] text-emerald-900 space-y-1 animate-in fade-in">
+          <div className="flex items-center gap-1.5 font-bold text-emerald-950">
+            <Video className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+            <span>100% Online WebRTC Tutoring</span>
+          </div>
+          <p className="text-[10px] text-emerald-800 leading-tight">
+            Encrypted in-browser video &amp; audio classes with camera-off privacy by default. Tutors teach nationwide across Pakistan and overseas.
+          </p>
+        </div>
+      ) : (
+        /* General City Filter for 'All Modes' */
+        <div className="space-y-2">
+          <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+            <MapPin className="w-3.5 h-3.5 text-[#0c2217]" />
+            <span>Pakistani City / Region (Optional)</span>
+          </label>
+          <CustomSelect
+            options={locationOptions}
+            value={filters.city || ''}
+            onChange={handleCityChange}
+            placeholder="All Cities (Pakistan)"
+            searchable={true}
+            variant="filter"
+          />
+
+          <button
+            type="button"
+            onClick={() => onFilterChange('mode', 'physical')}
+            className="w-full py-2 px-2.5 bg-[#faf7f2] hover:bg-[#f0ece1] text-[#b85d34] border border-[#d4a359]/40 rounded-xl text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+          >
+            <Navigation className="w-3 h-3 text-[#b85d34]" />
+            <span>Need Home Tuition? Select In-Person Mode</span>
+          </button>
+        </div>
+      )}
 
       {/* 6. Gender Preference Filter */}
       <div className="space-y-2">

@@ -299,6 +299,14 @@ export default function Hero() {
                   <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
                   <span>Female Alimahs</span>
                 </Link>
+                <Link
+                  href="/tutors?mode=physical"
+                  className="px-3.5 py-1.5 rounded-full bg-[#f4ebe1] hover:bg-[#ebdcd3] text-[#0c2217] font-bold border border-[#d4a359]/60 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group"
+                  title="Find verified male home tutors visiting your residence"
+                >
+                  <Home className="w-3.5 h-3.5 text-[#b85d34]" />
+                  <span>In-Person Home Tutors</span>
+                </Link>
                 <span className="text-[#6b7f76] text-xs font-semibold ml-1">Popular:</span>
                 {quickSubjects.map((sub) => (
                   <Link

@@ -17,6 +17,7 @@ import {
   ChevronDown
 } from 'lucide-react';
 import CustomSelect from '../common/CustomSelect';
+import InPersonLocationPicker from './InPersonLocationPicker';
 
 const subjectOptions = [
   // Quranic & Islamic
@@ -80,6 +81,11 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
   const [selectedDays, setSelectedDays] = useState(['Mon', 'Wed', 'Fri']);
   const [durationMinutes, setDurationMinutes] = useState('45');
 
+  // In-Person Location State
+  const [dealCity, setDealCity] = useState('');
+  const [dealArea, setDealArea] = useState('');
+  const [dealAddress, setDealAddress] = useState('');
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -115,7 +121,11 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
   };
 
   // Computed schedule details string
-  const computedSchedule = `Starts ${formatReadableDate(startDate)} • ${selectedDays.join(', ')} at ${formattedDisplayTime} PKT (${durationMinutes} min/class)`;
+  const locationSuffix = mode === 'physical'
+    ? ` • In-Person Home Tuition (${dealAddress ? dealAddress + ', ' : ''}${dealArea ? dealArea + ', ' : ''}${dealCity || 'Pakistan'})`
+    : ' • Online (WebRTC Video)';
+
+  const computedSchedule = `Starts ${formatReadableDate(startDate)} • ${selectedDays.join(', ')} at ${formattedDisplayTime} PKT (${durationMinutes} min/class)${locationSuffix}`;
 
   const finalSubject = selectedSubject === 'custom' ? customSubjectText.trim() || 'Custom Quran / Academic Tuition' : selectedSubject;
 
@@ -285,6 +295,24 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                 <span>In-Person (Home Tuition)</span>
               </button>
             </div>
+
+            {/* In-Person Tuition Location Picker & Live Location */}
+            {mode === 'physical' && (
+              <div className="pt-2">
+                <InPersonLocationPicker
+                  city={dealCity}
+                  area={dealArea}
+                  address={dealAddress}
+                  onLocationChange={(newCity, newArea) => {
+                    setDealCity(newCity);
+                    setDealArea(newArea);
+                  }}
+                  onAddressChange={setDealAddress}
+                  showAddressField={true}
+                  variant="modal"
+                />
+              </div>
+            )}
           </div>
 
           {/* 4. Calendar & Time Selection Box */}

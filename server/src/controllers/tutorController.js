@@ -52,8 +52,13 @@ exports.getPublicTutors = async (req, res) => {
         query.cities = { $in: [city] };
       } else {
         const loc = await Location.findOne({ name: new RegExp('^' + city + '$', 'i') });
-        if (loc) {
-          query.cities = { $in: [loc._id] };
+        const cityUsers = await User.find({ city: new RegExp('^' + city + '$', 'i') }, '_id');
+        const cityUserIds = cityUsers.map((u) => u._id);
+        const cityConditions = [];
+        if (loc) cityConditions.push({ cities: { $in: [loc._id] } });
+        if (cityUserIds.length > 0) cityConditions.push({ user: { $in: cityUserIds } });
+        if (cityConditions.length > 0) {
+          query.$or = (query.$or || []).concat(cityConditions);
         }
       }
     }
@@ -61,7 +66,7 @@ exports.getPublicTutors = async (req, res) => {
     // Filter by Teaching Mode
     if (mode && mode !== 'all') {
       const modeKey = (mode === 'physical' || mode === 'in-person') ? 'in_person' : mode;
-      query.teachingModes = { $in: [modeKey, 'online', 'in_person'] };
+      query.teachingModes = { $in: [modeKey] };
     }
 
     // Filter by Faculty / Gender

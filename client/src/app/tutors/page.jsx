@@ -7,7 +7,8 @@ import TutorFilterSidebar from '../../components/tutor/TutorFilterSidebar';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import CustomSelect from '../../components/common/CustomSelect';
 import { api } from '../../services/api';
-import { Search, Users, UserCheck, ArrowUpDown, ShieldCheck, BookOpen, GraduationCap } from 'lucide-react';
+import { Search, Users, UserCheck, ArrowUpDown, ShieldCheck, BookOpen, GraduationCap, Video, Navigation, Home, MapPin, Compass } from 'lucide-react';
+import { detectUserLiveLocation } from '../../utils/geolocation';
 
 const sortOptions = [
   { value: 'popular', label: 'Most Popular', sublabel: 'Top Enrolled & Active' },
@@ -31,6 +32,28 @@ function TutorSearchContent() {
     if (fac === 'alimah' || fac === 'female_alimah' || fac === 'female_tutor' || fac === 'female_academic' || fac === 'female_quran') return 'female';
     if (fac === 'male_quran' || fac === 'male_academic' || fac === 'qari') return 'male';
     return '';
+  };
+
+  const [detectingLocation, setDetectingLocation] = useState(false);
+  const [locationMessage, setLocationMessage] = useState('');
+
+  const handleTopLiveLocation = async () => {
+    setDetectingLocation(true);
+    setLocationMessage('');
+    try {
+      const loc = await detectUserLiveLocation();
+      setFilters((prev) => ({
+        ...prev,
+        mode: 'physical',
+        city: loc.city,
+        area: loc.area || ''
+      }));
+      setLocationMessage(`GPS Active: ${loc.displayName}`);
+    } catch (err) {
+      setLocationMessage(err.message || 'Location detection error');
+    } finally {
+      setDetectingLocation(false);
+    }
   };
 
   // Filters State
@@ -478,6 +501,87 @@ function TutorSearchContent() {
               <span>Male Academic Tutors</span>
             </button>
           </div>
+
+          {/* Delivery Mode Quick Toggle & Live GPS Location Trigger */}
+          <div className="pt-2.5 border-t border-[#e6ded1] flex flex-wrap items-center justify-between gap-2.5 text-xs">
+            <div className="flex flex-wrap items-center gap-1.5">
+              <span className="text-[11px] font-bold text-slate-500 mr-1 flex items-center gap-1">
+                <Video className="w-3.5 h-3.5 text-[#0c2217]" />
+                <span>Delivery Mode:</span>
+              </span>
+
+              {[
+                { label: 'All Modes', val: '' },
+                { label: 'Online (WebRTC)', val: 'online' },
+                { label: 'In-Person (Home Tuition)', val: 'physical' }
+              ].map((m) => (
+                <button
+                  key={m.val}
+                  type="button"
+                  onClick={() => handleFilterChange('mode', m.val)}
+                  className={`px-3 py-1 rounded-full text-xs font-bold transition-all cursor-pointer border ${
+                    (filters.mode || '') === m.val
+                      ? 'bg-[#b85d34] text-white border-[#b85d34] shadow-2xs'
+                      : 'bg-[#faf7f2] hover:bg-[#ede5d8] text-slate-700 border-[#e6ded1]'
+                  }`}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
+
+            {/* Quick Live GPS Location Button when In-Person mode is selected */}
+            {filters.mode === 'physical' && (
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={handleTopLiveLocation}
+                  disabled={detectingLocation}
+                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer border ${
+                    detectingLocation
+                      ? 'bg-[#f0ece1] text-stone-600 border-[#d4a359]/40 cursor-wait'
+                      : 'bg-[#0c2217] hover:bg-[#163524] text-[#d4a359] border-[#0c2217] active:scale-95'
+                  }`}
+                >
+                  <Navigation className={`w-3.5 h-3.5 text-[#d4a359] ${detectingLocation ? 'animate-spin' : 'animate-pulse'}`} />
+                  <span>{detectingLocation ? 'Detecting Pakistani GPS...' : 'Use My Live Location'}</span>
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Active In-Person Location Pill / Notice */}
+          {filters.mode === 'physical' && (filters.city || filters.area || locationMessage) && (
+            <div className="p-3 bg-gradient-to-r from-[#faf7f2] to-[#f4ebe1] border border-[#d4a359]/60 rounded-2xl flex flex-wrap items-center justify-between gap-2 text-xs animate-in fade-in">
+              <div className="flex items-center gap-2 min-w-0">
+                <div className="p-1.5 rounded-xl bg-[#0c2217] text-[#d4a359] shrink-0">
+                  <Home className="w-3.5 h-3.5" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-slate-900 font-bold leading-tight truncate">
+                    In-Person Home Tutoring in:{' '}
+                    <span className="text-[#b85d34]">
+                      {filters.area ? `${filters.area}, ${filters.city}` : filters.city || 'All Pakistan'}
+                    </span>
+                  </p>
+                  <p className="text-[10px] text-stone-600 truncate">
+                    {locationMessage || 'Verified male faculty visiting your residence'}
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  handleFilterChange('city', '');
+                  handleFilterChange('area', '');
+                  setLocationMessage('');
+                }}
+                className="text-[11px] font-bold text-stone-500 hover:text-[#b85d34] underline shrink-0 cursor-pointer"
+              >
+                Clear Location
+              </button>
+            </div>
+          )}
         </div>
 
         {/* 2-Column Layout */}

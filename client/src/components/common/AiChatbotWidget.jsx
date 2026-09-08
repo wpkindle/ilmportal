@@ -741,73 +741,119 @@ export default function LiveSupportWidget() {
 
   return (
     <>
-      {/* 1. FLOATING BOTTOM-RIGHT SUPPORT TRIGGER BUTTON */}
-      <div id="ai-chatbot-widget-trigger" className={`fixed bottom-20 right-4 sm:bottom-20 sm:right-6 md:bottom-6 md:right-6 z-[9998] print:hidden transition-opacity duration-200 ${isOpen ? 'hidden' : 'block'}`}>
-        <button
-          onClick={handleToggleWidget}
-          className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#0c2217] hover:bg-[#123323] text-white shadow-[0_10px_25px_rgba(12,34,23,0.35)] hover:shadow-[0_14px_32px_rgba(12,34,23,0.5)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border-2 border-[#d4a359]/70 ring-2 ring-[#0c2217]/20"
-          aria-label={isOpen ? "Close Helpdesk" : "Open IlmiDunya Support Desk"}
-          title={isOpen ? "Close Helpdesk" : (isAdminOnline ? "Chat with Support Desk (Online)" : "Support Desk (Offline • Leave an Email Note)")}
-        >
-          {isOpen ? (
-            <X className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
-          ) : (
-            <svg
-              className="w-5 h-5 sm:w-6 sm:h-6 text-white transition-transform duration-200 group-hover:scale-110"
-              viewBox="0 0 24 24"
-              fill="none"
-              xmlns="http://www.w3.org/2000/svg"
-              aria-hidden="true"
-            >
-              {/* Secondary dialogue bubble in warm gold */}
-              <path
-                d="M17 8.5H18.5C19.8807 8.5 21 9.61929 21 11V15C21 16.3807 19.8807 17.5 18.5 17.5H17.5V20L14.5 17.5H13"
-                stroke="#d4a359"
-                strokeWidth="1.75"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              {/* Primary dialogue bubble in crisp white */}
-              <path
-                d="M3 6.5C3 5.11929 4.11929 4 5.5 4H14.5C15.8807 4 17 5.11929 17 6.5V12.5C17 13.8807 15.8807 15 14.5 15H8L4 18.5V15C3.4 14.5 3 13.5 3 12.5V6.5Z"
-                fill="white"
-                fillOpacity="0.12"
-                stroke="white"
-                strokeWidth="1.85"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-              {/* 3 warm conversation dots */}
-              <circle cx="7" cy="9.5" r="1" fill="#d4a359" />
-              <circle cx="10" cy="9.5" r="1" fill="#d4a359" />
-              <circle cx="13" cy="9.5" r="1" fill="#d4a359" />
-            </svg>
-          )}
-
-          {/* Online/Offline Status Indicator Dot (Green when Online, Red when Offline) */}
-          {!isOpen && (
-            <span className="absolute top-0 right-0 -mt-0.5 -mr-0.5 flex h-3.5 w-3.5 pointer-events-none">
+      {/* 1. FLOATING BOTTOM-RIGHT SUPPORT TRIGGER BUTTON WITH BOUNCING ATTRACTOR EFFECTS */}
+      <div
+        id="ai-chatbot-widget-trigger"
+        className={`fixed z-[100002] print:hidden flex items-center transition-all duration-300 ${
+          isOpen
+            ? 'bottom-3 right-3 sm:bottom-6 sm:right-6'
+            : 'bottom-20 right-4 sm:bottom-6 sm:right-6'
+        }`}
+      >
+        {/* Attractor Speech Callout Pill (Visible on Desktop when closed) */}
+        {!isOpen && (
+          <div
+            onClick={handleToggleWidget}
+            className="hidden sm:flex items-center gap-2 px-3.5 py-2 mr-3 rounded-2xl bg-[#0c2217]/95 hover:bg-[#0c2217] text-white border border-[#d4a359]/60 shadow-[0_10px_25px_rgba(12,34,23,0.3)] cursor-pointer select-none transition-all hover:scale-105 active:scale-95 group/bubble animate-widget-bounce"
+            title="Click to start live conversation"
+          >
+            <span className="relative flex h-2 w-2">
               {isAdminOnline ? (
                 <>
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white shadow-xs" />
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
                 </>
               ) : (
-                <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-rose-500 border-2 border-white shadow-xs" />
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500" />
               )}
             </span>
+            <span className="text-xs font-bold tracking-tight text-white/95">
+              {isAdminOnline ? 'Need help? Chat live!' : 'Have questions? Ask us!'}
+            </span>
+            <span className="text-sm transition-transform group-hover/bubble:rotate-12">👋</span>
+          </div>
+        )}
+
+        {/* Circular Toggle Button (Open / Close) with Bouncing Background Ripple Effects */}
+        <div className="relative flex items-center justify-center">
+          {/* Bouncing Background Radar Waves and Halo Glow (Active when closed to attract user) */}
+          {!isOpen && (
+            <>
+              {/* Outer expanding radar wave */}
+              <span className="absolute -inset-2.5 sm:-inset-3 rounded-full border-2 border-emerald-400/50 animate-radar-wave pointer-events-none" />
+              {/* Second offset gold radar wave */}
+              <span className="absolute -inset-3.5 sm:-inset-4 rounded-full border border-[#d4a359]/60 animate-radar-wave pointer-events-none" style={{ animationDelay: '1.1s' }} />
+              {/* Radiant blurred ambient aura glow */}
+              <span className="absolute -inset-2 sm:-inset-2.5 rounded-full bg-gradient-to-tr from-emerald-500/40 via-[#d4a359]/40 to-[#0c2217]/30 blur-md animate-attractor-halo pointer-events-none" />
+            </>
           )}
 
-          {/* Unread Message Count Badge */}
-          {unreadCount > 0 && !isOpen && (
-            <span className="absolute -top-1 -left-1 flex h-5 w-5">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
-              <span className="relative inline-flex rounded-full h-5 w-5 bg-rose-500 text-[10px] text-white font-black items-center justify-center border-2 border-white shadow-xs">
-                {unreadCount}
+          <button
+            onClick={handleToggleWidget}
+            className={`group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#0c2217] hover:bg-[#123323] text-white shadow-[0_10px_25px_rgba(12,34,23,0.35)] hover:shadow-[0_14px_32px_rgba(12,34,23,0.5)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border-2 border-[#d4a359]/70 ring-2 ring-[#0c2217]/20 ${!isOpen ? 'animate-widget-bounce' : ''}`}
+            aria-label={isOpen ? "Close Helpdesk" : "Open IlmiDunya Support Desk"}
+            title={isOpen ? "Close Support Desk" : (isAdminOnline ? "Chat with Support Desk (Online)" : "Support Desk (Offline • Leave an Email Note)")}
+          >
+            {isOpen ? (
+              <X className="w-5 h-5 sm:w-6 sm:h-6 text-white transition-transform duration-300 group-hover:rotate-90" />
+            ) : (
+              <svg
+                className="w-5 h-5 sm:w-6 sm:h-6 text-white transition-transform duration-200 group-hover:scale-110"
+                viewBox="0 0 24 24"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+                aria-hidden="true"
+              >
+                {/* Secondary dialogue bubble in warm gold */}
+                <path
+                  d="M17 8.5H18.5C19.8807 8.5 21 9.61929 21 11V15C21 16.3807 19.8807 17.5 18.5 17.5H17.5V20L14.5 17.5H13"
+                  stroke="#d4a359"
+                  strokeWidth="1.75"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                {/* Primary dialogue bubble in crisp white */}
+                <path
+                  d="M3 6.5C3 5.11929 4.11929 4 5.5 4H14.5C15.8807 4 17 5.11929 17 6.5V12.5C17 13.8807 15.8807 15 14.5 15H8L4 18.5V15C3.4 14.5 3 13.5 3 12.5V6.5Z"
+                  fill="white"
+                  fillOpacity="0.12"
+                  stroke="white"
+                  strokeWidth="1.85"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+                {/* 3 warm conversation dots */}
+                <circle cx="7" cy="9.5" r="1" fill="#d4a359" />
+                <circle cx="10" cy="9.5" r="1" fill="#d4a359" />
+                <circle cx="13" cy="9.5" r="1" fill="#d4a359" />
+              </svg>
+            )}
+
+            {/* Online/Offline Status Indicator Dot (Green when Online, Red when Offline) */}
+            {!isOpen && (
+              <span className="absolute top-0 right-0 -mt-0.5 -mr-0.5 flex h-3.5 w-3.5 pointer-events-none">
+                {isAdminOnline ? (
+                  <>
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-emerald-500 border-2 border-white shadow-xs" />
+                  </>
+                ) : (
+                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 bg-rose-500 border-2 border-white shadow-xs" />
+                )}
               </span>
-            </span>
-          )}
-        </button>
+            )}
+
+            {/* Unread Message Count Badge */}
+            {unreadCount > 0 && !isOpen && (
+              <span className="absolute -top-1 -left-1 flex h-5 w-5 pointer-events-none">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />
+                <span className="relative inline-flex rounded-full h-5 w-5 bg-rose-500 text-[10px] text-white font-black items-center justify-center border-2 border-white shadow-xs">
+                  {unreadCount}
+                </span>
+              </span>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* 2. SUPPORT CHAT PANEL (Full-Screen on Mobile, Floating Drawer on Desktop) */}
@@ -817,7 +863,7 @@ export default function LiveSupportWidget() {
           aria-modal="true"
           aria-label="IlmiDunya Live Support Helpdesk"
           style={viewportHeight && typeof window !== 'undefined' && window.innerWidth < 640 ? { height: `${viewportHeight}px`, top: `${viewportOffsetTop}px` } : undefined}
-          className="fixed inset-0 sm:inset-auto sm:bottom-20 sm:right-6 z-[99999] w-full sm:w-[450px] h-[100dvh] sm:h-[640px] sm:max-h-[85vh] flex flex-col rounded-none sm:rounded-3xl bg-white border-0 sm:border-2 border-[#d4a359]/60 shadow-[0_20px_50px_rgba(12,34,23,0.2)] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+          className="fixed inset-0 sm:inset-auto sm:bottom-[88px] sm:right-6 z-[99999] w-full sm:w-[450px] h-[100dvh] sm:h-[640px] sm:max-h-[calc(100vh-104px)] flex flex-col rounded-none sm:rounded-3xl bg-white border-0 sm:border-2 border-[#d4a359]/60 shadow-[0_20px_50px_rgba(12,34,23,0.2)] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
         >
           
           {/* Header */}
@@ -956,7 +1002,7 @@ export default function LiveSupportWidget() {
 
           {/* OFFLINE EMAIL INQUIRY FORM VIEW (Light Theme) */}
           {isOfflineView ? (
-            <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#faf8f5] pb-[max(2rem,env(safe-area-inset-bottom))]">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#faf8f5] pb-20 sm:pb-[max(2rem,env(safe-area-inset-bottom))]">
               <div className="p-3.5 rounded-2xl bg-rose-50/80 border border-rose-200 text-rose-900 text-xs space-y-1 shadow-2xs">
                 <div className="flex items-center gap-1.5 font-bold text-rose-900">
                   <span className="w-2 h-2 rounded-full bg-rose-500 shrink-0" />
@@ -1250,7 +1296,7 @@ export default function LiveSupportWidget() {
               </div>
 
               {/* Input & Send Footer (Light Theme) */}
-              <div className="p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-[#faf8f5] border-t border-[#ebe3d3] shrink-0 space-y-2">
+              <div className="p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-[#faf8f5] border-t border-[#ebe3d3] shrink-0 space-y-2 pr-16 sm:pr-3">
                 {/* File Attachment Chip before sending */}
                 {selectedFile && (
                   <div className="p-2 bg-white border border-[#d4a359]/40 rounded-xl flex items-center justify-between gap-2 shadow-2xs">

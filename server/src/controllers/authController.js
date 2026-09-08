@@ -80,9 +80,6 @@ exports.register = async (req, res) => {
     if (!email || !email.trim()) {
       return res.status(400).json({ success: false, message: 'Email address is required' });
     }
-    if (!userPhone) {
-      return res.status(400).json({ success: false, message: 'Phone number is required' });
-    }
     if (!password || password.length < 6) {
       return res.status(400).json({ success: false, message: 'Password must be at least 6 characters' });
     }

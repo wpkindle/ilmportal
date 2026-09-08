@@ -7,7 +7,6 @@ import {
   Lock,
   Mail,
   User,
-  Phone,
   ArrowRight,
   Eye,
   EyeOff,
@@ -15,8 +14,7 @@ import {
   ShieldCheck,
   AlertCircle,
   CheckCircle2,
-  Sparkles,
-  BookOpen
+  Sparkles
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
@@ -52,11 +50,8 @@ function LoginContent() {
   // Sign Up Form States
   const [signUpName, setSignUpName] = useState('');
   const [signUpEmail, setSignUpEmail] = useState('');
-  const [signUpPhone, setSignUpPhone] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
   const [showSignUpPassword, setShowSignUpPassword] = useState(false);
-  const [signUpGender, setSignUpGender] = useState('female'); // Default female for student/tutor comfort
-  const [signUpSubject, setSignUpSubject] = useState('');
 
   // Keep state in sync with URL params if they change
   useEffect(() => {
@@ -123,11 +118,6 @@ function LoginContent() {
       setLoading(false);
       return;
     }
-    if (!signUpPhone.trim()) {
-      setError('Please enter your mobile / WhatsApp number');
-      setLoading(false);
-      return;
-    }
     if (!signUpPassword || signUpPassword.length < 6) {
       setError('Password must be at least 6 characters long');
       setLoading(false);
@@ -138,12 +128,8 @@ function LoginContent() {
       const payload = {
         name: signUpName.trim(),
         email: signUpEmail.trim().toLowerCase(),
-        phone: signUpPhone.trim(),
-        number: signUpPhone.trim(),
         password: signUpPassword,
-        role: isTutorMode ? 'tutor' : 'student',
-        gender: signUpGender,
-        ...(isTutorMode && signUpSubject ? { qualifications: signUpSubject.trim() } : {})
+        role: isTutorMode ? 'tutor' : 'student'
       };
 
       const res = await api.register(payload);
@@ -232,7 +218,7 @@ function LoginContent() {
                     : 'Teach Quran & Academic subjects nationwide from home with guaranteed monthly fee protection.'
                   : mode === 'signin'
                   ? 'Access your Quran & Academic lessons, student workspace, and live classes.'
-                  : 'Sign up in 30 seconds to connect with verified female Alimahs and academic tutors.'}
+                  : 'Sign up to connect with verified tutors.'}
               </p>
             </div>
 
@@ -452,77 +438,6 @@ function LoginContent() {
                 </div>
               </div>
 
-              {/* WhatsApp / Phone */}
-              <div>
-                <label className="text-xs font-bold text-stone-800 block mb-1">
-                  WhatsApp or Phone Number *
-                </label>
-                <div className="relative">
-                  <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="tel"
-                    required
-                    placeholder="Enter Your WhatsApp or Phone Number"
-                    value={signUpPhone}
-                    onChange={(e) => setSignUpPhone(e.target.value)}
-                    className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
-                  />
-                </div>
-                <p className="text-[10px] text-stone-500 mt-1">
-                  Used for class notifications &amp; trial scheduling. Never made public.
-                </p>
-              </div>
-
-              {/* Gender (Male / Female in single line) */}
-              <div className="flex items-center justify-between gap-3 py-1">
-                <label className="text-xs font-bold text-stone-800 shrink-0">
-                  Gender:
-                </label>
-                <div className="flex items-center gap-2 flex-1 max-w-xs">
-                  <button
-                    type="button"
-                    onClick={() => setSignUpGender('male')}
-                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all border text-center cursor-pointer ${
-                      signUpGender === 'male'
-                        ? 'bg-[#0c2217] text-white border-[#0c2217] shadow-xs'
-                        : 'bg-[#faf8f5] text-stone-700 border-[#e6dfd5] hover:bg-stone-50'
-                    }`}
-                  >
-                    Male
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setSignUpGender('female')}
-                    className={`flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all border text-center cursor-pointer ${
-                      signUpGender === 'female'
-                        ? 'bg-[#0c2217] text-white border-[#0c2217] shadow-xs'
-                        : 'bg-[#faf8f5] text-stone-700 border-[#e6dfd5] hover:bg-stone-50'
-                    }`}
-                  >
-                    Female
-                  </button>
-                </div>
-              </div>
-
-              {/* Tutor Subject / Qualification highlight (if tutor mode) */}
-              {isTutorMode && (
-                <div>
-                  <label className="text-xs font-bold text-stone-800 block mb-1">
-                    What will you teach? (Quran, Tajweed, Academic Subjects)
-                  </label>
-                  <div className="relative">
-                    <BookOpen className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                    <input
-                      type="text"
-                      placeholder="e.g. Tajweed &amp; Hifz, or FSc Physics &amp; Mathematics"
-                      value={signUpSubject}
-                      onChange={(e) => setSignUpSubject(e.target.value)}
-                      className="w-full pl-10 pr-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
-                    />
-                  </div>
-                </div>
-              )}
-
               {/* Password */}
               <div>
                 <label className="text-xs font-bold text-stone-800 block mb-1">
@@ -556,7 +471,7 @@ function LoginContent() {
                   <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
                   <span>100% Privacy Guarantee</span>
                 </p>
-                Camera-off by default in WebRTC classes. Your phone number is encrypted and protected.
+                Camera-off by default in WebRTC classes. Your learning and account data are encrypted and protected.
               </div>
 
               {/* Submit Sign Up Button */}

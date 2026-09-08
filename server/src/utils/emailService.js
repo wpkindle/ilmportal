@@ -55,14 +55,22 @@ initTransporter();
 
 const getClientBaseUrl = () => process.env.CLIENT_URL || 'https://ilmportal.vercel.app';
 
+// Helper to get formatted from address
+const getFromAddress = () => {
+  const fromEmail = process.env.BREVO_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
+  return `"IlmiDunya Pakistan" <${fromEmail}>`;
+};
+
 // HTTP REST API Email Dispatch (Port 443 / HTTPS - NEVER blocked by cloud firewalls)
 const sendViaHttpApi = async ({ to, subject, html, text }) => {
   let lastError = null;
 
-  // 1. Brevo HTTP API (https://brevo.com - Sends to ANY recipient without domain verification)
+  // 1. Brevo HTTP API (https://brevo.com - Sends to ANY recipient)
   if (process.env.BREVO_API_KEY) {
-    try {
-      const fromEmail = process.env.BREVO_FROM || 'abdulkhaliqwebdeveloper@gmail.com';
+    const primaryFrom = process.env.BREVO_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
+    const fallbackFrom = process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com';
+
+    const attemptBrevo = async (senderEmail) => {
       const res = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
         headers: {
@@ -70,20 +78,34 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          sender: { name: 'IlmiDunya Pakistan', email: fromEmail },
+          sender: { name: 'IlmiDunya Pakistan', email: senderEmail },
           to: [{ email: to }],
+          replyTo: { name: 'IlmiDunya Support', email: 'info@ilmidunya.com' },
           subject,
           htmlContent: html,
           textContent: text || html.replace(/<[^>]*>?/gm, '')
         })
       });
       const data = await res.json();
-      if (res.ok) {
-        console.log(`📧 [LIVE EMAIL SENT VIA BREVO HTTP API] MessageId: ${data.messageId} to ${to}`);
-        return { success: true, messageId: data.messageId, provider: 'brevo', response: '250 OK via Brevo' };
+      return { ok: res.ok, status: res.status, data };
+    };
+
+    try {
+      // Attempt 1: Send from official custom domain address (info@ilmidunya.com)
+      let brevoResult = await attemptBrevo(primaryFrom);
+
+      // Attempt 2: If custom domain not yet verified in Brevo account, fallback to account owner email to guarantee delivery
+      if (!brevoResult.ok && primaryFrom !== fallbackFrom) {
+        console.warn(`⚠️ [BREVO SENDER] Attempt with ${primaryFrom} returned ${brevoResult.status} (${brevoResult.data?.message || 'Sender not authorized'}). Retrying with fallback ${fallbackFrom}...`);
+        brevoResult = await attemptBrevo(fallbackFrom);
+      }
+
+      if (brevoResult.ok) {
+        console.log(`📧 [LIVE EMAIL SENT VIA BREVO HTTP API] MessageId: ${brevoResult.data.messageId} to ${to}`);
+        return { success: true, messageId: brevoResult.data.messageId, provider: 'brevo', response: '250 OK via Brevo' };
       } else {
-        console.error('Brevo HTTP API error:', data);
-        lastError = { success: false, error: data.message || 'Brevo error', provider: 'brevo' };
+        console.error('Brevo HTTP API error:', brevoResult.data);
+        lastError = { success: false, error: brevoResult.data?.message || 'Brevo error', provider: 'brevo' };
       }
     } catch (err) {
       console.error('Brevo fetch error:', err.message);
@@ -94,7 +116,7 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
   // 2. Resend HTTP API (https://resend.com)
   if (process.env.RESEND_API_KEY) {
     try {
-      const fromAddr = process.env.RESEND_FROM || 'IlmiDunya <onboarding@resend.dev>';
+      const fromAddr = process.env.RESEND_FROM || `IlmiDunya <${process.env.SMTP_FROM || 'info@ilmidunya.com'}>`;
       const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -104,6 +126,7 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
         body: JSON.stringify({
           from: fromAddr,
           to: Array.isArray(to) ? to : [to],
+          reply_to: 'info@ilmidunya.com',
           subject,
           html,
           text: text || html.replace(/<[^>]*>?/gm, '')
@@ -134,7 +157,7 @@ const sendEmail = async ({ to, subject, html, text }) => {
 
   try {
     if (transporter) {
-      const fromAddress = `"IlmiDunya Pakistan" <${process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com'}>`;
+      const fromAddress = getFromAddress();
       const info = await transporter.sendMail({
         from: fromAddress,
         to,
@@ -175,9 +198,9 @@ const getTransporter = (port = 587) => {
       port: customPort,
       secure: customPort === 465,
       auth: { user: smtpUser, pass: smtpPass },
-      connectionTimeout: 10000,
-      greetingTimeout: 8000,
-      socketTimeout: 12000,
+      connectionTimeout: 4000,
+      greetingTimeout: 3000,
+      socketTimeout: 5000,
       tls: { rejectUnauthorized: false }
     });
   }
@@ -194,14 +217,23 @@ const getTransporter = (port = 587) => {
     tls: {
       rejectUnauthorized: false
     },
-    connectionTimeout: 10000,
-    greetingTimeout: 8000,
-    socketTimeout: 12000
+    connectionTimeout: 4000,
+    greetingTimeout: 3000,
+    socketTimeout: 5000
   });
 };
 
 const sendEmailDetailed = async ({ to, subject, html, text, replyTo }) => {
-  const fromAddress = `"IlmiDunya Pakistan" <${process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com'}>`;
+  // 1. High Priority: HTTP REST API (Brevo / Resend) - instant, never blocked by cloud firewalls
+  if (process.env.BREVO_API_KEY || process.env.RESEND_API_KEY) {
+    const httpResult = await sendViaHttpApi({ to, subject, html, text });
+    if (httpResult && httpResult.success) {
+      return httpResult;
+    }
+    console.warn('⚠️ [EMAIL SERVICE] HTTP API dispatch failed, attempting SMTP fallback...');
+  }
+
+  const fromAddress = getFromAddress();
   const mailPayload = {
     from: fromAddress,
     to,
@@ -209,11 +241,12 @@ const sendEmailDetailed = async ({ to, subject, html, text, replyTo }) => {
     text: text || html.replace(/<[^>]*>?/gm, ''),
     html
   };
-  if (replyTo) {
-    mailPayload.replyTo = replyTo;
+  const replyToAddress = replyTo || process.env.BREVO_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
+  if (replyToAddress) {
+    mailPayload.replyTo = replyToAddress;
   }
 
-  // 1. Direct Gmail SMTP Port 587 (Authentic DKIM signed by Google, delivers straight to Primary Inbox)
+  // 2. Direct Gmail SMTP Port 587
   try {
     const t587 = getTransporter(587);
     const info587 = await t587.sendMail(mailPayload);
@@ -227,7 +260,7 @@ const sendEmailDetailed = async ({ to, subject, html, text, replyTo }) => {
   } catch (err587) {
     console.warn(`⚠️ [EMAIL SERVICE] Port 587 failed (${err587.message}). Trying fallback Port 465 SSL...`);
 
-    // 2. Direct Gmail SMTP Port 465 (SSL)
+    // 3. Direct Gmail SMTP Port 465 (SSL)
     try {
       const t465 = getTransporter(465);
       const info465 = await t465.sendMail(mailPayload);
@@ -239,9 +272,9 @@ const sendEmailDetailed = async ({ to, subject, html, text, replyTo }) => {
       console.log(`======================================================\n`);
       return { success: true, messageId: info465.messageId, response: info465.response, to, provider: 'gmail-port-465' };
     } catch (err465) {
-      console.warn(`⚠️ [EMAIL SERVICE] Both Port 587 and 465 failed. Trying HTTP API relay fallback...`);
+      console.warn(`⚠️ [EMAIL SERVICE] Both Port 587 and 465 failed.`);
 
-      // 3. Fallback to HTTP API (Brevo/Resend) if cloud blocks SMTP
+      // 4. Fallback to HTTP API if not attempted yet
       const httpResult = await sendViaHttpApi({ to, subject, html, text });
       if (httpResult && httpResult.success) {
         return httpResult;

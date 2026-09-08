@@ -224,6 +224,56 @@ export default function LiveSupportWidget() {
     }
   }, [isOpen, messages]);
 
+  // Lock body scroll on mobile and listen for Escape key when chat is open
+  useEffect(() => {
+    if (typeof document === 'undefined') return;
+    if (isOpen) {
+      document.body.classList.add('chat-widget-open');
+    } else {
+      document.body.classList.remove('chat-widget-open');
+    }
+
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape' && isOpen) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      document.body.classList.remove('chat-widget-open');
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [isOpen]);
+
+  // Dynamic visual viewport tracking for mobile virtual keyboards (iOS Safari & Android Chrome)
+  const [viewportHeight, setViewportHeight] = useState(null);
+  const [viewportOffsetTop, setViewportOffsetTop] = useState(0);
+
+  useEffect(() => {
+    if (!isOpen || typeof window === 'undefined') return;
+
+    const handleViewportChange = () => {
+      if (window.visualViewport) {
+        setViewportHeight(window.visualViewport.height);
+        setViewportOffsetTop(window.visualViewport.offsetTop);
+      }
+    };
+
+    if (window.visualViewport) {
+      window.visualViewport.addEventListener('resize', handleViewportChange);
+      window.visualViewport.addEventListener('scroll', handleViewportChange);
+      handleViewportChange();
+    }
+
+    return () => {
+      if (window.visualViewport) {
+        window.visualViewport.removeEventListener('resize', handleViewportChange);
+        window.visualViewport.removeEventListener('scroll', handleViewportChange);
+      }
+    };
+  }, [isOpen]);
+
   // 4. Socket listeners for real-time live chat with Admin
   useEffect(() => {
     if (!socket || !sessionId) return;
@@ -676,7 +726,7 @@ export default function LiveSupportWidget() {
   return (
     <>
       {/* 1. FLOATING BOTTOM-RIGHT SUPPORT TRIGGER BUTTON */}
-      <div id="ai-chatbot-widget-trigger" className="fixed bottom-20 right-4 sm:bottom-20 sm:right-6 md:bottom-6 md:right-6 z-[9998] print:hidden transition-opacity duration-200">
+      <div id="ai-chatbot-widget-trigger" className={`fixed bottom-20 right-4 sm:bottom-20 sm:right-6 md:bottom-6 md:right-6 z-[9998] print:hidden transition-opacity duration-200 ${isOpen ? 'hidden' : 'block'}`}>
         <button
           onClick={handleToggleWidget}
           className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-[#b85d34] to-[#d4a359] text-white shadow-[0_8px_24px_rgba(184,93,52,0.35)] hover:shadow-[0_12px_28px_rgba(184,93,52,0.45)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border-2 border-white"
@@ -717,14 +767,20 @@ export default function LiveSupportWidget() {
 
       {/* 2. SUPPORT CHAT PANEL (Full-Screen on Mobile, Floating Drawer on Desktop) */}
       {isOpen && (
-        <div className="fixed inset-0 sm:inset-auto sm:bottom-20 sm:right-6 z-[9999] w-full sm:w-[450px] h-[100dvh] sm:h-[640px] sm:max-h-[85vh] flex flex-col rounded-none sm:rounded-3xl bg-white border-0 sm:border-2 border-[#d4a359]/60 shadow-[0_20px_50px_rgba(12,34,23,0.2)] overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-label="IlmiDunya Live Support Helpdesk"
+          style={viewportHeight && typeof window !== 'undefined' && window.innerWidth < 640 ? { height: `${viewportHeight}px`, top: `${viewportOffsetTop}px` } : undefined}
+          className="fixed inset-0 sm:inset-auto sm:bottom-20 sm:right-6 z-[99999] w-full sm:w-[450px] h-[100dvh] sm:h-[640px] sm:max-h-[85vh] flex flex-col rounded-none sm:rounded-3xl bg-white border-0 sm:border-2 border-[#d4a359]/60 shadow-[0_20px_50px_rgba(12,34,23,0.2)] overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        >
           
           {/* Header */}
-          <div className="px-4 py-3 sm:py-3.5 bg-[#faf8f5] border-b border-[#ebe3d3] flex items-center justify-between shrink-0">
-            <div className="flex items-center gap-2.5 min-w-0">
+          <div className="pt-[max(0.75rem,env(safe-area-inset-top))] px-3.5 sm:px-4 pb-2.5 sm:pb-3.5 bg-[#faf8f5] border-b border-[#ebe3d3] flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-2 sm:gap-2.5 min-w-0">
               <button
                 onClick={() => setIsOpen(false)}
-                className="sm:hidden p-1.5 -ml-1 text-stone-400 hover:text-[#0c2217] cursor-pointer"
+                className="sm:hidden p-2 -ml-1 text-stone-600 hover:text-[#0c2217] active:scale-95 transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center rounded-xl hover:bg-stone-200/50"
                 aria-label="Back"
               >
                 <ArrowLeft className="w-5 h-5" />
@@ -764,7 +820,7 @@ export default function LiveSupportWidget() {
               <button
                 type="button"
                 onClick={handleDeleteChat}
-                className="p-1.5 rounded-lg text-stone-400 hover:text-rose-600 hover:bg-rose-50 transition-colors cursor-pointer"
+                className="p-2 rounded-xl text-stone-400 hover:text-rose-600 hover:bg-rose-50 active:scale-95 transition-all cursor-pointer min-w-[38px] min-h-[38px] flex items-center justify-center"
                 title="Delete Chat History"
                 aria-label="Delete Chat History"
               >
@@ -773,7 +829,7 @@ export default function LiveSupportWidget() {
 
               <button
                 onClick={() => setIsOpen(false)}
-                className="hidden sm:flex p-1.5 rounded-lg text-stone-400 hover:text-[#0c2217] hover:bg-stone-100 transition-colors cursor-pointer"
+                className="hidden sm:flex p-2 rounded-xl text-stone-400 hover:text-[#0c2217] hover:bg-stone-100 active:scale-95 transition-all cursor-pointer min-w-[38px] min-h-[38px] items-center justify-center"
                 title="Minimize chat"
                 aria-label="Minimize chat"
               >
@@ -781,7 +837,7 @@ export default function LiveSupportWidget() {
               </button>
               <button
                 onClick={() => setIsOpen(false)}
-                className="sm:hidden p-1.5 rounded-lg text-stone-400 hover:text-[#0c2217] hover:bg-stone-100 transition-colors cursor-pointer"
+                className="sm:hidden p-2 rounded-xl text-stone-600 hover:text-[#0c2217] hover:bg-stone-200/50 active:scale-95 transition-all cursor-pointer min-w-[44px] min-h-[44px] flex items-center justify-center"
                 title="Close chat"
                 aria-label="Close chat"
               >
@@ -831,7 +887,7 @@ export default function LiveSupportWidget() {
 
           {/* OFFLINE EMAIL INQUIRY FORM VIEW (Light Theme) */}
           {isOfflineView ? (
-            <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#faf8f5]">
+            <div className="flex-1 overflow-y-auto p-4 space-y-3.5 bg-[#faf8f5] pb-[max(2rem,env(safe-area-inset-bottom))]">
               <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs space-y-1 shadow-2xs">
                 <div className="flex items-center gap-1.5 font-bold text-amber-900">
                   <Mail className="w-4 h-4 text-amber-700" />
@@ -883,7 +939,7 @@ export default function LiveSupportWidget() {
                       value={offlineEmail}
                       onChange={(e) => setOfflineEmail(e.target.value)}
                       placeholder="e.g. yourname@example.com"
-                      className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-[#d4a359] shadow-2xs"
+                      className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-base sm:text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-[#d4a359] shadow-2xs"
                     />
                   </div>
 
@@ -896,7 +952,7 @@ export default function LiveSupportWidget() {
                       value={offlineName}
                       onChange={(e) => setOfflineName(e.target.value)}
                       placeholder="e.g. Muhammad / Fatima"
-                      className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-[#d4a359] shadow-2xs"
+                      className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-base sm:text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-[#d4a359] shadow-2xs"
                     />
                   </div>
 
@@ -910,7 +966,7 @@ export default function LiveSupportWidget() {
                       value={offlineMessage}
                       onChange={(e) => setOfflineMessage(e.target.value)}
                       placeholder="Describe your inquiry (e.g. course timings, tutor matching, fee verification)..."
-                      className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-[#d4a359] resize-none shadow-2xs"
+                      className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-base sm:text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-[#d4a359] resize-none shadow-2xs"
                     />
                   </div>
 
@@ -981,7 +1037,7 @@ export default function LiveSupportWidget() {
           ) : (
             <>
               {/* Messages Scroll Area (Light Theme) */}
-              <div className="flex-1 min-h-0 overflow-y-auto p-3.5 sm:p-4 space-y-3 bg-[#fcfdfc] scrollbar-thin">
+              <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-3.5 sm:p-4 space-y-3 bg-[#fcfdfc] scrollbar-thin">
                 {messages.map((m) => {
                   const isUser = m.sender === 'user';
                   const isSystem = m.sender === 'system';
@@ -1125,7 +1181,7 @@ export default function LiveSupportWidget() {
               </div>
 
               {/* Input & Send Footer (Light Theme) */}
-              <div className="p-3 bg-[#faf8f5] border-t border-[#ebe3d3] shrink-0 space-y-2">
+              <div className="p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-[#faf8f5] border-t border-[#ebe3d3] shrink-0 space-y-2">
                 {/* File Attachment Chip before sending */}
                 {selectedFile && (
                   <div className="p-2 bg-white border border-[#d4a359]/40 rounded-xl flex items-center justify-between gap-2 shadow-2xs">
@@ -1169,7 +1225,7 @@ export default function LiveSupportWidget() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="p-2 rounded-xl text-stone-400 hover:text-[#0c2217] hover:bg-stone-200/50 transition-colors cursor-pointer shrink-0"
+                    className="p-2 min-w-[40px] min-h-[40px] flex items-center justify-center rounded-xl text-stone-400 hover:text-[#0c2217] hover:bg-stone-200/50 active:scale-95 transition-colors cursor-pointer shrink-0"
                     title="Attach file (PNG, JPG, JPEG, PDF only)"
                   >
                     <Paperclip className="w-4 h-4" />
@@ -1181,14 +1237,14 @@ export default function LiveSupportWidget() {
                     value={inputValue}
                     onChange={handleInputChange}
                     placeholder={selectedFile ? 'Add caption (optional)...' : 'Type your message here...'}
-                    className="flex-1 min-w-0 bg-white border border-stone-300 rounded-xl px-3.5 py-2 text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-[#d4a359] transition-colors shadow-2xs"
+                    className="flex-1 min-w-0 bg-white border border-stone-300 rounded-xl px-3.5 py-2 text-base sm:text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-[#d4a359] transition-colors shadow-2xs"
                     disabled={isSending || uploadingFile}
                   />
 
                   <button
                     type="submit"
                     disabled={isSending || uploadingFile || (!inputValue.trim() && !selectedFile)}
-                    className="p-2 rounded-xl bg-gradient-to-r from-[#ba4c18] to-[#963b10] hover:scale-105 disabled:opacity-40 disabled:hover:scale-100 text-white transition-all cursor-pointer shrink-0 shadow-xs"
+                    className="p-2 min-w-[42px] min-h-[42px] flex items-center justify-center rounded-xl bg-gradient-to-r from-[#ba4c18] to-[#963b10] hover:scale-105 active:scale-95 disabled:opacity-40 disabled:hover:scale-100 text-white transition-all cursor-pointer shrink-0 shadow-xs"
                     aria-label="Send message"
                   >
                     {uploadingFile ? (

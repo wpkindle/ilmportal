@@ -39,12 +39,19 @@ export const SocketProvider = ({ children }) => {
     userRef.current = user;
   }, [user]);
 
-  // Register user whenever user identity resolves OR socket reconnects
+  // Register user whenever user identity resolves OR cleanly unregister on logout
   useEffect(() => {
-    if (!socketRef.current || !user) return;
-    const uId = (user._id || user.id)?.toString();
-    if (uId && socketRef.current.connected) {
-      socketRef.current.emit('register-user', uId);
+    if (!socketRef.current) return;
+    if (user) {
+      const uId = (user._id || user.id)?.toString();
+      if (uId && socketRef.current.connected) {
+        socketRef.current.emit('register-user', uId);
+      }
+    } else {
+      // User logged out or is unauthenticated guest — cleanly unregister from all rooms
+      if (socketRef.current.connected) {
+        socketRef.current.emit('unregister-user');
+      }
     }
   }, [user, isAuthenticated]);
 

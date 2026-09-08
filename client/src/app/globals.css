@@ -461,4 +461,18 @@ body.mobile-menu-open #support-platform-pill {
   visibility: hidden !important;
 }
 
+/* Live Chat Widget Open State: Lock body scroll & hide floating widgets / bottom navigation */
+body.chat-widget-open {
+  overflow: hidden !important;
+  touch-action: none;
+}
+
+body.chat-widget-open #mobile-bottom-nav,
+body.chat-widget-open #support-platform-pill {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 

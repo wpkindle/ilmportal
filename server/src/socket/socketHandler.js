@@ -25,14 +25,13 @@ const initSocket = (io) => {
         onlineUsers.get(idStr).add(socket.id);
         console.log(`👤 User registered on socket: ${idStr} (${socket.id}) - total connections: ${onlineUsers.get(idStr).size}`);
 
-        // If user is admin, join the dedicated 'admins' room for live support & safety alerts
+        // If user is admin, join the dedicated 'admins' room for administrative alerts
         try {
           const registeredUser = await User.findById(idStr).select('role');
           if (registeredUser && registeredUser.role === 'admin') {
             socket.join('admins');
             socket.isAdmin = true;
             console.log(`🛡️ Admin ${idStr} joined socket room 'admins'`);
-            io.emit('admin-online-status', { isOnline: true });
           }
         } catch (adminCheckErr) {
           console.warn('Admin check note on socket registration:', adminCheckErr.message);
@@ -90,6 +89,32 @@ const initSocket = (io) => {
           console.error('Error syncing undelivered messages on register-user:', err);
         }
       }
+    });
+
+    // Unregister user socket upon explicit logout
+    socket.on('unregister-user', () => {
+      const uId = socket.userId;
+      if (uId && onlineUsers.has(uId)) {
+        const userSockets = onlineUsers.get(uId);
+        userSockets.delete(socket.id);
+        if (userSockets.size === 0) {
+          onlineUsers.delete(uId);
+          io.emit('user-online-status', { userId: uId, status: 'offline' });
+          console.log(`👤 User explicitly unregistered & went offline: ${uId}`);
+        }
+      }
+      if (uId) {
+        socket.leave(`user_${uId}`);
+      }
+      socket.leave('admins');
+      socket.leave('support-desk-agents');
+      socket.userId = null;
+      socket.isAdmin = false;
+      socket.isSupportDuty = false;
+
+      const agentRoom = io.sockets.adapter.rooms.get('support-desk-agents');
+      const isOnline = Boolean(agentRoom && agentRoom.size > 0);
+      io.emit('admin-online-status', { isOnline, onlineAdmins: agentRoom ? agentRoom.size : 0 });
     });
 
     // Query online status on-demand for instant UI precision
@@ -442,15 +467,39 @@ const initSocket = (io) => {
       }
     });
 
-    // Check if any admin is currently online in 'admins' room
+    // Check if any support agent is currently online on the support desk
     socket.on('check-admin-online-status', (callback) => {
-      const adminRoom = io.sockets.adapter.rooms.get('admins');
-      const isOnline = Boolean(adminRoom && adminRoom.size > 0);
+      const agentRoom = io.sockets.adapter.rooms.get('support-desk-agents');
+      const isOnline = Boolean(agentRoom && agentRoom.size > 0);
+      const onlineAdmins = agentRoom ? agentRoom.size : 0;
       if (typeof callback === 'function') {
-        callback({ isOnline });
+        callback({ isOnline, onlineAdmins });
       } else {
-        socket.emit('admin-online-status', { isOnline });
+        socket.emit('admin-online-status', { isOnline, onlineAdmins });
       }
+    });
+
+    // Admin enters Support Desk and toggles Live Support Duty ON
+    socket.on('admin-support-duty-on', () => {
+      if (socket.isAdmin || socket.userId) {
+        socket.join('support-desk-agents');
+        socket.isSupportDuty = true;
+        const agentRoom = io.sockets.adapter.rooms.get('support-desk-agents');
+        const count = agentRoom ? agentRoom.size : 1;
+        console.log(`🎧 Support agent ${socket.userId || socket.id} is now ON DUTY (active: ${count})`);
+        io.emit('admin-online-status', { isOnline: true, onlineAdmins: count });
+      }
+    });
+
+    // Admin toggles Live Support Duty OFF or leaves Support Desk
+    socket.on('admin-support-duty-off', () => {
+      socket.leave('support-desk-agents');
+      socket.isSupportDuty = false;
+      const agentRoom = io.sockets.adapter.rooms.get('support-desk-agents');
+      const isOnline = Boolean(agentRoom && agentRoom.size > 0);
+      const count = agentRoom ? agentRoom.size : 0;
+      console.log(`🎧 Support agent ${socket.userId || socket.id} is now OFF DUTY (remaining: ${count})`);
+      io.emit('admin-online-status', { isOnline, onlineAdmins: count });
     });
 
     socket.on('send-support-message', async (data) => {
@@ -656,13 +705,14 @@ const initSocket = (io) => {
         }
       }
 
-      // Check if admin went offline
-      if (socket.isAdmin) {
+      // Check if support duty agent went offline
+      if (socket.isSupportDuty || socket.isAdmin) {
         setTimeout(() => {
-          const adminRoom = io.sockets.adapter.rooms.get('admins');
-          const isOnline = Boolean(adminRoom && adminRoom.size > 0);
-          io.emit('admin-online-status', { isOnline });
-        }, 1000);
+          const agentRoom = io.sockets.adapter.rooms.get('support-desk-agents');
+          const isOnline = Boolean(agentRoom && agentRoom.size > 0);
+          const onlineAdmins = agentRoom ? agentRoom.size : 0;
+          io.emit('admin-online-status', { isOnline, onlineAdmins });
+        }, 500);
       }
 
       if (socket.roomId && roomParticipants.has(socket.roomId)) {

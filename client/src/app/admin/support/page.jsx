@@ -104,6 +104,22 @@ export default function AdminSupportDeskPage() {
   // Search & Filter in Logs
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Live Support Duty Toggle (Online / Away)
+  const [isSupportDutyOnline, setIsSupportDutyOnline] = useState(true);
+
+  // Manage Support Desk Duty presence with Socket
+  useEffect(() => {
+    if (!socket) return;
+    if (isSupportDutyOnline) {
+      socket.emit('admin-support-duty-on');
+    } else {
+      socket.emit('admin-support-duty-off');
+    }
+    return () => {
+      socket.emit('admin-support-duty-off');
+    };
+  }, [socket, isSupportDutyOnline]);
+
   // Audio Chime on New Human Request
   const playAlertChime = () => {
     if (!soundEnabled || typeof window === 'undefined') return;
@@ -512,8 +528,33 @@ export default function AdminSupportDeskPage() {
               </div>
             </div>
 
-            {/* Mode Switcher Tabs */}
-            <div className="flex items-center bg-slate-950 p-1.5 rounded-2xl border border-slate-800 self-stretch sm:self-auto overflow-x-auto">
+            <div className="flex flex-wrap items-center gap-2.5 self-stretch sm:self-auto">
+              {/* Live Support Duty Switch */}
+              <button
+                type="button"
+                onClick={() => setIsSupportDutyOnline((prev) => !prev)}
+                className={`px-3.5 py-1.5 rounded-2xl text-xs font-black border flex items-center gap-2 transition-all cursor-pointer shadow-md ${
+                  isSupportDutyOnline
+                    ? 'bg-emerald-950/70 border-emerald-500/80 text-emerald-300 hover:bg-emerald-900/60'
+                    : 'bg-amber-950/70 border-amber-600/70 text-amber-300 hover:bg-amber-900/60'
+                }`}
+                title={isSupportDutyOnline ? 'You are Online on Live Desk. Click to switch to Away.' : 'You are Away. Click to go Online on Live Desk.'}
+              >
+                <span className="relative flex h-2.5 w-2.5 shrink-0">
+                  {isSupportDutyOnline ? (
+                    <>
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500" />
+                    </>
+                  ) : (
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-amber-500" />
+                  )}
+                </span>
+                <span>{isSupportDutyOnline ? 'Live Desk: Online' : 'Live Desk: Away'}</span>
+              </button>
+
+              {/* Mode Switcher Tabs */}
+              <div className="flex items-center bg-slate-950 p-1.5 rounded-2xl border border-slate-800 overflow-x-auto">
               <button
                 onClick={() => setActiveMode('inbox')}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-2 cursor-pointer ${
@@ -568,6 +609,7 @@ export default function AdminSupportDeskPage() {
               </button>
             </div>
           </div>
+        </div>
 
           {/* ========================================================= */}
           {/* MODE 1: LIVE SUPPORT INBOX & CHAT TAKEOVER */}

@@ -439,7 +439,7 @@ exports.getAdminOnlineStatus = async (req, res) => {
     let isOnline = false;
     let count = 0;
     if (io) {
-      const room = io.sockets.adapter.rooms.get('admins');
+      const room = io.sockets.adapter.rooms.get('support-desk-agents');
       if (room && room.size > 0) {
         isOnline = true;
         count = room.size;

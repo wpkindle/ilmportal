@@ -217,7 +217,7 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
           <h4
             key={`h4-${keyCounter++}`}
             id={headingId}
-            className={`text-xs sm:text-sm font-extrabold uppercase tracking-wider mt-7 sm:mt-8 mb-3 leading-relaxed scroll-mt-20 ${
+            className={`text-xs sm:text-sm font-extrabold uppercase tracking-wider pt-4 sm:pt-5 pb-1 leading-relaxed scroll-mt-20 ${
               isDark ? 'text-amber-300' : 'text-[#b85d34]'
             }`}
           >
@@ -233,7 +233,7 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
           <h3
             key={`h3-${keyCounter++}`}
             id={headingId}
-            className={`text-base sm:text-lg lg:text-xl font-bold font-serif mt-8 sm:mt-10 mb-3.5 leading-[1.4] tracking-tight scroll-mt-20 ${
+            className={`text-base sm:text-lg lg:text-xl font-bold font-serif pt-6 sm:pt-8 pb-1.5 leading-[1.4] tracking-tight scroll-mt-20 ${
               isDark ? 'text-slate-100' : 'text-[#0c2217]'
             }`}
           >
@@ -249,7 +249,7 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
           <h2
             key={`h2-${keyCounter++}`}
             id={headingId}
-            className={`text-xl sm:text-2xl lg:text-[26px] font-black font-serif mt-10 sm:mt-14 mb-4 sm:mb-5 leading-[1.35] tracking-tight scroll-mt-20 border-b pb-3 ${
+            className={`text-xl sm:text-2xl lg:text-[26px] font-black font-serif pt-8 sm:pt-12 pb-3.5 leading-[1.35] tracking-tight scroll-mt-20 border-b ${
               isDark ? 'text-white border-slate-800' : 'text-[#0c2217] border-[#ebe3d3]'
             }`}
           >
@@ -333,5 +333,5 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
 
   flushList();
 
-  return <div className="article-body-content space-y-1">{elements}</div>;
+  return <div className="article-body-content space-y-6 sm:space-y-8">{elements}</div>;
 }

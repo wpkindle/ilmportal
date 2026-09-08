@@ -286,42 +286,7 @@ export default async function ArticleDetailPage({ params }) {
           <ArticleFaqAccordion faqs={faqs} />
         )}
 
-        {/* 5. Primary Action Banner */}
-        <div className="bg-gradient-to-r from-[#0c2217] via-[#143928] to-[#0c2217] rounded-3xl border border-[#d4a359]/40 p-6 sm:p-7 shadow-md text-white flex flex-col sm:flex-row items-center justify-between gap-5 text-center sm:text-left">
-          <div className="space-y-1">
-            <div className="text-base sm:text-lg font-bold font-serif text-white tracking-tight">
-              Post your tuition need to compare relevant verified tutors.
-            </div>
-            <div className="text-xs text-[#f5d996]/90 font-medium">
-              Camera-off preference, verified female teachers, and structured monthly progress.
-            </div>
-          </div>
-          <Link
-            href="/tutors"
-            className="px-6 py-3 rounded-xl bg-[#d4a359] hover:bg-[#e0b26c] text-[#0c2217] font-extrabold text-xs sm:text-sm shrink-0 transition-all flex items-center gap-2 shadow-sm group cursor-pointer"
-          >
-            <span>Continue to Tutors</span>
-            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
-          </Link>
-        </div>
-
-        {/* 6. Practical Next Steps / Support Card */}
-        <div className="bg-white rounded-3xl border border-[#ebe3d3] p-5 sm:p-6 shadow-xs text-xs sm:text-sm text-stone-600 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left">
-          <p className="leading-relaxed">
-            Need practical next steps? Read our <Link href="/safety" className="text-[#0c2217] font-bold underline decoration-[#d4a359] hover:text-[#b85d34]">Female Safety Charter</Link>, learn <Link href="/how-it-works" className="text-[#0c2217] font-bold underline decoration-[#d4a359] hover:text-[#b85d34]">How Classes Work</Link>, or contact support.
-          </p>
-          <a
-            href="https://wa.me/923171759093?text=Assalamu%20Alaikum%20I%20have%20a%20question%20regarding%20IlmiDunya"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold hover:bg-emerald-100 transition-colors shrink-0 shadow-2xs"
-          >
-            <span>WhatsApp Help</span>
-            <span>↗</span>
-          </a>
-        </div>
-
-        {/* 7. Related Articles in 2-Column Grid */}
+        {/* 5. Related Articles in 2-Column Grid */}
         {relatedArticles.length > 0 && (
           <section aria-labelledby="related-articles-heading" className="space-y-4 pt-2">
             <div className="flex items-center justify-between px-1">

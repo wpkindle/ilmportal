@@ -446,3 +446,40 @@
     linear-gradient(180deg, #f6f2e8 0%, #faf3e8 55%, #eae0ce 100%);
 }
 
+/* 9. Editorial Article Typography & Headline Spacing */
+.article-body-content h2 {
+  margin-top: 3.5rem !important;
+  margin-bottom: 1.5rem !important;
+  line-height: 1.35 !important;
+}
+
+.article-body-content h3 {
+  margin-top: 2.5rem !important;
+  margin-bottom: 1.25rem !important;
+  line-height: 1.4 !important;
+}
+
+.article-body-content h4 {
+  margin-top: 2rem !important;
+  margin-bottom: 0.85rem !important;
+  line-height: 1.4 !important;
+}
+
+.article-body-content p {
+  margin-top: 0 !important;
+  margin-bottom: 1.6rem !important;
+  line-height: 1.85 !important;
+}
+
+.article-body-content ul,
+.article-body-content ol {
+  margin-top: 1.25rem !important;
+  margin-bottom: 1.75rem !important;
+}
+
+.article-body-content li {
+  margin-bottom: 0.65rem !important;
+  line-height: 1.8 !important;
+}
+
+

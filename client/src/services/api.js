@@ -126,6 +126,18 @@ export const api = {
     body: JSON.stringify(body)
   }).then(handleResponse),
 
+  requestEmailChange: (body) => fetch(`${API_BASE}/auth/request-email-change`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  verifyEmailChange: (body) => fetch(`${API_BASE}/auth/verify-email-change`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
   deleteAccount: async (body) => {
     // Try POST first for robust proxy compatibility
     try {

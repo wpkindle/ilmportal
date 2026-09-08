@@ -58,6 +58,17 @@ const userSchema = new mongoose.Schema({
   resetPasswordExpires: {
     type: Date
   },
+  pendingEmail: {
+    type: String,
+    lowercase: true,
+    trim: true
+  },
+  pendingEmailOtp: {
+    type: String
+  },
+  pendingEmailOtpExpires: {
+    type: Date
+  },
   avatar: {
     type: String,
     default: ''

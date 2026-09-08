@@ -111,40 +111,40 @@ export default function SafetyReportsSection({ userRole = 'student' }) {
   return (
     <section id="safety-reports" className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden scroll-mt-24 transition-all">
       {/* Header */}
-      <div className="p-5 sm:p-6 border-b border-slate-100 bg-gradient-to-r from-[#0c2217]/5 via-[#d4a359]/5 to-transparent flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-start gap-3.5">
-          <div className="w-12 h-12 rounded-2xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center shrink-0 shadow-xs border border-[#d4a359]/40">
-            <ShieldCheck className="w-6 h-6 text-[#0c2217]" />
+      <div className="p-4 sm:p-6 border-b border-slate-100 bg-gradient-to-r from-[#0c2217]/5 via-[#d4a359]/5 to-transparent flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="flex items-start gap-3 sm:gap-3.5 min-w-0">
+          <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center shrink-0 shadow-xs border border-[#d4a359]/40">
+            <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6 text-[#0c2217]" />
           </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h2 className="text-lg sm:text-xl font-black text-slate-900">
+          <div className="min-w-0">
+            <div className="flex flex-wrap items-center gap-2">
+              <h2 className="text-base sm:text-lg font-black text-slate-900 tracking-tight">
                 Safety Reports &amp; Admin Responses
               </h2>
-              <span className="hidden sm:inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40">
+              <span className="inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 shrink-0">
                 Trust &amp; Safety Portal
               </span>
             </div>
-            <p className="text-xs text-slate-500 mt-0.5">
+            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
               Track live status updates and official administrative resolutions for any reports involving your account.
             </p>
           </div>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 shrink-0">
           <button
             onClick={fetchMyReports}
             disabled={loading}
-            className="p-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-600 transition-colors cursor-pointer text-xs flex items-center gap-1.5 font-bold"
+            className="px-3 py-2 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 transition-colors cursor-pointer text-xs flex items-center gap-1.5 font-bold"
             title="Refresh Reports"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
-            <span className="hidden sm:inline">Refresh</span>
+            <span>Refresh</span>
           </button>
 
           <Link
             href="/safety"
-            className="px-3.5 py-2 rounded-xl bg-[#f0ece1] hover:bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 text-xs font-bold transition-colors flex items-center gap-1.5"
+            className="px-3.5 py-2 rounded-xl bg-[#f0ece1] hover:bg-[#ebe3d3] text-[#0c2217] border border-[#d4a359]/40 text-xs font-bold transition-colors flex items-center gap-1.5"
           >
             <HelpCircle className="w-3.5 h-3.5 text-[#d4a359]" />
             <span>Safety Policy</span>
@@ -153,10 +153,10 @@ export default function SafetyReportsSection({ userRole = 'student' }) {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-slate-100 bg-slate-50/50 px-6 pt-3 gap-6 text-xs font-bold">
+      <div className="flex border-b border-slate-100 bg-slate-50/50 px-4 sm:px-6 pt-3 gap-3 sm:gap-6 text-xs font-bold overflow-x-auto no-scrollbar">
         <button
           onClick={() => setActiveTab('filed')}
-          className={`pb-3 flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
+          className={`pb-3 flex items-center gap-2 border-b-2 transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
             activeTab === 'filed'
               ? 'border-[#0c2217] text-[#0c2217]'
               : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -173,7 +173,7 @@ export default function SafetyReportsSection({ userRole = 'student' }) {
         {reportsReceived.length > 0 && (
           <button
             onClick={() => setActiveTab('received')}
-            className={`pb-3 flex items-center gap-2 border-b-2 transition-colors cursor-pointer ${
+            className={`pb-3 flex items-center gap-2 border-b-2 transition-colors cursor-pointer shrink-0 whitespace-nowrap ${
               activeTab === 'received'
                 ? 'border-[#0c2217] text-[#0c2217]'
                 : 'border-transparent text-slate-500 hover:text-slate-800'
@@ -343,10 +343,10 @@ export default function SafetyReportsSection({ userRole = 'student' }) {
       </div>
 
       {/* Safety Bottom Guarantee */}
-      <div className="px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-2 text-[11px] text-slate-500">
-        <div className="flex items-center gap-1.5">
-          <ShieldAlert className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
-          <span>Need immediate protection or wish to report harassment? Our emergency response team operates 24/7.</span>
+      <div className="px-4 sm:px-6 py-3.5 bg-slate-50 border-t border-slate-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 text-[11px] text-slate-500">
+        <div className="flex items-start sm:items-center gap-1.5 min-w-0">
+          <ShieldAlert className="w-3.5 h-3.5 text-[#d4a359] shrink-0 mt-0.5 sm:mt-0" />
+          <span className="leading-snug">Need immediate protection or wish to report harassment? Our emergency response team operates 24/7.</span>
         </div>
         <Link
           href="/safety"

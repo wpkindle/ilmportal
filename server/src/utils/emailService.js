@@ -1574,10 +1574,92 @@ const sendEarlyTutorNoticeEmail = async ({ to, name }) => {
   });
 };
 
+// ==========================================
+// 15. EMAIL CHANGE OTP VERIFICATION TEMPLATE
+// ==========================================
+const sendEmailChangeOtpEmail = async (to, name, otp) => {
+  const subject = `🔐 Verify Your New Email Address - IlmiDunya Pakistan`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>${subject}</title>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #faf8f5; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;">
+      <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #faf8f5; padding: 24px 12px;">
+        <tr>
+          <td align="center">
+            <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 560px; background-color: #ffffff; border-radius: 20px; border: 1px solid #e6ded1; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+              <tr>
+                <td style="background-color: #0c2217; padding: 28px 24px; text-align: center;">
+                  <h1 style="margin: 0; font-size: 22px; font-weight: 900; color: #ffffff; font-family: Georgia, serif; letter-spacing: 0.5px;">
+                    IlmiDunya <span style="color: #d4a359;">Pakistan</span>
+                  </h1>
+                  <span style="display: inline-block; margin-top: 8px; font-size: 11px; font-weight: 700; color: #d4a359; text-transform: uppercase; letter-spacing: 1px; background: rgba(212,163,89,0.15); padding: 4px 12px; border: 1px solid rgba(212,163,89,0.3); border-radius: 20px;">
+                    Email Verification Security Code
+                  </span>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 32px 28px; color: #1c2826;">
+                  <h2 style="margin: 0 0 14px 0; font-size: 18px; font-weight: 800; color: #0c2217;">
+                    Confirm Your New Email Address
+                  </h2>
+                  <p style="margin: 0 0 18px 0; font-size: 14px; line-height: 1.6; color: #57534e;">
+                    Assalam-o-Alaikum <strong>${name || 'Valued Member'}</strong>,
+                  </p>
+                  <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.6; color: #57534e;">
+                    You recently requested to update your email address on IlmiDunya to <strong>${to}</strong>. To confirm this change and verify ownership of this email, please enter the following 6-digit verification code:
+                  </p>
+                  
+                  <div style="background-color: #faf8f5; border: 1px dashed #d4a359; border-radius: 14px; padding: 20px; text-align: center; margin: 24px 0;">
+                    <span style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #b85d34; margin-bottom: 8px;">
+                      6-Digit Verification Code (OTP)
+                    </span>
+                    <span style="display: block; font-family: 'Courier New', Courier, monospace; font-size: 34px; font-weight: 900; letter-spacing: 8px; color: #0c2217;">
+                      ${otp}
+                    </span>
+                    <span style="display: block; font-size: 11px; color: #78716c; margin-top: 8px;">
+                      This code is valid for 15 minutes.
+                    </span>
+                  </div>
+
+                  <div style="background-color: #fdfbf7; border-left: 3px solid #d4a359; padding: 12px 14px; border-radius: 8px; margin-top: 24px;">
+                    <p style="margin: 0; font-size: 12px; line-height: 1.5; color: #78716c;">
+                      <strong style="color: #0c2217;">Security Notice:</strong> If you did not request to change your email on IlmiDunya, please disregard this message. Your account remains completely secure.
+                    </p>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 20px 28px; background-color: #f5f0e6; border-top: 1px solid #e6ded1; text-align: center; font-size: 11px; color: #78716c;">
+                  IlmiDunya Pakistan &bull; Dedicated to Verified Academic &amp; Quranic Tutoring
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  return sendEmailDetailed({
+    to,
+    subject,
+    html,
+    text: `Your IlmiDunya email change verification code is: ${otp}\n\nThis code will expire in 15 minutes.`
+  });
+};
+
 module.exports = {
   sendEmail,
   sendEmailDetailed,
   sendVerificationOtpEmail,
+  sendEmailChangeOtpEmail,
   sendEarlyTutorRegistrationAdminAlert,
   sendEarlyTutorNoticeEmail,
   sendTutorStatusEmail,

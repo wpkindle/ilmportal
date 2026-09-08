@@ -296,7 +296,7 @@ function StudentProfileContent() {
           </div>
 
           {/* Right Column: Personal Information & Password Forms */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-6 min-w-0">
             
             {/* 1. Personal Information Form */}
             <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-xs space-y-5">

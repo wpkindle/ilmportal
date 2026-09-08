@@ -10,6 +10,8 @@ const {
   getMe,
   updateProfile,
   changePassword,
+  requestEmailChange,
+  verifyEmailChange,
   forgotPassword,
   resetPassword,
   testEmail,
@@ -29,6 +31,8 @@ router.get('/test-email', testEmail);
 router.get('/me', protect, getMe);
 router.put('/update-profile', protect, updateProfile);
 router.put('/change-password', protect, changePassword);
+router.post('/request-email-change', protect, requestEmailChange);
+router.post('/verify-email-change', protect, verifyEmailChange);
 router.delete('/delete-account', protect, deleteMyAccount);
 router.post('/delete-account', protect, deleteMyAccount);
 router.post('/forgot-password', forgotPassword);

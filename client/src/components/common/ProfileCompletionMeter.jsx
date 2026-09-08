@@ -26,7 +26,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       {
         key: 'name',
         label: 'Full Name',
-        weight: 10,
+        weight: 15,
         done: !!user.name?.trim(),
         link: '/tutor/profile#profile-name',
         actionLabel: 'Set Name'
@@ -34,18 +34,10 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       {
         key: 'email',
         label: 'Verified Email',
-        weight: 10,
+        weight: 15,
         done: !!user.isVerified,
         link: `/verify-email?email=${encodeURIComponent(user?.email || '')}&role=tutor`,
         actionLabel: 'Verify Email'
-      },
-      {
-        key: 'phone',
-        label: 'WhatsApp Mobile Number',
-        weight: 10,
-        done: !!user.phone?.trim(),
-        link: '/tutor/profile#profile-phone',
-        actionLabel: 'Add Phone'
       },
       {
         key: 'avatar',
@@ -82,7 +74,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       {
         key: 'bio',
         label: 'Teaching Bio & Headline',
-        weight: 10,
+        weight: 15,
         done: !!tutorProfile?.bio?.trim() && tutorProfile.bio.length > 20 && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmPortal') && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmiDunya'),
         link: '/tutor/profile#profile-bio',
         actionLabel: 'Write Bio'
@@ -90,7 +82,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       {
         key: 'qualifications',
         label: 'Educational Qualifications',
-        weight: 10,
+        weight: 15,
         done: !!tutorProfile?.qualifications?.trim() && tutorProfile.qualifications !== 'Tutor Qualifications',
         link: '/tutor/profile#profile-qualifications',
         actionLabel: 'Add Degrees'

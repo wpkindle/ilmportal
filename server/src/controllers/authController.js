@@ -3,6 +3,7 @@ const TutorProfile = require('../models/TutorProfile');
 const Notification = require('../models/Notification');
 const {
   sendVerificationOtpEmail,
+  sendEmailChangeOtpEmail,
   sendEmailDetailed,
   sendPasswordResetEmail,
   sendEarlyTutorRegistrationAdminAlert
@@ -22,15 +23,14 @@ const calculateProfileCompletion = (user, tutorProfile) => {
 
   if (user.role === 'tutor') {
     const checks = [
-      { key: 'name', label: 'Full Name', weight: 10, done: !!user.name?.trim() },
-      { key: 'email', label: 'Verified Email', weight: 10, done: !!user.isVerified },
-      { key: 'phone', label: 'Mobile Number (WhatsApp)', weight: 10, done: !!user.phone?.trim() },
+      { key: 'name', label: 'Full Name', weight: 15, done: !!user.name?.trim() },
+      { key: 'email', label: 'Verified Email', weight: 15, done: !!user.isVerified },
       { key: 'avatar', label: 'Profile Picture', weight: 15, done: !!user.avatar?.trim() },
       { key: 'age', label: 'Tutor Age', weight: 10, done: !!user.age },
       { key: 'gender', label: 'Gender', weight: 5, done: !!user.gender?.trim() },
       { key: 'city', label: 'City Location', weight: 10, done: !!user.city?.trim() },
-      { key: 'bio', label: 'Teaching Bio', weight: 10, done: !!tutorProfile?.bio?.trim() && tutorProfile.bio.length > 20 && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmPortal') && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmiDunya') },
-      { key: 'qualifications', label: 'Educational Qualifications', weight: 10, done: !!tutorProfile?.qualifications?.trim() && tutorProfile.qualifications !== 'Tutor Qualifications' },
+      { key: 'bio', label: 'Teaching Bio', weight: 15, done: !!tutorProfile?.bio?.trim() && tutorProfile.bio.length > 20 && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmPortal') && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmiDunya') },
+      { key: 'qualifications', label: 'Educational Qualifications', weight: 15, done: !!tutorProfile?.qualifications?.trim() && tutorProfile.qualifications !== 'Tutor Qualifications' },
       { key: 'sanad', label: 'Sanad / Degree Document', weight: 10, done: Array.isArray(tutorProfile?.sanadDocuments) && tutorProfile.sanadDocuments.length > 0 }
     ];
 
@@ -644,14 +644,8 @@ exports.updateProfile = async (req, res) => {
       }
     }
 
-    // If email is changed, check uniqueness
-    if (email && email.toLowerCase().trim() !== user.email) {
-      const emailExists = await User.findOne({ email: email.toLowerCase().trim() });
-      if (emailExists) {
-        return res.status(400).json({ success: false, message: 'Email is already in use by another account' });
-      }
-      user.email = email.toLowerCase().trim();
-    }
+    // Email updates require verified OTP via /api/auth/request-email-change
+    // Ignore unverified direct email payload in general profile update
 
     if (name) user.name = name.trim();
     if (phone !== undefined) user.phone = phone.trim();
@@ -1070,6 +1064,145 @@ exports.registerEarlyTutor = async (req, res) => {
       success: false,
       message: error.message || 'Server error during registration. Please try again.'
     });
+  }
+};
+
+// @desc    Request Email Change (sends 6-digit OTP to new email)
+// @route   POST /api/auth/request-email-change
+// @access  Private
+exports.requestEmailChange = async (req, res) => {
+  try {
+    const { newEmail, currentPassword } = req.body;
+
+    if (!newEmail || typeof newEmail !== 'string') {
+      return res.status(400).json({ success: false, message: 'Please provide a valid new email address.' });
+    }
+
+    const cleanEmail = newEmail.toLowerCase().trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cleanEmail)) {
+      return res.status(400).json({ success: false, message: 'Please enter a valid email format.' });
+    }
+
+    const user = await User.findById(req.user.id).select('+password');
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (cleanEmail === user.email) {
+      return res.status(400).json({ success: false, message: 'New email cannot be the same as your current email.' });
+    }
+
+    // Require current password verification
+    if (user.password) {
+      if (!currentPassword) {
+        return res.status(400).json({ success: false, message: 'Current password is required to request an email change.' });
+      }
+      const isMatch = await user.comparePassword(currentPassword);
+      if (!isMatch) {
+        return res.status(400).json({ success: false, message: 'Current password is incorrect.' });
+      }
+    }
+
+    // Check if new email is already taken by another account
+    const existing = await User.findOne({ email: cleanEmail, _id: { $ne: user._id } });
+    if (existing) {
+      return res.status(400).json({ success: false, message: 'This email address is already registered to another account.' });
+    }
+
+    // Generate 6-digit OTP code (15 minutes validity)
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expires = new Date(Date.now() + 15 * 60 * 1000);
+
+    user.pendingEmail = cleanEmail;
+    user.pendingEmailOtp = otp;
+    user.pendingEmailOtpExpires = expires;
+    await user.save();
+
+    console.log(`🔐 [EMAIL CHANGE OTP] Generated OTP for ${user.email} -> ${cleanEmail}: ${otp}`);
+
+    // Send email with OTP via Resend / SMTP
+    sendEmailChangeOtpEmail(cleanEmail, user.name, otp).catch((err) => {
+      console.error('Email change OTP send error:', err.message);
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: `A 6-digit verification code has been sent to ${cleanEmail}. Please enter it below to confirm.`
+    });
+  } catch (error) {
+    console.error('Request Email Change Error:', error);
+    return res.status(500).json({ success: false, message: error.message || 'Server error requesting email change' });
+  }
+};
+
+// @desc    Verify and Apply New Email Address
+// @route   POST /api/auth/verify-email-change
+// @access  Private
+exports.verifyEmailChange = async (req, res) => {
+  try {
+    const { otp } = req.body;
+
+    if (!otp || !otp.toString().trim()) {
+      return res.status(400).json({ success: false, message: 'Please provide the 6-digit verification code.' });
+    }
+
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (!user.pendingEmail || !user.pendingEmailOtp) {
+      return res.status(400).json({
+        success: false,
+        message: 'No pending email change request found. Please request a change first.'
+      });
+    }
+
+    if (user.pendingEmailOtpExpires && user.pendingEmailOtpExpires < Date.now()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Verification code has expired (15 minute limit). Please request a new code.'
+      });
+    }
+
+    if (user.pendingEmailOtp.trim() !== otp.toString().trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid verification code. Please check your inbox and enter the 6-digit code.'
+      });
+    }
+
+    // Ensure new email wasn't taken in the interim
+    const existing = await User.findOne({ email: user.pendingEmail, _id: { $ne: user._id } });
+    if (existing) {
+      return res.status(400).json({
+        success: false,
+        message: 'This email was registered by another account while waiting. Please use a different email.'
+      });
+    }
+
+    const previousEmail = user.email;
+    user.email = user.pendingEmail;
+    user.isVerified = true;
+    user.pendingEmail = undefined;
+    user.pendingEmailOtp = undefined;
+    user.pendingEmailOtpExpires = undefined;
+    await user.save();
+
+    console.log(`✅ [EMAIL CHANGE] User ${user._id} successfully updated email from ${previousEmail} to ${user.email}`);
+
+    const userObj = user.toObject();
+    delete userObj.password;
+
+    return res.status(200).json({
+      success: true,
+      message: 'Email address updated and verified successfully!',
+      user: userObj
+    });
+  } catch (error) {
+    console.error('Verify Email Change Error:', error);
+    return res.status(500).json({ success: false, message: error.message || 'Server error verifying email change' });
   }
 };
 

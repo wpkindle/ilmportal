@@ -13,15 +13,13 @@ export default function RootLoading() {
 
         {/* Center Brand Emblem Badge */}
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-14 h-14 rounded-2xl bg-[#faf8f5] p-2 shadow-md flex items-center justify-center border border-[#e6ded1]">
-            <img
-              src="/icon.png"
-              alt="IlmiDunya Emblem"
-              width={48}
-              height={48}
-              className="w-full h-full object-contain select-none"
-            />
-          </div>
+          <img
+            src="/icon.svg"
+            alt="IlmiDunya Icon"
+            width={48}
+            height={48}
+            className="w-12 h-12 object-contain select-none drop-shadow-sm"
+          />
         </div>
       </div>
 

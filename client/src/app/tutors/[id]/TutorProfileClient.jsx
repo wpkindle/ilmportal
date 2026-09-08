@@ -35,16 +35,35 @@ import { getTutorAvatar } from '../../../utils/tutorHelpers';
 
 export default function TutorProfileClient({ tutor, reviews = [] }) {
   const router = useRouter();
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isTutor } = useAuth();
+  const [mounted, setMounted] = useState(false);
   const [sanadModalOpen, setSanadModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
+  const [femaleGateModalOpen, setFemaleGateModalOpen] = useState(false);
+  const [chatRequestModalOpen, setChatRequestModalOpen] = useState(false);
   const [authoredCourses, setAuthoredCourses] = useState([]);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const tutorUser = tutor?.user || {};
   const tutorName = tutorUser.name || 'Verified Tutor';
   const tutorArea = tutor?.localArea || tutorUser.area || tutor?.area || '';
   const tutorCity = tutorUser.city || tutor?.city || 'Pakistan';
   const tutorAvatar = getTutorAvatar(tutor || tutorUser, tutorName);
+
+  const isTutorVisitor = isTutor || user?.role === 'tutor' || (typeof window !== 'undefined' && (() => {
+    try {
+      const cached = localStorage.getItem('ilm_user');
+      return cached ? JSON.parse(cached)?.role === 'tutor' : false;
+    } catch (e) {
+      return false;
+    }
+  })());
+
+  const tutorTargetId = tutorUser._id || tutorUser.id || tutor._id;
+  const isOwnProfile = Boolean((user?._id || user?.id) && (user?._id || user?.id) === tutorTargetId);
 
   React.useEffect(() => {
     const fetchCourses = async () => {
@@ -60,9 +79,6 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
     };
     fetchCourses();
   }, [tutorUser._id, tutorUser.id]);
-
-  const [femaleGateModalOpen, setFemaleGateModalOpen] = useState(false);
-  const [chatRequestModalOpen, setChatRequestModalOpen] = useState(false);
 
   const isFemaleTutor = tutor?.gender === 'female' || tutorUser?.gender === 'female';
   const isAlimah =
@@ -80,7 +96,6 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
     (Array.isArray(tutor?.subjects) &&
       tutor.subjects.some((s) => s?.type === 'quran' || /quran|tajweed|hifz|islamic/i.test(s?.name || s?.slug || '')));
 
-  const tutorTargetId = tutorUser._id || tutorUser.id || tutor._id;
   const myId = user?.id || user?._id;
   const conversationId = [myId, tutorTargetId].sort().join('_');
 
@@ -215,7 +230,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                 onClick={() => setSanadModalOpen(true)}
               />
 
-              {user?.role !== 'tutor' && (
+              {mounted && !isTutorVisitor && !isOwnProfile && (
                 <button
                   onClick={handleStartChat}
                   className="px-6 py-3 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-98 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-[#b85d34]/20 transition-all flex items-center justify-center gap-2 cursor-pointer"

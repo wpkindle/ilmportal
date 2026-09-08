@@ -14,7 +14,17 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const storedToken = localStorage.getItem('ilm_token');
-      setToken(storedToken);
+      if (storedToken) setToken(storedToken);
+
+      try {
+        const storedUser = localStorage.getItem('ilm_user');
+        if (storedUser) setUser(JSON.parse(storedUser));
+      } catch (e) {}
+
+      try {
+        const storedProfile = localStorage.getItem('ilm_tutor_profile');
+        if (storedProfile) setTutorProfile(JSON.parse(storedProfile));
+      } catch (e) {}
     }
   }, []);
 
@@ -24,6 +34,10 @@ export const AuthProvider = ({ children }) => {
         setUser(null);
         setTutorProfile(null);
         setLoading(false);
+        try {
+          localStorage.removeItem('ilm_user');
+          localStorage.removeItem('ilm_tutor_profile');
+        } catch (e) {}
         return;
       }
 
@@ -34,8 +48,14 @@ export const AuthProvider = ({ children }) => {
           const data = await api.getMe();
           if (data.success) {
             setUser(data.user);
+            try {
+              localStorage.setItem('ilm_user', JSON.stringify(data.user));
+            } catch (e) {}
             if (data.tutorProfile) {
               setTutorProfile(data.tutorProfile);
+              try {
+                localStorage.setItem('ilm_tutor_profile', JSON.stringify(data.tutorProfile));
+              } catch (e) {}
             }
             setLoading(false);
             return;
@@ -74,9 +94,11 @@ export const AuthProvider = ({ children }) => {
     const data = await api.login({ email, password });
     if (data.success && data.token) {
       localStorage.setItem('ilm_token', data.token);
+      localStorage.setItem('ilm_user', JSON.stringify(data.user));
       setToken(data.token);
       setUser(data.user);
       if (data.tutorProfile) {
+        localStorage.setItem('ilm_tutor_profile', JSON.stringify(data.tutorProfile));
         setTutorProfile(data.tutorProfile);
       }
       return data;
@@ -88,6 +110,7 @@ export const AuthProvider = ({ children }) => {
     const data = await api.register(userData);
     if (data.success && data.token) {
       localStorage.setItem('ilm_token', data.token);
+      localStorage.setItem('ilm_user', JSON.stringify(data.user));
       setToken(data.token);
       setUser(data.user);
       return data;
@@ -103,6 +126,7 @@ export const AuthProvider = ({ children }) => {
         setToken(data.token);
       }
       if (data.user) {
+        localStorage.setItem('ilm_user', JSON.stringify(data.user));
         setUser(data.user);
       }
       return data;
@@ -118,9 +142,11 @@ export const AuthProvider = ({ children }) => {
         setToken(data.token);
       }
       if (data.user) {
+        localStorage.setItem('ilm_user', JSON.stringify(data.user));
         setUser(data.user);
       }
       if (data.tutorProfile) {
+        localStorage.setItem('ilm_tutor_profile', JSON.stringify(data.tutorProfile));
         setTutorProfile(data.tutorProfile);
       }
       return data;
@@ -135,6 +161,8 @@ export const AuthProvider = ({ children }) => {
       }
     } catch (e) {}
     localStorage.removeItem('ilm_token');
+    localStorage.removeItem('ilm_user');
+    localStorage.removeItem('ilm_tutor_profile');
     setToken(null);
     setUser(null);
     setTutorProfile(null);
@@ -148,13 +176,22 @@ export const AuthProvider = ({ children }) => {
   const updateUserProfile = async (updates) => {
     const data = await api.updateProfile(updates);
     if (data.success) {
-      if (data.user) setUser(data.user);
-      if (data.tutorProfile) setTutorProfile(data.tutorProfile);
+      if (data.user) {
+        localStorage.setItem('ilm_user', JSON.stringify(data.user));
+        setUser(data.user);
+      }
+      if (data.tutorProfile) {
+        localStorage.setItem('ilm_tutor_profile', JSON.stringify(data.tutorProfile));
+        setTutorProfile(data.tutorProfile);
+      }
     }
     return data;
   };
 
   const updateTutorProfileState = (updatedProfile) => {
+    if (updatedProfile) {
+      try { localStorage.setItem('ilm_tutor_profile', JSON.stringify(updatedProfile)); } catch (e) {}
+    }
     setTutorProfile(updatedProfile);
   };
 
@@ -162,6 +199,8 @@ export const AuthProvider = ({ children }) => {
     const data = await api.deleteAccount({ password });
     if (data.success) {
       localStorage.removeItem('ilm_token');
+      localStorage.removeItem('ilm_user');
+      localStorage.removeItem('ilm_tutor_profile');
       setToken(null);
       setUser(null);
       setTutorProfile(null);

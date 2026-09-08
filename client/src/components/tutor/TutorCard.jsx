@@ -62,12 +62,17 @@ const CardHoverWrapper = ({ children }) => {
 // Main TutorCard
 // ─────────────────────────────────────────────
 const TutorCard = ({ tutor, tutorProfile }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { user, isAuthenticated, isTutor } = useAuth();
   const router = useRouter();
+  const [mounted, setMounted] = useState(false);
   const [sanadModalOpen, setSanadModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [femaleGateModalOpen, setFemaleGateModalOpen] = useState(false);
   const [chatRequestModalOpen, setChatRequestModalOpen] = useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   const data = tutor || tutorProfile || {};
   const tutorUser = data.user || {};
@@ -75,6 +80,18 @@ const TutorCard = ({ tutor, tutorProfile }) => {
   const tutorCity = tutorUser.city || data.city || 'Pakistan';
   const tutorArea = data.localArea || tutorUser.area || data.area || '';
   const tutorAvatar = getTutorAvatar(data, tutorName);
+
+  const isTutorVisitor = isTutor || user?.role === 'tutor' || (typeof window !== 'undefined' && (() => {
+    try {
+      const cached = localStorage.getItem('ilm_user');
+      return cached ? JSON.parse(cached)?.role === 'tutor' : false;
+    } catch (e) {
+      return false;
+    }
+  })());
+
+  const targetTutorId = tutorUser._id || tutorUser.id || data._id;
+  const isOwnCard = Boolean((user?._id || user?.id) && (user?._id || user?.id) === targetTutorId);
 
   // Resolve teachingModes — could be array or legacy string
   const rawModes = data.teachingModes || (data.teachingMode ? [data.teachingMode] : ['online']);
@@ -294,7 +311,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
               Profile
             </Link>
 
-            {user?.role !== 'tutor' && (
+            {mounted && !isTutorVisitor && !isOwnCard && (
               <motion.button
                 onClick={handleStartChat}
                 whileTap={{ scale: 0.94 }}

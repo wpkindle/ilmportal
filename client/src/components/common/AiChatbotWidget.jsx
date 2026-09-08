@@ -110,6 +110,27 @@ export default function LiveSupportWidget() {
     };
   }, []);
 
+  // Listen for immediate logout to instantly wipe stale presence
+  useEffect(() => {
+    const handleImmediateLogout = () => {
+      setServerAdminOnline(false);
+    };
+    window.addEventListener('ilmidunya:logout', handleImmediateLogout);
+    return () => window.removeEventListener('ilmidunya:logout', handleImmediateLogout);
+  }, []);
+
+  // When user identity changes (e.g. logout or login), re-verify admin online presence
+  useEffect(() => {
+    if (!user) {
+      setServerAdminOnline(false);
+      api.getAdminOnlineStatus().then((res) => {
+        if (res && typeof res.isOnline === 'boolean') {
+          setServerAdminOnline(res.isOnline);
+        }
+      }).catch(() => {});
+    }
+  }, [user]);
+
   // Determine if admin is online:
   // 1. Current logged-in user is an admin
   // 2. OR socket reported admin is online via real-time event or check query

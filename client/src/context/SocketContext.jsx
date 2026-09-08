@@ -38,9 +38,13 @@ export const SocketProvider = ({ children }) => {
 
   // Keep userRef current at all times
   useEffect(() => {
+    const prevUser = userRef.current;
     userRef.current = user;
     if (user?.role === 'admin') {
       setIsAdminOnline(true);
+    } else if (prevUser?.role === 'admin' && !user) {
+      setIsAdminOnline(false);
+      setOnlineAdminsCount(0);
     }
   }, [user]);
 
@@ -57,8 +61,17 @@ export const SocketProvider = ({ children }) => {
       }
     } else {
       // User logged out or is unauthenticated guest — cleanly unregister from all rooms
+      setIsAdminOnline(false);
+      setOnlineAdminsCount(0);
       if (socketRef.current.connected) {
+        socketRef.current.emit('admin-support-duty-off');
         socketRef.current.emit('unregister-user');
+        socketRef.current.emit('check-admin-online-status', (res) => {
+          if (res && typeof res.isOnline === 'boolean') {
+            setIsAdminOnline(res.isOnline);
+            setOnlineAdminsCount(res.onlineAdmins || 0);
+          }
+        });
       }
     }
   }, [user, isAuthenticated]);
@@ -155,17 +168,15 @@ export const SocketProvider = ({ children }) => {
 
     // Instant logout listener
     const handleImmediateLogout = () => {
+      setIsAdminOnline(false);
+      setOnlineAdminsCount(0);
       if (newSocket.connected) {
+        newSocket.emit('admin-support-duty-off');
         newSocket.emit('unregister-user');
-      }
-      if (userRef.current?.role === 'admin') {
         newSocket.emit('check-admin-online-status', (res) => {
           if (res && typeof res.isOnline === 'boolean') {
             setIsAdminOnline(res.isOnline);
             setOnlineAdminsCount(res.onlineAdmins || 0);
-          } else {
-            setIsAdminOnline(false);
-            setOnlineAdminsCount(0);
           }
         });
       }
@@ -181,6 +192,7 @@ export const SocketProvider = ({ children }) => {
 
   const unregisterCurrentSocket = () => {
     if (socketRef.current?.connected) {
+      socketRef.current.emit('admin-support-duty-off');
       socketRef.current.emit('unregister-user');
     }
     setIsAdminOnline(false);

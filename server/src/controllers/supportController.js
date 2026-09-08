@@ -442,8 +442,22 @@ exports.getAdminOnlineStatus = async (req, res) => {
     } else {
       const io = req.app.get('io');
       if (io) {
-        const room = io.sockets.adapter.rooms.get('support-desk-agents') || io.sockets.adapter.rooms.get('admins');
-        count = room ? room.size : 0;
+        const adminRoom = io.sockets.adapter?.rooms?.get('admins');
+        const supportRoom = io.sockets.adapter?.rooms?.get('support-desk-agents');
+        const liveSockets = new Set();
+        if (adminRoom) {
+          for (const sId of adminRoom) {
+            const s = io.sockets.sockets.get(sId);
+            if (s && s.connected) liveSockets.add(sId);
+          }
+        }
+        if (supportRoom) {
+          for (const sId of supportRoom) {
+            const s = io.sockets.sockets.get(sId);
+            if (s && s.connected) liveSockets.add(sId);
+          }
+        }
+        count = liveSockets.size;
       }
     }
     const isOnline = count > 0;

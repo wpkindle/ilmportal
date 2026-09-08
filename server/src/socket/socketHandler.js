@@ -11,15 +11,112 @@ const initSocket = (io, app) => {
   const supportDutyAdmins = new Set(); // admin userIds on live support duty
   const roomParticipants = new Map(); // roomId -> Set of user socketIds
 
+  // Check if a socket ID corresponds to an active, connected socket instance
+  const isSocketAlive = (socketId) => {
+    if (!socketId) return false;
+    const s = io.sockets.sockets.get(socketId);
+    return Boolean(s && s.connected);
+  };
+
+  // Helper to prune dead sockets for a user and return true if they still have at least 1 live socket
+  const pruneAndCheckUserOnline = (userId) => {
+    if (!userId) return false;
+    const idStr = userId.toString();
+    const sockets = onlineUsers.get(idStr);
+    if (!sockets || sockets.size === 0) {
+      onlineUsers.delete(idStr);
+      onlineAdminUserIds.delete(idStr);
+      supportDutyAdmins.delete(idStr);
+      return false;
+    }
+    for (const sId of Array.from(sockets)) {
+      if (!isSocketAlive(sId)) {
+        sockets.delete(sId);
+      }
+    }
+    if (sockets.size === 0) {
+      onlineUsers.delete(idStr);
+      onlineAdminUserIds.delete(idStr);
+      supportDutyAdmins.delete(idStr);
+      return false;
+    }
+    return true;
+  };
+
+  // Get exact verified count of active online admins with live sockets
+  const getVerifiedOnlineAdminCount = () => {
+    // 1. Prune all dead sockets across tracked admins
+    for (const adminId of Array.from(onlineAdminUserIds)) {
+      if (!pruneAndCheckUserOnline(adminId)) {
+        onlineAdminUserIds.delete(adminId);
+      }
+    }
+
+    for (const dutyId of Array.from(supportDutyAdmins)) {
+      if (!pruneAndCheckUserOnline(dutyId)) {
+        supportDutyAdmins.delete(dutyId);
+      }
+    }
+
+    // 2. Cross check active sockets in 'admins' or 'support-desk-agents' rooms
+    const adminRoom = io.sockets.adapter?.rooms?.get('admins');
+    const supportRoom = io.sockets.adapter?.rooms?.get('support-desk-agents');
+
+    const liveAdminSockets = new Set();
+    if (adminRoom) {
+      for (const sId of adminRoom) {
+        const s = io.sockets.sockets.get(sId);
+        if (s && s.connected && (s.isAdmin || s.adminUserId)) {
+          liveAdminSockets.add(sId);
+        }
+      }
+    }
+    if (supportRoom) {
+      for (const sId of supportRoom) {
+        const s = io.sockets.sockets.get(sId);
+        if (s && s.connected && (s.isAdmin || s.adminUserId || (s.userId && onlineAdminUserIds.has(s.userId)))) {
+          liveAdminSockets.add(sId);
+        }
+      }
+    }
+
+    // Set of distinct verified admin users that are actually online with live sockets
+    const activeAdminUsers = new Set();
+    for (const uId of onlineAdminUserIds) {
+      if (onlineUsers.get(uId)?.size > 0) {
+        activeAdminUsers.add(uId);
+      }
+    }
+    for (const uId of supportDutyAdmins) {
+      if (onlineUsers.get(uId)?.size > 0) {
+        activeAdminUsers.add(uId);
+      }
+    }
+
+    // If activeAdminUsers has entries, that is the accurate count.
+    // Otherwise, if any verified admin socket is connected, count is at least 1.
+    const count = activeAdminUsers.size > 0 ? activeAdminUsers.size : (liveAdminSockets.size > 0 ? 1 : 0);
+    return count;
+  };
+
   const broadcastAdminStatus = () => {
-    const isOnline = onlineAdminUserIds.size > 0 || supportDutyAdmins.size > 0;
-    const onlineAdmins = Math.max(onlineAdminUserIds.size, supportDutyAdmins.size);
+    const onlineAdmins = getVerifiedOnlineAdminCount();
+    const isOnline = onlineAdmins > 0;
     io.emit('admin-online-status', { isOnline, onlineAdmins });
   };
 
   if (app) {
-    app.set('getOnlineAdminCount', () => Math.max(onlineAdminUserIds.size, supportDutyAdmins.size));
+    app.set('getOnlineAdminCount', () => getVerifiedOnlineAdminCount());
   }
+
+  // Periodic cleanup interval to eliminate any phantom sockets
+  const presenceCleanupInterval = setInterval(() => {
+    try {
+      getVerifiedOnlineAdminCount();
+    } catch (e) {
+      // ignore
+    }
+  }, 20000);
 
   io.on('connection', (socket) => {
     console.log(`🔌 Socket client connected: ${socket.id}`);
@@ -109,23 +206,30 @@ const initSocket = (io, app) => {
     // Unregister user socket upon explicit logout
     socket.on('unregister-user', () => {
       const uId = socket.userId || socket.adminUserId;
-      if (uId && onlineUsers.has(uId)) {
-        const userSockets = onlineUsers.get(uId);
-        userSockets.delete(socket.id);
-        if (userSockets.size === 0) {
-          onlineUsers.delete(uId);
+      if (uId) {
+        if (onlineUsers.has(uId)) {
+          const userSockets = onlineUsers.get(uId);
+          userSockets.delete(socket.id);
+          // Prune any disconnected sockets for this user
+          for (const sId of Array.from(userSockets)) {
+            if (!isSocketAlive(sId)) {
+              userSockets.delete(sId);
+            }
+          }
+          if (userSockets.size === 0) {
+            onlineUsers.delete(uId);
+            onlineAdminUserIds.delete(uId);
+            supportDutyAdmins.delete(uId);
+            io.emit('user-online-status', { userId: uId, status: 'offline' });
+            console.log(`👤 User explicitly unregistered & went offline: ${uId}`);
+          }
+        } else {
           onlineAdminUserIds.delete(uId);
           supportDutyAdmins.delete(uId);
-          io.emit('user-online-status', { userId: uId, status: 'offline' });
-          console.log(`👤 User explicitly unregistered & went offline: ${uId}`);
         }
-      } else if (uId) {
-        onlineAdminUserIds.delete(uId);
-        supportDutyAdmins.delete(uId);
-      }
-      if (uId) {
         socket.leave(`user_${uId}`);
       }
+
       socket.leave('admins');
       socket.leave('support-desk-agents');
       socket.userId = null;
@@ -488,8 +592,8 @@ const initSocket = (io, app) => {
 
     // Check if any admin or support agent is currently online
     socket.on('check-admin-online-status', (callback) => {
-      const isOnline = onlineAdminUserIds.size > 0 || supportDutyAdmins.size > 0;
-      const onlineAdmins = Math.max(onlineAdminUserIds.size, supportDutyAdmins.size);
+      const onlineAdmins = getVerifiedOnlineAdminCount();
+      const isOnline = onlineAdmins > 0;
       if (typeof callback === 'function') {
         callback({ isOnline, onlineAdmins });
       } else {
@@ -499,13 +603,12 @@ const initSocket = (io, app) => {
 
     // Admin enters Support Desk and toggles Live Support Duty ON
     socket.on('admin-support-duty-on', () => {
-      if (socket.isAdmin || socket.userId) {
+      const uId = socket.userId || socket.adminUserId;
+      if (socket.isAdmin || (uId && onlineAdminUserIds.has(uId))) {
         socket.join('support-desk-agents');
         socket.isSupportDuty = true;
-        if (socket.userId) supportDutyAdmins.add(socket.userId);
-        const count = Math.max(onlineAdminUserIds.size, supportDutyAdmins.size, 1);
-        console.log(`🎧 Support agent ${socket.userId || socket.id} is now ON DUTY (active: ${count})`);
-        io.emit('admin-online-status', { isOnline: true, onlineAdmins: count });
+        if (uId) supportDutyAdmins.add(uId);
+        broadcastAdminStatus();
       }
     });
 
@@ -513,7 +616,8 @@ const initSocket = (io, app) => {
     socket.on('admin-support-duty-off', () => {
       socket.leave('support-desk-agents');
       socket.isSupportDuty = false;
-      if (socket.userId) supportDutyAdmins.delete(socket.userId);
+      const uId = socket.userId || socket.adminUserId;
+      if (uId) supportDutyAdmins.delete(uId);
       broadcastAdminStatus();
     });
 
@@ -709,21 +813,29 @@ const initSocket = (io, app) => {
     // Disconnect handler
     socket.on('disconnect', () => {
       const uId = socket.userId || socket.adminUserId;
-      if (uId && onlineUsers.has(uId)) {
-        const userSockets = onlineUsers.get(uId);
-        userSockets.delete(socket.id);
-        if (userSockets.size === 0) {
-          onlineUsers.delete(uId);
+      if (uId) {
+        if (onlineUsers.has(uId)) {
+          const userSockets = onlineUsers.get(uId);
+          userSockets.delete(socket.id);
+          // Prune any disconnected sockets for this user
+          for (const sId of Array.from(userSockets)) {
+            if (!isSocketAlive(sId)) {
+              userSockets.delete(sId);
+            }
+          }
+          if (userSockets.size === 0) {
+            onlineUsers.delete(uId);
+            onlineAdminUserIds.delete(uId);
+            supportDutyAdmins.delete(uId);
+            io.emit('user-online-status', { userId: uId, status: 'offline' });
+            console.log(`👤 User went offline: ${uId}`);
+          } else {
+            console.log(`👤 User socket closed: ${uId} (${userSockets.size} remaining)`);
+          }
+        } else {
           onlineAdminUserIds.delete(uId);
           supportDutyAdmins.delete(uId);
-          io.emit('user-online-status', { userId: uId, status: 'offline' });
-          console.log(`👤 User went offline: ${uId}`);
-        } else {
-          console.log(`👤 User socket closed: ${uId} (${userSockets.size} remaining)`);
         }
-      } else if (uId) {
-        onlineAdminUserIds.delete(uId);
-        supportDutyAdmins.delete(uId);
       }
 
       broadcastAdminStatus();

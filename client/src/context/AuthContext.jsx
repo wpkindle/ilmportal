@@ -139,7 +139,9 @@ export const AuthProvider = ({ children }) => {
     setUser(null);
     setTutorProfile(null);
     if (typeof window !== 'undefined') {
-      window.location.href = '/';
+      setTimeout(() => {
+        window.location.href = '/';
+      }, 50);
     }
   };
 

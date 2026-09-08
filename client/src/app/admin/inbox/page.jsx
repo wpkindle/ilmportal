@@ -199,7 +199,7 @@ export default function AdminMailboxPage() {
         setSelectedThread(res.thread);
         setReplyText('');
         fetchThreads(true);
-        setActionNotice('Reply successfully sent via Resend!');
+        setActionNotice('Reply successfully sent from info@ilmidunya.com!');
         setTimeout(() => setActionNotice(''), 3500);
         setTimeout(scrollToBottom, 100);
       }
@@ -339,8 +339,8 @@ export default function AdminMailboxPage() {
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
                   info@ilmidunya.com
                 </span>
-                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-purple-950 text-purple-300 border border-purple-800">
-                  Resend Engine
+                <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800">
+                  Verified Mail Server
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
@@ -577,7 +577,7 @@ export default function AdminMailboxPage() {
                 <div className="space-y-1 max-w-sm">
                   <h3 className="text-base font-bold text-white">Select a conversation</h3>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    View incoming inquiries sent to <strong className="text-[#d4a359]">info@ilmidunya.com</strong>, verify faculty degrees, or compose a reply directly via Resend.
+                    View incoming inquiries sent to <strong className="text-[#d4a359]">info@ilmidunya.com</strong>, verify faculty degrees, or compose a direct reply.
                   </p>
                 </div>
                 <button
@@ -794,7 +794,7 @@ export default function AdminMailboxPage() {
                     <div className="flex items-center justify-between">
                       <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
                         <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Sending from <strong>info@ilmidunya.com</strong> via Resend</span>
+                        <span>Sending from <strong>info@ilmidunya.com</strong></span>
                       </div>
 
                       <button

@@ -140,6 +140,10 @@ const startServer = async () => {
           { $or: [{ name: { $regex: /ayesha/i } }, { email: 'dr.ayesha@example.com' }] },
           { $set: { avatar: '/images/dr-ayesha.jpg' } }
         );
+      } catch (avatarErr) {
+        console.warn('Portraits sync note:', avatarErr.message);
+      }
+
       // Ensure demo article exists
       try {
         const { seedDemoArticleIfEmpty } = require('./controllers/articleController');

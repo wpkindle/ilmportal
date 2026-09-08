@@ -73,6 +73,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
   const tutorUser = data.user || {};
   const tutorName = tutorUser.name || data.name || 'Verified Tutor';
   const tutorCity = tutorUser.city || data.city || 'Pakistan';
+  const tutorArea = data.localArea || tutorUser.area || data.area || '';
   const tutorAvatar = getTutorAvatar(data, tutorName);
 
   // Resolve teachingModes — could be array or legacy string
@@ -185,7 +186,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500 mt-0.5">
                   <span className="flex items-center gap-1">
                     <MapPin className="w-3 h-3 text-[#b85d34] shrink-0" />
-                    {tutorCity}
+                    {tutorArea ? `${tutorArea}, ${tutorCity}` : tutorCity}
                   </span>
                   <span className="text-slate-300">·</span>
                   {isFemaleTutor ? (

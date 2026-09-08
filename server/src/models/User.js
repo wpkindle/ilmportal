@@ -84,6 +84,11 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  area: {
+    type: String,
+    default: '',
+    trim: true
+  },
   isActive: {
     type: Boolean,
     default: true

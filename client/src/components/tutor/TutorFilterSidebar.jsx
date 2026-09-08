@@ -1,10 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Filter, RotateCcw, MapPin, BookOpen, User, UserCheck, Video, ShieldCheck, Check, Navigation, ArrowUpDown, Sparkles, Clock, Star, Award, GraduationCap } from 'lucide-react';
+import { Filter, RotateCcw, MapPin, BookOpen, User, UserCheck, Video, ShieldCheck, Check, ArrowUpDown, Sparkles, Clock, Star, Award, GraduationCap } from 'lucide-react';
 import CustomSelect from '../common/CustomSelect';
-import InPersonLocationPicker from './InPersonLocationPicker';
-import { pakistaniCityAreas } from '../../data/pakistanAreas';
 
 const sortSidebarOptions = [
   { value: 'popular', label: 'Most Popular', sublabel: 'Top Enrolled & Active' },
@@ -40,27 +38,8 @@ const TutorFilterSidebar = ({
     }))
   ];
 
-  // Compute available local areas based on selected city
-  const activeCity = filters.city;
-  const cityAreasList = activeCity && pakistaniCityAreas[activeCity] ? pakistaniCityAreas[activeCity] : [];
-
-  const areaOptions = [
-    {
-      value: '',
-      label: activeCity ? `All Areas in ${activeCity}` : 'All Local Areas',
-      sublabel: activeCity ? 'City-wide' : 'Select a city first'
-    },
-    ...cityAreasList.map((area) => ({
-      value: area,
-      label: area,
-      sublabel: activeCity
-    }))
-  ];
-
   const handleCityChange = (cityName) => {
     onFilterChange('city', cityName);
-    // Reset area when city changes
-    onFilterChange('area', '');
   };
 
   return (
@@ -242,18 +221,36 @@ const TutorFilterSidebar = ({
         </div>
       </div>
 
-      {/* 4. Dynamic Location Picker - Appears when In-Person Tutoring is Selected */}
+      {/* 4. City Filter */}
       {filters.mode === 'physical' ? (
-        <InPersonLocationPicker
-          city={filters.city || ''}
-          area={filters.area || ''}
-          onLocationChange={(newCity, newArea) => {
-            onFilterChange('city', newCity);
-            onFilterChange('area', newArea);
-          }}
-          availableLocations={locations}
-          variant="sidebar"
-        />
+        <div className="space-y-2 p-3.5 bg-gradient-to-b from-[#faf7f2] to-[#f4ebe1] rounded-2xl border border-[#d4a359]/60 shadow-2xs animate-in fade-in">
+          <div className="flex items-center justify-between">
+            <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-[#0c2217]" />
+              <span>City for In-Person Tuition</span>
+            </label>
+            {filters.city && (
+              <button
+                type="button"
+                onClick={() => onFilterChange('city', '')}
+                className="text-[10px] text-stone-500 hover:text-[#b85d34] font-bold cursor-pointer"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+          <CustomSelect
+            options={locationOptions}
+            value={filters.city || ''}
+            onChange={handleCityChange}
+            placeholder="Select City (e.g. Lahore, Karachi)"
+            searchable={true}
+            variant="filter"
+          />
+          <p className="text-[10px] text-stone-600 leading-tight">
+            Filter verified male faculty available for physical home tutoring in {filters.city || 'your city'}.
+          </p>
+        </div>
       ) : filters.mode === 'online' ? (
         <div className="p-3 rounded-2xl bg-[#f4f9f6] border border-emerald-200/80 text-[11px] text-emerald-900 space-y-1 animate-in fade-in">
           <div className="flex items-center gap-1.5 font-bold text-emerald-950">
@@ -279,15 +276,6 @@ const TutorFilterSidebar = ({
             searchable={true}
             variant="filter"
           />
-
-          <button
-            type="button"
-            onClick={() => onFilterChange('mode', 'physical')}
-            className="w-full py-2 px-2.5 bg-[#faf7f2] hover:bg-[#f0ece1] text-[#b85d34] border border-[#d4a359]/40 rounded-xl text-[11px] font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-          >
-            <Navigation className="w-3 h-3 text-[#b85d34]" />
-            <span>Need Home Tuition? Select In-Person Mode</span>
-          </button>
         </div>
       )}
 

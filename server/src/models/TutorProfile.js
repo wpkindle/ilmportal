@@ -31,6 +31,16 @@ const tutorProfileSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Location'
   }],
+  city: {
+    type: String,
+    default: '',
+    trim: true
+  },
+  localArea: {
+    type: String,
+    default: '',
+    trim: true
+  },
   teachingModes: {
     type: [String],
     enum: ['online', 'in_person'],

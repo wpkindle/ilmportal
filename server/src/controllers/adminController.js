@@ -120,7 +120,7 @@ exports.getTutorApprovalQueue = async (req, res) => {
     }
 
     const tutors = await TutorProfile.find(filter)
-      .populate('user', 'name email avatar phone city isVerified createdAt')
+      .populate('user', 'name email avatar phone city area isVerified createdAt')
       .populate('subjects', 'name type')
       .populate('cities', 'name province')
       .sort({ createdAt: -1 });

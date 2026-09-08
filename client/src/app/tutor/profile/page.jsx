@@ -37,7 +37,7 @@ import { SanadModal } from '../../../components/common/SanadBadge';
 import DeleteAccountModal from '../../../components/common/DeleteAccountModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import SafetyReportsSection from '../../../components/profile/SafetyReportsSection';
-import { allPakistaniCities } from '../../../data/pakistanAreas';
+import { allPakistaniCities, pakistaniCityAreas } from '../../../data/pakistanAreas';
 
 const pakistaniCities = allPakistaniCities;
 
@@ -52,6 +52,7 @@ function TutorProfileContent() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [city, setCity] = useState('Lahore');
+  const [localArea, setLocalArea] = useState('');
   const [gender, setGender] = useState('male');
   const [age, setAge] = useState('');
   const [avatar, setAvatar] = useState('');
@@ -98,11 +99,14 @@ function TutorProfileContent() {
       setEmail(user.email || '');
       setPhone(user.phone || '');
       setCity(user.city || '');
+      setLocalArea(user.area || '');
       setGender(user.gender || '');
       setAge(user.age ? String(user.age) : '');
       setAvatar(user.avatar || '');
     }
     if (tutorProfile) {
+      if (tutorProfile.city) setCity(tutorProfile.city);
+      if (tutorProfile.localArea) setLocalArea(tutorProfile.localArea);
       setBio(tutorProfile.bio || '');
       setQualifications(tutorProfile.qualifications || '');
       setExperienceYears(tutorProfile.experienceYears || 2);
@@ -227,7 +231,8 @@ function TutorProfileContent() {
         username: username.trim().toLowerCase(),
         email: email.trim(),
         phone: phone.trim(),
-        city,
+        city: city.trim(),
+        localArea: localArea.trim(),
         gender,
         age: age ? Number(age) : undefined,
         avatar,
@@ -418,8 +423,8 @@ function TutorProfileContent() {
                   <span className="font-bold">{experienceYears} Years</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">City:</span>
-                  <span className="font-bold">{city || 'Not set'}</span>
+                  <span className="text-slate-400">Location:</span>
+                  <span className="font-bold text-right truncate max-w-[170px]">{localArea ? `${localArea}, ${city}` : (city || 'Not set')}</span>
                 </div>
               </div>
             </div>
@@ -593,7 +598,7 @@ function TutorProfileContent() {
                   />
                 </div>
 
-                {/* City & Mobile (WhatsApp) Row */}
+                {/* City & Local Main Area Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div id="profile-city" className="scroll-mt-28">
                     <label className="text-xs font-bold text-slate-700 block mb-1">
@@ -601,7 +606,10 @@ function TutorProfileContent() {
                     </label>
                     <select
                       value={city}
-                      onChange={(e) => setCity(e.target.value)}
+                      onChange={(e) => {
+                        setCity(e.target.value);
+                        setLocalArea('');
+                      }}
                       className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-semibold"
                     >
                       <option value="">-- Select City in Pakistan --</option>
@@ -611,19 +619,53 @@ function TutorProfileContent() {
                     </select>
                   </div>
 
-                  <div id="profile-phone" className="scroll-mt-28">
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Mobile Number (WhatsApp) *
-                    </label>
-                    <input
-                      type="tel"
-                      required
-                      placeholder="Enter Your Number"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-medium"
-                    />
+                  <div id="profile-local-area" className="scroll-mt-28">
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-bold text-slate-700 block">
+                        Local Main Area (Optional)
+                      </label>
+                      {city && (
+                        <span className="text-[10px] text-stone-500 font-medium">
+                          {city}
+                        </span>
+                      )}
+                    </div>
+                    {city && pakistaniCityAreas[city] && pakistaniCityAreas[city].length > 0 ? (
+                      <select
+                        value={localArea}
+                        onChange={(e) => setLocalArea(e.target.value)}
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-semibold"
+                      >
+                        <option value="">-- Select Main Area in {city} --</option>
+                        {pakistaniCityAreas[city].map((a) => (
+                          <option key={a} value={a}>{a}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type="text"
+                        placeholder={city ? `General coverage across ${city}` : 'Select city first'}
+                        value={localArea}
+                        onChange={(e) => setLocalArea(e.target.value)}
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-semibold"
+                      />
+                    )}
                   </div>
+                </div>
+
+                {/* Mobile Number (WhatsApp) */}
+                <div id="profile-phone" className="scroll-mt-28">
+                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                    Mobile Number (WhatsApp) *
+                  </label>
+                  <input
+                    type="tel"
+                    required
+                    placeholder="Enter Your Number"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-medium"
+                  />
                 </div>
 
                 {/* Hourly Rate & Experience Years Row */}

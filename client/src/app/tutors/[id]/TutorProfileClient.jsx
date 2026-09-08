@@ -42,6 +42,8 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
 
   const tutorUser = tutor?.user || {};
   const tutorName = tutorUser.name || 'Verified Tutor';
+  const tutorArea = tutor?.localArea || tutorUser.area || tutor?.area || '';
+  const tutorCity = tutorUser.city || tutor?.city || 'Pakistan';
   const tutorAvatar = getTutorAvatar(tutor || tutorUser, tutorName);
 
   React.useEffect(() => {
@@ -188,7 +190,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
 
                 <p className="text-xs sm:text-sm font-semibold text-slate-600 flex items-center gap-2">
                   <MapPin className="w-4 h-4 text-[#b85d34]" />
-                  <span>{tutorUser.city || 'Pakistan'}</span>
+                  <span>{tutorArea ? `${tutorArea}, ${tutorCity}` : tutorCity}</span>
                   <span>&bull;</span>
                   <span className="capitalize">{tutor.teachingMode === 'both' ? 'Online & In-Person' : tutor.teachingMode}</span>
                 </p>

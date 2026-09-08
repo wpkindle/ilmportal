@@ -57,6 +57,7 @@ exports.getPublicTutors = async (req, res) => {
         const cityConditions = [];
         if (loc) cityConditions.push({ cities: { $in: [loc._id] } });
         if (cityUserIds.length > 0) cityConditions.push({ user: { $in: cityUserIds } });
+        cityConditions.push({ city: new RegExp('^' + city + '$', 'i') });
         if (cityConditions.length > 0) {
           query.$or = (query.$or || []).concat(cityConditions);
         }
@@ -149,7 +150,7 @@ exports.getPublicTutors = async (req, res) => {
     const skip = (pageNumber - 1) * limitNumber;
 
     let tutorProfiles = await TutorProfile.find(query)
-      .populate('user', 'name email avatar phone city isVerified isActive')
+      .populate('user', 'name email avatar phone city area isVerified isActive')
       .populate('subjects', 'name slug type icon description')
       .populate('cities', 'name province isMajorCity')
       .sort(sortOptions)
@@ -193,14 +194,14 @@ exports.getPublicTutors = async (req, res) => {
 exports.getTutorById = async (req, res) => {
   try {
     let tutor = await TutorProfile.findById(req.params.id)
-      .populate('user', 'name email avatar phone city isVerified isActive')
+      .populate('user', 'name email avatar phone city area isVerified isActive')
       .populate('subjects', 'name slug type icon description')
       .populate('cities', 'name province isMajorCity');
 
     // If ID was user ID instead of tutor profile ID
     if (!tutor) {
       tutor = await TutorProfile.findOne({ user: req.params.id })
-        .populate('user', 'name email avatar phone city isVerified isActive')
+        .populate('user', 'name email avatar phone city area isVerified isActive')
         .populate('subjects', 'name slug type icon description')
         .populate('cities', 'name province isMajorCity');
     }
@@ -282,6 +283,9 @@ exports.updateMyTutorProfile = async (req, res) => {
       experienceYears,
       subjects,
       cities,
+      city,
+      localArea,
+      area,
       teachingMode,
       gender
     } = req.body;
@@ -294,6 +298,8 @@ exports.updateMyTutorProfile = async (req, res) => {
         bio: bio || '',
         qualifications: qualifications || '',
         experienceYears: experienceYears || 1,
+        city: city || '',
+        localArea: (localArea !== undefined ? localArea : area || '').trim(),
         gender: gender || 'male',
         verificationStatus: 'pending'
       });
@@ -304,12 +310,32 @@ exports.updateMyTutorProfile = async (req, res) => {
       if (gender !== undefined) profile.gender = gender;
       if (subjects !== undefined) profile.subjects = subjects;
       if (cities !== undefined) profile.cities = cities;
+      if (city !== undefined) profile.city = city.trim();
+      if (localArea !== undefined || area !== undefined) {
+        profile.localArea = (localArea !== undefined ? localArea : area).trim();
+      }
       if (teachingMode !== undefined) {
         profile.teachingModes = teachingMode === 'both' ? ['online', 'in_person'] : [teachingMode === 'physical' ? 'in_person' : teachingMode];
       }
     }
 
     await profile.save();
+
+    // Also sync city and area to the user record
+    const userDoc = await User.findById(req.user.id);
+    if (userDoc) {
+      let userUpdated = false;
+      if (city && userDoc.city !== city.trim()) {
+        userDoc.city = city.trim();
+        userUpdated = true;
+      }
+      const targetArea = (localArea !== undefined ? localArea : area || '').trim();
+      if (targetArea && userDoc.area !== targetArea) {
+        userDoc.area = targetArea;
+        userUpdated = true;
+      }
+      if (userUpdated) await userDoc.save();
+    }
 
     res.status(200).json({
       success: true,

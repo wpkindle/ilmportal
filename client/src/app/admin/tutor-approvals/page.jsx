@@ -189,7 +189,7 @@ export default function TutorApprovalPage() {
                             </span>
                           </div>
                           <p className="text-xs text-slate-500 mt-0.5">
-                            {tutor.user?.email} &bull; {tutor.user?.phone} &bull; {tutor.user?.city || 'No City'}
+                            {tutor.user?.email} &bull; {tutor.user?.phone} &bull; {tutor.localArea || tutor.user?.area ? `${tutor.localArea || tutor.user?.area}, ` : ''}{tutor.user?.city || tutor.city || 'No City'}
                           </p>
                           <p className="text-xs font-semibold text-emerald-800 mt-1">
                             Degree/Sanad: {tutor.qualifications || 'Not specified'} ({tutor.experienceYears} Yrs Exp)

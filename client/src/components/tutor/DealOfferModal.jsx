@@ -303,12 +303,12 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
                   city={dealCity}
                   area={dealArea}
                   address={dealAddress}
-                  onLocationChange={(newCity, newArea) => {
+                  onLocationChange={(newCity, newArea, newAddress) => {
                     setDealCity(newCity);
                     setDealArea(newArea);
+                    if (newAddress !== undefined) setDealAddress(newAddress);
                   }}
                   onAddressChange={setDealAddress}
-                  showAddressField={true}
                   variant="modal"
                 />
               </div>

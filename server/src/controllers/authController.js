@@ -608,6 +608,8 @@ exports.updateProfile = async (req, res) => {
       phone,
       guardianPhone,
       city,
+      area,
+      localArea,
       avatar,
       gender,
       age,
@@ -659,7 +661,10 @@ exports.updateProfile = async (req, res) => {
     if (name) user.name = name.trim();
     if (phone !== undefined) user.phone = phone.trim();
     if (guardianPhone !== undefined) user.guardianPhone = guardianPhone.trim();
-    if (city) user.city = city;
+    if (city) user.city = city.trim();
+    if (area !== undefined || localArea !== undefined) {
+      user.area = (localArea !== undefined ? localArea : area).trim();
+    }
     if (avatar !== undefined) user.avatar = avatar;
     if (gender) user.gender = gender;
     if (age !== undefined) user.age = Number(age);
@@ -673,6 +678,10 @@ exports.updateProfile = async (req, res) => {
         tutorProfile = new TutorProfile({ user: user._id, verificationStatus: 'pending' });
       }
 
+      if (city) tutorProfile.city = city.trim();
+      if (area !== undefined || localArea !== undefined) {
+        tutorProfile.localArea = (localArea !== undefined ? localArea : area).trim();
+      }
       if (bio !== undefined) tutorProfile.bio = bio;
       if (qualifications !== undefined) tutorProfile.qualifications = qualifications;
       if (experienceYears !== undefined) tutorProfile.experienceYears = Number(experienceYears);

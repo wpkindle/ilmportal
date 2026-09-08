@@ -7,8 +7,7 @@ import TutorFilterSidebar from '../../components/tutor/TutorFilterSidebar';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import CustomSelect from '../../components/common/CustomSelect';
 import { api } from '../../services/api';
-import { Search, Users, UserCheck, ArrowUpDown, ShieldCheck, BookOpen, GraduationCap, Video, Navigation, Home, MapPin, Compass } from 'lucide-react';
-import { detectUserLiveLocation } from '../../utils/geolocation';
+import { Search, Users, UserCheck, ArrowUpDown, ShieldCheck, BookOpen, GraduationCap, Video, Home, MapPin, Compass } from 'lucide-react';
 
 const sortOptions = [
   { value: 'popular', label: 'Most Popular', sublabel: 'Top Enrolled & Active' },
@@ -26,34 +25,12 @@ function TutorSearchContent() {
   const [locations, setLocations] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  // Helper to infer gender from faculty parameter
+  // Helper to map faculty preset to gender
   const resolveGender = (fac, gen) => {
     if (gen) return gen;
     if (fac === 'alimah' || fac === 'female_alimah' || fac === 'female_tutor' || fac === 'female_academic' || fac === 'female_quran') return 'female';
     if (fac === 'male_quran' || fac === 'male_academic' || fac === 'qari') return 'male';
     return '';
-  };
-
-  const [detectingLocation, setDetectingLocation] = useState(false);
-  const [locationMessage, setLocationMessage] = useState('');
-
-  const handleTopLiveLocation = async () => {
-    setDetectingLocation(true);
-    setLocationMessage('');
-    try {
-      const loc = await detectUserLiveLocation();
-      setFilters((prev) => ({
-        ...prev,
-        mode: 'physical',
-        city: loc.city,
-        area: loc.area || ''
-      }));
-      setLocationMessage(`GPS Active: ${loc.displayName}`);
-    } catch (err) {
-      setLocationMessage(err.message || 'Location detection error');
-    } finally {
-      setDetectingLocation(false);
-    }
   };
 
   // Filters State
@@ -64,7 +41,6 @@ function TutorSearchContent() {
     search: searchParams.get('q') || '',
     category: searchParams.get('category') || '',
     city: searchParams.get('city') || '',
-    area: searchParams.get('area') || '',
     mode: searchParams.get('mode') || '',
     gender: initialGender,
     faculty: initialFaculty,
@@ -150,12 +126,6 @@ function TutorSearchContent() {
       if (!queryParams.gender) delete queryParams.gender;
       if (!queryParams.faculty) delete queryParams.faculty;
       if (!queryParams.sanadVerified) delete queryParams.sanadVerified;
-
-      // If specific local area is chosen, factor it into search
-      if (queryParams.area) {
-        queryParams.search = queryParams.search ? `${queryParams.search} ${queryParams.area}` : queryParams.area;
-      }
-      delete queryParams.area;
 
       const res = await api.getTutors(queryParams);
       if (res.success) {
@@ -530,28 +500,10 @@ function TutorSearchContent() {
               ))}
             </div>
 
-            {/* Quick Live GPS Location Button when In-Person mode is selected */}
-            {filters.mode === 'physical' && (
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={handleTopLiveLocation}
-                  disabled={detectingLocation}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-bold flex items-center gap-1.5 transition-all shadow-xs cursor-pointer border ${
-                    detectingLocation
-                      ? 'bg-[#f0ece1] text-stone-600 border-[#d4a359]/40 cursor-wait'
-                      : 'bg-[#0c2217] hover:bg-[#163524] text-[#d4a359] border-[#0c2217] active:scale-95'
-                  }`}
-                >
-                  <Navigation className={`w-3.5 h-3.5 text-[#d4a359] ${detectingLocation ? 'animate-spin' : 'animate-pulse'}`} />
-                  <span>{detectingLocation ? 'Detecting Pakistani GPS...' : 'Use My Live Location'}</span>
-                </button>
-              </div>
-            )}
           </div>
 
-          {/* Active In-Person Location Pill / Notice */}
-          {filters.mode === 'physical' && (filters.city || filters.area || locationMessage) && (
+          {/* Active In-Person City Pill / Notice */}
+          {filters.mode === 'physical' && filters.city && (
             <div className="p-3 bg-gradient-to-r from-[#faf7f2] to-[#f4ebe1] border border-[#d4a359]/60 rounded-2xl flex flex-wrap items-center justify-between gap-2 text-xs animate-in fade-in">
               <div className="flex items-center gap-2 min-w-0">
                 <div className="p-1.5 rounded-xl bg-[#0c2217] text-[#d4a359] shrink-0">
@@ -559,26 +511,19 @@ function TutorSearchContent() {
                 </div>
                 <div className="min-w-0">
                   <p className="text-slate-900 font-bold leading-tight truncate">
-                    In-Person Home Tutoring in:{' '}
-                    <span className="text-[#b85d34]">
-                      {filters.area ? `${filters.area}, ${filters.city}` : filters.city || 'All Pakistan'}
-                    </span>
+                    In-Person Home Tutoring in: <span className="text-[#b85d34]">{filters.city}</span>
                   </p>
                   <p className="text-[10px] text-stone-600 truncate">
-                    {locationMessage || 'Verified male faculty visiting your residence'}
+                    Verified male faculty available for physical home tutoring
                   </p>
                 </div>
               </div>
               <button
                 type="button"
-                onClick={() => {
-                  handleFilterChange('city', '');
-                  handleFilterChange('area', '');
-                  setLocationMessage('');
-                }}
+                onClick={() => handleFilterChange('city', '')}
                 className="text-[11px] font-bold text-stone-500 hover:text-[#b85d34] underline shrink-0 cursor-pointer"
               >
-                Clear Location
+                Change / Clear City
               </button>
             </div>
           )}

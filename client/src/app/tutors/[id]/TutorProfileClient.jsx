@@ -258,7 +258,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
               <span className="text-[10px] uppercase font-bold text-slate-400">Tuition Fee</span>
               <p className="font-bold text-xs text-[#0c2217] flex items-center gap-1.5">
                 <Sparkles className="w-4 h-4 text-[#d4a359] shrink-0" />
-                <span>Flexible / Direct with Tutor</span>
+                <span>Flexible / Negotiable</span>
               </p>
             </div>
           </div>

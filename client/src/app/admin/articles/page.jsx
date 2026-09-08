@@ -5,6 +5,7 @@ import Link from 'next/link';
 import AdminSidebar from '../../../components/admin/AdminSidebar';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import { api } from '../../../services/api';
+import ArticleContentRenderer from '../../../components/articles/ArticleContentRenderer';
 import {
   Newspaper,
   Plus,
@@ -854,13 +855,17 @@ export default function AdminArticlesPage() {
                     className="w-full p-4 bg-slate-950 border border-slate-800 rounded-2xl text-xs sm:text-sm text-slate-100 font-mono leading-relaxed focus:outline-none focus:border-[#d4a359]"
                   />
                 ) : (
-                  <div className="p-6 bg-slate-950 border border-slate-800 rounded-2xl min-h-[300px] max-h-[500px] overflow-y-auto prose prose-invert prose-slate max-w-none text-xs sm:text-sm leading-relaxed whitespace-pre-line">
-                    <div className="pb-4 border-b border-slate-800 mb-4">
+                  <div className="p-6 bg-slate-950 border border-slate-800 rounded-2xl min-h-[300px] max-h-[500px] overflow-y-auto">
+                    <div className="pb-4 border-b border-slate-800 mb-6">
                       <span className="text-xs text-[#d4a359] font-bold uppercase">{formData.category}</span>
-                      <h1 className="text-xl sm:text-2xl font-black text-white mt-1">{formData.title || 'Untitled Article'}</h1>
+                      <h1 className="text-xl sm:text-2xl font-black text-white mt-1 font-serif">{formData.title || 'Untitled Article'}</h1>
                       <p className="text-xs text-slate-400 mt-1">By {formData.author} • {formData.readTime || '5 min read'}</p>
                     </div>
-                    {formData.content || <em className="text-slate-500">No content entered yet.</em>}
+                    {formData.content ? (
+                      <ArticleContentRenderer content={formData.content} variant="dark" />
+                    ) : (
+                      <em className="text-slate-500 text-xs">No content entered yet.</em>
+                    )}
                   </div>
                 )}
               </div>

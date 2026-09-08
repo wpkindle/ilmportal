@@ -22,6 +22,7 @@ import {
   getEditorialArticleBySlug,
   getRelatedEditorialArticles
 } from '../../../data/editorialArticles';
+import ArticleContentRenderer from '../../../components/articles/ArticleContentRenderer';
 
 export const revalidate = 60; // ISR cache for 60 seconds
 
@@ -274,9 +275,7 @@ export default async function ArticleDetailPage({ params }) {
 
         {/* Article Body Content */}
         <div className="bg-white p-6 sm:p-10 lg:p-12 rounded-3xl border border-[#ebe3d3] shadow-sm space-y-6">
-          <div className="prose prose-stone max-w-none text-sm sm:text-base leading-relaxed text-[#1e293b] whitespace-pre-line">
-            {article.content}
-          </div>
+          <ArticleContentRenderer content={article.content} variant="light" />
 
           {/* Tags */}
           {article.tags && article.tags.length > 0 && (

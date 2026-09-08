@@ -280,7 +280,7 @@ const Navbar = () => {
   return (
     <>
       <PromotionTopBar />
-      <header className={`sticky top-0 ${mobileMenuOpen ? 'z-[99999]' : 'z-40'} bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e6ded1] shadow-2xs transition-colors`}>
+      <header className="sticky top-0 z-40 bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e6ded1] shadow-2xs">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
           
@@ -744,13 +744,44 @@ const Navbar = () => {
           </div>
 
         </div>
+      </div>
 
-        {/* Mobile Navigation Drawer */}
-        {mobileMenuOpen && (
-          <div
-            id="mobile-nav-drawer"
-            className="lg:hidden fixed inset-x-0 top-14 sm:top-16 bottom-0 z-[99999] bg-[#faf8f5] overflow-y-auto overscroll-contain px-4 py-4 space-y-3 pb-40 shadow-2xl border-t border-[#e6ded1] animate-in slide-in-from-top-2 duration-200"
-          >
+      {/* Luminous Multi-stop Accent Line */}
+      <div className="absolute inset-x-0 bottom-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#d4a359]/40 via-[#10b981]/30 to-transparent pointer-events-none" />
+    </header>
+
+      {/* Full-Screen Mobile Navigation Drawer Overlay */}
+      {mobileMenuOpen && (
+        <div
+          id="mobile-nav-drawer"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Navigation Menu"
+          className="lg:hidden fixed inset-0 z-[999999] bg-[#faf8f5] flex flex-col w-full h-full min-h-screen overflow-hidden animate-in fade-in duration-150"
+          style={{ height: '100dvh' }}
+        >
+          {/* Top Bar: Brand Logo & Close X Button */}
+          <div className="h-14 sm:h-16 px-3 sm:px-6 flex items-center justify-between border-b border-[#e6ded1] bg-[#faf8f5] shrink-0">
+            <Link
+              href="/"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center group py-1 shrink-0"
+              title="IlmiDunya"
+            >
+              <BrandLogo variant="light" size="md" />
+            </Link>
+
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="p-1.5 sm:p-2.5 min-h-[38px] min-w-[38px] sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center rounded-xl text-slate-700 hover:bg-[#f0eae1] active:scale-95 transition-all cursor-pointer"
+              aria-label="Close Navigation Menu"
+            >
+              <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#0c2217]" />
+            </button>
+          </div>
+
+          {/* Scrollable Drawer Content */}
+          <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 space-y-3 pb-36">
             {!isAuthenticated && (
               <div className="grid grid-cols-2 gap-2 pb-3 border-b border-[#e6ded1]">
                 <Link
@@ -918,12 +949,8 @@ const Navbar = () => {
               </div>
             ) : null}
           </div>
-        )}
-
-        {/* Luminous Multi-stop Accent Line */}
-        <div className="absolute inset-x-0 bottom-0 h-[1.5px] bg-gradient-to-r from-transparent via-[#d4a359]/40 via-[#10b981]/30 to-transparent pointer-events-none" />
-      </div>
-    </header>
+        </div>
+      )}
     </>
   );
 };

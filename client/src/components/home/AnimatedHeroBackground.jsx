@@ -86,15 +86,7 @@ export default function AnimatedHeroBackground() {
       <div className="absolute top-1/4 -right-28 w-[680px] h-[680px] bg-[#d4a359]/8 rounded-full blur-[150px] pointer-events-none" />
       <div className="absolute -bottom-24 left-1/4 w-[550px] h-[450px] bg-[#b85d34]/4 rounded-full blur-[130px] pointer-events-none" />
 
-      {/* 4. Subtle Luminous Light Beams / Drifting Horizontal Accent Bars */}
-      <div className="absolute top-20 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#d4a359]/30 to-transparent pointer-events-none" />
-      <div className="absolute top-1/2 inset-x-12 h-px bg-gradient-to-r from-transparent via-[#10b981]/20 via-[#d4a359]/30 to-transparent pointer-events-none animate-light-sweep" />
-      <div className="absolute bottom-28 inset-x-0 h-px bg-gradient-to-r from-transparent via-[#b85d34]/20 to-transparent pointer-events-none" />
-
-      {/* 5. Slow Floating Shimmer Ribbon */}
-      <div className="absolute top-32 -left-1/4 w-[150%] h-[2px] bg-gradient-to-r from-transparent via-[#d4a359]/35 via-[#10b981]/25 to-transparent pointer-events-none animate-beam-drift blur-[0.5px]" />
-
-      {/* 6. Precision Architectural Coordinate Marks & Crosshairs */}
+      {/* 4. Precision Architectural Coordinate Marks & Crosshairs */}
       <div className="hidden sm:block absolute top-12 left-8 text-[#d4a359]/40 font-mono text-[10px] tracking-widest pointer-events-none select-none">
         +
       </div>
@@ -108,7 +100,7 @@ export default function AnimatedHeroBackground() {
         +
       </div>
 
-      {/* 7. Subtle Islamic Academic Geometric Rosette Outline Watermark */}
+      {/* 5. Subtle Islamic Academic Geometric Rosette Outline Watermark */}
       <div className="absolute -top-12 -right-12 w-96 h-96 opacity-[0.035] pointer-events-none select-none text-[#0c2217]">
         <svg viewBox="0 0 200 200" fill="none" stroke="currentColor" strokeWidth="1" className="w-full h-full animate-spin-slow">
           <circle cx="100" cy="100" r="90" />
@@ -120,7 +112,7 @@ export default function AnimatedHeroBackground() {
         </svg>
       </div>
 
-      {/* 8. Bottom Edge Seamless Gradient Blend */}
+      {/* 6. Bottom Edge Seamless Gradient Blend */}
       <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-[#f3ede0] to-transparent pointer-events-none" />
     </div>
   );

@@ -29,11 +29,7 @@ export default function SiteAmbientBackdrop() {
       {/* Bottom Center Sage Glow */}
       <div className="absolute -bottom-40 left-[25%] w-[750px] h-[500px] rounded-full bg-[#059669]/5 blur-[160px] animate-float-reverse pointer-events-none" />
 
-      {/* 3. Subtle Drifting Horizon Beams */}
-      <div className="absolute top-[28%] inset-x-0 h-px bg-gradient-to-r from-transparent via-[#d4a359]/20 via-[#10b981]/15 to-transparent animate-light-sweep" />
-      <div className="absolute top-[68%] inset-x-0 h-px bg-gradient-to-r from-transparent via-[#10b981]/15 via-[#b85d34]/15 to-transparent animate-beam-drift" />
-
-      {/* 4. Peripheral Precision Corner Crosshairs */}
+      {/* 3. Peripheral Precision Corner Crosshairs */}
       <div className="hidden lg:block absolute top-24 left-6 text-[#d4a359]/30 font-mono text-[9px] tracking-widest">
         +
       </div>

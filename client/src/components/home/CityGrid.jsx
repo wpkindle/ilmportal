@@ -34,8 +34,6 @@ const CityGrid = () => {
       <div className="absolute top-1/2 left-10 w-[480px] h-[480px] bg-[#10b981]/7 rounded-full blur-[140px] pointer-events-none animate-float-slow" />
       <div className="absolute top-10 right-10 w-[450px] h-[450px] bg-[#d4a359]/8 rounded-full blur-[130px] pointer-events-none animate-float-reverse" />
 
-      {/* Drifting horizontal light sweep */}
-      <div className="absolute top-1/3 inset-x-12 h-px bg-gradient-to-r from-transparent via-[#10b981]/25 via-[#d4a359]/25 to-transparent pointer-events-none animate-light-sweep" />
 
       {/* Precision architectural coordinate crosshairs */}
       <div className="hidden sm:block absolute top-6 left-6 text-[#d4a359]/40 font-mono text-[10px] pointer-events-none select-none">+</div>

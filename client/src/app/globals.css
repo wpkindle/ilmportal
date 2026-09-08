@@ -284,43 +284,6 @@
   animation: geometricPulse 10s ease-in-out infinite;
 }
 
-@keyframes beamDrift {
-  0% {
-    transform: translateX(-30%) skewX(-15deg);
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 0.75;
-  }
-  100% {
-    transform: translateX(30%) skewX(-15deg);
-    opacity: 0.3;
-  }
-}
-
-@keyframes lightSweep {
-  0% {
-    opacity: 0.25;
-    transform: translateY(0) scaleX(0.95);
-  }
-  50% {
-    opacity: 0.65;
-    transform: translateY(-8px) scaleX(1.05);
-  }
-  100% {
-    opacity: 0.25;
-    transform: translateY(0) scaleX(0.95);
-  }
-}
-
-.animate-beam-drift {
-  animation: beamDrift 14s ease-in-out infinite alternate;
-}
-
-.animate-light-sweep {
-  animation: lightSweep 10s ease-in-out infinite;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .animate-float-slow,
   .animate-float-reverse,
@@ -330,9 +293,7 @@
   .animate-spin-reverse,
   .animate-radar,
   .animate-particle-drift,
-  .animate-geometric-pulse,
-  .animate-beam-drift,
-  .animate-light-sweep {
+  .animate-geometric-pulse {
     animation: none !important;
   }
 }

@@ -4,21 +4,10 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Newspaper, ArrowRight, Clock, User, Calendar, BookOpen, Sparkles } from 'lucide-react';
 import { api } from '../../services/api';
-
-const DEFAULT_DEMO_ARTICLE = {
-  _id: 'demo-1',
-  title: 'Building Strong Foundations: Why Camera-Off Learning & Sanad Verification Matter for Pakistani Families',
-  slug: 'why-camera-off-learning-and-sanad-verification-matter-pakistan',
-  author: 'Abdul Khaliq',
-  category: 'Quran & Family Safety',
-  excerpt: 'In Pakistani households, educational excellence and Islamic modesty go hand-in-hand. Learn how camera-off default classes and rigorous Sanad verification create the safest learning environment for our children.',
-  coverImage: 'https://images.unsplash.com/photo-1584281722572-8873404c0003?w=1200&auto=format&fit=crop&q=80',
-  readTime: '6 min read',
-  publishedAt: new Date()
-};
+import { EDITORIAL_ARTICLES } from '../../data/editorialArticles';
 
 export default function LatestArticlesSection({ initialArticles = [] }) {
-  const [articles, setArticles] = useState(initialArticles);
+  const [articles, setArticles] = useState(initialArticles.length > 0 ? initialArticles : EDITORIAL_ARTICLES);
 
   useEffect(() => {
     if (initialArticles && initialArticles.length > 0) return;
@@ -29,17 +18,17 @@ export default function LatestArticlesSection({ initialArticles = [] }) {
         if (res && res.success && res.articles && res.articles.length > 0) {
           setArticles(res.articles);
         } else {
-          setArticles([DEFAULT_DEMO_ARTICLE]);
+          setArticles(EDITORIAL_ARTICLES);
         }
       } catch (err) {
-        setArticles([DEFAULT_DEMO_ARTICLE]);
+        setArticles(EDITORIAL_ARTICLES);
       }
     };
 
     fetchArticles();
   }, [initialArticles]);
 
-  const displayArticles = articles.length > 0 ? articles.slice(0, 3) : [DEFAULT_DEMO_ARTICLE];
+  const displayArticles = articles.length > 0 ? articles.slice(0, 3) : EDITORIAL_ARTICLES.slice(0, 3);
 
   return (
     <section className="py-16 sm:py-24 relative overflow-hidden bg-[#faf8f5] border-b border-[#ebe3d3]">

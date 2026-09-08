@@ -17,41 +17,63 @@ import {
   GraduationCap
 } from 'lucide-react';
 import { api } from '../../../services/api';
+import {
+  getEditorialArticles,
+  getEditorialArticleBySlug,
+  getRelatedEditorialArticles
+} from '../../../data/editorialArticles';
 
 export const revalidate = 60; // ISR cache for 60 seconds
 
-// Dynamic SEO metadata generator
+// Prerender foundational editorial articles at build time so they never 404
+export function generateStaticParams() {
+  return getEditorialArticles().map((article) => ({
+    slug: article.slug,
+  }));
+}
+
+// Dynamic SEO metadata generator with resilient fallback
 export async function generateMetadata({ params }) {
+  let article = null;
+
   try {
     const res = await api.getArticleBySlug(params.slug);
     if (res && res.success && res.article) {
-      const article = res.article;
-      return {
-        title: `${article.metaTitle || article.title} | IlmiDunya Pakistan`,
-        description: article.metaDescription || article.excerpt || 'Educational article on IlmiDunya Pakistan.',
-        alternates: {
-          canonical: `https://ilmidunya.com/articles/${params.slug}`,
-        },
-        openGraph: {
-          title: `${article.title} | IlmiDunya`,
-          description: article.excerpt || 'Read this article on IlmiDunya Pakistan.',
-          url: `https://ilmidunya.com/articles/${params.slug}`,
-          type: 'article',
-          publishedTime: article.publishedAt,
-          authors: [article.author],
-          images: article.coverImage ? [article.coverImage] : ['https://ilmidunya.com/icon.png'],
-          siteName: 'IlmiDunya'
-        },
-        twitter: {
-          card: 'summary_large_image',
-          title: article.title,
-          description: article.excerpt,
-          images: article.coverImage ? [article.coverImage] : []
-        }
-      };
+      article = res.article;
     }
   } catch (e) {
-    console.error('Metadata fetch error for article:', e);
+    // Backend warming up or deploying
+  }
+
+  // Resilient fallback to built-in editorial catalog
+  if (!article) {
+    article = getEditorialArticleBySlug(params.slug);
+  }
+
+  if (article) {
+    return {
+      title: `${article.metaTitle || article.title} | IlmiDunya Pakistan`,
+      description: article.metaDescription || article.excerpt || 'Educational article on IlmiDunya Pakistan.',
+      alternates: {
+        canonical: `https://ilmidunya.com/articles/${article.slug || params.slug}`,
+      },
+      openGraph: {
+        title: `${article.title} | IlmiDunya`,
+        description: article.excerpt || 'Read this article on IlmiDunya Pakistan.',
+        url: `https://ilmidunya.com/articles/${article.slug || params.slug}`,
+        type: 'article',
+        publishedTime: article.publishedAt,
+        authors: [article.author],
+        images: article.coverImage ? [article.coverImage] : ['https://ilmidunya.com/icon.png'],
+        siteName: 'IlmiDunya'
+      },
+      twitter: {
+        card: 'summary_large_image',
+        title: article.title,
+        description: article.excerpt,
+        images: article.coverImage ? [article.coverImage] : []
+      }
+    };
   }
 
   return {
@@ -74,12 +96,25 @@ export default async function ArticleDetailPage({ params }) {
       relatedArticles = res.relatedArticles || [];
     }
   } catch (err) {
-    console.error('Error fetching article:', err);
+    // Backend warming up, offline, or deploying
   }
 
-  // If not found, return 404
+  // Resilient fallback to built-in editorial catalog
+  if (!article) {
+    article = getEditorialArticleBySlug(params.slug);
+    if (article) {
+      relatedArticles = getRelatedEditorialArticles(article.slug);
+    }
+  }
+
+  // If still not found, return 404
   if (!article) {
     notFound();
+  }
+
+  // Ensure related articles exist
+  if (!relatedArticles || relatedArticles.length === 0) {
+    relatedArticles = getRelatedEditorialArticles(article.slug);
   }
 
   // Schema.org Article Structured Data

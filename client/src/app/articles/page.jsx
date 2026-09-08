@@ -2,6 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 import { Newspaper, ArrowRight, Clock, User, Calendar, BookOpen, Search, Sparkles, Filter, ChevronRight } from 'lucide-react';
 import { api } from '../../services/api';
+import { getEditorialArticles } from '../../data/editorialArticles';
 
 export const metadata = {
   title: 'Articles & Educational Guides | IlmiDunya Pakistan',
@@ -22,17 +23,7 @@ export const metadata = {
   }
 };
 
-const DEFAULT_DEMO = {
-  _id: 'demo-1',
-  title: 'Building Strong Foundations: Why Camera-Off Learning & Sanad Verification Matter for Pakistani Families',
-  slug: 'why-camera-off-learning-and-sanad-verification-matter-pakistan',
-  author: 'Abdul Khaliq',
-  category: 'Quran & Family Safety',
-  excerpt: 'In Pakistani households, educational excellence and Islamic modesty go hand-in-hand. Learn how camera-off default classes and rigorous Sanad verification create the safest learning environment for our children.',
-  coverImage: 'https://images.unsplash.com/photo-1584281722572-8873404c0003?w=1200&auto=format&fit=crop&q=80',
-  readTime: '6 min read',
-  publishedAt: new Date()
-};
+
 
 async function getPublishedArticles() {
   try {
@@ -41,15 +32,16 @@ async function getPublishedArticles() {
       return res.articles;
     }
   } catch (err) {
-    console.error('SSR fetch error for articles:', err);
+    // API is warming up or deploying
   }
-  return [DEFAULT_DEMO];
+  return getEditorialArticles();
 }
 
 export default async function ArticlesDirectoryPage() {
   const articles = await getPublishedArticles();
-  const featured = articles[0] || DEFAULT_DEMO;
-  const remaining = articles.slice(1);
+  const fallbackList = getEditorialArticles();
+  const featured = articles[0] || fallbackList[0];
+  const remaining = articles.slice(1).length > 0 ? articles.slice(1) : fallbackList.slice(1);
 
   return (
     <div className="min-h-screen bg-[#faf8f5]">

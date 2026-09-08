@@ -95,7 +95,7 @@ export default function SupportPlatformWidget() {
   return (
     <>
       {/* 1. Floating Support Platform Pill Button */}
-      <div className={`fixed z-40 transition-all ${
+      <div id="support-platform-pill" className={`fixed z-40 transition-all ${
         isChatRoute
           ? 'hidden md:block md:bottom-6 md:left-6'
           : 'bottom-20 left-3 sm:left-6 md:bottom-6 md:left-6'

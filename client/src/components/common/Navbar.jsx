@@ -205,6 +205,27 @@ const Navbar = () => {
     setSubjectsDropdownOpen(false);
   }, [pathname]);
 
+  // Lock body scroll and apply mobile-menu-open class when drawer is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.classList.add('mobile-menu-open');
+    } else {
+      document.body.classList.remove('mobile-menu-open');
+    }
+    return () => {
+      document.body.classList.remove('mobile-menu-open');
+    };
+  }, [mobileMenuOpen]);
+
+  // Handle ESC key to close mobile menu
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') setMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
   const handleLogout = () => {
     setUserMenuOpen(false);
     logout();
@@ -259,7 +280,7 @@ const Navbar = () => {
   return (
     <>
       <PromotionTopBar />
-      <header className="sticky top-0 z-40 bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e6ded1] shadow-2xs">
+      <header className={`sticky top-0 ${mobileMenuOpen ? 'z-[99999]' : 'z-40'} bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e6ded1] shadow-2xs transition-colors`}>
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-14 sm:h-16">
           
@@ -726,7 +747,10 @@ const Navbar = () => {
 
         {/* Mobile Navigation Drawer */}
         {mobileMenuOpen && (
-          <div className="lg:hidden border-t border-[#e6ded1] py-4 px-3 space-y-3 animate-in slide-in-from-top-2 duration-150 bg-[#faf8f5]/98 backdrop-blur-md">
+          <div
+            id="mobile-nav-drawer"
+            className="lg:hidden fixed inset-x-0 top-14 sm:top-16 bottom-0 z-[99999] bg-[#faf8f5] overflow-y-auto overscroll-contain px-4 py-4 space-y-3 pb-40 shadow-2xl border-t border-[#e6ded1] animate-in slide-in-from-top-2 duration-200"
+          >
             {!isAuthenticated && (
               <div className="grid grid-cols-2 gap-2 pb-3 border-b border-[#e6ded1]">
                 <Link

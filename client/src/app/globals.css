@@ -446,4 +446,19 @@
     linear-gradient(180deg, #f6f2e8 0%, #faf3e8 55%, #eae0ce 100%);
 }
 
+/* Mobile Menu Open State: Lock body scroll & hide floating widgets / bottom navigation */
+body.mobile-menu-open {
+  overflow: hidden !important;
+  touch-action: none;
+}
+
+body.mobile-menu-open #mobile-bottom-nav,
+body.mobile-menu-open #ai-chatbot-widget-trigger,
+body.mobile-menu-open #support-platform-pill {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
 

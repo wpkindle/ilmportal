@@ -92,8 +92,9 @@ const MobileBottomNav = () => {
 
   return (
     <nav 
+      id="mobile-bottom-nav"
       aria-label="Mobile Bottom Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] pb-safe"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-slate-900/95 backdrop-blur-xl border-t border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.4)] pb-safe transition-opacity duration-200"
     >
       <div className="grid grid-cols-5 items-center justify-around h-14 max-w-md mx-auto px-1">
         {navItems.map((item) => {

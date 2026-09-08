@@ -676,7 +676,7 @@ export default function LiveSupportWidget() {
   return (
     <>
       {/* 1. FLOATING BOTTOM-RIGHT SUPPORT TRIGGER BUTTON */}
-      <div className="fixed bottom-20 right-4 sm:bottom-20 sm:right-6 md:bottom-6 md:right-6 z-[9998] print:hidden">
+      <div id="ai-chatbot-widget-trigger" className="fixed bottom-20 right-4 sm:bottom-20 sm:right-6 md:bottom-6 md:right-6 z-[9998] print:hidden transition-opacity duration-200">
         <button
           onClick={handleToggleWidget}
           className="group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-gradient-to-tr from-[#b85d34] to-[#d4a359] text-white shadow-[0_8px_24px_rgba(184,93,52,0.35)] hover:shadow-[0_12px_28px_rgba(184,93,52,0.45)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border-2 border-white"

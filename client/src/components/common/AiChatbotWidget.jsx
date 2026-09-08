@@ -58,10 +58,10 @@ const renderFormattedText = (content) => {
           href={url}
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center gap-1 font-bold text-[#b85d34] hover:underline bg-[#f0ece1] px-2 py-0.5 rounded-md border border-[#d4a359]/40 my-0.5"
+          className="inline-flex items-center gap-1 font-bold text-emerald-800 hover:underline bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200 my-0.5"
         >
           <span>{label}</span>
-          <ExternalLink className="w-3 h-3 text-[#b85d34]" />
+          <ExternalLink className="w-3 h-3 text-emerald-700" />
         </a>
       );
     }
@@ -396,15 +396,23 @@ export default function LiveSupportWidget() {
       if (data?.sessionId === sessionId) {
         setSupportStatus('admin_joined');
         setAssignedAdmin(data.admin?.name || 'Representative');
-        setMessages((prev) => [
-          ...prev.map((m) => (m.sender === 'user' ? { ...m, seen: true, delivered: true } : m)),
-          {
-            id: Date.now().toString(),
-            sender: 'system',
-            text: `🟢 **IlmiDunya Helpdesk is now connected with you live.** How may we assist you today?`,
-            timestamp: new Date()
+        setMessages((prev) => {
+          const hasJoinNotice = prev.some(
+            (m) => m.sender === 'system' && m.text && m.text.includes('IlmiDunya Helpdesk')
+          );
+          if (hasJoinNotice) {
+            return prev.map((m) => (m.sender === 'user' ? { ...m, seen: true, delivered: true } : m));
           }
-        ]);
+          return [
+            ...prev.map((m) => (m.sender === 'user' ? { ...m, seen: true, delivered: true } : m)),
+            {
+              id: `join_${Date.now()}`,
+              sender: 'system',
+              text: `🟢 **IlmiDunya Helpdesk is now connected with you live.** How may we assist you today?`,
+              timestamp: new Date()
+            }
+          ];
+        });
         playMessageChime();
       }
     };
@@ -744,17 +752,19 @@ export default function LiveSupportWidget() {
       {/* 1. FLOATING BOTTOM-RIGHT SUPPORT TRIGGER BUTTON WITH BOUNCING ATTRACTOR EFFECTS */}
       <div
         id="ai-chatbot-widget-trigger"
-        className={`fixed z-[100002] print:hidden flex items-center transition-all duration-300 ${
+        className={`fixed z-[100002] print:hidden items-center transition-all duration-300 ${
           isOpen
-            ? 'bottom-3 right-3 sm:bottom-6 sm:right-6'
-            : 'bottom-20 right-4 sm:bottom-6 sm:right-6'
+            ? 'hidden sm:flex sm:bottom-6 sm:right-6'
+            : 'flex bottom-20 right-4 sm:bottom-6 sm:right-6'
         }`}
       >
         {/* Attractor Speech Callout Pill (Visible on Desktop when closed) */}
         {!isOpen && (
           <div
             onClick={handleToggleWidget}
-            className="hidden sm:flex items-center gap-2 px-3.5 py-2 mr-3 rounded-2xl bg-[#0c2217]/95 hover:bg-[#0c2217] text-white border border-[#d4a359]/60 shadow-[0_10px_25px_rgba(12,34,23,0.3)] cursor-pointer select-none transition-all hover:scale-105 active:scale-95 group/bubble animate-widget-bounce"
+            className={`hidden sm:flex items-center gap-2 px-3.5 py-2 mr-3 rounded-2xl bg-[#0c2217]/95 hover:bg-[#0c2217] text-white border ${
+              isAdminOnline ? 'border-emerald-400/70 shadow-[0_10px_25px_rgba(16,185,129,0.25)]' : 'border-[#d4a359]/60 shadow-[0_10px_25px_rgba(12,34,23,0.3)]'
+            } cursor-pointer select-none transition-all hover:scale-105 active:scale-95 group/bubble animate-widget-bounce`}
             title="Click to start live conversation"
           >
             <span className="relative flex h-2 w-2">
@@ -780,17 +790,19 @@ export default function LiveSupportWidget() {
           {!isOpen && (
             <>
               {/* Outer expanding radar wave */}
-              <span className="absolute -inset-2.5 sm:-inset-3 rounded-full border-2 border-emerald-400/50 animate-radar-wave pointer-events-none" />
-              {/* Second offset gold radar wave */}
-              <span className="absolute -inset-3.5 sm:-inset-4 rounded-full border border-[#d4a359]/60 animate-radar-wave pointer-events-none" style={{ animationDelay: '1.1s' }} />
+              <span className={`absolute -inset-2.5 sm:-inset-3 rounded-full border-2 ${isAdminOnline ? 'border-emerald-400/60' : 'border-emerald-400/40'} animate-radar-wave pointer-events-none`} />
+              {/* Second offset radar wave */}
+              <span className={`absolute -inset-3.5 sm:-inset-4 rounded-full border ${isAdminOnline ? 'border-emerald-300/50' : 'border-[#d4a359]/60'} animate-radar-wave pointer-events-none`} style={{ animationDelay: '1.1s' }} />
               {/* Radiant blurred ambient aura glow */}
-              <span className="absolute -inset-2 sm:-inset-2.5 rounded-full bg-gradient-to-tr from-emerald-500/40 via-[#d4a359]/40 to-[#0c2217]/30 blur-md animate-attractor-halo pointer-events-none" />
+              <span className={`absolute -inset-2 sm:-inset-2.5 rounded-full ${isAdminOnline ? 'bg-gradient-to-tr from-emerald-500/50 via-teal-400/40 to-[#0c2217]/30' : 'bg-gradient-to-tr from-emerald-500/40 via-[#d4a359]/40 to-[#0c2217]/30'} blur-md animate-attractor-halo pointer-events-none`} />
             </>
           )}
 
           <button
             onClick={handleToggleWidget}
-            className={`group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#0c2217] hover:bg-[#123323] text-white shadow-[0_10px_25px_rgba(12,34,23,0.35)] hover:shadow-[0_14px_32px_rgba(12,34,23,0.5)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border-2 border-[#d4a359]/70 ring-2 ring-[#0c2217]/20 ${!isOpen ? 'animate-widget-bounce' : ''}`}
+            className={`group relative w-12 h-12 sm:w-14 sm:h-14 rounded-full bg-[#0c2217] hover:bg-[#123323] text-white shadow-[0_10px_25px_rgba(12,34,23,0.35)] hover:shadow-[0_14px_32px_rgba(12,34,23,0.5)] hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer border-2 ${
+              isAdminOnline ? 'border-emerald-400 ring-2 ring-emerald-500/30' : 'border-[#d4a359]/70 ring-2 ring-[#0c2217]/20'
+            } ${!isOpen ? 'animate-widget-bounce' : ''}`}
             aria-label={isOpen ? "Close Helpdesk" : "Open IlmiDunya Support Desk"}
             title={isOpen ? "Close Support Desk" : (isAdminOnline ? "Chat with Support Desk (Online)" : "Support Desk (Offline • Leave an Email Note)")}
           >
@@ -804,28 +816,28 @@ export default function LiveSupportWidget() {
                 xmlns="http://www.w3.org/2000/svg"
                 aria-hidden="true"
               >
-                {/* Secondary dialogue bubble in warm gold */}
+                {/* Secondary dialogue bubble */}
                 <path
                   d="M17 8.5H18.5C19.8807 8.5 21 9.61929 21 11V15C21 16.3807 19.8807 17.5 18.5 17.5H17.5V20L14.5 17.5H13"
-                  stroke="#d4a359"
+                  stroke={isAdminOnline ? '#10b981' : '#d4a359'}
                   strokeWidth="1.75"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
-                {/* Primary dialogue bubble in crisp white */}
+                {/* Primary dialogue bubble */}
                 <path
                   d="M3 6.5C3 5.11929 4.11929 4 5.5 4H14.5C15.8807 4 17 5.11929 17 6.5V12.5C17 13.8807 15.8807 15 14.5 15H8L4 18.5V15C3.4 14.5 3 13.5 3 12.5V6.5Z"
-                  fill="white"
-                  fillOpacity="0.12"
-                  stroke="white"
+                  fill={isAdminOnline ? '#10b981' : 'white'}
+                  fillOpacity={isAdminOnline ? '0.2' : '0.12'}
+                  stroke={isAdminOnline ? '#34d399' : 'white'}
                   strokeWidth="1.85"
                   strokeLinecap="round"
                   strokeLinejoin="round"
                 />
-                {/* 3 warm conversation dots */}
-                <circle cx="7" cy="9.5" r="1" fill="#d4a359" />
-                <circle cx="10" cy="9.5" r="1" fill="#d4a359" />
-                <circle cx="13" cy="9.5" r="1" fill="#d4a359" />
+                {/* 3 conversation dots */}
+                <circle cx="7" cy="9.5" r="1" fill={isAdminOnline ? '#10b981' : '#d4a359'} />
+                <circle cx="10" cy="9.5" r="1" fill={isAdminOnline ? '#10b981' : '#d4a359'} />
+                <circle cx="13" cy="9.5" r="1" fill={isAdminOnline ? '#10b981' : '#d4a359'} />
               </svg>
             )}
 
@@ -876,9 +888,9 @@ export default function LiveSupportWidget() {
               >
                 <ArrowLeft className="w-5 h-5" />
               </button>
-              <div className="w-9 h-9 rounded-xl bg-[#0c2217] flex items-center justify-center shadow-xs shrink-0 border border-[#d4a359]/60">
+              <div className={`w-9 h-9 rounded-xl ${isAdminOnline ? 'bg-emerald-950 border border-emerald-500/70' : 'bg-[#0c2217] border border-[#d4a359]/60'} flex items-center justify-center shadow-xs shrink-0`}>
                 <svg
-                  className="w-5 h-5 text-white"
+                  className="w-5 h-5"
                   viewBox="0 0 24 24"
                   fill="none"
                   xmlns="http://www.w3.org/2000/svg"
@@ -886,23 +898,23 @@ export default function LiveSupportWidget() {
                 >
                   <path
                     d="M16 8.5H17.5C18.8807 8.5 20 9.61929 20 11V14.5C20 15.8807 18.8807 17 17.5 17H16.5V19.5L13.8 17H12.5"
-                    stroke="#d4a359"
+                    stroke={isAdminOnline ? '#10b981' : '#d4a359'}
                     strokeWidth="1.7"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
                   <path
                     d="M3.5 6.5C3.5 5.11929 4.61929 4 6 4H14C15.3807 4 16.5 5.11929 16.5 6.5V12C16.5 13.3807 15.3807 14.5 14 14.5H8L4.5 17.5V14.5C3.9 14.1 3.5 13.1 3.5 12V6.5Z"
-                    fill="white"
-                    fillOpacity="0.15"
-                    stroke="white"
+                    fill={isAdminOnline ? '#10b981' : 'white'}
+                    fillOpacity={isAdminOnline ? '0.2' : '0.15'}
+                    stroke={isAdminOnline ? '#34d399' : 'white'}
                     strokeWidth="1.7"
                     strokeLinecap="round"
                     strokeLinejoin="round"
                   />
-                  <circle cx="7" cy="9.25" r="0.9" fill="#d4a359" />
-                  <circle cx="10" cy="9.25" r="0.9" fill="#d4a359" />
-                  <circle cx="13" cy="9.25" r="0.9" fill="#d4a359" />
+                  <circle cx="7" cy="9.25" r="0.9" fill={isAdminOnline ? '#10b981' : '#d4a359'} />
+                  <circle cx="10" cy="9.25" r="0.9" fill={isAdminOnline ? '#10b981' : '#d4a359'} />
+                  <circle cx="13" cy="9.25" r="0.9" fill={isAdminOnline ? '#10b981' : '#d4a359'} />
                 </svg>
               </div>
               <div className="min-w-0">
@@ -964,12 +976,12 @@ export default function LiveSupportWidget() {
           {/* Status Sub-Banner / Mode Switcher */}
           <div className="px-3.5 py-2 bg-[#f5f0e6] border-b border-[#ebe3d3] flex items-center justify-between gap-2 shrink-0">
             <div className="flex items-center gap-1.5 text-[11px] min-w-0">
-              {isAdminConnected ? (
+              {isAdminOnline && isAdminConnected ? (
                 <span className="flex items-center gap-1 text-emerald-800 font-semibold truncate">
                   <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
                   <span className="truncate">Connected to Support Desk ({assignedAdmin || 'Active'})</span>
                 </span>
-              ) : isWaitingForAdmin ? (
+              ) : isAdminOnline && isWaitingForAdmin ? (
                 <span className="flex items-center gap-1 text-amber-800 font-semibold truncate">
                   <Clock className="w-3.5 h-3.5 animate-spin text-amber-600 shrink-0" />
                   <span className="truncate">Connecting to Support Desk...</span>
@@ -992,9 +1004,9 @@ export default function LiveSupportWidget() {
               <button
                 type="button"
                 onClick={() => setIsOfflineView((prev) => !prev)}
-                className="px-2.5 py-1 rounded-full bg-[#faf8f5] hover:bg-white text-[#b85d34] text-[10.5px] font-bold flex items-center gap-1 transition-all border border-[#d4a359]/40 cursor-pointer shrink-0 shadow-2xs"
+                className="px-2.5 py-1 rounded-full bg-[#faf8f5] hover:bg-white text-emerald-800 text-[10.5px] font-bold flex items-center gap-1 transition-all border border-emerald-300/60 cursor-pointer shrink-0 shadow-2xs"
               >
-                <Mail className="w-3 h-3" />
+                <Mail className="w-3 h-3 text-emerald-700" />
                 <span>{isOfflineView ? 'View Chat' : 'Leave Email Note'}</span>
               </button>
             )}
@@ -1026,7 +1038,7 @@ export default function LiveSupportWidget() {
                     <button
                       type="button"
                       onClick={() => setOfflineSubmitted(false)}
-                      className="px-3.5 py-2 rounded-xl bg-[#b85d34] hover:bg-[#a04e28] text-white font-bold text-xs transition-colors cursor-pointer shadow-xs"
+                      className="px-3.5 py-2 rounded-xl bg-emerald-700 hover:bg-emerald-800 text-white font-bold text-xs transition-colors cursor-pointer shadow-xs"
                     >
                       Send Another Message
                     </button>
@@ -1054,7 +1066,7 @@ export default function LiveSupportWidget() {
                       value={offlineEmail}
                       onChange={(e) => setOfflineEmail(e.target.value)}
                       placeholder="e.g. yourname@example.com"
-                      className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-base sm:text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-[#d4a359] shadow-2xs"
+                      className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-base sm:text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-emerald-500 shadow-2xs"
                     />
                   </div>
 
@@ -1066,8 +1078,8 @@ export default function LiveSupportWidget() {
                       type="text"
                       value={offlineName}
                       onChange={(e) => setOfflineName(e.target.value)}
-                      placeholder="e.g. Muhammad / Fatima"
-                      className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-base sm:text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-[#d4a359] shadow-2xs"
+                      placeholder="Enter your name"
+                      className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-base sm:text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-emerald-500 shadow-2xs"
                     />
                   </div>
 
@@ -1080,8 +1092,8 @@ export default function LiveSupportWidget() {
                       rows={4}
                       value={offlineMessage}
                       onChange={(e) => setOfflineMessage(e.target.value)}
-                      placeholder="Describe your inquiry (e.g. course timings, tutor matching, fee verification)..."
-                      className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-base sm:text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-[#d4a359] resize-none shadow-2xs"
+                      placeholder="Write a detailed message"
+                      className="w-full bg-white border border-stone-300 rounded-xl px-3 py-2 text-base sm:text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-emerald-500 resize-none shadow-2xs"
                     />
                   </div>
 
@@ -1092,7 +1104,7 @@ export default function LiveSupportWidget() {
                         {filePreview ? (
                           <img src={filePreview} alt="Preview" className="w-8 h-8 rounded-lg object-cover" />
                         ) : (
-                          <FileText className="w-5 h-5 text-[#b85d34]" />
+                          <FileText className="w-5 h-5 text-emerald-700" />
                         )}
                         <div className="min-w-0">
                           <p className="text-xs text-[#0c2217] truncate font-medium">{selectedFile.name}</p>
@@ -1124,14 +1136,14 @@ export default function LiveSupportWidget() {
                       onClick={() => fileInputRef.current?.click()}
                       className="px-3 py-2 rounded-xl bg-[#f0ece1] hover:bg-[#ebe3d3] text-[#0c2217] text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer border border-[#ebe3d3]"
                     >
-                      <Paperclip className="w-3.5 h-3.5 text-[#b85d34]" />
+                      <Paperclip className="w-3.5 h-3.5 text-emerald-700" />
                       <span>{selectedFile ? 'Change File' : 'Attach File (PNG, JPG, PDF)'}</span>
                     </button>
 
                     <button
                       type="submit"
                       disabled={offlineSending || !offlineEmail.trim() || !offlineMessage.trim()}
-                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-[#ba4c18] to-[#963b10] hover:scale-105 disabled:opacity-40 disabled:hover:scale-100 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
+                      className="px-4 py-2 rounded-xl bg-gradient-to-r from-emerald-700 to-[#0c2217] hover:from-emerald-600 hover:to-[#123323] hover:scale-105 disabled:opacity-40 disabled:hover:scale-100 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-md"
                     >
                       {offlineSending ? (
                         <>
@@ -1173,14 +1185,14 @@ export default function LiveSupportWidget() {
                   return (
                     <div key={m.id} className={`flex gap-2 ${isUser ? 'justify-end' : 'justify-start'}`}>
                       {!isUser && (
-                        <div className="w-6 h-6 rounded-full border border-[#d4a359]/40 bg-[#f0ece1] text-[#b85d34] flex items-center justify-center shrink-0 mt-1 shadow-2xs">
+                        <div className="w-6 h-6 rounded-full border border-emerald-300/70 bg-emerald-50 text-emerald-700 flex items-center justify-center shrink-0 mt-1 shadow-2xs">
                           <Headphones className="w-3.5 h-3.5" />
                         </div>
                       )}
 
                       <div className={`max-w-[85%] sm:max-w-[80%] rounded-2xl p-3 text-xs leading-relaxed space-y-2 ${
                         isUser
-                          ? 'bg-gradient-to-r from-[#ba4c18] to-[#963b10] text-white rounded-br-xs shadow-md'
+                          ? 'bg-gradient-to-r from-emerald-800 to-[#0c2217] text-white rounded-br-xs shadow-md'
                           : 'bg-[#f5f0e6] border border-[#ebe3d3] text-[#141c19] rounded-bl-xs shadow-2xs'
                       }`}>
                         <div className="flex items-center justify-between gap-2">
@@ -1247,7 +1259,7 @@ export default function LiveSupportWidget() {
                           ) : (
                             <div className="p-2.5 rounded-xl bg-white border border-[#ebe3d3] flex items-center justify-between gap-2 shadow-2xs">
                               <div className="flex items-center gap-2 min-w-0">
-                                <FileText className="w-5 h-5 text-[#b85d34] shrink-0" />
+                                <FileText className="w-5 h-5 text-emerald-700 shrink-0" />
                                 <div className="min-w-0">
                                   <p className="text-xs font-bold text-[#0c2217] truncate" title={m.fileName}>
                                     {m.fileName || 'Document.pdf'}
@@ -1296,15 +1308,15 @@ export default function LiveSupportWidget() {
               </div>
 
               {/* Input & Send Footer (Light Theme) */}
-              <div className="p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-[#faf8f5] border-t border-[#ebe3d3] shrink-0 space-y-2 pr-16 sm:pr-3">
+              <div className="p-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] bg-[#faf8f5] border-t border-[#ebe3d3] shrink-0 space-y-2">
                 {/* File Attachment Chip before sending */}
                 {selectedFile && (
-                  <div className="p-2 bg-white border border-[#d4a359]/40 rounded-xl flex items-center justify-between gap-2 shadow-2xs">
+                  <div className="p-2 bg-white border border-emerald-300/60 rounded-xl flex items-center justify-between gap-2 shadow-2xs">
                     <div className="flex items-center gap-2 min-w-0">
                       {filePreview ? (
                         <img src={filePreview} alt="Preview" className="w-8 h-8 rounded-lg object-cover shrink-0" />
                       ) : (
-                        <FileText className="w-5 h-5 text-[#b85d34] shrink-0" />
+                        <FileText className="w-5 h-5 text-emerald-700 shrink-0" />
                       )}
                       <div className="min-w-0">
                         <p className="text-xs font-bold text-[#0c2217] truncate">{selectedFile.name}</p>
@@ -1351,15 +1363,19 @@ export default function LiveSupportWidget() {
                     type="text"
                     value={inputValue}
                     onChange={handleInputChange}
-                    placeholder={selectedFile ? 'Add caption (optional)...' : 'Type your message here...'}
-                    className="flex-1 min-w-0 bg-white border border-stone-300 rounded-xl px-3.5 py-2 text-base sm:text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-[#d4a359] transition-colors shadow-2xs"
+                    placeholder={selectedFile ? 'Add caption (optional)...' : 'Write a detailed message...'}
+                    className="flex-1 min-w-0 bg-white border border-stone-300 rounded-xl px-3.5 py-2 text-base sm:text-xs text-[#141c19] placeholder:text-stone-400 focus:outline-none focus:border-emerald-500 transition-colors shadow-2xs"
                     disabled={isSending || uploadingFile}
                   />
 
                   <button
                     type="submit"
                     disabled={isSending || uploadingFile || (!inputValue.trim() && !selectedFile)}
-                    className="p-2 min-w-[42px] min-h-[42px] flex items-center justify-center rounded-xl bg-gradient-to-r from-[#ba4c18] to-[#963b10] hover:scale-105 active:scale-95 disabled:opacity-40 disabled:hover:scale-100 text-white transition-all cursor-pointer shrink-0 shadow-xs"
+                    className={`p-2 min-w-[42px] min-h-[42px] flex items-center justify-center rounded-xl ${
+                      isAdminOnline
+                        ? 'bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-500 hover:to-teal-600 shadow-emerald-900/20'
+                        : 'bg-[#0c2217] hover:bg-[#123323]'
+                    } hover:scale-105 active:scale-95 disabled:opacity-40 disabled:hover:scale-100 text-white transition-all cursor-pointer shrink-0 shadow-xs`}
                     aria-label="Send message"
                   >
                     {uploadingFile ? (

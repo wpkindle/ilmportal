@@ -298,9 +298,6 @@ export default function AdminSupportDeskPage() {
       if (res.success) {
         fetchSessionTranscript(selectedSessionId);
         fetchSessions();
-        if (socket) {
-          socket.emit('admin-join-support', { sessionId: selectedSessionId, admin: user });
-        }
       }
     } catch (err) {
       alert('Failed to join support session: ' + err.message);

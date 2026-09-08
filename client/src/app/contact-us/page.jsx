@@ -278,7 +278,7 @@ export default function ContactUsPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-900 focus:outline-hidden focus:border-[#d4a359] focus:bg-white transition-colors"
-                    placeholder="e.g. Muhammad Usman or Dr. Ayesha Siddiqua"
+                    placeholder="Enter your name"
                   />
                 </div>
 
@@ -348,7 +348,7 @@ export default function ContactUsPage() {
                     placeholder={
                       subject.toLowerCase().includes('article') || subject.toLowerCase().includes('guest')
                         ? "Please provide:\n1. Proposed Article Title\n2. Outline or Full Draft text\n3. Short author biography and credentials/degrees\n4. Any relevant background..."
-                        : "Describe your inquiry, feedback, or question in detail..."
+                        : "Write a detailed message..."
                     }
                   />
                 </div>

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import AdminSidebar from '../../../components/admin/AdminSidebar';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
@@ -32,7 +32,10 @@ import {
   ShieldCheck,
   Heart,
   Database,
-  RefreshCw
+  RefreshCw,
+  Upload,
+  UploadCloud,
+  Link2
 } from 'lucide-react';
 
 const AUTHOR_OPTIONS = [
@@ -125,6 +128,13 @@ export default function AdminArticlesPage() {
 
   const [previewMode, setPreviewMode] = useState(false);
 
+  // Image Upload State
+  const fileInputRef = useRef(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [imageUploadError, setImageUploadError] = useState('');
+  const [imageTab, setImageTab] = useState('upload'); // 'upload' | 'url'
+  const [isDraggingOver, setIsDraggingOver] = useState(false);
+
   // Fetch articles
   const fetchArticles = async () => {
     try {
@@ -214,6 +224,74 @@ export default function AdminArticlesPage() {
     return () => clearTimeout(timer);
   }, [searchQuery]);
 
+  // Handle image file upload (file picker or drag-and-drop)
+  const handleImageFileUpload = async (file) => {
+    if (!file) return;
+    if (!file.type.startsWith('image/')) {
+      setImageUploadError('Please select a valid image file (JPG, PNG, WEBP, GIF).');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      setImageUploadError('Image size exceeds 10MB limit. Please choose a smaller image.');
+      return;
+    }
+
+    try {
+      setUploadingImage(true);
+      setImageUploadError('');
+
+      // Create instant optimistic preview with FileReader
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        setFormData(prev => ({ ...prev, coverImage: event.target.result }));
+      };
+      reader.readAsDataURL(file);
+
+      // Upload to backend API
+      const uploadData = new FormData();
+      uploadData.append('image', file);
+
+      const res = await api.adminUploadArticleImage(uploadData);
+      if (res && res.success && res.imageUrl) {
+        setFormData(prev => ({ ...prev, coverImage: res.imageUrl }));
+      }
+    } catch (err) {
+      console.error('Feature image upload error:', err);
+      // Keep optimistic preview but log error
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleDragOver = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(true);
+  };
+
+  const handleDragLeave = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDraggingOver(false);
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleImageFileUpload(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setFormData(prev => ({ ...prev, coverImage: '' }));
+    setImageUploadError('');
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   // Handle open editor for new article
   const handleOpenNew = () => {
     setEditingArticleId(null);
@@ -233,6 +311,9 @@ export default function AdminArticlesPage() {
     });
     setFeedback({ type: '', message: '' });
     setPreviewMode(false);
+    setImageUploadError('');
+    setImageTab('upload');
+    setIsDraggingOver(false);
     setIsEditorOpen(true);
   };
 
@@ -255,6 +336,9 @@ export default function AdminArticlesPage() {
     });
     setFeedback({ type: '', message: '' });
     setPreviewMode(false);
+    setImageUploadError('');
+    setImageTab('upload');
+    setIsDraggingOver(false);
     setIsEditorOpen(true);
   };
 
@@ -799,37 +883,241 @@ export default function AdminArticlesPage() {
                 </div>
               </div>
 
-              {/* 4. Cover Image with Quick Presets */}
-              <div className="space-y-2">
-                <label className="block text-xs font-bold text-slate-300">Cover Image URL</label>
-                <div className="flex gap-2">
-                  <input
-                    type="url"
-                    placeholder="https://images.unsplash.com/..."
-                    value={formData.coverImage}
-                    onChange={(e) => setFormData(prev => ({ ...prev, coverImage: e.target.value }))}
-                    className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-mono focus:outline-none focus:border-[#d4a359]"
-                  />
-                </div>
+              {/* 4. Featured Cover Image (Upload from Computer or URL/Presets) */}
+              <div className="space-y-3 bg-slate-950/60 p-4 sm:p-5 rounded-2xl border border-slate-800">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <label className="block text-xs font-black uppercase tracking-wider text-amber-400">
+                      Featured Cover Image
+                    </label>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      Recommended: 1200 × 630 px (16:9 ratio). Upload from your device or use an external URL.
+                    </p>
+                  </div>
 
-                {/* Preset image selectors */}
-                <div className="flex flex-wrap items-center gap-2 pt-1">
-                  <span className="text-[10px] text-slate-400 font-bold uppercase">Presets:</span>
-                  {PRESET_COVERS.map((preset) => (
+                  {/* Mode switcher tabs */}
+                  <div className="flex items-center gap-1 bg-slate-900 p-1 rounded-xl border border-slate-800 shrink-0 self-start sm:self-auto">
                     <button
-                      key={preset.name}
                       type="button"
-                      onClick={() => setFormData(prev => ({ ...prev, coverImage: preset.url }))}
-                      className={`px-2.5 py-1 rounded-lg text-[10px] font-bold border transition-colors ${
-                        formData.coverImage === preset.url
-                          ? 'bg-[#d4a359]/20 border-[#d4a359] text-[#f5d996]'
-                          : 'bg-slate-800 border-slate-700 text-slate-300 hover:text-white'
+                      onClick={() => setImageTab('upload')}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                        imageTab === 'upload'
+                          ? 'bg-[#d4a359] text-stone-950 shadow-xs'
+                          : 'text-slate-400 hover:text-white'
                       }`}
                     >
-                      {preset.name}
+                      <Upload className="w-3.5 h-3.5" />
+                      <span>Upload from Device</span>
                     </button>
-                  ))}
+                    <button
+                      type="button"
+                      onClick={() => setImageTab('url')}
+                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                        imageTab === 'url'
+                          ? 'bg-[#d4a359] text-stone-950 shadow-xs'
+                          : 'text-slate-400 hover:text-white'
+                      }`}
+                    >
+                      <Link2 className="w-3.5 h-3.5" />
+                      <span>URL &amp; Presets</span>
+                    </button>
+                  </div>
                 </div>
+
+                {/* Hidden File Input */}
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp,image/gif"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      handleImageFileUpload(e.target.files[0]);
+                    }
+                  }}
+                  className="hidden"
+                />
+
+                {imageTab === 'upload' ? (
+                  <div>
+                    {formData.coverImage ? (
+                      /* Preview with Actions */
+                      <div className="relative rounded-2xl overflow-hidden border border-slate-700/80 bg-slate-900/90 group">
+                        <div className="relative h-48 sm:h-60 w-full overflow-hidden">
+                          <img
+                            src={formData.coverImage}
+                            alt="Featured preview"
+                            className="w-full h-full object-cover"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent pointer-events-none" />
+
+                          {/* Uploading overlay */}
+                          {uploadingImage && (
+                            <div className="absolute inset-0 bg-slate-950/80 backdrop-blur-xs flex flex-col items-center justify-center gap-2 text-white">
+                              <LoadingSpinner />
+                              <span className="text-xs font-bold">Uploading featured image...</span>
+                            </div>
+                          )}
+
+                          {/* Top pill */}
+                          <div className="absolute top-3 left-3 flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/90 border border-emerald-600/70 text-emerald-300 text-[11px] font-bold backdrop-blur-xs">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Featured Image Active</span>
+                          </div>
+
+                          {/* Bottom controls */}
+                          <div className="absolute bottom-3 inset-x-3 flex items-center justify-between gap-2">
+                            <span className="text-[11px] text-slate-300 font-mono truncate max-w-xs bg-black/60 px-2.5 py-1 rounded-lg backdrop-blur-xs">
+                              {formData.coverImage.startsWith('data:') ? 'Uploaded Image' : formData.coverImage}
+                            </span>
+
+                            <div className="flex items-center gap-2 shrink-0">
+                              <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={uploadingImage}
+                                className="px-3 py-1.5 rounded-xl bg-slate-800/90 hover:bg-slate-700 text-white text-xs font-bold border border-slate-600 backdrop-blur-xs flex items-center gap-1.5 transition-all cursor-pointer"
+                              >
+                                <Upload className="w-3.5 h-3.5 text-[#d4a359]" />
+                                <span>Change Image</span>
+                              </button>
+
+                              <button
+                                type="button"
+                                onClick={handleRemoveImage}
+                                disabled={uploadingImage}
+                                className="p-1.5 rounded-xl bg-rose-950/90 hover:bg-rose-900 text-rose-300 border border-rose-700 backdrop-blur-xs transition-all cursor-pointer"
+                                title="Remove Image"
+                              >
+                                <Trash2 className="w-4 h-4" />
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ) : (
+                      /* Drag & Drop Upload Zone */
+                      <div
+                        onDragOver={handleDragOver}
+                        onDragLeave={handleDragLeave}
+                        onDrop={handleDrop}
+                        onClick={() => fileInputRef.current?.click()}
+                        className={`p-6 sm:p-8 rounded-2xl border-2 border-dashed transition-all cursor-pointer text-center flex flex-col items-center justify-center gap-3 ${
+                          isDraggingOver
+                            ? 'border-[#d4a359] bg-[#d4a359]/10 scale-[1.01]'
+                            : 'border-slate-700/80 hover:border-[#d4a359]/70 bg-slate-900/50 hover:bg-slate-900/80'
+                        }`}
+                      >
+                        {uploadingImage ? (
+                          <div className="space-y-2 py-4">
+                            <LoadingSpinner />
+                            <p className="text-xs font-bold text-slate-300">Uploading featured image...</p>
+                          </div>
+                        ) : (
+                          <>
+                            <div className="w-14 h-14 rounded-2xl bg-slate-800/80 border border-slate-700 flex items-center justify-center text-[#d4a359] transition-transform">
+                              <UploadCloud className="w-7 h-7" />
+                            </div>
+
+                            <div className="space-y-1">
+                              <p className="text-xs sm:text-sm font-bold text-white">
+                                <span className="text-[#d4a359] underline decoration-[#d4a359]/60 underline-offset-2">Click to browse</span> or drag and drop image here
+                              </p>
+                              <p className="text-[11px] text-slate-400">
+                                Supports PNG, JPG, WEBP, or GIF (max 10MB)
+                              </p>
+                            </div>
+
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                fileInputRef.current?.click();
+                              }}
+                              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700 transition-all cursor-pointer"
+                            >
+                              <ImageIcon className="w-3.5 h-3.5 text-[#d4a359]" />
+                              <span>Select Image from Computer / Phone</span>
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    )}
+
+                    {imageUploadError && (
+                      <p className="text-xs font-semibold text-rose-400 mt-2 flex items-center gap-1.5">
+                        <AlertCircle className="w-3.5 h-3.5 shrink-0" />
+                        <span>{imageUploadError}</span>
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  /* URL & Presets Mode */
+                  <div className="space-y-3">
+                    <div className="flex gap-2">
+                      <input
+                        type="url"
+                        placeholder="Paste image URL (https://images.unsplash.com/...)"
+                        value={formData.coverImage}
+                        onChange={(e) => setFormData(prev => ({ ...prev, coverImage: e.target.value }))}
+                        className="w-full px-4 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white font-mono focus:outline-none focus:border-[#d4a359]"
+                      />
+                      {formData.coverImage && (
+                        <button
+                          type="button"
+                          onClick={handleRemoveImage}
+                          className="px-3 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white rounded-xl text-xs font-bold border border-slate-700"
+                        >
+                          Clear
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Presets */}
+                    <div className="space-y-1.5">
+                      <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider block">Curated Cover Presets:</span>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                        {PRESET_COVERS.map((preset) => (
+                          <button
+                            key={preset.name}
+                            type="button"
+                            onClick={() => {
+                              setFormData(prev => ({ ...prev, coverImage: preset.url }));
+                              setImageUploadError('');
+                            }}
+                            className={`p-2 rounded-xl border text-left flex flex-col gap-1.5 transition-all cursor-pointer group ${
+                              formData.coverImage === preset.url
+                                ? 'border-[#d4a359] bg-[#d4a359]/10'
+                                : 'border-slate-800 bg-slate-900/60 hover:bg-slate-900 hover:border-slate-700'
+                            }`}
+                          >
+                            <img
+                              src={preset.url}
+                              alt={preset.name}
+                              className="w-full h-14 rounded-lg object-cover border border-slate-800"
+                            />
+                            <span className="text-[10px] font-bold text-slate-300 line-clamp-1 group-hover:text-white">
+                              {preset.name}
+                            </span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Live Preview if URL entered */}
+                    {formData.coverImage && (
+                      <div className="mt-2 rounded-xl overflow-hidden border border-slate-800 h-36 w-full relative">
+                        <img
+                          src={formData.coverImage}
+                          alt="Cover preview"
+                          className="w-full h-full object-cover"
+                        />
+                        <span className="absolute bottom-2 left-2 px-2.5 py-0.5 rounded-md text-[10px] font-bold bg-black/70 text-white backdrop-blur-xs">
+                          Preview
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
 
               {/* 5. Excerpt / Summary */}

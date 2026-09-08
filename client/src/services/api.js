@@ -872,5 +872,11 @@ export const api = {
   adminSeedArticles: () => fetch(`${API_BASE}/articles/admin/seed-defaults`, {
     method: 'POST',
     headers: getHeaders()
+  }).then(handleResponse),
+
+  adminUploadArticleImage: (formData) => fetch(`${API_BASE}/articles/admin/upload-image`, {
+    method: 'POST',
+    headers: getHeaders(true),
+    body: formData
   }).then(handleResponse)
 };

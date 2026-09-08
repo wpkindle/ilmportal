@@ -673,6 +673,78 @@ const seedAdminArticles = async (req, res) => {
   }
 };
 
+// @desc    Upload featured image for an article
+// @route   POST /api/articles/admin/upload-image
+// @access  Private/Admin
+const uploadArticleImage = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        message: 'No image file uploaded. Please select an image.'
+      });
+    }
+
+    let imageUrl = '';
+
+    // 1. Upload to Cloudinary if configured
+    if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+      try {
+        const { cloudinary } = require('../config/cloudinary');
+        imageUrl = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            {
+              folder: 'ilmportal/articles',
+              resource_type: 'image',
+              transformation: [{ quality: 'auto', fetch_format: 'auto' }]
+            },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result.secure_url);
+            }
+          );
+          stream.end(req.file.buffer);
+        });
+      } catch (cloudErr) {
+        console.warn('Cloudinary upload error, falling back to local storage:', cloudErr);
+      }
+    }
+
+    // 2. Local fallback to uploads directory
+    if (!imageUrl) {
+      const fs = require('fs');
+      const path = require('path');
+      const uploadsDir = path.join(__dirname, '../uploads');
+      if (!fs.existsSync(uploadsDir)) {
+        fs.mkdirSync(uploadsDir, { recursive: true });
+      }
+
+      const ext = path.extname(req.file.originalname || '.jpg').toLowerCase() || '.jpg';
+      const cleanName = path.basename(req.file.originalname, ext).replace(/[^a-zA-Z0-9_-]/g, '_').slice(0, 30);
+      const filename = `featured-${Date.now()}-${cleanName}${ext}`;
+      const filepath = path.join(uploadsDir, filename);
+
+      fs.writeFileSync(filepath, req.file.buffer);
+
+      const host = req.get('host');
+      const protocol = req.protocol || 'https';
+      imageUrl = host ? `${protocol}://${host}/uploads/${filename}` : `/uploads/${filename}`;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Feature image uploaded successfully',
+      imageUrl
+    });
+  } catch (error) {
+    console.error('Error uploading article feature image:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Failed to upload feature image'
+    });
+  }
+};
+
 module.exports = {
   getArticles,
   getArticleBySlug,
@@ -682,6 +754,7 @@ module.exports = {
   deleteArticle,
   seedAdminArticles,
   seedAllDefaultArticles,
-  seedDemoArticleIfEmpty
+  seedDemoArticleIfEmpty,
+  uploadArticleImage
 };
 

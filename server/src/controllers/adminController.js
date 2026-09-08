@@ -106,7 +106,12 @@ exports.getTutorApprovalQueue = async (req, res) => {
     let filter = {};
 
     if (status === 'under_review') {
-      filter = { verificationStatus: { $in: ['under_review', 'pending'] } };
+      filter = {
+        $or: [
+          { verificationStatus: { $in: ['under_review', 'pending'] } },
+          { 'sanadDocuments.status': 'pending' }
+        ]
+      };
     } else if (status === 'incomplete') {
       filter = { verificationStatus: 'incomplete' };
     } else if (status === 'approved') {
@@ -135,7 +140,12 @@ exports.getTutorApprovalQueue = async (req, res) => {
     });
 
     const counts = {
-      under_review: await TutorProfile.countDocuments({ verificationStatus: { $in: ['under_review', 'pending'] } }),
+      under_review: await TutorProfile.countDocuments({
+        $or: [
+          { verificationStatus: { $in: ['under_review', 'pending'] } },
+          { 'sanadDocuments.status': 'pending' }
+        ]
+      }),
       incomplete: await TutorProfile.countDocuments({ verificationStatus: 'incomplete' }),
       approved: await TutorProfile.countDocuments({ verificationStatus: 'approved' }),
       contact_needed: await TutorProfile.countDocuments({ verificationStatus: 'contact_needed' }),
@@ -172,14 +182,25 @@ exports.approveTutor = async (req, res) => {
 
     tutor.verificationStatus = 'approved';
     tutor.rejectionReason = '';
+
+    // Mark all sanadDocuments as verified
+    if (Array.isArray(tutor.sanadDocuments)) {
+      tutor.sanadDocuments.forEach((doc) => {
+        doc.status = 'verified';
+        doc.reviewedAt = new Date();
+        doc.reviewedBy = req.user.id;
+        doc.rejectionReason = '';
+      });
+    }
+
     await tutor.save();
 
     // Create Notification & Send Email
     await Notification.create({
       recipient: tutor.user._id,
       sender: req.user.id,
-      title: 'Tutor Profile Approved!',
-      message: 'Congratulations! Your tutor application and credentials have been verified and approved. Your profile is now live.',
+      title: 'Tutor Profile & Sanad Credentials Approved!',
+      message: 'Congratulations! Your tutor credentials and degrees have been verified and approved. Your profile is now verified and live.',
       type: 'verification_status',
       link: '/tutor/dashboard'
     });
@@ -189,7 +210,7 @@ exports.approveTutor = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: `Tutor ${tutor.user.name} has been approved successfully!`,
+      message: `Tutor ${tutor.user.name} and all educational documents have been approved & verified!`,
       tutor
     });
   } catch (error) {
@@ -216,6 +237,18 @@ exports.rejectTutor = async (req, res) => {
 
     tutor.verificationStatus = 'rejected';
     tutor.rejectionReason = reason || 'Documentation could not be verified.';
+
+    if (Array.isArray(tutor.sanadDocuments)) {
+      tutor.sanadDocuments.forEach((doc) => {
+        if (doc.status === 'pending') {
+          doc.status = 'rejected';
+          doc.rejectionReason = reason || 'Documentation could not be verified.';
+          doc.reviewedAt = new Date();
+          doc.reviewedBy = req.user.id;
+        }
+      });
+    }
+
     await tutor.save();
 
     await Notification.create({
@@ -239,6 +272,73 @@ exports.rejectTutor = async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message || 'Error rejecting tutor'
+    });
+  }
+};
+
+// @desc    Review individual tutor sanad document (verify / reject)
+// @route   PUT /api/admin/tutors/:id/documents/:docId/review
+exports.reviewTutorDocument = async (req, res) => {
+  try {
+    const { status = 'verified', reason = '' } = req.body;
+    const tutor = await TutorProfile.findById(req.params.id).populate('user');
+
+    if (!tutor) {
+      return res.status(404).json({
+        success: false,
+        message: 'Tutor profile not found'
+      });
+    }
+
+    const doc = tutor.sanadDocuments.id(req.params.docId) ||
+      tutor.sanadDocuments.find((d) => d._id?.toString() === req.params.docId);
+
+    if (!doc) {
+      return res.status(404).json({
+        success: false,
+        message: 'Sanad document not found'
+      });
+    }
+
+    doc.status = status;
+    doc.reviewedAt = new Date();
+    doc.reviewedBy = req.user.id;
+    if (status === 'rejected') {
+      doc.rejectionReason = reason || 'Document does not meet authenticity criteria.';
+    } else {
+      doc.rejectionReason = '';
+    }
+
+    // If all documents are verified, transition tutor verificationStatus to approved if under review
+    const allVerified = tutor.sanadDocuments.length > 0 && tutor.sanadDocuments.every((d) => d.status === 'verified' || d.status === 'approved');
+    if (allVerified && tutor.verificationStatus !== 'approved') {
+      tutor.verificationStatus = 'approved';
+    }
+
+    await tutor.save();
+
+    // Create Notification
+    await Notification.create({
+      recipient: tutor.user._id,
+      sender: req.user.id,
+      title: status === 'verified' ? 'Degree / Sanad Document Verified!' : 'Degree / Sanad Verification Update',
+      message: status === 'verified'
+        ? `Your document "${doc.title}" has been reviewed and verified by IlmiDunya administration.`
+        : `Your document "${doc.title}" could not be verified: ${doc.rejectionReason}`,
+      type: 'verification_status',
+      link: '/tutor/profile#profile-sanads'
+    });
+
+    res.status(200).json({
+      success: true,
+      message: `Document status updated to ${status}.`,
+      document: doc,
+      tutor
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error reviewing document'
     });
   }
 };

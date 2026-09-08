@@ -24,6 +24,7 @@ export default function TutorApprovalPage() {
   const [sanadModalOpen, setSanadModalOpen] = useState(false);
   const [activeSanads, setActiveSanads] = useState([]);
   const [activeTutorName, setActiveTutorName] = useState('');
+  const [activeTutorId, setActiveTutorId] = useState(null);
 
   // Reject / Contact Modals
   const [rejectId, setRejectId] = useState(null);
@@ -31,6 +32,21 @@ export default function TutorApprovalPage() {
   const [contactId, setContactId] = useState(null);
   const [contactNotes, setContactNotes] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+
+  const handleVerifySingleDoc = async (docId) => {
+    if (!activeTutorId) return;
+    try {
+      const res = await api.reviewTutorDocument(activeTutorId, docId, { status: 'verified' });
+      if (res.success) {
+        setActiveSanads((prev) =>
+          prev.map((d) => (d._id === docId ? { ...d, status: 'verified' } : d))
+        );
+        fetchQueue();
+      }
+    } catch (err) {
+      alert(err.message || 'Error reviewing document');
+    }
+  };
 
   const fetchQueue = async () => {
     setLoading(true);
@@ -198,17 +214,34 @@ export default function TutorApprovalPage() {
                       </div>
 
                       {/* Sanad preview button */}
-                      <button
-                        onClick={() => {
-                          setActiveSanads(tutor.sanadDocuments || []);
-                          setActiveTutorName(tutor.user?.name || 'Tutor');
-                          setSanadModalOpen(true);
-                        }}
-                        className="px-3 py-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs rounded-xl border border-emerald-200 flex items-center gap-1.5 cursor-pointer"
-                      >
-                        <FileText className="w-4 h-4 text-emerald-600" />
-                        <span>Inspect Sanad ({tutor.sanadDocuments?.length || 0})</span>
-                      </button>
+                      {(() => {
+                        const hasPendingDocs = tutor.sanadDocuments?.some(
+                          (d) => d.status === 'pending' || (!d.status && tutor.verificationStatus !== 'approved')
+                        );
+                        return (
+                          <button
+                            onClick={() => {
+                              setActiveSanads(tutor.sanadDocuments || []);
+                              setActiveTutorName(tutor.user?.name || 'Tutor');
+                              setActiveTutorId(tutor._id);
+                              setSanadModalOpen(true);
+                            }}
+                            className={`px-3 py-1.5 rounded-xl border flex items-center gap-1.5 cursor-pointer font-bold text-xs transition-colors ${
+                              hasPendingDocs
+                                ? 'bg-amber-50 hover:bg-amber-100 text-amber-900 border-amber-300 shadow-xs'
+                                : 'bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border-emerald-200'
+                            }`}
+                          >
+                            <FileText className={`w-4 h-4 ${hasPendingDocs ? 'text-amber-600' : 'text-emerald-600'}`} />
+                            <span>Inspect Sanad ({tutor.sanadDocuments?.length || 0})</span>
+                            {hasPendingDocs && (
+                              <span className="bg-amber-500 text-white text-[9px] px-1.5 py-0.2 rounded-full font-black animate-pulse">
+                                PENDING
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })()}
                     </div>
 
                     {/* Profile Completion Bar */}
@@ -290,6 +323,8 @@ export default function TutorApprovalPage() {
         onClose={() => setSanadModalOpen(false)}
         documents={activeSanads}
         tutorName={activeTutorName}
+        isAdmin={true}
+        onVerifyDoc={handleVerifySingleDoc}
       />
 
       {/* Reject Modal */}

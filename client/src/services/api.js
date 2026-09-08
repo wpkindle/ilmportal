@@ -495,6 +495,12 @@ export const api = {
     body: JSON.stringify({ notes })
   }).then(handleResponse),
 
+  reviewTutorDocument: (tutorId, docId, body) => fetch(`${API_BASE}/admin/tutors/${tutorId}/documents/${docId}/review`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
   getAdminDeals: (params = {}) => {
     const query = new URLSearchParams(params).toString();
     return fetch(`${API_BASE}/admin/deals?${query}`, {

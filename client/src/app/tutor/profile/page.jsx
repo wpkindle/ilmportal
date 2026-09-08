@@ -175,34 +175,52 @@ function TutorProfileContent() {
     setSanadError('');
 
     try {
-      // Direct base64 addition to tutor profile sanadDocuments
-      const updatedDocs = [
-        ...uploadedSanads,
-        {
-          title: newSanadTitle.trim() || 'Sanad / Educational Degree',
-          fileUrl: newSanadFileUrl,
-          fileType: newSanadFileUrl.startsWith('data:application/pdf') ? 'application/pdf' : 'image/jpeg',
-          uploadedAt: new Date()
-        }
-      ];
+      // Add document with pending status
+      const newDoc = {
+        title: newSanadTitle.trim() || 'Sanad / Educational Degree',
+        fileUrl: newSanadFileUrl,
+        fileType: newSanadFileUrl.startsWith('data:application/pdf') ? 'application/pdf' : 'image/jpeg',
+        status: 'pending',
+        uploadedAt: new Date()
+      };
+
+      const updatedDocs = [...uploadedSanads, newDoc];
 
       const res = await api.updateMyTutorProfile({
         sanadDocuments: updatedDocs,
-        verificationStatus: 'pending' // Flag for admin verification
+        verificationStatus: 'pending' // Queued for admin verification
       });
 
       if (res.success) {
-        setUploadedSanads(updatedDocs);
+        setUploadedSanads(res.profile?.sanadDocuments || updatedDocs);
         if (res.profile) updateTutorProfileState(res.profile);
         setNewSanadTitle('');
         setNewSanadFileUrl('');
-        setSanadSuccess('Sanad / Degree uploaded successfully! It is queued for Admin approval.');
-        setTimeout(() => setSanadSuccess(''), 4500);
+        setSanadSuccess('Sanad / Degree uploaded successfully! It is queued for admin approval (Pending Approval).');
+        setTimeout(() => setSanadSuccess(''), 5000);
       }
     } catch (err) {
       setSanadError(err.message || 'Error uploading Sanad document');
     } finally {
       setUploadingSanad(false);
+    }
+  };
+
+  const handleDeleteSanadDoc = async (docIndex) => {
+    if (!window.confirm('Are you sure you want to remove this document?')) return;
+    try {
+      const updatedDocs = uploadedSanads.filter((_, idx) => idx !== docIndex);
+      const res = await api.updateMyTutorProfile({
+        sanadDocuments: updatedDocs
+      });
+      if (res.success) {
+        setUploadedSanads(res.profile?.sanadDocuments || updatedDocs);
+        if (res.profile) updateTutorProfileState(res.profile);
+        setSanadSuccess('Document removed successfully.');
+        setTimeout(() => setSanadSuccess(''), 3000);
+      }
+    } catch (err) {
+      setSanadError(err.message || 'Failed to remove document');
     }
   };
 
@@ -451,9 +469,9 @@ function TutorProfileContent() {
                       <ShieldCheck className="w-3 h-3" />
                       <span>Verified & Approved</span>
                     </span>
-                  ) : tutorProfile?.verificationStatus === 'under_review' ? (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-900 border border-blue-200 flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-blue-600 animate-pulse" />
+                  ) : tutorProfile?.verificationStatus === 'under_review' || tutorProfile?.verificationStatus === 'pending' ? (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-amber-600 animate-pulse" />
                       <span>Under Admin Review</span>
                     </span>
                   ) : (
@@ -783,10 +801,29 @@ function TutorProfileContent() {
                   </p>
                 </div>
 
-                {tutorProfile?.verificationStatus === 'approved' && (
-                  <span className="px-2.5 py-1 bg-[#f0ece1] text-[#0c2217] text-[11px] font-bold rounded-xl flex items-center gap-1">
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
-                    <span>Verified Sanad</span>
+                {uploadedSanads.length > 0 ? (
+                  uploadedSanads.some(d => d.status === 'pending' || (!d.status && tutorProfile?.verificationStatus !== 'approved')) ||
+                  tutorProfile?.verificationStatus === 'under_review' ||
+                  tutorProfile?.verificationStatus === 'pending' ? (
+                    <span className="px-3 py-1 bg-amber-50 text-amber-900 border border-amber-300 text-[11px] font-bold rounded-xl flex items-center gap-1.5 shadow-2xs">
+                      <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                      <span>Pending Approval</span>
+                    </span>
+                  ) : tutorProfile?.verificationStatus === 'rejected' ? (
+                    <span className="px-3 py-1 bg-rose-50 text-rose-800 border border-rose-300 text-[11px] font-bold rounded-xl flex items-center gap-1.5 shadow-2xs">
+                      <AlertCircle className="w-3.5 h-3.5 text-rose-600" />
+                      <span>Verification Rejected</span>
+                    </span>
+                  ) : (
+                    <span className="px-3 py-1 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 text-[11px] font-bold rounded-xl flex items-center gap-1.5 shadow-2xs">
+                      <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
+                      <span>Verified Sanad</span>
+                    </span>
+                  )
+                ) : (
+                  <span className="px-2.5 py-1 bg-slate-100 text-slate-600 text-[11px] font-semibold rounded-xl flex items-center gap-1">
+                    <FileText className="w-3.5 h-3.5 text-slate-400" />
+                    <span>Document Required</span>
                   </span>
                 )}
               </div>
@@ -807,7 +844,7 @@ function TutorProfileContent() {
 
               {/* Uploaded Documents Grid */}
               <div className="space-y-3">
-                <h4 className="text-xs font-bold text-slate-700">Uploaded Sanad & Degree Documents ({uploadedSanads.length})</h4>
+                <h4 className="text-xs font-bold text-slate-700">Uploaded Sanad &amp; Degree Documents ({uploadedSanads.length})</h4>
                 
                 {uploadedSanads.length === 0 ? (
                   <div className="p-5 border-2 border-dashed border-slate-200 rounded-2xl text-center text-xs text-slate-400 space-y-1">
@@ -817,33 +854,68 @@ function TutorProfileContent() {
                   </div>
                 ) : (
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {uploadedSanads.map((doc, idx) => (
-                      <div
-                        key={idx}
-                        className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between gap-3 group hover:bg-[#f0ece1]/40 hover:border-[#d4a359]/40 transition-all"
-                      >
-                        <div className="flex items-center gap-3 overflow-hidden">
-                          <div className="w-10 h-10 rounded-xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center shrink-0">
-                            <GraduationCap className="w-5 h-5" />
+                    {uploadedSanads.map((doc, idx) => {
+                      const isDocVerified = doc.status === 'verified' || doc.status === 'approved' || (!doc.status && tutorProfile?.verificationStatus === 'approved');
+                      const isDocRejected = doc.status === 'rejected';
+                      const isDocPending = !isDocVerified && !isDocRejected;
+
+                      return (
+                        <div
+                          key={doc._id || idx}
+                          className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex items-center justify-between gap-3 group hover:bg-[#f0ece1]/40 hover:border-[#d4a359]/40 transition-all"
+                        >
+                          <div className="flex items-center gap-3 overflow-hidden min-w-0">
+                            <div className="w-10 h-10 rounded-xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center shrink-0">
+                              <GraduationCap className="w-5 h-5" />
+                            </div>
+                            <div className="truncate min-w-0">
+                              <p className="font-bold text-xs text-slate-900 truncate">{doc.title || 'Sanad / Degree Document'}</p>
+                              <div className="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                                <span className="text-[10px] text-slate-400">
+                                  Uploaded {new Date(doc.uploadedAt || Date.now()).toLocaleDateString()}
+                                </span>
+                                <span className="text-slate-300">·</span>
+                                {isDocVerified ? (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-100/90 border border-emerald-200 px-1.5 py-0.2 rounded-md">
+                                    <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
+                                    Verified
+                                  </span>
+                                ) : isDocRejected ? (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-800 bg-rose-100/90 border border-rose-200 px-1.5 py-0.2 rounded-md">
+                                    <AlertCircle className="w-2.5 h-2.5 text-rose-600" />
+                                    Rejected
+                                  </span>
+                                ) : (
+                                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-900 bg-amber-100/90 border border-amber-200 px-1.5 py-0.2 rounded-md">
+                                    <Clock className="w-2.5 h-2.5 text-amber-600 animate-pulse" />
+                                    Pending Approval
+                                  </span>
+                                )}
+                              </div>
+                            </div>
                           </div>
-                          <div className="truncate">
-                            <p className="font-bold text-xs text-slate-900 truncate">{doc.title || 'Sanad / Degree Document'}</p>
-                            <span className="text-[10px] text-slate-400">
-                              Uploaded {new Date(doc.uploadedAt || Date.now()).toLocaleDateString()}
-                            </span>
+
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            <button
+                              type="button"
+                              onClick={() => setSelectedSanadModal(true)}
+                              className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-[#0c2217] hover:border-[#d4a359]/40 shadow-2xs transition-colors cursor-pointer"
+                              title="Preview Document"
+                            >
+                              <Eye className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => handleDeleteSanadDoc(idx)}
+                              className="p-2 rounded-xl bg-white border border-slate-200 text-slate-400 hover:text-rose-600 hover:border-rose-200 shadow-2xs transition-colors cursor-pointer"
+                              title="Remove Document"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
                           </div>
                         </div>
-
-                        <button
-                          type="button"
-                          onClick={() => setSelectedSanadModal(true)}
-                          className="p-2 rounded-xl bg-white border border-slate-200 text-slate-600 hover:text-[#0c2217] hover:border-[#d4a359]/40 shadow-2xs transition-colors cursor-pointer"
-                          title="Preview Document"
-                        >
-                          <Eye className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>

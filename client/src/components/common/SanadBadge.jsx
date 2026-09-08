@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { ShieldCheck, GraduationCap, FileText, ExternalLink, X } from 'lucide-react';
+import { ShieldCheck, GraduationCap, FileText, ExternalLink, X, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
 
 const SanadBadge = ({ documents = [], isVerified = true, onClick }) => {
   if (!documents || documents.length === 0) return null;
@@ -21,7 +21,15 @@ const SanadBadge = ({ documents = [], isVerified = true, onClick }) => {
   );
 };
 
-export const SanadModal = ({ isOpen, onClose, documents = [], tutorName = '' }) => {
+export const SanadModal = ({
+  isOpen,
+  onClose,
+  documents = [],
+  tutorName = '',
+  isAdmin = false,
+  onVerifyDoc = null,
+  onRejectDoc = null
+}) => {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -40,10 +48,10 @@ export const SanadModal = ({ isOpen, onClose, documents = [], tutorName = '' }) 
             </div>
             <div>
               <h3 className="text-lg font-serif font-bold text-[#0c2217]">
-                Verified Credentials &amp; Sanad
+                Educational Degrees &amp; Sanad Credentials
               </h3>
               <p className="text-xs text-stone-500">
-                Official documents submitted by {tutorName || 'Tutor'} &amp; verified by IlmiDunya
+                Official documents submitted by {tutorName || 'Tutor'} &amp; verified by IlmiDunya administration
               </p>
             </div>
           </div>
@@ -56,27 +64,59 @@ export const SanadModal = ({ isOpen, onClose, documents = [], tutorName = '' }) 
         </div>
 
         <div className="overflow-y-auto flex-1 py-4 space-y-4">
-          {documents.map((doc, idx) => (
-            <div key={idx} className="border border-stone-200 rounded-2xl overflow-hidden bg-[#faf8f5]">
-              <div className="p-3 bg-white border-b border-stone-200 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <FileText className="w-4 h-4 text-[#0c2217]" />
-                  <span className="font-semibold text-sm text-stone-800">
-                    {doc.title || `Document #${idx + 1}`}
-                  </span>
+          {documents.map((doc, idx) => {
+            const isDocVerified = doc.status === 'verified' || doc.status === 'approved';
+            const isDocRejected = doc.status === 'rejected';
+            const isDocPending = !isDocVerified && !isDocRejected;
+
+            return (
+              <div key={doc._id || idx} className="border border-stone-200 rounded-2xl overflow-hidden bg-[#faf8f5]">
+                <div className="p-3 bg-white border-b border-stone-200 flex flex-wrap items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <FileText className="w-4 h-4 text-[#0c2217] shrink-0" />
+                    <span className="font-semibold text-sm text-stone-800 truncate">
+                      {doc.title || `Document #${idx + 1}`}
+                    </span>
+                    {isDocVerified ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-md shrink-0">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        Verified
+                      </span>
+                    ) : isDocRejected ? (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-800 bg-rose-100 border border-rose-300 px-2 py-0.5 rounded-md shrink-0">
+                        <AlertCircle className="w-3 h-3 text-rose-600" />
+                        Rejected
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-md shrink-0">
+                        <Clock className="w-3 h-3 text-amber-600 animate-pulse" />
+                        Pending Approval
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-2">
+                    {isAdmin && isDocPending && onVerifyDoc && (
+                      <button
+                        type="button"
+                        onClick={() => onVerifyDoc(doc._id || idx)}
+                        className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-lg shadow-xs transition-colors cursor-pointer"
+                      >
+                        Verify Doc
+                      </button>
+                    )}
+                    <a
+                      href={doc.fileUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs font-bold text-[#b85d34] hover:text-[#9e4e2a] inline-flex items-center gap-1"
+                    >
+                      Full View <ExternalLink className="w-3 h-3" />
+                    </a>
+                  </div>
                 </div>
-                <a
-                  href={doc.fileUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs font-bold text-[#b85d34] hover:text-[#9e4e2a] inline-flex items-center gap-1"
-                >
-                  Full View <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-              <div className="p-2 flex justify-center bg-slate-900/5">
-                {doc.fileUrl.endsWith('.pdf') ? (
-                  <div className="p-8 text-center text-slate-600">
+                <div className="p-2 flex justify-center bg-slate-900/5">
+                  {doc.fileUrl && (doc.fileUrl.endsWith('.pdf') || doc.fileType === 'application/pdf' || doc.fileUrl.startsWith('data:application/pdf')) ? (
+                    <div className="p-8 text-center text-slate-600">
                     <FileText className="w-12 h-12 mx-auto text-red-500 mb-2" />
                     <p className="text-sm font-medium">PDF Sanad / Degree Document</p>
                     <a
@@ -97,7 +137,8 @@ export const SanadModal = ({ isOpen, onClose, documents = [], tutorName = '' }) 
                 )}
               </div>
             </div>
-          ))}
+          );
+        })}
         </div>
 
         <div className="pt-4 border-t border-slate-100 flex justify-end">

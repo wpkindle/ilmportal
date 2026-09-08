@@ -287,7 +287,9 @@ exports.updateMyTutorProfile = async (req, res) => {
       localArea,
       area,
       teachingMode,
-      gender
+      gender,
+      sanadDocuments,
+      verificationStatus
     } = req.body;
 
     let profile = await TutorProfile.findOne({ user: req.user.id });
@@ -301,7 +303,7 @@ exports.updateMyTutorProfile = async (req, res) => {
         city: city || '',
         localArea: (localArea !== undefined ? localArea : area || '').trim(),
         gender: gender || 'male',
-        verificationStatus: 'pending'
+        verificationStatus: 'under_review'
       });
     } else {
       if (bio !== undefined) profile.bio = bio;
@@ -316,6 +318,63 @@ exports.updateMyTutorProfile = async (req, res) => {
       }
       if (teachingMode !== undefined) {
         profile.teachingModes = teachingMode === 'both' ? ['online', 'in_person'] : [teachingMode === 'physical' ? 'in_person' : teachingMode];
+      }
+    }
+
+    let hasNewlyUploadedDoc = false;
+    let newlyUploadedDocTitle = '';
+
+    // Handle Sanad Documents Array & Status Tracking
+    if (Array.isArray(sanadDocuments)) {
+      const existingUrls = new Set((profile.sanadDocuments || []).map(d => d.fileUrl));
+
+      const normalizedDocs = sanadDocuments.map(doc => {
+        const isNew = !existingUrls.has(doc.fileUrl);
+        if (isNew) {
+          hasNewlyUploadedDoc = true;
+          newlyUploadedDocTitle = doc.title || 'Sanad / Educational Degree';
+        }
+        return {
+          _id: doc._id,
+          title: doc.title || 'Sanad / Educational Degree',
+          fileUrl: doc.fileUrl,
+          fileType: doc.fileType || (doc.fileUrl && doc.fileUrl.startsWith('data:application/pdf') ? 'application/pdf' : 'image/jpeg'),
+          status: isNew ? 'pending' : (doc.status || 'pending'),
+          uploadedAt: doc.uploadedAt || new Date(),
+          rejectionReason: doc.rejectionReason || ''
+        };
+      });
+
+      profile.sanadDocuments = normalizedDocs;
+    }
+
+    // Determine verificationStatus updates
+    if (hasNewlyUploadedDoc) {
+      if (profile.verificationStatus !== 'approved') {
+        profile.verificationStatus = 'under_review';
+      }
+
+      // Dispatch Admin Notification for new document
+      try {
+        const Notification = require('../models/Notification');
+        const adminUsers = await User.find({ role: 'admin' });
+        const tutorUser = await User.findById(req.user.id);
+        for (const admin of adminUsers) {
+          await Notification.create({
+            recipient: admin._id,
+            sender: req.user.id,
+            title: 'New Tutor Document Uploaded for Review',
+            message: `${tutorUser?.name || 'A tutor'} uploaded "${newlyUploadedDocTitle}" for admin approval.`,
+            type: 'verification_status',
+            link: '/admin/tutor-approvals'
+          });
+        }
+      } catch (notifErr) {
+        console.error('Failed to notify admin of new document upload:', notifErr);
+      }
+    } else if (verificationStatus && ['pending', 'under_review'].includes(verificationStatus)) {
+      if (profile.verificationStatus !== 'approved' && profile.verificationStatus !== 'suspended') {
+        profile.verificationStatus = verificationStatus;
       }
     }
 
@@ -339,7 +398,9 @@ exports.updateMyTutorProfile = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Profile updated successfully',
+      message: hasNewlyUploadedDoc
+        ? 'Document uploaded successfully! It is now pending admin approval.'
+        : 'Profile updated successfully',
       profile
     });
   } catch (error) {
@@ -365,7 +426,7 @@ exports.uploadSanad = async (req, res) => {
     if (!profile) {
       profile = new TutorProfile({
         user: req.user.id,
-        verificationStatus: 'pending'
+        verificationStatus: 'under_review'
       });
     }
 
@@ -374,6 +435,7 @@ exports.uploadSanad = async (req, res) => {
       title: req.body.title || 'Sanad / Degree Document',
       fileUrl,
       fileType: req.file.mimetype,
+      status: 'pending',
       uploadedAt: new Date()
     };
 
@@ -384,30 +446,32 @@ exports.uploadSanad = async (req, res) => {
     const completion = user ? calculateProfileCompletion(user, profile) : { percentage: 0 };
 
     if (profile.verificationStatus !== 'approved' && profile.verificationStatus !== 'suspended') {
-      if (completion.percentage >= 100) {
-        profile.verificationStatus = 'under_review';
-        const adminUser = await User.findOne({ role: 'admin' });
-        if (adminUser) {
-          const Notification = require('../models/Notification');
-          await Notification.create({
-            recipient: adminUser._id,
-            title: 'Tutor Profile 100% Complete — Ready for Review',
-            message: `${user.name} has completed 100% of their teaching profile with Sanad documents.`,
-            type: 'system',
-            link: '/admin/tutor-approvals'
-          });
-        }
-      } else {
-        profile.verificationStatus = 'incomplete';
-      }
+      profile.verificationStatus = 'under_review';
     }
+
     await profile.save();
+
+    // Notify admins immediately
+    try {
+      const Notification = require('../models/Notification');
+      const adminUsers = await User.find({ role: 'admin' });
+      for (const admin of adminUsers) {
+        await Notification.create({
+          recipient: admin._id,
+          sender: req.user.id,
+          title: 'New Tutor Document Uploaded for Review',
+          message: `${user?.name || 'A tutor'} uploaded "${newDoc.title}" for admin approval.`,
+          type: 'verification_status',
+          link: '/admin/tutor-approvals'
+        });
+      }
+    } catch (notifErr) {
+      console.error('Error creating admin notification for sanad upload:', notifErr);
+    }
 
     res.status(200).json({
       success: true,
-      message: completion.percentage >= 100
-        ? 'Sanad document uploaded and profile is 100% complete! Submitted to administration for review.'
-        : `Sanad document uploaded. Profile is ${completion.percentage}% complete. Complete remaining fields to submit for review.`,
+      message: 'Sanad / Degree document uploaded and submitted to admin for approval (Pending Approval).',
       sanadDocuments: profile.sanadDocuments,
       verificationStatus: profile.verificationStatus,
       completion

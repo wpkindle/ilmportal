@@ -36,9 +36,7 @@ export const EDITORIAL_ARTICLES = [
         answer: 'Parents can schedule 3 trial lessons with any verified tutor. You observe the teaching pacing directly; if satisfied, you proceed with regular classes with zero middleman fee.'
       }
     ],
-    content: `### Bismillah-ir-Rahman-ir-Rahim
-
-The quest for authentic knowledge is a sacred duty for every Muslim family. In our beloved Pakistan, parents have historically invested their utmost energy and finances to ensure their sons and daughters learn the Holy Quran with accurate **Tajweed (مخارج)** and receive top-notch academic guidance.
+    content: `The quest for authentic knowledge is a sacred duty for every Muslim family. In our beloved Pakistan, parents have historically invested their utmost energy and finances to ensure their sons and daughters learn the Holy Quran with accurate **Tajweed (مخارج)** and receive top-notch academic guidance.
 
 Yet, over the past decade, as learning moved rapidly onto digital screens, Pakistani families faced unprecedented dilemmas regarding **modesty, privacy, and digital vulnerability**.
 
@@ -207,9 +205,7 @@ Let us nurture our daughters with warmth, dignity, and sacred knowledge.
         answer: 'For best muscle memory and vocal tract training, 4 to 5 short sessions of 30 minutes each week produce much faster results than long infrequent sessions.'
       }
     ],
-    content: `### In the Name of Allah, Most Gracious, Most Merciful
-
-Reciting the Holy Quran with **Tajweed** is not merely an aesthetic embellishment; it is the correct preservation of how the Quran was revealed to Prophet Muhammad (peace and blessings be upon him).
+    content: `Reciting the Holy Quran with **Tajweed** is not merely an aesthetic embellishment; it is the correct preservation of how the Quran was revealed to Prophet Muhammad (peace and blessings be upon him).
 
 Because our native languages in Pakistan are Urdu, Punjabi, Pashto, or Sindhi, our vocal tracts naturally carry regional phonetic habits. When reciting Arabic, these habits often cause subtle yet critical pronunciation errors.
 

@@ -867,5 +867,10 @@ export const api = {
   adminDeleteArticle: (id) => fetch(`${API_BASE}/articles/${id}`, {
     method: 'DELETE',
     headers: getHeaders()
+  }).then(handleResponse),
+
+  adminSeedArticles: () => fetch(`${API_BASE}/articles/admin/seed-defaults`, {
+    method: 'POST',
+    headers: getHeaders()
   }).then(handleResponse)
 };

@@ -186,31 +186,6 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
 
       const headingId = slugifyHeading(headingText);
 
-      // Special handling for Bismillah
-      if (
-        headingText.toLowerCase().includes('bismillah') ||
-        headingText.includes('بسم الله')
-      ) {
-        elements.push(
-          <div
-            key={`bismillah-${keyCounter++}`}
-            className={`my-4 p-4 sm:p-5 rounded-2xl text-center border ${
-              isDark
-                ? 'bg-slate-900 border-slate-800 text-amber-200'
-                : 'bg-[#faf6ee] border-[#ebe1ce] text-[#0c2217]'
-            } shadow-2xs`}
-          >
-            <div className={`text-xl sm:text-2xl font-serif font-black tracking-wide ${isDark ? 'text-amber-200' : 'text-[#0c2217]'}`}>
-              بِسْمِ اللَّهِ الرَّحْمَٰنِ الرَّحِيمِ
-            </div>
-            <div className="text-xs text-stone-500 font-medium mt-1">
-              In the Name of Allah, Most Gracious, Most Merciful
-            </div>
-          </div>
-        );
-        continue;
-      }
-
       // H4: Detailed Topic / Minor Heading (####)
       if (h4Match) {
         elements.push(

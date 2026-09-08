@@ -6,7 +6,8 @@ const {
   getAdminArticles,
   createArticle,
   updateArticle,
-  deleteArticle
+  deleteArticle,
+  seedAdminArticles
 } = require('../controllers/articleController');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
@@ -16,6 +17,7 @@ router.get('/', getArticles);
 
 // Admin routes (declared before /:slug to avoid collision)
 router.get('/admin/all', protect, authorize('admin'), getAdminArticles);
+router.post('/admin/seed-defaults', protect, authorize('admin'), seedAdminArticles);
 router.post('/', protect, authorize('admin'), createArticle);
 router.put('/:id', protect, authorize('admin'), updateArticle);
 router.delete('/:id', protect, authorize('admin'), deleteArticle);

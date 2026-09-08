@@ -469,9 +469,9 @@ function LoginContent() {
               <div className="p-3 bg-[#faf8f5] rounded-2xl border border-[#e6dfd5] text-[11px] text-stone-600 leading-relaxed">
                 <p className="flex items-center gap-1.5 font-semibold text-[#0c2217] mb-0.5">
                   <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
-                  <span>100% Privacy Guarantee</span>
+                  <span>Strict Privacy &amp; Data Protection</span>
                 </p>
-                Camera-off by default in WebRTC classes. Your learning and account data are encrypted and protected.
+                Your personal details are confidential and securely encrypted. We never sell, rent, or share your data with any third party.
               </div>
 
               {/* Submit Sign Up Button */}

@@ -11,7 +11,6 @@ import {
   Mail,
   Lock,
   User,
-  Phone,
   MapPin,
   Sparkles,
   ArrowRight,
@@ -67,7 +66,6 @@ export default function StudentAuthModal({
   const [registerForm, setRegisterForm] = useState({
     name: '',
     email: '',
-    phone: '',
     password: '',
     role: 'student'
   });
@@ -157,18 +155,11 @@ export default function StudentAuthModal({
       setLoading(false);
       return;
     }
-    if (!registerForm.phone.trim()) {
-      setError('Mobile / WhatsApp number is required');
-      setLoading(false);
-      return;
-    }
 
     try {
       const res = await api.register({
         name: registerForm.name.trim(),
         email: registerForm.email.trim().toLowerCase(),
-        phone: registerForm.phone.trim(),
-        number: registerForm.phone.trim(),
         password: registerForm.password,
         role: 'student'
       });
@@ -481,24 +472,6 @@ export default function StudentAuthModal({
                 </div>
               </div>
 
-              {/* Row 2: Phone Number */}
-              <div>
-                <label className="text-[11px] font-bold text-slate-700 block mb-0.5">
-                  Mobile / WhatsApp *
-                </label>
-                <div className="relative">
-                  <Phone className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                  <input
-                    type="tel"
-                    required
-                    autoComplete="off"
-                    placeholder="Enter Your Number"
-                    value={registerForm.phone}
-                    onChange={(e) => setRegisterForm({ ...registerForm, phone: e.target.value })}
-                    className="w-full pl-8 pr-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 font-medium"
-                  />
-                </div>
-              </div>
 
               {/* Row 3: Email Address */}
               <div>

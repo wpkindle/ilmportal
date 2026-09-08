@@ -181,61 +181,105 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen py-10 sm:py-16 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative z-10">
-      <div className="max-w-md w-full space-y-5">
+    <div className="min-h-screen py-8 sm:py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative z-10">
+      <div className="max-w-4xl w-full bg-white rounded-3xl border border-[#e6dfd5] shadow-[0_16px_50px_rgba(12,34,23,0.08)] overflow-hidden grid grid-cols-1 md:grid-cols-12">
         
-        {/* Top Logo & Portal Badge */}
-        <div className="text-center space-y-2.5">
-          <Link href="/" className="inline-flex items-center gap-3 group">
-            <BrandLogo variant="light" size="md" />
-          </Link>
+        {/* Left Column: Sign In Title, Logo & Brand Details */}
+        <div className="md:col-span-5 bg-[#faf8f5] p-6 sm:p-8 lg:p-10 border-b md:border-b-0 md:border-r border-[#e6dfd5] flex flex-col justify-between space-y-6">
+          <div className="space-y-4">
+            <Link href="/" className="inline-flex items-center gap-3 group">
+              <BrandLogo variant="light" size="md" />
+            </Link>
 
-          {/* Role Header Indicator */}
-          <div className="flex items-center justify-center gap-2">
-            <div
-              className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold shadow-2xs border ${
-                isTutorMode
-                  ? 'bg-[#f5ebe6] border-[#b85d34]/30 text-[#b85d34]'
-                  : 'bg-[#f5f0e6] border-[#d4a359]/40 text-[#0c2217]'
-              }`}
-            >
+            {/* Role Header Indicator */}
+            <div>
+              <div
+                className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold shadow-2xs border ${
+                  isTutorMode
+                    ? 'bg-[#f5ebe6] border-[#b85d34]/30 text-[#b85d34]'
+                    : 'bg-[#f5f0e6] border-[#d4a359]/40 text-[#0c2217]'
+                }`}
+              >
+                {isTutorMode ? (
+                  <>
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
+                    <span>Faculty &amp; Tutor Portal</span>
+                  </>
+                ) : (
+                  <>
+                    <GraduationCap className="w-3.5 h-3.5 text-[#d4a359]" />
+                    <span>Student &amp; Family Portal</span>
+                  </>
+                )}
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <h1 className="text-2xl sm:text-3xl font-serif font-black text-[#0c2217] tracking-tight">
+                {isTutorMode
+                  ? mode === 'signin'
+                    ? 'Tutor Sign In'
+                    : 'Join Teaching Faculty'
+                  : mode === 'signin'
+                  ? 'Student Sign In'
+                  : 'Create Student Account'}
+              </h1>
+
+              <p className="text-xs sm:text-sm text-stone-600 leading-relaxed">
+                {isTutorMode
+                  ? mode === 'signin'
+                    ? 'Access your teaching workspace, WebRTC classroom, and lesson schedules.'
+                    : 'Teach Quran & Academic subjects nationwide from home with guaranteed monthly fee protection.'
+                  : mode === 'signin'
+                  ? 'Access your Quran & Academic lessons, student workspace, and live classes.'
+                  : 'Sign up in 30 seconds to connect with verified female Alimahs and academic tutors.'}
+              </p>
+            </div>
+
+            {/* Key Trust Guarantees */}
+            <div className="pt-4 border-t border-[#e6dfd5] space-y-2.5">
               {isTutorMode ? (
                 <>
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
-                  <span>Faculty &amp; Tutor Portal</span>
+                  <div className="flex items-center gap-2.5 text-xs text-stone-700 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-[#b85d34] shrink-0" />
+                    <span>Direct student scheduling &amp; negotiations</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 text-xs text-stone-700 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-[#b85d34] shrink-0" />
+                    <span>Guaranteed tuition fee protection</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 text-xs text-stone-700 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-[#b85d34] shrink-0" />
+                    <span>Integrated live WebRTC classroom</span>
+                  </div>
                 </>
               ) : (
                 <>
-                  <GraduationCap className="w-3.5 h-3.5 text-[#d4a359]" />
-                  <span>Student &amp; Family Portal</span>
+                  <div className="flex items-center gap-2.5 text-xs text-stone-700 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-[#0c2217] shrink-0" />
+                    <span>Verified Sanad &amp; Academic faculty</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 text-xs text-stone-700 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-[#0c2217] shrink-0" />
+                    <span>Modesty &amp; camera-off learning options</span>
+                  </div>
+                  <div className="flex items-center gap-2.5 text-xs text-stone-700 font-medium">
+                    <CheckCircle2 className="w-4 h-4 text-[#0c2217] shrink-0" />
+                    <span>Direct agreed tuition rates with tutors</span>
+                  </div>
                 </>
               )}
             </div>
           </div>
 
-          <h1 className="text-2xl sm:text-3xl font-serif font-black text-[#0c2217] tracking-tight">
-            {isTutorMode
-              ? mode === 'signin'
-                ? 'Tutor Sign In'
-                : 'Join Teaching Faculty'
-              : mode === 'signin'
-              ? 'Student Sign In'
-              : 'Create Student Account'}
-          </h1>
-
-          <p className="text-xs text-stone-600 max-w-sm mx-auto leading-relaxed">
-            {isTutorMode
-              ? mode === 'signin'
-                ? 'Access your teaching workspace, WebRTC classroom, and lesson schedules.'
-                : 'Teach Quran & Academic subjects nationwide from home with guaranteed monthly fee protection.'
-              : mode === 'signin'
-              ? 'Access your Quran & Academic lessons, student workspace, and live classes.'
-              : 'Sign up in 30 seconds to connect with verified female Alimahs and academic tutors.'}
-          </p>
+          <div className="pt-4 border-t border-[#e6dfd5]/80 text-[11px] text-stone-500 flex items-center gap-2">
+            <ShieldCheck className="w-3.5 h-3.5 text-[#0c2217]/70 shrink-0" />
+            <span>End-to-end encrypted &bull; Verified Pakistani Faculty</span>
+          </div>
         </div>
 
-        {/* Unified Card */}
-        <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[#e6dfd5] shadow-[0_8px_30px_rgba(12,34,23,0.06)] space-y-5">
+        {/* Right Column: Sign In / Sign Up Form */}
+        <div className="md:col-span-7 p-6 sm:p-8 lg:p-10 flex flex-col justify-center space-y-5">
           
           {/* Two Choices Selector: Sign In vs Sign Up */}
           <div className="flex bg-[#f5efe6] p-1.5 rounded-2xl border border-[#e6dfd5]">
@@ -539,37 +583,6 @@ function LoginContent() {
             </form>
           )}
 
-        </div>
-
-        {/* Portal Role Switcher at Bottom */}
-        <div className="text-center">
-          {isTutorMode ? (
-            <button
-              type="button"
-              onClick={() => {
-                setRole('student');
-                setError('');
-                setSuccessMessage('');
-              }}
-              className="inline-flex items-center gap-1.5 text-xs text-stone-600 hover:text-[#0c2217] font-semibold transition-colors cursor-pointer py-1"
-            >
-              <GraduationCap className="w-3.5 h-3.5 text-[#b85d34]" />
-              <span>Looking for Student Portal? Switch to Student</span>
-            </button>
-          ) : (
-            <button
-              type="button"
-              onClick={() => {
-                setRole('tutor');
-                setError('');
-                setSuccessMessage('');
-              }}
-              className="inline-flex items-center gap-1.5 text-xs text-stone-600 hover:text-[#b85d34] font-semibold transition-colors cursor-pointer py-1"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
-              <span>Are you a Teacher? Switch to Tutor Portal</span>
-            </button>
-          )}
         </div>
 
       </div>

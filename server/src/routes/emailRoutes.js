@@ -40,24 +40,41 @@ router.post('/webhook', async (req, res) => {
 
     let emailData = payload;
 
-    // Handle Resend standard webhook structure: { type: 'email.received', data: { email_id, from, to, subject } }
-    if (payload.type === 'email.received' && payload.data?.email_id) {
-      const fullEmail = await getInboundEmail(payload.data.email_id);
+    // Handle Resend standard webhook structure: { type: 'email.received', data: { email_id, id, from, to, subject } }
+    const incomingId = payload.data?.email_id || payload.data?.id || payload.email_id;
+    if (incomingId) {
+      const fullEmail = await getInboundEmail(incomingId);
       if (fullEmail) {
         emailData = {
-          messageId: payload.data.email_id,
-          from: fullEmail.from || payload.data.from,
-          to: fullEmail.to || payload.data.to,
-          subject: fullEmail.subject || payload.data.subject,
+          messageId: incomingId,
+          from: fullEmail.from || payload.data?.from,
+          to: fullEmail.to || payload.data?.to,
+          subject: fullEmail.subject || payload.data?.subject,
           text: fullEmail.text || '',
           html: fullEmail.html || '',
           attachments: fullEmail.attachments || []
         };
+      } else if (payload.data) {
+        emailData = {
+          messageId: incomingId,
+          from: payload.data.from,
+          to: payload.data.to,
+          subject: payload.data.subject,
+          text: payload.data.text || '',
+          html: payload.data.html || '',
+          attachments: payload.data.attachments || []
+        };
       }
     }
 
-    const rawFrom = emailData.from || '';
-    const rawTo = emailData.to || 'info@ilmidunya.com';
+    let rawFrom = emailData.from || '';
+    if (Array.isArray(rawFrom) && rawFrom.length > 0) {
+      rawFrom = rawFrom[0];
+    }
+    let rawTo = emailData.to || 'info@ilmidunya.com';
+    if (Array.isArray(rawTo) && rawTo.length > 0) {
+      rawTo = rawTo[0];
+    }
     const subject = emailData.subject || '(No Subject)';
     const text = emailData.text || '';
     const html = emailData.html || '';
@@ -74,7 +91,7 @@ router.post('/webhook', async (req, res) => {
         senderAddress = rawFrom.trim().toLowerCase();
         senderName = senderAddress.split('@')[0];
       }
-    } else if (typeof rawFrom === 'object') {
+    } else if (typeof rawFrom === 'object' && rawFrom !== null) {
       senderAddress = (rawFrom.address || rawFrom.email || '').trim().toLowerCase();
       senderName = rawFrom.name || senderAddress.split('@')[0];
     }

@@ -92,8 +92,8 @@ const getInboundEmail = async (emailId) => {
   }
 
   try {
-    if (client.emails && client.emails.receiving && typeof client.emails.receiving.get === 'function') {
-      const res = await client.emails.receiving.get(emailId);
+    if (client.emails && typeof client.emails.get === 'function') {
+      const res = await client.emails.get(emailId);
       return res.data || null;
     }
   } catch (err) {

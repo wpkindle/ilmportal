@@ -109,11 +109,11 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
     if (currentList) {
       if (currentList.type === 'ul') {
         elements.push(
-          <ul key={`ul-${keyCounter++}`} className="my-4 space-y-2.5 pl-1 sm:pl-2">
+          <ul key={`ul-${keyCounter++}`} className="my-3 space-y-1.5 pl-1 sm:pl-2">
             {currentList.items.map((item, idx) => (
               <li
                 key={idx}
-                className={`flex items-start gap-3 text-sm sm:text-[15px] md:text-base leading-[1.8] ${
+                className={`flex items-start gap-2.5 text-xs sm:text-sm md:text-[15px] leading-relaxed ${
                   isDark ? 'text-slate-300' : 'text-stone-700'
                 }`}
               >
@@ -125,11 +125,11 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
         );
       } else if (currentList.type === 'ol') {
         elements.push(
-          <ol key={`ol-${keyCounter++}`} className="my-4 space-y-2.5 pl-1 sm:pl-2">
+          <ol key={`ol-${keyCounter++}`} className="my-3 space-y-1.5 pl-1 sm:pl-2">
             {currentList.items.map((item, idx) => (
               <li
                 key={idx}
-                className={`flex items-start gap-3 text-sm sm:text-[15px] md:text-base leading-[1.8] ${
+                className={`flex items-start gap-2.5 text-xs sm:text-sm md:text-[15px] leading-relaxed ${
                   isDark ? 'text-slate-300' : 'text-stone-700'
                 }`}
               >
@@ -194,7 +194,7 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
         elements.push(
           <div
             key={`bismillah-${keyCounter++}`}
-            className={`my-6 p-5 sm:p-6 rounded-2xl text-center border ${
+            className={`my-4 p-4 sm:p-5 rounded-2xl text-center border ${
               isDark
                 ? 'bg-slate-900 border-slate-800 text-amber-200'
                 : 'bg-[#faf6ee] border-[#ebe1ce] text-[#0c2217]'
@@ -217,7 +217,7 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
           <h4
             key={`h4-${keyCounter++}`}
             id={headingId}
-            className={`text-xs sm:text-sm font-extrabold uppercase tracking-wider pt-4 sm:pt-5 pb-1 leading-relaxed scroll-mt-20 ${
+            className={`text-xs sm:text-sm font-extrabold uppercase tracking-wider mt-5 mb-1.5 leading-normal scroll-mt-20 ${
               isDark ? 'text-amber-300' : 'text-[#b85d34]'
             }`}
           >
@@ -233,7 +233,7 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
           <h3
             key={`h3-${keyCounter++}`}
             id={headingId}
-            className={`text-base sm:text-lg lg:text-xl font-bold font-serif pt-6 sm:pt-8 pb-1.5 leading-[1.4] tracking-tight scroll-mt-20 ${
+            className={`text-base sm:text-lg lg:text-xl font-bold font-serif mt-6 sm:mt-7 mb-2.5 leading-snug tracking-tight scroll-mt-20 ${
               isDark ? 'text-slate-100' : 'text-[#0c2217]'
             }`}
           >
@@ -249,7 +249,7 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
           <h2
             key={`h2-${keyCounter++}`}
             id={headingId}
-            className={`text-xl sm:text-2xl lg:text-[26px] font-black font-serif pt-8 sm:pt-12 pb-3.5 leading-[1.35] tracking-tight scroll-mt-20 border-b ${
+            className={`text-xl sm:text-2xl lg:text-[26px] font-black font-serif mt-8 sm:mt-10 mb-3 leading-snug tracking-tight scroll-mt-20 border-b pb-2.5 ${
               isDark ? 'text-white border-slate-800' : 'text-[#0c2217] border-[#ebe3d3]'
             }`}
           >
@@ -267,7 +267,7 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
       elements.push(
         <blockquote
           key={`quote-${keyCounter++}`}
-          className={`my-6 p-5 sm:p-6 rounded-2xl border-l-4 italic leading-[1.8] text-sm sm:text-base ${
+          className={`my-4 p-4 rounded-xl border-l-4 italic leading-relaxed text-xs sm:text-sm md:text-[15px] ${
             isDark
               ? 'bg-slate-900/90 text-slate-300 border-amber-400'
               : 'bg-[#faf6ee] text-[#0c2217] border-[#d4a359]'
@@ -307,7 +307,7 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
       elements.push(
         <div
           key={`signature-${keyCounter++}`}
-          className={`mt-8 pt-4 border-t text-sm sm:text-base font-serif font-bold ${
+          className={`mt-6 pt-3 border-t text-xs sm:text-sm font-serif font-bold ${
             isDark ? 'border-slate-800 text-slate-400' : 'border-[#ebe3d3] text-[#0c2217]'
           }`}
         >
@@ -322,7 +322,7 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
     elements.push(
       <p
         key={`p-${keyCounter++}`}
-        className={`my-3.5 sm:my-4 text-sm sm:text-[15px] md:text-base leading-[1.85] sm:leading-[1.9] ${
+        className={`my-2.5 sm:my-3 text-xs sm:text-sm md:text-[15px] leading-relaxed ${
           isDark ? 'text-slate-300' : 'text-stone-700'
         }`}
       >
@@ -333,5 +333,5 @@ export default function ArticleContentRenderer({ content = '', variant = 'light'
 
   flushList();
 
-  return <div className="article-body-content space-y-6 sm:space-y-8">{elements}</div>;
+  return <div className="article-body-content">{elements}</div>;
 }

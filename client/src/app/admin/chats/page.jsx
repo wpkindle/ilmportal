@@ -63,7 +63,7 @@ export default function ChatAuditPage() {
     }
   };
 
-  if (loading) return <LoadingSpinner text="Loading chat oversight logs..." />;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="py-8 bg-slate-50 min-h-screen">
@@ -171,7 +171,7 @@ export default function ChatAuditPage() {
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 rounded-2xl my-3">
               {loadingTranscript ? (
                 <div className="flex items-center justify-center py-12">
-                  <LoadingSpinner size="md" text="Loading messages..." />
+                  <LoadingSpinner size="md" />
                 </div>
               ) : (
                 transcript.map((msg) => (

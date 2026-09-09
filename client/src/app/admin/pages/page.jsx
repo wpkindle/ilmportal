@@ -243,7 +243,7 @@ export default function AdminCMSPagesPage() {
             </div>
 
             {loading ? (
-              <LoadingSpinner text="Loading page details from database..." />
+              <LoadingSpinner />
             ) : (
               <form onSubmit={handleSave} className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200 shadow-2xs space-y-6">
                 

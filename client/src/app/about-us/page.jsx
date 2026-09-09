@@ -119,7 +119,7 @@ export default function AboutUsPage() {
           
           <div className="bg-white rounded-3xl p-6 sm:p-12 border border-slate-200/90 shadow-xs space-y-8">
             {loading ? (
-              <LoadingSpinner text="Loading about us narrative..." />
+              <LoadingSpinner />
             ) : page?.content ? (
               <CMSContentRenderer content={page.content} />
             ) : (

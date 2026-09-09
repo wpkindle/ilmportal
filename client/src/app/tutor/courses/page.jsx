@@ -538,7 +538,7 @@ export default function TutorCoursesPage() {
     }
   };
 
-  if (loading) return <LoadingSpinner text="Loading your course studio..." />;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="py-8 bg-[#faf8f5] min-h-screen text-stone-900">

@@ -402,7 +402,7 @@ export default function AdminUsersModerationPage() {
 
             {/* Users Table List */}
             {loading ? (
-              <LoadingSpinner text="Fetching platform accounts..." />
+              <LoadingSpinner />
             ) : filteredUsers.length === 0 ? (
               <div className="p-12 text-center bg-white rounded-3xl border border-dashed border-slate-200 space-y-2">
                 <Users className="w-10 h-10 text-slate-300 mx-auto" />

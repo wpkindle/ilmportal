@@ -49,7 +49,7 @@ export default function VideoClassroomPage() {
     fetchSession();
   }, [roomId]);
 
-  if (loading) return <LoadingSpinner text="Connecting to In-Platform Video Classroom..." />;
+  if (loading) return <LoadingSpinner />;
 
   // Block classroom if access is denied / deal not accepted
   if (sessionData?.isDenied && user?.role !== 'admin') {

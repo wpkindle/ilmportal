@@ -71,7 +71,7 @@ export default function ReviewsManagementPage() {
     }
   };
 
-  if (loading) return <LoadingSpinner text="Loading reviews for moderation..." />;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="py-8 bg-slate-50 min-h-screen">

@@ -11,12 +11,12 @@ function StudentRegisterRedirect() {
     router.replace('/login?role=student&mode=signup');
   }, [router]);
 
-  return <LoadingSpinner text="Redirecting to Student Portal..." />;
+  return <LoadingSpinner />;
 }
 
 export default function StudentRegisterPage() {
   return (
-    <Suspense fallback={<LoadingSpinner text="Redirecting to Student Portal..." />}>
+    <Suspense fallback={<LoadingSpinner />}>
       <StudentRegisterRedirect />
     </Suspense>
   );

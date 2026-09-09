@@ -128,7 +128,7 @@ export default function TutorOnboardingPage() {
     }
   };
 
-  if (initialLoading) return <LoadingSpinner text="Setting up your tutor onboarding..." />;
+  if (initialLoading) return <LoadingSpinner />;
 
   return (
     <div className="py-12 min-h-screen relative z-10">

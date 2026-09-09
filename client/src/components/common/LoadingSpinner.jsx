@@ -3,79 +3,153 @@
 import React from 'react';
 
 /**
- * Main IlmiDunya signature brand loader / spinner.
- * Features the signature rotating dual-tone ring (terracotta & gold),
- * soft ambient gold glow, and central authentic brand emblem badge.
+ * IlmiDunya brand loader.
  *
- * @param {'sm' | 'md' | 'lg'} size - Dimension scaling
- * @param {string} text - Subtitle loading description
- * @param {boolean} showTitle - Whether to display "IlmiDunya Pakistan" brand title
- * @param {string} className - Optional container styling
+ * Design:
+ *  - Rounded-square (squircle) SVG spinner track with animated gradient arc
+ *  - Central /icon.svg emblem in a rounded-square container
+ *  - /logo.svg brand wordmark displayed below — no loading text
+ *
+ * @param {'sm' | 'md' | 'lg'} size
+ * @param {string}  className  - Optional extra classes on wrapper
  */
-const LoadingSpinner = ({
-  size = 'md',
-  text = 'Loading...',
-  showTitle = false,
-  className = ''
-}) => {
+const LoadingSpinner = ({ size = 'md', className = '' }) => {
+  /* ── Size presets ─────────────────────────────────── */
+  const presets = {
+    sm: { box: 40, r: 14, sw: 3, icon: 18, logoW: 80 },
+    md: { box: 64, r: 22, sw: 4, icon: 28, logoW: 112 },
+    lg: { box: 90, r: 30, sw: 5, icon: 40, logoW: 152 },
+  };
+  const p = presets[size] ?? presets.md;
+
+  /*
+   * Squircle path via SVG rect with rx — the spinner arc runs around
+   * a rounded-corner square so both the track and the moving stroke cap
+   * have rounded corners.
+   */
+  const pad  = p.sw / 2 + 1;            // inset so stroke isn't clipped
+  const side = p.box - pad * 2;         // rect side length inside svg
+  const rx   = p.r;                     // corner radius
+
+  // Approximate perimeter: 4*(side-2rx) + 2π*rx
+  const perimeter = 4 * (side - 2 * rx) + 2 * Math.PI * rx;
+  const dashLen   = perimeter * 0.28;   // ~28 % visible arc
+  const gap       = perimeter - dashLen;
+
+  /* sm: tiny inline variant — icon only, no logo */
   if (size === 'sm') {
     return (
-      <div className={`inline-flex flex-col items-center justify-center space-y-1.5 ${className}`}>
-        <div className="relative flex items-center justify-center">
-          <div className="w-6 h-6 rounded-full border-2 border-[#ba4c18]/20 border-t-[#ba4c18] border-r-[#d4a359] animate-spin" />
+      <div className={`inline-flex flex-col items-center justify-center gap-1.5 ${className}`}>
+        <div className="relative" style={{ width: p.box, height: p.box }}>
+          {/* Glow */}
+          <div
+            className="absolute inset-0 bg-[#d4a359]/20 blur-md pointer-events-none animate-pulse"
+            style={{ borderRadius: rx + 4 }}
+          />
+          {/* Static track */}
+          <svg width={p.box} height={p.box} className="absolute inset-0">
+            <rect x={pad} y={pad} width={side} height={side} rx={rx} ry={rx}
+              fill="none" stroke="#ba4c18" strokeOpacity="0.15" strokeWidth={p.sw} />
+          </svg>
+          {/* Rotating arc */}
+          <svg width={p.box} height={p.box} className="absolute inset-0 animate-spin"
+            style={{ animationDuration: '1.2s' }}>
+            <defs>
+              <linearGradient id="ilmi-grad-sm" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#ba4c18" />
+                <stop offset="100%" stopColor="#d4a359" />
+              </linearGradient>
+            </defs>
+            <rect x={pad} y={pad} width={side} height={side} rx={rx} ry={rx}
+              fill="none" stroke="url(#ilmi-grad-sm)" strokeWidth={p.sw}
+              strokeLinecap="round" strokeDasharray={`${dashLen} ${gap}`} />
+          </svg>
+          {/* Center icon */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="flex items-center justify-center overflow-hidden"
+              style={{ width: p.icon + 6, height: p.icon + 6, borderRadius: Math.round(rx * 0.55) }}>
+              <img src="/icon.svg" alt="IlmiDunya" width={p.icon} height={p.icon} className="object-contain" />
+            </div>
+          </div>
         </div>
-        {text && <p className="text-[11px] font-medium text-stone-500 animate-pulse">{text}</p>}
       </div>
     );
   }
 
-  const isLg = size === 'lg';
-
+  /* md / lg: full variant — spinner + brand wordmark below */
   return (
-    <div className={`flex flex-col items-center justify-center p-6 space-y-3.5 select-none ${className}`}>
-      <div className="relative flex items-center justify-center">
-        {/* Soft Ambient Glow Halo */}
+    <div className={`flex flex-col items-center justify-center gap-5 select-none ${className}`}>
+
+      {/* ── Squircle spinner ─────────────────────────── */}
+      <div className="relative" style={{ width: p.box, height: p.box }}>
+
+        {/* Ambient glow halo */}
         <div
-          className={`absolute ${
-            isLg ? 'w-24 h-24' : 'w-16 h-16'
-          } bg-[#d4a359]/15 rounded-full blur-xl pointer-events-none animate-pulse`}
+          className="absolute bg-[#d4a359]/20 blur-xl pointer-events-none animate-pulse"
+          style={{
+            inset: -8,
+            borderRadius: rx + 12,
+          }}
         />
 
-        {/* Outer Rotating Dual-Tone Spinner Ring */}
-        <div
-          className={`${
-            isLg
-              ? 'w-16 h-16 sm:w-20 sm:h-20 border-[3px]'
-              : 'w-12 h-12 sm:w-14 sm:h-14 border-[2.5px]'
-          } rounded-full border-[#ba4c18]/20 border-t-[#ba4c18] border-r-[#d4a359] animate-spin`}
-        />
+        {/* Static track */}
+        <svg width={p.box} height={p.box} className="absolute inset-0">
+          <rect x={pad} y={pad} width={side} height={side} rx={rx} ry={rx}
+            fill="none" stroke="#ba4c18" strokeOpacity="0.15" strokeWidth={p.sw} />
+        </svg>
 
-        {/* Center Brand Emblem Badge */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <img
-            src="/icon.svg"
-            alt="IlmiDunya Icon"
-            width={isLg ? 40 : 28}
-            height={isLg ? 40 : 28}
-            className={`${
-              isLg ? 'w-9 h-9 sm:w-11 sm:h-11' : 'w-6 h-6 sm:w-7 sm:h-7'
-            } object-contain select-none drop-shadow-xs`}
+        {/* Rotating gradient arc */}
+        <svg
+          width={p.box} height={p.box}
+          className="absolute inset-0 animate-spin"
+          style={{ animationDuration: '1.3s' }}
+        >
+          <defs>
+            <linearGradient id={`ilmi-grad-${size}`} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%"   stopColor="#ba4c18" />
+              <stop offset="60%"  stopColor="#d4a359" />
+              <stop offset="100%" stopColor="#ba4c18" stopOpacity="0.3" />
+            </linearGradient>
+          </defs>
+          <rect x={pad} y={pad} width={side} height={side} rx={rx} ry={rx}
+            fill="none"
+            stroke={`url(#ilmi-grad-${size})`}
+            strokeWidth={p.sw}
+            strokeLinecap="round"
+            strokeDasharray={`${dashLen} ${gap}`}
           />
+        </svg>
+
+        {/* Center icon in rounded-square tile */}
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div
+            className="flex items-center justify-center overflow-hidden shadow-sm"
+            style={{
+              width:  p.icon + 10,
+              height: p.icon + 10,
+              borderRadius: Math.round(rx * 0.55),
+              background: 'rgba(255,255,255,0.06)',
+            }}
+          >
+            <img
+              src="/icon.svg"
+              alt="IlmiDunya"
+              width={p.icon}
+              height={p.icon}
+              className="object-contain drop-shadow-sm"
+            />
+          </div>
         </div>
       </div>
 
-      <div className="text-center space-y-0.5">
-        {(showTitle || isLg) && (
-          <p className="text-xs sm:text-sm font-extrabold text-stone-800 tracking-tight">
-            IlmiDunya Pakistan
-          </p>
-        )}
-        {text && (
-          <p className="text-[11px] sm:text-xs font-semibold text-stone-600 tracking-wide animate-pulse">
-            {text}
-          </p>
-        )}
-      </div>
+      {/* ── Brand wordmark ───────────────────────────── */}
+      <img
+        src="/logo.svg"
+        alt="IlmiDunya Pakistan"
+        style={{ width: p.logoW }}
+        className="object-contain opacity-75"
+        draggable={false}
+      />
     </div>
   );
 };

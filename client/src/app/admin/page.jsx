@@ -229,7 +229,7 @@ export default function AdminDashboardPage() {
     }
   };
 
-  if (loading) return <LoadingSpinner text="Loading admin analytics..." />;
+  if (loading) return <LoadingSpinner />;
 
   const getCategoryBadge = (cat) => {
     switch (cat) {
@@ -539,7 +539,7 @@ export default function AdminDashboardPage() {
 
               {/* Users List Cards */}
               {usersLoading ? (
-                <LoadingSpinner text="Fetching platform accounts..." />
+                <LoadingSpinner />
               ) : filteredUsers.length === 0 ? (
                 <div className="p-8 text-center bg-slate-50 rounded-2xl border border-dashed border-slate-200 space-y-2">
                   <Users className="w-8 h-8 text-slate-300 mx-auto" />

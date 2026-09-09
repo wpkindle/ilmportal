@@ -252,7 +252,7 @@ export default function TutorApprovalPage() {
             </div>
 
             {loading ? (
-              <LoadingSpinner text="Loading applicant queue..." />
+              <LoadingSpinner />
             ) : tutors.length === 0 ? (
               <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center text-xs text-slate-400 space-y-2">
                 <p className="font-bold text-sm text-slate-700">No tutors found in the {statusFilter.replace('_', ' ')} section.</p>

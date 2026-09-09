@@ -80,7 +80,7 @@ export default function CMSLocationsPage() {
     }
   };
 
-  if (loading) return <LoadingSpinner text="Loading Pakistani locations CMS..." />;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="py-8 bg-slate-50 min-h-screen">

@@ -28,7 +28,7 @@ export default function AdminLayout({ children }) {
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <LoadingSpinner size="lg" text="Verifying Administrator Authorization..." />
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
@@ -36,7 +36,7 @@ export default function AdminLayout({ children }) {
   if (!user || user.role !== 'admin') {
     return (
       <div className="min-h-screen bg-slate-900 flex items-center justify-center">
-        <LoadingSpinner size="lg" text="Redirecting to Admin Gateway..." />
+        <LoadingSpinner size="lg" />
       </div>
     );
   }

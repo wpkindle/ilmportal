@@ -63,7 +63,7 @@ export default function MyDealsPage() {
     }
   };
 
-  if (loading) return <LoadingSpinner text="Loading your course deals..." />;
+  if (loading) return <LoadingSpinner />;
 
   const filteredDeals = filter === 'all'
     ? deals

@@ -70,7 +70,7 @@ export default function TermsPage() {
           
           <div className="bg-white rounded-3xl p-6 sm:p-12 border border-slate-200/90 shadow-xs">
             {loading ? (
-              <LoadingSpinner text="Loading platform terms of service..." />
+              <LoadingSpinner />
             ) : page?.content ? (
               <CMSContentRenderer content={page.content} />
             ) : (

@@ -11,12 +11,12 @@ function TutorRegisterRedirect() {
     router.replace('/login?role=tutor&mode=signup');
   }, [router]);
 
-  return <LoadingSpinner text="Redirecting to Tutor Portal..." />;
+  return <LoadingSpinner />;
 }
 
 export default function TutorRegisterPage() {
   return (
-    <Suspense fallback={<LoadingSpinner text="Redirecting to Tutor Portal..." />}>
+    <Suspense fallback={<LoadingSpinner />}>
       <TutorRegisterRedirect />
     </Suspense>
   );

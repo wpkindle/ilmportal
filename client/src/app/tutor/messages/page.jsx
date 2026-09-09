@@ -257,7 +257,7 @@ function TutorMessagesContent() {
   if (loading) {
     return (
       <div className="min-h-[70vh] flex flex-col items-center justify-center p-8">
-        <LoadingSpinner size="lg" text="Loading messages..." showTitle={true} />
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
@@ -553,7 +553,7 @@ export default function TutorMessagesPage() {
     <Suspense
       fallback={
         <div className="min-h-[70vh] flex flex-col items-center justify-center p-8">
-          <LoadingSpinner size="lg" text="Loading messages..." showTitle={true} />
+          <LoadingSpinner size="lg" />
         </div>
       }
     >

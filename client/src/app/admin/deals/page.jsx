@@ -110,7 +110,7 @@ export default function DealsManagementPage() {
     }
   };
 
-  if (loading) return <LoadingSpinner text="Loading platform deals..." />;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="py-8 bg-slate-50 min-h-screen">

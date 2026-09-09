@@ -398,7 +398,7 @@ function TutorProfileContent() {
   };
 
   if (authLoading) {
-    return <LoadingSpinner text="Loading tutor credentials..." />;
+    return <LoadingSpinner />;
   }
 
   return (
@@ -1375,7 +1375,7 @@ function TutorProfileContent() {
 
 export default function TutorProfilePage() {
   return (
-    <Suspense fallback={<LoadingSpinner text="Loading tutor profile settings..." />}>
+    <Suspense fallback={<LoadingSpinner />}>
       <TutorProfileContent />
     </Suspense>
   );

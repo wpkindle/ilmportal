@@ -52,7 +52,7 @@ export default function StudentDashboardPage() {
   }, []);
 
   if (loading) {
-    return <LoadingSpinner text="Loading student dashboard..." />;
+    return <LoadingSpinner />;
   }
 
   const activeCourses = deals.filter(d => d.status === 'active_trial' || d.status === 'active_paid');

@@ -759,7 +759,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
   if (loading) {
     return (
       <div className="flex flex-col h-[calc(100dvh-132px)] lg:h-[calc(100dvh-125px)] bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden items-center justify-center p-8">
-        <LoadingSpinner size="lg" text="Loading messages..." showTitle={true} />
+        <LoadingSpinner size="lg" />
       </div>
     );
   }

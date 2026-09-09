@@ -182,7 +182,7 @@ export default function ResetPasswordPage() {
           </p>
         </div>
 
-        <Suspense fallback={<LoadingSpinner text="Validating security token..." />}>
+        <Suspense fallback={<LoadingSpinner />}>
           <ResetPasswordForm />
         </Suspense>
 

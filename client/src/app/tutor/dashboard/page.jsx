@@ -91,7 +91,7 @@ export default function TutorDashboardPage() {
     fetchData();
   }, []);
 
-  if (loading) return <LoadingSpinner text="Loading tutor workspace..." />;
+  if (loading) return <LoadingSpinner />;
 
   const isPending = tutorProfile?.verificationStatus === 'pending' || tutorProfile?.verificationStatus === 'under_review';
   const isContactNeeded = tutorProfile?.verificationStatus === 'contact_needed';

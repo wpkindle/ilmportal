@@ -24,7 +24,7 @@ export default function SessionsLogPage() {
     fetchLogs();
   }, []);
 
-  if (loading) return <LoadingSpinner text="Loading session logs..." />;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="py-8 bg-slate-50 min-h-screen">

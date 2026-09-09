@@ -23,12 +23,12 @@ function RegisterRedirect() {
     router.replace(target);
   }, [router, role, redirect]);
 
-  return <LoadingSpinner text="Redirecting to portal..." />;
+  return <LoadingSpinner />;
 }
 
 export default function RegisterPage() {
   return (
-    <Suspense fallback={<LoadingSpinner text="Redirecting to portal..." />}>
+    <Suspense fallback={<LoadingSpinner />}>
       <RegisterRedirect />
     </Suspense>
   );

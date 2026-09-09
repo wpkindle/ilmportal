@@ -166,7 +166,7 @@ function VerifyEmailContent() {
               </p>
             </div>
             <div className="pt-2">
-              <LoadingSpinner text="Redirecting to your profile..." />
+              <LoadingSpinner />
             </div>
           </div>
         ) : (
@@ -346,7 +346,7 @@ function VerifyEmailContent() {
 
 export default function VerifyEmailPage() {
   return (
-    <Suspense fallback={<LoadingSpinner text="Loading verification..." />}>
+    <Suspense fallback={<LoadingSpinner />}>
       <VerifyEmailContent />
     </Suspense>
   );

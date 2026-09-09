@@ -210,7 +210,7 @@ function StudentProfileContent() {
   };
 
   if (authLoading) {
-    return <LoadingSpinner text="Loading your profile settings..." />;
+    return <LoadingSpinner />;
   }
 
   return (
@@ -888,7 +888,7 @@ function StudentProfileContent() {
 
 export default function StudentProfilePage() {
   return (
-    <Suspense fallback={<LoadingSpinner text="Loading profile settings..." />}>
+    <Suspense fallback={<LoadingSpinner />}>
       <StudentProfileContent />
     </Suspense>
   );

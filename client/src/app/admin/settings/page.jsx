@@ -73,7 +73,7 @@ export default function SystemSettingsPage() {
     }
   };
 
-  if (loading) return <LoadingSpinner text="Loading system settings..." />;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="py-8 bg-slate-50 min-h-screen">

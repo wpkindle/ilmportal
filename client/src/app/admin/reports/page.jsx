@@ -133,7 +133,7 @@ export default function AdminReportsPage() {
 
           {/* Reports Content List */}
           {loading ? (
-            <LoadingSpinner text="Loading incident reports..." />
+            <LoadingSpinner />
           ) : reports.length === 0 ? (
             <div className="bg-slate-900 border border-slate-800 rounded-3xl p-12 text-center space-y-3">
               <div className="w-12 h-12 bg-slate-800 text-slate-400 rounded-2xl flex items-center justify-center mx-auto">

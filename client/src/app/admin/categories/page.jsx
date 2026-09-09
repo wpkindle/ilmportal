@@ -87,7 +87,7 @@ export default function CMSCategoriesPage() {
     }
   };
 
-  if (loading) return <LoadingSpinner text="Loading CMS Categories..." />;
+  if (loading) return <LoadingSpinner />;
 
   return (
     <div className="py-8 bg-slate-50 min-h-screen">

@@ -76,59 +76,57 @@ const LoadingSpinner = ({ size = 'md', className = '' }) => {
     );
   }
 
-  /* md / lg: full variant — spinner + brand wordmark below */
+  /* md / lg */
   return (
     <div className={`flex flex-col items-center justify-center gap-5 select-none ${className}`}>
+      <style>{keyframes}</style>
 
-      {/* ── Squircle spinner ─────────────────────────── */}
+      {/* Spinner */}
       <div className="relative" style={{ width: p.box, height: p.box }}>
-
-        {/* Ambient glow halo */}
+        {/* Glow halo */}
         <div
-          className="absolute bg-[#d4a359]/20 blur-xl pointer-events-none animate-pulse"
-          style={{
-            inset: -8,
-            borderRadius: rx + 12,
-          }}
+          className="absolute bg-[#d4a359]/18 blur-xl pointer-events-none animate-pulse"
+          style={{ inset: -10, borderRadius: rx + 14 }}
         />
 
-        {/* Static track */}
-        <svg width={p.box} height={p.box} className="absolute inset-0">
-          <rect x={pad} y={pad} width={side} height={side} rx={rx} ry={rx}
-            fill="none" stroke="#ba4c18" strokeOpacity="0.15" strokeWidth={p.sw} />
-        </svg>
-
-        {/* Rotating gradient arc */}
-        <svg
-          width={p.box} height={p.box}
-          className="absolute inset-0 animate-spin"
-          style={{ animationDuration: '1.3s' }}
-        >
+        {/* Single SVG: track + sliding arc — perfectly aligned */}
+        <svg width={p.box} height={p.box} className="absolute inset-0" style={{ overflow: 'visible' }}>
           <defs>
-            <linearGradient id={`ilmi-grad-${size}`} x1="0%" y1="0%" x2="100%" y2="100%">
+            <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%"   stopColor="#ba4c18" />
-              <stop offset="60%"  stopColor="#d4a359" />
-              <stop offset="100%" stopColor="#ba4c18" stopOpacity="0.3" />
+              <stop offset="55%"  stopColor="#d4a359" />
+              <stop offset="100%" stopColor="#ba4c18" stopOpacity="0.25" />
             </linearGradient>
           </defs>
+
+          {/* Track */}
           <rect x={pad} y={pad} width={side} height={side} rx={rx} ry={rx}
             fill="none"
-            stroke={`url(#ilmi-grad-${size})`}
+            stroke="#ba4c18"
+            strokeOpacity="0.13"
+            strokeWidth={p.sw}
+          />
+
+          {/* Sliding arc */}
+          <rect x={pad} y={pad} width={side} height={side} rx={rx} ry={rx}
+            fill="none"
+            stroke={`url(#${gradId})`}
             strokeWidth={p.sw}
             strokeLinecap="round"
-            strokeDasharray={`${dashLen} ${gap}`}
+            strokeDasharray={`${dashLen.toFixed(2)} ${gap.toFixed(2)}`}
+            style={{ animation: `${animId} 1.3s linear infinite` }}
           />
         </svg>
 
-        {/* Center icon in rounded-square tile */}
+        {/* Icon in rounded-square tile */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div
-            className="flex items-center justify-center overflow-hidden shadow-sm"
+            className="flex items-center justify-center overflow-hidden"
             style={{
-              width:  p.icon + 10,
-              height: p.icon + 10,
-              borderRadius: Math.round(rx * 0.55),
-              background: 'rgba(255,255,255,0.06)',
+              width: iconTileSize,
+              height: iconTileSize,
+              borderRadius: iconTileR,
+              background: 'rgba(255,255,255,0.07)',
             }}
           >
             <img
@@ -142,12 +140,12 @@ const LoadingSpinner = ({ size = 'md', className = '' }) => {
         </div>
       </div>
 
-      {/* ── Brand wordmark ───────────────────────────── */}
+      {/* Brand wordmark */}
       <img
         src="/logo.svg"
         alt="IlmiDunya Pakistan"
         style={{ width: p.logoW }}
-        className="object-contain opacity-75"
+        className="object-contain opacity-80"
         draggable={false}
       />
     </div>

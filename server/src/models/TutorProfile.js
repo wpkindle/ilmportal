@@ -46,6 +46,11 @@ const tutorProfileSchema = new mongoose.Schema({
     enum: ['online', 'in_person'],
     default: ['online']
   },
+  tutoringType: {
+    type: String,
+    enum: ['quran', 'academic', 'both', ''],
+    default: 'both'
+  },
   gender: {
     type: String,
     enum: ['male', 'female', 'other', ''],

@@ -4,9 +4,24 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
-import { BookOpen, ShieldCheck, Award, CheckCircle2, ArrowRight, Sparkles, Video, Home, Check } from 'lucide-react';
+import {
+  BookOpen,
+  ShieldCheck,
+  Award,
+  CheckCircle2,
+  ArrowRight,
+  Sparkles,
+  Video,
+  Home,
+  Check,
+  MapPin,
+  GraduationCap,
+  User,
+  Compass
+} from 'lucide-react';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
-import CustomSelect from '../../../components/common/CustomSelect';
+import CustomSelect, { StyledNativeSelect } from '../../../components/common/CustomSelect';
+import { allPakistaniCities, pakistaniCityAreas } from '../../../data/pakistanAreas';
 
 export default function TutorOnboardingPage() {
   const { user, updateTutorProfileState } = useAuth();
@@ -17,11 +32,14 @@ export default function TutorOnboardingPage() {
   const [locations, setLocations] = useState([]);
 
   // Form State
-  const [bio, setBio] = useState('Assalam-o-Alaikum! I am an experienced tutor committed to high quality Quranic and academic teaching.');
+  const [bio, setBio] = useState('Assalam-o-Alaikum! I am committed to high quality Quranic and academic teaching for students.');
   const [gender, setGender] = useState('male');
+  const [tutoringType, setTutoringType] = useState('both'); // 'quran' | 'academic' | 'both'
   const [qualifications, setQualifications] = useState('Dars-e-Nizami / Master Degree');
-  const [experienceYears, setExperienceYears] = useState(3);
+  const [experienceYears, setExperienceYears] = useState(1);
   const [hourlyRate, setHourlyRate] = useState(1500);
+  const [city, setCity] = useState('Lahore');
+  const [localArea, setLocalArea] = useState('');
   const [teachingModes, setTeachingModes] = useState(['online']);
   const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
@@ -29,6 +47,14 @@ export default function TutorOnboardingPage() {
   const [loading, setLoading] = useState(false);
   const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState('');
+
+  useEffect(() => {
+    if (user) {
+      if (user.gender) setGender(user.gender);
+      if (user.city) setCity(user.city);
+      if (user.area) setLocalArea(user.area);
+    }
+  }, [user]);
 
   useEffect(() => {
     const fetchMetadata = async () => {
@@ -42,11 +68,18 @@ export default function TutorOnboardingPage() {
         if (locRes.success) setLocations(locRes.locations || []);
 
         if (profileRes.success && profileRes.profile) {
-          if (profileRes.profile.bio) setBio(profileRes.profile.bio);
-          if (profileRes.profile.qualifications) setQualifications(profileRes.profile.qualifications);
-          if (profileRes.profile.experienceYears) setExperienceYears(profileRes.profile.experienceYears);
-          if (profileRes.profile.hourlyRate) setHourlyRate(profileRes.profile.hourlyRate);
-          if (profileRes.profile.subjects) setSelectedSubjects(profileRes.profile.subjects.map(s => s._id || s));
+          const p = profileRes.profile;
+          if (p.bio) setBio(p.bio);
+          if (p.gender) setGender(p.gender);
+          if (p.tutoringType) setTutoringType(p.tutoringType);
+          if (p.city) setCity(p.city);
+          if (p.localArea) setLocalArea(p.localArea);
+          if (p.qualifications) setQualifications(p.qualifications);
+          if (p.experienceYears !== undefined && p.experienceYears !== null) {
+            setExperienceYears(p.experienceYears);
+          }
+          if (p.hourlyRate) setHourlyRate(p.hourlyRate);
+          if (p.subjects) setSelectedSubjects(p.subjects.map(s => s._id || s));
         }
       } catch (err) {
         console.error(err);
@@ -72,9 +105,13 @@ export default function TutorOnboardingPage() {
       const profileRes = await api.updateMyTutorProfile({
         bio: bio.trim(),
         gender,
+        tutoringType,
         qualifications: qualifications.trim(),
         experienceYears: Number(experienceYears),
         hourlyRate: Number(hourlyRate),
+        city: city.trim(),
+        localArea: localArea.trim(),
+        area: localArea.trim(),
         teachingModes,
         subjects: selectedSubjects,
         cities: selectedCities
@@ -131,33 +168,143 @@ export default function TutorOnboardingPage() {
 
           {/* Step 1: Subjects & Disciplines */}
           {step === 1 && (
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <h3 className="font-serif font-bold text-sm text-[#0c2217]">Step 1: Select Subjects You Teach</h3>
-                <p className="text-xs text-stone-600">Choose all the Quranic and academic subjects you offer.</p>
+                <h3 className="font-serif font-bold text-sm text-[#0c2217]">Step 1: Teaching Discipline &amp; Gender</h3>
+                <p className="text-xs text-stone-600">Select your tutoring specialization and subjects to help students find you.</p>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-80 overflow-y-auto p-1">
-                {categories.map((cat) => {
-                  const isChecked = selectedSubjects.includes(cat._id);
-                  return (
-                    <div
-                      key={cat._id}
-                      onClick={() => handleToggleSubject(cat._id)}
-                      className={`p-3.5 rounded-2xl border text-xs cursor-pointer transition-all ${
-                        isChecked
-                          ? 'bg-[#faf8f5] border-2 border-[#0c2217] text-[#0c2217] font-bold shadow-xs'
-                          : 'bg-[#faf8f5]/60 border-[#e6dfd5] text-stone-700 hover:border-stone-400 hover:bg-white'
-                      }`}
-                    >
-                      <p className="flex items-center justify-between">
-                        <span className="font-serif text-[13px]">{cat.name}</span>
-                        {isChecked && <CheckCircle2 className="w-4 h-4 text-[#0c2217]" />}
-                      </p>
-                      <span className="text-[10px] text-stone-500 capitalize">{cat.type}</span>
+              {/* Gender & Tutoring Specialization Selection */}
+              <div className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {/* Gender */}
+                  <div>
+                    <label className="text-xs font-bold text-slate-800 block mb-1.5 flex items-center gap-1.5">
+                      <User className="w-3.5 h-3.5 text-[#b85d34]" />
+                      <span>Your Gender *</span>
+                    </label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {[
+                        { val: 'female', label: 'Female', sub: 'Alimah / Teacher' },
+                        { val: 'male', label: 'Male', sub: 'Qari / Teacher' }
+                      ].map((g) => (
+                        <button
+                          key={g.val}
+                          type="button"
+                          onClick={() => setGender(g.val)}
+                          className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                            gender === g.val
+                              ? 'bg-[#0c2217] text-white border-[#0c2217] shadow-xs'
+                              : 'bg-white text-stone-700 border-[#e6ded1] hover:border-stone-400'
+                          }`}
+                        >
+                          <p className="text-xs font-bold">{g.label}</p>
+                          <p className={`text-[10px] ${gender === g.val ? 'text-[#d4a359]' : 'text-stone-500'}`}>{g.sub}</p>
+                        </button>
+                      ))}
                     </div>
-                  );
-                })}
+                  </div>
+
+                  {/* Primary Teaching Discipline */}
+                  <div>
+                    <label className="text-xs font-bold text-slate-800 block mb-1.5 flex items-center gap-1.5">
+                      <Compass className="w-3.5 h-3.5 text-[#0c2217]" />
+                      <span>Primary Discipline *</span>
+                    </label>
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {[
+                        { val: 'quran', label: 'Quranic', sub: 'Nazra/Hifz' },
+                        { val: 'academic', label: 'Academic', sub: 'School/Board' },
+                        { val: 'both', label: 'Both', sub: 'All Fields' }
+                      ].map((t) => (
+                        <button
+                          key={t.val}
+                          type="button"
+                          onClick={() => setTutoringType(t.val)}
+                          className={`p-2 rounded-xl border text-center transition-all cursor-pointer ${
+                            tutoringType === t.val
+                              ? 'bg-[#b85d34] text-white border-[#b85d34] shadow-xs font-bold'
+                              : 'bg-white text-stone-700 border-[#e6ded1] hover:border-stone-400'
+                          }`}
+                        >
+                          <p className="text-[11px] font-bold">{t.label}</p>
+                          <p className={`text-[9px] ${tutoringType === t.val ? 'text-white/90' : 'text-stone-400'}`}>{t.sub}</p>
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Faculty Role Identity Preview */}
+                <div className="pt-2 border-t border-[#ebe3d3] flex items-center justify-between text-xs flex-wrap gap-2">
+                  <span className="text-[11px] text-stone-600 font-medium">Faculty Role Designation:</span>
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-white border border-[#d4a359]/50 text-[#0c2217] shadow-2xs">
+                    {gender === 'female' ? (
+                      <>
+                        <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
+                        <span>
+                          {tutoringType === 'quran'
+                            ? 'Verified Female Alimah / Quran Faculty'
+                            : tutoringType === 'academic'
+                            ? 'Verified Female Academic Faculty'
+                            : 'Verified Female Faculty (Quran & Academic)'}
+                        </span>
+                      </>
+                    ) : (
+                      <>
+                        <GraduationCap className="w-3.5 h-3.5 text-[#0c2217]" />
+                        <span>
+                          {tutoringType === 'quran'
+                            ? 'Male Quran Faculty / Qari'
+                            : tutoringType === 'academic'
+                            ? 'Male Academic Faculty'
+                            : 'Male Faculty (Quran & Academic)'}
+                        </span>
+                      </>
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              {/* Subject Selection List */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-serif font-bold text-[#0c2217]">
+                    Select Subjects You Teach *
+                  </label>
+                  <span className="text-[11px] text-stone-500 font-medium">
+                    {selectedSubjects.length} selected
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-72 overflow-y-auto p-1 custom-scrollbar">
+                  {categories
+                    .filter((cat) => {
+                      if (tutoringType === 'quran') return cat.type === 'quran';
+                      if (tutoringType === 'academic') return cat.type === 'academic';
+                      return true;
+                    })
+                    .map((cat) => {
+                      const isChecked = selectedSubjects.includes(cat._id);
+                      return (
+                        <div
+                          key={cat._id}
+                          onClick={() => handleToggleSubject(cat._id)}
+                          className={`p-3 rounded-2xl border text-xs cursor-pointer transition-all ${
+                            isChecked
+                              ? 'bg-[#faf8f5] border-2 border-[#0c2217] text-[#0c2217] font-bold shadow-xs'
+                              : 'bg-[#faf8f5]/60 border-[#e6dfd5] text-stone-700 hover:border-stone-400 hover:bg-white'
+                          }`}
+                        >
+                          <p className="flex items-center justify-between">
+                            <span className="font-serif text-[13px]">{cat.name}</span>
+                            {isChecked && <CheckCircle2 className="w-4 h-4 text-[#0c2217]" />}
+                          </p>
+                          <span className="text-[10px] text-stone-500 capitalize">{cat.type === 'quran' ? 'Quranic Science' : 'Academic Program'}</span>
+                        </div>
+                      );
+                    })}
+                </div>
               </div>
 
               <div className="flex justify-between items-center pt-3 border-t border-[#e6dfd5]">
@@ -170,19 +317,19 @@ export default function TutorOnboardingPage() {
                   onClick={() => setStep(2)}
                   className="px-6 py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-2xl shadow-lg shadow-[#0c2217]/20 disabled:opacity-40 flex items-center gap-2 transition-all cursor-pointer"
                 >
-                  <span>Next: Bio &amp; Hourly Rate</span>
+                  <span>Next: Bio &amp; Location</span>
                   <ArrowRight className="w-4 h-4 text-[#d4a359]" />
                 </button>
               </div>
             </div>
           )}
 
-          {/* Step 2: Teaching Bio, Experience, Hourly Rate & Finalize */}
+          {/* Step 2: Teaching Bio, Experience, Location & Finalize */}
           {step === 2 && (
             <form onSubmit={handleCompleteOnboarding} className="space-y-4">
               <div>
-                <h3 className="font-serif font-bold text-sm text-[#0c2217]">Step 2: Teaching Bio &amp; Rates</h3>
-                <p className="text-xs text-stone-600">Set your bio, experience, and hourly rate for student bookings.</p>
+                <h3 className="font-serif font-bold text-sm text-[#0c2217]">Step 2: Bio, Experience &amp; Location</h3>
+                <p className="text-xs text-stone-600">Provide details for student discovery and tuition requests.</p>
               </div>
 
               <div>
@@ -199,28 +346,104 @@ export default function TutorOnboardingPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-serif font-bold text-[#0c2217] block mb-1">Degree Title</label>
+                  <label className="text-xs font-serif font-bold text-[#0c2217] block mb-1">Degree Title *</label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Shahadat-ul-Alimiyya"
+                    placeholder="e.g. Shahadat-ul-Alimiyya / BS"
                     value={qualifications}
                     onChange={(e) => setQualifications(e.target.value)}
-                    className="w-full p-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white font-medium"
                   />
                 </div>
 
                 <div>
-                  <label className="text-xs font-serif font-bold text-[#0c2217] block mb-1">Experience (Years)</label>
+                  <div className="flex items-center justify-between mb-1">
+                    <label className="text-xs font-serif font-bold text-[#0c2217] block">Experience (Years) *</label>
+                    <button
+                      type="button"
+                      onClick={() => setExperienceYears(0)}
+                      className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-all cursor-pointer border flex items-center gap-1 ${
+                        Number(experienceYears) === 0
+                          ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217]'
+                          : 'bg-[#faf8f5] text-stone-600 border-[#e6ded1] hover:border-[#d4a359]'
+                      }`}
+                    >
+                      <Sparkles className="w-2.5 h-2.5 text-[#d4a359]" />
+                      <span>{Number(experienceYears) === 0 ? 'Fresh Selected' : 'Choose Fresh (0 yrs)'}</span>
+                    </button>
+                  </div>
                   <input
                     type="number"
-                    min="1"
+                    min="0"
                     max="50"
                     required
                     value={experienceYears}
                     onChange={(e) => setExperienceYears(e.target.value)}
-                    className="w-full p-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] font-bold outline-none focus:border-[#0c2217] focus:bg-white"
+                    className="w-full px-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] font-bold outline-none focus:border-[#0c2217] focus:bg-white"
                   />
+                  {Number(experienceYears) === 0 && (
+                    <p className="text-[10px] text-[#b85d34] font-semibold mt-1">
+                      Registered as Fresh / Beginner Tutor (&lt; 1 Year experience).
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* City & Local Area Section */}
+              <div className="space-y-1.5 pt-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-serif font-bold text-[#0c2217] block">
+                    City &amp; Local Area (Pakistan) *
+                  </label>
+                  {city && (
+                    <span className="text-[10px] font-semibold text-stone-500">
+                      {city}{localArea ? ` • ${localArea}` : ''}
+                    </span>
+                  )}
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-700 block mb-1">City Location *</label>
+                    <StyledNativeSelect
+                      value={city}
+                      onChange={(e) => {
+                        setCity(e.target.value);
+                        setLocalArea('');
+                      }}
+                      icon={MapPin}
+                    >
+                      <option value="">-- Select City --</option>
+                      {allPakistaniCities.map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </StyledNativeSelect>
+                  </div>
+
+                  <div>
+                    <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                      Local Area / Sector {city ? `in ${city}` : ''}
+                    </label>
+                    {city && pakistaniCityAreas[city] && pakistaniCityAreas[city].length > 0 ? (
+                      <StyledNativeSelect
+                        value={localArea}
+                        onChange={(e) => setLocalArea(e.target.value)}
+                      >
+                        <option value="">-- Select Area in {city} --</option>
+                        {pakistaniCityAreas[city].map((a) => (
+                          <option key={a} value={a}>{a}</option>
+                        ))}
+                      </StyledNativeSelect>
+                    ) : (
+                      <input
+                        type="text"
+                        placeholder={city ? `Coverage across ${city}` : 'Enter local area name'}
+                        value={localArea}
+                        onChange={(e) => setLocalArea(e.target.value)}
+                        className="w-full px-4 py-2.5 bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-2 focus:ring-[#d4a359]/20 rounded-2xl text-xs text-slate-900 font-semibold outline-none transition-all shadow-2xs"
+                      />
+                    )}
+                  </div>
                 </div>
               </div>
 

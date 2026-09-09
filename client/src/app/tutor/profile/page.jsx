@@ -38,6 +38,7 @@ import DeleteAccountModal from '../../../components/common/DeleteAccountModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import SafetyReportsSection from '../../../components/profile/SafetyReportsSection';
 import { allPakistaniCities, pakistaniCityAreas } from '../../../data/pakistanAreas';
+import { StyledNativeSelect } from '../../../components/common/CustomSelect';
 
 const pakistaniCities = allPakistaniCities;
 
@@ -52,6 +53,7 @@ function TutorProfileContent() {
   const [city, setCity] = useState('Lahore');
   const [localArea, setLocalArea] = useState('');
   const [gender, setGender] = useState('male');
+  const [tutoringType, setTutoringType] = useState('both');
   const [age, setAge] = useState('');
   const [avatar, setAvatar] = useState('');
 
@@ -113,9 +115,12 @@ function TutorProfileContent() {
     if (tutorProfile) {
       if (tutorProfile.city) setCity(tutorProfile.city);
       if (tutorProfile.localArea) setLocalArea(tutorProfile.localArea);
+      if (tutorProfile.tutoringType) setTutoringType(tutorProfile.tutoringType);
       setBio(tutorProfile.bio || '');
       setQualifications(tutorProfile.qualifications || '');
-      setExperienceYears(tutorProfile.experienceYears || 2);
+      if (tutorProfile.experienceYears !== undefined && tutorProfile.experienceYears !== null) {
+        setExperienceYears(tutorProfile.experienceYears);
+      }
       setHourlyRate(tutorProfile.hourlyRate || 1500);
       setUploadedSanads(tutorProfile.sanadDocuments || []);
       const modes = Array.isArray(tutorProfile.teachingModes) && tutorProfile.teachingModes.length > 0
@@ -248,7 +253,9 @@ function TutorProfileContent() {
         name: name.trim(),
         city: city.trim(),
         localArea: localArea.trim(),
+        area: localArea.trim(),
         gender,
+        tutoringType,
         age: age ? Number(age) : undefined,
         avatar,
         bio: bio.trim(),
@@ -257,6 +264,24 @@ function TutorProfileContent() {
         hourlyRate: Number(hourlyRate),
         teachingModes
       });
+
+      try {
+        const tutorRes = await api.updateMyTutorProfile({
+          city: city.trim(),
+          localArea: localArea.trim(),
+          area: localArea.trim(),
+          gender,
+          tutoringType,
+          bio: bio.trim(),
+          qualifications: qualifications.trim(),
+          experienceYears: Number(experienceYears),
+          hourlyRate: Number(hourlyRate),
+          teachingModes
+        });
+        if (tutorRes?.profile) updateTutorProfileState(tutorRes.profile);
+      } catch (tErr) {
+        console.error('Error syncing tutor profile:', tErr);
+      }
 
       if (res.success) {
         setProfileSuccess('Tutor profile details updated successfully!');
@@ -609,16 +634,16 @@ function TutorProfileContent() {
                     <label className="text-xs font-bold text-slate-700 block mb-1">
                       Gender *
                     </label>
-                    <select
+                    <StyledNativeSelect
                       value={gender}
                       onChange={(e) => setGender(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-semibold h-[42px]"
+                      icon={User}
                     >
                       <option value="">-- Select Gender --</option>
                       <option value="male">Male</option>
                       <option value="female">Female</option>
                       <option value="other">Other</option>
-                    </select>
+                    </StyledNativeSelect>
                   </div>
 
                   <div id="profile-age" className="scroll-mt-28">
@@ -633,7 +658,7 @@ function TutorProfileContent() {
                       placeholder="e.g. 28"
                       value={age}
                       onChange={(e) => setAge(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-bold h-[42px]"
+                      className="w-full px-4 py-2.5 bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-2 focus:ring-[#d4a359]/20 rounded-2xl text-xs text-slate-900 outline-none font-bold transition-all shadow-2xs h-[42px]"
                     />
                   </div>
                 </div>
@@ -666,25 +691,25 @@ function TutorProfileContent() {
                     <label className="text-xs font-bold text-slate-700 block mb-1">
                       City Location *
                     </label>
-                    <select
+                    <StyledNativeSelect
                       value={city}
                       onChange={(e) => {
                         setCity(e.target.value);
                         setLocalArea('');
                       }}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-semibold"
+                      icon={MapPin}
                     >
                       <option value="">-- Select City in Pakistan --</option>
                       {pakistaniCities.map((c) => (
                         <option key={c} value={c}>{c}</option>
                       ))}
-                    </select>
+                    </StyledNativeSelect>
                   </div>
 
                   <div id="profile-local-area" className="scroll-mt-28">
                     <div className="flex items-center justify-between mb-1">
                       <label className="text-xs font-bold text-slate-700 block">
-                        Local Main Area (Optional)
+                        Local Main Area / Sector (Optional)
                       </label>
                       {city && (
                         <span className="text-[10px] text-stone-500 font-medium">
@@ -693,43 +718,107 @@ function TutorProfileContent() {
                       )}
                     </div>
                     {city && pakistaniCityAreas[city] && pakistaniCityAreas[city].length > 0 ? (
-                      <select
+                      <StyledNativeSelect
                         value={localArea}
                         onChange={(e) => setLocalArea(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-semibold"
                       >
                         <option value="">-- Select Main Area in {city} --</option>
                         {pakistaniCityAreas[city].map((a) => (
                           <option key={a} value={a}>{a}</option>
                         ))}
-                      </select>
+                      </StyledNativeSelect>
                     ) : (
                       <input
                         type="text"
                         placeholder={city ? `General coverage across ${city}` : 'Select city first'}
                         value={localArea}
                         onChange={(e) => setLocalArea(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-semibold"
+                        className="w-full px-4 py-2.5 bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-2 focus:ring-[#d4a359]/20 rounded-2xl text-xs text-slate-900 font-semibold outline-none transition-all shadow-2xs"
                       />
                     )}
+                  </div>
+                </div>
+
+                {/* Tutoring Discipline & Faculty Role */}
+                <div className="p-3.5 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl space-y-2">
+                  <div className="flex items-center justify-between flex-wrap gap-1">
+                    <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <GraduationCap className="w-3.5 h-3.5 text-[#0c2217]" />
+                      <span>Primary Tutoring Discipline *</span>
+                    </label>
+                    <span className="text-[10.5px] font-bold text-[#b85d34] bg-[#f5ebe6] px-2.5 py-0.5 rounded-full border border-[#b85d34]/30">
+                      {gender === 'female'
+                        ? tutoringType === 'quran'
+                          ? 'Verified Female Alimah / Quran Faculty'
+                          : tutoringType === 'academic'
+                          ? 'Verified Female Academic Faculty'
+                          : 'Verified Female Faculty (Quran & Academic)'
+                        : tutoringType === 'quran'
+                        ? 'Male Quran Faculty / Qari'
+                        : tutoringType === 'academic'
+                        ? 'Male Academic Faculty'
+                        : 'Male Faculty (Quran & Academic)'}
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-0.5">
+                    {[
+                      { val: 'quran', label: 'Quranic Sciences', sub: 'Nazra, Hifz, Tajweed, Alim' },
+                      { val: 'academic', label: 'Academic Education', sub: 'School, College, Board' },
+                      { val: 'both', label: 'Both Disciplines', sub: 'Quran & Academics' }
+                    ].map((t) => (
+                      <button
+                        key={t.val}
+                        type="button"
+                        onClick={() => setTutoringType(t.val)}
+                        className={`p-2.5 rounded-xl border text-left transition-all cursor-pointer ${
+                          tutoringType === t.val
+                            ? 'bg-[#0c2217] text-white border-[#0c2217] shadow-xs'
+                            : 'bg-white text-stone-700 border-[#e6ded1] hover:border-stone-400'
+                        }`}
+                      >
+                        <p className="text-xs font-bold">{t.label}</p>
+                        <p className={`text-[10px] mt-0.5 line-clamp-1 ${tutoringType === t.val ? 'text-[#d4a359]' : 'text-stone-500'}`}>
+                          {t.sub}
+                        </p>
+                      </button>
+                    ))}
                   </div>
                 </div>
 
                 {/* Teaching Experience & Tuition Model Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Teaching Experience (Years) *
-                    </label>
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-bold text-slate-700 block">
+                        Teaching Experience (Years) *
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => setExperienceYears(0)}
+                        className={`text-[10px] font-bold px-2 py-0.5 rounded-full transition-all cursor-pointer border flex items-center gap-1 ${
+                          Number(experienceYears) === 0
+                            ? 'bg-[#0c2217] text-[#d4a359] border-[#0c2217]'
+                            : 'bg-[#faf8f5] text-stone-600 border-[#e6ded1] hover:border-[#d4a359]'
+                        }`}
+                      >
+                        <Sparkles className="w-2.5 h-2.5 text-[#d4a359]" />
+                        <span>{Number(experienceYears) === 0 ? 'Fresh Selected' : 'Set as Fresh (0 yrs)'}</span>
+                      </button>
+                    </div>
                     <input
                       type="number"
-                      min="1"
+                      min="0"
                       max="45"
                       required
                       value={experienceYears}
                       onChange={(e) => setExperienceYears(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-bold"
+                      className="w-full px-4 py-2.5 bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-2 focus:ring-[#d4a359]/20 rounded-2xl text-xs text-slate-900 outline-none font-bold transition-all shadow-2xs"
                     />
+                    {Number(experienceYears) === 0 && (
+                      <p className="text-[10.5px] text-[#b85d34] font-semibold mt-1">
+                        Displaying as: Fresh / Beginner Tutor (&lt; 1 Year Experience).
+                      </p>
+                    )}
                   </div>
 
                   <div className="p-3 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl flex flex-col justify-center">

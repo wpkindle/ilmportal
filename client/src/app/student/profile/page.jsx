@@ -32,7 +32,8 @@ import AccountStatusBanner from '../../../components/common/AccountStatusBanner'
 import DeleteAccountModal from '../../../components/common/DeleteAccountModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import SafetyReportsSection from '../../../components/profile/SafetyReportsSection';
-import { allPakistaniCities } from '../../../data/pakistanAreas';
+import { allPakistaniCities, pakistaniCityAreas } from '../../../data/pakistanAreas';
+import { StyledNativeSelect } from '../../../components/common/CustomSelect';
 
 const pakistaniCities = allPakistaniCities;
 
@@ -47,6 +48,7 @@ function StudentProfileContent() {
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
   const [city, setCity] = useState('Lahore');
+  const [area, setArea] = useState('');
   const [gender, setGender] = useState('male');
   const [age, setAge] = useState('');
   const [avatar, setAvatar] = useState('');
@@ -82,6 +84,7 @@ function StudentProfileContent() {
       setEmail(user.email || '');
       setPhone(user.phone || user.guardianPhone || '');
       setCity(user.city || '');
+      setArea(user.area || '');
       setGender(user.gender || '');
       setAge(user.age ? String(user.age) : '');
       setAvatar(user.avatar || '');
@@ -116,7 +119,7 @@ function StudentProfileContent() {
     const reader = new FileReader();
     reader.onloadend = () => {
       setAvatar(reader.result);
-      setProfileSuccess('Photo selected! Click "Save Changes" to apply.');
+      setProfileSuccess('Profile picture selected! Click "Save Changes" below to save.');
     };
     reader.readAsDataURL(file);
   };
@@ -148,6 +151,7 @@ function StudentProfileContent() {
         phone: phone.trim(),
         guardianPhone: phone.trim(),
         city,
+        area: area.trim(),
         gender,
         age: age ? Number(age) : undefined,
         avatar,
@@ -316,8 +320,8 @@ function StudentProfileContent() {
                   <span className="font-bold">{age ? `${age} Years` : 'Not set'}</span>
                 </div>
                 <div className="flex items-center justify-between">
-                  <span className="text-slate-400">City:</span>
-                  <span className="font-bold">{city || 'Not set'}</span>
+                  <span className="text-slate-400">City &amp; Area:</span>
+                  <span className="font-bold">{city ? `${city}${area ? ` (${area})` : ''}` : 'Not set'}</span>
                 </div>
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Tuition Mode:</span>
@@ -352,29 +356,31 @@ function StudentProfileContent() {
               </div>
 
               {profileSuccess && (
-                <div className="p-3 bg-[#f0ece1] border border-[#d4a359]/40 text-[#0c2217] text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
-                  <CheckCircle2 className="w-4 h-4 text-[#b85d34] shrink-0" />
+                <div className="p-3.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-2xl text-xs font-semibold flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                   <span>{profileSuccess}</span>
                 </div>
               )}
 
               {profileError && (
-                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
-                  <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                <div className="p-3.5 bg-red-50 text-red-700 border border-red-200 rounded-2xl text-xs font-semibold flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-red-500 shrink-0" />
                   <span>{profileError}</span>
                 </div>
               )}
 
               <form onSubmit={handleProfileSubmit} className="space-y-4">
-                {/* Full Name & Username Row */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 items-start">
+                
+                {/* Full Name & Username */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div id="profile-name" className="scroll-mt-28">
                     <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Student Full Name *
+                      Full Name *
                     </label>
                     <input
                       type="text"
                       required
+                      placeholder="e.g. Abdullah Khan"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-semibold"
@@ -398,9 +404,6 @@ function StudentProfileContent() {
                         className="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-semibold font-mono"
                       />
                     </div>
-                    <p className="text-[10px] text-slate-400 mt-1">
-                      Unique identifier for your student profile &amp; inquiries.
-                    </p>
                   </div>
                 </div>
 
@@ -410,16 +413,16 @@ function StudentProfileContent() {
                     <label className="text-xs font-bold text-slate-700 block mb-1">
                       Gender *
                     </label>
-                    <select
+                    <StyledNativeSelect
                       value={gender}
                       onChange={(e) => setGender(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-semibold h-[42px]"
+                      icon={User}
                     >
                       <option value="">-- Select Gender --</option>
                       <option value="male">Male</option>
                       <option value="female">Female</option>
                       <option value="other">Other</option>
-                    </select>
+                    </StyledNativeSelect>
                   </div>
 
                   <div id="profile-age" className="scroll-mt-28">
@@ -434,7 +437,7 @@ function StudentProfileContent() {
                       placeholder="e.g. 8"
                       value={age}
                       onChange={(e) => setAge(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-bold h-[42px]"
+                      className="w-full px-4 py-2.5 bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-2 focus:ring-[#d4a359]/20 rounded-2xl text-xs text-slate-900 outline-none focus:bg-white font-bold transition-all shadow-2xs h-[42px]"
                     />
                   </div>
                 </div>
@@ -453,37 +456,73 @@ function StudentProfileContent() {
                   />
                 </div>
 
-                {/* City & Mobile Row */}
+                {/* City & Local Area Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div id="profile-city" className="scroll-mt-28">
                     <label className="text-xs font-bold text-slate-700 block mb-1">
                       City Location *
                     </label>
-                    <select
+                    <StyledNativeSelect
                       value={city}
-                      onChange={(e) => setCity(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-semibold"
+                      onChange={(e) => {
+                        setCity(e.target.value);
+                        setArea('');
+                      }}
+                      icon={MapPin}
                     >
                       <option value="">-- Select City in Pakistan --</option>
                       {pakistaniCities.map((c) => (
                         <option key={c} value={c}>{c}</option>
                       ))}
-                    </select>
+                    </StyledNativeSelect>
                   </div>
 
-                  <div id="profile-phone" className="scroll-mt-28">
-                    <label className="text-xs font-bold text-slate-700 block mb-1 flex items-center justify-between">
-                      <span>Mobile Number</span>
-                      <span className="text-[10px] text-slate-400 font-normal">Optional</span>
-                    </label>
-                    <input
-                      type="tel"
-                      placeholder="Enter Your Number"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white"
-                    />
+                  <div id="profile-area" className="scroll-mt-28">
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-xs font-bold text-slate-700 block">
+                        Local Area / Sector (Optional)
+                      </label>
+                      {city && (
+                        <span className="text-[10px] text-stone-500 font-medium">
+                          {city}
+                        </span>
+                      )}
+                    </div>
+                    {city && pakistaniCityAreas[city] && pakistaniCityAreas[city].length > 0 ? (
+                      <StyledNativeSelect
+                        value={area}
+                        onChange={(e) => setArea(e.target.value)}
+                      >
+                        <option value="">-- Select Area in {city} --</option>
+                        {pakistaniCityAreas[city].map((a) => (
+                          <option key={a} value={a}>{a}</option>
+                        ))}
+                      </StyledNativeSelect>
+                    ) : (
+                      <input
+                        type="text"
+                        placeholder={city ? `General coverage across ${city}` : 'Enter area name'}
+                        value={area}
+                        onChange={(e) => setArea(e.target.value)}
+                        className="w-full px-4 py-2.5 bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-2 focus:ring-[#d4a359]/20 rounded-2xl text-xs text-slate-900 font-semibold outline-none transition-all shadow-2xs"
+                      />
+                    )}
                   </div>
+                </div>
+
+                {/* Mobile Phone Number */}
+                <div id="profile-phone" className="scroll-mt-28">
+                  <label className="text-xs font-bold text-slate-700 block mb-1 flex items-center justify-between">
+                    <span>Mobile Number</span>
+                    <span className="text-[10px] text-slate-400 font-normal">Optional</span>
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="Enter Your Number"
+                    value={phone}
+                    onChange={(e) => setPhone(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-2 focus:ring-[#d4a359]/20 rounded-2xl text-xs text-slate-900 outline-none transition-all shadow-2xs"
+                  />
                 </div>
 
                 {/* Tuition Mode Preference */}

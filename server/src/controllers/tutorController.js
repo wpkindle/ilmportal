@@ -13,6 +13,7 @@ exports.getPublicTutors = async (req, res) => {
       subject,
       category,
       city,
+      area,
       province,
       mode,
       gender,
@@ -62,6 +63,17 @@ exports.getPublicTutors = async (req, res) => {
           query.$or = (query.$or || []).concat(cityConditions);
         }
       }
+    }
+
+    // Filter by Area / Locality
+    if (area && area !== 'all') {
+      const areaUsers = await User.find({ area: new RegExp('^' + area + '$', 'i') }, '_id');
+      const areaUserIds = areaUsers.map((u) => u._id);
+      const areaConditions = [
+        { localArea: new RegExp('^' + area + '$', 'i') }
+      ];
+      if (areaUserIds.length > 0) areaConditions.push({ user: { $in: areaUserIds } });
+      query.$or = (query.$or || []).concat(areaConditions);
     }
 
     // Filter by Teaching Mode
@@ -287,10 +299,15 @@ exports.updateMyTutorProfile = async (req, res) => {
       localArea,
       area,
       teachingMode,
+      tutoringType,
       gender,
       sanadDocuments,
       verificationStatus
     } = req.body;
+
+    const normalizedExp = (experienceYears !== undefined && experienceYears !== null && experienceYears !== '')
+      ? Number(experienceYears)
+      : undefined;
 
     let profile = await TutorProfile.findOne({ user: req.user.id });
 
@@ -299,17 +316,19 @@ exports.updateMyTutorProfile = async (req, res) => {
         user: req.user.id,
         bio: bio || '',
         qualifications: qualifications || '',
-        experienceYears: experienceYears || 1,
+        experienceYears: normalizedExp !== undefined ? normalizedExp : 1,
         city: city || '',
         localArea: (localArea !== undefined ? localArea : area || '').trim(),
+        tutoringType: tutoringType || 'both',
         gender: gender || 'male',
         verificationStatus: 'under_review'
       });
     } else {
       if (bio !== undefined) profile.bio = bio;
       if (qualifications !== undefined) profile.qualifications = qualifications;
-      if (experienceYears !== undefined) profile.experienceYears = Number(experienceYears);
+      if (normalizedExp !== undefined) profile.experienceYears = normalizedExp;
       if (gender !== undefined) profile.gender = gender;
+      if (tutoringType !== undefined) profile.tutoringType = tutoringType;
       if (subjects !== undefined) profile.subjects = subjects;
       if (cities !== undefined) profile.cities = cities;
       if (city !== undefined) profile.city = city.trim();

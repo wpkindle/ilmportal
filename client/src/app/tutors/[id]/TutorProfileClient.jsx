@@ -203,10 +203,15 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                   )}
                 </div>
 
-                <p className="text-xs sm:text-sm font-semibold text-slate-600 flex items-center gap-2">
-                  <MapPin className="w-4 h-4 text-[#b85d34]" />
-                  <span>{tutorArea ? `${tutorArea}, ${tutorCity}` : tutorCity}</span>
-                  <span>&bull;</span>
+                <p className="text-xs sm:text-sm font-semibold text-slate-600 flex items-center flex-wrap gap-x-2 gap-y-1">
+                  <span className="inline-flex items-center gap-1.5 text-slate-800">
+                    <MapPin className="w-4 h-4 text-[#b85d34] shrink-0" />
+                    <span>City: <strong className="text-slate-900">{tutorCity}</strong></span>
+                    {tutorArea && (
+                      <span className="text-stone-600 font-medium">&bull; Area: <strong className="text-slate-900">{tutorArea}</strong></span>
+                    )}
+                  </span>
+                  <span className="text-stone-300">&bull;</span>
                   <span className="capitalize">{tutor.teachingMode === 'both' ? 'Online & In-Person' : tutor.teachingMode}</span>
                 </p>
 
@@ -262,10 +267,19 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
             </div>
 
             <div className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-1">
-              <span className="text-[10px] uppercase font-bold text-slate-400">Experience</span>
+              <span className="text-[10px] uppercase font-bold text-slate-400">Teaching Experience</span>
               <p className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
-                <CheckCircle2 className="w-4 h-4 text-[#0c2217] shrink-0" />
-                <span>{tutor.experienceYears || 3} Years Teaching Experience</span>
+                {(tutor.experienceYears === 0 || tutor.experienceYears === '0' || tutor.experienceYears === 'fresh') ? (
+                  <>
+                    <Sparkles className="w-4 h-4 text-[#d4a359] shrink-0" />
+                    <span className="text-[#0c2217]">Fresh / Beginner Tutor (&lt; 1 Year)</span>
+                  </>
+                ) : (
+                  <>
+                    <CheckCircle2 className="w-4 h-4 text-[#0c2217] shrink-0" />
+                    <span>{tutor.experienceYears || 1} {Number(tutor.experienceYears) === 1 ? 'Year' : 'Years'} Experience</span>
+                  </>
+                )}
               </p>
             </div>
 

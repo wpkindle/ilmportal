@@ -105,7 +105,7 @@ export default function CustomSelect({
       {isOpen && (
         <div
           role="listbox"
-          className={`absolute left-0 right-0 ${placementClass} z-50 rounded-2xl bg-white border-2 border-[#d4a359]/60 shadow-2xl text-[#141c19] text-left overflow-hidden animate-in fade-in zoom-in-95 duration-150 min-w-[260px] max-w-[320px]`}
+          className={`absolute left-0 ${placementClass} z-50 rounded-2xl bg-white border-2 border-[#d4a359]/60 shadow-2xl text-[#141c19] text-left overflow-hidden animate-in fade-in zoom-in-95 duration-150 w-full min-w-full sm:min-w-[260px] max-w-[420px]`}
         >
           {/* Search Bar */}
           {searchable && (
@@ -132,7 +132,7 @@ export default function CustomSelect({
           )}
 
           {/* Options List */}
-          <div className="max-h-56 overflow-y-auto p-1.5 space-y-1 custom-scrollbar text-left bg-white">
+          <div className="max-h-60 overflow-y-auto p-1.5 space-y-1 custom-scrollbar text-left bg-white">
             {filteredOptions.length === 0 ? (
               <div className="p-4 text-center text-xs text-stone-500 font-medium">
                 No matching options found
@@ -151,16 +151,16 @@ export default function CustomSelect({
                     }}
                     className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-between gap-2.5 cursor-pointer text-left ${
                       isSelected
-                        ? 'bg-[#b85d34] text-white font-bold shadow-md'
+                        ? 'bg-[#0c2217] text-[#faf8f5] font-bold shadow-md'
                         : 'text-stone-800 hover:bg-[#f5f0e6] hover:text-[#0c2217]'
                     }`}
                   >
                     <div className="flex flex-col min-w-0 text-left">
-                      <span className={`font-semibold truncate text-left ${isSelected ? 'text-white' : 'text-[#141c19]'}`}>
+                      <span className={`font-semibold truncate text-left ${isSelected ? 'text-[#faf8f5]' : 'text-[#141c19]'}`}>
                         {opt.label}
                       </span>
                       {opt.sublabel && (
-                        <span className={`text-[10px] truncate text-left ${isSelected ? 'text-white/90' : 'text-stone-500'}`}>
+                        <span className={`text-[10px] truncate text-left ${isSelected ? 'text-[#d4a359]' : 'text-stone-500'}`}>
                           {opt.sublabel}
                         </span>
                       )}
@@ -173,7 +173,7 @@ export default function CustomSelect({
                         </span>
                       )}
                       {isSelected && (
-                        <Check className="w-4 h-4 text-white shrink-0" />
+                        <Check className="w-4 h-4 text-[#d4a359] shrink-0" />
                       )}
                     </div>
                   </div>
@@ -184,6 +184,49 @@ export default function CustomSelect({
         </div>
       )}
 
+    </div>
+  );
+}
+
+/**
+ * Reusable StyledNativeSelect wrapper for professional, modern selects
+ * Replaces unstyled native OS dropdowns with consistent IlmiDunya styling
+ */
+export function StyledNativeSelect({
+  value,
+  onChange,
+  children,
+  icon: Icon,
+  className = '',
+  selectClassName = '',
+  disabled = false,
+  required = false,
+  name,
+  id
+}) {
+  return (
+    <div className={`relative w-full ${className}`}>
+      {Icon && (
+        <div className="absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#b85d34] z-10">
+          <Icon className="w-4 h-4" />
+        </div>
+      )}
+      <select
+        id={id}
+        name={name}
+        value={value}
+        onChange={onChange}
+        disabled={disabled}
+        required={required}
+        className={`w-full appearance-none bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-2 focus:ring-[#d4a359]/20 rounded-2xl ${
+          Icon ? 'pl-10' : 'pl-4'
+        } pr-10 py-2.5 text-xs text-slate-900 font-semibold cursor-pointer shadow-2xs transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed ${selectClassName}`}
+      >
+        {children}
+      </select>
+      <div className="absolute right-3.5 top-1/2 -translate-y-1/2 pointer-events-none text-[#b85d34]">
+        <ChevronDown className="w-4 h-4" />
+      </div>
     </div>
   );
 }

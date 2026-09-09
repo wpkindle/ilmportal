@@ -7,7 +7,7 @@ import TutorFilterSidebar from '../../components/tutor/TutorFilterSidebar';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import CustomSelect from '../../components/common/CustomSelect';
 import { api } from '../../services/api';
-import { Search, Users, UserCheck, ArrowUpDown, ShieldCheck, BookOpen, GraduationCap, Video, Home, MapPin, Compass } from 'lucide-react';
+import { Search, Users, UserCheck, ArrowUpDown, ShieldCheck, BookOpen, GraduationCap, Video, Home, MapPin, Compass, X } from 'lucide-react';
 
 const sortOptions = [
   { value: 'popular', label: 'Most Popular', sublabel: 'Top Enrolled & Active' },
@@ -41,6 +41,7 @@ function TutorSearchContent() {
     search: searchParams.get('q') || '',
     category: searchParams.get('category') || '',
     city: searchParams.get('city') || '',
+    area: searchParams.get('area') || '',
     mode: searchParams.get('mode') || '',
     gender: initialGender,
     faculty: initialFaculty,
@@ -122,6 +123,7 @@ function TutorSearchContent() {
       if (!queryParams.search) delete queryParams.search;
       if (!queryParams.category) delete queryParams.category;
       if (!queryParams.city) delete queryParams.city;
+      if (!queryParams.area) delete queryParams.area;
       if (!queryParams.mode) delete queryParams.mode;
       if (!queryParams.gender) delete queryParams.gender;
       if (!queryParams.faculty) delete queryParams.faculty;
@@ -130,10 +132,21 @@ function TutorSearchContent() {
       const res = await api.getTutors(queryParams);
       if (res.success) {
         let list = res.tutors || [];
+
+        // Client-side fallback filter for area
+        if (filters.area) {
+          const cleanArea = filters.area.toLowerCase().trim();
+          list = list.filter((t) => {
+            const tutorArea = (t.localArea || t.area || t.user?.area || '').toLowerCase();
+            return tutorArea.includes(cleanArea);
+          });
+        }
+
         if (filters.faculty === 'alimah' || filters.faculty === 'female_quran') {
           list = list.filter((t) => {
             const isFemale = t.gender === 'female' || t.user?.gender === 'female';
             if (!isFemale) return false;
+            if (t.tutoringType === 'quran' || t.tutoringType === 'both') return true;
             const qual = (t.qualifications || '').toLowerCase();
             const bio = (t.bio || '').toLowerCase();
             const name = (t.user?.name || '').toLowerCase();
@@ -162,6 +175,7 @@ function TutorSearchContent() {
           list = list.filter((t) => {
             const isFemale = t.gender === 'female' || t.user?.gender === 'female';
             if (!isFemale) return false;
+            if (t.tutoringType === 'academic' || t.tutoringType === 'both') return true;
             const qual = (t.qualifications || '').toLowerCase();
             const bio = (t.bio || '').toLowerCase();
             const hasAcademicSubject = t.subjects?.some((s) => {
@@ -197,6 +211,7 @@ function TutorSearchContent() {
           list = list.filter((t) => {
             const isMale = t.gender === 'male' || t.user?.gender === 'male';
             if (!isMale) return false;
+            if (t.tutoringType === 'quran' || t.tutoringType === 'both') return true;
             const qual = (t.qualifications || '').toLowerCase();
             const bio = (t.bio || '').toLowerCase();
             const name = (t.user?.name || '').toLowerCase();
@@ -228,6 +243,7 @@ function TutorSearchContent() {
           list = list.filter((t) => {
             const isMale = t.gender === 'male' || t.user?.gender === 'male';
             if (!isMale) return false;
+            if (t.tutoringType === 'academic' || t.tutoringType === 'both') return true;
             const qual = (t.qualifications || '').toLowerCase();
             const bio = (t.bio || '').toLowerCase();
             const hasAcademicSubject = t.subjects?.some((s) => {
@@ -276,7 +292,13 @@ function TutorSearchContent() {
   }, [filters]);
 
   const handleFilterChange = (key, value) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
+    setFilters(prev => {
+      const next = { ...prev, [key]: value };
+      if (key === 'city' && value !== prev.city) {
+        next.area = '';
+      }
+      return next;
+    });
   };
 
   const handleReset = () => {
@@ -512,6 +534,7 @@ function TutorSearchContent() {
                 <div className="min-w-0">
                   <p className="text-slate-900 font-bold leading-tight truncate">
                     In-Person Home Tutoring in: <span className="text-[#b85d34]">{filters.city}</span>
+                    {filters.area ? ` (${filters.area})` : ''}
                   </p>
                   <p className="text-[10px] text-stone-600 truncate">
                     Verified male faculty available for physical home tutoring
@@ -520,10 +543,128 @@ function TutorSearchContent() {
               </div>
               <button
                 type="button"
-                onClick={() => handleFilterChange('city', '')}
+                onClick={() => {
+                  handleFilterChange('city', '');
+                  handleFilterChange('area', '');
+                }}
                 className="text-[11px] font-bold text-stone-500 hover:text-[#b85d34] underline shrink-0 cursor-pointer"
               >
                 Change / Clear City
+              </button>
+            </div>
+          )}
+
+          {/* Active Filter Tags */}
+          {(filters.city || filters.area || filters.faculty || (filters.gender && !filters.faculty) || filters.category || filters.search) && (
+            <div className="flex flex-wrap items-center gap-1.5 pt-2.5 border-t border-[#e6ded1] text-xs">
+              <span className="text-[11px] font-bold text-stone-500 mr-1">Active Filters:</span>
+
+              {filters.search && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#faf7f2] border border-[#e6ded1] rounded-full text-[11px] font-semibold text-stone-800">
+                  Keyword: "{filters.search}"
+                  <button
+                    type="button"
+                    onClick={() => handleFilterChange('search', '')}
+                    className="hover:text-red-500 cursor-pointer ml-0.5"
+                    aria-label="Remove keyword filter"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+
+              {filters.faculty && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#f5ebe6] border border-[#b85d34]/30 rounded-full text-[11px] font-bold text-[#b85d34]">
+                  {filters.faculty === 'alimah' || filters.faculty === 'female_quran'
+                    ? '🌸 Female Quran (Alimah)'
+                    : filters.faculty === 'female_academic'
+                    ? '📚 Female Academic'
+                    : filters.faculty === 'male_quran'
+                    ? '🕌 Male Quran (Qari)'
+                    : filters.faculty === 'male_academic'
+                    ? '🎓 Male Academic'
+                    : filters.faculty}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleFilterChange('faculty', '');
+                      handleFilterChange('gender', '');
+                    }}
+                    className="hover:text-red-500 cursor-pointer ml-0.5"
+                    aria-label="Remove faculty filter"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+
+              {filters.gender && !filters.faculty && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#f5ebe6] border border-[#b85d34]/30 rounded-full text-[11px] font-bold text-[#b85d34] capitalize">
+                  Gender: {filters.gender}
+                  <button
+                    type="button"
+                    onClick={() => handleFilterChange('gender', '')}
+                    className="hover:text-red-500 cursor-pointer ml-0.5"
+                    aria-label="Remove gender filter"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+
+              {filters.city && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#edf6f0] border border-emerald-300 rounded-full text-[11px] font-bold text-emerald-900">
+                  <MapPin className="w-3 h-3 text-emerald-700" />
+                  City: {filters.city}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleFilterChange('city', '');
+                      handleFilterChange('area', '');
+                    }}
+                    className="hover:text-red-500 cursor-pointer ml-0.5"
+                    aria-label="Remove city filter"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+
+              {filters.area && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#edf6f0] border border-emerald-300 rounded-full text-[11px] font-bold text-emerald-900">
+                  <MapPin className="w-3 h-3 text-emerald-700" />
+                  Area: {filters.area}
+                  <button
+                    type="button"
+                    onClick={() => handleFilterChange('area', '')}
+                    className="hover:text-red-500 cursor-pointer ml-0.5"
+                    aria-label="Remove area filter"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+
+              {filters.category && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-[#faf7f2] border border-[#e6ded1] rounded-full text-[11px] font-semibold text-stone-800">
+                  Subject: {categories.find(c => c._id === filters.category)?.name || filters.category}
+                  <button
+                    type="button"
+                    onClick={() => handleFilterChange('category', '')}
+                    className="hover:text-red-500 cursor-pointer ml-0.5"
+                    aria-label="Remove category filter"
+                  >
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              )}
+
+              <button
+                type="button"
+                onClick={handleReset}
+                className="text-[11px] font-bold text-[#b85d34] hover:underline cursor-pointer ml-1"
+              >
+                Reset All
               </button>
             </div>
           )}

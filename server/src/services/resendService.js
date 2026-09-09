@@ -113,7 +113,9 @@ const sendEmail = async ({
       return String(item).trim();
     });
 
-    const sender = process.env.RESEND_FROM || from;
+    const rawSender = process.env.RESEND_FROM || from;
+    const cleanEmail = (rawSender.match(/<([^>]+)>/) ? rawSender.match(/<([^>]+)>/)[1] : rawSender.replace(/["']/g, '')).trim();
+    const sender = `IlmiDunya Pakistan <${cleanEmail}>`;
 
     const payload = {
       from: sender,

@@ -107,7 +107,7 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
     try {
       const rawFrom = process.env.RESEND_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
       const cleanEmail = (rawFrom.match(/<([^>]+)>/) ? rawFrom.match(/<([^>]+)>/)[1] : rawFrom.replace(/["']/g, '')).trim();
-      const fromAddr = rawFrom.includes('<') ? rawFrom : `"IlmiDunya Pakistan" <${cleanEmail}>`;
+      const fromAddr = `IlmiDunya Pakistan <${cleanEmail}>`;
 
       const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',

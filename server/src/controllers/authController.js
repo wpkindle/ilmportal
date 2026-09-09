@@ -23,9 +23,9 @@ const calculateProfileCompletion = (user, tutorProfile) => {
 
   if (user.role === 'tutor') {
     const checks = [
-      { key: 'name', label: 'Full Name', weight: 15, done: !!user.name?.trim() },
+      { key: 'name', label: 'Full Name', weight: 10, done: !!user.name?.trim() },
       { key: 'email', label: 'Verified Email', weight: 15, done: !!user.isVerified },
-      { key: 'avatar', label: 'Profile Picture', weight: 15, done: !!user.avatar?.trim() },
+      { key: 'avatar', label: 'Profile Picture', weight: 10, done: !!user.avatar?.trim() },
       { key: 'age', label: 'Tutor Age', weight: 10, done: !!user.age },
       { key: 'gender', label: 'Gender', weight: 5, done: !!user.gender?.trim() },
       { key: 'city', label: 'City Location', weight: 10, done: !!user.city?.trim() },
@@ -34,7 +34,7 @@ const calculateProfileCompletion = (user, tutorProfile) => {
       { key: 'sanad', label: 'Sanad / Degree Document', weight: 10, done: Array.isArray(tutorProfile?.sanadDocuments) && tutorProfile.sanadDocuments.length > 0 }
     ];
 
-    const percentage = checks.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0);
+    const percentage = Math.min(100, Math.max(0, checks.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0)));
     return { percentage, items: checks };
   } else {
     // Student
@@ -48,7 +48,7 @@ const calculateProfileCompletion = (user, tutorProfile) => {
       { key: 'city', label: 'City', weight: 15, done: !!user.city?.trim() }
     ];
 
-    const percentage = checks.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0);
+    const percentage = Math.min(100, Math.max(0, checks.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0)));
     return { percentage, items: checks };
   }
 };

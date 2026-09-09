@@ -26,7 +26,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       {
         key: 'name',
         label: 'Full Name',
-        weight: 15,
+        weight: 10,
         done: !!user.name?.trim(),
         link: '/tutor/profile#profile-name',
         actionLabel: 'Set Name'
@@ -42,7 +42,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       {
         key: 'avatar',
         label: 'Profile Picture',
-        weight: 15,
+        weight: 10,
         done: !!user.avatar?.trim(),
         link: '/tutor/profile#profile-avatar',
         actionLabel: 'Upload Photo'
@@ -97,7 +97,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       }
     ];
 
-    const percentage = checks.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0);
+    const percentage = Math.min(100, Math.max(0, checks.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0)));
     return { percentage, items: checks };
   } else {
     // Student
@@ -160,7 +160,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       }
     ];
 
-    const percentage = checks.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0);
+    const percentage = Math.min(100, Math.max(0, checks.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0)));
     return { percentage, items: checks };
   }
 };
@@ -189,7 +189,7 @@ export default function ProfileCompletionMeter({
   };
 
   const getStatusBadge = (isDark = false) => {
-    if (percentage === 100) {
+    if (percentage >= 100) {
       return (
         <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold ${
           isDark
@@ -337,7 +337,7 @@ export default function ProfileCompletionMeter({
           <div className="w-full bg-stone-100 h-2.5 rounded-full overflow-hidden p-0.5 border border-stone-200">
             <div
               className={`h-full rounded-full bg-gradient-to-r ${getBarColor(percentage)} transition-all duration-500 shadow-sm`}
-              style={{ width: `${Math.max(percentage, 5)}%` }}
+              style={{ width: `${Math.min(100, Math.max(percentage, 5))}%` }}
             />
           </div>
 
@@ -483,7 +483,7 @@ export default function ProfileCompletionMeter({
       <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden p-0.5 border border-slate-200/60">
         <div
           className={`h-full rounded-full bg-gradient-to-r ${getBarColor(percentage)} transition-all duration-500 shadow-xs`}
-          style={{ width: `${Math.max(percentage, 5)}%` }}
+          style={{ width: `${Math.min(100, Math.max(percentage, 5))}%` }}
         />
       </div>
 

@@ -347,13 +347,13 @@ export default function TutorApprovalPage() {
                           <div className="flex items-center justify-between text-xs">
                             <span className="font-bold text-slate-700">Profile Strength &amp; Completion:</span>
                             <span className={`font-black ${tutor.completion.percentage >= 100 ? 'text-emerald-700' : 'text-amber-700'}`}>
-                              {tutor.completion.percentage}% {tutor.completion.percentage >= 100 ? '(100% Ready for Approval)' : '(Incomplete)'}
+                              {Math.min(100, tutor.completion.percentage)}% {tutor.completion.percentage >= 100 ? '(100% Ready for Approval)' : '(Incomplete)'}
                             </span>
                           </div>
                           <div className="w-full h-2 bg-slate-200 rounded-full overflow-hidden">
                             <div
                               className={`h-full transition-all rounded-full ${tutor.completion.percentage >= 100 ? 'bg-emerald-500' : 'bg-amber-500'}`}
-                              style={{ width: `${tutor.completion.percentage}%` }}
+                              style={{ width: `${Math.min(100, tutor.completion.percentage)}%` }}
                             />
                           </div>
                           {tutor.completion.items && tutor.completion.items.some(i => !i.done) && (

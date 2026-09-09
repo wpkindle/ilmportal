@@ -1,12 +1,18 @@
 // IlmiDunya Service Worker - Handles Desktop & Mobile Push Notifications & Smooth Focusing
-const CACHE_NAME = 'ilmidunya-cache-v1';
+const CACHE_NAME = 'ilmidunya-cache-v2';
 
 self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.filter((name) => name !== CACHE_NAME).map((name) => caches.delete(name))
+      );
+    }).then(() => self.clients.claim())
+  );
 });
 
 // Handle notification click on Desktop & Mobile OS without unnecessary reloading

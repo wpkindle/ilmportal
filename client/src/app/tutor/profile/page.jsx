@@ -689,7 +689,7 @@ function TutorProfileContent() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div id="profile-city" className="scroll-mt-28">
                     <label className="text-xs font-bold text-slate-700 block mb-1">
-                      City Location *
+                      City *
                     </label>
                     <StyledNativeSelect
                       value={city}
@@ -709,7 +709,7 @@ function TutorProfileContent() {
                   <div id="profile-local-area" className="scroll-mt-28">
                     <div className="flex items-center justify-between mb-1">
                       <label className="text-xs font-bold text-slate-700 block">
-                        Local Main Area / Sector (Optional)
+                        Area (Optional)
                       </label>
                       {city && (
                         <span className="text-[10px] text-stone-500 font-medium">

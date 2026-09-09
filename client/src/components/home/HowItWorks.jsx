@@ -17,25 +17,25 @@ import {
 const steps = [
   {
     step: '01',
-    title: 'Browse & Filter by Subject, Gender, or City',
-    highlight: 'Female Alimahs & Academic Tutors',
-    description: 'Explore verified teacher profiles with authenticated CNIC and Sanad documents. Filter for female teachers for daughters, or academic specialists in your city.',
-    detail: 'Over 20+ disciplines across Pakistan',
+    title: 'Filter by City for Home-Based or Online Tuitions',
+    highlight: 'Home & Online • City Filter',
+    description: 'Search verified male and female tutors by your specific Pakistani city and neighborhood for in-person home tutoring, or connect nationwide for 1-on-1 live online classes.',
+    detail: 'Home & Online across all Pakistani cities',
     icon: Search,
-    modalTitle: '1. Browse & Filter Verified Teachers',
-    modalIntro: 'Find verified Quran scholars, certified female Alimahs, and top academic educators tailored to your family’s exact requirements.',
+    modalTitle: '1. Filter by City for Home-Based or Online Tuitions',
+    modalIntro: 'Find verified Quran scholars, certified female Alimahs, and top academic educators tailored to your city and family requirements.',
     features: [
       {
-        title: 'Authentic Sanad & CNIC Verification',
-        desc: 'Every teacher profile is verified by platform administrators against their official degree credentials (Wafaq-ul-Madaris, Tanzeem-ul-Madaris, HEC universities).'
+        title: 'Home-Based In-Person & Online Availability',
+        desc: 'Select in-person home tutoring in your city (Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, Multan, Peshawar, etc.) or nationwide online WebRTC live classes.'
       },
       {
         title: '100% Female Privacy & Alimahs for Girls',
         desc: 'Filter specifically for certified female Alimahs for daughters and mothers to ensure absolute comfort, dignity, and cultural respect.'
       },
       {
-        title: 'Flexible City & Online Availability',
-        desc: 'Select in-person home tutoring in major Pakistani cities (Lahore, Karachi, Islamabad, Rawalpindi) or nationwide online WebRTC live classes.'
+        title: 'Authentic Sanad & CNIC Verification',
+        desc: 'Every teacher profile is verified by platform administrators against their official degree credentials (Wafaq-ul-Madaris, Tanzeem-ul-Madaris, HEC universities) and CNIC.'
       }
     ],
     actionText: 'Browse Verified Tutors Now',
@@ -43,17 +43,17 @@ const steps = [
   },
   {
     step: '02',
-    title: 'Free Direct Chat to Agree on Timings & Fee',
-    highlight: 'Zero Middleman Markups',
-    description: 'Message teachers directly within our protected in-app chat. Discuss your child’s learning pace, preferred evening or weekend hours, and agree on a fair monthly fee in PKR.',
-    detail: 'No personal phone numbers leaked',
+    title: 'Safe Direct Chat — Zero Phone / WhatsApp Needed',
+    highlight: 'Zero Contact Exposure',
+    description: 'We never ask for or require your personal phone number or WhatsApp. Message teachers directly inside our protected in-app chat to agree on schedule and fair PKR tuition fee.',
+    detail: 'Zero phone or WhatsApp number required',
     icon: MessageSquare,
-    modalTitle: '2. Free Direct In-App Chat',
+    modalTitle: '2. Safe Direct Chat — Zero Contact Exposure',
     modalIntro: 'Connect directly with teachers within our monitored in-app chat with zero phone number leaks and zero agency markups.',
     features: [
       {
-        title: 'Zero Personal Phone Number Sharing',
-        desc: 'Keep your personal WhatsApp and mobile numbers completely private. Inquire, interview, and test compatibility within our encrypted chat.'
+        title: 'Zero Phone / WhatsApp Collection Policy',
+        desc: 'We never ask for or require personal phone numbers or WhatsApp details from students or tutors. Inquire, interview, and test compatibility with total privacy.'
       },
       {
         title: 'Direct PKR Fee Agreement',

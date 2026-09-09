@@ -6,11 +6,19 @@ import { ChevronDown, HelpCircle } from 'lucide-react';
 const faqs = [
   {
     q: 'How does tutoring work on IlmiDunya for Pakistani families?',
-    a: 'You can search verified Quran teachers and school tutors by subject, city, and teacher gender. You chat directly with the teacher for free to discuss class days and mutually agree on a monthly fee (PKR). 1-on-1 live video classes happen right in your internet browser with camera-off privacy by default.'
+    a: 'IlmiDunya offers two flexible learning modes: Home-Based In-Person Tuitions (vetted teachers visiting your residence in your city) and 1-on-1 Live Online Classes (browser-native WebRTC with camera-off privacy by default). You can filter tutors by city, subject, and teacher gender, chat directly inside the platform with zero phone number exposure, and agree on an honest monthly fee in PKR.'
+  },
+  {
+    q: 'Do you ask for or require my personal phone number or WhatsApp?',
+    a: 'No, never. We do not ask for or require personal phone numbers or WhatsApp details from either students or tutors. All inquiries, scheduling, and lesson discussions happen safely inside our protected in-platform messaging system, shielding your family from spam, unwanted calls, and off-platform harassment.'
+  },
+  {
+    q: 'Can I find Home-Based In-Person tuitions in my city?',
+    a: 'Yes, absolutely! IlmiDunya is fully focused on both Home-Based In-Person tuitions and 1-on-1 Live Online classes. You can filter verified male and female tutors by your specific Pakistani city (such as Lahore, Karachi, Islamabad, Rawalpindi, Faisalabad, Multan, Peshawar, and more) and local neighborhood to find a tutor who can visit your home.'
   },
   {
     q: 'Do I or my child need to download Zoom, Skype, or any software?',
-    a: 'No! Zero app downloads required. Classes take place directly inside your web browser (Chrome, Edge, Safari, Firefox, or mobile browser) with crystal-clear audio, interactive screen sharing, digital Quran reader, and digital blackboard.'
+    a: 'No! Zero app downloads required. Online classes take place directly inside your web browser (Chrome, Edge, Safari, Firefox, or mobile browser) with crystal-clear audio, interactive screen sharing, digital Quran reader, and digital blackboard.'
   },
   {
     q: 'How are Quran Qaris and academic tutors verified?',

@@ -18,11 +18,44 @@ import {
   Camera,
   Ban,
   Mail,
-  UserCheck
+  UserCheck,
+  PhoneOff,
+  Home,
+  MapPin
 } from 'lucide-react';
 
 export default function SafetyPage() {
   const safetyPillars = [
+    {
+      id: 'zero-phone-policy',
+      icon: PhoneOff,
+      badge: 'Zero Phone / WhatsApp Needed',
+      title: 'Zero Phone & WhatsApp Collection Guarantee',
+      color: 'bg-rose-50 text-rose-800 border-rose-200',
+      description:
+        'We never ask for, collect, or distribute personal phone numbers or WhatsApp details from either students or tutors. All messaging and lesson arrangements remain safely inside our platform.',
+      features: [
+        'No Phone Number Ever Required: Register, search tutors, and coordinate classes without ever revealing your personal mobile or WhatsApp number.',
+        'Spam & Harassment Elimination: Completely shields students, daughters, and teachers from unwanted calls, late-night texts, and off-platform harassment.',
+        'Encrypted In-App Messaging: Real-time platform chat allows students and parents to negotiate schedules and tuition fees directly with tutors.',
+        'Proactive Contact Leak Prevention: Automated system monitors prevent accidental sharing of contact information.'
+      ]
+    },
+    {
+      id: 'home-in-person-safety',
+      icon: Home,
+      badge: 'City & Area Discovery',
+      title: 'Home-Based In-Person Tuition Safety Protocol',
+      color: 'bg-[#f5ebe6] text-[#b85d34] border-[#b85d34]/30',
+      description:
+        'For families seeking physical tutoring in their city and neighborhood, we enforce strict identity vetting and on-premises safety protocols.',
+      features: [
+        'City & Local Area Filtering: Filter verified male and female tutors by your specific Pakistani city (Lahore, Karachi, Islamabad, Rawalpindi, etc.) and neighborhood.',
+        'Government CNIC & Sanad Authentication: In-person tutors must submit verified CNICs and academic credentials before being approved.',
+        'Mandatory Adult Guardian Presence: For minor students, an adult parent or guardian must be present on the home premises throughout in-person lessons.',
+        'Full Residential Privacy: Your exact home address is never displayed publicly on the platform and is only shared after mutual deal confirmation.'
+      ]
+    },
     {
       id: 'female-safety',
       icon: ShieldCheck,
@@ -87,9 +120,9 @@ export default function SafetyPage() {
 
   const trustBadges = [
     { label: 'Female-First Privacy', sub: 'Camera-Off & Purdah-Safe' },
-    { label: 'PECA 2016 Compliant', sub: 'Pakistan Cybercrime Law Protected' },
-    { label: 'Sanad Verified Faculty', sub: 'Authentic Religious & Academic Degrees' },
-    { label: 'Zero-Contact Leak Policy', sub: 'No Personal Phone Numbers Exposed' }
+    { label: 'Zero Phone / WhatsApp', sub: 'Neither Student nor Tutor Number Asked' },
+    { label: 'Home & Online Tuitions', sub: 'City & Local Area Filtering' },
+    { label: 'Sanad Verified Faculty', sub: 'Authentic Religious & Academic Degrees' }
   ];
 
   return (
@@ -155,17 +188,17 @@ export default function SafetyPage() {
         </div>
       </section>
 
-      {/* 4 Pillars of Protection on Warm Sand */}
+      {/* 6 Pillars of Protection on Warm Sand */}
       <section className="py-20 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 space-y-14">
         <div className="text-center space-y-2.5 max-w-2xl mx-auto">
           <span className="text-xs font-bold uppercase tracking-wider text-[#b85d34] bg-[#f5ebe6] px-3.5 py-1 rounded-full border border-[#b85d34]/20 inline-block">
-            Our 4-Pillar Security Framework
+            Our 6-Pillar Security &amp; Privacy Framework
           </span>
           <h2 className="text-2xl sm:text-4xl font-serif font-black text-slate-900 tracking-tight">
-            How IlmiDunya Keeps Female Learners &amp; Families Safe
+            How IlmiDunya Protects Learners, Families &amp; Educators
           </h2>
           <p className="text-xs sm:text-sm text-slate-600">
-            Engineered with deep cultural sensitivity, family ethics, and modern privacy technology.
+            Engineered for Home-Based In-Person and Live Online tuitions with deep cultural sensitivity and guaranteed zero phone/WhatsApp collection.
           </p>
         </div>
 

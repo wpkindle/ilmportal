@@ -12,17 +12,16 @@ const {
   sendChatRequestStatusEmail
 } = require('../utils/emailService');
 
-// Helper to check 100% student profile completion (7 core required fields)
+// Helper to check 100% student profile completion (6 core required fields)
 const isStudentProfile100Percent = (user) => {
   if (!user) return false;
   const hasName = !!user.name?.trim();
   const hasVerifiedEmail = !!user.isVerified;
-  const hasPhone = !!user.phone?.trim() || !!user.guardianPhone?.trim();
   const hasAvatar = !!user.avatar?.trim();
   const hasAge = !!user.age && user.age >= 3;
   const hasGender = !!user.gender && user.gender.trim() !== '';
   const hasCity = !!user.city && user.city.trim() !== '';
-  return hasName && hasVerifiedEmail && hasPhone && hasAvatar && hasAge && hasGender && hasCity;
+  return hasName && hasVerifiedEmail && hasAvatar && hasAge && hasGender && hasCity;
 };
 
 // @desc    Get all conversation threads for logged-in user
@@ -516,8 +515,8 @@ exports.sendChatRequest = async (req, res) => {
       studentProfileSnapshot: {
         name: studentUser.name,
         email: studentUser.email,
-        phone: studentUser.phone || studentUser.guardianPhone,
-        guardianPhone: studentUser.guardianPhone,
+        phone: '',
+        guardianPhone: '',
         age: studentUser.age,
         gender: studentUser.gender,
         city: studentUser.city,
@@ -526,7 +525,7 @@ exports.sendChatRequest = async (req, res) => {
     });
 
     const populatedRequest = await ChatRequest.findById(request._id)
-      .populate('student', 'name email avatar phone guardianPhone age gender city');
+      .populate('student', 'name email avatar age gender city');
 
     // Send in-app notification to tutor
     await Notification.create({
@@ -651,7 +650,7 @@ exports.respondChatRequest = async (req, res) => {
     }
 
     const request = await ChatRequest.findById(requestId)
-      .populate('student', 'name email avatar phone guardianPhone age gender city')
+      .populate('student', 'name email avatar age gender city')
       .populate('tutor', 'name email avatar');
 
     if (!request) {

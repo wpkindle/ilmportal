@@ -6,7 +6,6 @@ import { useSearchParams } from 'next/navigation';
 import {
   User,
   Mail,
-  Phone,
   MapPin,
   Lock,
   Camera,
@@ -46,7 +45,6 @@ function StudentProfileContent() {
   const [name, setName] = useState('');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
-  const [phone, setPhone] = useState('');
   const [city, setCity] = useState('Lahore');
   const [area, setArea] = useState('');
   const [isCustomArea, setIsCustomArea] = useState(false);
@@ -83,7 +81,6 @@ function StudentProfileContent() {
       setName(user.name || '');
       setUsername(user.username || '');
       setEmail(user.email || '');
-      setPhone(user.phone || user.guardianPhone || '');
       const uCity = user.city || '';
       const uArea = user.area || '';
       setCity(uCity);
@@ -154,8 +151,6 @@ function StudentProfileContent() {
         name: name.trim(),
         username: username.trim().toLowerCase(),
         email: email.trim(),
-        phone: phone.trim(),
-        guardianPhone: phone.trim(),
         city,
         area: area.trim(),
         gender,
@@ -578,21 +573,6 @@ function StudentProfileContent() {
                       </div>
                     )}
                   </div>
-                </div>
-
-                {/* Mobile Phone Number */}
-                <div id="profile-phone" className="scroll-mt-28">
-                  <label className="text-xs font-bold text-slate-700 block mb-1 flex items-center justify-between">
-                    <span>Mobile Number</span>
-                    <span className="text-[10px] text-slate-400 font-normal">Optional</span>
-                  </label>
-                  <input
-                    type="tel"
-                    placeholder="Enter Your Number"
-                    value={phone}
-                    onChange={(e) => setPhone(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-2 focus:ring-[#d4a359]/20 rounded-2xl text-xs text-slate-900 outline-none transition-all shadow-2xs"
-                  />
                 </div>
 
                 {/* Tuition Mode Preference */}

@@ -105,7 +105,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       {
         key: 'name',
         label: 'Student Name',
-        weight: 15,
+        weight: 20,
         done: !!user.name?.trim(),
         link: '/student/profile#profile-name',
         actionLabel: 'Set Name'
@@ -113,18 +113,10 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       {
         key: 'email',
         label: 'Verified Email',
-        weight: 15,
+        weight: 20,
         done: !!user.isVerified,
         link: `/verify-email?email=${encodeURIComponent(user?.email || '')}&role=student`,
         actionLabel: 'Verify Email'
-      },
-      {
-        key: 'phone',
-        label: 'Mobile / WhatsApp Number',
-        weight: 15,
-        done: !!user.phone?.trim() || !!user.guardianPhone?.trim(),
-        link: '/student/profile#profile-phone',
-        actionLabel: 'Add Phone'
       },
       {
         key: 'avatar',
@@ -145,7 +137,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       {
         key: 'gender',
         label: 'Gender',
-        weight: 10,
+        weight: 15,
         done: !!user.gender && user.gender.trim() !== '',
         link: '/student/profile#profile-gender',
         actionLabel: 'Set Gender'

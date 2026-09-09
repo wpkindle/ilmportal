@@ -26,31 +26,31 @@ export default function FemaleTutorGateModal({
   const missingItems = items.filter(item => !item.done);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/40 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-[#e6ded1] overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-[#e6ded1] overflow-hidden text-slate-800 my-auto flex flex-col max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-2.5rem)] animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header Banner */}
-        <div className="bg-[#faf8f5] border-b border-[#ebe3d3] text-[#0c2217] p-6 relative">
+        <div className="shrink-0 bg-[#faf8f5] border-b border-[#ebe3d3] text-[#0c2217] p-4 sm:p-6 relative">
           <button
             type="button"
             onClick={onClose}
-            className="absolute top-4 right-4 p-2 text-stone-400 hover:text-[#0c2217] rounded-full hover:bg-black/5 transition-colors"
+            className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 p-2 text-stone-400 hover:text-[#0c2217] rounded-full hover:bg-black/5 transition-colors cursor-pointer"
             title="Close"
           >
             <X className="w-5 h-5" />
           </button>
 
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-[#f5f0e6] border border-[#d4a359]/40 rounded-2xl text-[#b85d34]">
-              <ShieldCheck className="w-6 h-6" />
+          <div className="flex items-center gap-3 pr-8">
+            <div className="p-2.5 sm:p-3 bg-[#f5f0e6] border border-[#d4a359]/40 rounded-2xl text-[#b85d34] shrink-0">
+              <ShieldCheck className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#b85d34] bg-[#f5f0e6] px-2.5 py-0.5 rounded-full border border-[#d4a359]/30">
+            <div className="min-w-0">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#b85d34] bg-[#f5f0e6] px-2.5 py-0.5 rounded-full border border-[#d4a359]/30 inline-block">
                 Safety &amp; Privacy Protocol
               </span>
-              <h2 className="text-lg font-black text-[#0c2217] mt-1 font-serif">
+              <h2 className="text-base sm:text-lg font-black text-[#0c2217] mt-1 font-serif truncate sm:whitespace-normal">
                 100% Profile Strength Required
               </h2>
             </div>
@@ -58,7 +58,7 @@ export default function FemaleTutorGateModal({
         </div>
 
         {/* Content Body */}
-        <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4 sm:space-y-5">
           {/* Tutor Info Preview */}
           <div className="p-3.5 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] flex items-center gap-3">
             <img
@@ -144,20 +144,20 @@ export default function FemaleTutorGateModal({
         </div>
 
         {/* Footer Actions */}
-        <div className="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between gap-3">
+        <div className="shrink-0 p-3 sm:p-4 bg-slate-50 border-t border-slate-100 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5">
           <button
             type="button"
             onClick={onClose}
-            className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-200/70 transition-colors"
+            className="w-full sm:w-auto px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-200/70 transition-colors order-2 sm:order-1 text-center cursor-pointer"
           >
             Cancel
           </button>
           <Link
             href="/student/profile"
             onClick={onClose}
-            className="px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-98 text-white rounded-xl text-xs font-black shadow-md shadow-[#b85d34]/25 flex items-center gap-2 transition-all"
+            className="w-full sm:w-auto px-4 sm:px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-98 text-white rounded-xl text-xs font-black shadow-md shadow-[#b85d34]/25 flex items-center justify-center gap-2 transition-all order-1 sm:order-2 text-center cursor-pointer"
           >
-            <Sparkles className="w-3.5 h-3.5 text-white/80" />
+            <Sparkles className="w-3.5 h-3.5 text-white/80 shrink-0" />
             <span>Complete My Profile ({percentage}% Done)</span>
           </Link>
         </div>

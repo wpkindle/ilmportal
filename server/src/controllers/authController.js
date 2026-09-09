@@ -39,12 +39,11 @@ const calculateProfileCompletion = (user, tutorProfile) => {
   } else {
     // Student
     const checks = [
-      { key: 'name', label: 'Student Name', weight: 15, done: !!user.name?.trim() },
-      { key: 'email', label: 'Verified Email', weight: 15, done: !!user.isVerified },
-      { key: 'phone', label: 'Contact Phone Number', weight: 15, done: !!user.phone?.trim() || !!user.guardianPhone?.trim() },
+      { key: 'name', label: 'Student Name', weight: 20, done: !!user.name?.trim() },
+      { key: 'email', label: 'Verified Email', weight: 20, done: !!user.isVerified },
       { key: 'avatar', label: 'Profile Picture', weight: 15, done: !!user.avatar?.trim() },
       { key: 'age', label: 'Student Age', weight: 15, done: !!user.age },
-      { key: 'gender', label: 'Gender', weight: 10, done: !!user.gender?.trim() },
+      { key: 'gender', label: 'Gender', weight: 15, done: !!user.gender?.trim() },
       { key: 'city', label: 'City', weight: 15, done: !!user.city?.trim() }
     ];
 

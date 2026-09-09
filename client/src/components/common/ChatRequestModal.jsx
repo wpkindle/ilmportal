@@ -71,36 +71,36 @@ export default function ChatRequestModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/35 backdrop-blur-sm animate-in fade-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-black/40 backdrop-blur-sm overflow-y-auto animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-[#e6ded1] overflow-hidden text-slate-800 animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl border border-[#e6ded1] overflow-hidden text-slate-800 my-auto flex flex-col max-h-[calc(100dvh-1.5rem)] sm:max-h-[calc(100dvh-2.5rem)] animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Header */}
-        <div className="bg-[#faf8f5] border-b border-[#ebe3d3] text-[#0c2217] p-6 relative">
+        <div className="shrink-0 bg-[#faf8f5] border-b border-[#ebe3d3] text-[#0c2217] p-4 sm:p-6 relative">
           <button
             type="button"
             onClick={handleResetAndClose}
-            className="absolute top-4 right-4 p-2 text-stone-400 hover:text-[#0c2217] rounded-full hover:bg-black/5 transition-colors"
+            className="absolute top-3.5 right-3.5 sm:top-4 sm:right-4 p-2 text-stone-400 hover:text-[#0c2217] rounded-full hover:bg-black/5 transition-colors cursor-pointer"
             title="Close"
           >
             <X className="w-5 h-5" />
           </button>
 
-          <div className="flex items-center gap-3">
-            <div className="p-3 bg-[#f5f0e6] border border-[#d4a359]/40 rounded-2xl text-[#b85d34]">
-              <MessageSquare className="w-6 h-6" />
+          <div className="flex items-center gap-3 pr-8">
+            <div className="p-2.5 sm:p-3 bg-[#f5f0e6] border border-[#d4a359]/40 rounded-2xl text-[#b85d34] shrink-0">
+              <MessageSquare className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
-            <div>
+            <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-[#b85d34] bg-[#f5f0e6] px-2.5 py-0.5 rounded-full border border-[#d4a359]/30">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-[#b85d34] bg-[#f5f0e6] px-2.5 py-0.5 rounded-full border border-[#d4a359]/30 inline-block">
                   Verified Request
                 </span>
                 <span className="text-[10px] font-bold text-[#0c2217] bg-[#ebe3d3] px-2 py-0.5 rounded-full border border-stone-300">
                   Female Tutor
                 </span>
               </div>
-              <h2 className="text-lg font-black text-[#0c2217] mt-1 font-serif">
+              <h2 className="text-base sm:text-lg font-black text-[#0c2217] mt-1 font-serif truncate sm:whitespace-normal">
                 Send Message Request
               </h2>
             </div>
@@ -108,7 +108,7 @@ export default function ChatRequestModal({
         </div>
 
         {/* Content Body */}
-        <div className="p-6 space-y-5 max-h-[75vh] overflow-y-auto">
+        <div className="flex-1 min-h-0 overflow-y-auto overscroll-contain p-4 sm:p-6 space-y-4 sm:space-y-5">
           {submitted ? (
             <div className="py-6 text-center space-y-4">
               <div className="w-16 h-16 bg-[#f0ece1] text-[#0c2217] rounded-full flex items-center justify-center mx-auto ring-8 ring-[#faf8f5] shadow-inner">
@@ -209,19 +209,19 @@ export default function ChatRequestModal({
               )}
 
               {/* Submit Buttons */}
-              <div className="pt-2 flex items-center justify-between gap-3">
+              <div className="pt-2 flex flex-wrap sm:flex-nowrap items-center justify-between gap-2.5">
                 <button
                   type="button"
                   onClick={handleResetAndClose}
                   disabled={loading}
-                  className="px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors"
+                  className="w-full sm:w-auto px-4 py-2 text-xs font-bold text-slate-600 hover:text-slate-900 rounded-xl hover:bg-slate-100 transition-colors order-2 sm:order-1 text-center cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={loading || details.trim().length < 10}
-                  className="px-6 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] disabled:opacity-50 text-white rounded-xl text-xs font-black shadow-md shadow-[#b85d34]/25 flex items-center gap-2 transition-all cursor-pointer"
+                  className="w-full sm:w-auto px-6 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] disabled:opacity-50 text-white rounded-xl text-xs font-black shadow-md shadow-[#b85d34]/25 flex items-center justify-center gap-2 transition-all cursor-pointer order-1 sm:order-2"
                 >
                   {loading ? (
                     <span>Sending Request...</span>

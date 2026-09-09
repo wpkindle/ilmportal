@@ -6,7 +6,6 @@ import AdminSidebar from '../../../components/admin/AdminSidebar';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import { api } from '../../../services/api';
 import ArticleContentRenderer from '../../../components/articles/ArticleContentRenderer';
-import { EDITORIAL_ARTICLES } from '../../../data/editorialArticles';
 import {
   Newspaper,
   Plus,
@@ -31,8 +30,6 @@ import {
   Check,
   ShieldCheck,
   Heart,
-  Database,
-  RefreshCw,
   Upload,
   UploadCloud,
   Link2
@@ -100,10 +97,6 @@ export default function AdminArticlesPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalCount, setTotalCount] = useState(0);
 
-  // Syncing state
-  const [syncing, setSyncing] = useState(false);
-  const [syncStatus, setSyncStatus] = useState(null);
-
   // Editor Modal State
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [editingArticleId, setEditingArticleId] = useState(null);
@@ -148,66 +141,21 @@ export default function AdminArticlesPage() {
       };
       const res = await api.adminGetArticles(params);
       if (res && res.success) {
-        if ((!res.articles || res.articles.length === 0) && !searchQuery && selectedAuthorFilter === 'all' && selectedStatusFilter === 'all') {
-          // If the database has 0 articles, auto-seed the 3 foundational articles
-          try {
-            const seedRes = await api.adminSeedArticles();
-            if (seedRes && seedRes.success && seedRes.articles && seedRes.articles.length > 0) {
-              setArticles(seedRes.articles);
-              setTotalPages(1);
-              setTotalCount(seedRes.articles.length);
-              return;
-            }
-          } catch (seedErr) {
-            console.warn('Auto-seed attempt:', seedErr);
-          }
-          // Fallback to EDITORIAL_ARTICLES if DB seeding is in progress
-          setArticles(EDITORIAL_ARTICLES);
-          setTotalPages(1);
-          setTotalCount(EDITORIAL_ARTICLES.length);
-          return;
-        }
         setArticles(res.articles || []);
         setTotalPages(res.totalPages || 1);
         setTotalCount(res.total || 0);
       } else {
-        setArticles(EDITORIAL_ARTICLES);
+        setArticles([]);
         setTotalPages(1);
-        setTotalCount(EDITORIAL_ARTICLES.length);
+        setTotalCount(0);
       }
     } catch (err) {
       console.error('Error fetching articles in admin:', err);
-      setArticles(EDITORIAL_ARTICLES);
+      setArticles([]);
       setTotalPages(1);
-      setTotalCount(EDITORIAL_ARTICLES.length);
+      setTotalCount(0);
     } finally {
       setLoading(false);
-    }
-  };
-
-  // Manual sync to database
-  const handleSyncDatabase = async () => {
-    try {
-      setSyncing(true);
-      setSyncStatus({ type: 'info', message: 'Syncing foundational articles to MongoDB database...' });
-      const res = await api.adminSeedArticles();
-      if (res && res.success) {
-        setSyncStatus({ type: 'success', message: 'All 3 foundational articles successfully synced to MongoDB database!' });
-        if (res.articles && res.articles.length > 0) {
-          setArticles(res.articles);
-          setTotalCount(res.count || res.articles.length);
-        } else {
-          fetchArticles();
-        }
-      } else {
-        setSyncStatus({ type: 'error', message: res?.message || 'Failed to sync articles.' });
-      }
-    } catch (err) {
-      console.error('Database sync error:', err);
-      setSyncStatus({ type: 'error', message: err.message || 'Error occurred while syncing with database.' });
-    } finally {
-      setSyncing(false);
-      setTimeout(() => setSyncStatus(null), 5000);
     }
   };
 
@@ -479,17 +427,6 @@ export default function AdminArticlesPage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <button
-                type="button"
-                onClick={handleSyncDatabase}
-                disabled={syncing}
-                className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white text-xs font-bold border border-slate-700 transition-all cursor-pointer disabled:opacity-50"
-                title="Sync default foundational articles to MongoDB"
-              >
-                <Database className={`w-3.5 h-3.5 text-emerald-400 ${syncing ? 'animate-pulse' : ''}`} />
-                <span>{syncing ? 'Syncing...' : 'Sync to DB'}</span>
-              </button>
-
               <Link
                 href="/articles"
                 target="_blank"
@@ -508,32 +445,6 @@ export default function AdminArticlesPage() {
               </button>
             </div>
           </div>
-
-          {/* Sync Status Banner */}
-          {syncStatus && (
-            <div className={`p-4 rounded-2xl text-xs font-semibold flex items-center justify-between gap-3 border transition-all ${
-              syncStatus.type === 'success' ? 'bg-emerald-950/80 border-emerald-700/80 text-emerald-300 shadow-lg shadow-emerald-950/30' :
-              syncStatus.type === 'error' ? 'bg-rose-950/80 border-rose-700/80 text-rose-300 shadow-lg shadow-rose-950/30' :
-              'bg-blue-950/80 border-blue-700/80 text-blue-300 shadow-lg shadow-blue-950/30'
-            }`}>
-              <div className="flex items-center gap-2.5">
-                {syncStatus.type === 'success' ? (
-                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                ) : syncStatus.type === 'error' ? (
-                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
-                ) : (
-                  <RefreshCw className="w-4 h-4 text-blue-400 animate-spin shrink-0" />
-                )}
-                <span>{syncStatus.message}</span>
-              </div>
-              <button
-                onClick={() => setSyncStatus(null)}
-                className="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          )}
 
           {/* Metrics Quick Strip */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">

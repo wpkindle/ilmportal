@@ -395,13 +395,14 @@ const Navbar = () => {
 
             <Link
               href="/articles"
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all inline-flex items-center gap-1.5 ${
                 pathname.startsWith('/articles')
                   ? 'text-[#0c2217] bg-[#ede6db]'
                   : 'text-slate-700 hover:text-[#0c2217] hover:bg-[#f3ece2]'
               }`}
             >
-              Articles
+              <span>Articles</span>
+              <span className="text-[9px] uppercase tracking-wider font-extrabold px-1.5 py-0.5 rounded-md bg-[#d4a359]/20 text-[#8f6424] border border-[#d4a359]/30">Soon</span>
             </Link>
           </nav>
 
@@ -869,9 +870,10 @@ const Navbar = () => {
               <Link
                 href="/articles"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-[#0c2217] bg-[#ede6db]/50 hover:bg-[#ede6db] transition-colors"
+                className="flex items-center justify-between px-3.5 py-3 min-h-[44px] rounded-xl text-xs font-bold text-[#0c2217] bg-[#ede6db]/50 hover:bg-[#ede6db] transition-colors"
               >
-                Articles &amp; Educational Advice
+                <span>Articles &amp; Educational Advice</span>
+                <span className="text-[9px] uppercase tracking-wider font-extrabold px-2 py-0.5 rounded-md bg-[#d4a359]/20 text-[#8f6424] border border-[#d4a359]/30">Soon</span>
               </Link>
               <Link
                 href="/safety"

@@ -14,11 +14,9 @@ import ArticleFaqAccordion from '../../../components/articles/ArticleFaqAccordio
 
 export const revalidate = 60; // ISR cache for 60 seconds
 
-// Prerender foundational editorial articles at build time so they never 404
+// Prerender empty set; real articles render dynamically on demand
 export function generateStaticParams() {
-  return getEditorialArticles().map((article) => ({
-    slug: article.slug,
-  }));
+  return [];
 }
 
 // Dynamic SEO metadata generator with resilient fallback

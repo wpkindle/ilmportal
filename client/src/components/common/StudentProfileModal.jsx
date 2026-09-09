@@ -18,6 +18,7 @@ import {
   GraduationCap
 } from 'lucide-react';
 import { api } from '../../services/api';
+import LoadingSpinner from './LoadingSpinner';
 
 export default function StudentProfileModal({
   isOpen,
@@ -137,9 +138,8 @@ export default function StudentProfileModal({
         {/* Content Body - Responsive Landscape Grid on Desktop */}
         <div className="p-4 sm:p-6 md:p-7 overflow-y-auto flex-1">
           {loading ? (
-            <div className="py-16 text-center space-y-3">
-              <div className="w-8 h-8 border-3 border-[#d4a359] border-t-transparent rounded-full animate-spin mx-auto" />
-              <p className="text-xs font-medium text-slate-500">Loading student details...</p>
+            <div className="py-12 flex items-center justify-center">
+              <LoadingSpinner size="md" />
             </div>
           ) : error ? (
             <div className="p-4 bg-rose-50 rounded-2xl border border-rose-200 text-xs text-rose-800 text-center">

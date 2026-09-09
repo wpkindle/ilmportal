@@ -18,6 +18,7 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import { api } from '../../services/api';
+import LoadingSpinner from '../common/LoadingSpinner';
 
 export default function SafetyReportsSection({ userRole = 'student' }) {
   const [reportsFiled, setReportsFiled] = useState([]);
@@ -192,9 +193,8 @@ export default function SafetyReportsSection({ userRole = 'student' }) {
       {/* Content Area */}
       <div className="p-5 sm:p-6">
         {loading ? (
-          <div className="py-12 text-center text-slate-400 space-y-2">
-            <RefreshCw className="w-6 h-6 animate-spin mx-auto text-[#d4a359]" />
-            <p className="text-xs font-medium">Checking safety registry &amp; incident logs...</p>
+          <div className="py-12 flex items-center justify-center">
+            <LoadingSpinner size="sm" />
           </div>
         ) : activeTab === 'filed' ? (
           reportsFiled.length === 0 ? (

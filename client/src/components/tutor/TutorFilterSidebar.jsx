@@ -79,19 +79,18 @@ const TutorFilterSidebar = ({
         </button>
       </div>
 
-      {/* Specialization by Gender Selection */}
-      <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#faf6f2] to-[#f5ebe6] border border-[#d4a359]/50 shadow-xs space-y-3">
+      {/* Priority Female Safety Faculty Filters */}
+      <div className="p-3.5 rounded-2xl bg-gradient-to-br from-[#faf6f2] to-[#f5ebe6] border border-[#d4a359]/50 shadow-xs space-y-2.5">
         <div className="flex items-center justify-between px-0.5">
           <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#b85d34] flex items-center gap-1.5">
-            <Compass className="w-3.5 h-3.5 text-[#b85d34]" />
-            <span>Specialization &amp; Gender</span>
+            <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
+            <span>Female Safety Filters</span>
           </span>
-          {(filters.faculty || filters.gender) && (
+          {(filters.faculty === 'female_academic' || filters.faculty === 'alimah' || filters.faculty === 'female_quran') && (
             <button
               type="button"
               onClick={() => {
                 onFilterChange('faculty', '');
-                onFilterChange('gender', '');
               }}
               className="text-[10px] text-stone-500 hover:text-[#b85d34] font-semibold underline cursor-pointer"
             >
@@ -100,38 +99,8 @@ const TutorFilterSidebar = ({
           )}
         </div>
 
-        {/* 4 Core Specialization Presets */}
-        <div className="grid grid-cols-2 gap-1.5">
-          {/* 1. Female Quran / Alimah */}
-          <button
-            type="button"
-            onClick={() => {
-              if (filters.faculty === 'alimah' || filters.faculty === 'female_quran') {
-                onFilterChange('faculty', '');
-              } else {
-                onFilterChange('gender', 'female');
-                onFilterChange('faculty', 'alimah');
-              }
-            }}
-            className={`p-2 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
-              filters.faculty === 'alimah' || filters.faculty === 'female_quran'
-                ? 'bg-[#0c2217] text-white border-[#0c2217] shadow-xs'
-                : 'bg-white hover:bg-[#edf6f0] text-[#0c2217] border-[#e6ded1]'
-            }`}
-          >
-            <div className="flex items-center justify-between w-full">
-              <ShieldCheck className={`w-3.5 h-3.5 ${filters.faculty === 'alimah' || filters.faculty === 'female_quran' ? 'text-[#d4a359]' : 'text-[#0c2217]'}`} />
-              {(filters.faculty === 'alimah' || filters.faculty === 'female_quran') && (
-                <Check className="w-3 h-3 text-[#d4a359]" />
-              )}
-            </div>
-            <div className="mt-1">
-              <p className="text-[11px] font-bold leading-tight">Female Quran</p>
-              <p className={`text-[9px] ${filters.faculty === 'alimah' || filters.faculty === 'female_quran' ? 'text-white/80' : 'text-stone-500'}`}>Alimah / Tajweed</p>
-            </div>
-          </button>
-
-          {/* 2. Female Academic */}
+        <div className="grid grid-cols-1 gap-1.5">
+          {/* 1. Female Academic Tutors */}
           <button
             type="button"
             onClick={() => {
@@ -142,114 +111,46 @@ const TutorFilterSidebar = ({
                 onFilterChange('faculty', 'female_academic');
               }
             }}
-            className={`p-2 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+            className={`w-full p-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
               filters.faculty === 'female_academic'
                 ? 'bg-[#b85d34] text-white border-[#b85d34] shadow-xs'
                 : 'bg-white hover:bg-[#ede0d8] text-[#0c2217] border-[#e6ded1]'
             }`}
           >
-            <div className="flex items-center justify-between w-full">
-              <GraduationCap className={`w-3.5 h-3.5 ${filters.faculty === 'female_academic' ? 'text-white' : 'text-[#b85d34]'}`} />
-              {filters.faculty === 'female_academic' && (
-                <Check className="w-3 h-3 text-white" />
-              )}
+            <div className="flex items-center gap-2">
+              <GraduationCap className={`w-4 h-4 ${filters.faculty === 'female_academic' ? 'text-white' : 'text-[#b85d34]'}`} />
+              <span>Female Academic Tutors</span>
             </div>
-            <div className="mt-1">
-              <p className="text-[11px] font-bold leading-tight">Female Academic</p>
-              <p className={`text-[9px] ${filters.faculty === 'female_academic' ? 'text-white/80' : 'text-stone-500'}`}>School &amp; College</p>
-            </div>
+            {filters.faculty === 'female_academic' && (
+              <Check className="w-4 h-4 text-white shrink-0" />
+            )}
           </button>
 
-          {/* 3. Male Quran / Qari */}
+          {/* 2. Female Quran Tutors */}
           <button
             type="button"
             onClick={() => {
-              if (filters.faculty === 'male_quran' || filters.faculty === 'qari') {
+              if (filters.faculty === 'alimah' || filters.faculty === 'female_quran') {
                 onFilterChange('faculty', '');
               } else {
-                onFilterChange('gender', 'male');
-                onFilterChange('faculty', 'male_quran');
+                onFilterChange('gender', 'female');
+                onFilterChange('faculty', 'alimah');
               }
             }}
-            className={`p-2 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
-              filters.faculty === 'male_quran' || filters.faculty === 'qari'
+            className={`w-full p-2.5 rounded-xl border text-xs font-bold transition-all flex items-center justify-between cursor-pointer ${
+              filters.faculty === 'alimah' || filters.faculty === 'female_quran'
                 ? 'bg-[#0c2217] text-white border-[#0c2217] shadow-xs'
                 : 'bg-white hover:bg-[#edf6f0] text-[#0c2217] border-[#e6ded1]'
             }`}
           >
-            <div className="flex items-center justify-between w-full">
-              <BookOpen className={`w-3.5 h-3.5 ${filters.faculty === 'male_quran' || filters.faculty === 'qari' ? 'text-[#d4a359]' : 'text-[#0c2217]'}`} />
-              {(filters.faculty === 'male_quran' || filters.faculty === 'qari') && (
-                <Check className="w-3 h-3 text-[#d4a359]" />
-              )}
+            <div className="flex items-center gap-2">
+              <ShieldCheck className={`w-4 h-4 ${filters.faculty === 'alimah' || filters.faculty === 'female_quran' ? 'text-[#d4a359]' : 'text-[#0c2217]'}`} />
+              <span>Female Quran Tutors</span>
             </div>
-            <div className="mt-1">
-              <p className="text-[11px] font-bold leading-tight">Male Quran</p>
-              <p className={`text-[9px] ${filters.faculty === 'male_quran' || filters.faculty === 'qari' ? 'text-white/80' : 'text-stone-500'}`}>Qari / Hifz / Dars</p>
-            </div>
-          </button>
-
-          {/* 4. Male Academic */}
-          <button
-            type="button"
-            onClick={() => {
-              if (filters.faculty === 'male_academic') {
-                onFilterChange('faculty', '');
-              } else {
-                onFilterChange('gender', 'male');
-                onFilterChange('faculty', 'male_academic');
-              }
-            }}
-            className={`p-2 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
-              filters.faculty === 'male_academic'
-                ? 'bg-[#b85d34] text-white border-[#b85d34] shadow-xs'
-                : 'bg-white hover:bg-[#ede0d8] text-[#0c2217] border-[#e6ded1]'
-            }`}
-          >
-            <div className="flex items-center justify-between w-full">
-              <GraduationCap className={`w-3.5 h-3.5 ${filters.faculty === 'male_academic' ? 'text-white' : 'text-[#b85d34]'}`} />
-              {filters.faculty === 'male_academic' && (
-                <Check className="w-3 h-3 text-white" />
-              )}
-            </div>
-            <div className="mt-1">
-              <p className="text-[11px] font-bold leading-tight">Male Academic</p>
-              <p className={`text-[9px] ${filters.faculty === 'male_academic' ? 'text-white/80' : 'text-stone-500'}`}>STEM &amp; Board Tutors</p>
-            </div>
-          </button>
-        </div>
-
-        {/* Gender Filter Buttons */}
-        <div className="pt-2 border-t border-[#ebe3d3]/80 space-y-1.5">
-          <label className="text-[11px] font-bold text-slate-700 flex items-center justify-between">
-            <span>Filter Gender:</span>
-            {filters.gender && (
-              <span className="text-[10px] uppercase font-bold text-[#b85d34]">{filters.gender}</span>
+            {(filters.faculty === 'alimah' || filters.faculty === 'female_quran') && (
+              <Check className="w-4 h-4 text-[#d4a359] shrink-0" />
             )}
-          </label>
-          <div className="grid grid-cols-3 gap-1 text-xs">
-            {[
-              { label: 'All', val: '' },
-              { label: 'Male', val: 'male' },
-              { label: 'Female', val: 'female' }
-            ].map((g) => (
-              <button
-                key={g.val}
-                type="button"
-                onClick={() => {
-                  onFilterChange('gender', g.val);
-                  onFilterChange('faculty', '');
-                }}
-                className={`py-1.5 px-2 rounded-lg text-center text-[11px] font-bold transition-all cursor-pointer border ${
-                  (!filters.faculty && (filters.gender || '') === g.val)
-                    ? 'bg-[#0c2217] text-white border-[#0c2217] shadow-2xs'
-                    : 'bg-white text-stone-700 border-[#e6ded1] hover:border-stone-400'
-                }`}
-              >
-                {g.label}
-              </button>
-            ))}
-          </div>
+          </button>
         </div>
       </div>
 
@@ -505,7 +406,70 @@ const TutorFilterSidebar = ({
         </div>
       )}
 
-      {/* 5. Sanad / Degree Verified Only */}
+      {/* 5. Gender Preference Filter */}
+      <div className="space-y-2">
+        <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+          <User className="w-3.5 h-3.5 text-[#b85d34]" />
+          <span>Tutor Gender</span>
+        </label>
+        <div className="grid grid-cols-3 gap-1.5 text-xs font-semibold">
+          {[
+            { label: 'All', val: '' },
+            { label: 'Male', val: 'male' },
+            { label: 'Female', val: 'female' }
+          ].map((g) => (
+            <button
+              key={g.val}
+              type="button"
+              onClick={() => {
+                onFilterChange('gender', g.val);
+                onFilterChange('faculty', '');
+              }}
+              className={`py-2 px-2 rounded-xl text-center transition-all cursor-pointer ${
+                (filters.gender || '') === g.val
+                  ? 'bg-[#b85d34] text-white font-bold shadow-sm border border-[#b85d34]'
+                  : 'bg-[#f4efe8] text-stone-700 hover:bg-[#eae3d8] border border-[#e6dfd5]'
+              }`}
+            >
+              {g.label}
+            </button>
+          ))}
+        </div>
+
+        {/* If Male is selected, show Academic or Quran Specialization */}
+        {filters.gender === 'male' && (
+          <div className="grid grid-cols-2 gap-1.5 pt-1 animate-in fade-in">
+            <button
+              type="button"
+              onClick={() => {
+                onFilterChange('faculty', filters.faculty === 'male_quran' ? '' : 'male_quran');
+              }}
+              className={`p-2 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${
+                filters.faculty === 'male_quran'
+                  ? 'bg-[#0c2217] text-white border-[#0c2217] shadow-xs'
+                  : 'bg-white hover:bg-[#edf6f0] text-[#0c2217] border-[#e6ded1]'
+              }`}
+            >
+              Male Quran (Qari)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                onFilterChange('faculty', filters.faculty === 'male_academic' ? '' : 'male_academic');
+              }}
+              className={`p-2 rounded-xl border text-center text-xs font-bold transition-all cursor-pointer ${
+                filters.faculty === 'male_academic'
+                  ? 'bg-[#b85d34] text-white border-[#b85d34] shadow-xs'
+                  : 'bg-white hover:bg-[#ede0d8] text-[#0c2217] border-[#e6ded1]'
+              }`}
+            >
+              Male Academic
+            </button>
+          </div>
+        )}
+      </div>
+
+      {/* 6. Sanad / Degree Verified Only */}
       <div className="pt-2 border-t border-[#e6ded1]">
         <label className="flex items-center gap-2 cursor-pointer select-none">
           <input

@@ -88,56 +88,87 @@ exports.getPublicTutors = async (req, res) => {
       const quranCatIds = quranCats.map(c => c._id);
       const femaleUsers = await User.find({ gender: 'female' }, '_id');
       const femaleUserIds = femaleUsers.map(u => u._id);
-      query.$and = [
-        { $or: [{ gender: 'female' }, { user: { $in: femaleUserIds } }] },
-        {
-          $or: [
-            { qualifications: { $regex: /alimah|wifaq|wafaq|dars-e-nizami|sanad|tajweed|hafiz|quran/i } },
-            { bio: { $regex: /alimah|wifaq|wafaq|dars-e-nizami|sanad|tajweed|hafiz|quran|islamic/i } },
-            { subjects: { $in: quranCatIds } }
-          ]
-        }
-      ];
+      const facultyCondition = {
+        $and: [
+          { $or: [{ gender: 'female' }, { user: { $in: femaleUserIds } }] },
+          {
+            $or: [
+              { tutoringType: { $in: ['quran', 'both'] } },
+              { qualifications: { $regex: /alimah|wifaq|wafaq|dars-e-nizami|sanad|tajweed|hafiz|quran/i } },
+              { bio: { $regex: /alimah|wifaq|wafaq|dars-e-nizami|sanad|tajweed|hafiz|quran|islamic/i } },
+              { subjects: { $in: quranCatIds } }
+            ]
+          }
+        ]
+      };
+      query.$and = (query.$and || []).concat([facultyCondition]);
     } else if (faculty === 'female_academic') {
       const acadCats = await Category.find({ type: 'academic' }, '_id');
       const acadCatIds = acadCats.map(c => c._id);
       const femaleUsers = await User.find({ gender: 'female' }, '_id');
       const femaleUserIds = femaleUsers.map(u => u._id);
-      query.$and = [
-        { $or: [{ gender: 'female' }, { user: { $in: femaleUserIds } }] },
-        {
-          $or: [
-            { qualifications: { $regex: /bs|ms|msc|mphil|phd|b\.ed|m\.ed|board|matric|fsc|engineer|master|bachelor|academic|doctor|mbbs/i } },
-            { bio: { $regex: /math|physics|chemistry|biology|science|english|computer|accounting|economics|matric|board|academic|school/i } },
-            { subjects: { $in: acadCatIds } }
-          ]
-        }
-      ];
+      const facultyCondition = {
+        $and: [
+          { $or: [{ gender: 'female' }, { user: { $in: femaleUserIds } }] },
+          {
+            $or: [
+              { tutoringType: { $in: ['academic', 'both'] } },
+              { qualifications: { $regex: /bs|ms|msc|mphil|phd|b\.ed|m\.ed|board|matric|fsc|engineer|master|bachelor|academic|doctor|mbbs/i } },
+              { bio: { $regex: /math|physics|chemistry|biology|science|english|computer|accounting|economics|matric|board|academic|school/i } },
+              { subjects: { $in: acadCatIds } }
+            ]
+          }
+        ]
+      };
+      query.$and = (query.$and || []).concat([facultyCondition]);
     } else if (faculty === 'male_quran' || faculty === 'qari') {
-      query.gender = 'male';
       const quranCats = await Category.find({ type: 'quran' }, '_id');
       const quranCatIds = quranCats.map(c => c._id);
-      query.$or = [
-        { qualifications: { $regex: /qari|hafiz|sanad|wifaq|wafaq|dars-e-nizami|tajweed|quran/i } },
-        { bio: { $regex: /qari|hafiz|sanad|wifaq|wafaq|dars-e-nizami|tajweed|quran|islamic/i } },
-        { subjects: { $in: quranCatIds } }
-      ];
+      const maleUsers = await User.find({ gender: 'male' }, '_id');
+      const maleUserIds = maleUsers.map(u => u._id);
+      const facultyCondition = {
+        $and: [
+          { $or: [{ gender: 'male' }, { user: { $in: maleUserIds } }] },
+          {
+            $or: [
+              { tutoringType: { $in: ['quran', 'both'] } },
+              { qualifications: { $regex: /qari|hafiz|sanad|wifaq|wafaq|dars-e-nizami|tajweed|quran/i } },
+              { bio: { $regex: /qari|hafiz|sanad|wifaq|wafaq|dars-e-nizami|tajweed|quran|islamic/i } },
+              { subjects: { $in: quranCatIds } }
+            ]
+          }
+        ]
+      };
+      query.$and = (query.$and || []).concat([facultyCondition]);
     } else if (faculty === 'male_academic') {
-      query.gender = 'male';
       const acadCats = await Category.find({ type: 'academic' }, '_id');
       const acadCatIds = acadCats.map(c => c._id);
-      query.$or = [
-        { qualifications: { $regex: /bs|ms|msc|mphil|phd|b\.ed|m\.ed|board|matric|fsc|engineer|master|bachelor|academic/i } },
-        { bio: { $regex: /math|physics|chemistry|biology|science|english|computer|accounting|economics|matric|board|academic|school/i } },
-        { subjects: { $in: acadCatIds } }
-      ];
+      const maleUsers = await User.find({ gender: 'male' }, '_id');
+      const maleUserIds = maleUsers.map(u => u._id);
+      const facultyCondition = {
+        $and: [
+          { $or: [{ gender: 'male' }, { user: { $in: maleUserIds } }] },
+          {
+            $or: [
+              { tutoringType: { $in: ['academic', 'both'] } },
+              { qualifications: { $regex: /bs|ms|msc|mphil|phd|b\.ed|m\.ed|board|matric|fsc|engineer|master|bachelor|academic/i } },
+              { bio: { $regex: /math|physics|chemistry|biology|science|english|computer|accounting|economics|matric|board|academic|school/i } },
+              { subjects: { $in: acadCatIds } }
+            ]
+          }
+        ]
+      };
+      query.$and = (query.$and || []).concat([facultyCondition]);
     } else if (gender && gender !== 'all') {
       const usersWithGender = await User.find({ gender: gender }, '_id');
       const userIdsWithGender = usersWithGender.map(u => u._id);
-      query.$or = [
-        { gender: gender },
-        { user: { $in: userIdsWithGender } }
-      ];
+      const genderCondition = {
+        $or: [
+          { gender: gender },
+          { user: { $in: userIdsWithGender } }
+        ]
+      };
+      query.$and = (query.$and || []).concat([genderCondition]);
     }
 
     // Filter by Minimum Rating
@@ -399,10 +430,14 @@ exports.updateMyTutorProfile = async (req, res) => {
 
     await profile.save();
 
-    // Also sync city and area to the user record
+    // Also sync gender, city and area to the user record
     const userDoc = await User.findById(req.user.id);
     if (userDoc) {
       let userUpdated = false;
+      if (gender && userDoc.gender !== gender) {
+        userDoc.gender = gender;
+        userUpdated = true;
+      }
       if (city && userDoc.city !== city.trim()) {
         userDoc.city = city.trim();
         userUpdated = true;

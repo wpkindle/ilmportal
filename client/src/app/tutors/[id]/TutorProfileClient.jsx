@@ -53,6 +53,15 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
   const tutorCity = tutorUser.city || tutor?.city || 'Pakistan';
   const tutorAvatar = getTutorAvatar(tutor || tutorUser, tutorName);
 
+  const rawJoiningDate = tutorUser?.createdAt || tutor?.createdAt;
+  const formattedJoiningDate = rawJoiningDate
+    ? new Date(rawJoiningDate).toLocaleDateString('en-US', {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      })
+    : null;
+
   const isTutorVisitor = isTutor || user?.role === 'tutor' || (typeof window !== 'undefined' && (() => {
     try {
       const cached = localStorage.getItem('ilm_user');
@@ -215,14 +224,26 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                   <span className="capitalize">{tutor.teachingMode === 'both' ? 'Online & In-Person' : tutor.teachingMode}</span>
                 </p>
 
-                <div className="flex items-center gap-2 pt-0.5">
-                  <RatingStars rating={tutor.averageRating || 5} size="sm" />
-                  <span className="text-xs font-bold text-slate-800">
-                    {tutor.averageRating?.toFixed(1) || '5.0'}
-                  </span>
-                  <span className="text-xs text-slate-400">
-                    ({reviews.length} reviews)
-                  </span>
+                <div className="flex items-center flex-wrap gap-x-3 gap-y-1 pt-0.5">
+                  <div className="flex items-center gap-1.5">
+                    <RatingStars rating={tutor.averageRating || 5} size="sm" />
+                    <span className="text-xs font-bold text-slate-800">
+                      {tutor.averageRating?.toFixed(1) || '5.0'}
+                    </span>
+                    <span className="text-xs text-slate-400">
+                      ({reviews.length} reviews)
+                    </span>
+                  </div>
+
+                  {formattedJoiningDate && (
+                    <>
+                      <span className="text-stone-300">&bull;</span>
+                      <span className="inline-flex items-center gap-1 text-xs text-stone-600 font-medium">
+                        <Calendar className="w-3.5 h-3.5 text-[#b85d34]" />
+                        <span>Joined: <strong className="text-slate-800">{formattedJoiningDate}</strong></span>
+                      </span>
+                    </>
+                  )}
                 </div>
               </div>
             </div>
@@ -257,12 +278,12 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
           </div>
 
           {/* Key Qualifications & Subjects */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-slate-100">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 pt-4 border-t border-slate-100">
             <div className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-1">
               <span className="text-[10px] uppercase font-bold text-slate-400">Verified Credentials</span>
-              <p className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+              <p className="font-bold text-xs text-slate-900 flex items-center gap-1.5 truncate" title={tutor.qualifications || 'Dars-e-Nizami / Shahadat-ul-Alimiyya'}>
                 <Award className="w-4 h-4 text-[#0c2217] shrink-0" />
-                <span>{tutor.qualifications || 'Dars-e-Nizami / Shahadat-ul-Alimiyya'}</span>
+                <span className="truncate">{tutor.qualifications || 'Dars-e-Nizami / Shahadat-ul-Alimiyya'}</span>
               </p>
             </div>
 
@@ -272,14 +293,22 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                 {(tutor.experienceYears === 0 || tutor.experienceYears === '0' || tutor.experienceYears === 'fresh') ? (
                   <>
                     <Sparkles className="w-4 h-4 text-[#d4a359] shrink-0" />
-                    <span className="text-[#0c2217]">Fresh / Beginner Tutor (&lt; 1 Year)</span>
+                    <span className="text-[#0c2217]">Fresh Tutor (&lt; 1 Yr)</span>
                   </>
                 ) : (
                   <>
                     <CheckCircle2 className="w-4 h-4 text-[#0c2217] shrink-0" />
-                    <span>{tutor.experienceYears || 1} {Number(tutor.experienceYears) === 1 ? 'Year' : 'Years'} Experience</span>
+                    <span>{tutor.experienceYears || 1} {Number(tutor.experienceYears) === 1 ? 'Year' : 'Years'} Exp</span>
                   </>
                 )}
+              </p>
+            </div>
+
+            <div className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-1">
+              <span className="text-[10px] uppercase font-bold text-slate-400">Platform Member</span>
+              <p className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                <Calendar className="w-4 h-4 text-[#b85d34] shrink-0" />
+                <span>Joined {formattedJoiningDate || 'Recently'}</span>
               </p>
             </div>
 

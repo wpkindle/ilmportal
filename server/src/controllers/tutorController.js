@@ -193,7 +193,7 @@ exports.getPublicTutors = async (req, res) => {
     const skip = (pageNumber - 1) * limitNumber;
 
     let tutorProfiles = await TutorProfile.find(query)
-      .populate('user', 'name email avatar phone city area isVerified isActive')
+      .populate('user', 'name email avatar phone city area isVerified isActive createdAt')
       .populate('subjects', 'name slug type icon description')
       .populate('cities', 'name province isMajorCity')
       .sort(sortOptions)
@@ -237,14 +237,14 @@ exports.getPublicTutors = async (req, res) => {
 exports.getTutorById = async (req, res) => {
   try {
     let tutor = await TutorProfile.findById(req.params.id)
-      .populate('user', 'name email avatar phone city area isVerified isActive')
+      .populate('user', 'name email avatar phone city area isVerified isActive createdAt')
       .populate('subjects', 'name slug type icon description')
       .populate('cities', 'name province isMajorCity');
 
     // If ID was user ID instead of tutor profile ID
     if (!tutor) {
       tutor = await TutorProfile.findOne({ user: req.params.id })
-        .populate('user', 'name email avatar phone city area isVerified isActive')
+        .populate('user', 'name email avatar phone city area isVerified isActive createdAt')
         .populate('subjects', 'name slug type icon description')
         .populate('cities', 'name province isMajorCity');
     }

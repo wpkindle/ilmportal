@@ -55,20 +55,25 @@ initTransporter();
 
 const getClientBaseUrl = () => process.env.CLIENT_URL || 'https://ilmportal.vercel.app';
 
-// Helper to get formatted from address
+// Helper to get formatted from address safely avoiding double brackets
 const getFromAddress = () => {
-  const fromEmail = process.env.RESEND_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
-  return `"IlmiDunya Pakistan" <${fromEmail}>`;
+  const raw = process.env.SMTP_FROM || process.env.RESEND_FROM || process.env.SMTP_USER || 'info@ilmidunya.com';
+  const match = raw.match(/<([^>]+)>/);
+  const cleanEmail = (match ? match[1] : raw.replace(/["']/g, '')).trim();
+  return `"IlmiDunya Pakistan" <${cleanEmail}>`;
 };
 
 // HTTP REST API Email Dispatch (Port 443 / HTTPS - NEVER blocked by cloud firewalls)
 const sendViaHttpApi = async ({ to, subject, html, text }) => {
   let lastError = null;
 
-  // Resend HTTP API (https://resend.com)
+  // 1. Resend HTTP API (https://resend.com)
   if (process.env.RESEND_API_KEY) {
     try {
-      const fromAddr = process.env.RESEND_FROM || `IlmiDunya Pakistan <${process.env.SMTP_FROM || 'info@ilmidunya.com'}>`;
+      const rawFrom = process.env.RESEND_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
+      const cleanEmail = (rawFrom.match(/<([^>]+)>/) ? rawFrom.match(/<([^>]+)>/)[1] : rawFrom.replace(/["']/g, '')).trim();
+      const fromAddr = rawFrom.includes('<') ? rawFrom : `"IlmiDunya Pakistan" <${cleanEmail}>`;
+
       const res = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
@@ -95,6 +100,39 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
     } catch (err) {
       console.error('Resend fetch error:', err.message);
       lastError = { success: false, error: err.message, provider: 'resend' };
+    }
+  }
+
+  // 2. Brevo HTTP API (https://api.brevo.com/v3/smtp/email)
+  if (process.env.BREVO_API_KEY) {
+    try {
+      const rawFrom = process.env.BREVO_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
+      const cleanEmail = (rawFrom.match(/<([^>]+)>/) ? rawFrom.match(/<([^>]+)>/)[1] : rawFrom.replace(/["']/g, '')).trim();
+
+      const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'api-key': process.env.BREVO_API_KEY.trim(),
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          sender: { name: 'IlmiDunya Pakistan', email: cleanEmail },
+          to: (Array.isArray(to) ? to : [to]).map(e => ({ email: e })),
+          subject,
+          htmlContent: html,
+          textContent: text || html.replace(/<[^>]*>?/gm, '')
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        console.log(`📧 [LIVE EMAIL SENT VIA BREVO HTTP API] MessageId: ${data.messageId} to ${to}`);
+        return { success: true, messageId: data.messageId, provider: 'brevo' };
+      } else {
+        console.error('Brevo HTTP API error:', data);
+      }
+    } catch (err) {
+      console.error('Brevo fetch error:', err.message);
     }
   }
 

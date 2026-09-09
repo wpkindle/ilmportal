@@ -5,10 +5,6 @@ import {
   AlertTriangle,
   Clock,
   Ban,
-  CheckCircle2,
-  ShieldCheck,
-  Info,
-  ChevronRight,
   AlertCircle
 } from 'lucide-react';
 
@@ -148,37 +144,7 @@ export default function AccountStatusBanner({ user, tutorProfile, role = 'studen
   }
 
   // 5. ACTIVE / APPROVED / GOOD STANDING STATE
-  if (!showVerifiedState) return null;
-
-  // If tutor is NOT approved yet, do NOT render verified faculty state
-  if (isTutor && tutorProfile?.verificationStatus !== 'approved') {
-    return null;
-  }
-
-  return (
-    <div className="bg-[#f0ece1] border border-[#d4a359]/40 rounded-2xl p-3.5 flex items-center justify-between gap-3 shadow-xs">
-      <div className="flex items-center gap-2.5">
-        <div className="w-8 h-8 rounded-xl bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/40 flex items-center justify-center shrink-0">
-          <ShieldCheck className="w-4 h-4" />
-        </div>
-        <div>
-          <div className="flex items-center gap-1.5">
-            <span className="text-xs font-black text-[#0c2217]">
-              {isTutor ? 'Verified Faculty Account' : 'Verified Student Account'}
-            </span>
-            <span className="px-2 py-0.5 rounded-full text-[9px] font-black uppercase bg-[#143d2b] text-[#d4a359] border border-[#d4a359]/40">
-              Approved & Live
-            </span>
-          </div>
-          <p className="text-[11px] text-[#0c2217] font-medium">
-            {isTutor
-              ? 'Your profile is approved by administration and publicly visible to students across Pakistan.'
-              : 'Account verified & fully active across Pakistan LMS portal'}
-          </p>
-        </div>
-      </div>
-      <CheckCircle2 className="w-5 h-5 text-[#d4a359] shrink-0" />
-    </div>
-  );
+  // Active accounts in good standing do not require a status banner
+  return null;
 }
 

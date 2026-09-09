@@ -6,7 +6,6 @@ import { useSearchParams } from 'next/navigation';
 import {
   User,
   Mail,
-  Phone,
   MapPin,
   Lock,
   Camera,

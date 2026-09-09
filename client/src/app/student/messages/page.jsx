@@ -168,7 +168,13 @@ function StudentMessagesContent() {
     setTimeout(() => fetchConversations(), 1200);
   };
 
-  if (loading) return <LoadingSpinner text="Loading messages..." />;
+  if (loading) {
+    return (
+      <div className="min-h-[70vh] flex flex-col items-center justify-center p-8">
+        <LoadingSpinner size="lg" text="Loading messages..." showTitle={true} />
+      </div>
+    );
+  }
 
   return (
     <div className="bg-[#faf8f5] flex flex-col flex-1">
@@ -290,7 +296,13 @@ function StudentMessagesContent() {
 
 export default function StudentMessagesPage() {
   return (
-    <Suspense fallback={<LoadingSpinner text="Loading messages..." />}>
+    <Suspense
+      fallback={
+        <div className="min-h-[70vh] flex flex-col items-center justify-center p-8">
+          <LoadingSpinner size="lg" text="Loading messages..." showTitle={true} />
+        </div>
+      }
+    >
       <StudentMessagesContent />
     </Suspense>
   );

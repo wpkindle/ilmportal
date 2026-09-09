@@ -170,7 +170,9 @@ export default function ChatAuditPage() {
 
             <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 rounded-2xl my-3">
               {loadingTranscript ? (
-                <div className="text-center text-xs text-slate-400 py-8">Loading messages...</div>
+                <div className="flex items-center justify-center py-12">
+                  <LoadingSpinner size="md" text="Loading messages..." />
+                </div>
               ) : (
                 transcript.map((msg) => (
                   <div key={msg._id} className="p-3 bg-white rounded-xl border border-slate-200 text-xs space-y-1">

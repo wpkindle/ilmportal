@@ -67,7 +67,42 @@ const getFromAddress = () => {
 const sendViaHttpApi = async ({ to, subject, html, text }) => {
   let lastError = null;
 
-  // 1. Resend HTTP API (https://resend.com)
+  // 1. Brevo HTTP API (https://api.brevo.com/v3/smtp/email) - where ilmidunya.com is authenticated
+  if (process.env.BREVO_API_KEY) {
+    try {
+      const rawFrom = process.env.BREVO_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
+      const cleanEmail = (rawFrom.match(/<([^>]+)>/) ? rawFrom.match(/<([^>]+)>/)[1] : rawFrom.replace(/["']/g, '')).trim();
+
+      const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'api-key': process.env.BREVO_API_KEY.trim(),
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+          sender: { name: 'IlmiDunya Pakistan', email: cleanEmail },
+          to: (Array.isArray(to) ? to : [to]).map(e => ({ email: typeof e === 'string' ? e.trim() : (e.email || e.address || String(e)).trim() })),
+          subject,
+          htmlContent: html,
+          textContent: text || (html ? html.replace(/<[^>]*>?/gm, '') : '')
+        })
+      });
+      const data = await res.json();
+      if (res.ok) {
+        console.log(`📧 [LIVE EMAIL SENT VIA BREVO HTTP API] MessageId: ${data.messageId} to ${JSON.stringify(to)}`);
+        return { success: true, messageId: data.messageId, provider: 'brevo', response: '250 OK via Brevo' };
+      } else {
+        console.error('Brevo HTTP API error:', data);
+        lastError = { success: false, error: data.message || 'Brevo error', provider: 'brevo' };
+      }
+    } catch (err) {
+      console.error('Brevo fetch error:', err.message);
+      lastError = { success: false, error: err.message, provider: 'brevo' };
+    }
+  }
+
+  // 2. Resend HTTP API (https://resend.com)
   if (process.env.RESEND_API_KEY) {
     try {
       const rawFrom = process.env.RESEND_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
@@ -91,7 +126,7 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
       });
       const data = await res.json();
       if (res.ok) {
-        console.log(`📧 [LIVE EMAIL SENT VIA RESEND HTTP API] MessageId: ${data.id} to ${to}`);
+        console.log(`📧 [LIVE EMAIL SENT VIA RESEND HTTP API] MessageId: ${data.id} to ${JSON.stringify(to)}`);
         return { success: true, messageId: data.id, provider: 'resend', response: '250 OK via Resend' };
       } else {
         console.error('Resend HTTP API error:', data);
@@ -100,39 +135,6 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
     } catch (err) {
       console.error('Resend fetch error:', err.message);
       lastError = { success: false, error: err.message, provider: 'resend' };
-    }
-  }
-
-  // 2. Brevo HTTP API (https://api.brevo.com/v3/smtp/email)
-  if (process.env.BREVO_API_KEY) {
-    try {
-      const rawFrom = process.env.BREVO_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
-      const cleanEmail = (rawFrom.match(/<([^>]+)>/) ? rawFrom.match(/<([^>]+)>/)[1] : rawFrom.replace(/["']/g, '')).trim();
-
-      const res = await fetch('https://api.brevo.com/v3/smtp/email', {
-        method: 'POST',
-        headers: {
-          'api-key': process.env.BREVO_API_KEY.trim(),
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({
-          sender: { name: 'IlmiDunya Pakistan', email: cleanEmail },
-          to: (Array.isArray(to) ? to : [to]).map(e => ({ email: e })),
-          subject,
-          htmlContent: html,
-          textContent: text || html.replace(/<[^>]*>?/gm, '')
-        })
-      });
-      const data = await res.json();
-      if (res.ok) {
-        console.log(`📧 [LIVE EMAIL SENT VIA BREVO HTTP API] MessageId: ${data.messageId} to ${to}`);
-        return { success: true, messageId: data.messageId, provider: 'brevo' };
-      } else {
-        console.error('Brevo HTTP API error:', data);
-      }
-    } catch (err) {
-      console.error('Brevo fetch error:', err.message);
     }
   }
 
@@ -214,13 +216,13 @@ const getTransporter = (port = 587) => {
 };
 
 const sendEmailDetailed = async ({ to, subject, html, text, replyTo }) => {
-  // 1. High Priority: HTTP REST API (Resend) - instant, never blocked by cloud firewalls
-  if (process.env.RESEND_API_KEY) {
+  // 1. High Priority: HTTP REST API (Brevo / Resend) - instant, never blocked by cloud firewalls
+  if (process.env.BREVO_API_KEY || process.env.RESEND_API_KEY) {
     const httpResult = await sendViaHttpApi({ to, subject, html, text });
     if (httpResult && httpResult.success) {
       return httpResult;
     }
-    console.warn('⚠️ [EMAIL SERVICE] Resend HTTP API dispatch failed, attempting SMTP fallback...');
+    console.warn('⚠️ [EMAIL SERVICE] HTTP API dispatch failed, attempting SMTP fallback...');
   }
 
   const fromAddress = getFromAddress();

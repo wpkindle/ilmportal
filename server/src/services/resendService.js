@@ -15,7 +15,58 @@ const getResendClient = () => {
 };
 
 /**
- * Send an email via Resend API
+ * Send an email via Brevo HTTP API (Port 443 / HTTPS)
+ */
+const sendViaBrevo = async ({ to, subject, html, text, replyTo }) => {
+  if (!process.env.BREVO_API_KEY) return null;
+
+  const senderEmail = process.env.BREVO_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
+  const senderName = 'IlmiDunya Pakistan';
+
+  const recipientList = (Array.isArray(to) ? to : [to]).map((item) => {
+    if (typeof item === 'string') return { email: item.trim() };
+    if (item && item.address) return { email: item.address.trim(), name: item.name };
+    if (item && item.email) return { email: item.email.trim(), name: item.name };
+    return { email: String(item).trim() };
+  });
+
+  const res = await fetch('https://api.brevo.com/v3/smtp/email', {
+    method: 'POST',
+    headers: {
+      'api-key': process.env.BREVO_API_KEY.trim(),
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      sender: { name: senderName, email: senderEmail },
+      to: recipientList,
+      replyTo: { name: 'IlmiDunya Support', email: replyTo || 'info@ilmidunya.com' },
+      subject,
+      htmlContent: html || `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #222;">${(text || '').replace(/\n/g, '<br/>')}</div>`,
+      textContent: text || (html ? html.replace(/<[^>]*>?/gm, '') : '')
+    })
+  });
+
+  const data = await res.json();
+  if (res.ok) {
+    console.log(`📧 [LIVE EMAIL SENT VIA BREVO] MessageId: ${data.messageId} to ${JSON.stringify(to)}`);
+    return {
+      success: true,
+      id: data.messageId || `brevo_${Date.now()}`,
+      provider: 'brevo',
+      data
+    };
+  } else {
+    console.warn(`⚠️ [BREVO WARNING]:`, data);
+    return {
+      success: false,
+      error: data.message || 'Brevo delivery failed',
+      data
+    };
+  }
+};
+
+/**
+ * Send an email via Brevo or Resend HTTP API
  */
 const sendEmail = async ({
   to,
@@ -26,17 +77,31 @@ const sendEmail = async ({
   replyTo = 'info@ilmidunya.com',
   headers = {}
 }) => {
+  // 1. High Priority: Brevo HTTP API (where ilmidunya.com is authenticated)
+  if (process.env.BREVO_API_KEY) {
+    try {
+      const brevoResult = await sendViaBrevo({ to, subject, html, text, replyTo });
+      if (brevoResult && brevoResult.success) {
+        return brevoResult;
+      }
+      console.warn(`⚠️ [BREVO DISPATCH FAILED, TRYING FALLBACK]:`, brevoResult?.error);
+    } catch (brevoErr) {
+      console.error('❌ [BREVO DISPATCH EXCEPTION]:', brevoErr.message);
+    }
+  }
+
+  // 2. High Priority: Resend HTTP API
   const client = getResendClient();
 
   // If no live API key is configured, simulate cleanly in development
   if (!client || !process.env.RESEND_API_KEY) {
-    console.log(`[RESEND SIMULATION] Would send email from "${from}" to "${JSON.stringify(to)}"`);
-    console.log(`[RESEND SIMULATION] Subject: "${subject}"`);
+    console.log(`[EMAIL SIMULATION] Would send email from "${from}" to "${JSON.stringify(to)}"`);
+    console.log(`[EMAIL SIMULATION] Subject: "${subject}"`);
     return {
       success: true,
       id: `sim_${Date.now()}`,
       simulated: true,
-      message: 'Simulated email delivery (set RESEND_API_KEY for live delivery)'
+      message: 'Simulated email delivery (set BREVO_API_KEY or RESEND_API_KEY for live delivery)'
     };
   }
 

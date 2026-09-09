@@ -221,7 +221,7 @@ function StudentProfileContent() {
 
   return (
     <div className="py-8 bg-[#faf8f5] min-h-screen text-stone-900">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         
         {/* Top Header & Breadcrumb */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
@@ -354,10 +354,10 @@ function StudentProfileContent() {
               <div className="border-b border-slate-100 pb-3">
                 <h2 className="text-sm font-black text-slate-900 flex items-center gap-2">
                   <User className="w-4 h-4 text-[#b85d34]" />
-                  <span>Personal Details & Contact</span>
+                  <span>Personal Details &amp; Profile</span>
                 </h2>
                 <p className="text-xs text-slate-500 mt-0.5">
-                  Update your contact phone, city, age, and identity details.
+                  Update your name, city, local area, age, and identity details.
                 </p>
               </div>
 

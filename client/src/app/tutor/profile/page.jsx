@@ -762,7 +762,7 @@ function TutorProfileContent() {
                   </div>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-0.5">
                     {[
-                      { val: 'quran', label: 'Quranic Sciences', sub: 'Nazra, Hifz, Tajweed, Alim' },
+                      { val: 'quran', label: 'Quranic Sciences', sub: 'Nazra, Hifz, Tajweed' },
                       { val: 'academic', label: 'Academic Education', sub: 'School, College, Board' },
                       { val: 'both', label: 'Both Disciplines', sub: 'Quran & Academics' }
                     ].map((t) => (

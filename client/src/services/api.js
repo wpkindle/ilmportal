@@ -432,6 +432,9 @@ export const api = {
   }).then(handleResponse),
 
   getTutorReviews: (tutorId) => fetch(`${API_BASE}/reviews/tutor/${tutorId}`).then(handleResponse),
+  getMyReviews: () => fetch(`${API_BASE}/reviews/my-reviews`, {
+    headers: getHeaders()
+  }).then(handleResponse),
 
   // Sessions
   scheduleSession: (body) => fetch(`${API_BASE}/sessions/schedule`, {

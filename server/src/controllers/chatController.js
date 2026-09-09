@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Message = require('../models/Message');
 const User = require('../models/User');
 const Deal = require('../models/Deal');
+const Review = require('../models/Review');
 const TutorProfile = require('../models/TutorProfile');
 const ChatRequest = require('../models/ChatRequest');
 const Notification = require('../models/Notification');
@@ -774,16 +775,28 @@ exports.getStudentProfileForTutor = async (req, res) => {
       age: studentDoc.age,
       gender: studentDoc.gender,
       city: studentDoc.city,
+      tuitionMode: studentDoc.tuitionMode || studentDoc.preferredMode || 'both',
+      preferredMode: studentDoc.preferredMode || studentDoc.tuitionMode || 'both',
       createdAt: studentDoc.createdAt,
       isVerified: studentDoc.isVerified,
       role: studentDoc.role,
       status: studentDoc.status
     };
 
-    // Also fetch any recent request or deal between this tutor and student
-    const [latestRequest, latestDeal] = await Promise.all([
+    // Also fetch any recent request, deal with this tutor, full tuitions history, and reviews
+    const [latestRequest, latestDeal, tuitionsHistory, reviews] = await Promise.all([
       ChatRequest.findOne({ student: studentDoc._id, tutor: req.user.id }).sort({ createdAt: -1 }),
-      Deal.findOne({ student: studentDoc._id, tutor: req.user.id }).sort({ createdAt: -1 })
+      Deal.findOne({ student: studentDoc._id, tutor: req.user.id }).sort({ createdAt: -1 }),
+      Deal.find({ student: studentDoc._id })
+        .select('subject mode price priceUnit status createdAt trialStartDate trialEndDate tutor')
+        .populate('tutor', 'name avatar')
+        .sort({ createdAt: -1 })
+        .limit(10),
+      Review.find({ student: studentDoc._id, status: 'published' })
+        .select('rating comment createdAt deal tutor')
+        .populate('tutor', 'name avatar')
+        .sort({ createdAt: -1 })
+        .limit(10)
     ]);
 
     res.status(200).json({
@@ -792,7 +805,9 @@ exports.getStudentProfileForTutor = async (req, res) => {
       is100Percent,
       profileStrength: is100Percent ? 100 : 85,
       latestRequest,
-      latestDeal
+      latestDeal,
+      tuitionsHistory: tuitionsHistory || [],
+      reviews: reviews || []
     });
   } catch (error) {
     console.error('Error fetching student profile for tutor:', error);

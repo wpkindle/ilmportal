@@ -85,3 +85,30 @@ exports.getTutorReviews = async (req, res) => {
     });
   }
 };
+
+// @desc    Get my reviews (for student or tutor)
+// @route   GET /api/reviews/my-reviews
+exports.getMyReviews = async (req, res) => {
+  try {
+    const filter = req.user.role === 'student'
+      ? { student: req.user.id }
+      : { tutor: req.user.id };
+
+    const reviews = await Review.find(filter)
+      .populate('student', 'name avatar city')
+      .populate('tutor', 'name avatar')
+      .populate('deal', 'subject mode')
+      .sort({ createdAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      count: reviews.length,
+      reviews
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error fetching reviews'
+    });
+  }
+};

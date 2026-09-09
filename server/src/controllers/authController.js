@@ -550,7 +550,9 @@ exports.login = async (req, res) => {
         age: user.age,
         isVerified: user.isVerified,
         city: user.city,
-        phone: user.phone
+        phone: user.phone,
+        tuitionMode: user.tuitionMode || user.preferredMode || 'both',
+        preferredMode: user.preferredMode || user.tuitionMode || 'both'
       },
       tutorProfile,
       completion
@@ -657,6 +659,12 @@ exports.updateProfile = async (req, res) => {
     if (avatar !== undefined) user.avatar = avatar;
     if (gender) user.gender = gender;
     if (age !== undefined) user.age = Number(age);
+    if (req.body.tuitionMode !== undefined || req.body.preferredMode !== undefined || (user.role === 'student' && teachingMode !== undefined)) {
+      const modeVal = req.body.tuitionMode || req.body.preferredMode || teachingMode;
+      const normalizedMode = modeVal === 'physical' ? 'in_person' : (['online', 'in_person', 'both'].includes(modeVal) ? modeVal : 'both');
+      user.tuitionMode = normalizedMode;
+      user.preferredMode = normalizedMode;
+    }
 
     await user.save();
 

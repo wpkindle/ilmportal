@@ -100,6 +100,16 @@ const userSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
+  tuitionMode: {
+    type: String,
+    enum: ['online', 'in_person', 'both'],
+    default: 'both'
+  },
+  preferredMode: {
+    type: String,
+    enum: ['online', 'in_person', 'both'],
+    default: 'both'
+  },
   isActive: {
     type: Boolean,
     default: true

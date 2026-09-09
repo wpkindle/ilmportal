@@ -18,7 +18,12 @@ import {
   Layers,
   Eye,
   EyeOff,
-  Trash2
+  Trash2,
+  Globe,
+  BookOpen,
+  Calendar,
+  GraduationCap,
+  Star
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
@@ -45,6 +50,12 @@ function StudentProfileContent() {
   const [gender, setGender] = useState('male');
   const [age, setAge] = useState('');
   const [avatar, setAvatar] = useState('');
+  const [tuitionMode, setTuitionMode] = useState('both');
+
+  // History & Reviews State
+  const [tuitionHistory, setTuitionHistory] = useState([]);
+  const [reviewsList, setReviewsList] = useState([]);
+  const [loadingHistory, setLoadingHistory] = useState(true);
 
   // Password Form State
   const [currentPassword, setCurrentPassword] = useState('');
@@ -74,6 +85,21 @@ function StudentProfileContent() {
       setGender(user.gender || '');
       setAge(user.age ? String(user.age) : '');
       setAvatar(user.avatar || '');
+      setTuitionMode(user.tuitionMode || user.preferredMode || 'both');
+    }
+  }, [user]);
+
+  // Fetch tuition history and reviews
+  useEffect(() => {
+    if (user) {
+      Promise.all([
+        api.getMyDeals().catch(() => ({ success: false, deals: [] })),
+        api.getMyReviews().catch(() => ({ success: false, reviews: [] }))
+      ]).then(([dealsRes, reviewsRes]) => {
+        if (dealsRes?.success && dealsRes.deals) setTuitionHistory(dealsRes.deals);
+        if (reviewsRes?.success && reviewsRes.reviews) setReviewsList(reviewsRes.reviews);
+        setLoadingHistory(false);
+      });
     }
   }, [user]);
 
@@ -124,7 +150,9 @@ function StudentProfileContent() {
         city,
         gender,
         age: age ? Number(age) : undefined,
-        avatar
+        avatar,
+        tuitionMode,
+        preferredMode: tuitionMode
       });
 
       if (res.success) {
@@ -278,7 +306,7 @@ function StudentProfileContent() {
                 </div>
               </div>
 
-              <div className="pt-3 border-t border-slate-100 text-left space-y-2 text-xs text-slate-600">
+              <div className="pt-3 border-t border-slate-100 text-left space-y-2.5 text-xs text-slate-600">
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">Gender:</span>
                   <span className="font-bold capitalize">{gender || 'Not set'}</span>
@@ -290,6 +318,19 @@ function StudentProfileContent() {
                 <div className="flex items-center justify-between">
                   <span className="text-slate-400">City:</span>
                   <span className="font-bold">{city || 'Not set'}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Tuition Mode:</span>
+                  <span className="font-black text-[#0c2217] bg-[#f0ece1] px-2 py-0.5 rounded-md text-[11px] border border-[#d4a359]/40">
+                    {tuitionMode === 'both' ? 'Online & In-Person' : tuitionMode === 'in_person' ? 'In-Person Only' : 'Online Only'}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-400">Joined Date:</span>
+                  <span className="font-semibold text-slate-700 flex items-center gap-1">
+                    <Calendar className="w-3 h-3 text-[#d4a359]" />
+                    <span>{user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) : 'Verified Member'}</span>
+                  </span>
                 </div>
               </div>
             </div>
@@ -445,6 +486,71 @@ function StudentProfileContent() {
                   </div>
                 </div>
 
+                {/* Tuition Mode Preference */}
+                <div id="profile-tuition-mode" className="scroll-mt-28 space-y-2 pt-2 border-t border-slate-100">
+                  <label className="text-xs font-bold text-slate-700 block">
+                    Preferred Tuition Mode *
+                  </label>
+                  <p className="text-[11px] text-slate-500">
+                    Select how you prefer to attend classes. Tutors will see your preference on your student profile.
+                  </p>
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+                    <button
+                      type="button"
+                      onClick={() => setTuitionMode('both')}
+                      className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                        tuitionMode === 'both'
+                          ? 'border-[#0c2217] bg-[#f0ece1] ring-2 ring-[#d4a359]/50 shadow-xs'
+                          : 'border-slate-200 bg-slate-50 hover:bg-slate-100/70 text-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 font-bold text-xs text-[#0c2217]">
+                        <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
+                        <span>Online &amp; In-Person</span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 mt-1 leading-tight">
+                        Flexible for both online video lessons &amp; home classes
+                      </p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setTuitionMode('online')}
+                      className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                        tuitionMode === 'online'
+                          ? 'border-[#0c2217] bg-[#f0ece1] ring-2 ring-[#d4a359]/50 shadow-xs'
+                          : 'border-slate-200 bg-slate-50 hover:bg-slate-100/70 text-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 font-bold text-xs text-[#0c2217]">
+                        <Globe className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Online Only</span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 mt-1 leading-tight">
+                        Interactive 1-on-1 audio/video lessons from home
+                      </p>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setTuitionMode('in_person')}
+                      className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                        tuitionMode === 'in_person'
+                          ? 'border-[#0c2217] bg-[#f0ece1] ring-2 ring-[#d4a359]/50 shadow-xs'
+                          : 'border-slate-200 bg-slate-50 hover:bg-slate-100/70 text-slate-700'
+                      }`}
+                    >
+                      <div className="flex items-center gap-1.5 font-bold text-xs text-[#0c2217]">
+                        <MapPin className="w-3.5 h-3.5 text-amber-600" />
+                        <span>In-Person Only</span>
+                      </div>
+                      <p className="text-[10px] text-slate-500 mt-1 leading-tight">
+                        Physical / home tutor in your city
+                      </p>
+                    </button>
+                  </div>
+                </div>
+
                 <div className="pt-2">
                   <button
                     type="submit"
@@ -572,7 +678,124 @@ function StudentProfileContent() {
               </form>
             </div>
 
-            {/* 3. Safety Reports & Incident Resolutions */}
+            {/* 3. My Tuition History & Reviews Card */}
+            <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-xs space-y-6">
+              <div className="border-b border-slate-100 pb-3 flex items-center justify-between">
+                <div>
+                  <h2 className="text-sm font-black text-slate-900 flex items-center gap-2">
+                    <GraduationCap className="w-4 h-4 text-[#d4a359]" />
+                    <span>My Tuitions History &amp; Reviews</span>
+                  </h2>
+                  <p className="text-xs text-slate-500 mt-0.5">
+                    Your enrolled courses, tuition deals, and tutor feedback history.
+                  </p>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-[11px] font-bold px-2.5 py-1 rounded-full bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30">
+                    {tuitionHistory.length} {tuitionHistory.length === 1 ? 'Tuition' : 'Tuitions'}
+                  </span>
+                </div>
+              </div>
+
+              {/* Tuitions History List */}
+              <div className="space-y-3">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                  <BookOpen className="w-3.5 h-3.5 text-[#d4a359]" />
+                  <span>Tuition Records</span>
+                </h3>
+
+                {loadingHistory ? (
+                  <div className="py-6 text-center text-xs text-slate-400">Loading tuition history...</div>
+                ) : tuitionHistory.length > 0 ? (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    {tuitionHistory.map((deal) => (
+                      <div key={deal._id} className="p-3.5 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] space-y-2">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="min-w-0">
+                            <h4 className="font-black text-xs text-slate-900 truncate">
+                              {deal.subject || 'Quran / Academic Tuition'}
+                            </h4>
+                            <p className="text-[11px] text-slate-500 truncate mt-0.5">
+                              {deal.tutor?.name ? `Tutor: ${deal.tutor.name}` : 'Tutor Assigned'}
+                            </p>
+                          </div>
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-white border border-[#d4a359]/40 text-[#0c2217] shrink-0">
+                            {deal.status ? deal.status.replace(/_/g, ' ') : 'Active'}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-[#ebe3d3]">
+                          <span className="font-semibold text-[#0c2217]">
+                            {deal.mode === 'in_person' ? 'In-Person (Home)' : 'Online WebRTC'}
+                          </span>
+                          <span>
+                            {deal.createdAt ? new Date(deal.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : ''}
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-xs text-slate-500 text-center space-y-2">
+                    <p>No active or previous tuitions yet.</p>
+                    <Link
+                      href="/tutors"
+                      className="inline-flex items-center gap-1 text-xs font-bold text-[#b85d34] hover:underline"
+                    >
+                      <span>Find a Verified Quran / Academic Tutor &rarr;</span>
+                    </Link>
+                  </div>
+                )}
+              </div>
+
+              {/* Reviews Section */}
+              <div className="space-y-3 pt-4 border-t border-slate-100">
+                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
+                  <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                  <span>Reviews &amp; Ratings ({reviewsList.length})</span>
+                </h3>
+
+                {loadingHistory ? (
+                  <div className="py-6 text-center text-xs text-slate-400">Loading reviews...</div>
+                ) : reviewsList.length > 0 ? (
+                  <div className="space-y-2.5">
+                    {reviewsList.map((rev) => (
+                      <div key={rev._id} className="p-3.5 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] space-y-1.5 text-xs">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`w-3.5 h-3.5 ${star <= (rev.rating || 5) ? 'text-amber-500 fill-amber-500' : 'text-slate-200'}`}
+                              />
+                            ))}
+                            <span className="font-black text-slate-900 ml-1 text-xs">{rev.rating || 5}.0</span>
+                          </div>
+                          <span className="text-[10px] text-slate-400">
+                            {rev.createdAt ? new Date(rev.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
+                          </span>
+                        </div>
+                        {rev.comment && (
+                          <p className="text-slate-700 italic text-xs leading-relaxed">
+                            &ldquo;{rev.comment}&rdquo;
+                          </p>
+                        )}
+                        {rev.tutor?.name && (
+                          <p className="text-[10px] text-slate-500 font-medium">
+                            Tutor: {rev.tutor.name}
+                          </p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-slate-500 italic p-3 bg-slate-50 rounded-2xl border border-slate-200">
+                    No reviews or feedback recorded yet. Once you complete tuition sessions, feedback and ratings will appear here.
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* 4. Safety Reports & Incident Resolutions */}
             <SafetyReportsSection userRole="student" />
 
             {/* 4. Danger Zone / Delete Account */}

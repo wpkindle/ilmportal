@@ -12,7 +12,10 @@ import {
   CheckCircle2,
   Clock,
   BookOpen,
-  MessageSquare
+  MessageSquare,
+  Globe,
+  Star,
+  GraduationCap
 } from 'lucide-react';
 import { api } from '../../services/api';
 
@@ -28,10 +31,11 @@ export default function StudentProfileModal({
 
   useEffect(() => {
     if (studentData) {
-      setProfile(studentData);
-    } else if (isOpen && studentId) {
+      setProfile((prev) => ({ ...(prev || {}), ...studentData }));
+    }
+    if (isOpen && studentId) {
       let isMounted = true;
-      setLoading(true);
+      if (!studentData) setLoading(true);
       setError('');
       api.getStudentProfileForTutor(studentId)
         .then((res) => {
@@ -42,9 +46,11 @@ export default function StudentProfileModal({
                 is100Percent: res.is100Percent,
                 profileStrength: res.profileStrength,
                 latestRequest: res.latestRequest,
-                latestDeal: res.latestDeal
+                latestDeal: res.latestDeal,
+                tuitionsHistory: res.tuitionsHistory || [],
+                reviews: res.reviews || []
               });
-            } else {
+            } else if (!studentData) {
               setError(res.message || 'Unable to load student profile.');
             }
             setLoading(false);
@@ -52,7 +58,9 @@ export default function StudentProfileModal({
         })
         .catch((err) => {
           if (isMounted) {
-            setError(err.message || 'Error fetching student profile.');
+            if (!studentData) {
+              setError(err.message || 'Error fetching student profile.');
+            }
             setLoading(false);
           }
         });
@@ -71,8 +79,28 @@ export default function StudentProfileModal({
   const studentGender = profile?.gender;
   const studentCity = profile?.city || 'Pakistan';
   const joinedDate = profile?.createdAt
-    ? new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })
+    ? new Date(profile.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
     : null;
+
+  const rawMode = profile?.tuitionMode || profile?.preferredMode || 'both';
+  const modeBadge = (() => {
+    if (rawMode === 'both') {
+      return {
+        label: 'Online & In-Person',
+        badgeClass: 'text-emerald-800 bg-emerald-50 border-emerald-200'
+      };
+    }
+    if (rawMode === 'in_person') {
+      return {
+        label: 'In-Person Only',
+        badgeClass: 'text-amber-800 bg-amber-50 border-amber-200'
+      };
+    }
+    return {
+      label: 'Online Only',
+      badgeClass: 'text-blue-800 bg-blue-50 border-blue-200'
+    };
+  })();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-slate-950/80 backdrop-blur-sm animate-in fade-in duration-200">
@@ -151,9 +179,9 @@ export default function StudentProfileModal({
                   </span>
 
                   {joinedDate && (
-                    <div className="text-[11px] text-slate-400 flex items-center gap-1 pt-2 border-t border-[#ebe3d3] w-full justify-center">
-                      <Calendar className="w-3.5 h-3.5" />
-                      <span>Member since {joinedDate}</span>
+                    <div className="text-[11px] font-semibold text-slate-600 flex items-center gap-1.5 pt-2 border-t border-[#ebe3d3] w-full justify-center">
+                      <Calendar className="w-3.5 h-3.5 text-[#d4a359]" />
+                      <span>Joined {joinedDate}</span>
                     </div>
                   )}
                 </div>
@@ -211,9 +239,18 @@ export default function StudentProfileModal({
 
                   <div className="p-3.5 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] shadow-2xs">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Tuition Mode</span>
-                    <span className="text-xs sm:text-sm font-black text-slate-800 mt-1 block">
-                      Online 1-on-1
-                    </span>
+                    <div className="mt-1">
+                      <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-black border ${modeBadge.badgeClass}`}>
+                        {rawMode === 'both' ? (
+                          <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                        ) : rawMode === 'in_person' ? (
+                          <MapPin className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+                        ) : (
+                          <Globe className="w-3.5 h-3.5 text-blue-600 shrink-0" />
+                        )}
+                        <span>{modeBadge.label}</span>
+                      </span>
+                    </div>
                   </div>
                 </div>
 
@@ -229,6 +266,118 @@ export default function StudentProfileModal({
                     </p>
                   </div>
                 )}
+
+                {/* Tuitions History (if does) */}
+                <div className="p-4 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] shadow-2xs space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-[#0c2217] flex items-center gap-1.5">
+                      <GraduationCap className="w-4 h-4 text-[#d4a359]" />
+                      <span>Tuitions History</span>
+                    </span>
+                    {profile?.tuitionsHistory && profile.tuitionsHistory.length > 0 ? (
+                      <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-[#143d2b] text-[#f5d996]">
+                        {profile.tuitionsHistory.length} {profile.tuitionsHistory.length === 1 ? 'Tuition' : 'Tuitions'}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-medium text-slate-400">
+                        New Student
+                      </span>
+                    )}
+                  </div>
+
+                  {profile?.tuitionsHistory && profile.tuitionsHistory.length > 0 ? (
+                    <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                      {profile.tuitionsHistory.map((t, idx) => (
+                        <div key={t._id || idx} className="p-2.5 rounded-xl bg-white border border-[#e6dfd5] text-xs flex items-center justify-between gap-2 shadow-2xs">
+                          <div className="min-w-0 space-y-0.5">
+                            <div className="font-bold text-slate-900 truncate flex items-center gap-1.5">
+                              <BookOpen className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
+                              <span className="truncate">{t.subject || 'Tuition Course'}</span>
+                            </div>
+                            <div className="text-[10px] text-slate-500 flex items-center gap-2">
+                              <span className="font-medium text-slate-600">
+                                {t.mode === 'in_person' ? 'In-Person (Home)' : 'Online WebRTC'}
+                              </span>
+                              {t.createdAt && (
+                                <span>• {new Date(t.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
+                              )}
+                              {t.tutor?.name && (
+                                <span className="truncate">• Tutor: {t.tutor.name}</span>
+                              )}
+                            </div>
+                          </div>
+                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase shrink-0 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30">
+                            {t.status ? t.status.replace(/_/g, ' ') : 'Active'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-slate-500 text-[11px] italic bg-white p-3 rounded-xl border border-slate-100">
+                      No prior tuition history recorded yet on IlmiDunya.
+                    </p>
+                  )}
+                </div>
+
+                {/* Reviews & Ratings (if does) */}
+                <div className="p-4 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] shadow-2xs space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-black text-[#0c2217] flex items-center gap-1.5">
+                      <Star className="w-4 h-4 text-amber-500 fill-amber-500" />
+                      <span>Reviews &amp; Feedback</span>
+                    </span>
+                    {profile?.reviews && profile.reviews.length > 0 ? (
+                      <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 border border-amber-300">
+                        {profile.reviews.length} {profile.reviews.length === 1 ? 'Review' : 'Reviews'}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-medium text-slate-400">
+                        0 Reviews
+                      </span>
+                    )}
+                  </div>
+
+                  {profile?.reviews && profile.reviews.length > 0 ? (
+                    <div className="space-y-2 max-h-48 overflow-y-auto pr-1">
+                      {profile.reviews.map((r, idx) => (
+                        <div key={r._id || idx} className="p-3 rounded-xl bg-white border border-[#e6dfd5] text-xs space-y-1.5 shadow-2xs">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`w-3 h-3 ${star <= (r.rating || 5) ? 'text-amber-500 fill-amber-500' : 'text-slate-200'}`}
+                                />
+                              ))}
+                              <span className="text-[11px] font-black text-slate-800 ml-1">
+                                {r.rating || 5}.0
+                              </span>
+                            </div>
+                            {r.createdAt && (
+                              <span className="text-[10px] text-slate-400">
+                                {new Date(r.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                              </span>
+                            )}
+                          </div>
+                          {r.comment && (
+                            <p className="text-slate-700 italic text-[11px] leading-relaxed">
+                              &ldquo;{r.comment}&rdquo;
+                            </p>
+                          )}
+                          {r.tutor?.name && (
+                            <div className="text-[10px] font-medium text-slate-500">
+                              Feedback from Tutor: {r.tutor.name}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-slate-500 text-[11px] italic bg-white p-3 rounded-xl border border-slate-100">
+                      No reviews recorded yet for this student.
+                    </p>
+                  )}
+                </div>
 
                 {/* Safe Platform Privacy & Child Safety Protection Notice */}
                 <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-xs flex items-start gap-3 shadow-2xs">

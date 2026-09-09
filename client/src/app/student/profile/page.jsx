@@ -492,7 +492,7 @@ function StudentProfileContent() {
                   <div id="profile-area" className="scroll-mt-28">
                     <div className="flex items-center justify-between mb-1">
                       <label className="text-xs font-bold text-slate-700 block">
-                        Local Area / Sector (Optional)
+                        Area (Optional)
                       </label>
                       <div className="flex items-center gap-2">
                         {city && (

@@ -36,7 +36,12 @@ exports.getDashboardStats = async (req, res) => {
     const totalStudents = await User.countDocuments({ role: 'student' });
     const totalTutors = await User.countDocuments({ role: 'tutor' });
     const approvedTutors = await TutorProfile.countDocuments({ verificationStatus: 'approved' });
-    const pendingTutorApprovals = await TutorProfile.countDocuments({ verificationStatus: { $in: ['under_review', 'pending'] } });
+    const pendingTutorApprovals = await TutorProfile.countDocuments({
+      $or: [
+        { verificationStatus: { $in: ['under_review', 'pending'] } },
+        { 'sanadDocuments.status': 'pending' }
+      ]
+    });
     const incompleteTutors = await TutorProfile.countDocuments({ verificationStatus: 'incomplete' });
     
     const totalDeals = await Deal.countDocuments();
@@ -208,6 +213,18 @@ exports.approveTutor = async (req, res) => {
     await sendTutorStatusEmail(tutor.user.email, tutor.user.name, 'approved');
     await logAction(req.user.id, 'APPROVE_TUTOR', 'tutor_profile', tutor._id, { tutorName: tutor.user.name }, req);
 
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`user_${tutor.user._id}`).emit('notification-alert', {
+        title: 'Tutor Profile & Sanad Credentials Approved!',
+        message: 'Congratulations! Your tutor credentials and degrees have been verified and approved. Your profile is now verified and live.',
+        type: 'verification_status',
+        link: '/tutor/dashboard'
+      });
+      io.to(`user_${tutor.user._id}`).emit('tutor-profile-updated', tutor);
+      io.emit('admin-tutor-queue-updated', { tutorId: tutor._id, status: 'approved' });
+    }
+
     res.status(200).json({
       success: true,
       message: `Tutor ${tutor.user.name} and all educational documents have been approved & verified!`,
@@ -262,6 +279,18 @@ exports.rejectTutor = async (req, res) => {
 
     await sendTutorStatusEmail(tutor.user.email, tutor.user.name, 'rejected', tutor.rejectionReason);
     await logAction(req.user.id, 'REJECT_TUTOR', 'tutor_profile', tutor._id, { reason: tutor.rejectionReason }, req);
+
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`user_${tutor.user._id}`).emit('notification-alert', {
+        title: 'Tutor Application Update',
+        message: `Your tutor application could not be approved. Reason: ${tutor.rejectionReason}`,
+        type: 'verification_status',
+        link: '/tutor/profile'
+      });
+      io.to(`user_${tutor.user._id}`).emit('tutor-profile-updated', tutor);
+      io.emit('admin-tutor-queue-updated', { tutorId: tutor._id, status: 'rejected' });
+    }
 
     res.status(200).json({
       success: true,
@@ -328,6 +357,20 @@ exports.reviewTutorDocument = async (req, res) => {
       type: 'verification_status',
       link: '/tutor/profile#profile-sanads'
     });
+
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`user_${tutor.user._id}`).emit('notification-alert', {
+        title: status === 'verified' ? 'Degree / Sanad Document Verified!' : 'Degree / Sanad Verification Update',
+        message: status === 'verified'
+          ? `Your document "${doc.title}" has been reviewed and verified by IlmiDunya administration.`
+          : `Your document "${doc.title}" could not be verified: ${doc.rejectionReason}`,
+        type: 'verification_status',
+        link: '/tutor/profile#profile-sanads'
+      });
+      io.to(`user_${tutor.user._id}`).emit('tutor-profile-updated', tutor);
+      io.emit('admin-tutor-queue-updated', { tutorId: tutor._id, docId: doc._id, status });
+    }
 
     res.status(200).json({
       success: true,

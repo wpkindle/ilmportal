@@ -303,6 +303,32 @@ export default function AdminDashboardPage() {
               </div>
             )}
 
+            {/* Pending Tutor Applications & Sanad Verification Alert Banner */}
+            {stats?.pendingTutorApprovals > 0 && (
+              <div className="bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-transparent border border-amber-300/80 rounded-3xl p-4 sm:p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-xs">
+                <div className="flex items-center gap-3.5">
+                  <div className="p-2.5 bg-amber-500 text-white rounded-2xl shadow-sm">
+                    <Clock className="w-5 h-5 animate-pulse" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-black text-amber-950">
+                      {stats.pendingTutorApprovals} Tutor Application{stats.pendingTutorApprovals > 1 ? 's' : ''} &amp; Sanad Credential{stats.pendingTutorApprovals > 1 ? 's' : ''} Awaiting Review
+                    </h4>
+                    <p className="text-xs text-amber-800/90 mt-0.5">
+                      New tutor applications or submitted Sanad &amp; degree documents are pending administrative verification.
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  href="/admin/tutor-approvals?status=under_review"
+                  className="px-4 py-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold rounded-xl shadow-xs flex items-center gap-1.5 shrink-0 transition-colors"
+                >
+                  <span>Review &amp; Verify Sanads</span>
+                  <ChevronRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
+
             {/* Key Metric Stats Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
               
@@ -361,16 +387,21 @@ export default function AdminDashboardPage() {
 
               {/* Pending Tutor Approvals */}
               <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-2xs">
-                <div className="p-2 bg-amber-100 text-amber-700 w-fit rounded-xl mb-3">
-                  <Clock className="w-5 h-5" />
+                <div className="flex items-center justify-between mb-3">
+                  <div className="p-2 bg-amber-100 text-amber-700 rounded-xl">
+                    <Clock className="w-5 h-5" />
+                  </div>
+                  {stats?.pendingTutorApprovals > 0 && (
+                    <span className="px-2 py-0.5 text-[9px] font-black uppercase tracking-wider bg-amber-500 text-white rounded-full animate-pulse">
+                      Pending Review
+                    </span>
+                  )}
                 </div>
                 <p className="text-2xl font-black text-amber-600">{stats?.pendingTutorApprovals || 0}</p>
-                <p className="text-xs text-slate-500 font-medium">Pending Approvals</p>
-                {stats?.pendingTutorApprovals > 0 && (
-                  <Link href="/admin/tutor-approvals" className="text-[10px] font-bold text-amber-700 hover:underline mt-1 block">
-                    Review Queue &rarr;
-                  </Link>
-                )}
+                <p className="text-xs text-slate-500 font-medium">Pending Approvals &amp; Sanads</p>
+                <Link href="/admin/tutor-approvals" className="text-[11px] font-bold text-amber-700 hover:underline mt-2 flex items-center gap-1 block">
+                  <span>Review Queue &rarr;</span>
+                </Link>
               </div>
 
               {/* Total Deals */}

@@ -95,25 +95,61 @@ export const SanadModal = ({
                     )}
                   </div>
                   <div className="flex items-center gap-2">
-                    {isAdmin && isDocPending && onVerifyDoc && (
+                    {isAdmin && onVerifyDoc && (
                       <button
                         type="button"
                         onClick={() => onVerifyDoc(doc._id || idx)}
-                        className="px-2.5 py-1 bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold rounded-lg shadow-xs transition-colors cursor-pointer"
+                        className={`px-2.5 py-1 text-[11px] font-bold rounded-lg shadow-xs transition-colors cursor-pointer flex items-center gap-1 ${
+                          isDocVerified
+                            ? 'bg-emerald-100 text-emerald-800 border border-emerald-300'
+                            : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                        }`}
+                        title="Approve / Verify this Sanad credential"
                       >
-                        Verify Doc
+                        <CheckCircle2 className="w-3 h-3" />
+                        <span>{isDocVerified ? 'Re-Verify' : 'Verify Doc'}</span>
+                      </button>
+                    )}
+                    {isAdmin && onRejectDoc && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const reason = window.prompt(
+                            `State the reason for rejecting "${doc.title || 'this document'}":`,
+                            'Document scan is blurry or credential is unverified.'
+                          );
+                          if (reason !== null && reason.trim()) {
+                            onRejectDoc(doc._id || idx, reason.trim());
+                          }
+                        }}
+                        className={`px-2.5 py-1 text-[11px] font-bold rounded-lg shadow-xs transition-colors cursor-pointer flex items-center gap-1 ${
+                          isDocRejected
+                            ? 'bg-rose-100 text-rose-800 border border-rose-300'
+                            : 'bg-rose-600 hover:bg-rose-700 text-white'
+                        }`}
+                        title="Reject this Sanad credential"
+                      >
+                        <AlertCircle className="w-3 h-3" />
+                        <span>{isDocRejected ? 'Rejected (Update)' : 'Reject Doc'}</span>
                       </button>
                     )}
                     <a
                       href={doc.fileUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-xs font-bold text-[#b85d34] hover:text-[#9e4e2a] inline-flex items-center gap-1"
+                      className="text-xs font-bold text-[#b85d34] hover:text-[#9e4e2a] inline-flex items-center gap-1 ml-1"
                     >
                       Full View <ExternalLink className="w-3 h-3" />
                     </a>
                   </div>
                 </div>
+
+                {isDocRejected && doc.rejectionReason && (
+                  <div className="px-3 py-1.5 bg-rose-50 border-b border-rose-200 text-[11px] text-rose-700 flex items-center gap-1.5 font-medium">
+                    <AlertCircle className="w-3.5 h-3.5 shrink-0 text-rose-500" />
+                    <span><strong>Rejection note:</strong> {doc.rejectionReason}</span>
+                  </div>
+                )}
                 <div className="p-2 flex justify-center bg-slate-900/5">
                   {doc.fileUrl && (doc.fileUrl.endsWith('.pdf') || doc.fileType === 'application/pdf' || doc.fileUrl.startsWith('data:application/pdf')) ? (
                     <div className="p-8 text-center text-slate-600">

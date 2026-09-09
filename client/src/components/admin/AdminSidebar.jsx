@@ -34,6 +34,7 @@ const AdminSidebar = () => {
   const [pendingReportsCount, setPendingReportsCount] = useState(0);
   const [pendingSupportCount, setPendingSupportCount] = useState(0);
   const [unreadEmailCount, setUnreadEmailCount] = useState(0);
+  const [pendingApprovalsCount, setPendingApprovalsCount] = useState(0);
 
   const fetchCounts = async () => {
     try {
@@ -56,6 +57,13 @@ const AdminSidebar = () => {
         setUnreadEmailCount(emailRes.counts?.unread || 0);
       }
     } catch (e) {}
+
+    try {
+      const queueRes = await api.getTutorQueue('under_review');
+      if (queueRes.success) {
+        setPendingApprovalsCount(queueRes.counts?.under_review || (queueRes.tutors ? queueRes.tutors.length : 0));
+      }
+    } catch (e) {}
   };
 
   useEffect(() => {
@@ -66,23 +74,26 @@ const AdminSidebar = () => {
   useEffect(() => {
     if (!socket) return;
     const handleAlert = (data) => {
-      if (data?.type === 'safety_report' || data?.type === 'human_support_request') {
+      if (data?.type === 'safety_report' || data?.type === 'human_support_request' || data?.type === 'verification_status') {
         fetchCounts();
       }
     };
     const handleSupportAlert = () => fetchCounts();
     const handleEmailAlert = () => fetchCounts();
+    const handleQueueAlert = () => fetchCounts();
 
     socket.on('notification-alert', handleAlert);
     socket.on('human-support-alert', handleSupportAlert);
     socket.on('support-session-updated', handleSupportAlert);
     socket.on('email-received', handleEmailAlert);
+    socket.on('admin-tutor-queue-updated', handleQueueAlert);
 
     return () => {
       socket.off('notification-alert', handleAlert);
       socket.off('human-support-alert', handleSupportAlert);
       socket.off('support-session-updated', handleSupportAlert);
       socket.off('email-received', handleEmailAlert);
+      socket.off('admin-tutor-queue-updated', handleQueueAlert);
     };
   }, [socket]);
 
@@ -110,7 +121,13 @@ const AdminSidebar = () => {
       badge: pendingReportsCount > 0 ? pendingReportsCount : null,
       badgeColor: 'bg-rose-500 text-white animate-pulse'
     },
-    { to: '/admin/tutor-approvals', label: 'Tutor Approval Queue', icon: UserCheck },
+    {
+      to: '/admin/tutor-approvals',
+      label: 'Tutor Approval Queue',
+      icon: UserCheck,
+      badge: pendingApprovalsCount > 0 ? pendingApprovalsCount : null,
+      badgeColor: 'bg-amber-500 text-white animate-pulse'
+    },
     { to: '/admin/categories', label: 'CMS Categories & Subjects', icon: BookOpen },
     { to: '/admin/locations', label: 'CMS Cities & Locations', icon: MapPin },
     { to: '/admin/deals', label: 'Deals & Payment Verification', icon: Handshake },

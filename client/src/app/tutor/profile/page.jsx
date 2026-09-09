@@ -38,7 +38,7 @@ import DeleteAccountModal from '../../../components/common/DeleteAccountModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import SafetyReportsSection from '../../../components/profile/SafetyReportsSection';
 import { allPakistaniCities, pakistaniCityAreas } from '../../../data/pakistanAreas';
-import { StyledNativeSelect } from '../../../components/common/CustomSelect';
+import CustomSelect, { StyledNativeSelect } from '../../../components/common/CustomSelect';
 
 const pakistaniCities = allPakistaniCities;
 
@@ -52,6 +52,7 @@ function TutorProfileContent() {
   const [email, setEmail] = useState('');
   const [city, setCity] = useState('Lahore');
   const [localArea, setLocalArea] = useState('');
+  const [isCustomArea, setIsCustomArea] = useState(false);
   const [gender, setGender] = useState('male');
   const [tutoringType, setTutoringType] = useState('both');
   const [age, setAge] = useState('');
@@ -106,15 +107,27 @@ function TutorProfileContent() {
     if (user) {
       setName(user.name || '');
       setEmail(user.email || '');
-      setCity(user.city || '');
-      setLocalArea(user.area || '');
+      const uCity = user.city || '';
+      const uArea = user.area || '';
+      setCity(uCity);
+      setLocalArea(uArea);
+      if (uCity && uArea && pakistaniCityAreas[uCity] && !pakistaniCityAreas[uCity].includes(uArea)) {
+        setIsCustomArea(true);
+      }
       setGender(user.gender || '');
       setAge(user.age ? String(user.age) : '');
       setAvatar(user.avatar || '');
     }
     if (tutorProfile) {
-      if (tutorProfile.city) setCity(tutorProfile.city);
-      if (tutorProfile.localArea) setLocalArea(tutorProfile.localArea);
+      const pCity = tutorProfile.city || '';
+      const pArea = tutorProfile.localArea || tutorProfile.area || '';
+      if (pCity) setCity(pCity);
+      if (pArea) {
+        setLocalArea(pArea);
+        if (pCity && pakistaniCityAreas[pCity] && !pakistaniCityAreas[pCity].includes(pArea)) {
+          setIsCustomArea(true);
+        }
+      }
       if (tutorProfile.tutoringType) setTutoringType(tutorProfile.tutoringType);
       setBio(tutorProfile.bio || '');
       setQualifications(tutorProfile.qualifications || '');
@@ -634,16 +647,18 @@ function TutorProfileContent() {
                     <label className="text-xs font-bold text-slate-700 block mb-1">
                       Gender *
                     </label>
-                    <StyledNativeSelect
+                    <CustomSelect
+                      options={[
+                        { value: 'male', label: 'Male', sublabel: 'Male Tutor / Faculty' },
+                        { value: 'female', label: 'Female', sublabel: 'Female Tutor / Alimah' },
+                        { value: 'other', label: 'Other' }
+                      ]}
                       value={gender}
-                      onChange={(e) => setGender(e.target.value)}
+                      onChange={(val) => setGender(val)}
+                      placeholder="Select Gender..."
                       icon={User}
-                    >
-                      <option value="">-- Select Gender --</option>
-                      <option value="male">Male</option>
-                      <option value="female">Female</option>
-                      <option value="other">Other</option>
-                    </StyledNativeSelect>
+                      variant="profile"
+                    />
                   </div>
 
                   <div id="profile-age" className="scroll-mt-28">
@@ -691,19 +706,23 @@ function TutorProfileContent() {
                     <label className="text-xs font-bold text-slate-700 block mb-1">
                       City *
                     </label>
-                    <StyledNativeSelect
+                    <CustomSelect
+                      options={pakistaniCities.map((c) => ({
+                        value: c,
+                        label: c,
+                        sublabel: 'Pakistan'
+                      }))}
                       value={city}
-                      onChange={(e) => {
-                        setCity(e.target.value);
+                      onChange={(val) => {
+                        setCity(val);
                         setLocalArea('');
+                        setIsCustomArea(false);
                       }}
+                      placeholder="Select City in Pakistan..."
                       icon={MapPin}
-                    >
-                      <option value="">-- Select City in Pakistan --</option>
-                      {pakistaniCities.map((c) => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                    </StyledNativeSelect>
+                      searchable={true}
+                      variant="profile"
+                    />
                   </div>
 
                   <div id="profile-local-area" className="scroll-mt-28">
@@ -711,30 +730,93 @@ function TutorProfileContent() {
                       <label className="text-xs font-bold text-slate-700 block">
                         Area (Optional)
                       </label>
-                      {city && (
-                        <span className="text-[10px] text-stone-500 font-medium">
-                          {city}
-                        </span>
-                      )}
+                      <div className="flex items-center gap-2">
+                        {city && (
+                          <span className="text-[10px] text-stone-500 font-medium">
+                            {city}
+                          </span>
+                        )}
+                        {city && pakistaniCityAreas[city] && pakistaniCityAreas[city].length > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const next = !isCustomArea;
+                              setIsCustomArea(next);
+                              if (!next && !pakistaniCityAreas[city]?.includes(localArea)) {
+                                setLocalArea('');
+                              }
+                            }}
+                            className="text-[10.5px] font-bold text-[#b85d34] hover:text-[#913d16] hover:underline cursor-pointer"
+                          >
+                            {isCustomArea ? 'Choose from list' : '+ Other Area'}
+                          </button>
+                        )}
+                      </div>
                     </div>
-                    {city && pakistaniCityAreas[city] && pakistaniCityAreas[city].length > 0 ? (
-                      <StyledNativeSelect
+
+                    {city && pakistaniCityAreas[city] && pakistaniCityAreas[city].length > 0 && !isCustomArea ? (
+                      <CustomSelect
+                        options={[
+                          ...pakistaniCityAreas[city].map((a) => ({
+                            value: a,
+                            label: a,
+                            sublabel: city
+                          })),
+                          {
+                            value: '__other__',
+                            label: '+ Other Area (Type custom location)...',
+                            sublabel: 'Custom colony, phase, or sector',
+                            isAction: true
+                          }
+                        ]}
                         value={localArea}
-                        onChange={(e) => setLocalArea(e.target.value)}
-                      >
-                        <option value="">-- Select Main Area in {city} --</option>
-                        {pakistaniCityAreas[city].map((a) => (
-                          <option key={a} value={a}>{a}</option>
-                        ))}
-                      </StyledNativeSelect>
-                    ) : (
-                      <input
-                        type="text"
-                        placeholder={city ? `General coverage across ${city}` : 'Select city first'}
-                        value={localArea}
-                        onChange={(e) => setLocalArea(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-2 focus:ring-[#d4a359]/20 rounded-2xl text-xs text-slate-900 font-semibold outline-none transition-all shadow-2xs"
+                        onChange={(val) => {
+                          if (val === '__other__') {
+                            setIsCustomArea(true);
+                            if (pakistaniCityAreas[city]?.includes(localArea)) {
+                              setLocalArea('');
+                            }
+                          } else {
+                            setLocalArea(val);
+                          }
+                        }}
+                        placeholder={`Select Area in ${city}...`}
+                        searchable={true}
+                        allowCustom={true}
+                        variant="profile"
                       />
+                    ) : (
+                      <div className="space-y-1.5">
+                        <div className="relative flex items-center">
+                          <MapPin className="w-4 h-4 text-[#b85d34] absolute left-3.5 pointer-events-none z-10" />
+                          <input
+                            type="text"
+                            placeholder={city ? `Enter specific area / sector in ${city}...` : 'Enter local area name'}
+                            value={localArea}
+                            onChange={(e) => setLocalArea(e.target.value)}
+                            className="w-full pl-10 pr-28 py-2.5 bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-2 focus:ring-[#d4a359]/20 rounded-2xl text-xs text-slate-900 font-bold outline-none transition-all shadow-2xs h-[42px]"
+                          />
+                          {city && pakistaniCityAreas[city] && pakistaniCityAreas[city].length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsCustomArea(false);
+                                if (!pakistaniCityAreas[city]?.includes(localArea)) {
+                                  setLocalArea('');
+                                }
+                              }}
+                              className="absolute right-2 px-2.5 py-1 text-[10.5px] font-bold text-[#b85d34] hover:text-white hover:bg-[#b85d34] rounded-xl border border-[#b85d34]/30 transition-all cursor-pointer shadow-2xs"
+                            >
+                              Choose from list
+                            </button>
+                          )}
+                        </div>
+                        {isCustomArea && (
+                          <p className="text-[10px] text-stone-500 font-medium">
+                            Tip: Enter your specific society, phase, or colony name (e.g. Wapda Town, Eden, Cantt).
+                          </p>
+                        )}
+                      </div>
                     )}
                   </div>
                 </div>

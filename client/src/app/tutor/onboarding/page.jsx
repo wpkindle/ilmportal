@@ -40,6 +40,7 @@ export default function TutorOnboardingPage() {
   const [hourlyRate, setHourlyRate] = useState(1500);
   const [city, setCity] = useState('Lahore');
   const [localArea, setLocalArea] = useState('');
+  const [isCustomArea, setIsCustomArea] = useState(false);
   const [teachingModes, setTeachingModes] = useState(['online']);
   const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
@@ -52,7 +53,12 @@ export default function TutorOnboardingPage() {
     if (user) {
       if (user.gender) setGender(user.gender);
       if (user.city) setCity(user.city);
-      if (user.area) setLocalArea(user.area);
+      if (user.area) {
+        setLocalArea(user.area);
+        if (user.city && pakistaniCityAreas[user.city] && !pakistaniCityAreas[user.city].includes(user.area)) {
+          setIsCustomArea(true);
+        }
+      }
     }
   }, [user]);
 
@@ -73,7 +79,12 @@ export default function TutorOnboardingPage() {
           if (p.gender) setGender(p.gender);
           if (p.tutoringType) setTutoringType(p.tutoringType);
           if (p.city) setCity(p.city);
-          if (p.localArea) setLocalArea(p.localArea);
+          if (p.localArea) {
+            setLocalArea(p.localArea);
+            if (p.city && pakistaniCityAreas[p.city] && !pakistaniCityAreas[p.city].includes(p.localArea)) {
+              setIsCustomArea(true);
+            }
+          }
           if (p.qualifications) setQualifications(p.qualifications);
           if (p.experienceYears !== undefined && p.experienceYears !== null) {
             setExperienceYears(p.experienceYears);
@@ -405,43 +416,105 @@ export default function TutorOnboardingPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="text-[11px] font-bold text-slate-700 block mb-1">City Location *</label>
-                    <StyledNativeSelect
+                    <CustomSelect
+                      options={allPakistaniCities.map((c) => ({
+                        value: c,
+                        label: c,
+                        sublabel: 'Pakistan'
+                      }))}
                       value={city}
-                      onChange={(e) => {
-                        setCity(e.target.value);
+                      onChange={(val) => {
+                        setCity(val);
                         setLocalArea('');
+                        setIsCustomArea(false);
                       }}
+                      placeholder="Select City..."
                       icon={MapPin}
-                    >
-                      <option value="">-- Select City --</option>
-                      {allPakistaniCities.map((c) => (
-                        <option key={c} value={c}>{c}</option>
-                      ))}
-                    </StyledNativeSelect>
+                      searchable={true}
+                      variant="profile"
+                    />
                   </div>
 
                   <div>
-                    <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                      Local Area / Sector {city ? `in ${city}` : ''}
-                    </label>
-                    {city && pakistaniCityAreas[city] && pakistaniCityAreas[city].length > 0 ? (
-                      <StyledNativeSelect
+                    <div className="flex items-center justify-between mb-1">
+                      <label className="text-[11px] font-bold text-slate-700 block">
+                        Local Area / Sector {city ? `in ${city}` : ''}
+                      </label>
+                      {city && pakistaniCityAreas[city] && pakistaniCityAreas[city].length > 0 && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const next = !isCustomArea;
+                            setIsCustomArea(next);
+                            if (!next && !pakistaniCityAreas[city]?.includes(localArea)) {
+                              setLocalArea('');
+                            }
+                          }}
+                          className="text-[10px] font-bold text-[#b85d34] hover:text-[#913d16] hover:underline cursor-pointer"
+                        >
+                          {isCustomArea ? 'Choose from list' : '+ Other Area'}
+                        </button>
+                      )}
+                    </div>
+
+                    {city && pakistaniCityAreas[city] && pakistaniCityAreas[city].length > 0 && !isCustomArea ? (
+                      <CustomSelect
+                        options={[
+                          ...pakistaniCityAreas[city].map((a) => ({
+                            value: a,
+                            label: a,
+                            sublabel: city
+                          })),
+                          {
+                            value: '__other__',
+                            label: '+ Other Area (Type custom location)...',
+                            sublabel: 'Custom colony, phase, or sector',
+                            isAction: true
+                          }
+                        ]}
                         value={localArea}
-                        onChange={(e) => setLocalArea(e.target.value)}
-                      >
-                        <option value="">-- Select Area in {city} --</option>
-                        {pakistaniCityAreas[city].map((a) => (
-                          <option key={a} value={a}>{a}</option>
-                        ))}
-                      </StyledNativeSelect>
-                    ) : (
-                      <input
-                        type="text"
-                        placeholder={city ? `Coverage across ${city}` : 'Enter local area name'}
-                        value={localArea}
-                        onChange={(e) => setLocalArea(e.target.value)}
-                        className="w-full px-4 py-2.5 bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-2 focus:ring-[#d4a359]/20 rounded-2xl text-xs text-slate-900 font-semibold outline-none transition-all shadow-2xs"
+                        onChange={(val) => {
+                          if (val === '__other__') {
+                            setIsCustomArea(true);
+                            if (pakistaniCityAreas[city]?.includes(localArea)) {
+                              setLocalArea('');
+                            }
+                          } else {
+                            setLocalArea(val);
+                          }
+                        }}
+                        placeholder={`Select Area in ${city}...`}
+                        searchable={true}
+                        allowCustom={true}
+                        variant="profile"
                       />
+                    ) : (
+                      <div className="space-y-1">
+                        <div className="relative flex items-center">
+                          <MapPin className="w-4 h-4 text-[#b85d34] absolute left-3.5 pointer-events-none z-10" />
+                          <input
+                            type="text"
+                            placeholder={city ? `Coverage or sector in ${city}...` : 'Enter local area name'}
+                            value={localArea}
+                            onChange={(e) => setLocalArea(e.target.value)}
+                            className="w-full pl-10 pr-28 py-2.5 bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-2 focus:ring-[#d4a359]/20 rounded-2xl text-xs text-slate-900 font-bold outline-none transition-all shadow-2xs h-[42px]"
+                          />
+                          {city && pakistaniCityAreas[city] && pakistaniCityAreas[city].length > 0 && (
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setIsCustomArea(false);
+                                if (!pakistaniCityAreas[city]?.includes(localArea)) {
+                                  setLocalArea('');
+                                }
+                              }}
+                              className="absolute right-2 px-2 py-1 text-[10px] font-bold text-[#b85d34] hover:text-white hover:bg-[#b85d34] rounded-xl border border-[#b85d34]/30 transition-all cursor-pointer shadow-2xs"
+                            >
+                              Choose from list
+                            </button>
+                          )}
+                        </div>
+                      </div>
                     )}
                   </div>
                 </div>

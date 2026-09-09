@@ -13,6 +13,8 @@ export default function CustomSelect({
   className = '',
   variant = 'default', // 'default' | 'hero' | 'filter' | 'form'
   placement = 'bottom', // 'bottom' | 'top'
+  allowCustom = false,
+  customPlaceholder = 'Add as custom value...',
   disabled = false
 }) {
   const [isOpen, setIsOpen] = useState(false);
@@ -64,12 +66,18 @@ export default function CustomSelect({
     hero: 'bg-transparent text-stone-900 font-semibold text-xs sm:text-sm py-2 px-2.5 rounded-full hover:bg-stone-100/90',
     default: 'bg-white border border-[#ebe3d3] text-[#141c19] font-medium text-xs sm:text-sm py-2.5 px-3.5 rounded-2xl hover:border-[#d4a359]/70 shadow-xs',
     filter: 'bg-white border border-[#ebe3d3] text-[#141c19] font-medium text-xs py-2 px-3 rounded-xl hover:border-[#d4a359] shadow-xs',
-    form: 'bg-white border border-stone-300 text-[#141c19] font-medium text-sm py-2.5 px-3.5 rounded-xl hover:border-[#d4a359] focus-within:border-[#d4a359] shadow-xs'
+    form: 'bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] text-slate-900 font-bold text-xs py-2.5 px-3.5 rounded-2xl shadow-2xs h-[42px] transition-all',
+    profile: 'bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] text-slate-900 font-bold text-xs py-2.5 px-3.5 rounded-2xl shadow-2xs h-[42px] transition-all'
   };
 
   const placementClass = placement === 'top'
     ? 'bottom-full mb-2'
     : 'top-full mt-1.5';
+
+  const hasValue = (selectedOption && selectedOption.value !== '') || (value && value !== '');
+  const displayLabel = selectedOption
+    ? (selectedOption.value !== '' ? selectedOption.label : placeholder)
+    : (value || placeholder);
 
   return (
     <div ref={containerRef} className={`relative select-none text-left ${className}`}>
@@ -84,19 +92,19 @@ export default function CustomSelect({
         className={`w-full flex items-center justify-between gap-2 transition-all cursor-pointer text-left outline-none ${
           variantStyles[variant] || variantStyles.default
         } ${disabled ? 'opacity-50 cursor-not-allowed' : ''} ${
-          isOpen ? 'ring-2 ring-[#d4a359]/40 border-[#d4a359]' : ''
+          isOpen ? 'ring-2 ring-[#d4a359]/40 border-[#d4a359] bg-white' : ''
         }`}
       >
         <div className="flex items-center gap-2 min-w-0 flex-1 truncate text-left">
           {Icon && <Icon className="w-4 h-4 text-[#b85d34] shrink-0" />}
-          <span className={`truncate text-left ${selectedOption ? 'font-bold text-[#141c19]' : 'text-stone-400 font-normal'}`}>
-            {selectedOption ? selectedOption.label : placeholder}
+          <span className={`truncate text-left ${hasValue ? 'font-bold text-[#141c19]' : 'text-stone-400 font-normal'}`}>
+            {displayLabel}
           </span>
         </div>
 
         <ChevronDown
           className={`w-4 h-4 shrink-0 transition-transform duration-200 ${
-            variant === 'hero' ? 'text-stone-600' : 'text-stone-400'
+            variant === 'hero' ? 'text-stone-600' : 'text-[#b85d34]'
           } ${isOpen ? (placement === 'top' ? '-rotate-180 text-[#b85d34]' : 'rotate-180 text-[#b85d34]') : ''}`}
         />
       </button>
@@ -105,7 +113,7 @@ export default function CustomSelect({
       {isOpen && (
         <div
           role="listbox"
-          className={`absolute left-0 ${placementClass} z-50 rounded-2xl bg-white border-2 border-[#d4a359]/60 shadow-2xl text-[#141c19] text-left overflow-hidden animate-in fade-in zoom-in-95 duration-150 w-full min-w-full sm:min-w-[260px] max-w-[420px]`}
+          className={`absolute left-0 ${placementClass} z-50 rounded-2xl bg-white border-2 border-[#d4a359]/70 shadow-2xl text-[#141c19] text-left overflow-hidden animate-in fade-in zoom-in-95 duration-150 w-full min-w-full sm:min-w-[260px] max-w-[420px]`}
         >
           {/* Search Bar */}
           {searchable && (
@@ -133,13 +141,36 @@ export default function CustomSelect({
 
           {/* Options List */}
           <div className="max-h-60 overflow-y-auto p-1.5 space-y-1 custom-scrollbar text-left bg-white">
-            {filteredOptions.length === 0 ? (
+            {/* Allow Custom Quick Action */}
+            {allowCustom && searchQuery.trim() && !filteredOptions.some(o => o.value?.toLowerCase() === searchQuery.trim().toLowerCase()) && (
+              <div
+                role="option"
+                onClick={() => {
+                  onChange(searchQuery.trim());
+                  setIsOpen(false);
+                  setSearchQuery('');
+                }}
+                className="p-2.5 my-1 rounded-xl bg-[#fdf6ec] hover:bg-[#faebd4] border border-[#d4a359] text-[#ba4c18] font-bold text-xs cursor-pointer flex items-center justify-between transition-all"
+              >
+                <div className="flex flex-col text-left min-w-0 pr-2">
+                  <span className="truncate">Use &ldquo;{searchQuery.trim()}&rdquo;</span>
+                  <span className="text-[10px] text-stone-500 font-normal">Add as custom area / location</span>
+                </div>
+                <span className="px-2.5 py-1 rounded-lg bg-[#ba4c18] text-white text-[10.5px] font-bold shrink-0 shadow-2xs">
+                  + Select
+                </span>
+              </div>
+            )}
+
+            {filteredOptions.length === 0 && (!allowCustom || !searchQuery.trim()) ? (
               <div className="p-4 text-center text-xs text-stone-500 font-medium">
                 No matching options found
               </div>
             ) : (
               filteredOptions.map((opt) => {
                 const isSelected = opt.value === value;
+                const isSpecial = opt.value === '__other__' || opt.isAction;
+
                 return (
                   <div
                     key={opt.value}
@@ -152,22 +183,32 @@ export default function CustomSelect({
                     className={`px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-all flex items-center justify-between gap-2.5 cursor-pointer text-left ${
                       isSelected
                         ? 'bg-[#0c2217] text-[#faf8f5] font-bold shadow-md'
+                        : isSpecial
+                        ? 'text-[#ba4c18] font-bold bg-[#fdfaf4] hover:bg-[#faebd4] border-t border-[#f0e6d6] mt-1'
                         : 'text-stone-800 hover:bg-[#f5f0e6] hover:text-[#0c2217]'
                     }`}
                   >
                     <div className="flex flex-col min-w-0 text-left">
-                      <span className={`font-semibold truncate text-left ${isSelected ? 'text-[#faf8f5]' : 'text-[#141c19]'}`}>
+                      <span className={`truncate text-left ${
+                        isSelected
+                          ? 'text-[#faf8f5] font-bold'
+                          : isSpecial
+                          ? 'text-[#ba4c18] font-bold'
+                          : 'text-[#141c19] font-semibold'
+                      }`}>
                         {opt.label}
                       </span>
                       {opt.sublabel && (
-                        <span className={`text-[10px] truncate text-left ${isSelected ? 'text-[#d4a359]' : 'text-stone-500'}`}>
+                        <span className={`text-[10px] truncate text-left ${
+                          isSelected ? 'text-[#d4a359]' : 'text-stone-500'
+                        }`}>
                           {opt.sublabel}
                         </span>
                       )}
                     </div>
 
                     <div className="flex items-center gap-1.5 shrink-0">
-                      {opt.sublabel && !isSelected && (
+                      {opt.sublabel && !isSelected && !isSpecial && (
                         <span className="text-[9px] font-semibold px-2 py-0.5 rounded-md bg-[#faf8f5] text-stone-600 border border-[#ebe3d3]">
                           {opt.sublabel.split(' ')[0]}
                         </span>
@@ -183,6 +224,7 @@ export default function CustomSelect({
           </div>
         </div>
       )}
+
 
     </div>
   );

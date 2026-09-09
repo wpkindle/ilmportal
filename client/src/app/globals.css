@@ -524,3 +524,20 @@ body.chat-widget-open #support-platform-pill {
 
 
 
+
+/* ── IlmiDunya brand spinner keyframes ─────────────────────── */
+@keyframes ilmi-dash-sm {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -120; }
+}
+@keyframes ilmi-dash-md {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -175; }
+}
+@keyframes ilmi-dash-lg {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: -235; }
+}
+.ilmi-arc-sm { animation: ilmi-dash-sm 1.1s linear infinite; }
+.ilmi-arc-md { animation: ilmi-dash-md 1.3s linear infinite; }
+.ilmi-arc-lg { animation: ilmi-dash-lg 1.5s linear infinite; }

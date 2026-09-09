@@ -280,9 +280,9 @@ const Navbar = () => {
   return (
     <>
       <PromotionTopBar />
-      <header className="sticky top-0 z-40 bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e6ded1] shadow-2xs">
+      <header className="sticky top-0 z-40 bg-[#faf8f5]/95 backdrop-blur-md border-b border-[#e6ded1] shadow-2xs relative">
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-14 sm:h-16">
+          <div className="flex items-center justify-between h-14 sm:h-16 gap-2 sm:gap-4">
           
           {/* Brand Logo & Tagline */}
           <Link href="/" className="flex items-center group py-1 shrink-0" title="IlmiDunya">
@@ -290,7 +290,7 @@ const Navbar = () => {
           </Link>
 
           {/* Desktop Nav Links */}
-          <nav className="hidden lg:flex items-center gap-1">
+          <nav className="hidden xl:flex items-center gap-1 xl:gap-1.5 2xl:gap-2">
             <Link
               href="/courses"
               className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
@@ -383,14 +383,15 @@ const Navbar = () => {
 
             <Link
               href="/safety"
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+              className={`px-2.5 xl:px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                 pathname === '/safety'
                   ? 'text-[#b85d34] bg-[#f5ebe6] border border-[#b85d34]/30'
                   : 'text-[#0c2217] hover:text-[#b85d34] hover:bg-[#f5ebe6]'
               }`}
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
-              <span>Female Safety &amp; Privacy</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34] shrink-0" />
+              <span className="hidden 2xl:inline">Female Safety &amp; Privacy</span>
+              <span className="2xl:hidden">Safety &amp; Privacy</span>
             </Link>
 
             <Link
@@ -410,10 +411,10 @@ const Navbar = () => {
           <div className="flex items-center gap-1 sm:gap-2 md:gap-3 shrink-0">
             {isAuthenticated ? (
               <div className="flex items-center gap-1 sm:gap-2 md:gap-3">
-                {/* Active Portal Badge Link */}
+                {/* Active Portal Badge Link (Shown on ultra-wide screens to prevent cramming) */}
                 <Link
                   href={getDashboardRoute()}
-                  className="hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#f5f0e6] text-[#0c2217] border border-[#d4a359]/40 text-xs font-bold hover:bg-[#ebe3d3] transition-colors shadow-xs"
+                  className="hidden 2xl:flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#f5f0e6] text-[#0c2217] border border-[#d4a359]/40 text-xs font-bold hover:bg-[#ebe3d3] transition-colors shadow-xs shrink-0"
                 >
                   <Layers className="w-3.5 h-3.5 text-[#b85d34]" />
                   <span>
@@ -597,7 +598,7 @@ const Navbar = () => {
                     </div>
 
                     {/* Desktop: Decent, elegant, modern profile box */}
-                    <div className="hidden sm:flex items-center gap-2.5 pl-1.5 pr-3 py-1.5 rounded-2xl bg-white border border-stone-200 hover:border-[#0c2217] hover:shadow-md transition-all shadow-2xs group">
+                    <div className="hidden sm:flex items-center gap-2 pl-1.5 pr-2.5 sm:pr-3 py-1.5 rounded-2xl bg-white border border-stone-200 hover:border-[#0c2217] hover:shadow-md transition-all shadow-2xs group shrink-0">
                       <div className="w-8 h-8 rounded-xl overflow-hidden ring-1 ring-[#d4a359]/30 group-hover:ring-[#d4a359]/60 transition-all shrink-0 relative">
                         <img
                           src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=0c2217&color=d4a359`}
@@ -606,7 +607,7 @@ const Navbar = () => {
                         />
                       </div>
                       <div className="text-left">
-                        <p className="text-xs font-bold text-stone-800 leading-tight max-w-[110px] truncate group-hover:text-[#0c2217] transition-colors">
+                        <p className="text-xs font-bold text-stone-800 leading-tight max-w-[80px] sm:max-w-[110px] truncate group-hover:text-[#0c2217] transition-colors">
                           {user?.name?.split(' ')[0]}
                         </p>
                         <span className="inline-block text-[9px] uppercase font-black tracking-wider text-[#0c2217] bg-[#f0ece1] px-1.5 py-0.2 rounded border border-[#d4a359]/30 mt-0.5">
@@ -715,7 +716,7 @@ const Navbar = () => {
               </div>
             ) : (
               /* Unauthenticated Dual Portal Buttons (Student & Tutor) - Desktop Only, shown inside mobile drawer on small screens */
-              <div className="hidden lg:flex items-center gap-1.5 sm:gap-2">
+              <div className="hidden xl:flex items-center gap-1.5 sm:gap-2">
                 <Link
                   href="/login?role=student"
                   className="flex items-center gap-1.5 px-3.5 py-1.5 bg-[#f5f0e6] hover:bg-[#ebe3d3] active:bg-[#e0d6c4] text-[#0c2217] text-xs font-bold rounded-xl shadow-xs transition-all border border-[#d4a359]/40 cursor-pointer"
@@ -737,7 +738,7 @@ const Navbar = () => {
             {/* Mobile Menu Toggle Button */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="lg:hidden p-1.5 sm:p-2.5 min-h-[38px] min-w-[38px] sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center rounded-xl text-slate-700 hover:bg-[#f0eae1] active:scale-95 transition-all"
+              className="xl:hidden p-1.5 sm:p-2.5 min-h-[38px] min-w-[38px] sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center rounded-xl text-slate-700 hover:bg-[#f0eae1] active:scale-95 transition-all cursor-pointer shrink-0"
               aria-label={mobileMenuOpen ? 'Close Navigation Menu' : 'Open Navigation Menu'}
             >
               {mobileMenuOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6 text-[#0c2217]" /> : <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-[#0c2217]" />}
@@ -758,7 +759,7 @@ const Navbar = () => {
           role="dialog"
           aria-modal="true"
           aria-label="Navigation Menu"
-          className="lg:hidden fixed inset-0 z-[999999] bg-[#faf8f5] flex flex-col w-full h-full min-h-screen overflow-hidden animate-in fade-in duration-150"
+          className="xl:hidden fixed inset-0 z-[999999] bg-[#faf8f5] flex flex-col w-full h-full min-h-screen overflow-hidden animate-in fade-in duration-150"
           style={{ height: '100dvh' }}
         >
           {/* Top Bar: Brand Logo & Close X Button */}
@@ -783,7 +784,35 @@ const Navbar = () => {
 
           {/* Scrollable Drawer Content */}
           <div className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 space-y-3 pb-36">
-            {!isAuthenticated && (
+            {isAuthenticated ? (
+              <div className="p-3.5 rounded-2xl bg-white border border-[#e6ded1] shadow-xs flex items-center justify-between gap-3">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-xl overflow-hidden ring-2 ring-[#d4a359]/40 shrink-0">
+                    <img
+                      src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=0c2217&color=d4a359`}
+                      alt={user?.name}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-stone-900 truncate">{user?.name}</p>
+                    <div className="flex items-center gap-1.5 mt-0.5">
+                      <span className="inline-block text-[9px] uppercase font-black tracking-wider text-[#0c2217] bg-[#f0ece1] px-1.5 py-0.5 rounded border border-[#d4a359]/30">
+                        {user?.role}
+                      </span>
+                      <span className="text-[10px] text-stone-500 truncate">{user?.email}</span>
+                    </div>
+                  </div>
+                </div>
+                <Link
+                  href={getDashboardRoute()}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="px-3 py-1.5 bg-[#0c2217] hover:bg-[#163826] text-[#f5d996] text-xs font-bold rounded-xl shrink-0 shadow-xs transition-colors"
+                >
+                  Dashboard
+                </Link>
+              </div>
+            ) : (
               <div className="grid grid-cols-2 gap-2 pb-3 border-b border-[#e6ded1]">
                 <Link
                   href="/login?role=student"

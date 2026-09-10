@@ -14,13 +14,24 @@ const getResendClient = () => {
   return resendClient;
 };
 
+const extractEmailAddress = (raw) => {
+  if (!raw) return 'info@ilmidunya.com';
+  const str = String(raw).trim();
+  const match = str.match(/<([^>]+)>/);
+  const candidate = (match ? match[1] : str.replace(/["']/g, '')).trim();
+  if (candidate && candidate.includes('@') && candidate.includes('.')) {
+    return candidate;
+  }
+  return 'info@ilmidunya.com';
+};
+
 /**
  * Send an email via Brevo HTTP API (Port 443 / HTTPS)
  */
 const sendViaBrevo = async ({ to, subject, html, text, replyTo }) => {
   if (!process.env.BREVO_API_KEY) return null;
 
-  const senderEmail = process.env.BREVO_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
+  const senderEmail = extractEmailAddress(process.env.BREVO_FROM || process.env.SMTP_FROM || process.env.RESEND_FROM);
   const senderName = 'IlmiDunya Pakistan';
 
   const recipientList = (Array.isArray(to) ? to : [to]).map((item) => {
@@ -113,8 +124,7 @@ const sendEmail = async ({
       return String(item).trim();
     });
 
-    const rawSender = process.env.RESEND_FROM || from;
-    const cleanEmail = (rawSender.match(/<([^>]+)>/) ? rawSender.match(/<([^>]+)>/)[1] : rawSender.replace(/["']/g, '')).trim();
+    const cleanEmail = extractEmailAddress(process.env.RESEND_FROM || process.env.SMTP_FROM || from);
     const sender = `IlmiDunya Pakistan <${cleanEmail}>`;
 
     const payload = {
@@ -132,6 +142,22 @@ const sendEmail = async ({
 
     if (response.error) {
       console.error('❌ [RESEND ERROR]:', response.error);
+      // Attempt fallback to SMTP / emailService before erroring out
+      try {
+        const { sendEmailDetailed } = require('../utils/emailService');
+        const fallbackResult = await sendEmailDetailed({
+          to: recipientList,
+          subject,
+          html,
+          text,
+          replyTo: replyTo || 'info@ilmidunya.com'
+        });
+        if (fallbackResult && fallbackResult.success) {
+          return fallbackResult;
+        }
+      } catch (fbErr) {
+        console.warn('⚠️ [FALLBACK DISPATCH FAILED]:', fbErr.message);
+      }
       throw new Error(response.error.message || 'Resend delivery failed');
     }
 
@@ -145,6 +171,21 @@ const sendEmail = async ({
     };
   } catch (error) {
     console.error('❌ [RESEND EXCEPTION]:', error.message);
+    try {
+      const { sendEmailDetailed } = require('../utils/emailService');
+      const fallbackResult = await sendEmailDetailed({
+        to,
+        subject,
+        html,
+        text,
+        replyTo: replyTo || 'info@ilmidunya.com'
+      });
+      if (fallbackResult && fallbackResult.success) {
+        return fallbackResult;
+      }
+    } catch (fbErr) {
+      console.warn('⚠️ [FALLBACK DISPATCH FAILED]:', fbErr.message);
+    }
     throw error;
   }
 };

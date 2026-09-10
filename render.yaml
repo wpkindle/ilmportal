@@ -21,6 +21,8 @@ services:
         value: info@ilmidunya.com
       - key: ADMIN_EMAIL
         value: info@ilmidunya.com
+      - key: RESEND_FROM
+        value: "IlmiDunya Pakistan <info@ilmidunya.com>"
       - key: SMTP_PASS
         sync: false
       - key: MONGODB_URI

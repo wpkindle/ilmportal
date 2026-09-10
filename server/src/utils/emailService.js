@@ -55,11 +55,20 @@ initTransporter();
 
 const getClientBaseUrl = () => process.env.CLIENT_URL || 'https://ilmidunya.com';
 
+const extractEmailAddress = (raw) => {
+  if (!raw) return 'info@ilmidunya.com';
+  const str = String(raw).trim();
+  const match = str.match(/<([^>]+)>/);
+  const candidate = (match ? match[1] : str.replace(/["']/g, '')).trim();
+  if (candidate && candidate.includes('@') && candidate.includes('.')) {
+    return candidate;
+  }
+  return 'info@ilmidunya.com';
+};
+
 // Helper to get formatted from address safely avoiding double brackets
 const getFromAddress = () => {
-  const raw = process.env.SMTP_FROM || process.env.RESEND_FROM || process.env.SMTP_USER || 'info@ilmidunya.com';
-  const match = raw.match(/<([^>]+)>/);
-  const cleanEmail = (match ? match[1] : raw.replace(/["']/g, '')).trim();
+  const cleanEmail = extractEmailAddress(process.env.SMTP_FROM || process.env.RESEND_FROM || process.env.SMTP_USER);
   return `"IlmiDunya Pakistan" <${cleanEmail}>`;
 };
 
@@ -70,8 +79,7 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
   // 1. Brevo HTTP API (https://api.brevo.com/v3/smtp/email) - where ilmidunya.com is authenticated
   if (process.env.BREVO_API_KEY) {
     try {
-      const rawFrom = process.env.BREVO_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
-      const cleanEmail = (rawFrom.match(/<([^>]+)>/) ? rawFrom.match(/<([^>]+)>/)[1] : rawFrom.replace(/["']/g, '')).trim();
+      const cleanEmail = extractEmailAddress(process.env.BREVO_FROM || process.env.SMTP_FROM || process.env.RESEND_FROM);
 
       const res = await fetch('https://api.brevo.com/v3/smtp/email', {
         method: 'POST',
@@ -105,8 +113,7 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
   // 2. Resend HTTP API (https://resend.com)
   if (process.env.RESEND_API_KEY) {
     try {
-      const rawFrom = process.env.RESEND_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
-      const cleanEmail = (rawFrom.match(/<([^>]+)>/) ? rawFrom.match(/<([^>]+)>/)[1] : rawFrom.replace(/["']/g, '')).trim();
+      const cleanEmail = extractEmailAddress(process.env.RESEND_FROM || process.env.SMTP_FROM);
       const fromAddr = `IlmiDunya Pakistan <${cleanEmail}>`;
 
       const res = await fetch('https://api.resend.com/emails', {
@@ -233,7 +240,7 @@ const sendEmailDetailed = async ({ to, subject, html, text, replyTo }) => {
     text: text || html.replace(/<[^>]*>?/gm, ''),
     html
   };
-  const replyToAddress = replyTo || process.env.RESEND_FROM || process.env.SMTP_FROM || 'info@ilmidunya.com';
+  const replyToAddress = replyTo || extractEmailAddress(process.env.RESEND_FROM || process.env.SMTP_FROM);
   if (replyToAddress) {
     mailPayload.replyTo = replyToAddress;
   }

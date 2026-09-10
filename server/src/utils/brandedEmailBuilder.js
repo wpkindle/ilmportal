@@ -163,9 +163,9 @@ const buildBrandedEmailHtml = ({
                 <table cellpadding="0" cellspacing="0" border="0" width="100%">
                   <tr>
                     <td style="vertical-align: middle; width: 48px; padding-right: 14px;">
-                      <div style="width: 44px; height: 44px; border-radius: 12px; background-color: #0c2217; border: 1px solid #d4a359; text-align: center; line-height: 44px; color: #d4a359; font-weight: 900; font-size: 18px; font-family: serif;">
-                        علم
-                      </div>
+                      <a href="${clientUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
+                        <img src="${clientUrl}/icon.png" alt="IlmiDunya Logo" width="44" height="44" style="display: block; width: 44px; height: 44px; border-radius: 10px; border: 1px solid #d4a359; background-color: #0c2217; object-fit: contain;" />
+                      </a>
                     </td>
                     <td style="vertical-align: middle;">
                       <div style="font-size: 14px; font-weight: 800; color: #0c2217; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">

@@ -151,9 +151,11 @@ function EmailTemplatePreview({ subject, body, recipientName, category = 'genera
 
           {/* Signature Block */}
           <div className="mt-6 pt-5 border-t border-[#e6ded1] flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-[#0c2217] text-[#d4a359] font-black font-serif text-lg flex items-center justify-center border border-[#d4a359] shrink-0">
-              علم
-            </div>
+            <img
+              src="/icon.png"
+              alt="IlmiDunya"
+              className="w-10 h-10 rounded-xl object-contain border border-[#d4a359] shrink-0 bg-[#0c2217]"
+            />
             <div className="text-[11px] leading-tight text-left">
               <div className="font-bold text-[#0c2217]">IlmiDunya Academic Faculty &amp; Support</div>
               <div className="text-[#78716c] mt-0.5">

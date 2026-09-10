@@ -24,13 +24,14 @@ const calculateProfileCompletion = (user, tutorProfile) => {
   if (user.role === 'tutor') {
     const checks = [
       { key: 'name', label: 'Full Name', weight: 10, done: !!user.name?.trim() },
-      { key: 'email', label: 'Verified Email', weight: 15, done: !!user.isVerified },
+      { key: 'email', label: 'Verified Email', weight: 10, done: !!user.isVerified },
       { key: 'avatar', label: 'Profile Picture', weight: 10, done: !!user.avatar?.trim() },
       { key: 'age', label: 'Tutor Age', weight: 10, done: !!user.age },
       { key: 'gender', label: 'Gender', weight: 5, done: !!user.gender?.trim() },
       { key: 'city', label: 'City Location', weight: 10, done: !!user.city?.trim() },
+      { key: 'subjects', label: 'Subjects & Classes', weight: 10, done: Array.isArray(tutorProfile?.subjects) && tutorProfile.subjects.length > 0 },
       { key: 'bio', label: 'Teaching Bio', weight: 15, done: !!tutorProfile?.bio?.trim() && tutorProfile.bio.length > 20 && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmPortal') && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmiDunya') },
-      { key: 'qualifications', label: 'Educational Qualifications', weight: 15, done: !!tutorProfile?.qualifications?.trim() && tutorProfile.qualifications !== 'Tutor Qualifications' },
+      { key: 'qualifications', label: 'Educational Qualifications', weight: 10, done: !!tutorProfile?.qualifications?.trim() && tutorProfile.qualifications !== 'Tutor Qualifications' },
       { key: 'sanad', label: 'Sanad / Degree Document', weight: 10, done: Array.isArray(tutorProfile?.sanadDocuments) && tutorProfile.sanadDocuments.length > 0 }
     ];
 
@@ -683,11 +684,16 @@ exports.updateProfile = async (req, res) => {
       if (experienceYears !== undefined) tutorProfile.experienceYears = Number(experienceYears);
       if (hourlyRate !== undefined) tutorProfile.hourlyRate = Number(hourlyRate);
       if (gender) tutorProfile.gender = gender;
-      if (teachingMode !== undefined) {
+      if (req.body.tutoringType !== undefined) tutorProfile.tutoringType = req.body.tutoringType;
+      if (req.body.subjects !== undefined) tutorProfile.subjects = req.body.subjects;
+      if (Array.isArray(req.body.teachingModes) && req.body.teachingModes.length > 0) {
+        tutorProfile.teachingModes = req.body.teachingModes;
+      } else if (teachingMode !== undefined) {
         tutorProfile.teachingModes = teachingMode === 'both' ? ['online', 'in_person'] : [teachingMode === 'physical' ? 'in_person' : teachingMode];
       }
 
       await tutorProfile.save();
+      await tutorProfile.populate('subjects', 'name slug type description subtopics');
 
       // Auto-transition verification status based on 100% completion
       const completion = calculateProfileCompletion(user, tutorProfile);

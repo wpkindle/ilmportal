@@ -34,7 +34,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       {
         key: 'email',
         label: 'Verified Email',
-        weight: 15,
+        weight: 10,
         done: !!user.isVerified,
         link: `/verify-email?email=${encodeURIComponent(user?.email || '')}&role=tutor`,
         actionLabel: 'Verify Email'
@@ -72,6 +72,14 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         actionLabel: 'Select City'
       },
       {
+        key: 'subjects',
+        label: 'Subjects & Classes',
+        weight: 10,
+        done: Array.isArray(tutorProfile?.subjects) && tutorProfile.subjects.length > 0,
+        link: '/tutor/profile#profile-subjects',
+        actionLabel: 'Select Subjects'
+      },
+      {
         key: 'bio',
         label: 'Teaching Bio & Headline',
         weight: 15,
@@ -82,7 +90,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       {
         key: 'qualifications',
         label: 'Educational Qualifications',
-        weight: 15,
+        weight: 10,
         done: !!tutorProfile?.qualifications?.trim() && tutorProfile.qualifications !== 'Tutor Qualifications',
         link: '/tutor/profile#profile-qualifications',
         actionLabel: 'Add Degrees'

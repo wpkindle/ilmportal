@@ -337,12 +337,14 @@ exports.updateMyTutorProfile = async (req, res) => {
       bio,
       qualifications,
       experienceYears,
+      hourlyRate,
       subjects,
       cities,
       city,
       localArea,
       area,
       teachingMode,
+      teachingModes,
       tutoringType,
       gender,
       sanadDocuments,
@@ -361,16 +363,22 @@ exports.updateMyTutorProfile = async (req, res) => {
         bio: bio || '',
         qualifications: qualifications || '',
         experienceYears: normalizedExp !== undefined ? normalizedExp : 1,
+        hourlyRate: hourlyRate !== undefined ? Number(hourlyRate) : 1500,
         city: city || '',
         localArea: (localArea !== undefined ? localArea : area || '').trim(),
         tutoringType: tutoringType || 'both',
         gender: gender || 'male',
+        subjects: Array.isArray(subjects) ? subjects : [],
+        teachingModes: Array.isArray(teachingModes) && teachingModes.length > 0
+          ? teachingModes
+          : (teachingMode ? (teachingMode === 'both' ? ['online', 'in_person'] : [teachingMode === 'physical' ? 'in_person' : teachingMode]) : ['online']),
         verificationStatus: 'under_review'
       });
     } else {
       if (bio !== undefined) profile.bio = bio;
       if (qualifications !== undefined) profile.qualifications = qualifications;
       if (normalizedExp !== undefined) profile.experienceYears = normalizedExp;
+      if (hourlyRate !== undefined) profile.hourlyRate = Number(hourlyRate);
       if (gender !== undefined) profile.gender = gender;
       if (tutoringType !== undefined) profile.tutoringType = tutoringType;
       if (subjects !== undefined) profile.subjects = subjects;
@@ -379,7 +387,9 @@ exports.updateMyTutorProfile = async (req, res) => {
       if (localArea !== undefined || area !== undefined) {
         profile.localArea = (localArea !== undefined ? localArea : area).trim();
       }
-      if (teachingMode !== undefined) {
+      if (Array.isArray(teachingModes) && teachingModes.length > 0) {
+        profile.teachingModes = teachingModes;
+      } else if (teachingMode !== undefined) {
         profile.teachingModes = teachingMode === 'both' ? ['online', 'in_person'] : [teachingMode === 'physical' ? 'in_person' : teachingMode];
       }
     }
@@ -462,6 +472,11 @@ exports.updateMyTutorProfile = async (req, res) => {
       }
       if (userUpdated) await userDoc.save();
     }
+
+    await profile.populate([
+      { path: 'subjects', select: 'name slug type description subtopics' },
+      { path: 'cities', select: 'name province' }
+    ]);
 
     res.status(200).json({
       success: true,

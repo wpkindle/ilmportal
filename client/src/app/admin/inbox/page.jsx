@@ -33,8 +33,32 @@ import {
   GraduationCap,
   Paperclip,
   Eye,
-  Edit3
+  Edit3,
+  Radio,
+  Copy
 } from 'lucide-react';
+
+// Helper to extract counterparty contact details for any thread
+const getThreadCounterparty = (thread) => {
+  if (!thread) return { name: 'Unknown', address: '' };
+  if (thread.from?.address && thread.from.address !== 'info@ilmidunya.com') {
+    return {
+      name: thread.from.name || thread.from.address.split('@')[0],
+      address: thread.from.address
+    };
+  }
+  if (thread.to && Array.isArray(thread.to) && thread.to.length > 0) {
+    const external = thread.to.find(t => t.address && t.address !== 'info@ilmidunya.com') || thread.to[0];
+    return {
+      name: external.name || (external.address ? external.address.split('@')[0] : 'Inquirer'),
+      address: external.address || ''
+    };
+  }
+  return {
+    name: thread.from?.name || 'Contact',
+    address: thread.from?.address || 'info@ilmidunya.com'
+  };
+};
 
 const CATEGORY_LABELS = {
   all: 'All Messages',
@@ -196,6 +220,15 @@ export default function AdminMailboxPage() {
   const [composeTab, setComposeTab] = useState('edit'); // 'edit' or 'preview'
   const [replyPreviewOpen, setReplyPreviewOpen] = useState(false);
   const [actionNotice, setActionNotice] = useState('');
+
+  // Inbound Webhook Setup & Simulation Form
+  const [webhookModalOpen, setWebhookModalOpen] = useState(false);
+  const [webhookTab, setWebhookTab] = useState('simulate'); // 'simulate' or 'guide'
+  const [simulateFrom, setSimulateFrom] = useState('');
+  const [simulateSubject, setSimulateSubject] = useState('');
+  const [simulateText, setSimulateText] = useState('');
+  const [simulating, setSimulating] = useState(false);
+  const [copiedWebhookUrl, setCopiedWebhookUrl] = useState(false);
 
   const messagesEndRef = useRef(null);
 
@@ -398,6 +431,41 @@ export default function AdminMailboxPage() {
     }
   };
 
+  const handleSimulateInbound = async (e) => {
+    e.preventDefault();
+    if (!simulateFrom || !simulateFrom.trim()) {
+      alert('Please enter a sender email address');
+      return;
+    }
+    setSimulating(true);
+    try {
+      const res = await api.simulateInboundEmail({
+        from: simulateFrom.trim(),
+        subject: simulateSubject.trim() || 'Inquiry / Reply',
+        text: simulateText.trim() || 'This is a simulated inbound message received at info@ilmidunya.com.'
+      });
+      setActionNotice('Inbound message received and synced to inbox!');
+      setTimeout(() => setActionNotice(''), 4000);
+      setWebhookModalOpen(false);
+      setSimulateText('');
+      await fetchThreads(true);
+      if (res?.thread?.threadId) {
+        await loadThreadDetails(res.thread.threadId);
+      }
+    } catch (err) {
+      alert(err.message || 'Failed to simulate inbound email');
+    } finally {
+      setSimulating(false);
+    }
+  };
+
+  const handleCopyWebhookUrl = () => {
+    const webhookUrl = 'https://ilmportal-backend.onrender.com/api/emails/webhook';
+    navigator.clipboard.writeText(webhookUrl);
+    setCopiedWebhookUrl(true);
+    setTimeout(() => setCopiedWebhookUrl(false), 2500);
+  };
+
   const formatTimeAgo = (dateStr) => {
     if (!dateStr) return '';
     const date = new Date(dateStr);
@@ -442,7 +510,7 @@ export default function AdminMailboxPage() {
                 </span>
               </div>
               <p className="text-xs text-slate-400 mt-0.5">
-                Official inquiries, faculty Sanad applications, and student admissions
+                Manage all customer inquiries, student admissions, tutor Sanad verifications, and direct replies.
               </p>
             </div>
           </div>
@@ -459,6 +527,23 @@ export default function AdminMailboxPage() {
                 <span>Load Sample Inquiries</span>
               </button>
             )}
+
+            <button
+              type="button"
+              onClick={() => {
+                if (selectedThread) {
+                  const cp = getThreadCounterparty(selectedThread);
+                  setSimulateFrom(cp.address || '');
+                  setSimulateSubject(selectedThread.subject?.startsWith('Re:') ? selectedThread.subject : `Re: ${selectedThread.subject || ''}`);
+                }
+                setWebhookModalOpen(true);
+              }}
+              className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-bold flex items-center gap-1.5 transition cursor-pointer shadow-xs"
+              title="Connect Inbound Email & Live Webhook"
+            >
+              <Radio className="w-3.5 h-3.5 text-emerald-400" />
+              <span className="hidden sm:inline">Inbound Setup &amp; Test</span>
+            </button>
 
             <button
               type="button"
@@ -597,7 +682,10 @@ export default function AdminMailboxPage() {
                           )}
 
                           <span className={`text-xs truncate ${isUnread ? 'font-black text-white' : 'font-semibold text-slate-300'}`}>
-                            {thread.from?.name || thread.from?.address || 'Unknown'}
+                            {(() => {
+                              const cp = getThreadCounterparty(thread);
+                              return cp.name || cp.address || 'Inquirer';
+                            })()}
                           </span>
 
                           {/* Role Badge */}
@@ -743,33 +831,40 @@ export default function AdminMailboxPage() {
                   {/* Sender Profile Header Card */}
                   <div className="p-3 rounded-2xl bg-slate-950/80 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
                     <div className="flex items-center gap-3">
-                      <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-800 text-white font-black flex items-center justify-center shrink-0 shadow">
-                        {(selectedThread.from?.name || selectedThread.from?.address || 'U').charAt(0).toUpperCase()}
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2 flex-wrap">
-                          <span className="font-bold text-white">
-                            {selectedThread.from?.name || 'Inquirer'}
-                          </span>
-                          <span className="text-slate-400 font-mono text-[11px]">
-                            &lt;{selectedThread.from?.address}&gt;
-                          </span>
-                          {selectedThread.userRole && selectedThread.userRole !== 'guest' && (
-                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
-                              selectedThread.userRole === 'tutor'
-                                ? 'bg-emerald-950 text-emerald-300 border border-emerald-700'
-                                : 'bg-sky-950 text-sky-300 border border-sky-700'
-                            }`}>
-                              Registered {selectedThread.userRole}
-                            </span>
-                          )}
-                        </div>
-                        <div className="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5">
-                          <span>To: <strong>info@ilmidunya.com</strong></span>
-                          <span>•</span>
-                          <span>Category: <strong>{CATEGORY_LABELS[selectedThread.category] || selectedThread.category}</strong></span>
-                        </div>
-                      </div>
+                      {(() => {
+                        const cp = getThreadCounterparty(selectedThread);
+                        return (
+                          <>
+                            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-600 to-teal-800 text-white font-black flex items-center justify-center shrink-0 shadow">
+                              {(cp.name || cp.address || 'U').charAt(0).toUpperCase()}
+                            </div>
+                            <div>
+                              <div className="flex items-center gap-2 flex-wrap">
+                                <span className="font-bold text-white">
+                                  {cp.name || 'Inquirer'}
+                                </span>
+                                <span className="text-slate-400 font-mono text-[11px]">
+                                  &lt;{cp.address || ''}&gt;
+                                </span>
+                                {selectedThread.userRole && selectedThread.userRole !== 'guest' && (
+                                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${
+                                    selectedThread.userRole === 'tutor'
+                                      ? 'bg-emerald-950 text-emerald-300 border border-emerald-700'
+                                      : 'bg-sky-950 text-sky-300 border border-sky-700'
+                                  }`}>
+                                    Registered {selectedThread.userRole}
+                                  </span>
+                                )}
+                              </div>
+                              <div className="text-[11px] text-slate-400 flex items-center gap-2 mt-0.5">
+                                <span>Channel: <strong>info@ilmidunya.com</strong></span>
+                                <span>•</span>
+                                <span>Category: <strong>{CATEGORY_LABELS[selectedThread.category] || selectedThread.category}</strong></span>
+                              </div>
+                            </div>
+                          </>
+                        );
+                      })()}
                     </div>
 
                     {/* Matched LMS User Actions */}
@@ -1179,6 +1274,217 @@ export default function AdminMailboxPage() {
                 </div>
               </form>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ==================================================== */}
+      {/* 4. INBOUND SETUP & SIMULATOR MODAL */}
+      {/* ==================================================== */}
+      {webhookModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-fadeIn">
+          <div className="w-full max-w-xl bg-slate-900 border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            {/* Modal Header */}
+            <div className="p-4 sm:p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/90">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                  <Radio className="w-4 h-4" />
+                </div>
+                <div>
+                  <h3 className="text-sm sm:text-base font-black text-white flex items-center gap-2">
+                    <span>Inbound Email Integration &amp; Test</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-950 text-emerald-300 border border-emerald-800 font-bold">
+                      Live Gateway
+                    </span>
+                  </h3>
+                  <p className="text-[11px] text-slate-400">
+                    Receive and synchronize incoming replies to <strong>info@ilmidunya.com</strong>
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setWebhookModalOpen(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            {/* Modal Tabs */}
+            <div className="flex items-center border-b border-slate-800 bg-slate-950/50 px-5 pt-2">
+              <button
+                type="button"
+                onClick={() => setWebhookTab('simulate')}
+                className={`pb-2.5 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
+                  webhookTab === 'simulate'
+                    ? 'border-emerald-400 text-emerald-400'
+                    : 'border-transparent text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Simulate Inbound Reply</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setWebhookTab('guide')}
+                className={`pb-2.5 px-3 text-xs font-bold transition-all border-b-2 cursor-pointer flex items-center gap-1.5 ${
+                  webhookTab === 'guide'
+                    ? 'border-emerald-400 text-emerald-400'
+                    : 'border-transparent text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Production Webhook Setup</span>
+              </button>
+            </div>
+
+            {/* Modal Body */}
+            <div className="p-5 overflow-y-auto space-y-4">
+              {webhookTab === 'simulate' ? (
+                <form onSubmit={handleSimulateInbound} className="space-y-4">
+                  <div className="p-3.5 rounded-2xl bg-emerald-950/30 border border-emerald-800/40 text-xs text-emerald-200 leading-relaxed">
+                    <strong>Instant Test:</strong> Simulate a customer or tutor replying to an email thread from Gmail, Yahoo, or Outlook. The system matches the reply to the conversation and updates this inbox in real-time.
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                      Sender Email (From):
+                    </label>
+                    <input
+                      type="email"
+                      required
+                      value={simulateFrom}
+                      onChange={(e) => setSimulateFrom(e.target.value)}
+                      placeholder="e.g., student@gmail.com or tutor@example.com"
+                      className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-xs focus:outline-none focus:border-emerald-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                      Subject:
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={simulateSubject}
+                      onChange={(e) => setSimulateSubject(e.target.value)}
+                      placeholder="e.g., Re: Quran Tajweed Trial Class Booking"
+                      className="w-full p-2.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-xs focus:outline-none focus:border-emerald-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                      Inbound Reply Content:
+                    </label>
+                    <textarea
+                      rows={4}
+                      required
+                      value={simulateText}
+                      onChange={(e) => setSimulateText(e.target.value)}
+                      placeholder="Write the message that was sent to info@ilmidunya.com..."
+                      className="w-full p-3 rounded-xl bg-slate-950 border border-slate-800 text-slate-100 text-xs focus:outline-none focus:border-emerald-400 font-sans resize-none"
+                    />
+                  </div>
+
+                  <div className="pt-2 flex items-center justify-end gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setWebhookModalOpen(false)}
+                      className="px-4 py-2 rounded-xl border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold cursor-pointer"
+                    >
+                      Cancel
+                    </button>
+
+                    <button
+                      type="submit"
+                      disabled={simulating}
+                      className="px-5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-black text-xs flex items-center gap-2 shadow-lg disabled:opacity-50 cursor-pointer"
+                    >
+                      {simulating ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          <span>Simulating Inbound...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-3.5 h-3.5" />
+                          <span>Deliver Inbound Reply</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <div className="space-y-4 text-xs">
+                  <div>
+                    <label className="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">
+                      Your Production Inbound Webhook URL:
+                    </label>
+                    <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-950 border border-slate-800 font-mono text-[11px] text-emerald-400 break-all">
+                      <span className="flex-1 select-all">https://ilmportal-backend.onrender.com/api/emails/webhook</span>
+                      <button
+                        type="button"
+                        onClick={handleCopyWebhookUrl}
+                        className="px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold flex items-center gap-1 shrink-0 cursor-pointer transition"
+                      >
+                        {copiedWebhookUrl ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-400" />
+                            <span className="text-emerald-400">Copied!</span>
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="w-3.5 h-3.5" />
+                            <span>Copy</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="space-y-3 pt-1">
+                    <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+                      <div className="flex items-center gap-2 text-white font-bold">
+                        <span className="w-5 h-5 rounded-full bg-[#d4a359]/20 text-[#d4a359] text-[11px] flex items-center justify-center font-black">1</span>
+                        <span>Option A: Resend Webhook (Native Integration)</span>
+                      </div>
+                      <ol className="list-decimal list-inside text-slate-400 space-y-1 pl-1 text-[11px] leading-relaxed">
+                        <li>Log in to your <strong>Resend Dashboard</strong> (<a href="https://resend.com/webhooks" target="_blank" rel="noopener noreferrer" className="text-[#d4a359] underline">resend.com/webhooks</a>).</li>
+                        <li>Click <strong>Add Webhook</strong>, paste your URL above, and check the <strong>email.received</strong> event.</li>
+                        <li>Under your Domain DNS, ensure Resend's MX records are configured for receiving.</li>
+                      </ol>
+                    </div>
+
+                    <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2">
+                      <div className="flex items-center gap-2 text-white font-bold">
+                        <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 text-[11px] flex items-center justify-center font-black">2</span>
+                        <span>Option B: Cloudmailin / Email Forwarding Webhook</span>
+                      </div>
+                      <ol className="list-decimal list-inside text-slate-400 space-y-1 pl-1 text-[11px] leading-relaxed">
+                        <li>Register a free account at <strong>Cloudmailin.com</strong> (no credit card needed).</li>
+                        <li>Set the Target HTTP POST Address to the Webhook URL above.</li>
+                        <li>In your domain host (e.g. Namecheap Email Forwarding), forward <code className="text-slate-200">info@ilmidunya.com</code> to your Cloudmailin address.</li>
+                        <li>Every client reply will automatically stream into this dashboard within seconds!</li>
+                      </ol>
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={() => setWebhookModalOpen(false)}
+                      className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold cursor-pointer transition"
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}

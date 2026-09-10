@@ -837,6 +837,12 @@ export const api = {
     headers: getHeaders()
   }).then(handleResponse),
 
+  simulateInboundEmail: (body) => fetch(`${API_BASE}/emails/simulate-inbound`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
   // Articles & Editorial
   getArticles: (params = {}) => {
     const query = new URLSearchParams(params).toString();

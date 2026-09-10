@@ -10,7 +10,7 @@ const { buildBrandedEmailHtml } = require('../utils/brandedEmailBuilder');
 
 // Helper to sanitize subject lines for threading (remove Re:, Fwd:)
 const cleanSubject = (subject = '') => {
-  return subject.replace(/^(re|fwd|fw):\s*/i, '').trim();
+  return subject.replace(/^((re|fwd|fw):\s*)+/i, '').trim();
 };
 
 // Helper to determine category from content
@@ -31,144 +31,218 @@ const detectCategory = (subject = '', text = '') => {
   return 'general';
 };
 
+// Helper to parse inbound payload from multiple webhook providers (Resend, Cloudmailin, Brevo, SendGrid, JSON)
+const parseInboundPayload = async (payload) => {
+  let emailData = payload || {};
+
+  // 1. Resend Inbound Webhook ({ type: 'email.received', data: { email_id, ... } })
+  const resendIncomingId = payload.data?.email_id || payload.data?.id || payload.email_id;
+  if (resendIncomingId) {
+    const fullEmail = await getInboundEmail(resendIncomingId);
+    if (fullEmail) {
+      emailData = {
+        messageId: resendIncomingId,
+        from: fullEmail.from || payload.data?.from,
+        to: fullEmail.to || payload.data?.to,
+        subject: fullEmail.subject || payload.data?.subject,
+        text: fullEmail.text || '',
+        html: fullEmail.html || '',
+        attachments: fullEmail.attachments || []
+      };
+    } else if (payload.data) {
+      emailData = {
+        messageId: resendIncomingId,
+        from: payload.data.from,
+        to: payload.data.to,
+        subject: payload.data.subject,
+        text: payload.data.text || '',
+        html: payload.data.html || '',
+        attachments: payload.data.attachments || []
+      };
+    }
+  }
+
+  // 2. Cloudmailin Format ({ headers: { From, To, Subject }, plain, html })
+  if (payload.headers && (payload.plain || payload.html)) {
+    emailData = {
+      from: payload.headers.From || payload.envelope?.from || payload.from,
+      to: payload.headers.To || payload.envelope?.to || payload.to,
+      subject: payload.headers.Subject || payload.subject,
+      text: payload.plain || '',
+      html: payload.html || '',
+      attachments: payload.attachments || []
+    };
+  }
+
+  // 3. Brevo Inbound Format ({ items: [ { From, Subject, ... } ] })
+  if (Array.isArray(payload.items) && payload.items.length > 0) {
+    const item = payload.items[0];
+    emailData = {
+      from: item.From?.Address ? `${item.From.Name || ''} <${item.From.Address}>` : item.From,
+      to: item.To?.[0]?.Address || 'info@ilmidunya.com',
+      subject: item.Subject,
+      text: item.ExtractedMarkdownMessage || '',
+      html: item.RawHtml || '',
+      attachments: item.Attachments || []
+    };
+  }
+
+  let rawFrom = emailData.from || '';
+  if (Array.isArray(rawFrom) && rawFrom.length > 0) rawFrom = rawFrom[0];
+
+  let rawTo = emailData.to || 'info@ilmidunya.com';
+  if (Array.isArray(rawTo) && rawTo.length > 0) rawTo = rawTo[0];
+
+  const subject = (emailData.subject || '(No Subject)').trim();
+  const html = emailData.html || '';
+  const text = emailData.text || (html ? html.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim() : '');
+
+  let senderAddress = '';
+  let senderName = '';
+
+  if (typeof rawFrom === 'string') {
+    const match = rawFrom.match(/(.*)<([^>]+)>/);
+    if (match) {
+      senderName = match[1].trim().replace(/^["']|["']$/g, '');
+      senderAddress = match[2].trim().toLowerCase();
+    } else {
+      senderAddress = rawFrom.trim().toLowerCase();
+      senderName = senderAddress.split('@')[0];
+    }
+  } else if (typeof rawFrom === 'object' && rawFrom !== null) {
+    senderAddress = (rawFrom.address || rawFrom.email || '').trim().toLowerCase();
+    senderName = rawFrom.name || senderAddress.split('@')[0];
+  }
+
+  return {
+    messageId: emailData.messageId || `in_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
+    senderName: senderName || 'User',
+    senderAddress,
+    rawTo,
+    subject,
+    text,
+    html,
+    attachments: emailData.attachments || []
+  };
+};
+
+// Core processor for inbound messages & replies
+const processInboundMessage = async (inboundData, io = null) => {
+  const { messageId, senderName, senderAddress, subject, text, html, attachments } = inboundData;
+
+  if (!senderAddress) {
+    throw new Error('Invalid sender email address');
+  }
+
+  // Check if sender is a registered user in LMS
+  const matchedUser = await User.findOne({ email: senderAddress }).select('name role avatar phone city');
+  const userRole = matchedUser ? matchedUser.role : 'guest';
+  const userRef = matchedUser ? matchedUser._id : null;
+
+  // Find existing thread with matching counterparty and normalized subject
+  const normalizedSub = cleanSubject(subject);
+  const escapedSub = normalizedSub ? normalizedSub.replace(/[.*+?^${}()|[\]\\]/g, '\\$&') : '';
+
+  let thread = null;
+
+  // 1. Try matching by subject AND counterparty address involvement
+  if (escapedSub) {
+    thread = await EmailThread.findOne({
+      status: { $ne: 'archived' },
+      $and: [
+        {
+          $or: [
+            { 'from.address': senderAddress },
+            { 'to.address': senderAddress },
+            { 'messages.from.address': senderAddress },
+            { 'messages.to.address': senderAddress }
+          ]
+        },
+        { subject: new RegExp(escapedSub, 'i') }
+      ]
+    }).sort({ lastMessageAt: -1 });
+  }
+
+  // 2. Fallback: match most recent active conversation with this sender within 14 days
+  if (!thread) {
+    thread = await EmailThread.findOne({
+      status: { $ne: 'archived' },
+      $or: [
+        { 'from.address': senderAddress },
+        { 'to.address': senderAddress },
+        { 'messages.from.address': senderAddress },
+        { 'messages.to.address': senderAddress }
+      ],
+      lastMessageAt: { $gte: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000) }
+    }).sort({ lastMessageAt: -1 });
+  }
+
+  const newMessageItem = {
+    messageId,
+    direction: 'inbound',
+    from: { name: senderName, address: senderAddress },
+    to: [{ name: 'IlmiDunya Support', address: 'info@ilmidunya.com' }],
+    subject,
+    text,
+    html,
+    attachments: attachments || [],
+    createdAt: new Date()
+  };
+
+  const snippet = (text || subject || '').slice(0, 160).replace(/\s+/g, ' ');
+
+  if (thread) {
+    thread.messages.push(newMessageItem);
+    thread.status = 'unread';
+    thread.lastMessageSnippet = snippet;
+    thread.lastMessageAt = new Date();
+    if (!thread.userRef && userRef) {
+      thread.userRef = userRef;
+      thread.userRole = userRole;
+    }
+    await thread.save();
+  } else {
+    thread = await EmailThread.create({
+      threadId: `th_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
+      subject,
+      from: { name: senderName, address: senderAddress },
+      to: [{ name: 'IlmiDunya Support', address: 'info@ilmidunya.com' }],
+      status: 'unread',
+      category: detectCategory(subject, text),
+      userRef,
+      userRole,
+      messages: [newMessageItem],
+      lastMessageSnippet: snippet,
+      lastMessageAt: new Date()
+    });
+  }
+
+  // Emit live socket event to connected admin dashboards
+  if (io) {
+    io.emit('email-received', {
+      threadId: thread.threadId,
+      from: thread.from,
+      subject: thread.subject,
+      snippet: thread.lastMessageSnippet,
+      category: thread.category,
+      userRole: thread.userRole
+    });
+  }
+
+  return thread;
+};
+
 // ==========================================
-// 1. PUBLIC INBOUND WEBHOOK (For Resend)
+// 1. PUBLIC INBOUND WEBHOOK (Resend, Cloudmailin, Brevo, SendGrid)
 // ==========================================
 router.post('/webhook', async (req, res) => {
   try {
     const payload = req.body;
     console.log('📥 [EMAIL WEBHOOK RECEIVED]:', JSON.stringify(payload).slice(0, 300));
 
-    let emailData = payload;
-
-    // Handle Resend standard webhook structure: { type: 'email.received', data: { email_id, id, from, to, subject } }
-    const incomingId = payload.data?.email_id || payload.data?.id || payload.email_id;
-    if (incomingId) {
-      const fullEmail = await getInboundEmail(incomingId);
-      if (fullEmail) {
-        emailData = {
-          messageId: incomingId,
-          from: fullEmail.from || payload.data?.from,
-          to: fullEmail.to || payload.data?.to,
-          subject: fullEmail.subject || payload.data?.subject,
-          text: fullEmail.text || '',
-          html: fullEmail.html || '',
-          attachments: fullEmail.attachments || []
-        };
-      } else if (payload.data) {
-        emailData = {
-          messageId: incomingId,
-          from: payload.data.from,
-          to: payload.data.to,
-          subject: payload.data.subject,
-          text: payload.data.text || '',
-          html: payload.data.html || '',
-          attachments: payload.data.attachments || []
-        };
-      }
-    }
-
-    let rawFrom = emailData.from || '';
-    if (Array.isArray(rawFrom) && rawFrom.length > 0) {
-      rawFrom = rawFrom[0];
-    }
-    let rawTo = emailData.to || 'info@ilmidunya.com';
-    if (Array.isArray(rawTo) && rawTo.length > 0) {
-      rawTo = rawTo[0];
-    }
-    const subject = emailData.subject || '(No Subject)';
-    const html = emailData.html || '';
-    const text = emailData.text || (html ? html.replace(/<[^>]*>?/gm, ' ').replace(/\s+/g, ' ').trim() : '');
-
-    // Extract email and name
-    let senderAddress = '';
-    let senderName = '';
-    if (typeof rawFrom === 'string') {
-      const match = rawFrom.match(/(.*)<(.*)>/);
-      if (match) {
-        senderName = match[1].trim().replace(/^["']|["']$/g, '');
-        senderAddress = match[2].trim().toLowerCase();
-      } else {
-        senderAddress = rawFrom.trim().toLowerCase();
-        senderName = senderAddress.split('@')[0];
-      }
-    } else if (typeof rawFrom === 'object' && rawFrom !== null) {
-      senderAddress = (rawFrom.address || rawFrom.email || '').trim().toLowerCase();
-      senderName = rawFrom.name || senderAddress.split('@')[0];
-    }
-
-    if (!senderAddress) {
-      return res.status(400).json({ success: false, message: 'Invalid sender email address' });
-    }
-
-    // Check if sender is a registered user in LMS
-    const matchedUser = await User.findOne({ email: senderAddress }).select('name role avatar phone city');
-    const userRole = matchedUser ? matchedUser.role : 'guest';
-    const userRef = matchedUser ? matchedUser._id : null;
-
-    // Find existing thread with matching sender and normalized subject
-    const normalizedSub = cleanSubject(subject);
-    let thread = await EmailThread.findOne({
-      'from.address': senderAddress,
-      status: { $ne: 'archived' },
-      $or: [
-        { subject: new RegExp(normalizedSub.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') },
-        { lastMessageAt: { $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } } // Within last 7 days
-      ]
-    });
-
-    const newMessageItem = {
-      messageId: emailData.messageId || `in_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
-      direction: 'inbound',
-      from: { name: senderName, address: senderAddress },
-      to: [{ name: 'IlmiDunya Support', address: 'info@ilmidunya.com' }],
-      subject,
-      text,
-      html,
-      attachments: emailData.attachments || [],
-      createdAt: new Date()
-    };
-
-    const snippet = (text || subject || '').slice(0, 160).replace(/\s+/g, ' ');
-
-    if (thread) {
-      thread.messages.push(newMessageItem);
-      thread.status = 'unread';
-      thread.lastMessageSnippet = snippet;
-      thread.lastMessageAt = new Date();
-      if (!thread.userRef && userRef) {
-        thread.userRef = userRef;
-        thread.userRole = userRole;
-      }
-      await thread.save();
-    } else {
-      thread = await EmailThread.create({
-        threadId: `th_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
-        subject,
-        from: { name: senderName, address: senderAddress },
-        to: [{ name: 'IlmiDunya Support', address: 'info@ilmidunya.com' }],
-        status: 'unread',
-        category: detectCategory(subject, text),
-        userRef,
-        userRole,
-        messages: [newMessageItem],
-        lastMessageSnippet: snippet,
-        lastMessageAt: new Date()
-      });
-    }
-
-    // Emit live socket event to connected admin dashboards
+    const parsedData = await parseInboundPayload(payload);
     const io = req.app.get('io');
-    if (io) {
-      io.emit('email-received', {
-        threadId: thread.threadId,
-        from: thread.from,
-        subject: thread.subject,
-        snippet: thread.lastMessageSnippet,
-        category: thread.category,
-        userRole: thread.userRole
-      });
-    }
+    const thread = await processInboundMessage(parsedData, io);
 
     return res.status(200).json({
       success: true,
@@ -392,8 +466,8 @@ router.post('/compose', async (req, res) => {
     const newThread = await EmailThread.create({
       threadId: `th_${Date.now()}_${crypto.randomBytes(4).toString('hex')}`,
       subject: subject.trim(),
-      from: { name: 'IlmiDunya Admin', address: 'info@ilmidunya.com' },
-      to: [{ name: matchedUser?.name || recipientAddress, address: recipientAddress }],
+      from: { name: matchedUser?.name || recipientAddress.split('@')[0], address: recipientAddress },
+      to: [{ name: 'IlmiDunya Admin', address: 'info@ilmidunya.com' }],
       status: 'replied',
       category,
       userRef,
@@ -567,6 +641,37 @@ router.post('/seed-demo', async (req, res) => {
       count: demoThreads.length
     });
   } catch (error) {
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
+// POST /api/emails/simulate-inbound - Admin tool to simulate or trigger an incoming reply
+router.post('/simulate-inbound', async (req, res) => {
+  try {
+    const { from, subject, text, html } = req.body;
+
+    if (!from || !from.trim()) {
+      return res.status(400).json({ success: false, message: 'Sender email is required' });
+    }
+
+    const parsedData = await parseInboundPayload({
+      from,
+      to: 'info@ilmidunya.com',
+      subject: subject || 'Reply from ' + from,
+      text: text || '',
+      html: html || ''
+    });
+
+    const io = req.app.get('io');
+    const thread = await processInboundMessage(parsedData, io);
+
+    res.status(200).json({
+      success: true,
+      message: 'Inbound message processed and matched to conversation',
+      thread
+    });
+  } catch (error) {
+    console.error('❌ [SIMULATE INBOUND ERROR]:', error);
     res.status(500).json({ success: false, message: error.message });
   }
 });

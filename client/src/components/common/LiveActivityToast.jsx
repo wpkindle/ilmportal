@@ -24,7 +24,7 @@ const activities = [
     action: 'just booked a 3-Day Free Trial for',
     subject: 'Board Exam Physics (SSC & HSSC)',
     tutor: 'Engr. Bilal Ahmad',
-    avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&q=80',
+    avatar: 'https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80',
     timeAgo: 'Just now',
     typeLabel: 'Free Trial',
     badgeClass: 'bg-[#d4a359]/20 text-[#d4a359] border-[#d4a359]/30'
@@ -36,7 +36,7 @@ const activities = [
     action: 'enrolled in live 1:1 classes for',
     subject: 'Tajweed al-Quran & Makharij',
     tutor: 'Qari Muhammad Huzaifa',
-    avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=120&q=80',
+    avatar: 'https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=150&auto=format&fit=crop&q=80',
     timeAgo: '1 min ago',
     typeLabel: 'Enrolled',
     badgeClass: 'bg-[#b85d34]/20 text-[#e07a4a] border-[#b85d34]/30'
@@ -48,7 +48,7 @@ const activities = [
     action: 'verified tuition payment via JazzCash for',
     subject: 'FSc Pre-Medical Biology',
     tutor: 'Dr. Ayesha Tariq',
-    avatar: '/images/dr-ayesha.jpg',
+    avatar: 'https://images.unsplash.com/photo-1517677208171-0bc6725a3e60?w=150&auto=format&fit=crop&q=80',
     timeAgo: '2 mins ago',
     typeLabel: 'JazzCash Verified',
     badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30'
@@ -60,7 +60,7 @@ const activities = [
     action: 'booked online lessons for',
     subject: 'Noorani Qaida for Kids',
     tutor: 'Alimah Fatima Zahra',
-    avatar: '/images/tutors/alimah-fatima.jpg',
+    avatar: 'https://images.unsplash.com/photo-1543332164-6e82f355badc?w=150&auto=format&fit=crop&q=80',
     timeAgo: '3 mins ago',
     typeLabel: 'New Student',
     badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/30'
@@ -72,7 +72,7 @@ const activities = [
     action: 'left a 5-Star Verified Review on',
     subject: 'Board Mathematics & Algebra',
     tutor: 'Engr. Bilal Ahmad',
-    avatar: 'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=120&q=80',
+    avatar: 'https://images.unsplash.com/photo-1502086223501-7ea6ecd79368?w=150&auto=format&fit=crop&q=80',
     timeAgo: 'Just now',
     typeLabel: '5.0 Rating',
     badgeClass: 'bg-rose-500/20 text-rose-300 border-rose-500/30'
@@ -84,7 +84,7 @@ const activities = [
     action: 'started 3-day free trial for',
     subject: 'Hifz al-Quran & Manzil Revision',
     tutor: 'Qari Muhammad Huzaifa',
-    avatar: '/images/tutors/qari-huzaifa.jpg',
+    avatar: 'https://images.unsplash.com/photo-1485546246426-74dc88dec4d9?w=150&auto=format&fit=crop&q=80',
     timeAgo: '1 min ago',
     typeLabel: 'Free Trial',
     badgeClass: 'bg-[#d4a359]/20 text-[#d4a359] border-[#d4a359]/30'
@@ -96,7 +96,7 @@ const activities = [
     action: 'enrolled in past paper revision for',
     subject: 'Matric Class 10 Science & Math',
     tutor: 'Dr. Ayesha Tariq',
-    avatar: '/images/dr-ayesha.jpg',
+    avatar: 'https://images.unsplash.com/photo-1503454537195-1dcabb73ffb9?w=150&auto=format&fit=crop&q=80',
     timeAgo: '2 mins ago',
     typeLabel: 'Matric Board',
     badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/30'
@@ -108,7 +108,7 @@ const activities = [
     action: 'completed live video session for',
     subject: 'Tafseer & Quranic Translation',
     tutor: 'Ustadh Abdul Rahman',
-    avatar: '/images/tutors/ustadh-abdul-rehman.jpg',
+    avatar: 'https://images.unsplash.com/photo-1516627145497-ae6968895b74?w=150&auto=format&fit=crop&q=80',
     timeAgo: 'Just now',
     typeLabel: 'Live Session Done',
     badgeClass: 'bg-[#d4a359]/20 text-[#d4a359] border-[#d4a359]/30'
@@ -120,7 +120,7 @@ const activities = [
     action: 'booked female tutor for',
     subject: 'Tajweed Rules & Daily Duas',
     tutor: 'Alimah Fatima Zahra',
-    avatar: '/images/tutors/alimah-fatima.jpg',
+    avatar: 'https://images.unsplash.com/photo-1596495578065-6e0763fa1178?w=150&auto=format&fit=crop&q=80',
     timeAgo: '1 min ago',
     typeLabel: 'Female Qaria',
     badgeClass: 'bg-[#b85d34]/20 text-[#e07a4a] border-[#b85d34]/30'
@@ -132,7 +132,7 @@ const activities = [
     action: 'verified tuition payment via EasyPaisa for',
     subject: 'MDCAT Entry Test Chemistry',
     tutor: 'Dr. Ayesha Tariq',
-    avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=120&q=80',
+    avatar: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?w=150&auto=format&fit=crop&q=80',
     timeAgo: '3 mins ago',
     typeLabel: 'EasyPaisa Verified',
     badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30'
@@ -144,7 +144,7 @@ const activities = [
     action: 'booked online lessons for',
     subject: 'Spoken Arabic & Sarf/Nahw',
     tutor: 'Ustadh Abdul Rahman',
-    avatar: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=120&q=80',
+    avatar: 'https://images.unsplash.com/photo-1577896851231-70ef18881754?w=150&auto=format&fit=crop&q=80',
     timeAgo: 'Just now',
     typeLabel: 'Free Trial',
     badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/30'
@@ -156,7 +156,7 @@ const activities = [
     action: 'booked live home & online tutoring for',
     subject: 'Board Computer Science & Coding',
     tutor: 'Engr. Bilal Ahmad',
-    avatar: 'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=120&q=80',
+    avatar: 'https://images.unsplash.com/photo-1540479859555-17af45c78602?w=150&auto=format&fit=crop&q=80',
     timeAgo: '2 mins ago',
     typeLabel: 'Academic',
     badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/30'
@@ -289,6 +289,10 @@ export default function LiveActivityToast() {
               key={current.id}
               src={current.avatar}
               alt={current.studentName}
+              onError={(e) => {
+                e.currentTarget.onerror = null;
+                e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(current.studentName)}&background=0c2217&color=d4a359`;
+              }}
               className="w-10 h-10 rounded-2xl object-cover border border-[#d4a359]/40 shadow-md animate-in fade-in duration-300"
             />
             <span className="absolute -top-1 -right-1 flex h-3 w-3">

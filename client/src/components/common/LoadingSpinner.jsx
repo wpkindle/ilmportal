@@ -3,150 +3,134 @@
 import React from 'react';
 
 /**
- * IlmiDunya brand loader.
+ * Professional Brand Loading Spinner for IlmiDunya Pakistan.
  *
- * Design:
- *  - Single SVG with squircle track + arc animated via stroke-dashoffset
- *    (CSS classes defined in globals.css — SSR-safe, no inline <style>)
- *  - Central /icon.svg in a rounded-square tile
- *  - /logo.svg brand wordmark below (md/lg only)
+ * Features:
+ *  - Radial ambient brand glow backdrop (forest green, warm gold, terracotta)
+ *  - Silky-smooth, hardware-accelerated circular dual-gradient spinner
+ *  - Authentic official IlmiDunya brand logo (/logo.svg)
+ *  - Refined horizontal shimmer progress indicator
+ *  - Fully responsive across mobile, tablet, and desktop screens
  *
  * @param {'sm' | 'md' | 'lg'} size
  * @param {string} className
+ * @param {string} text - Optional status text
  */
-const LoadingSpinner = ({ size = 'md', className = '' }) => {
-  const presets = {
-    sm: { box: 44,  r: 14, sw: 3.5, icon: 20, logoW: 88,  dashLen: 34,  gap: 86  },
-    md: { box: 72,  r: 22, sw: 4.5, icon: 32, logoW: 120, dashLen: 50,  gap: 125 },
-    lg: { box: 96,  r: 28, sw: 5.5, icon: 44, logoW: 156, dashLen: 67,  gap: 168 },
-  };
-  const p = presets[size] ?? presets.md;
-
-  const pad  = p.sw / 2 + 1;
-  const side = p.box - pad * 2;
-  const rx   = p.r;
-
-  const gradId      = `ilmi-g-${size}`;
-  const iconTileW   = p.icon + 12;
-  const iconTileR   = Math.round(rx * 0.55);
-
-  /* ── sm: compact icon-only spinner ───────────────────── */
+const LoadingSpinner = ({ size = 'md', className = '', text }) => {
+  /* ── sm: ultra-sleek compact spinner for buttons, pills, and inline cards ── */
   if (size === 'sm') {
     return (
-      <div className={`inline-flex items-center justify-center ${className}`}>
-        <div className="relative" style={{ width: p.box, height: p.box }}>
-          {/* Glow */}
-          <div
-            className="absolute inset-0 bg-[#d4a359]/20 blur-md pointer-events-none animate-pulse"
-            style={{ borderRadius: rx + 4 }}
-          />
-          {/* Single SVG: track + arc */}
-          <svg width={p.box} height={p.box} className="absolute inset-0" style={{ overflow: 'visible' }}>
-            <defs>
-              <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%"   stopColor="#ba4c18" />
-                <stop offset="100%" stopColor="#d4a359" />
-              </linearGradient>
-            </defs>
-            {/* Track */}
-            <rect x={pad} y={pad} width={side} height={side} rx={rx} ry={rx}
-              fill="none" stroke="#ba4c18" strokeOpacity="0.15" strokeWidth={p.sw} />
-            {/* Arc */}
-            <rect x={pad} y={pad} width={side} height={side} rx={rx} ry={rx}
-              fill="none"
-              stroke={`url(#${gradId})`}
-              strokeWidth={p.sw}
-              strokeLinecap="round"
-              strokeDasharray={`${p.dashLen} ${p.gap}`}
-              className="ilmi-arc-sm"
+      <div className={`inline-flex items-center justify-center ${className}`} role="status" aria-label="Loading">
+        <div className="relative w-6 h-6">
+          <div className="absolute inset-0 rounded-full bg-[#d4a359]/20 blur-xs animate-pulse pointer-events-none" />
+          <svg className="w-6 h-6 animate-spin text-[#143d2b]" viewBox="0 0 24 24" fill="none">
+            <circle
+              cx="12"
+              cy="12"
+              r="9.5"
+              stroke="currentColor"
+              strokeOpacity="0.15"
+              strokeWidth="2.5"
+            />
+            <path
+              fill="#ba4c18"
+              d="M12 2.5a9.5 9.5 0 0 1 9.5 9.5h-2.5a7 7 0 0 0-7-7V2.5z"
             />
           </svg>
-          {/* Center icon */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div
-              className="flex items-center justify-center overflow-hidden"
-              style={{ width: iconTileW, height: iconTileW, borderRadius: iconTileR }}
-            >
-              <img src="/icon.svg" alt="IlmiDunya" width={p.icon} height={p.icon} className="object-contain" />
-            </div>
-          </div>
         </div>
       </div>
     );
   }
 
-  /* ── md / lg: spinner + brand wordmark ─────────────────── */
+  const isLg = size === 'lg';
+  const spinnerPx = isLg ? 56 : 44;
+  const logoWidthPx = isLg ? 156 : 124;
+
   return (
-    <div className={`flex flex-col items-center justify-center gap-5 select-none ${className}`}>
-
-      {/* Squircle spinner */}
-      <div className="relative" style={{ width: p.box, height: p.box }}>
-
-        {/* Glow halo */}
+    <div
+      className={`flex flex-col items-center justify-center gap-3.5 sm:gap-4 select-none ${className}`}
+      role="status"
+      aria-label="Loading..."
+    >
+      {/* ── Circular Precision Spinner ───────────────────── */}
+      <div className="relative flex items-center justify-center">
+        {/* Soft atmospheric brand aura */}
         <div
-          className="absolute bg-[#d4a359]/20 blur-xl pointer-events-none animate-pulse"
-          style={{ inset: -10, borderRadius: rx + 14 }}
+          className="absolute bg-gradient-to-tr from-[#143d2b]/15 via-[#d4a359]/25 to-[#ba4c18]/20 rounded-full blur-xl pointer-events-none animate-pulse"
+          style={{
+            width: spinnerPx + 28,
+            height: spinnerPx + 28,
+          }}
         />
 
-        {/* Single SVG: track + arc — perfectly aligned */}
-        <svg width={p.box} height={p.box} className="absolute inset-0" style={{ overflow: 'visible' }}>
+        {/* Circular Dual-Gradient Spinner Ring */}
+        <svg
+          width={spinnerPx}
+          height={spinnerPx}
+          viewBox="0 0 50 50"
+          className="relative animate-spin"
+          style={{ animationDuration: '0.85s' }}
+        >
           <defs>
-            <linearGradient id={gradId} x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%"   stopColor="#ba4c18" />
-              <stop offset="55%"  stopColor="#d4a359" />
-              <stop offset="100%" stopColor="#ba4c18" stopOpacity="0.25" />
+            <linearGradient id={`ilmi-spin-${size}`} x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#143d2b" />
+              <stop offset="50%" stopColor="#d4a359" />
+              <stop offset="100%" stopColor="#ba4c18" />
             </linearGradient>
           </defs>
-
-          {/* Track */}
-          <rect x={pad} y={pad} width={side} height={side} rx={rx} ry={rx}
+          {/* Subtle background track */}
+          <circle
+            cx="25"
+            cy="25"
+            r="20"
             fill="none"
-            stroke="#ba4c18"
-            strokeOpacity="0.13"
-            strokeWidth={p.sw}
+            stroke="#143d2b"
+            strokeOpacity="0.12"
+            strokeWidth="3.5"
           />
-
-          {/* Animated arc via CSS class */}
-          <rect x={pad} y={pad} width={side} height={side} rx={rx} ry={rx}
+          {/* Smooth animated arc */}
+          <circle
+            cx="25"
+            cy="25"
+            r="20"
             fill="none"
-            stroke={`url(#${gradId})`}
-            strokeWidth={p.sw}
+            stroke={`url(#ilmi-spin-${size})`}
+            strokeWidth="3.5"
             strokeLinecap="round"
-            strokeDasharray={`${p.dashLen} ${p.gap}`}
-            className={`ilmi-arc-${size}`}
+            strokeDasharray="45 80"
           />
         </svg>
 
-        {/* Icon in rounded-square tile */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div
-            className="flex items-center justify-center overflow-hidden"
-            style={{
-              width: iconTileW,
-              height: iconTileW,
-              borderRadius: iconTileR,
-              background: 'rgba(255,255,255,0.07)',
-            }}
-          >
-            <img
-              src="/icon.svg"
-              alt="IlmiDunya"
-              width={p.icon}
-              height={p.icon}
-              className="object-contain drop-shadow-sm"
-            />
-          </div>
-        </div>
+        {/* Center brand pulse dot */}
+        <div className="absolute w-2 h-2 rounded-full bg-[#143d2b]/80 shadow-xs" />
       </div>
 
-      {/* Brand wordmark */}
-      <img
-        src="/logo.svg"
-        alt="IlmiDunya Pakistan"
-        style={{ width: p.logoW }}
-        className="object-contain opacity-80"
-        draggable={false}
-      />
+      {/* ── Authentic Official Ilmi Brand Logo ────────────── */}
+      <div className="flex flex-col items-center gap-2">
+        <img
+          src="/logo.svg"
+          alt="IlmiDunya Pakistan"
+          style={{ width: logoWidthPx }}
+          className="h-auto object-contain select-none pointer-events-none drop-shadow-xs"
+          draggable={false}
+        />
+
+        {/* Shimmer progress bar */}
+        <div className="w-20 sm:w-24 h-0.5 rounded-full bg-[#143d2b]/10 overflow-hidden relative">
+          <div
+            className="absolute inset-y-0 w-1/2 bg-gradient-to-r from-[#143d2b] via-[#d4a359] to-[#ba4c18] rounded-full"
+            style={{
+              animation: 'ilmi-shimmer 1.4s ease-in-out infinite',
+            }}
+          />
+        </div>
+
+        {text && (
+          <p className="text-[11px] font-medium text-[#4a5e55] tracking-wide animate-pulse pt-0.5">
+            {text}
+          </p>
+        )}
+      </div>
     </div>
   );
 };

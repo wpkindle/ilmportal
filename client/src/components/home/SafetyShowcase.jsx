@@ -90,17 +90,17 @@ export default function SafetyShowcase() {
           <div className="lg:col-span-7 space-y-5">
             
             {/* Feature 1: Interactive Camera-Off Guarantee Card */}
-            <div className="p-6 rounded-3xl bg-white border-2 border-[#d4a359]/40 shadow-md space-y-4">
-              <div className="flex items-center justify-between gap-3">
-                <div className="flex items-center gap-2.5">
-                  <div className="p-2 rounded-xl bg-[#f5f0e6] border border-[#d4a359]/40 text-[#b85d34]">
+            <div className="p-4 sm:p-6 rounded-2xl sm:rounded-3xl bg-white border-2 border-[#d4a359]/40 shadow-md space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 items-start">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="p-2 rounded-xl bg-[#f5f0e6] border border-[#d4a359]/40 text-[#b85d34] shrink-0">
                     <EyeOff className="w-4 h-4" />
                   </div>
-                  <div>
-                    <h3 className="font-black text-[#0c2217] text-sm sm:text-base">
+                  <div className="min-w-0">
+                    <h3 className="font-black text-[#0c2217] text-sm sm:text-base leading-snug">
                       Camera-Off by Default Guarantee
                     </h3>
-                    <p className="text-[11px] text-[#4a5e55]">
+                    <p className="text-[11px] text-[#4a5e55] leading-tight">
                       Standard for every class across all cities in Pakistan
                     </p>
                   </div>
@@ -110,7 +110,7 @@ export default function SafetyShowcase() {
                 <button
                   type="button"
                   onClick={() => setCameraDemoState(!cameraDemoState)}
-                  className={`px-3 py-1.5 rounded-full text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                  className={`self-start sm:self-auto shrink-0 px-3 py-1.5 rounded-full text-xs font-mono font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
                     cameraDemoState
                       ? 'bg-rose-50 text-rose-700 border border-rose-300'
                       : 'bg-[#f5f0e6] text-[#b85d34] border border-[#d4a359]/50'
@@ -125,17 +125,17 @@ export default function SafetyShowcase() {
                 When your child joins a video lesson, their video feed is <strong className="text-[#0c2217]">permanently off by default</strong>. Neither the tutor nor the platform can turn it on. Your family has 100% control to keep video off throughout the entire course.
               </p>
 
-              <div className="flex items-center gap-4 text-[11px] text-[#4a5e55] pt-1">
-                <span className="flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#059669]" />
+              <div className="flex flex-wrap items-center gap-2.5 sm:gap-4 text-[11px] text-[#4a5e55] pt-1">
+                <span className="inline-flex items-center gap-1.5 shrink-0">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#059669] shrink-0" />
                   <span>Crystal Clear Audio</span>
                 </span>
-                <span className="flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#059669]" />
+                <span className="inline-flex items-center gap-1.5 shrink-0">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#059669] shrink-0" />
                   <span>Interactive Quran &amp; Slate</span>
                 </span>
-                <span className="flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#059669]" />
+                <span className="inline-flex items-center gap-1.5 shrink-0">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#059669] shrink-0" />
                   <span>Parent May Observe Live</span>
                 </span>
               </div>

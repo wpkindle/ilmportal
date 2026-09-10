@@ -53,7 +53,7 @@ const initTransporter = () => {
 
 initTransporter();
 
-const getClientBaseUrl = () => process.env.CLIENT_URL || 'https://ilmportal.vercel.app';
+const getClientBaseUrl = () => process.env.CLIENT_URL || 'https://ilmidunya.com';
 
 // Helper to get formatted from address safely avoiding double brackets
 const getFromAddress = () => {

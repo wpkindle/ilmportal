@@ -181,7 +181,7 @@ export default function SafetyPage() {
               className="w-full sm:w-auto px-6 py-3.5 bg-[#143d2b] hover:bg-[#1e543c] text-[#f5f0e6] font-bold text-xs sm:text-sm rounded-xl border border-[#d4a359]/40 transition-all flex items-center justify-center gap-2 cursor-pointer"
             >
               <Mail className="w-4 h-4 text-[#d4a359]" />
-              <span>Safety Helpline: info@ilmidunya.com</span>
+              <span>Official Safety Support: info@ilmidunya.com</span>
             </a>
           </div>
 

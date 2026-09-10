@@ -51,21 +51,29 @@ export async function generateMetadata({ params }) {
   const formattedCity = rawCity.charAt(0).toUpperCase() + rawCity.slice(1);
   const context = cityLocalContext[cityKey];
 
-  const title = `Online Quran & Academic Tutors in ${formattedCity} | IlmiDunya Pakistan`;
+  const title = `Verified Tutors in ${formattedCity} | ilmidunya Pakistan`;
   const description = context
-    ? `Connect with verified Quran Qaris, female Alimahs, and Playgroup to FSc tutors in ${formattedCity}. Serving ${context.areas}. Safe 1:1 classes with camera-off privacy.`
+    ? `Connect with verified Quran Qaris, female Alimahs, and Playgroup to FSc tutors in ${formattedCity}. Serving ${context.areas}. Safe 1:1 home tuitions and online classes with camera-off privacy.`
     : `Find top-rated Quran teachers, female Alimahs, and Playgroup to FSc academic tutors available for live online classes and home tutoring in ${formattedCity}, Pakistan.`;
 
   return {
     title,
     description,
     alternates: {
-      canonical: `/tutors/city/${cityKey}`,
+      canonical: `https://ilmidunya.com/tutors/city/${cityKey}`,
     },
     openGraph: {
-      title: `Quran & Academic Tutors in ${formattedCity} - IlmiDunya`,
+      title: `Verified Tutors in ${formattedCity} | ilmidunya Pakistan`,
       description,
       url: `https://ilmidunya.com/tutors/city/${cityKey}`,
+      siteName: 'ilmidunya Pakistan',
+      locale: 'en_PK',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title: `Verified Tutors in ${formattedCity} | ilmidunya Pakistan`,
+      description,
     }
   };
 }

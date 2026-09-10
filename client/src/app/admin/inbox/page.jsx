@@ -57,7 +57,7 @@ const TEMPLATES = [
     title: 'Tutor Sanad Additional Info Needed',
     category: 'sanad_verification',
     subject: 'Action Required: Additional Verification Details for IlmiDunya',
-    body: `Assalam-o-Alaikum,\n\nThank you for submitting your application to join IlmiDunya as an educator.\n\nUpon reviewing your submission, we require a clearer scanned copy of your degree / Sanad certificate and your CNIC copy for background verification.\n\nPlease reply directly to this email with the requested documents attached, or message our Faculty Coordinator via WhatsApp.\n\nJazakAllah Khair,\nIlmiDunya Faculty Team\ninfo@ilmidunya.com`
+    body: `Assalam-o-Alaikum,\n\nThank you for submitting your application to join IlmiDunya as an educator.\n\nUpon reviewing your submission, we require a clearer scanned copy of your degree / Sanad certificate and your CNIC copy for background verification.\n\nPlease reply directly to this email with the requested documents attached, or upload them through your tutor portal dashboard.\n\nJazakAllah Khair,\nIlmiDunya Faculty Team\ninfo@ilmidunya.com`
   },
   {
     title: 'Student Demo Class Guidance',
@@ -69,7 +69,7 @@ const TEMPLATES = [
     title: 'General Support Acknowledgment',
     category: 'general',
     subject: 'Inquiry Received - IlmiDunya Support Desk',
-    body: `Assalam-o-Alaikum,\n\nThank you for reaching out to IlmiDunya Pakistan. We have received your message, and an academic coordinator is reviewing your request.\n\nWe will get back to you with full details shortly.\n\nSincerely,\nIlmiDunya Support Team\ninfo@ilmidunya.com\nHelpline: +92 317 1759093`
+    body: `Assalam-o-Alaikum,\n\nThank you for reaching out to IlmiDunya Pakistan. We have received your message, and an academic coordinator is reviewing your request.\n\nWe will get back to you with full details shortly.\n\nSincerely,\nIlmiDunya Support Team\ninfo@ilmidunya.com`
   }
 ];
 
@@ -135,7 +135,6 @@ function EmailTemplatePreview({ subject, body, recipientName, category = 'genera
               <div className="text-[#78716c] mt-0.5">
                 Official Portal: <span className="text-[#b85d34] font-semibold">ilmidunya.com</span> &bull; Direct: <span className="text-[#0c2217] font-semibold">info@ilmidunya.com</span>
               </div>
-              <div className="text-[#a8a29e] mt-0.5">Helpline: +92 317 1759093 &bull; WhatsApp Available</div>
             </div>
           </div>
         </div>

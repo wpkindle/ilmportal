@@ -18,11 +18,11 @@ export const viewport = {
 export const metadata = {
   metadataBase: new URL('https://ilmidunya.com'),
   title: {
-    default: 'IlmiDunya | Verified Quran & Academic Tutoring in Pakistan',
-    template: '%s | IlmiDunya',
+    default: 'ilmidunya Pakistan - Connecting Verified Tutors With Students Across Pakistan',
+    template: '%s | ilmidunya Pakistan',
   },
-  description: 'Connect with verified Pakistani Quran Qaris, female Alimahs, and Playgroup to FSc subject tutors. 1-on-1 live video classes with camera-off privacy from Lahore, Karachi, Islamabad & across Pakistan.',
-  keywords: 'Quran tutor Pakistan, Tajweed tutor Lahore, Board tutor Karachi, Online Quran Academy, Hifz tutor, Matric science tutor, FSc tutor, Female Quran teacher Pakistan, In-platform WebRTC classroom',
+  description: 'ilmidunya Pakistan connects verified Quran Qaris, certified female Alimahs, and Playgroup to FSc academic tutors with students across Pakistan. Find verified home and online tutors with camera-off privacy by default.',
+  keywords: 'ilmidunya Pakistan, Connecting Verified Tutors With Students Across Pakistan, home tutor Lahore, home tutor Karachi, home tutor Islamabad, Quran tutor Pakistan, female Alimah tutor, Tajweed tutor, Matric tutor, FSc tutor Pakistan',
   alternates: {
     canonical: '/',
   },
@@ -39,23 +39,36 @@ export const metadata = {
   appleWebApp: {
     capable: true,
     statusBarStyle: 'black-translucent',
-    title: 'IlmiDunya',
+    title: 'ilmidunya Pakistan',
   },
   other: {
     'mobile-web-app-capable': 'yes',
+    'geo.region': 'PK',
+    'geo.placename': 'Pakistan',
+    'geo.position': '30.3753;69.3451',
+    'ICBM': '30.3753, 69.3451',
   },
   openGraph: {
-    title: 'IlmiDunya | Verified Quran & Academic Tutoring in Pakistan',
-    description: 'Connect with verified Pakistani Quran Qaris and Playgroup to FSc educators for live 1:1 in-platform video classrooms with complete family privacy.',
+    title: 'ilmidunya Pakistan - Connecting Verified Tutors With Students Across Pakistan',
+    description: 'Connect with verified Pakistani Quran Qaris, certified female Alimahs, and Playgroup to FSc educators for live 1:1 classes and home tuitions across Pakistan.',
     url: 'https://ilmidunya.com',
-    siteName: 'IlmiDunya',
+    siteName: 'ilmidunya Pakistan',
     locale: 'en_PK',
     type: 'website',
+    images: [
+      {
+        url: 'https://ilmidunya.com/logo-master.png',
+        width: 1200,
+        height: 630,
+        alt: 'ilmidunya Pakistan - Connecting Verified Tutors With Students Across Pakistan',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'IlmiDunya | Verified Quran & Academic Tutoring in Pakistan',
-    description: 'Connect with verified Pakistani Quran Qaris and Playgroup to FSc educators for live 1:1 in-platform video classrooms with complete family privacy.',
+    title: 'ilmidunya Pakistan - Connecting Verified Tutors With Students Across Pakistan',
+    description: 'Connect with verified Pakistani Quran Qaris, certified female Alimahs, and Playgroup to FSc educators for live 1:1 classes and home tuitions across Pakistan.',
+    images: ['https://ilmidunya.com/logo-master.png'],
   },
 };
 
@@ -63,12 +76,14 @@ const orgSchema = {
   '@context': 'https://schema.org',
   '@graph': [
     {
-      '@type': 'Organization',
+      '@type': ['Organization', 'EducationalOrganization'],
       '@id': 'https://ilmidunya.com/#organization',
-      name: 'IlmiDunya',
+      name: 'ilmidunya Pakistan',
+      alternateName: ['IlmiDunya', 'Ilmi Dunya'],
       url: 'https://ilmidunya.com',
-      logo: 'https://ilmidunya.com/logo.svg',
-      description: 'Pakistan’s dedicated platform for 1-on-1 verified Quran and academic tutoring with camera-off privacy.',
+      logo: 'https://ilmidunya.com/logo-master.png',
+      image: 'https://ilmidunya.com/logo-master.png',
+      description: 'Pakistan’s dedicated platform connecting verified Quran Qaris, female Alimahs, and Playgroup to FSc academic tutors with students across Pakistan.',
       contactPoint: {
         '@type': 'ContactPoint',
         email: 'info@ilmidunya.com',
@@ -85,7 +100,7 @@ const orgSchema = {
       '@type': 'WebSite',
       '@id': 'https://ilmidunya.com/#website',
       url: 'https://ilmidunya.com',
-      name: 'IlmiDunya',
+      name: 'ilmidunya Pakistan - Connecting Verified Tutors With Students Across Pakistan',
       publisher: {
         '@id': 'https://ilmidunya.com/#organization'
       },

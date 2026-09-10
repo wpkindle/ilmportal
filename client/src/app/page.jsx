@@ -10,21 +10,52 @@ import LatestArticlesSection from '../components/home/LatestArticlesSection';
 import { api } from '../services/api';
 
 export const metadata = {
-  title: 'Verified Qaris, Alimahs & Academic Tutors in Pakistan | Female-Safe | IlmiDunya',
-  description: 'Connect with verified Pakistani Quran Qaris, certified female Alimahs, and Playgroup to FSc tutors. Designed especially for female privacy & comfort with camera-off classes by default.',
+  title: {
+    absolute: 'ilmidunya Pakistan - Connecting Verified Tutors With Students Across Pakistan',
+  },
+  description: 'ilmidunya Pakistan connects verified Quran Qaris, certified female Alimahs, and Playgroup to FSc academic tutors with students across Pakistan. Find verified home and online tutors in Lahore, Karachi, Islamabad, Rawalpindi, Peshawar, Faisalabad, Multan & nationwide.',
+  keywords: [
+    'ilmidunya Pakistan',
+    'Connecting Verified Tutors With Students Across Pakistan',
+    'home tutors Pakistan',
+    'online tutor Pakistan',
+    'female Quran teacher Pakistan',
+    'Alimah tutor online',
+    'home tutor Lahore',
+    'home tutor Karachi',
+    'home tutor Islamabad',
+    'home tutor Rawalpindi',
+    'Tajweed tutor Pakistan',
+    'Noorani Qaida teacher',
+    'Matric science tutor',
+    'FSc tutor Pakistan',
+    'entry test preparation Pakistan',
+    'Wafaq ul Madaris certified Qari'
+  ].join(', '),
   alternates: {
-    canonical: '/',
+    canonical: 'https://ilmidunya.com',
   },
   openGraph: {
-    title: 'Verified Qaris, Alimahs & Academic Tutors in Pakistan | IlmiDunya',
-    description: 'Connect with verified Pakistani Quran Qaris, female Alimahs, and Playgroup to FSc educators with camera-off privacy by default.',
+    title: 'ilmidunya Pakistan - Connecting Verified Tutors With Students Across Pakistan',
+    description: 'Connect with verified Pakistani Quran Qaris, certified female Alimahs, and Playgroup to FSc academic tutors with students across Pakistan. 1-on-1 home tuitions and live in-browser classes with camera-off privacy.',
     url: 'https://ilmidunya.com',
-    siteName: 'IlmiDunya',
+    siteName: 'ilmidunya Pakistan',
+    locale: 'en_PK',
+    type: 'website',
+    images: [
+      {
+        url: 'https://ilmidunya.com/logo-master.png',
+        width: 1200,
+        height: 630,
+        alt: 'ilmidunya Pakistan - Connecting Verified Tutors With Students Across Pakistan',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Verified Qaris, Alimahs & Academic Tutors in Pakistan | IlmiDunya',
-    description: 'Connect with verified Pakistani Quran Qaris, female Alimahs, and Playgroup to FSc educators with camera-off privacy by default.',
+    title: 'ilmidunya Pakistan - Connecting Verified Tutors With Students Across Pakistan',
+    description: 'Connect with verified Pakistani Quran Qaris, certified female Alimahs, and Playgroup to FSc academic tutors with students across Pakistan.',
+    images: ['https://ilmidunya.com/logo-master.png'],
   },
 };
 
@@ -32,20 +63,29 @@ const homeStructuredData = {
   '@context': 'https://schema.org',
   '@graph': [
     {
-      '@type': 'EducationalOrganization',
+      '@type': ['EducationalOrganization', 'LocalBusiness'],
       '@id': 'https://ilmidunya.com/#organization',
-      name: 'IlmiDunya',
+      name: 'ilmidunya Pakistan',
+      alternateName: ['IlmiDunya', 'Ilmi Dunya', 'ilmidunya.com'],
       url: 'https://ilmidunya.com',
-      logo: 'https://ilmidunya.com/icon.svg',
-      description: 'Pakistan’s premier educational network connecting families with verified Quran Qaris, female Alimahs, and Playgroup to FSc tutors.',
+      logo: 'https://ilmidunya.com/logo-master.png',
+      image: 'https://ilmidunya.com/logo-master.png',
+      description: 'Pakistan’s premier educational platform connecting verified Quran Qaris, certified female Alimahs, and Playgroup to FSc academic tutors with students across Pakistan.',
       email: 'info@ilmidunya.com',
+      priceRange: 'PKR',
       address: {
         '@type': 'PostalAddress',
         addressLocality: 'Lahore',
         addressRegion: 'Punjab',
         addressCountry: 'PK'
       },
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: 31.5204,
+        longitude: 74.3587
+      },
       areaServed: [
+        { '@type': 'AdministrativeArea', name: 'Pakistan' },
         { '@type': 'City', name: 'Lahore' },
         { '@type': 'City', name: 'Karachi' },
         { '@type': 'City', name: 'Islamabad' },
@@ -53,8 +93,40 @@ const homeStructuredData = {
         { '@type': 'City', name: 'Peshawar' },
         { '@type': 'City', name: 'Quetta' },
         { '@type': 'City', name: 'Faisalabad' },
-        { '@type': 'City', name: 'Multan' }
+        { '@type': 'City', name: 'Multan' },
+        { '@type': 'City', name: 'Hyderabad' },
+        { '@type': 'City', name: 'Gujranwala' },
+        { '@type': 'City', name: 'Sialkot' },
+        { '@type': 'City', name: 'Abbottabad' }
+      ],
+      knowsAbout: [
+        'Quran Recitation with Tajweed',
+        'Noorani Qaida for Kids & Beginners',
+        'Hifz al-Quran Memorization',
+        'Female Alimah Islamic Scholarship',
+        'FBISE & BISE Matric Science Tuitions',
+        'FSc Pre-Medical & Pre-Engineering Tutoring',
+        'Home Tuition across Pakistan',
+        'Online WebRTC 1-on-1 Tutoring'
+      ],
+      sameAs: [
+        'https://facebook.com/ilmidunya',
+        'https://twitter.com/ilmidunya'
       ]
+    },
+    {
+      '@type': 'WebSite',
+      '@id': 'https://ilmidunya.com/#website',
+      url: 'https://ilmidunya.com',
+      name: 'ilmidunya Pakistan - Connecting Verified Tutors With Students Across Pakistan',
+      publisher: {
+        '@id': 'https://ilmidunya.com/#organization'
+      },
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: 'https://ilmidunya.com/tutors?q={search_term_string}',
+        'query-input': 'required name=search_term_string'
+      }
     },
     {
       '@type': 'BreadcrumbList',
@@ -64,6 +136,43 @@ const homeStructuredData = {
           position: 1,
           name: 'Home',
           item: 'https://ilmidunya.com'
+        }
+      ]
+    },
+    {
+      '@type': 'FAQPage',
+      mainEntity: [
+        {
+          '@type': 'Question',
+          name: 'How does ilmidunya Pakistan connect verified tutors with students?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'ilmidunya Pakistan allows students and parents to search verified Quran Qaris, female Alimahs, and academic school/college tutors by city, area, subject, and gender. You can message tutors directly inside the portal and arrange home tuitions or live online WebRTC classes.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: 'Do you ask for or require personal phone numbers or WhatsApp?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'No, never. ilmidunya Pakistan operates on a strict zero phone/WhatsApp collection policy. All discussions, scheduling, and learning take place safely within the portal to ensure total privacy for students, daughters, and teachers.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: 'How are tutors and religious Sanads verified on ilmidunya Pakistan?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Every educator undergoes a manual verification procedure including CNIC identity check, Wafaq-ul-Madaris Shahadat-ul-Alimiyyah Sanad authentication, and academic degree validation from Pakistani educational boards and universities.'
+          }
+        },
+        {
+          '@type': 'Question',
+          name: 'Are female tutors available for daughters and female students in Pakistan?',
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: 'Yes. We have certified female Alimahs and academic female tutors available for 100% online WebRTC classes with camera-off privacy by default, ensuring maximum modesty and comfort.'
+          }
         }
       ]
     }

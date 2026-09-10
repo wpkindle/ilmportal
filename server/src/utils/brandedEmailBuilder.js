@@ -174,9 +174,6 @@ const buildBrandedEmailHtml = ({
                       <div style="font-size: 12px; color: #78716c; margin-top: 2px;">
                         Official Portal: <a href="${clientUrl}" target="_blank" style="color: #b85d34; text-decoration: none; font-weight: 700;">ilmidunya.com</a> &bull; Direct: <a href="mailto:info@ilmidunya.com" style="color: #0c2217; font-weight: 600; text-decoration: none;">info@ilmidunya.com</a>
                       </div>
-                      <div style="font-size: 11px; color: #a8a29e; margin-top: 2px;">
-                        Helpline: +92 317 1759093 &bull; WhatsApp Available
-                      </div>
                     </td>
                   </tr>
                 </table>

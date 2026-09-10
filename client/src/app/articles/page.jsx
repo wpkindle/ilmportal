@@ -14,25 +14,27 @@ import {
 } from "lucide-react";
 
 export const metadata = {
-  title: "Articles & Educational Guides (Coming Soon) | IlmiDunya Pakistan",
+  title: 'Educational Articles & Study Guides | ilmidunya Pakistan',
   description:
-    "Articles, Tajweed learning tips, family safety insights, and academic guidance from verified scholars and teachers across Pakistan. Articles section is Coming Soon.",
+    'Read verified educational guides on Tajweed rules, Quranic recitation, Board exam preparation, female Islamic scholarship, and academic home tuitions across Pakistan.',
   alternates: {
-    canonical: "https://ilmidunya.com/articles"
+    canonical: 'https://ilmidunya.com/articles',
   },
   openGraph: {
-    title: "Articles & Educational Guides (Coming Soon) | IlmiDunya",
+    title: 'Educational Articles & Study Guides | ilmidunya Pakistan',
     description:
-      "Practical guides on Quran recitation, Tajweed, and home tutoring. Articles section is Coming Soon on IlmiDunya.",
-    url: "https://ilmidunya.com/articles",
-    siteName: "IlmiDunya"
+      'Verified insights on Quran learning, Tajweed, STEM subjects, and home tutoring from Pakistani educators and scholars.',
+    url: 'https://ilmidunya.com/articles',
+    siteName: 'ilmidunya Pakistan',
+    locale: 'en_PK',
+    type: 'website',
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Articles & Educational Guides (Coming Soon) | IlmiDunya",
+    card: 'summary_large_image',
+    title: 'Educational Articles & Study Guides | ilmidunya Pakistan',
     description:
-      "Practical guides on Quran recitation, Tajweed, and home tutoring. Articles section is Coming Soon on IlmiDunya."
-  }
+      'Verified insights on Quran learning, Tajweed, STEM subjects, and home tutoring from Pakistani educators and scholars.',
+  },
 };
 
 const UPCOMING_TOPICS = [

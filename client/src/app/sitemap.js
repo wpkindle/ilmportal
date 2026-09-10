@@ -5,6 +5,7 @@ export default async function sitemap() {
     { route: '', priority: 1.0, changeFrequency: 'daily' },
     { route: '/tutors', priority: 0.9, changeFrequency: 'daily' },
     { route: '/courses', priority: 0.9, changeFrequency: 'weekly' },
+    { route: '/articles', priority: 0.85, changeFrequency: 'daily' },
     { route: '/safety', priority: 0.8, changeFrequency: 'monthly' },
     { route: '/how-it-works', priority: 0.8, changeFrequency: 'monthly' },
     { route: '/about-us', priority: 0.7, changeFrequency: 'monthly' },

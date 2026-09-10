@@ -28,7 +28,7 @@ const CATEGORY_META = {
   },
   general: {
     badge: 'Official Correspondence',
-    actionText: 'Visit IlmiDunya Portal',
+    actionText: 'Visit ilmidunya.com',
     actionPath: ''
   }
 };
@@ -169,10 +169,10 @@ const buildBrandedEmailHtml = ({
                     </td>
                     <td style="vertical-align: middle;">
                       <div style="font-size: 14px; font-weight: 800; color: #0c2217; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                        IlmiDunya Academic Faculty &amp; Support
+                        ilmidunya Support
                       </div>
                       <div style="font-size: 12px; color: #78716c; margin-top: 2px;">
-                        Official Portal: <a href="${clientUrl}" target="_blank" style="color: #b85d34; text-decoration: none; font-weight: 700;">ilmidunya.com</a> &bull; Direct: <a href="mailto:info@ilmidunya.com" style="color: #0c2217; font-weight: 600; text-decoration: none;">info@ilmidunya.com</a>
+                        Official Portal: <a href="${clientUrl}" target="_blank" style="color: #b85d34; text-decoration: none; font-weight: 700;">ilmidunya.com</a> &bull; Email: <a href="mailto:info@ilmidunya.com" style="color: #0c2217; font-weight: 600; text-decoration: none;">info@ilmidunya.com</a>
                       </div>
                     </td>
                   </tr>
@@ -189,9 +189,8 @@ const buildBrandedEmailHtml = ({
                 <tr>
                   <td align="center" style="font-size: 11.5px; font-weight: 700; color: #78716c; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
                     <a href="${clientUrl}/tutors" target="_blank" style="color: #0c2217; text-decoration: none; padding: 0 10px;">Browse Tutors</a> &bull;
-                    <a href="${clientUrl}/login/student" target="_blank" style="color: #0c2217; text-decoration: none; padding: 0 10px;">Student Login</a> &bull;
-                    <a href="${clientUrl}/login/tutor" target="_blank" style="color: #0c2217; text-decoration: none; padding: 0 10px;">Faculty Portal</a> &bull;
-                    <a href="${clientUrl}/contact" target="_blank" style="color: #0c2217; text-decoration: none; padding: 0 10px;">Contact Us</a>
+                    <a href="${clientUrl}/login/student" target="_blank" style="color: #0c2217; text-decoration: none; padding: 0 10px;">Student Portal</a> &bull;
+                    <a href="${clientUrl}/login/tutor" target="_blank" style="color: #0c2217; text-decoration: none; padding: 0 10px;">Tutor Portal</a>
                   </td>
                 </tr>
               </table>

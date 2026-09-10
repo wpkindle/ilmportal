@@ -31,7 +31,9 @@ import {
   Check,
   BookOpen,
   GraduationCap,
-  Paperclip
+  Paperclip,
+  Eye,
+  Edit3
 } from 'lucide-react';
 
 const CATEGORY_LABELS = {
@@ -71,6 +73,101 @@ const TEMPLATES = [
   }
 ];
 
+function EmailTemplatePreview({ subject, body, recipientName, category = 'general' }) {
+  const CATEGORY_TITLES = {
+    sanad_verification: 'Faculty Sanad Verification',
+    tutor_inquiry: 'Faculty & Educator Network',
+    student_admission: 'Student Admissions Desk',
+    billing: 'Billing & Deal Verification',
+    general: 'Official Correspondence'
+  };
+  const categoryLabel = CATEGORY_TITLES[category] || 'Official Correspondence';
+
+  const paragraphs = (body || 'Type your message above to see a live preview in the official IlmiDunya email theme...')
+    .split(/\n\s*\n/)
+    .filter(Boolean);
+
+  return (
+    <div className="bg-[#faf8f5] p-3 sm:p-5 rounded-2xl border border-[#e6ded1] text-slate-800 font-sans shadow-inner max-h-[460px] overflow-y-auto">
+      {/* Email Container Card */}
+      <div className="max-w-[540px] mx-auto bg-white rounded-2xl overflow-hidden shadow-xl border border-[#e6ded1]">
+        {/* Brand Header */}
+        <div className="bg-[#0c2217] p-6 text-center border-b-4 border-[#d4a359]">
+          <div className="flex justify-center mb-3">
+            <img
+              src="/logo-dark.png"
+              alt="IlmiDunya Pakistan"
+              className="h-8 w-auto object-contain"
+            />
+          </div>
+          <span className="inline-block px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest text-[#d4a359] bg-[#143d2b] border border-[#d4a359]/40">
+            {categoryLabel}
+          </span>
+        </div>
+
+        {/* Email Body */}
+        <div className="p-6 sm:p-7 space-y-3.5 text-stone-800 text-xs sm:text-sm leading-relaxed">
+          {recipientName && (
+            <h4 className="font-black text-base text-[#0c2217] font-serif">
+              Assalam-o-Alaikum, {recipientName}!
+            </h4>
+          )}
+          {paragraphs.map((p, idx) => (
+            <p key={idx} className="whitespace-pre-line text-[#292524] leading-relaxed">
+              {p}
+            </p>
+          ))}
+
+          {/* Action CTA Button */}
+          <div className="pt-4 pb-2 text-center">
+            <span className="inline-block px-6 py-2.5 rounded-xl bg-[#0c2217] text-white text-xs font-bold border border-[#d4a359] shadow-md uppercase tracking-wide">
+              Visit IlmiDunya Portal &rarr;
+            </span>
+          </div>
+
+          {/* Signature Block */}
+          <div className="mt-6 pt-5 border-t border-[#e6ded1] flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-[#0c2217] text-[#d4a359] font-black font-serif text-lg flex items-center justify-center border border-[#d4a359] shrink-0">
+              علم
+            </div>
+            <div className="text-[11px] leading-tight text-left">
+              <div className="font-bold text-[#0c2217]">IlmiDunya Academic Faculty &amp; Support</div>
+              <div className="text-[#78716c] mt-0.5">
+                Official Portal: <span className="text-[#b85d34] font-semibold">ilmidunya.com</span> &bull; Direct: <span className="text-[#0c2217] font-semibold">info@ilmidunya.com</span>
+              </div>
+              <div className="text-[#a8a29e] mt-0.5">Helpline: +92 317 1759093 &bull; WhatsApp Available</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Quick Portal Navigation Links */}
+        <div className="bg-[#faf8f5] px-4 py-2.5 border-t border-[#e6ded1] text-center text-[10px] font-bold text-[#78716c] flex items-center justify-center gap-2 flex-wrap">
+          <span className="text-[#0c2217]">Browse Tutors</span>
+          <span>&bull;</span>
+          <span className="text-[#0c2217]">Student Login</span>
+          <span>&bull;</span>
+          <span className="text-[#0c2217]">Faculty Portal</span>
+          <span>&bull;</span>
+          <span className="text-[#0c2217]">Contact Us</span>
+        </div>
+
+        {/* Footer */}
+        <div className="bg-[#f5f0e6] p-4 text-center border-t border-[#e6ded1] text-[10px] text-[#78716c]">
+          <div className="font-bold text-[#0c2217]">
+            IlmiDunya Pakistan &bull; Verified Academic &amp; Quranic Tutoring Network
+          </div>
+          <div className="text-[9.5px] text-[#78716c] mt-0.5">
+            Islamabad &bull; Lahore &bull; Karachi &bull; Peshawar &bull; Quetta &bull; Nationwide
+          </div>
+          <div className="text-[9px] text-[#a8a29e] mt-1 leading-normal">
+            Dispatched officially from <strong className="text-[#78716c]">info@ilmidunya.com</strong>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminMailboxPage() {
   const { user } = useAuth();
   const { socket } = useSocket();
@@ -97,6 +194,8 @@ export default function AdminMailboxPage() {
   const [composeBody, setComposeBody] = useState('');
   const [composeCategory, setComposeCategory] = useState('general');
   const [sendingCompose, setSendingCompose] = useState(false);
+  const [composeTab, setComposeTab] = useState('edit'); // 'edit' or 'preview'
+  const [replyPreviewOpen, setReplyPreviewOpen] = useState(false);
   const [actionNotice, setActionNotice] = useState('');
 
   const messagesEndRef = useRef(null);
@@ -791,10 +890,40 @@ export default function AdminMailboxPage() {
                       className="w-full p-3 rounded-2xl bg-slate-950 border border-slate-800 text-slate-100 text-xs sm:text-sm focus:outline-none focus:border-[#d4a359] placeholder-slate-500 resize-none font-sans"
                     />
 
-                    <div className="flex items-center justify-between">
-                      <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
-                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                        <span>Sending from <strong>info@ilmidunya.com</strong></span>
+                    {replyPreviewOpen && (
+                      <div className="pt-2">
+                        <div className="text-[10px] font-bold text-[#d4a359] uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>Recipient View Preview (Signature Theme, Logo &amp; Portal Links):</span>
+                        </div>
+                        <EmailTemplatePreview
+                          subject={selectedThread.subject}
+                          body={replyText}
+                          recipientName={selectedThread.from?.name}
+                          category={selectedThread.category}
+                        />
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between flex-wrap gap-2 pt-1">
+                      <div className="flex items-center gap-2">
+                        <div className="text-[11px] text-slate-400 flex items-center gap-1.5">
+                          <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                          <span>Sending from <strong>info@ilmidunya.com</strong></span>
+                        </div>
+
+                        <button
+                          type="button"
+                          onClick={() => setReplyPreviewOpen(!replyPreviewOpen)}
+                          className={`px-2.5 py-1 rounded-lg border text-[11px] font-bold flex items-center gap-1 transition cursor-pointer ${
+                            replyPreviewOpen
+                              ? 'border-[#d4a359] text-[#d4a359] bg-[#d4a359]/10'
+                              : 'border-slate-800 hover:border-slate-700 text-slate-400 hover:text-slate-200 bg-slate-950'
+                          }`}
+                        >
+                          <Eye className="w-3 h-3" />
+                          <span>{replyPreviewOpen ? 'Hide Preview' : 'Preview Branded Email'}</span>
+                        </button>
                       </div>
 
                       <button
@@ -868,97 +997,189 @@ export default function AdminMailboxPage() {
               ))}
             </div>
 
-            {/* Modal Body Form */}
-            <form onSubmit={handleSendCompose} className="p-5 space-y-3.5 flex-1 overflow-y-auto">
-              <div>
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                  Recipient Email (To):
-                </label>
-                <input
-                  type="email"
-                  required
-                  value={composeTo}
-                  onChange={(e) => setComposeTo(e.target.value)}
-                  placeholder="e.g. qari.student@example.com"
-                  className="w-full px-3 py-2 text-xs rounded-xl bg-slate-950 border border-slate-800 text-slate-100 focus:outline-none focus:border-[#d4a359]"
-                />
+            {/* Mode Switcher Tabs */}
+            <div className="px-5 pt-3 pb-2 border-b border-slate-800/60 bg-slate-950/20 flex items-center justify-between flex-wrap gap-2">
+              <div className="flex items-center gap-1 bg-slate-950 p-1 rounded-xl border border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => setComposeTab('edit')}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                    composeTab === 'edit'
+                      ? 'bg-[#d4a359] text-stone-950 shadow'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Edit3 className="w-3.5 h-3.5" />
+                  <span>Compose</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setComposeTab('preview')}
+                  className={`px-3 py-1 rounded-lg text-xs font-bold flex items-center gap-1.5 transition cursor-pointer ${
+                    composeTab === 'preview'
+                      ? 'bg-[#d4a359] text-stone-950 shadow'
+                      : 'text-slate-400 hover:text-white'
+                  }`}
+                >
+                  <Eye className="w-3.5 h-3.5" />
+                  <span>Branded Theme Preview</span>
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div className="sm:col-span-2">
+              <span className="text-[10px] text-emerald-400 font-mono font-semibold flex items-center gap-1">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Official Signature Theme Active</span>
+              </span>
+            </div>
+
+            {/* Modal Body: Edit Form OR Live Branded Preview */}
+            {composeTab === 'preview' ? (
+              <div className="p-5 flex-1 overflow-y-auto space-y-4">
+                <div className="flex items-center justify-between text-xs text-slate-400 bg-slate-950/60 p-2.5 rounded-xl border border-slate-800">
+                  <span>To: <strong className="text-slate-200">{composeTo || '(Recipient Email)'}</strong></span>
+                  <span>Subject: <strong className="text-slate-200">{composeSubject || '(No Subject)'}</strong></span>
+                </div>
+
+                <EmailTemplatePreview
+                  subject={composeSubject}
+                  body={composeBody}
+                  recipientName={composeTo ? composeTo.split('@')[0] : ''}
+                  category={composeCategory}
+                />
+
+                <div className="pt-2 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setComposeTab('edit')}
+                    className="px-4 py-2 rounded-xl border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>Back to Edit</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSendCompose}
+                    disabled={sendingCompose || !composeTo.trim() || !composeSubject.trim() || !composeBody.trim()}
+                    className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#d4a359] to-[#b85d34] text-stone-950 font-black text-xs flex items-center gap-2 shadow-lg disabled:opacity-50 cursor-pointer hover:scale-105 transition-all"
+                  >
+                    {sendingCompose ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>Dispatching...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Send className="w-3.5 h-3.5" />
+                        <span>Send from info@ilmidunya.com</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <form onSubmit={handleSendCompose} className="p-5 space-y-3.5 flex-1 overflow-y-auto">
+                <div>
                   <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                    Subject:
+                    Recipient Email (To):
                   </label>
                   <input
-                    type="text"
+                    type="email"
                     required
-                    value={composeSubject}
-                    onChange={(e) => setComposeSubject(e.target.value)}
-                    placeholder="e.g. Sanad Verification Approved"
+                    value={composeTo}
+                    onChange={(e) => setComposeTo(e.target.value)}
+                    placeholder="e.g. qari.student@example.com"
                     className="w-full px-3 py-2 text-xs rounded-xl bg-slate-950 border border-slate-800 text-slate-100 focus:outline-none focus:border-[#d4a359]"
                   />
                 </div>
 
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <div className="sm:col-span-2">
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                      Subject:
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={composeSubject}
+                      onChange={(e) => setComposeSubject(e.target.value)}
+                      placeholder="e.g. Sanad Verification Approved"
+                      className="w-full px-3 py-2 text-xs rounded-xl bg-slate-950 border border-slate-800 text-slate-100 focus:outline-none focus:border-[#d4a359]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                      Category:
+                    </label>
+                    <select
+                      value={composeCategory}
+                      onChange={(e) => setComposeCategory(e.target.value)}
+                      className="w-full px-3 py-2 text-xs rounded-xl bg-slate-950 border border-slate-800 text-slate-100 focus:outline-none focus:border-[#d4a359]"
+                    >
+                      <option value="general">General</option>
+                      <option value="tutor_inquiry">Tutor Inquiry</option>
+                      <option value="sanad_verification">Sanad Verification</option>
+                      <option value="student_admission">Student Admission</option>
+                      <option value="billing">Billing & Deals</option>
+                    </select>
+                  </div>
+                </div>
+
                 <div>
                   <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                    Category:
+                    Message Content:
                   </label>
-                  <select
-                    value={composeCategory}
-                    onChange={(e) => setComposeCategory(e.target.value)}
-                    className="w-full px-3 py-2 text-xs rounded-xl bg-slate-950 border border-slate-800 text-slate-100 focus:outline-none focus:border-[#d4a359]"
-                  >
-                    <option value="general">General</option>
-                    <option value="tutor_inquiry">Tutor Inquiry</option>
-                    <option value="sanad_verification">Sanad Verification</option>
-                    <option value="student_admission">Student Admission</option>
-                    <option value="billing">Billing & Deals</option>
-                  </select>
+                  <textarea
+                    rows={8}
+                    required
+                    value={composeBody}
+                    onChange={(e) => setComposeBody(e.target.value)}
+                    placeholder="Type your official email message here..."
+                    className="w-full p-3 rounded-2xl bg-slate-950 border border-slate-800 text-slate-100 text-xs focus:outline-none focus:border-[#d4a359] font-sans resize-none"
+                  />
                 </div>
-              </div>
 
-              <div>
-                <label className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">
-                  Message Content:
-                </label>
-                <textarea
-                  rows={8}
-                  required
-                  value={composeBody}
-                  onChange={(e) => setComposeBody(e.target.value)}
-                  placeholder="Type your official email message here..."
-                  className="w-full p-3 rounded-2xl bg-slate-950 border border-slate-800 text-slate-100 text-xs focus:outline-none focus:border-[#d4a359] font-sans resize-none"
-                />
-              </div>
+                <div className="pt-2 flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setComposeTab('preview')}
+                    className="px-3.5 py-2 rounded-xl border border-slate-800 text-slate-300 hover:text-white text-xs font-semibold flex items-center gap-1.5 cursor-pointer hover:bg-slate-800"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-[#d4a359]" />
+                    <span>Preview Template</span>
+                  </button>
 
-              <div className="pt-2 flex items-center justify-end gap-2.5">
-                <button
-                  type="button"
-                  onClick={() => setComposeModalOpen(false)}
-                  className="px-4 py-2 rounded-xl border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold"
-                >
-                  Cancel
-                </button>
+                  <div className="flex items-center gap-2.5">
+                    <button
+                      type="button"
+                      onClick={() => setComposeModalOpen(false)}
+                      className="px-4 py-2 rounded-xl border border-slate-700 text-slate-300 hover:text-white text-xs font-semibold cursor-pointer"
+                    >
+                      Cancel
+                    </button>
 
-                <button
-                  type="submit"
-                  disabled={sendingCompose}
-                  className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#d4a359] to-[#b85d34] text-stone-950 font-black text-xs flex items-center gap-2 shadow-lg disabled:opacity-50"
-                >
-                  {sendingCompose ? (
-                    <>
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                      <span>Dispatching...</span>
-                    </>
-                  ) : (
-                    <>
-                      <Send className="w-3.5 h-3.5" />
-                      <span>Send from info@ilmidunya.com</span>
-                    </>
-                  )}
-                </button>
-              </div>
-            </form>
+                    <button
+                      type="submit"
+                      disabled={sendingCompose}
+                      className="px-6 py-2 rounded-xl bg-gradient-to-r from-[#d4a359] to-[#b85d34] text-stone-950 font-black text-xs flex items-center gap-2 shadow-lg disabled:opacity-50 cursor-pointer hover:scale-105 transition-all"
+                    >
+                      {sendingCompose ? (
+                        <>
+                          <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                          <span>Dispatching...</span>
+                        </>
+                      ) : (
+                        <>
+                          <Send className="w-3.5 h-3.5" />
+                          <span>Send from info@ilmidunya.com</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            )}
           </div>
         </div>
       )}

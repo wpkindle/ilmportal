@@ -6,6 +6,7 @@ const User = require('../models/User');
 const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 const { sendEmail, getInboundEmail } = require('../services/resendService');
+const { buildBrandedEmailHtml } = require('../utils/brandedEmailBuilder');
 
 // Helper to sanitize subject lines for threading (remove Re:, Fwd:)
 const cleanSubject = (subject = '') => {
@@ -299,14 +300,22 @@ router.post('/threads/:id/reply', async (req, res) => {
     }
 
     const recipientAddress = thread.from.address;
+    const recipientName = thread.from.name || thread.userRef?.name || '';
     const replySubject = thread.subject.startsWith('Re:') ? thread.subject : `Re: ${thread.subject}`;
+
+    const formattedHtml = html || buildBrandedEmailHtml({
+      subject: replySubject,
+      contentText: text || '',
+      recipientName,
+      category: thread.category || 'general'
+    });
 
     // Send email using Resend
     const sendResult = await sendEmail({
       to: recipientAddress,
       subject: replySubject,
       text: text || '',
-      html: html || `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #222;">${(text || '').replace(/\n/g, '<br/>')}</div>`,
+      html: formattedHtml,
       from: 'IlmiDunya Pakistan <info@ilmidunya.com>',
       replyTo: 'info@ilmidunya.com'
     });
@@ -318,7 +327,7 @@ router.post('/threads/:id/reply', async (req, res) => {
       to: [{ name: thread.from.name || recipientAddress, address: recipientAddress }],
       subject: replySubject,
       text: text || '',
-      html: html || text,
+      html: formattedHtml,
       sentBy: req.user._id,
       createdAt: new Date()
     };
@@ -361,13 +370,21 @@ router.post('/compose', async (req, res) => {
     const matchedUser = await User.findOne({ email: recipientAddress }).select('name role avatar phone city');
     const userRole = matchedUser ? matchedUser.role : 'guest';
     const userRef = matchedUser ? matchedUser._id : null;
+    const recipientName = matchedUser?.name || '';
+
+    const formattedHtml = html || buildBrandedEmailHtml({
+      subject: subject.trim(),
+      contentText: text || '',
+      recipientName,
+      category
+    });
 
     // Send email using Resend
     const sendResult = await sendEmail({
       to: recipientAddress,
       subject: subject.trim(),
       text: text || '',
-      html: html || `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #222;">${(text || '').replace(/\n/g, '<br/>')}</div>`,
+      html: formattedHtml,
       from: 'IlmiDunya Pakistan <info@ilmidunya.com>',
       replyTo: 'info@ilmidunya.com'
     });
@@ -388,7 +405,7 @@ router.post('/compose', async (req, res) => {
         to: [{ name: matchedUser?.name || recipientAddress, address: recipientAddress }],
         subject: subject.trim(),
         text: text || '',
-        html: html || text,
+        html: formattedHtml,
         sentBy: req.user._id,
         createdAt: new Date()
       }],

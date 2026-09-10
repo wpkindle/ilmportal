@@ -14,6 +14,8 @@ const getResendClient = () => {
   return resendClient;
 };
 
+const { buildBrandedEmailHtml } = require('../utils/brandedEmailBuilder');
+
 const extractEmailAddress = (raw) => {
   if (!raw) return 'info@ilmidunya.com';
   const str = String(raw).trim();
@@ -41,6 +43,8 @@ const sendViaBrevo = async ({ to, subject, html, text, replyTo }) => {
     return { email: String(item).trim() };
   });
 
+  const resolvedHtml = html || buildBrandedEmailHtml({ subject, contentText: text || '' });
+
   const res = await fetch('https://api.brevo.com/v3/smtp/email', {
     method: 'POST',
     headers: {
@@ -52,7 +56,7 @@ const sendViaBrevo = async ({ to, subject, html, text, replyTo }) => {
       to: recipientList,
       replyTo: { name: 'IlmiDunya Support', email: replyTo || 'info@ilmidunya.com' },
       subject,
-      htmlContent: html || `<div style="font-family: Arial, sans-serif; line-height: 1.6; color: #222;">${(text || '').replace(/\n/g, '<br/>')}</div>`,
+      htmlContent: resolvedHtml,
       textContent: text || (html ? html.replace(/<[^>]*>?/gm, '') : '')
     })
   });
@@ -127,16 +131,17 @@ const sendEmail = async ({
     const cleanEmail = extractEmailAddress(process.env.RESEND_FROM || process.env.SMTP_FROM || from);
     const sender = `IlmiDunya Pakistan <${cleanEmail}>`;
 
+    const resolvedHtml = html || buildBrandedEmailHtml({ subject, contentText: text || '' });
+
     const payload = {
       from: sender,
       to: recipientList,
       subject,
+      html: resolvedHtml,
+      text: text || (html ? html.replace(/<[^>]*>?/gm, '') : ''),
       reply_to: replyTo || 'info@ilmidunya.com',
       headers
     };
-
-    if (html) payload.html = html;
-    if (text) payload.text = text;
 
     const response = await client.emails.send(payload);
 

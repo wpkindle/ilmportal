@@ -21,6 +21,7 @@ import FemaleTutorGateModal from '../common/FemaleTutorGateModal';
 import ChatRequestModal from '../common/ChatRequestModal';
 import { calculateClientCompletion } from '../common/ProfileCompletionMeter';
 import { useAuth } from '../../context/AuthContext';
+import { useSocket } from '../../context/SocketContext';
 import { api } from '../../services/api';
 import { getTutorAvatar } from '../../utils/tutorHelpers';
 
@@ -63,6 +64,7 @@ const CardHoverWrapper = ({ children }) => {
 // ─────────────────────────────────────────────
 const TutorCard = ({ tutor, tutorProfile }) => {
   const { user, isAuthenticated, isTutor } = useAuth();
+  const { onlineStatusMap } = useSocket();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
   const [sanadModalOpen, setSanadModalOpen] = useState(false);
@@ -80,6 +82,12 @@ const TutorCard = ({ tutor, tutorProfile }) => {
   const tutorCity = tutorUser.city || data.city || 'Pakistan';
   const tutorArea = data.localArea || tutorUser.area || data.area || '';
   const tutorAvatar = getTutorAvatar(data, tutorName);
+
+  const tutorUserId = tutorUser._id || tutorUser.id || data?.user?._id || data?.user?.id || (typeof data?.user === 'string' ? data.user : null);
+  const tutorUserIdStr = tutorUserId ? tutorUserId.toString() : null;
+
+  const isOnlineLive = tutorUserIdStr ? (onlineStatusMap?.[tutorUserIdStr] === true) : false;
+  const isTutorOnline = isOnlineLive || (data?.isOnline === true && onlineStatusMap?.[tutorUserIdStr] !== false);
 
   const isTutorVisitor = isTutor || user?.role === 'tutor' || (typeof window !== 'undefined' && (() => {
     try {
@@ -184,8 +192,25 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                   }}
                   className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border-2 border-white shadow-md"
                 />
+
+                {/* Real-time Online / Offline Indicator Dot */}
+                {isTutorOnline ? (
+                  <span
+                    className="absolute -top-1 -right-1 flex h-3.5 w-3.5 sm:h-4 sm:w-4 z-10"
+                    title="Online Now"
+                  >
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 bg-emerald-500 border-2 border-white shadow-xs"></span>
+                  </span>
+                ) : (
+                  <span
+                    className="absolute -top-1 -right-1 inline-flex rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 bg-stone-400 border-2 border-white shadow-xs z-10"
+                    title="Offline"
+                  />
+                )}
+
                 {data.isSanadVerified && (
-                  <div className="absolute -bottom-1 -right-1 p-1 bg-[#143d2b] text-white rounded-full ring-2 ring-white shadow" title="Sanad Verified Faculty">
+                  <div className="absolute -bottom-1 -right-1 p-1 bg-[#143d2b] text-white rounded-full ring-2 ring-white shadow z-10" title="Sanad Verified Faculty">
                     <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
                   </div>
                 )}
@@ -193,12 +218,25 @@ const TutorCard = ({ tutor, tutorProfile }) => {
 
               {/* Name / location / rating */}
               <div className="min-w-0">
-                <Link
-                  href={`/tutors/${data._id}`}
-                  className="font-serif font-black text-sm sm:text-[15px] text-slate-900 hover:text-[#0c2217] transition-colors leading-tight line-clamp-1"
-                >
-                  {tutorName}
-                </Link>
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  <Link
+                    href={`/tutors/${data._id}`}
+                    className="font-serif font-black text-sm sm:text-[15px] text-slate-900 hover:text-[#0c2217] transition-colors leading-tight line-clamp-1"
+                  >
+                    {tutorName}
+                  </Link>
+                  {isTutorOnline ? (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-md text-[9px] font-bold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Online</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-md text-[9px] font-semibold text-stone-500 bg-stone-100 border border-stone-200 shrink-0">
+                      <span className="w-1.5 h-1.5 rounded-full bg-stone-400" />
+                      <span>Offline</span>
+                    </span>
+                  )}
+                </div>
 
                 <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500 mt-0.5">
                   <span className="flex items-center gap-1">

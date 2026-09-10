@@ -25,6 +25,7 @@ import {
   Star
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
+import { useSocket } from '../../../context/SocketContext';
 import { api } from '../../../services/api';
 import ProfileCompletionMeter from '../../../components/common/ProfileCompletionMeter';
 import AccountStatusBanner from '../../../components/common/AccountStatusBanner';
@@ -40,6 +41,7 @@ function StudentProfileContent() {
   const searchParams = useSearchParams();
   const isVerifiedNotice = searchParams.get('verified') === 'true';
   const { user, updateUserProfile, loading: authLoading } = useAuth();
+  const { isConnected } = useSocket();
 
   // Profile Form State
   const [name, setName] = useState('');
@@ -281,9 +283,25 @@ function StudentProfileContent() {
                   alt={name}
                   className="w-28 h-28 rounded-full object-cover border-4 border-[#eef5f0] shadow-md mx-auto"
                 />
+
+                {/* Real-time Online / Offline Indicator Dot */}
+                {isConnected ? (
+                  <span
+                    className="absolute top-1 right-1 flex h-5 w-5 z-10"
+                    title="Active / Online Now"
+                  >
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-5 w-5 bg-emerald-500 border-2 border-white shadow-sm"></span>
+                  </span>
+                ) : (
+                  <span
+                    className="absolute top-1 right-1 inline-flex rounded-full h-5 w-5 bg-stone-400 border-2 border-white shadow-sm z-10"
+                    title="Offline"
+                  />
+                )}
                 
                 {/* Upload Button overlay */}
-                <label className="absolute bottom-0 right-0 p-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-full cursor-pointer shadow-md transition-transform hover:scale-105">
+                <label className="absolute bottom-0 right-0 p-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-full cursor-pointer shadow-md transition-transform hover:scale-105 z-10">
                   <Camera className="w-4 h-4" />
                   <input
                     type="file"
@@ -298,10 +316,21 @@ function StudentProfileContent() {
                 <h3 className="font-bold text-sm text-slate-900">{name || 'Student Name'}</h3>
                 {username && <p className="text-[11px] font-mono font-bold text-[#b85d34]">@{username}</p>}
                 <p className="text-xs text-slate-500">{email || 'student@example.com'}</p>
-                <div className="mt-2 flex items-center justify-center gap-2">
+                <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-[#f0ece1] text-[#0c2217]">
                     Student Account
                   </span>
+                  {isConnected ? (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Online Now</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-stone-100 text-stone-600 border border-stone-200">
+                      <span className="w-1.5 h-1.5 rounded-full bg-stone-400" />
+                      <span>Offline</span>
+                    </span>
+                  )}
                   {user?.isVerified && (
                     <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-800 flex items-center gap-1">
                       <CheckCircle2 className="w-3 h-3 text-blue-600" />

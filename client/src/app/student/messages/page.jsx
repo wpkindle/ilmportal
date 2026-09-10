@@ -227,7 +227,7 @@ function StudentMessagesContent() {
                         />
                         <span
                           className={`absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 border-2 border-white rounded-full ${
-                            isTutorOnline ? 'bg-amber-500 ring-2 ring-amber-500/20' : 'bg-slate-300'
+                            isTutorOnline ? 'bg-emerald-500 ring-2 ring-emerald-500/30 shadow-xs' : 'bg-stone-300'
                           }`}
                           title={isTutorOnline ? 'Online' : 'Offline'}
                         />
@@ -240,8 +240,8 @@ function StudentMessagesContent() {
                           </h4>
                           <div className="flex items-center gap-1.5 shrink-0">
                             {isTutorOnline ? (
-                              <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-[#0c2217] bg-[#f0ece1] px-2 py-0.5 rounded-full border border-[#d4a359]/40">
-                                <span className="w-1.5 h-1.5 rounded-full bg-[#d4a359] animate-pulse" />
+                              <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                                 Online
                               </span>
                             ) : (

@@ -105,6 +105,13 @@ export const SocketProvider = ({ children }) => {
       console.log('[WebSocket] Connected successfully!');
       registerCurrentUser();
 
+      // Query online users immediately on connection
+      newSocket.emit('get-online-status', [], (statusMap) => {
+        if (statusMap && typeof statusMap === 'object') {
+          setOnlineStatusMap(prev => ({ ...prev, ...statusMap }));
+        }
+      });
+
       // Query admin status immediately on connection
       newSocket.emit('check-admin-online-status', (res) => {
         if (res && typeof res.isOnline === 'boolean') {
@@ -117,6 +124,11 @@ export const SocketProvider = ({ children }) => {
     newSocket.io.on('reconnect', () => {
       console.log('[WebSocket] Reconnected to server');
       registerCurrentUser();
+      newSocket.emit('get-online-status', [], (statusMap) => {
+        if (statusMap && typeof statusMap === 'object') {
+          setOnlineStatusMap(prev => ({ ...prev, ...statusMap }));
+        }
+      });
       newSocket.emit('check-admin-online-status', (res) => {
         if (res && typeof res.isOnline === 'boolean') {
           setIsAdminOnline(res.isOnline);

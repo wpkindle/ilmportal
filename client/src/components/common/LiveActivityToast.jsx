@@ -168,11 +168,36 @@ export default function LiveActivityToast() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(false);
   const timeoutRef = useRef(null);
+  const [isDesktop, setIsDesktop] = useState(false);
 
   const isAdminRoute = pathname?.startsWith('/admin');
 
   useEffect(() => {
-    if (isAdminRoute) return;
+    if (typeof window === 'undefined') return;
+    const mq = window.matchMedia('(min-width: 768px)');
+    setIsDesktop(mq.matches);
+
+    const handleMediaChange = (e) => {
+      setIsDesktop(e.matches);
+    };
+
+    if (mq.addEventListener) {
+      mq.addEventListener('change', handleMediaChange);
+    } else {
+      mq.addListener(handleMediaChange);
+    }
+
+    return () => {
+      if (mq.removeEventListener) {
+        mq.removeEventListener('change', handleMediaChange);
+      } else {
+        mq.removeListener(handleMediaChange);
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    if (isAdminRoute || !isDesktop) return;
 
     let isMounted = true;
 
@@ -203,19 +228,19 @@ export default function LiveActivityToast() {
       }, 4200);
     };
 
-    // Initial launch after 1 second
-    timeoutRef.current = setTimeout(scheduleNextCycle, 1000);
+    // Initial launch after 1.5 seconds on desktop
+    timeoutRef.current = setTimeout(scheduleNextCycle, 1500);
 
     return () => {
       isMounted = false;
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
     };
-  }, [isAdminRoute]);
+  }, [isAdminRoute, isDesktop]);
 
   const isChatRoute = pathname?.includes('/messages');
 
-  // If on admin, classroom, or messages chat routes, do not render toast
-  if (isAdminRoute || pathname?.startsWith('/classroom') || isChatRoute) {
+  // If on admin, classroom, chat routes, or on mobile screen, do not render toast
+  if (isAdminRoute || pathname?.startsWith('/classroom') || isChatRoute || !isDesktop) {
     return null;
   }
 
@@ -242,7 +267,7 @@ export default function LiveActivityToast() {
   return (
     <aside
       aria-label="Live Community Activity"
-      className={`fixed bottom-36 left-3 sm:left-6 md:bottom-20 md:left-6 z-40 max-w-[320px] sm:max-w-sm w-[calc(100%-2rem)] sm:w-auto pointer-events-auto transition-all duration-500 ease-out transform ${
+      className={`hidden md:block fixed bottom-20 left-6 z-40 max-w-sm w-auto pointer-events-auto transition-all duration-500 ease-out transform ${
         isVisible
           ? 'translate-y-0 opacity-100 scale-100'
           : 'translate-y-6 opacity-0 pointer-events-none scale-95'

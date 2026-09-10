@@ -38,7 +38,7 @@ import BrandLogo from './BrandLogo';
 
 const Navbar = () => {
   const { user, isAuthenticated, logout, isStudent, isTutor, isAdmin } = useAuth();
-  const { socket } = useSocket();
+  const { socket, isConnected } = useSocket();
   
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
@@ -595,16 +595,43 @@ const Navbar = () => {
                         alt={user?.name}
                         className="w-full h-full object-cover"
                       />
+                      {/* Real-time Presence Dot */}
+                      {isConnected ? (
+                        <span
+                          className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-emerald-500 border border-white rounded-full shadow-xs"
+                          title="Online Now"
+                        />
+                      ) : (
+                        <span
+                          className="absolute top-0.5 right-0.5 w-2.5 h-2.5 bg-stone-400 border border-white rounded-full shadow-xs"
+                          title="Offline"
+                        />
+                      )}
                     </div>
 
                     {/* Desktop: Decent, elegant, modern profile box */}
                     <div className="hidden sm:flex items-center gap-2 pl-1.5 pr-2.5 sm:pr-3 py-1.5 rounded-2xl bg-white border border-stone-200 hover:border-[#0c2217] hover:shadow-md transition-all shadow-2xs group shrink-0">
-                      <div className="w-8 h-8 rounded-xl overflow-hidden ring-1 ring-[#d4a359]/30 group-hover:ring-[#d4a359]/60 transition-all shrink-0 relative">
+                      <div className="w-8 h-8 rounded-xl ring-1 ring-[#d4a359]/30 group-hover:ring-[#d4a359]/60 transition-all shrink-0 relative">
                         <img
                           src={user?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(user?.name || 'User')}&background=0c2217&color=d4a359`}
                           alt={user?.name}
-                          className="w-full h-full object-cover"
+                          className="w-full h-full object-cover rounded-xl"
                         />
+                        {/* Real-time Presence Dot */}
+                        {isConnected ? (
+                          <span
+                            className="absolute -top-1 -right-1 flex h-3 w-3"
+                            title="Online Now"
+                          >
+                            <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                            <span className="relative inline-flex rounded-full h-3 w-3 bg-emerald-500 border-2 border-white shadow-xs"></span>
+                          </span>
+                        ) : (
+                          <span
+                            className="absolute -top-1 -right-1 inline-flex rounded-full h-3 w-3 bg-stone-400 border-2 border-white shadow-xs"
+                            title="Offline"
+                          />
+                        )}
                       </div>
                       <div className="text-left">
                         <p className="text-xs font-bold text-stone-800 leading-tight max-w-[80px] sm:max-w-[110px] truncate group-hover:text-[#0c2217] transition-colors">

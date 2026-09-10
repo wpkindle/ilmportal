@@ -215,13 +215,21 @@ exports.getPublicTutors = async (req, res) => {
 
     const total = await TutorProfile.countDocuments(query);
 
+    const isUserOnline = req.app.get('isUserOnline');
+    const tutorsWithOnline = tutorProfiles.map(tp => {
+      const obj = tp.toObject ? tp.toObject() : { ...tp };
+      const uId = obj.user?._id || obj.user?.id || obj.user;
+      obj.isOnline = isUserOnline ? Boolean(isUserOnline(uId)) : false;
+      return obj;
+    });
+
     res.status(200).json({
       success: true,
-      count: tutorProfiles.length,
+      count: tutorsWithOnline.length,
       total,
       totalPages: Math.ceil(total / limitNumber),
       currentPage: pageNumber,
-      tutors: tutorProfiles
+      tutors: tutorsWithOnline
     });
   } catch (error) {
     console.error('Error in getPublicTutors:', error);
@@ -275,9 +283,14 @@ exports.getTutorById = async (req, res) => {
       .sort({ createdAt: -1 })
       .limit(10);
 
+    const isUserOnline = req.app.get('isUserOnline');
+    const tutorObj = tutor.toObject ? tutor.toObject() : { ...tutor };
+    const uId = tutorObj.user?._id || tutorObj.user?.id || tutorObj.user;
+    tutorObj.isOnline = isUserOnline ? Boolean(isUserOnline(uId)) : false;
+
     res.status(200).json({
       success: true,
-      tutor,
+      tutor: tutorObj,
       reviews
     });
   } catch (error) {

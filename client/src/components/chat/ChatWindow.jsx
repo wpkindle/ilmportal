@@ -792,12 +792,12 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             />
             {isPartnerOnline ? (
               <span
-                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-[#0c2217] border-2 border-white rounded-full ring-2 ring-[#d4a359]/40 shadow-xs"
+                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-emerald-500 border-2 border-white rounded-full ring-2 ring-emerald-500/30 shadow-xs"
                 title="Online Now"
               />
             ) : (
               <span
-                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-stone-300 border-2 border-white rounded-full"
+                className="absolute -bottom-0.5 -right-0.5 w-3 h-3 sm:w-3.5 sm:h-3.5 bg-stone-400 border-2 border-white rounded-full shadow-xs"
                 title="Offline"
               />
             )}
@@ -812,12 +812,12 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
 
             <div className="flex items-center gap-1.5 mt-0.5 text-[10.5px] sm:text-[11px] truncate">
               {isPartnerOnline ? (
-                <span className="inline-flex items-center gap-1 font-bold text-[#0c2217] bg-[#f0ece1] px-2 py-0.5 rounded-full border border-[#d4a359]/40 text-[9.5px] sm:text-[10px] shrink-0">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#0c2217] animate-pulse" />
+                <span className="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 text-[9.5px] sm:text-[10px] shrink-0">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span>Online</span>
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 font-semibold text-stone-400 bg-stone-100 px-2 py-0.5 rounded-full border border-stone-200 text-[9.5px] sm:text-[10px] shrink-0">
+                <span className="inline-flex items-center gap-1 font-semibold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full border border-stone-200 text-[9.5px] sm:text-[10px] shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-stone-400" />
                   <span>Offline</span>
                 </span>

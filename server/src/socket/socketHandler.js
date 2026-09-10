@@ -107,6 +107,12 @@ const initSocket = (io, app) => {
 
   if (app) {
     app.set('getOnlineAdminCount', () => getVerifiedOnlineAdminCount());
+    app.set('isUserOnline', (uId) => {
+      if (!uId) return false;
+      const idStr = uId.toString();
+      return onlineUsers.has(idStr) && onlineUsers.get(idStr).size > 0;
+    });
+    app.set('getOnlineUsers', () => Array.from(onlineUsers.keys()));
   }
 
   // Periodic cleanup interval to eliminate any phantom sockets
@@ -120,6 +126,10 @@ const initSocket = (io, app) => {
 
   io.on('connection', (socket) => {
     console.log(`🔌 Socket client connected: ${socket.id}`);
+
+    // Send currently online user IDs immediately to any connecting client (guests & authenticated users)
+    const currentOnlineIds = Array.from(onlineUsers.keys()).filter((uId) => onlineUsers.get(uId)?.size > 0);
+    socket.emit('initial-online-users', currentOnlineIds);
 
     // Register user socket & send current online users list
     socket.on('register-user', async (userId) => {
@@ -242,12 +252,18 @@ const initSocket = (io, app) => {
 
     // Query online status on-demand for instant UI precision
     socket.on('get-online-status', (userIds, callback) => {
-      if (Array.isArray(userIds) && typeof callback === 'function') {
+      if (typeof callback === 'function') {
         const statusMap = {};
-        userIds.forEach((id) => {
-          const idStr = id?.toString();
-          statusMap[idStr] = onlineUsers.has(idStr) && onlineUsers.get(idStr).size > 0;
-        });
+        if (!Array.isArray(userIds) || userIds.length === 0) {
+          onlineUsers.forEach((sockets, uId) => {
+            if (sockets && sockets.size > 0) statusMap[uId] = true;
+          });
+        } else {
+          userIds.forEach((id) => {
+            const idStr = id?.toString();
+            statusMap[idStr] = onlineUsers.has(idStr) && onlineUsers.get(idStr).size > 0;
+          });
+        }
         callback(statusMap);
       }
     });

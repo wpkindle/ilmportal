@@ -30,6 +30,7 @@ import FemaleTutorGateModal from '../../../components/common/FemaleTutorGateModa
 import ChatRequestModal from '../../../components/common/ChatRequestModal';
 import { calculateClientCompletion } from '../../../components/common/ProfileCompletionMeter';
 import { useAuth } from '../../../context/AuthContext';
+import { useSocket } from '../../../context/SocketContext';
 import { api } from '../../../services/api';
 import { getTutorAvatar } from '../../../utils/tutorHelpers';
 
@@ -43,6 +44,8 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
   const [chatRequestModalOpen, setChatRequestModalOpen] = useState(false);
   const [authoredCourses, setAuthoredCourses] = useState([]);
 
+  const { onlineStatusMap, refreshUserOnlineStatus, isConnected } = useSocket();
+
   React.useEffect(() => {
     setMounted(true);
   }, []);
@@ -52,6 +55,19 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
   const tutorArea = tutor?.localArea || tutorUser.area || tutor?.area || '';
   const tutorCity = tutorUser.city || tutor?.city || 'Pakistan';
   const tutorAvatar = getTutorAvatar(tutor || tutorUser, tutorName);
+
+  const tutorUserId = tutorUser._id || tutorUser.id || tutor?.user?._id || tutor?.user?.id || (typeof tutor?.user === 'string' ? tutor.user : null);
+  const tutorUserIdStr = tutorUserId ? tutorUserId.toString() : null;
+
+  // Real-time online check, falling back to initial SSR isOnline flag
+  const isOnlineLive = tutorUserIdStr ? (onlineStatusMap?.[tutorUserIdStr] === true) : false;
+  const isTutorOnline = isOnlineLive || (tutor?.isOnline === true && onlineStatusMap?.[tutorUserIdStr] !== false);
+
+  useEffect(() => {
+    if (tutorUserIdStr) {
+      refreshUserOnlineStatus(tutorUserIdStr);
+    }
+  }, [tutorUserIdStr, isConnected]);
 
   const rawJoiningDate = tutorUser?.createdAt || tutor?.createdAt;
   const formattedJoiningDate = rawJoiningDate
@@ -160,7 +176,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
           <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
             
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-              <div className="relative">
+              <div className="relative shrink-0">
                 <img
                   src={tutorAvatar}
                   alt={tutorName}
@@ -170,8 +186,25 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                   }}
                   className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl object-cover border-2 border-[#e6ded1] shadow-sm"
                 />
+
+                {/* Real-time Online / Offline Indicator Dot */}
+                {isTutorOnline ? (
+                  <span
+                    className="absolute -top-1 -right-1 flex h-4 w-4 sm:h-5 sm:w-5 z-10"
+                    title="Tutor is Online Now"
+                  >
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-4 w-4 sm:h-5 sm:w-5 bg-emerald-500 border-2 sm:border-[2.5px] border-white shadow-xs"></span>
+                  </span>
+                ) : (
+                  <span
+                    className="absolute -top-1 -right-1 inline-flex rounded-full h-4 w-4 sm:h-5 sm:w-5 bg-stone-400 border-2 sm:border-[2.5px] border-white shadow-xs z-10"
+                    title="Tutor is Offline"
+                  />
+                )}
+
                 {tutor.isSanadVerified && (
-                  <div className="absolute -bottom-1 -right-1 p-1.5 bg-[#143d2b] text-white rounded-full ring-2 ring-white" title="Sanad Verified">
+                  <div className="absolute -bottom-1 -right-1 p-1.5 bg-[#143d2b] text-white rounded-full ring-2 ring-white shadow z-10" title="Sanad Verified">
                     <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
                   </div>
                 )}
@@ -180,6 +213,20 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
               <div className="space-y-1.5">
                 <div className="flex flex-wrap items-center gap-2">
                   <h1 className="text-xl sm:text-2xl font-serif font-black text-slate-900">{tutorName}</h1>
+
+                  {/* Real-time Online / Offline Badge */}
+                  {isTutorOnline ? (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
+                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      <span>Online Now</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-stone-100 text-stone-600 border border-stone-200">
+                      <span className="w-2 h-2 rounded-full bg-stone-400" />
+                      <span>Offline</span>
+                    </span>
+                  )}
+
                   {isFemaleTutor ? (
                     <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-[#f5ebe6] text-[#b85d34] border border-[#b85d34]/30">
                       <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />

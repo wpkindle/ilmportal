@@ -206,8 +206,8 @@ export default function Hero() {
             </div>
 
             {/* Main Editorial Headline with Dramatic Contrast */}
-            <h1 className="text-3xl sm:text-4xl md:text-[42px] lg:text-[44px] xl:text-[52px] font-serif font-black tracking-tight text-[#0c2217] leading-[1.18]">
-              Connecting Verified Tutors <br className="hidden md:inline" />
+            <h1 className="text-2xl sm:text-3xl md:text-[38px] lg:text-[35px] xl:text-[44px] 2xl:text-[48px] font-serif font-bold text-[#0c2217] leading-[1.25] sm:leading-[1.24] lg:leading-[1.25] tracking-tight text-balance">
+              Connecting Verified Tutors <br className="hidden sm:inline" />
               With Students <span className="hand-drawn-underline text-[#0c2217] whitespace-nowrap">Across Pakistan</span>
             </h1>
 

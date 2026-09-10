@@ -145,7 +145,7 @@ function EmailTemplatePreview({ subject, body, recipientName, category = 'genera
           {/* Action CTA Button */}
           <div className="pt-4 pb-2 text-center">
             <span className="inline-block px-6 py-2.5 rounded-xl bg-[#0c2217] text-white text-xs font-bold border border-[#d4a359] shadow-md uppercase tracking-wide">
-              Visit IlmiDunya Portal &rarr;
+              Visit ilmidunya.com &rarr;
             </span>
           </div>
 
@@ -157,9 +157,9 @@ function EmailTemplatePreview({ subject, body, recipientName, category = 'genera
               className="w-10 h-10 rounded-xl object-contain border border-[#d4a359] shrink-0 bg-[#0c2217]"
             />
             <div className="text-[11px] leading-tight text-left">
-              <div className="font-bold text-[#0c2217]">IlmiDunya Academic Faculty &amp; Support</div>
+              <div className="font-bold text-[#0c2217]">ilmidunya Support</div>
               <div className="text-[#78716c] mt-0.5">
-                Official Portal: <span className="text-[#b85d34] font-semibold">ilmidunya.com</span> &bull; Direct: <span className="text-[#0c2217] font-semibold">info@ilmidunya.com</span>
+                Official Portal: <span className="text-[#b85d34] font-semibold">ilmidunya.com</span> &bull; Email: <span className="text-[#0c2217] font-semibold">info@ilmidunya.com</span>
               </div>
             </div>
           </div>
@@ -169,11 +169,9 @@ function EmailTemplatePreview({ subject, body, recipientName, category = 'genera
         <div className="bg-[#faf8f5] px-4 py-2.5 border-t border-[#e6ded1] text-center text-[10px] font-bold text-[#78716c] flex items-center justify-center gap-2 flex-wrap">
           <span className="text-[#0c2217]">Browse Tutors</span>
           <span>&bull;</span>
-          <span className="text-[#0c2217]">Student Login</span>
+          <span className="text-[#0c2217]">Student Portal</span>
           <span>&bull;</span>
-          <span className="text-[#0c2217]">Faculty Portal</span>
-          <span>&bull;</span>
-          <span className="text-[#0c2217]">Contact Us</span>
+          <span className="text-[#0c2217]">Tutor Portal</span>
         </div>
 
         {/* Footer */}

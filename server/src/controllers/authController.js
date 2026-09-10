@@ -21,7 +21,8 @@ const generateToken = (id) => {
 const calculateProfileCompletion = (user, tutorProfile) => {
   if (!user) return { percentage: 0, items: [] };
 
-  if (user.role === 'tutor') {
+  const isTutor = user.role === 'tutor' || !!tutorProfile;
+  if (isTutor) {
     const checks = [
       { key: 'name', label: 'Full Name', weight: 10, done: !!user.name?.trim() },
       { key: 'email', label: 'Verified Email', weight: 10, done: !!user.isVerified },
@@ -38,7 +39,7 @@ const calculateProfileCompletion = (user, tutorProfile) => {
         weight: 10,
         done: Array.isArray(tutorProfile?.sanadDocuments) &&
               tutorProfile.sanadDocuments.length > 0 &&
-              tutorProfile.sanadDocuments.some(doc => doc.status === 'verified' || doc.status === 'approved' || (!doc.status && tutorProfile?.verificationStatus === 'approved'))
+              tutorProfile.sanadDocuments.some(doc => doc.status === 'verified' || doc.status === 'approved')
       }
     ];
 

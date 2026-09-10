@@ -21,11 +21,12 @@ import {
 export const calculateClientCompletion = (user, tutorProfile) => {
   if (!user) return { percentage: 0, items: [] };
 
-  if (user.role === 'tutor') {
+  const isTutor = user.role === 'tutor' || !!tutorProfile;
+  if (isTutor) {
     const hasApprovedSanad = Array.isArray(tutorProfile?.sanadDocuments) &&
       tutorProfile.sanadDocuments.length > 0 &&
       tutorProfile.sanadDocuments.some(
-        (doc) => doc.status === 'verified' || doc.status === 'approved' || (!doc.status && tutorProfile?.verificationStatus === 'approved')
+        (doc) => doc.status === 'verified' || doc.status === 'approved'
       );
 
     const hasUploadedSanad = Array.isArray(tutorProfile?.sanadDocuments) && tutorProfile.sanadDocuments.length > 0;
@@ -192,12 +193,12 @@ export default function ProfileCompletionMeter({
   const [detailsOpen, setDetailsOpen] = useState(false);
   const { percentage, items } = calculateClientCompletion(user, tutorProfile);
   const isApproved = tutorProfile?.verificationStatus === 'approved';
-  const isTutor = user?.role === 'tutor';
+  const isTutor = user?.role === 'tutor' || !!tutorProfile;
   const hasPendingSanad = isTutor &&
     Array.isArray(tutorProfile?.sanadDocuments) &&
     tutorProfile.sanadDocuments.length > 0 &&
     !tutorProfile.sanadDocuments.some(
-      (doc) => doc.status === 'verified' || doc.status === 'approved' || (!doc.status && tutorProfile?.verificationStatus === 'approved')
+      (doc) => doc.status === 'verified' || doc.status === 'approved'
     );
 
   const completedCount = items.filter((i) => i.done).length;

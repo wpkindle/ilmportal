@@ -29,7 +29,11 @@ exports.getPublicTutors = async (req, res) => {
     const query = {
       verificationStatus: 'approved',
       subjects: { $exists: true, $not: { $size: 0 } },
-      sanadDocuments: { $exists: true, $not: { $size: 0 } }
+      sanadDocuments: {
+        $elemMatch: {
+          status: { $in: ['verified', 'approved'] }
+        }
+      }
     };
 
     // Filter by subject/category
@@ -196,7 +200,7 @@ exports.getPublicTutors = async (req, res) => {
     const skip = (pageNumber - 1) * limitNumber;
 
     let tutorProfiles = await TutorProfile.find(query)
-      .populate('user', 'name email avatar phone city area age gender isVerified isActive createdAt')
+      .populate('user', 'name email avatar phone city area age gender role isVerified isActive createdAt')
       .populate('subjects', 'name slug type icon description')
       .populate('cities', 'name province isMajorCity')
       .sort(sortOptions);
@@ -254,14 +258,14 @@ exports.getPublicTutors = async (req, res) => {
 exports.getTutorById = async (req, res) => {
   try {
     let tutor = await TutorProfile.findById(req.params.id)
-      .populate('user', 'name email avatar phone city area age gender isVerified isActive createdAt')
+      .populate('user', 'name email avatar phone city area age gender role isVerified isActive createdAt')
       .populate('subjects', 'name slug type icon description')
       .populate('cities', 'name province isMajorCity');
 
     // If ID was user ID instead of tutor profile ID
     if (!tutor) {
       tutor = await TutorProfile.findOne({ user: req.params.id })
-        .populate('user', 'name email avatar phone city area age gender isVerified isActive createdAt')
+        .populate('user', 'name email avatar phone city area age gender role isVerified isActive createdAt')
         .populate('subjects', 'name slug type icon description')
         .populate('cities', 'name province isMajorCity');
     }
@@ -474,9 +478,7 @@ exports.updateMyTutorProfile = async (req, res) => {
     }
 
     if (hasNewlyUploadedDoc) {
-      if (profile.verificationStatus !== 'approved') {
-        profile.verificationStatus = 'under_review';
-      }
+      profile.verificationStatus = 'under_review';
 
       // Dispatch Admin Notification for new document
       try {
@@ -558,7 +560,7 @@ exports.uploadSanad = async (req, res) => {
     const user = await User.findById(req.user.id);
     const completion = user ? calculateProfileCompletion(user, profile) : { percentage: 0 };
 
-    if (profile.verificationStatus !== 'approved' && profile.verificationStatus !== 'suspended') {
+    if (profile.verificationStatus !== 'suspended') {
       profile.verificationStatus = 'under_review';
     }
 

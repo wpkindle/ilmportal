@@ -703,23 +703,6 @@ export const api = {
     body: JSON.stringify(body)
   }).then(handleResponse),
 
-  // AI Support & Human Live Desk
-  sendAiChat: (body) => fetch(`${API_BASE}/ai/chat`, {
-    method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify(body)
-  }).then(handleResponse),
-
-  requestHumanSupport: (body) => fetch(`${API_BASE}/ai/human-support`, {
-    method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify(body)
-  }).then(handleResponse),
-
-  getAiHealth: () => fetch(`${API_BASE}/ai/health`, {
-    headers: getHeaders()
-  }).then(handleResponse),
-
   getAdminSupportSessions: (params) => fetch(`${API_BASE}/support-chat/admin/sessions?${new URLSearchParams(params || {})}`, {
     headers: getHeaders()
   }).then(handleResponse),

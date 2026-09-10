@@ -85,12 +85,37 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
     tutorToken = jwt.sign({ id: res.body.user.id }, process.env.JWT_SECRET || 'fallback_jwt_secret_for_pakistan_lms_2026', { expiresIn: '30d' });
 
     const User = require('../src/models/User');
-    await User.findByIdAndUpdate(res.body.user.id, { isVerified: true });
+    await User.findByIdAndUpdate(res.body.user.id, {
+      isVerified: true,
+      avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200',
+      age: 32,
+      gender: 'Male',
+      city: 'Islamabad'
+    });
 
     const TutorProfile = require('../src/models/TutorProfile');
     const profile = await TutorProfile.findOne({ user: res.body.user.id });
-    expect(['pending', 'incomplete']).toContain(profile.verificationStatus);
+    const Category = require('../src/models/Category');
+    let cat = await Category.findOne();
+    if (!cat) {
+      cat = await Category.create({ name: 'Quran & Tajweed', slug: 'quran-tajweed', icon: 'BookOpen' });
+    }
+
     profile.verificationStatus = 'pending';
+    profile.gender = 'male';
+    profile.city = 'Islamabad';
+    profile.subjects = [cat._id];
+    profile.bio = 'Experienced certified Quran tutor teaching Tajweed, Hifz, and Islamic studies for over 10 years.';
+    profile.qualifications = 'Shahadat-ul-Alimiyyah (Wifaq-ul-Madaris)';
+    profile.sanadDocuments = [
+      {
+        title: 'Shahadat-ul-Alimiyyah',
+        fileUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600',
+        fileType: 'image/jpeg',
+        status: 'verified',
+        uploadedAt: new Date()
+      }
+    ];
     await profile.save();
     tutorProfileId = profile._id.toString();
   });

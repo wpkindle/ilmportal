@@ -430,13 +430,6 @@
     linear-gradient(180deg, #f4efe2 0%, #fbf5eb 50%, #f1ebd8 100%);
 }
 
-/* 7. Testimonials: Serene, peaceful soft slate-ivory with emerald tint */
-.bg-section-testimonials {
-  background: 
-    radial-gradient(ellipse 60% 55% at 85% 30%, rgba(16, 185, 129, 0.09), transparent 70%),
-    radial-gradient(ellipse 50% 50% at 15% 70%, rgba(212, 163, 89, 0.10), transparent 65%),
-    linear-gradient(180deg, #f1ebd8 0%, #f2f7f9 50%, #f6f2e8 100%);
-}
 
 /* 8. FAQ: Warm golden parchment closing into the dark footer */
 .bg-section-faq {

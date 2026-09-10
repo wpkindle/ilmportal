@@ -1,5 +1,4 @@
 const mongoose = require('mongoose');
-const { getKnowledgeBaseFAQs, saveSupportFAQ } = require('../config/supabaseClient');
 const SupportSession = require('../models/SupportSession');
 const Notification = require('../models/Notification');
 const FAQ = require('../models/FAQ');
@@ -266,7 +265,21 @@ exports.escalateToHuman = async (req, res) => {
 exports.getFaqs = async (req, res) => {
   try {
     const { category } = req.query;
-    const faqs = await getKnowledgeBaseFAQs(category);
+    const query = { isActive: true };
+    if (category) query.category = category;
+    const mongoFaqs = await FAQ.find(query).sort({ displayOrder: 1, createdAt: 1 }).lean();
+    const faqs = mongoFaqs.map(f => ({
+      id: f._id.toString(),
+      _id: f._id.toString(),
+      question: f.question,
+      answer: f.answer,
+      category: f.category,
+      tags: f.tags || [],
+      is_active: f.isActive,
+      isActive: f.isActive,
+      display_order: f.displayOrder,
+      displayOrder: f.displayOrder
+    }));
     res.status(200).json({ success: true, count: faqs.length, faqs });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
@@ -283,17 +296,16 @@ exports.adminCreateFaq = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Question and answer are required' });
     }
 
-    const id = await saveSupportFAQ({
+    const faq = await FAQ.create({
       question,
       answer,
       category: category || 'general',
       tags: Array.isArray(tags) ? tags : (tags ? tags.split(',').map(t => t.trim()) : []),
       isActive: isActive !== false,
-      displayOrder: Number(displayOrder) || 0,
-      embedding: []
+      displayOrder: Number(displayOrder) || 0
     });
 
-    res.status(201).json({ success: true, message: 'FAQ added successfully', id });
+    res.status(201).json({ success: true, message: 'FAQ added successfully', id: faq._id.toString() });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message });
   }

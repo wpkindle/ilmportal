@@ -154,7 +154,7 @@ exports.register = async (req, res) => {
         verificationStatus: 'incomplete'
       });
 
-      // Send email alert with tutor data to abdulkhaliqwebdeveloper@gmail.com
+      // Send email alert with tutor data to info@ilmidunya.com
       sendEarlyTutorRegistrationAdminAlert({
         name: user.name,
         email: user.email,
@@ -897,7 +897,7 @@ exports.resetPassword = async (req, res) => {
 // @route   GET /api/auth/test-email
 exports.testEmail = async (req, res) => {
   try {
-    const to = req.query.to || 'abdulkhaliqwebdeveloper@gmail.com';
+    const to = req.query.to || 'info@ilmidunya.com';
     const result = await sendEmailDetailed({
       to,
       subject: '🧪 IlmiDunya Diagnostic Email Test',
@@ -1044,7 +1044,7 @@ exports.registerEarlyTutor = async (req, res) => {
       });
     }
 
-    // Send detailed email with tutor data to abdulkhaliqwebdeveloper@gmail.com
+    // Send detailed email with tutor data to info@ilmidunya.com
     // (Registrar does NOT receive any email; admin will follow up manually with info@ilmidunya.com)
     sendEarlyTutorRegistrationAdminAlert({
       name: user.name,

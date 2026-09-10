@@ -164,7 +164,7 @@ exports.submitContactMessage = async (req, res) => {
 // @desc    Live Email & DB Diagnostic
 // @route   GET /api/cms/diagnose-email
 exports.diagnoseEmail = async (req, res) => {
-  const targetEmail = req.query.to || 'abdulkhaliqwebdeveloper@gmail.com';
+  const targetEmail = req.query.to || 'info@ilmidunya.com';
   const { sendEmailDetailed } = require('../utils/emailService');
   const mongoose = require('mongoose');
 

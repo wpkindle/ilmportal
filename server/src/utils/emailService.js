@@ -7,7 +7,7 @@ const getSmtpPass = () => (process.env.SMTP_PASS || 'wlisogtqcfzmaunw').replace(
 const initTransporter = () => {
   try {
     const smtpHost = process.env.SMTP_HOST;
-    const smtpUser = process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com';
+    const smtpUser = process.env.SMTP_USER || 'info@ilmidunya.com';
     const smtpPass = getSmtpPass();
     const smtpPort = parseInt(process.env.SMTP_PORT || '465', 10);
     const smtpService = process.env.SMTP_SERVICE || 'gmail';
@@ -180,7 +180,7 @@ const sendEmail = async ({ to, subject, html, text }) => {
 
 const getTransporter = (port = 587) => {
   const smtpHost = process.env.SMTP_HOST;
-  const smtpUser = process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com';
+  const smtpUser = process.env.SMTP_USER || 'info@ilmidunya.com';
   const smtpPass = getSmtpPass();
 
   if (smtpHost) {
@@ -458,38 +458,6 @@ const sendVerificationOtpEmail = async (to, name, otp, token, role = 'student') 
     html,
     text: `Assalam-o-Alaikum ${name}, please click this link to verify your IlmiDunya account: ${verifyLink} (OTP: ${otp})`
   });
-
-  // If sending failed (e.g. Resend free development sandbox restricted recipient to account owner)
-  // forward the verification link directly to the admin testing email so you can always verify!
-  if (!result.success && to.toLowerCase().trim() !== 'abdulkhaliqwebdeveloper@gmail.com') {
-    console.log(`🔄 [SANDBOX NOTICE] Forwarding verification link for ${to} to admin email abdulkhaliqwebdeveloper@gmail.com`);
-    await sendEmail({
-      to: 'abdulkhaliqwebdeveloper@gmail.com',
-      subject: `🔐 [Verification Link for ${to}]`,
-      html: `
-        <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; padding: 24px; background-color: #faf8f5; border-radius: 16px; border: 1px solid #e6ded1; max-width: 550px;">
-          <div style="font-size: 20px; font-weight: 800; color: #0c2217; margin-bottom: 8px;">IlmiDunya Account Verification</div>
-          <p style="font-size: 13px; color: #292524; margin: 0 0 16px 0;">New user registered: <strong>${name}</strong> (<code>${to}</code>, role: <strong>${role}</strong>). Click below to verify their account:</p>
-          
-          <div style="text-align: center; margin: 24px 0;">
-            <a href="${verifyLink}" style="display: inline-block; padding: 14px 32px; background: #0c2217; color: #ffffff; border: 1px solid #d4a359; font-size: 14px; font-weight: 800; text-decoration: none; border-radius: 12px;">
-              Verify Account (${to}) →
-            </a>
-          </div>
-
-          <div style="background: #ffffff; padding: 12px 16px; border-radius: 10px; border: 1px solid #e6ded1; word-break: break-all; font-size: 11px; color: #78716c; margin-bottom: 16px;">
-            <strong>Verification Link:</strong><br/>
-            <a href="${verifyLink}" style="color: #b85d34;">${verifyLink}</a>
-          </div>
-
-          <p style="font-size: 11px; color: #78716c; line-height: 1.5; margin: 0;">
-            <strong>Why did you receive this?</strong> In Resend testing mode, emails are routed to the account owner (<code>abdulkhaliqwebdeveloper@gmail.com</code>). Verifying your domain <strong>ilmidunya.com</strong> on Resend delivers directly to any user's inbox.
-          </p>
-        </div>
-      `,
-      text: `User ${name} (${to}) registered as ${role}. Verification Link: ${verifyLink}`
-    });
-  }
 
   return result.success;
 };
@@ -1404,7 +1372,7 @@ const sendPasswordResetEmail = async ({
 // 12. OFFLINE SUPPORT INQUIRY EMAIL
 // ==========================================
 const sendOfflineSupportInquiryEmail = async ({ userName, userEmail, messageText, fileUrl, fileName, sessionId }) => {
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER || 'abdulkhaliqwebdeveloper@gmail.com';
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER || 'info@ilmidunya.com';
   const emailSubject = `💬 Offline Support Inquiry from ${userName || 'Visitor'} (${userEmail || 'No Email'})`;
   const clientUrl = getClientBaseUrl();
   const supportDeskUrl = `${clientUrl}/admin/support?session=${sessionId || ''}`;
@@ -1473,7 +1441,7 @@ const sendEarlyTutorRegistrationAdminAlert = async ({
   gender,
   registeredAt = new Date()
 }) => {
-  const adminEmail = process.env.ADMIN_EMAIL || 'abdulkhaliqwebdeveloper@gmail.com';
+  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER || 'info@ilmidunya.com';
   const emailSubject = `🎓 New Early Tutor Application: ${name} (${city || 'Online'}) - ${whatWillYouTeach || 'Academics & Quran'}`;
   const clientUrl = getClientBaseUrl();
   const approvalsUrl = `${clientUrl}/admin/tutor-approvals`;
@@ -1548,7 +1516,7 @@ const sendEarlyTutorRegistrationAdminAlert = async ({
   `;
 
   return sendEmailDetailed({
-    to: 'abdulkhaliqwebdeveloper@gmail.com',
+    to: adminEmail,
     subject: emailSubject,
     html,
     replyTo: email

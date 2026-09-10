@@ -15,12 +15,14 @@ services:
         generateValue: true
       - key: JWT_EXPIRE
         value: 30d
-      - key: SMTP_SERVICE
-        value: gmail
       - key: SMTP_USER
-        value: abdulkhaliqwebdeveloper@gmail.com
+        value: info@ilmidunya.com
+      - key: SMTP_FROM
+        value: info@ilmidunya.com
+      - key: ADMIN_EMAIL
+        value: info@ilmidunya.com
       - key: SMTP_PASS
-        value: zthfqcnavkuldwwt
+        sync: false
       - key: MONGODB_URI
         sync: false
 

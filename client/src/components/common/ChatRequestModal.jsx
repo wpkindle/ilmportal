@@ -213,7 +213,7 @@ export default function ChatRequestModal({
                   <textarea
                     value={details}
                     onChange={(e) => setDetails(e.target.value)}
-                    placeholder="e.g., Assalam-o-Alaikum! I am looking for tutoring in FSc Biology / Quran Tajweed for myself / my daughter. We would like to learn 3 days a week in the evening..."
+                    placeholder="A detailed introduction about your study goals, schedule, and any questions you have for the tutor."
                     rows={5}
                     required
                     className="w-full p-3.5 rounded-2xl border border-slate-300 focus:ring-2 focus:ring-[#0c2217]/20 focus:border-[#0c2217] text-xs text-slate-800 placeholder:text-slate-400 leading-relaxed outline-none transition-all resize-none shadow-2xs"

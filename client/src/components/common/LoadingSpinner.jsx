@@ -115,14 +115,13 @@ const LoadingSpinner = ({ size = 'md', className = '', text }) => {
           {/* Centered Ilmi site icon tile */}
           <div className="absolute inset-0 flex items-center justify-center">
             <div
-              className="flex items-center justify-center bg-white border border-[#d4a359]/30 shadow-2xs overflow-hidden"
+              className="flex items-center justify-center overflow-hidden border border-[#d4a359]/30 shadow-2xs"
               style={{ width: p.tileW, height: p.tileW, borderRadius: p.tileR }}
             >
               <img
                 src="/icon.svg"
-                alt="IlmiDunya"
-                style={{ width: p.iconW, height: p.iconW }}
-                className="object-contain select-none"
+                alt="Ilmi"
+                className="w-full h-full object-cover select-none pointer-events-none"
                 draggable={false}
               />
             </div>
@@ -191,10 +190,10 @@ const LoadingSpinner = ({ size = 'md', className = '', text }) => {
           />
         </svg>
 
-        {/* Center: Clean card with authentic Ilmi site icon */}
+        {/* Center: Authentic Ilmi site icon badge */}
         <div className="absolute inset-0 flex items-center justify-center">
           <div
-            className="flex items-center justify-center bg-white border border-[#d4a359]/35 shadow-xs overflow-hidden"
+            className="flex items-center justify-center overflow-hidden border border-[#d4a359]/35 shadow-xs"
             style={{
               width: p.tileW,
               height: p.tileW,
@@ -203,9 +202,8 @@ const LoadingSpinner = ({ size = 'md', className = '', text }) => {
           >
             <img
               src="/icon.svg"
-              alt="IlmiDunya"
-              style={{ width: p.iconW, height: p.iconW }}
-              className="object-contain select-none pointer-events-none drop-shadow-2xs"
+              alt="Ilmi"
+              className="w-full h-full object-cover select-none pointer-events-none drop-shadow-2xs"
               draggable={false}
             />
           </div>

@@ -32,7 +32,14 @@ const calculateProfileCompletion = (user, tutorProfile) => {
       { key: 'subjects', label: 'Subjects & Classes', weight: 10, done: Array.isArray(tutorProfile?.subjects) && tutorProfile.subjects.length > 0 },
       { key: 'bio', label: 'Teaching Bio', weight: 15, done: !!tutorProfile?.bio?.trim() && tutorProfile.bio.length > 20 && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmPortal') && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmiDunya') },
       { key: 'qualifications', label: 'Educational Qualifications', weight: 10, done: !!tutorProfile?.qualifications?.trim() && tutorProfile.qualifications !== 'Tutor Qualifications' },
-      { key: 'sanad', label: 'Sanad / Degree Document', weight: 10, done: Array.isArray(tutorProfile?.sanadDocuments) && tutorProfile.sanadDocuments.length > 0 }
+      {
+        key: 'sanad',
+        label: 'Sanad / Degree Approved',
+        weight: 10,
+        done: Array.isArray(tutorProfile?.sanadDocuments) &&
+              tutorProfile.sanadDocuments.length > 0 &&
+              tutorProfile.sanadDocuments.some(doc => doc.status === 'verified' || doc.status === 'approved' || (!doc.status && tutorProfile?.verificationStatus === 'approved'))
+      }
     ];
 
     const percentage = Math.min(100, Math.max(0, checks.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0)));
@@ -698,9 +705,15 @@ exports.updateProfile = async (req, res) => {
       // Auto-transition verification status based on 100% completion
       const completion = calculateProfileCompletion(user, tutorProfile);
 
+      const hasUploadedSanad = Array.isArray(tutorProfile?.sanadDocuments) && tutorProfile.sanadDocuments.length > 0;
+      const hasPendingSanad = hasUploadedSanad && tutorProfile.sanadDocuments.some(d => d.status === 'pending');
+
       if (completion.percentage < 100) {
-        if (tutorProfile.verificationStatus === 'approved' || tutorProfile.verificationStatus === 'under_review' || tutorProfile.verificationStatus === 'pending') {
-          tutorProfile.verificationStatus = 'incomplete';
+        if (tutorProfile.verificationStatus === 'approved') {
+          tutorProfile.verificationStatus = hasPendingSanad ? 'under_review' : 'incomplete';
+          await tutorProfile.save();
+        } else if (hasPendingSanad && tutorProfile.verificationStatus === 'incomplete') {
+          tutorProfile.verificationStatus = 'under_review';
           await tutorProfile.save();
         }
       } else if (completion.percentage >= 100) {

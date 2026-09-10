@@ -409,22 +409,25 @@ exports.updateMyTutorProfile = async (req, res) => {
 
     // Handle Sanad Documents Array & Status Tracking
     if (Array.isArray(sanadDocuments)) {
-      const existingUrls = new Set((profile.sanadDocuments || []).map(d => d.fileUrl));
+      const existingDocMap = new Map((profile.sanadDocuments || []).map(d => [d.fileUrl, d]));
 
       const normalizedDocs = sanadDocuments.map(doc => {
-        const isNew = !existingUrls.has(doc.fileUrl);
+        const existing = existingDocMap.get(doc.fileUrl) || (doc._id ? (profile.sanadDocuments.id ? profile.sanadDocuments.id(doc._id) : null) : null);
+        const isNew = !existing;
         if (isNew) {
           hasNewlyUploadedDoc = true;
           newlyUploadedDocTitle = doc.title || 'Sanad / Educational Degree';
         }
         return {
-          _id: doc._id,
+          _id: existing?._id || doc._id,
           title: doc.title || 'Sanad / Educational Degree',
           fileUrl: doc.fileUrl,
           fileType: doc.fileType || (doc.fileUrl && doc.fileUrl.startsWith('data:application/pdf') ? 'application/pdf' : 'image/jpeg'),
-          status: isNew ? 'pending' : (doc.status || 'pending'),
-          uploadedAt: doc.uploadedAt || new Date(),
-          rejectionReason: doc.rejectionReason || ''
+          status: isNew ? 'pending' : (existing?.status || 'pending'),
+          uploadedAt: existing?.uploadedAt || doc.uploadedAt || new Date(),
+          reviewedAt: existing?.reviewedAt,
+          reviewedBy: existing?.reviewedBy,
+          rejectionReason: existing?.rejectionReason || ''
         };
       });
 
@@ -454,10 +457,14 @@ exports.updateMyTutorProfile = async (req, res) => {
     // Determine verificationStatus updates based on 100% completion requirement
     const completion = calculateProfileCompletion(userDoc, profile);
 
+    const hasUploadedSanad = Array.isArray(profile?.sanadDocuments) && profile.sanadDocuments.length > 0;
+    const hasPendingSanad = hasUploadedSanad && profile.sanadDocuments.some(d => d.status === 'pending');
+
     if (completion.percentage < 100) {
-      // Any profile with < 100% health CANNOT be approved or under review
-      if (profile.verificationStatus === 'approved' || profile.verificationStatus === 'under_review' || profile.verificationStatus === 'pending') {
-        profile.verificationStatus = 'incomplete';
+      if (profile.verificationStatus === 'approved') {
+        profile.verificationStatus = hasPendingSanad ? 'under_review' : 'incomplete';
+      } else if (hasPendingSanad && profile.verificationStatus === 'incomplete') {
+        profile.verificationStatus = 'under_review';
       }
     } else {
       // 100% completed
@@ -467,7 +474,7 @@ exports.updateMyTutorProfile = async (req, res) => {
     }
 
     if (hasNewlyUploadedDoc) {
-      if (profile.verificationStatus !== 'approved' && completion.percentage >= 100) {
+      if (profile.verificationStatus !== 'approved') {
         profile.verificationStatus = 'under_review';
       }
 
@@ -551,14 +558,8 @@ exports.uploadSanad = async (req, res) => {
     const user = await User.findById(req.user.id);
     const completion = user ? calculateProfileCompletion(user, profile) : { percentage: 0 };
 
-    if (completion.percentage < 100) {
-      if (profile.verificationStatus === 'approved' || profile.verificationStatus === 'under_review') {
-        profile.verificationStatus = 'incomplete';
-      }
-    } else {
-      if (profile.verificationStatus === 'incomplete' || profile.verificationStatus === 'pending') {
-        profile.verificationStatus = 'under_review';
-      }
+    if (profile.verificationStatus !== 'approved' && profile.verificationStatus !== 'suspended') {
+      profile.verificationStatus = 'under_review';
     }
 
     await profile.save();

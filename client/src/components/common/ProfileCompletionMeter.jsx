@@ -22,6 +22,15 @@ export const calculateClientCompletion = (user, tutorProfile) => {
   if (!user) return { percentage: 0, items: [] };
 
   if (user.role === 'tutor') {
+    const hasApprovedSanad = Array.isArray(tutorProfile?.sanadDocuments) &&
+      tutorProfile.sanadDocuments.length > 0 &&
+      tutorProfile.sanadDocuments.some(
+        (doc) => doc.status === 'verified' || doc.status === 'approved' || (!doc.status && tutorProfile?.verificationStatus === 'approved')
+      );
+
+    const hasUploadedSanad = Array.isArray(tutorProfile?.sanadDocuments) && tutorProfile.sanadDocuments.length > 0;
+    const hasPendingSanad = hasUploadedSanad && !hasApprovedSanad;
+
     const checks = [
       {
         key: 'name',
@@ -97,11 +106,19 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       },
       {
         key: 'sanad',
-        label: 'Sanad / Degree Document',
+        label: hasApprovedSanad
+          ? 'Sanad / Degree Approved'
+          : hasPendingSanad
+            ? 'Sanad / Degree (Pending Admin Review)'
+            : 'Sanad / Degree Document',
         weight: 10,
-        done: Array.isArray(tutorProfile?.sanadDocuments) && tutorProfile.sanadDocuments.length > 0,
+        done: hasApprovedSanad,
         link: '/tutor/profile#profile-sanads',
-        actionLabel: 'Upload Sanad'
+        actionLabel: hasApprovedSanad
+          ? 'Approved'
+          : hasPendingSanad
+            ? 'Pending Review'
+            : 'Upload Sanad'
       }
     ];
 
@@ -176,6 +193,12 @@ export default function ProfileCompletionMeter({
   const { percentage, items } = calculateClientCompletion(user, tutorProfile);
   const isApproved = tutorProfile?.verificationStatus === 'approved';
   const isTutor = user?.role === 'tutor';
+  const hasPendingSanad = isTutor &&
+    Array.isArray(tutorProfile?.sanadDocuments) &&
+    tutorProfile.sanadDocuments.length > 0 &&
+    !tutorProfile.sanadDocuments.some(
+      (doc) => doc.status === 'verified' || doc.status === 'approved' || (!doc.status && tutorProfile?.verificationStatus === 'approved')
+    );
 
   const completedCount = items.filter((i) => i.done).length;
   const totalCount = items.length;
@@ -373,7 +396,11 @@ export default function ProfileCompletionMeter({
               {percentage < 100 ? (
                 <div className="p-2.5 bg-amber-50 rounded-xl border border-amber-300 flex items-center gap-2 text-xs font-medium text-amber-950">
                   <Clock className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>Incomplete Profile ({percentage}%): 100% profile health is strictly required to be listed publicly in the tutor directory.</span>
+                  <span>
+                    {hasPendingSanad
+                      ? `Profile Under Review (${percentage}%): Your uploaded Sanad document is awaiting admin review to reach 100% profile health.`
+                      : `Incomplete Profile (${percentage}%): 100% profile health is strictly required to be listed publicly in the tutor directory.`}
+                  </span>
                 </div>
               ) : tutorProfile?.verificationStatus === 'approved' ? (
                 <div className="p-2.5 bg-emerald-50 rounded-xl border border-emerald-300 flex items-center gap-2 text-xs font-medium text-emerald-900">
@@ -524,7 +551,11 @@ export default function ProfileCompletionMeter({
           {percentage < 100 ? (
             <div className="p-2.5 bg-amber-50/80 rounded-2xl border border-amber-300 flex items-center gap-2 text-xs font-bold text-amber-950">
               <Clock className="w-4 h-4 text-amber-600 shrink-0" />
-              <span>Incomplete Profile ({percentage}%): 100% profile health is strictly required to be listed publicly in the tutor directory.</span>
+              <span>
+                {hasPendingSanad
+                  ? `Profile Under Review (${percentage}%): Your uploaded Sanad document is awaiting admin review to reach 100% profile health.`
+                  : `Incomplete Profile (${percentage}%): 100% profile health is strictly required to be listed publicly in the tutor directory.`}
+              </span>
             </div>
           ) : tutorProfile?.verificationStatus === 'approved' ? (
             <div className="p-2.5 bg-[#f0ece1] rounded-2xl border border-[#d4a359]/40 flex items-center gap-2 text-xs font-bold text-[#0c2217]">

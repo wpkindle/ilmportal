@@ -185,6 +185,16 @@ exports.approveTutor = async (req, res) => {
       });
     }
 
+    // Mark all uploaded sanadDocuments as verified upon admin approval
+    if (Array.isArray(tutor.sanadDocuments) && tutor.sanadDocuments.length > 0) {
+      tutor.sanadDocuments.forEach((doc) => {
+        doc.status = 'verified';
+        doc.reviewedAt = new Date();
+        doc.reviewedBy = req.user.id;
+        doc.rejectionReason = '';
+      });
+    }
+
     const { calculateProfileCompletion } = require('./authController');
     const completion = calculateProfileCompletion(tutor.user, tutor);
     if (completion.percentage < 100) {
@@ -196,16 +206,6 @@ exports.approveTutor = async (req, res) => {
 
     tutor.verificationStatus = 'approved';
     tutor.rejectionReason = '';
-
-    // Mark all sanadDocuments as verified
-    if (Array.isArray(tutor.sanadDocuments)) {
-      tutor.sanadDocuments.forEach((doc) => {
-        doc.status = 'verified';
-        doc.reviewedAt = new Date();
-        doc.reviewedBy = req.user.id;
-        doc.rejectionReason = '';
-      });
-    }
 
     await tutor.save();
 

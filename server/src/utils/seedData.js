@@ -360,6 +360,7 @@ const seedDatabase = async () => {
         title: 'Sanad Tajweed & Qirat (Wifaq-ul-Madaris)',
         fileUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600',
         fileType: 'image/jpeg',
+        status: 'verified',
         uploadedAt: new Date()
       }],
       availabilitySlots: [
@@ -403,6 +404,7 @@ const seedDatabase = async () => {
         title: 'Shahadat-ul-Alimiyyah Degree',
         fileUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600',
         fileType: 'image/jpeg',
+        status: 'verified',
         uploadedAt: new Date()
       }]
     });
@@ -438,6 +440,7 @@ const seedDatabase = async () => {
         title: 'MS Degree Document (NUST)',
         fileUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600',
         fileType: 'image/jpeg',
+        status: 'verified',
         uploadedAt: new Date()
       }]
     });
@@ -473,6 +476,7 @@ const seedDatabase = async () => {
         title: 'KEMU MBBS Degree & PMDC Registration',
         fileUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600',
         fileType: 'image/jpeg',
+        status: 'verified',
         uploadedAt: new Date()
       }]
     });
@@ -507,6 +511,7 @@ const seedDatabase = async () => {
         title: 'MA Arabic Degree Document',
         fileUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600',
         fileType: 'image/jpeg',
+        status: 'verified',
         uploadedAt: new Date()
       }]
     });

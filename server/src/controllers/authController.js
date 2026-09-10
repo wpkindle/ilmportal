@@ -27,8 +27,8 @@ const calculateProfileCompletion = (user, tutorProfile) => {
       { key: 'email', label: 'Verified Email', weight: 10, done: !!user.isVerified },
       { key: 'avatar', label: 'Profile Picture', weight: 10, done: !!user.avatar?.trim() },
       { key: 'age', label: 'Tutor Age', weight: 10, done: !!user.age },
-      { key: 'gender', label: 'Gender', weight: 5, done: !!user.gender?.trim() },
-      { key: 'city', label: 'City Location', weight: 10, done: !!user.city?.trim() },
+      { key: 'gender', label: 'Gender', weight: 5, done: !!(user.gender?.trim() || tutorProfile?.gender?.trim()) },
+      { key: 'city', label: 'City Location', weight: 10, done: !!(user.city?.trim() || tutorProfile?.city?.trim()) },
       { key: 'subjects', label: 'Subjects & Classes', weight: 10, done: Array.isArray(tutorProfile?.subjects) && tutorProfile.subjects.length > 0 },
       { key: 'bio', label: 'Teaching Bio', weight: 15, done: !!tutorProfile?.bio?.trim() && tutorProfile.bio.length > 20 && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmPortal') && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmiDunya') },
       { key: 'qualifications', label: 'Educational Qualifications', weight: 10, done: !!tutorProfile?.qualifications?.trim() && tutorProfile.qualifications !== 'Tutor Qualifications' },
@@ -698,29 +698,26 @@ exports.updateProfile = async (req, res) => {
       // Auto-transition verification status based on 100% completion
       const completion = calculateProfileCompletion(user, tutorProfile);
 
-      if (tutorProfile.verificationStatus !== 'approved' && tutorProfile.verificationStatus !== 'suspended') {
-        if (completion.percentage >= 100) {
-          if (tutorProfile.verificationStatus !== 'under_review') {
-            tutorProfile.verificationStatus = 'under_review';
-            await tutorProfile.save();
+      if (completion.percentage < 100) {
+        if (tutorProfile.verificationStatus === 'approved' || tutorProfile.verificationStatus === 'under_review' || tutorProfile.verificationStatus === 'pending') {
+          tutorProfile.verificationStatus = 'incomplete';
+          await tutorProfile.save();
+        }
+      } else if (completion.percentage >= 100) {
+        if (tutorProfile.verificationStatus === 'incomplete' || tutorProfile.verificationStatus === 'pending') {
+          tutorProfile.verificationStatus = 'under_review';
+          await tutorProfile.save();
 
-            // Notify admin
-            const adminUser = await User.findOne({ role: 'admin' });
-            if (adminUser) {
-              await Notification.create({
-                recipient: adminUser._id,
-                title: 'Tutor Profile 100% Complete — Ready for Review',
-                message: `${user.name} has completed 100% of their teaching profile and submitted for review.`,
-                type: 'system',
-                link: '/admin/tutor-approvals'
-              });
-            }
-          }
-        } else {
-          // If < 100%, remain incomplete
-          if (tutorProfile.verificationStatus === 'under_review' || tutorProfile.verificationStatus === 'pending') {
-            tutorProfile.verificationStatus = 'incomplete';
-            await tutorProfile.save();
+          // Notify admin
+          const adminUser = await User.findOne({ role: 'admin' });
+          if (adminUser) {
+            await Notification.create({
+              recipient: adminUser._id,
+              title: 'Tutor Profile 100% Complete — Ready for Review',
+              message: `${user.name} has completed 100% of their teaching profile and submitted for review.`,
+              type: 'system',
+              link: '/admin/tutor-approvals'
+            });
           }
         }
       }

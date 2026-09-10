@@ -336,6 +336,7 @@ const seedDatabase = async () => {
       password: 'Password@123',
       role: 'tutor',
       isVerified: true,
+      age: 32,
       city: 'Lahore',
       phone: '+92 301 2345678',
       avatar: '/images/tutors/qari-huzaifa.jpg'
@@ -378,6 +379,7 @@ const seedDatabase = async () => {
       password: 'Password@123',
       role: 'tutor',
       isVerified: true,
+      age: 28,
       city: 'Islamabad',
       phone: '+92 333 4567890',
       avatar: '/images/tutors/alimah-fatima.jpg'
@@ -412,6 +414,7 @@ const seedDatabase = async () => {
       password: 'Password@123',
       role: 'tutor',
       isVerified: true,
+      age: 31,
       city: 'Karachi',
       phone: '+92 321 9876543',
       avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200'
@@ -446,6 +449,7 @@ const seedDatabase = async () => {
       password: 'Password@123',
       role: 'tutor',
       isVerified: true,
+      age: 34,
       city: 'Lahore',
       phone: '+92 345 5566778',
       avatar: '/images/dr-ayesha.jpg'
@@ -480,6 +484,7 @@ const seedDatabase = async () => {
       password: 'Password@123',
       role: 'tutor',
       isVerified: true,
+      age: 38,
       city: 'Peshawar',
       phone: '+92 312 3344556',
       avatar: '/images/tutors/ustadh-abdul-rehman.jpg'
@@ -513,6 +518,7 @@ const seedDatabase = async () => {
       password: 'Password@123',
       role: 'tutor',
       isVerified: true,
+      age: 29,
       city: 'Faisalabad',
       phone: '+92 304 9988776',
       avatar: 'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=200'

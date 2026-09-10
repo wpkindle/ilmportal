@@ -185,6 +185,15 @@ exports.approveTutor = async (req, res) => {
       });
     }
 
+    const { calculateProfileCompletion } = require('./authController');
+    const completion = calculateProfileCompletion(tutor.user, tutor);
+    if (completion.percentage < 100) {
+      return res.status(400).json({
+        success: false,
+        message: `Cannot approve tutor: Profile is only ${completion.percentage}% complete. Tutor must achieve 100% profile health before public approval.`
+      });
+    }
+
     tutor.verificationStatus = 'approved';
     tutor.rejectionReason = '';
 
@@ -338,10 +347,14 @@ exports.reviewTutorDocument = async (req, res) => {
       doc.rejectionReason = '';
     }
 
-    // If all documents are verified, transition tutor verificationStatus to approved if under review
+    // If all documents are verified, transition tutor verificationStatus to approved if under review and 100% complete
     const allVerified = tutor.sanadDocuments.length > 0 && tutor.sanadDocuments.every((d) => d.status === 'verified' || d.status === 'approved');
     if (allVerified && tutor.verificationStatus !== 'approved') {
-      tutor.verificationStatus = 'approved';
+      const { calculateProfileCompletion } = require('./authController');
+      const completion = calculateProfileCompletion(tutor.user, tutor);
+      if (completion.percentage === 100) {
+        tutor.verificationStatus = 'approved';
+      }
     }
 
     await tutor.save();
@@ -633,7 +646,11 @@ exports.updateUserStatus = async (req, res) => {
         } else if (status === 'suspended' || status === 'deactivated') {
           tutorProfile.verificationStatus = 'suspended';
         } else if (status === 'active' && tutorProfile.verificationStatus !== 'approved') {
-          tutorProfile.verificationStatus = 'approved';
+          const { calculateProfileCompletion } = require('./authController');
+          const completion = calculateProfileCompletion(user, tutorProfile);
+          if (completion.percentage === 100) {
+            tutorProfile.verificationStatus = 'approved';
+          }
         }
         await tutorProfile.save();
       }

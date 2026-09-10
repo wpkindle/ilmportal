@@ -3,6 +3,7 @@ const User = require('../models/User');
 const Category = require('../models/Category');
 const Location = require('../models/Location');
 const Review = require('../models/Review');
+const { calculateProfileCompletion } = require('./authController');
 
 // @desc    Get all public verified tutors with filters & pagination
 // @route   GET /api/tutors
@@ -26,7 +27,9 @@ exports.getPublicTutors = async (req, res) => {
     } = req.query;
 
     const query = {
-      verificationStatus: 'approved'
+      verificationStatus: 'approved',
+      subjects: { $exists: true, $not: { $size: 0 } },
+      sanadDocuments: { $exists: true, $not: { $size: 0 } }
     };
 
     // Filter by subject/category
@@ -193,12 +196,17 @@ exports.getPublicTutors = async (req, res) => {
     const skip = (pageNumber - 1) * limitNumber;
 
     let tutorProfiles = await TutorProfile.find(query)
-      .populate('user', 'name email avatar phone city area isVerified isActive createdAt')
+      .populate('user', 'name email avatar phone city area age gender isVerified isActive createdAt')
       .populate('subjects', 'name slug type icon description')
       .populate('cities', 'name province isMajorCity')
-      .sort(sortOptions)
-      .skip(skip)
-      .limit(limitNumber);
+      .sort(sortOptions);
+
+    // Strictly enforce 100% completed profile health for public directory visibility
+    tutorProfiles = tutorProfiles.filter(tp => {
+      if (!tp.user) return false;
+      const completion = calculateProfileCompletion(tp.user, tp);
+      return completion.percentage === 100;
+    });
 
     // Apply text search on tutor name, bio, qualifications, subjects, cities
     if (search && search.trim() !== '') {
@@ -213,10 +221,11 @@ exports.getPublicTutors = async (req, res) => {
       });
     }
 
-    const total = await TutorProfile.countDocuments(query);
+    const total = tutorProfiles.length;
+    const paginatedTutors = tutorProfiles.slice(skip, skip + limitNumber);
 
     const isUserOnline = req.app.get('isUserOnline');
-    const tutorsWithOnline = tutorProfiles.map(tp => {
+    const tutorsWithOnline = paginatedTutors.map(tp => {
       const obj = tp.toObject ? tp.toObject() : { ...tp };
       const uId = obj.user?._id || obj.user?.id || obj.user;
       obj.isOnline = isUserOnline ? Boolean(isUserOnline(uId)) : false;
@@ -245,14 +254,14 @@ exports.getPublicTutors = async (req, res) => {
 exports.getTutorById = async (req, res) => {
   try {
     let tutor = await TutorProfile.findById(req.params.id)
-      .populate('user', 'name email avatar phone city area isVerified isActive createdAt')
+      .populate('user', 'name email avatar phone city area age gender isVerified isActive createdAt')
       .populate('subjects', 'name slug type icon description')
       .populate('cities', 'name province isMajorCity');
 
     // If ID was user ID instead of tutor profile ID
     if (!tutor) {
       tutor = await TutorProfile.findOne({ user: req.params.id })
-        .populate('user', 'name email avatar phone city area isVerified isActive createdAt')
+        .populate('user', 'name email avatar phone city area age gender isVerified isActive createdAt')
         .populate('subjects', 'name slug type icon description')
         .populate('cities', 'name province isMajorCity');
     }
@@ -264,16 +273,17 @@ exports.getTutorById = async (req, res) => {
       });
     }
 
-    // Only approved tutors are visible to public (admin and tutor themselves can view)
+    // Only approved tutors with 100% completion are visible to public (admin and tutor themselves can view)
     const reqUserId = req.user?._id?.toString() || req.user?.id?.toString();
     const tutorUserId = tutor.user?._id?.toString() || tutor.user?.toString();
     const isAdmin = req.user?.role === 'admin';
     const isOwner = reqUserId && reqUserId === tutorUserId;
 
-    if (tutor.verificationStatus !== 'approved' && !isAdmin && !isOwner) {
+    const completion = calculateProfileCompletion(tutor.user, tutor);
+    if ((tutor.verificationStatus !== 'approved' || completion.percentage < 100) && !isAdmin && !isOwner) {
       return res.status(403).json({
         success: false,
-        message: 'This tutor profile is currently under review by administration and not yet publicly visible.'
+        message: 'This tutor profile is incomplete (must be 100% complete) or under review and not yet publicly visible.'
       });
     }
 
@@ -421,9 +431,43 @@ exports.updateMyTutorProfile = async (req, res) => {
       profile.sanadDocuments = normalizedDocs;
     }
 
-    // Determine verificationStatus updates
+    // Also sync gender, city and area to the user record first so completion checks are accurate
+    const userDoc = await User.findById(req.user.id);
+    if (userDoc) {
+      let userUpdated = false;
+      if (gender && userDoc.gender !== gender) {
+        userDoc.gender = gender;
+        userUpdated = true;
+      }
+      if (city && userDoc.city !== city.trim()) {
+        userDoc.city = city.trim();
+        userUpdated = true;
+      }
+      const targetArea = (localArea !== undefined ? localArea : area || '').trim();
+      if (targetArea && userDoc.area !== targetArea) {
+        userDoc.area = targetArea;
+        userUpdated = true;
+      }
+      if (userUpdated) await userDoc.save();
+    }
+
+    // Determine verificationStatus updates based on 100% completion requirement
+    const completion = calculateProfileCompletion(userDoc, profile);
+
+    if (completion.percentage < 100) {
+      // Any profile with < 100% health CANNOT be approved or under review
+      if (profile.verificationStatus === 'approved' || profile.verificationStatus === 'under_review' || profile.verificationStatus === 'pending') {
+        profile.verificationStatus = 'incomplete';
+      }
+    } else {
+      // 100% completed
+      if (profile.verificationStatus === 'incomplete' || profile.verificationStatus === 'pending') {
+        profile.verificationStatus = 'under_review';
+      }
+    }
+
     if (hasNewlyUploadedDoc) {
-      if (profile.verificationStatus !== 'approved') {
+      if (profile.verificationStatus !== 'approved' && completion.percentage >= 100) {
         profile.verificationStatus = 'under_review';
       }
 
@@ -446,32 +490,12 @@ exports.updateMyTutorProfile = async (req, res) => {
         console.error('Failed to notify admin of new document upload:', notifErr);
       }
     } else if (verificationStatus && ['pending', 'under_review'].includes(verificationStatus)) {
-      if (profile.verificationStatus !== 'approved' && profile.verificationStatus !== 'suspended') {
+      if (profile.verificationStatus !== 'approved' && profile.verificationStatus !== 'suspended' && completion.percentage >= 100) {
         profile.verificationStatus = verificationStatus;
       }
     }
 
     await profile.save();
-
-    // Also sync gender, city and area to the user record
-    const userDoc = await User.findById(req.user.id);
-    if (userDoc) {
-      let userUpdated = false;
-      if (gender && userDoc.gender !== gender) {
-        userDoc.gender = gender;
-        userUpdated = true;
-      }
-      if (city && userDoc.city !== city.trim()) {
-        userDoc.city = city.trim();
-        userUpdated = true;
-      }
-      const targetArea = (localArea !== undefined ? localArea : area || '').trim();
-      if (targetArea && userDoc.area !== targetArea) {
-        userDoc.area = targetArea;
-        userUpdated = true;
-      }
-      if (userUpdated) await userDoc.save();
-    }
 
     await profile.populate([
       { path: 'subjects', select: 'name slug type description subtopics' },
@@ -483,7 +507,8 @@ exports.updateMyTutorProfile = async (req, res) => {
       message: hasNewlyUploadedDoc
         ? 'Document uploaded successfully! It is now pending admin approval.'
         : 'Profile updated successfully',
-      profile
+      profile,
+      completion
     });
   } catch (error) {
     res.status(500).json({
@@ -524,11 +549,16 @@ exports.uploadSanad = async (req, res) => {
     profile.sanadDocuments.push(newDoc);
 
     const user = await User.findById(req.user.id);
-    const { calculateProfileCompletion } = require('./authController');
     const completion = user ? calculateProfileCompletion(user, profile) : { percentage: 0 };
 
-    if (profile.verificationStatus !== 'approved' && profile.verificationStatus !== 'suspended') {
-      profile.verificationStatus = 'under_review';
+    if (completion.percentage < 100) {
+      if (profile.verificationStatus === 'approved' || profile.verificationStatus === 'under_review') {
+        profile.verificationStatus = 'incomplete';
+      }
+    } else {
+      if (profile.verificationStatus === 'incomplete' || profile.verificationStatus === 'pending') {
+        profile.verificationStatus = 'under_review';
+      }
     }
 
     await profile.save();

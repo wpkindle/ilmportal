@@ -59,7 +59,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         key: 'gender',
         label: 'Gender',
         weight: 5,
-        done: !!user.gender && user.gender.trim() !== '',
+        done: !!(user.gender?.trim() || tutorProfile?.gender?.trim()),
         link: '/tutor/profile#profile-gender',
         actionLabel: 'Set Gender'
       },
@@ -67,7 +67,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         key: 'city',
         label: 'City Location',
         weight: 10,
-        done: !!user.city && user.city.trim() !== '',
+        done: !!(user.city?.trim() || tutorProfile?.city?.trim()),
         link: '/tutor/profile#profile-city',
         actionLabel: 'Select City'
       },
@@ -370,10 +370,15 @@ export default function ProfileCompletionMeter({
           {/* Verification State Callout for Tutor */}
           {isTutor && (
             <div className="pt-1">
-              {tutorProfile?.verificationStatus === 'approved' ? (
+              {percentage < 100 ? (
+                <div className="p-2.5 bg-amber-50 rounded-xl border border-amber-300 flex items-center gap-2 text-xs font-medium text-amber-950">
+                  <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+                  <span>Incomplete Profile ({percentage}%): 100% profile health is strictly required to be listed publicly in the tutor directory.</span>
+                </div>
+              ) : tutorProfile?.verificationStatus === 'approved' ? (
                 <div className="p-2.5 bg-emerald-50 rounded-xl border border-emerald-300 flex items-center gap-2 text-xs font-medium text-emerald-900">
                   <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                  <span>Verified Sanad &amp; Degree: Your profile is Approved and publicly visible across Pakistan.</span>
+                  <span>Verified Sanad &amp; Degree: Your profile is 100% complete, Approved, and publicly visible across Pakistan.</span>
                 </div>
               ) : tutorProfile?.verificationStatus === 'rejected' ? (
                 <div className="p-2.5 bg-rose-50 rounded-xl border border-rose-300 flex items-center gap-2 text-xs font-medium text-rose-900">
@@ -383,7 +388,7 @@ export default function ProfileCompletionMeter({
               ) : (
                 <div className="p-2.5 bg-amber-50 rounded-xl border border-amber-300 flex items-center gap-2 text-xs font-medium text-amber-900">
                   <Clock className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>Pending Verification: Your degrees are in the verification queue before full public listing.</span>
+                  <span>Pending Verification: Your 100% completed profile is in the verification queue before full public listing.</span>
                 </div>
               )}
             </div>
@@ -516,10 +521,15 @@ export default function ProfileCompletionMeter({
       {/* Verification State Callout for Tutor */}
       {isTutor && (
         <div className="pt-1">
-          {tutorProfile?.verificationStatus === 'approved' ? (
+          {percentage < 100 ? (
+            <div className="p-2.5 bg-amber-50/80 rounded-2xl border border-amber-300 flex items-center gap-2 text-xs font-bold text-amber-950">
+              <Clock className="w-4 h-4 text-amber-600 shrink-0" />
+              <span>Incomplete Profile ({percentage}%): 100% profile health is strictly required to be listed publicly in the tutor directory.</span>
+            </div>
+          ) : tutorProfile?.verificationStatus === 'approved' ? (
             <div className="p-2.5 bg-[#f0ece1] rounded-2xl border border-[#d4a359]/40 flex items-center gap-2 text-xs font-bold text-[#0c2217]">
               <ShieldCheck className="w-4 h-4 text-[#d4a359] shrink-0" />
-              <span>Verified Sanad &amp; Degree: Your profile is Approved and publicly visible on Pakistan search filters.</span>
+              <span>Verified Sanad &amp; Degree: Your profile is 100% complete, Approved, and publicly visible on Pakistan search filters.</span>
             </div>
           ) : tutorProfile?.verificationStatus === 'rejected' ? (
             <div className="p-2.5 bg-rose-50 rounded-2xl border border-rose-200 flex items-center gap-2 text-xs font-bold text-rose-800">
@@ -529,7 +539,7 @@ export default function ProfileCompletionMeter({
           ) : (
             <div className="p-2.5 bg-amber-50 rounded-2xl border border-amber-200 flex items-center gap-2 text-xs font-bold text-amber-900">
               <Clock className="w-4 h-4 text-amber-600 shrink-0" />
-              <span>Pending Admin Review: Your uploaded degrees are currently in the verification queue before going live.</span>
+              <span>Pending Admin Review: Your 100% completed profile is currently in the verification queue before going live.</span>
             </div>
           )}
         </div>

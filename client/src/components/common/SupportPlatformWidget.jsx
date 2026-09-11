@@ -124,7 +124,7 @@ export default function SupportPlatformWidget() {
           
           {/* Modal Container with Editorial Light Styling */}
           <div
-            className="w-full max-w-lg max-h-[90dvh] flex flex-col rounded-3xl bg-white border-2 border-[#d4a359]/60 shadow-2xl text-[#141c19] relative animate-in zoom-in-95 duration-200 overflow-hidden"
+            className="w-full max-w-xl max-h-[90dvh] flex flex-col rounded-3xl bg-white border-2 border-[#d4a359]/60 shadow-2xl text-[#141c19] relative animate-in zoom-in-95 duration-200 overflow-hidden"
             role="dialog"
             aria-modal="true"
           >

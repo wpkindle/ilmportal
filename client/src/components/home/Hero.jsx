@@ -198,225 +198,258 @@ export default function Hero() {
         isPaused={isPaused}
       />
 
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full text-center space-y-7 pt-2 pb-6">
-        
-        {/* Regional Trust Eyebrow */}
-        <div className="flex items-center justify-center">
-          <Link
-            href="/safety"
-            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/60 hover:bg-black/80 border border-[#d4a359]/60 text-[#f5d799] text-xs font-bold transition-all shadow-lg group backdrop-blur-md cursor-pointer"
-          >
-            <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-            <span>Female-First Safety • Verified Qaris, Alimahs &amp; Academic Tutors</span>
-            <ChevronRight className="w-3 h-3 text-[#d4a359] group-hover:translate-x-0.5 transition-transform" />
-          </Link>
-        </div>
-
-        {/* Main Editorial Headline with Dramatic Contrast */}
-        <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-black tracking-tight text-[#faf8f5] leading-[1.2] sm:leading-[1.22] lg:leading-[1.24] max-w-4xl mx-auto">
-          Connecting Verified Tutors <br />
-          With Students <br />
-          <span className="hand-drawn-underline-gold text-[#faf8f5]">Across Pakistan</span>
-        </h1>
-
-        {/* Humanized, Colloquial Pakistani Copy */}
-        <p className="text-sm sm:text-base text-[#d6e3dd] max-w-2xl mx-auto leading-relaxed font-normal">
-          Designed specifically for female learners, daughters, and mothers to feel 100% comfortable and protected. Verified female Alimahs from Wafaq-ul-Madaris, certified Qaris, and top school tutors. 1-on-1 classes with camera-off privacy by default, zero personal contact sharing, and agreed fees directly with your tutor.
-        </p>
-
-        {/* Key Assurance Signals */}
-        <div className="flex flex-wrap items-center justify-center gap-2 max-w-3xl mx-auto pt-1 text-xs font-semibold">
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-            <span>100% Female Privacy &amp; Comfort</span>
-          </span>
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-            <span>Verified Qaris &amp; Alimahs (Sanad)</span>
-          </span>
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs">
-            <Lock className="w-3.5 h-3.5 text-[#d4a359]" />
-            <span>Camera-Off by Default</span>
-          </span>
-          <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Zero Personal Contact Sharing</span>
-          </span>
-        </div>
-
-        {/* Search Input Box with Centered Container */}
-        <div className="pt-2 max-w-2xl sm:max-w-3xl mx-auto w-full">
-          <form
-            onSubmit={handleSearchSubmit}
-            className="bg-white p-2 rounded-2xl sm:rounded-full shadow-2xl border-2 border-[#d4a359]/70 flex flex-col sm:flex-row items-center gap-2"
-          >
-            {/* Search Text */}
-            <div className="flex items-center gap-2 px-4 py-2 w-full sm:flex-1 text-left">
-              <Search className="w-4 h-4 text-slate-400 shrink-0" />
-              <input
-                type="text"
-                placeholder="Search subject (Tajweed, Math, Physics...)"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-transparent text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 font-medium outline-none"
-              />
-            </div>
-
-            <div className="hidden sm:block w-px h-8 bg-slate-200" />
-
-            {/* City Selector */}
-            <div className="w-full sm:w-56 text-left">
-              <CustomSelect
-                options={availableCities}
-                value={selectedCity}
-                onChange={setSelectedCity}
-                placeholder="All Pakistan Cities"
-                icon={MapPin}
-                searchable={true}
-                variant="hero"
-                placement="top"
-              />
-            </div>
-
-            {/* Terracotta Action Button */}
-            <button
-              type="submit"
-              className="w-full sm:w-auto px-7 py-3 bg-gradient-to-r from-[#b85d34] to-[#9e4e2a] hover:from-[#c9673b] hover:to-[#b0552e] text-white font-bold text-xs sm:text-sm rounded-xl sm:rounded-full shadow-lg shadow-[#b85d34]/40 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer active:scale-95"
-            >
-              <span>Find Tutors</span>
-              <ArrowRight className="w-4 h-4" />
-            </button>
-          </form>
-
-          {/* Quick Topic Chips & Female Faculty Filters */}
-          <div className="mt-3.5 flex flex-wrap items-center justify-center gap-1.5 text-xs">
-            <Link
-              href="/tutors?gender=female"
-              className="px-3.5 py-1.5 rounded-full bg-[#f5ebe6] hover:bg-[#ede0d8] text-[#b85d34] font-bold border border-[#b85d34]/40 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group cursor-pointer"
-              title="Browse verified female tutors across all academic & Quran subjects"
-            >
-              <UserCheck className="w-3.5 h-3.5 text-[#b85d34]" />
-              <span>Female Tutors</span>
-            </Link>
-            <Link
-              href="/tutors?gender=female&faculty=alimah"
-              className="px-3.5 py-1.5 rounded-full bg-white hover:bg-[#f5f0e6] text-[#0c2217] font-bold border border-[#d4a359]/50 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group cursor-pointer"
-              title="Browse verified female Alimahs for Quran, Tajweed & Islamic studies"
-            >
-              <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-              <span>Female Alimahs</span>
-            </Link>
-            <Link
-              href="/tutors?mode=physical"
-              className="px-3.5 py-1.5 rounded-full bg-[#f4ebe1] hover:bg-[#ebdcd3] text-[#0c2217] font-bold border border-[#d4a359]/60 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group cursor-pointer"
-              title="Find verified male home tutors visiting your residence"
-            >
-              <Home className="w-3.5 h-3.5 text-[#b85d34]" />
-              <span>In-Person Home Tutors</span>
-            </Link>
-            <span className="text-[#c2d3cc] text-xs font-semibold ml-1">Popular:</span>
-            {quickSubjects.map((sub) => (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pt-2 pb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          
+          {/* Left Column (7 cols): Editorial Typography, Assurances & Search Engine */}
+          <div className="lg:col-span-7 space-y-5 text-left">
+            
+            {/* Regional Trust Eyebrow */}
+            <div className="flex items-center gap-2">
               <Link
-                key={sub.slug}
-                href={`/tutors?category=${sub.slug}`}
-                className="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-[#faf8f5] hover:text-white text-xs font-medium border border-white/20 shadow-2xs transition-colors cursor-pointer"
+                href="/safety"
+                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/60 hover:bg-black/80 border border-[#d4a359]/60 text-[#f5d799] text-xs font-bold transition-all shadow-lg group backdrop-blur-md cursor-pointer"
               >
-                {sub.label}
+                <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
+                <span>Female-First Safety • Verified Qaris, Alimahs &amp; Academic Tutors</span>
+                <ChevronRight className="w-3 h-3 text-[#d4a359] group-hover:translate-x-0.5 transition-transform" />
               </Link>
-            ))}
-          </div>
+            </div>
 
-          {/* Quick Trust Guarantees below search */}
-          <div className="mt-4 pt-3 border-t border-white/15 flex flex-wrap items-center justify-center gap-x-5 gap-y-1.5 text-xs text-[#d6e3dd]">
-            <span className="inline-flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Direct fee agreement in chat</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Zero agency commission</span>
-            </span>
-            <span className="inline-flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Free trial class</span>
-            </span>
-          </div>
-        </div>
+            {/* Main Editorial Headline with Dramatic Contrast */}
+            <h1 className="text-3xl sm:text-5xl lg:text-6xl font-serif font-black tracking-tight text-[#faf8f5] leading-[1.2] sm:leading-[1.22] lg:leading-[1.24]">
+              Connecting Verified Tutors <br />
+              With Students <br />
+              <span className="hand-drawn-underline-gold text-[#faf8f5]">Across Pakistan</span>
+            </h1>
 
-        {/* Interactive Tutoring Mode Pills (Controls the Cinematic Background Scene) */}
-        <div className="pt-2 max-w-2xl mx-auto w-full">
-          <div className="p-1.5 rounded-2xl bg-black/60 backdrop-blur-xl border border-white/15 shadow-xl flex items-center justify-between gap-1 flex-wrap sm:flex-nowrap">
-            {heroSlides.map((slide, idx) => {
-              const Icon = slide.tabIcon;
-              const isActive = currentSlide === idx;
-              return (
+            {/* Humanized, Colloquial Pakistani Copy */}
+            <p className="text-sm sm:text-base text-[#d6e3dd] max-w-xl leading-relaxed font-normal">
+              Designed specifically for female learners, daughters, and mothers to feel 100% comfortable and protected. Verified female Alimahs from Wafaq-ul-Madaris, certified Qaris, and top school tutors. 1-on-1 classes with camera-off privacy by default, zero personal contact sharing, and agreed fees directly with your tutor.
+            </p>
+
+            {/* Key Assurance Signals */}
+            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-semibold">
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
+                <span>100% Female Privacy &amp; Comfort</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
+                <span>Verified Qaris &amp; Alimahs (Sanad)</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs">
+                <Lock className="w-3.5 h-3.5 text-[#d4a359]" />
+                <span>Camera-Off by Default</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Zero Personal Contact Sharing</span>
+              </span>
+            </div>
+
+            {/* Search Input Box with Dual Fields */}
+            <div className="pt-2 max-w-xl">
+              <form
+                onSubmit={handleSearchSubmit}
+                className="bg-white p-2 rounded-2xl sm:rounded-full shadow-2xl border-2 border-[#d4a359]/70 flex flex-col sm:flex-row items-center gap-2"
+              >
+                {/* Search Text */}
+                <div className="flex items-center gap-2 px-4 py-2 w-full sm:flex-1 text-left">
+                  <Search className="w-4 h-4 text-slate-400 shrink-0" />
+                  <input
+                    type="text"
+                    placeholder="Search subject (Tajweed, Math, Physics...)"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-transparent text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 font-medium outline-none"
+                  />
+                </div>
+
+                <div className="hidden sm:block w-px h-8 bg-slate-200" />
+
+                {/* City Selector */}
+                <div className="w-full sm:w-48 text-left">
+                  <CustomSelect
+                    options={availableCities}
+                    value={selectedCity}
+                    onChange={setSelectedCity}
+                    placeholder="All Pakistan Cities"
+                    icon={MapPin}
+                    searchable={true}
+                    variant="hero"
+                    placement="top"
+                  />
+                </div>
+
+                {/* Terracotta Action Button */}
                 <button
-                  key={slide.id}
-                  type="button"
-                  onClick={() => setCurrentSlide(idx)}
-                  className={`w-1/2 sm:w-auto flex-1 py-2 px-3 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
-                    isActive
-                      ? 'bg-gradient-to-r from-[#d4a359] to-[#c29247] text-[#0c2217] shadow-lg font-black scale-102'
-                      : 'text-[#d6e3dd] hover:text-white hover:bg-white/10'
-                  }`}
+                  type="submit"
+                  className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-[#b85d34] to-[#9e4e2a] hover:from-[#c9673b] hover:to-[#b0552e] text-white font-bold text-xs sm:text-sm rounded-xl sm:rounded-full shadow-lg shadow-[#b85d34]/40 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer active:scale-95"
                 >
-                  <Icon className="w-3.5 h-3.5 shrink-0" />
-                  <span className="truncate">{slide.tabLabel}</span>
+                  <span>Find Tutors</span>
+                  <ArrowRight className="w-4 h-4" />
                 </button>
-              );
-            })}
+              </form>
+
+              {/* Quick Topic Chips & Female Faculty Filters */}
+              <div className="mt-3.5 flex flex-wrap items-center gap-1.5 text-xs">
+                <Link
+                  href="/tutors?gender=female"
+                  className="px-3.5 py-1.5 rounded-full bg-[#f5ebe6] hover:bg-[#ede0d8] text-[#b85d34] font-bold border border-[#b85d34]/40 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group cursor-pointer"
+                  title="Browse verified female tutors across all academic & Quran subjects"
+                >
+                  <UserCheck className="w-3.5 h-3.5 text-[#b85d34]" />
+                  <span>Female Tutors</span>
+                </Link>
+                <Link
+                  href="/tutors?gender=female&faculty=alimah"
+                  className="px-3.5 py-1.5 rounded-full bg-white hover:bg-[#f5f0e6] text-[#0c2217] font-bold border border-[#d4a359]/50 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group cursor-pointer"
+                  title="Browse verified female Alimahs for Quran, Tajweed & Islamic studies"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
+                  <span>Female Alimahs</span>
+                </Link>
+                <Link
+                  href="/tutors?mode=physical"
+                  className="px-3.5 py-1.5 rounded-full bg-[#f4ebe1] hover:bg-[#ebdcd3] text-[#0c2217] font-bold border border-[#d4a359]/60 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group cursor-pointer"
+                  title="Find verified male home tutors visiting your residence"
+                >
+                  <Home className="w-3.5 h-3.5 text-[#b85d34]" />
+                  <span>In-Person Home Tutors</span>
+                </Link>
+                <span className="text-[#c2d3cc] text-xs font-semibold ml-1">Popular:</span>
+                {quickSubjects.map((sub) => (
+                  <Link
+                    key={sub.slug}
+                    href={`/tutors?category=${sub.slug}`}
+                    className="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-[#faf8f5] hover:text-white text-xs font-medium border border-white/20 shadow-2xs transition-colors cursor-pointer"
+                  >
+                    {sub.label}
+                  </Link>
+                ))}
+              </div>
+
+              {/* Quick Trust Guarantees below search */}
+              <div className="mt-4 pt-3 border-t border-white/15 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-[#d6e3dd]">
+                <span className="inline-flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Direct fee agreement in chat</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Zero agency commission</span>
+                </span>
+                <span className="inline-flex items-center gap-1.5">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Free trial class</span>
+                </span>
+              </div>
+            </div>
+
           </div>
 
-          {/* Active Mode Quick Description Ribbon */}
-          <div className="mt-2.5 flex items-center justify-between gap-3 text-xs text-[#d6e3dd] px-2 flex-wrap sm:flex-nowrap">
-            <span className="flex items-center gap-1.5 truncate">
-              <span className={`w-2 h-2 rounded-full ${heroSlides[currentSlide].dotColor} animate-pulse shrink-0`} />
-              <strong className="text-white">{heroSlides[currentSlide].title}:</strong>
-              <span className="truncate opacity-90 hidden md:inline">{heroSlides[currentSlide].desc}</span>
-            </span>
-            <Link
-              href={heroSlides[currentSlide].ctaLink}
-              className="inline-flex items-center gap-1 text-[#d4a359] hover:text-[#f5d799] font-bold shrink-0 transition-colors cursor-pointer group"
-            >
-              <span>{heroSlides[currentSlide].ctaText}</span>
-              <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-            </Link>
-          </div>
-        </div>
+          {/* Right Column (5 cols): High-Trust Enrollment & Safety Gateway Card */}
+          <div className="lg:col-span-5 relative mt-6 lg:mt-0 flex flex-col justify-center">
+            <div className="relative rounded-3xl bg-black/50 backdrop-blur-xl border border-white/15 p-6 sm:p-7 shadow-2xl space-y-6">
+              
+              {/* Card Header */}
+              <div className="space-y-2 pb-4 border-b border-white/10">
+                <div className="flex items-center justify-between gap-2">
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/30">
+                    <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                    Verified Learning Community
+                  </span>
+                  <span className="text-[11px] font-semibold text-[#d4a359]">
+                    0% Commission
+                  </span>
+                </div>
+                <h2 className="text-xl sm:text-2xl font-serif font-bold text-white tracking-tight">
+                  Direct Tutoring Across Pakistan
+                </h2>
+                <p className="text-xs text-[#d6e3dd] leading-relaxed">
+                  Join verified Pakistani families learning Quran, Tajweed, and school/college subjects with 100% verified educators.
+                </p>
+              </div>
 
-        {/* Bottom Gateway CTAs & PWA App trigger */}
-        <div className="pt-2 max-w-md mx-auto space-y-3">
-          <div className="flex items-center justify-center gap-3">
-            <Link
-              href="/login?role=student&mode=signup"
-              className="py-2.5 px-6 rounded-xl bg-gradient-to-r from-[#b85d34] to-[#9e4e2a] hover:from-[#c9673b] hover:to-[#b0552e] text-white font-bold text-xs sm:text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#b85d34]/50 active:scale-98"
-            >
-              <GraduationCap className="w-4 h-4" />
-              <span>Join as Student</span>
-            </Link>
-            <Link
-              href="/login?role=tutor&mode=signup"
-              className="py-2.5 px-6 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/20 active:scale-98"
-            >
-              <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
-              <span>Apply as Tutor</span>
-            </Link>
+              {/* 3 Core Assurance Highlights */}
+              <div className="space-y-3">
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
+                  <ShieldCheck className="w-5 h-5 text-[#d4a359] shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <h3 className="text-xs font-bold text-white">CNIC &amp; Sanad Audited</h3>
+                    <p className="text-[11px] text-[#c2d3cc]">Wafaq-ul-Madaris Qaris &amp; top university degree holders verified before listing.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
+                  <Lock className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <h3 className="text-xs font-bold text-white">Female Safety &amp; Camera-Off Privacy</h3>
+                    <p className="text-[11px] text-[#c2d3cc]">Complete comfort for daughters and mothers with zero contact numbers shared.</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-3 p-3 rounded-xl bg-white/5 border border-white/10">
+                  <Sparkles className="w-5 h-5 text-[#b85d34] shrink-0 mt-0.5" />
+                  <div className="space-y-0.5">
+                    <h3 className="text-xs font-bold text-white">Agreed Direct Monthly Rates</h3>
+                    <p className="text-[11px] text-[#c2d3cc]">Chat free with tutors, take a trial class, and pay directly via EasyPaisa or JazzCash.</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Actions: Enrollment Gateways */}
+              <div className="pt-2 space-y-2.5">
+                <div className="flex flex-col sm:flex-row items-center gap-2.5">
+                  <Link
+                    href="/login?role=student&mode=signup"
+                    className="w-full sm:w-1/2 py-3 px-4 rounded-xl bg-gradient-to-r from-[#b85d34] to-[#9e4e2a] hover:from-[#c9673b] hover:to-[#b0552e] text-white font-bold text-xs sm:text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#b85d34]/50 active:scale-98"
+                  >
+                    <GraduationCap className="w-4 h-4" />
+                    <span>Join as Student</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
+                  <Link
+                    href="/login?role=tutor&mode=signup"
+                    className="w-full sm:w-1/2 py-3 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/20 active:scale-98"
+                  >
+                    <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
+                    <span>Apply as Tutor</span>
+                    <ArrowRight className="w-3.5 h-3.5 text-[#d4a359]" />
+                  </Link>
+                </div>
+
+                {/* Direct Female Tutors Hero Action Button */}
+                <Link
+                  href="/tutors?gender=female"
+                  className="w-full py-2.5 px-4 rounded-xl bg-[#d4a359]/20 hover:bg-[#d4a359]/30 text-[#f5d799] border border-[#d4a359]/50 font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all active:scale-98 cursor-pointer"
+                >
+                  <UserCheck className="w-4 h-4 text-[#d4a359]" />
+                  <span>Browse Verified Female Tutors &amp; Alimahs</span>
+                  <ChevronRight className="w-3.5 h-3.5 text-[#d4a359]" />
+                </Link>
+
+                {/* Chrome App Download trigger */}
+                <div className="text-center pt-1">
+                  <button
+                    type="button"
+                    onClick={() => setChromeModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#a5b8b0] hover:text-white transition-colors cursor-pointer"
+                  >
+                    <Chrome className="w-3.5 h-3.5 text-[#d4a359]" />
+                    <span>Install IlmiDunya App for Chrome / Windows / Android (Free PWA)</span>
+                  </button>
+                </div>
+              </div>
+
+            </div>
           </div>
 
-          <div className="text-center">
-            <button
-              type="button"
-              onClick={() => setChromeModalOpen(true)}
-              className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#a5b8b0] hover:text-white transition-colors cursor-pointer"
-            >
-              <Chrome className="w-3.5 h-3.5 text-[#d4a359]" />
-              <span>Install IlmiDunya App for Chrome / Windows / Android (Free PWA)</span>
-            </button>
-          </div>
         </div>
 
         {/* Editorial Trust Ledger (Frosted Glass Trust Cards) */}
-        <div className="pt-6 border-t border-white/15">
+        <div className="pt-8 mt-6 border-t border-white/15">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-left">
             
             {/* Feature 1: Verification */}

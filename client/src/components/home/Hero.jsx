@@ -198,29 +198,29 @@ export default function Hero() {
         isPaused={isPaused}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pt-2 sm:pt-6 pb-4 sm:pb-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 lg:gap-10 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pt-1 sm:pt-6 pb-4 sm:pb-6">
+        <div className="flex flex-col lg:grid lg:grid-cols-12 gap-5 sm:gap-8 lg:gap-10 items-center">
           
-          {/* Left Column (7 cols): Editorial Typography & Assurances */}
-          <div className="order-1 lg:col-span-7 space-y-4 sm:space-y-6 text-left">
+          {/* Left Column (7 cols on desktop): Editorial Typography & Assurances */}
+          <div className="w-full order-1 lg:col-span-7 space-y-3.5 sm:space-y-6 text-left">
             
             {/* Regional Trust Eyebrow */}
             <div className="flex items-center gap-2">
               <Link
                 href="/safety"
-                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-black/60 hover:bg-black/80 border border-[#d4a359]/60 text-[#f5d799] text-[11px] sm:text-xs font-bold transition-all shadow-lg group backdrop-blur-md cursor-pointer"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-black/60 hover:bg-black/80 border border-[#d4a359]/60 text-[#f5d799] text-[11px] sm:text-xs font-bold transition-all shadow-lg group backdrop-blur-md cursor-pointer whitespace-nowrap"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
-                <span className="sm:hidden">Female-First Safety • 100% Verified</span>
+                <span className="sm:hidden whitespace-nowrap">Female-First Safety • 100% Verified</span>
                 <span className="hidden sm:inline">Female-First Safety • Verified Qaris, Alimahs &amp; Academic Tutors</span>
                 <ChevronRight className="w-3 h-3 text-[#d4a359] group-hover:translate-x-0.5 transition-transform shrink-0" />
               </Link>
             </div>
 
             {/* Main Editorial Headline in Exactly Two Lines */}
-            <h1 className="text-[clamp(1.35rem,5.6vw,2.15rem)] sm:text-3xl md:text-4xl lg:text-[2.15rem] xl:text-[2.65rem] 2xl:text-5xl font-serif font-black tracking-tight text-[#faf8f5] leading-[1.15] sm:leading-[1.18] lg:leading-[1.2]">
-              <span className="block whitespace-nowrap">Connecting Verified Tutors</span>
-              <span className="block whitespace-nowrap">
+            <h1 className="text-2xl xs:text-[1.75rem] sm:text-3xl md:text-4xl lg:text-[2.15rem] xl:text-[2.65rem] 2xl:text-5xl font-serif font-black tracking-tight text-[#faf8f5] leading-[1.18] sm:leading-[1.2]">
+              <span className="block sm:whitespace-nowrap">Connecting Verified Tutors</span>
+              <span className="block sm:whitespace-nowrap">
                 With Students <span className="hand-drawn-underline-gold text-[#faf8f5]">Across Pakistan</span>
               </span>
             </h1>
@@ -235,31 +235,35 @@ export default function Hero() {
               </span>
             </p>
 
-            {/* Key Assurance Signals */}
+            {/* Key Assurance Signals (Clean, Never-Truncated on Mobile) */}
             <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 pt-0.5 sm:pt-1 text-[11px] sm:text-xs font-semibold">
-              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs truncate">
+              <span className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs text-center">
                 <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
-                <span className="truncate">100% Female Privacy</span>
+                <span className="sm:hidden whitespace-nowrap">Female Privacy</span>
+                <span className="hidden sm:inline whitespace-nowrap">100% Female Privacy</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs truncate">
+              <span className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs text-center">
                 <Award className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
-                <span className="truncate">Verified Sanad Tutors</span>
+                <span className="sm:hidden whitespace-nowrap">Verified Sanad</span>
+                <span className="hidden sm:inline whitespace-nowrap">Verified Sanad Tutors</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs truncate">
+              <span className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs text-center">
                 <Lock className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
-                <span className="truncate">Camera-Off by Default</span>
+                <span className="sm:hidden whitespace-nowrap">Camera-Off</span>
+                <span className="hidden sm:inline whitespace-nowrap">Camera-Off by Default</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs truncate">
+              <span className="inline-flex items-center justify-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs text-center">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span className="truncate">Zero Contact Sharing</span>
+                <span className="sm:hidden whitespace-nowrap">0% Contact Share</span>
+                <span className="hidden sm:inline whitespace-nowrap">Zero Contact Sharing</span>
               </span>
             </div>
 
           </div>
 
-          {/* Right Column (5 cols): Buttons & Quick Tags Showcase (Transparent Glass with Darker Hover) */}
-          <div className="order-3 lg:order-2 lg:col-span-5 relative mt-3 sm:mt-6 lg:mt-0">
-            <div className="rounded-2xl sm:rounded-3xl bg-black/20 hover:bg-black/75 border border-white/20 hover:border-white/40 p-4 sm:p-6 shadow-xl hover:shadow-2xl space-y-3.5 sm:space-y-5 transition-all duration-300 backdrop-blur-md">
+          {/* Right Column (5 cols on desktop): Buttons & Quick Tags Showcase (Full Width on Mobile) */}
+          <div className="w-full order-3 lg:order-2 lg:col-span-5 relative mt-1 sm:mt-6 lg:mt-0">
+            <div className="w-full rounded-2xl sm:rounded-3xl bg-black/20 hover:bg-black/75 border border-white/20 hover:border-white/40 p-4 sm:p-6 shadow-xl hover:shadow-2xl space-y-3.5 sm:space-y-5 transition-all duration-300 backdrop-blur-md">
               
               {/* Header: Popular Subjects & Faculty Modes */}
               <div className="space-y-1 pb-2.5 sm:pb-3 border-b border-white/15">
@@ -361,8 +365,8 @@ export default function Hero() {
             </div>
           </div>
 
-          {/* Full-Width Search Engine Row (Spans all 12 columns across container) */}
-          <div className="order-2 lg:order-3 col-span-12 w-full pt-1 sm:pt-4">
+          {/* Full-Width Search Engine Row (Order 2 on mobile, spans 12 columns on desktop) */}
+          <div className="w-full order-2 lg:order-3 lg:col-span-12 pt-1 sm:pt-4">
             <form
               onSubmit={handleSearchSubmit}
               className="bg-white p-2 sm:p-2.5 rounded-2xl sm:rounded-full shadow-2xl border-2 border-[#d4a359]/70 flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full"

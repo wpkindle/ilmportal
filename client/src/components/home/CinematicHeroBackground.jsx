@@ -50,16 +50,17 @@ export default function CinematicHeroBackground({
         })}
       </div>
 
-      {/* 3. Main Hero Background Slideshow Dark Overlay:
+      {/* 3. Main Hero Background Slideshow Dark Overlay (Desktop):
              Rich dark overlay across the entire background slideshow for premium contrast and depth */}
-      <div className="absolute inset-0 bg-[#07150e]/55" />
+      <div className="absolute inset-0 bg-[#07150e]/55 hidden lg:block" />
 
-      {/* 4. Directional Gradient Scrim: Deep emerald-black text protection on left (95%), 
+      {/* 4. Directional Gradient Scrim (Desktop): Deep emerald-black text protection on left (95%), 
              smoothly feathering out towards the right so the slideshow motion remains visible through the transparent glass card */}
       <div className="absolute inset-0 bg-gradient-to-r from-[#07150e]/95 via-[#07150e]/90 via-48% to-transparent hidden lg:block" />
 
-      {/* 5. Mobile Scrim: Balanced dark coverage so typography and UI are crisp on smaller screens */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/90 via-[#07150e]/75 to-[#07150e]/90 lg:hidden" />
+      {/* 5. Mobile Dark Contrast Scrim: Solid rich dark emerald scrim ensuring 100% crystal-clear readability over facial imagery */}
+      <div className="absolute inset-0 bg-[#07150e]/85 lg:hidden" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/95 via-[#07150e]/80 to-[#07150e] lg:hidden" />
 
       {/* 6. Vertical Framing Vignette (Blends into Navbar and next section) */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/80 via-transparent to-[#07150e]" />

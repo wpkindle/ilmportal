@@ -45,7 +45,6 @@ function StudentProfileContent() {
 
   // Profile Form State
   const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [city, setCity] = useState('Lahore');
   const [area, setArea] = useState('');
@@ -81,7 +80,6 @@ function StudentProfileContent() {
   useEffect(() => {
     if (user) {
       setName(user.name || '');
-      setUsername(user.username || '');
       setEmail(user.email || '');
       const uCity = user.city || '';
       const uArea = user.area || '';
@@ -151,7 +149,6 @@ function StudentProfileContent() {
     try {
       const res = await updateUserProfile({
         name: name.trim(),
-        username: username.trim().toLowerCase(),
         email: email.trim(),
         city,
         area: area.trim(),
@@ -314,7 +311,7 @@ function StudentProfileContent() {
 
               <div>
                 <h3 className="font-bold text-sm text-slate-900">{name || 'Student Name'}</h3>
-                {username && <p className="text-[11px] font-mono font-bold text-[#b85d34]">@{username}</p>}
+                {user?.username && <p className="text-[11px] font-mono font-bold text-[#b85d34]">@{user.username}</p>}
                 <p className="text-xs text-slate-500">{email || 'student@example.com'}</p>
                 <div className="mt-2 flex flex-wrap items-center justify-center gap-2">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-[#f0ece1] text-[#0c2217]">
@@ -401,40 +398,19 @@ function StudentProfileContent() {
 
               <form onSubmit={handleProfileSubmit} className="space-y-4">
                 
-                {/* Full Name & Username */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div id="profile-name" className="scroll-mt-28">
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Full Name *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      placeholder="e.g. Abdullah Khan"
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-semibold"
-                    />
-                  </div>
-
-                  <div id="profile-username" className="scroll-mt-28">
-                    <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Username (Handle)
-                    </label>
-                    <div className="relative">
-                      <span className="absolute left-3.5 top-2.5 text-xs font-bold text-slate-400 select-none">
-                        @
-                      </span>
-                      <input
-                        type="text"
-                        placeholder="e.g. abdullah_student"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g, ''))}
-                        maxLength={30}
-                        className="w-full pl-8 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-semibold font-mono"
-                      />
-                    </div>
-                  </div>
+                {/* Full Name */}
+                <div id="profile-name" className="scroll-mt-28">
+                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Abdullah Khan"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] focus:bg-white font-semibold"
+                  />
                 </div>
 
                 {/* Gender & Age Row */}

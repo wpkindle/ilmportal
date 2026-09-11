@@ -21,12 +21,12 @@ const activities = [
     id: 1,
     studentName: 'Zainab Malik',
     city: 'Islamabad',
-    action: 'just booked a 3-Day Free Trial for',
+    action: 'booked 1:1 lessons for',
     subject: 'Board Exam Physics (SSC & HSSC)',
     tutor: 'Engr. Bilal Ahmad',
     avatar: '/images/students/zainab-malik.jpg',
     timeAgo: 'Just now',
-    typeLabel: 'Free Trial',
+    typeLabel: 'New Student',
     badgeClass: 'bg-[#d4a359]/20 text-[#d4a359] border-[#d4a359]/30'
   },
   {
@@ -37,7 +37,7 @@ const activities = [
     subject: 'Tajweed al-Quran & Makharij',
     tutor: 'Qari Muhammad Huzaifa',
     avatar: '/images/students/hamza-khan.jpg',
-    timeAgo: '1 min ago',
+    timeAgo: '2 hours ago',
     typeLabel: 'Enrolled',
     badgeClass: 'bg-[#b85d34]/20 text-[#e07a4a] border-[#b85d34]/30'
   },
@@ -49,7 +49,7 @@ const activities = [
     subject: 'FSc Pre-Medical Biology',
     tutor: 'Dr. Ayesha Tariq',
     avatar: '/images/students/fatima-sheikh.jpg',
-    timeAgo: '2 mins ago',
+    timeAgo: '5 hours ago',
     typeLabel: 'JazzCash Verified',
     badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30'
   },
@@ -61,7 +61,7 @@ const activities = [
     subject: 'Noorani Qaida for Kids',
     tutor: 'Alimah Fatima Zahra',
     avatar: '/images/students/amina-rehman.jpg',
-    timeAgo: '3 mins ago',
+    timeAgo: 'Yesterday',
     typeLabel: 'New Student',
     badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/30'
   },
@@ -73,7 +73,7 @@ const activities = [
     subject: 'Board Mathematics & Algebra',
     tutor: 'Engr. Bilal Ahmad',
     avatar: '/images/students/ali-raza.jpg',
-    timeAgo: 'Just now',
+    timeAgo: '3 hours ago',
     typeLabel: '5.0 Rating',
     badgeClass: 'bg-rose-500/20 text-rose-300 border-rose-500/30'
   },
@@ -81,12 +81,12 @@ const activities = [
     id: 6,
     studentName: 'Hassan Bilal',
     city: 'Peshawar',
-    action: 'started 3-day free trial for',
+    action: 'enrolled in live sessions for',
     subject: 'Hifz al-Quran & Manzil Revision',
     tutor: 'Qari Muhammad Huzaifa',
     avatar: '/images/students/hassan-bilal.jpg',
-    timeAgo: '1 min ago',
-    typeLabel: 'Free Trial',
+    timeAgo: '2 days ago',
+    typeLabel: 'Enrolled',
     badgeClass: 'bg-[#d4a359]/20 text-[#d4a359] border-[#d4a359]/30'
   },
   {
@@ -97,7 +97,7 @@ const activities = [
     subject: 'Matric Class 10 Science & Math',
     tutor: 'Dr. Ayesha Tariq',
     avatar: '/images/students/maryam-tariq.jpg',
-    timeAgo: '2 mins ago',
+    timeAgo: '18 mins ago',
     typeLabel: 'Matric Board',
     badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/30'
   },
@@ -109,7 +109,7 @@ const activities = [
     subject: 'Tafseer & Quranic Translation',
     tutor: 'Ustadh Abdul Rahman',
     avatar: '/images/students/usman-farooq.jpg',
-    timeAgo: 'Just now',
+    timeAgo: '1 day ago',
     typeLabel: 'Live Session Done',
     badgeClass: 'bg-[#d4a359]/20 text-[#d4a359] border-[#d4a359]/30'
   },
@@ -121,7 +121,7 @@ const activities = [
     subject: 'Tajweed Rules & Daily Duas',
     tutor: 'Alimah Fatima Zahra',
     avatar: '/images/students/sara-ahmed.jpg',
-    timeAgo: '1 min ago',
+    timeAgo: '3 days ago',
     typeLabel: 'Female Qaria',
     badgeClass: 'bg-[#b85d34]/20 text-[#e07a4a] border-[#b85d34]/30'
   },
@@ -133,7 +133,7 @@ const activities = [
     subject: 'MDCAT Entry Test Chemistry',
     tutor: 'Dr. Ayesha Tariq',
     avatar: '/images/students/bilal-chaudhry.jpg',
-    timeAgo: '3 mins ago',
+    timeAgo: '8 hours ago',
     typeLabel: 'EasyPaisa Verified',
     badgeClass: 'bg-amber-500/20 text-amber-300 border-amber-500/30'
   },
@@ -145,8 +145,8 @@ const activities = [
     subject: 'Spoken Arabic & Sarf/Nahw',
     tutor: 'Ustadh Abdul Rahman',
     avatar: '/images/students/khadija-noor.jpg',
-    timeAgo: 'Just now',
-    typeLabel: 'Free Trial',
+    timeAgo: '4 hours ago',
+    typeLabel: 'New Student',
     badgeClass: 'bg-purple-500/20 text-purple-300 border-purple-500/30'
   },
   {
@@ -157,7 +157,7 @@ const activities = [
     subject: 'Board Computer Science & Coding',
     tutor: 'Engr. Bilal Ahmad',
     avatar: '/images/students/danyal-shah.jpg',
-    timeAgo: '2 mins ago',
+    timeAgo: '4 days ago',
     typeLabel: 'Academic',
     badgeClass: 'bg-blue-500/20 text-blue-300 border-blue-500/30'
   }

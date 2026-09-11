@@ -251,9 +251,9 @@ export default function Hero() {
 
           </div>
 
-          {/* Right Column (5 cols): Buttons & Quick Tags Showcase (Transparent Glass) */}
+          {/* Right Column (5 cols): Buttons & Quick Tags Showcase (Transparent Glass with Darker Hover) */}
           <div className="order-3 lg:order-2 lg:col-span-5 relative mt-6 lg:mt-0">
-            <div className="rounded-3xl bg-black/20 hover:bg-black/30 border border-white/20 p-5 sm:p-6 shadow-xl space-y-5 transition-colors">
+            <div className="rounded-3xl bg-black/20 hover:bg-black/75 border border-white/20 hover:border-white/40 p-5 sm:p-6 shadow-xl hover:shadow-2xl space-y-5 transition-all duration-300">
               
               {/* Header: Popular Subjects & Faculty Modes */}
               <div className="space-y-1 pb-3 border-b border-white/15">

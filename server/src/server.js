@@ -178,6 +178,27 @@ const startServer = async () => {
         console.warn('Contact page sync note:', contactSyncErr.message);
       }
 
+      // Ensure 'Primary School (Class 1 to 5)' category exists
+      try {
+        const Category = require('./models/Category');
+        await Category.findOneAndUpdate(
+          { slug: 'primary-school-1-to-5' },
+          {
+            $setOnInsert: {
+              name: 'Primary School (Class 1 to 5)',
+              slug: 'primary-school-1-to-5',
+              type: 'academic',
+              icon: 'Users',
+              description: 'Foundational learning for young learners in English, Urdu, Basic Mathematics, General Science, and daily schoolwork guidance.',
+              subtopics: ['Class 1 to 5 All Subjects', 'Primary English Phonics', 'Urdu Reading & Writing', 'Basic Math & Tables', 'General Science & Social Studies']
+            }
+          },
+          { upsert: true, new: true }
+        );
+      } catch (catErr) {
+        console.warn('Primary category sync note:', catErr.message);
+      }
+
       server.on('error', (e) => {
         if (e.code === 'EADDRINUSE') {
           console.error(`Port ${PORT} is currently in use. Exiting for clean supervisor restart...`);

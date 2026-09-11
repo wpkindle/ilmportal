@@ -232,10 +232,11 @@ const Navbar = () => {
       icon: GraduationCap,
       color: 'text-[#b85d34] bg-[#faf0eb]',
       items: [
+        { name: 'Primary School (Class 1 to 5)', link: '/tutors?category=primary-school-1-to-5' },
+        { name: 'Middle School Academic (Class 6-8)', link: '/tutors?category=middle-school-academic' },
         { name: 'Matric / SSC Science & Arts', link: '/tutors?category=matric-ssc-science' },
         { name: 'FSc Pre-Medical & Engineering', link: '/tutors?category=fsc-pre-engineering' },
         { name: 'Board Exam Preparation', link: '/tutors?category=board-exam-prep' },
-        { name: 'Middle School Academic (Class 6-8)', link: '/tutors?category=middle-school-academic' },
         { name: 'MDCAT & ECAT Entry Prep', link: '/tutors?category=entry-test-prep' }
       ]
     },
@@ -878,6 +879,13 @@ const Navbar = () => {
                 className="block px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-[#0c2217] hover:bg-[#ede6db] transition-colors"
               >
                 &bull; Quran &amp; Tajweed Tutors
+              </Link>
+              <Link
+                href="/tutors?category=primary-school-1-to-5"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-700 hover:bg-[#ede6db] transition-colors"
+              >
+                &bull; Primary School (Class 1 to 5)
               </Link>
               <Link
                 href="/tutors?category=matric-ssc-science"

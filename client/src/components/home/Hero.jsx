@@ -160,19 +160,19 @@ const heroSlides = [
   },
   {
     id: 7,
-    tabLabel: 'Primary & Junior',
+    tabLabel: 'Class 1 to 5',
     tabIcon: Users,
-    badgeText: 'Playgroup to Grade 5 • Live Screen Tutoring',
+    badgeText: 'Primary School (Class 1-5) • Live Screen Tutoring',
     badgeIcon: Video,
     badgeColor: 'text-[#faf8f5]',
     dotColor: 'bg-[#b85d34]',
-    tag: 'Live Junior WebRTC',
-    title: 'Early Childhood & Junior Lessons • Live Video Screen',
-    desc: 'Caring verified female tutors teaching young learners live on screen in geometry, Urdu reading, English phonics, and schoolwork.',
+    tag: 'Primary School (1 to 5)',
+    title: 'Primary School Classes 1 to 5 • Live Video Screen',
+    desc: 'Caring verified tutors teaching young learners live on screen in geometry, Urdu reading, English phonics, and daily schoolwork.',
     image: '/images/hero-female-live-junior.jpg',
     alt: 'Young Pakistani student with headphones attending engaging live 1-on-1 online video call class with smiling female tutor on laptop screen',
-    ctaLink: '/tutors?category=primary-junior&gender=female',
-    ctaText: 'Find Female Junior Tutors'
+    ctaLink: '/tutors?category=primary-school-1-to-5',
+    ctaText: 'Find Class 1 to 5 Tutors'
   }
 ];
 
@@ -251,6 +251,7 @@ export default function Hero() {
     { label: 'Tajweed al-Quran', slug: 'tajweed-al-quran' },
     { label: 'Noorani Qaida', slug: 'noorani-qaida' },
     { label: 'Hifz Memorization', slug: 'hifz-al-quran' },
+    { label: 'Class 1 to 5', slug: 'primary-school-1-to-5' },
     { label: 'Board Exam Prep', slug: 'board-exam-prep' },
     { label: 'FSc Pre-Medical', slug: 'fsc-hssc' },
     { label: 'Matric Science', slug: 'matric-ssc-science' }

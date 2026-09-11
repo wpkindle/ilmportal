@@ -297,8 +297,8 @@ const Footer = () => {
             </div>
             <ul className="space-y-2 text-xs text-[#a3bcaf]">
               <li>
-                <Link href="/tutors?category=board-exam-prep" className="hover:text-white transition-colors block">
-                  Board Exam Preparation
+                <Link href="/tutors?category=primary-school-1-to-5" className="hover:text-white transition-colors block">
+                  Primary School (Class 1 to 5)
                 </Link>
               </li>
               <li>
@@ -319,6 +319,11 @@ const Footer = () => {
               <li>
                 <Link href="/tutors?category=mdcat-ecat" className="hover:text-white transition-colors block">
                   MDCAT &amp; ECAT Entry Prep
+                </Link>
+              </li>
+              <li>
+                <Link href="/tutors?category=board-exam-prep" className="hover:text-white transition-colors block">
+                  Board Exam Preparation
                 </Link>
               </li>
               <li>

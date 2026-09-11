@@ -231,11 +231,19 @@ const categoriesData = [
     subtopics: ['FBISE Federal Board Mastery', 'Punjab Boards (BISE)', 'Sindh Boards & BSEK', 'Model Papers & Schemes']
   },
   {
-    name: 'Middle & Primary School Academic (Class 1 - 8)',
+    name: 'Primary School (Class 1 to 5)',
+    slug: 'primary-school-1-to-5',
+    type: 'academic',
+    icon: 'Users',
+    description: 'Foundational learning for young learners in English, Urdu, Basic Mathematics, General Science, and daily schoolwork guidance.',
+    subtopics: ['Class 1 to 5 All Subjects', 'Primary English Phonics', 'Urdu Reading & Writing', 'Basic Math & Tables', 'General Science & Social Studies']
+  },
+  {
+    name: 'Middle School Academic (Class 6 - 8)',
     slug: 'middle-school-academic',
     type: 'academic',
     icon: 'BookOpen',
-    description: 'Foundation building in Mathematics, General Science, English, and Urdu for middle and primary grades.',
+    description: 'Foundation building in Mathematics, General Science, English, and Urdu for middle school grades.',
     subtopics: ['Middle School Math (Class 6-8)', 'General Science Foundation', 'English Grammar & Comprehension', 'Urdu & Social Studies']
   },
   {
@@ -428,7 +436,7 @@ const seedDatabase = async () => {
       qualifications: 'MS Electrical Engineering (NUST), Board Exam Specialist',
       experienceYears: 7,
       hourlyRate: 2500, // PKR
-      subjects: [catMap['board-exam-prep'], catMap['middle-school-academic'], catMap['fsc-hssc']],
+      subjects: [catMap['primary-school-1-to-5'], catMap['middle-school-academic'], catMap['board-exam-prep'], catMap['fsc-hssc']],
       cities: [locMap['Karachi'], locMap['Hyderabad']],
       teachingModes: ['online', 'in_person'],
       gender: 'male',

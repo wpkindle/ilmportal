@@ -149,6 +149,43 @@
   transform-origin: 0% 50%;
 }
 
+/* Cinematic Ken-Burns Pan & Zoom Animations */
+@keyframes kenburns-zoom-in {
+  0% {
+    transform: scale(1.02) translate3d(0, 0, 0);
+  }
+  100% {
+    transform: scale(1.12) translate3d(-1.5%, -1%, 0);
+  }
+}
+
+@keyframes kenburns-zoom-out {
+  0% {
+    transform: scale(1.12) translate3d(-1%, 1%, 0);
+  }
+  100% {
+    transform: scale(1.02) translate3d(1%, -0.5%, 0);
+  }
+}
+
+.animate-kenburns-1 {
+  animation: kenburns-zoom-in 9s cubic-bezier(0.25, 1, 0.5, 1) infinite alternate;
+  will-change: transform;
+}
+
+.animate-kenburns-2 {
+  animation: kenburns-zoom-out 9s cubic-bezier(0.25, 1, 0.5, 1) infinite alternate;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-kenburns-1,
+  .animate-kenburns-2 {
+    animation: none !important;
+    transform: scale(1.03) !important;
+  }
+}
+
 /* Vivid Aurora & Hero Float Animations */
 @keyframes floatSlow {
   0%, 100% {

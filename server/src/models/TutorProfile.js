@@ -107,7 +107,17 @@ const tutorProfileSchema = new mongoose.Schema({
     default: false
   }
 }, {
-  timestamps: true
+  timestamps: true,
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
+});
+
+tutorProfileSchema.virtual('averageRating').get(function () {
+  return this.ratingAverage !== undefined ? this.ratingAverage : 5.0;
+});
+
+tutorProfileSchema.virtual('totalReviews').get(function () {
+  return this.ratingCount !== undefined ? this.ratingCount : 0;
 });
 
 module.exports = mongoose.model('TutorProfile', tutorProfileSchema);

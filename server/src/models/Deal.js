@@ -133,6 +133,14 @@ const dealSchema = new mongoose.Schema({
   completionNotes: {
     type: String,
     default: ''
+  },
+  isReviewed: {
+    type: Boolean,
+    default: false
+  },
+  review: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Review'
   }
 }, {
   timestamps: true

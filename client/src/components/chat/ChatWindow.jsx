@@ -31,7 +31,8 @@ import {
   ExternalLink,
   X,
   File,
-  CreditCard
+  CreditCard,
+  Star
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -42,6 +43,7 @@ import { getTutorAvatar } from '../../utils/tutorHelpers';
 import DealOfferCard from './DealOfferCard';
 import DealOfferModal from '../tutor/DealOfferModal';
 import TutorPaymentModal from '../tutor/TutorPaymentModal';
+import LeaveReviewModal from '../common/LeaveReviewModal';
 import VoiceMessagePlayer from './VoiceMessagePlayer';
 import ReportModal from './ReportModal';
 import LoadingSpinner from '../common/LoadingSpinner';
@@ -78,6 +80,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
   const [dealModalOpen, setDealModalOpen] = useState(false);
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [partnerDeal, setPartnerDeal] = useState(initialDeal || null);
+  const [showStudentReviewModal, setShowStudentReviewModal] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -360,8 +363,15 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
     };
 
     const handleDealCompleted = (data) => {
-      setPartnerDeal((prev) => prev ? { ...prev, status: 'completed' } : { status: 'completed' });
+      const incomingDeal = data?.deal || (partnerDeal ? { ...partnerDeal, status: 'completed' } : { status: 'completed' });
+      setPartnerDeal((prev) => ({ ...(prev || {}), ...incomingDeal, status: 'completed' }));
       setMessages([]);
+
+      const currentUserId = (user?._id || user?.id)?.toString();
+      const isStudentViewer = user?.role === 'student' || isStudent || (data?.studentId && data.studentId.toString() === currentUserId);
+      if (isStudentViewer) {
+        setShowStudentReviewModal(true);
+      }
     };
 
     const handleConversationCleared = (data) => {
@@ -1095,14 +1105,74 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
       {/* Messages List Area */}
       <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-3 bg-stone-50/50">
         {messages.length === 0 && partnerDeal?.status === 'completed' ? (
-          <div className="text-center py-12 space-y-2.5 max-w-sm mx-auto animate-in fade-in">
-            <div className="w-12 h-12 rounded-2xl bg-[#0c2217] text-[#d4a359] flex items-center justify-center mx-auto shadow-xs border border-[#d4a359]/30">
-              <CheckCircle2 className="w-6 h-6" />
-            </div>
-            <p className="text-xs font-serif font-bold text-stone-900">Course Deal Completed 🎉</p>
-            <p className="text-[11px] text-stone-600 leading-relaxed">
-              This course has been marked as completed. To optimize database storage, the conversation messages between you and this user have been cleared.
-            </p>
+          <div className="py-8 px-4 max-w-md mx-auto space-y-4 animate-in fade-in">
+            {isStudent || user?.role === 'student' ? (
+              partnerDeal?.isReviewed ? (
+                <div className="p-6 bg-white rounded-3xl border border-emerald-200 shadow-sm text-center space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
+                    <CheckCircle2 className="w-6 h-6" />
+                  </div>
+                  <h3 className="font-serif font-bold text-sm text-stone-900">
+                    Course Completed &amp; Review Published! 🎓
+                  </h3>
+                  <div className="flex items-center justify-center gap-1 text-amber-500 py-0.5">
+                    {[1, 2, 3, 4, 5].map((s) => (
+                      <Star key={s} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+                  <p className="text-[11px] text-stone-600 leading-relaxed">
+                    Thank you! Your verified student review and rating are now active on {partner?.name}&apos;s public profile.
+                  </p>
+                  <Link
+                    href={`/tutors/${partner?._id || partnerDeal?.tutor?._id || partnerDeal?.tutor}`}
+                    className="inline-flex items-center gap-1.5 px-4 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-white rounded-xl text-xs font-bold transition-all border border-[#d4a359]/30"
+                  >
+                    <span>View Profile &amp; Reviews</span>
+                    <ExternalLink className="w-3.5 h-3.5 text-[#d4a359]" />
+                  </Link>
+                </div>
+              ) : (
+                <div className="p-6 bg-white rounded-3xl border-2 border-[#d4a359]/50 shadow-md text-center space-y-3.5">
+                  <div className="w-12 h-12 rounded-2xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center mx-auto border border-[#d4a359]/40">
+                    <Sparkles className="w-6 h-6 text-[#d4a359]" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-bold tracking-widest text-[#b85d34] block">
+                      Course Completed
+                    </span>
+                    <h3 className="font-serif font-bold text-base text-stone-900 mt-0.5">
+                      How was your experience with {partner?.name}?
+                    </h3>
+                  </div>
+                  <p className="text-xs text-stone-600 leading-relaxed">
+                    Your tutor marked the course as completed. Please take a moment to rate their punctuality, Tajweed guidance, and teaching quality.
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => setShowStudentReviewModal(true)}
+                    className="w-full py-3 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-bold rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <Star className="w-4 h-4 fill-white text-white" />
+                    <span>Rate &amp; Review Tutor</span>
+                  </button>
+                  <p className="text-[10px] text-stone-400">
+                    Chat history was cleared to optimize database storage.
+                  </p>
+                </div>
+              )
+            ) : (
+              <div className="p-6 bg-white rounded-3xl border border-stone-200 text-center space-y-3">
+                <div className="w-12 h-12 rounded-2xl bg-[#0c2217] text-[#d4a359] flex items-center justify-center mx-auto shadow-xs border border-[#d4a359]/30">
+                  <CheckCircle2 className="w-6 h-6" />
+                </div>
+                <h3 className="font-serif font-bold text-sm text-stone-900">
+                  Course Deal Completed 🎉
+                </h3>
+                <p className="text-[11px] text-stone-600 leading-relaxed">
+                  This course has been concluded. Your student has been invited to leave a review for your public profile. Chat history has been cleared to optimize database storage.
+                </p>
+              </div>
+            )}
           </div>
         ) : messages.length === 0 ? (
           <div className="text-center py-12 space-y-2">
@@ -1575,6 +1645,23 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             setPartnerDeal((prev) =>
               prev ? { ...prev, ...dealObj, paymentStatus: 'submitted_proof' } : prev
             );
+          }}
+        />
+      )}
+
+      {/* Student Leave Review Modal */}
+      {showStudentReviewModal && (
+        <LeaveReviewModal
+          isOpen={showStudentReviewModal}
+          onClose={() => setShowStudentReviewModal(false)}
+          deal={partnerDeal}
+          tutor={partner}
+          onSuccess={(reviewData) => {
+            setPartnerDeal((prev) => ({
+              ...(prev || {}),
+              isReviewed: true,
+              studentReview: reviewData
+            }));
           }}
         />
       )}

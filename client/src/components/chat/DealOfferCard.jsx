@@ -1,11 +1,12 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles, CheckCircle2, XCircle, Clock, Video, Home, MapPin, CreditCard, ShieldCheck, Award, AlertTriangle, X } from 'lucide-react';
+import { Sparkles, CheckCircle2, XCircle, Clock, Video, Home, MapPin, CreditCard, ShieldCheck, Award, AlertTriangle, X, Star } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import Tutor72HourClock from '../tutor/Tutor72HourClock';
 import TutorPaymentModal from '../tutor/TutorPaymentModal';
+import LeaveReviewModal from '../common/LeaveReviewModal';
 
 const runConfetti = async () => {
   if (typeof window !== 'undefined') {
@@ -28,6 +29,7 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
   const [dealState, setDealState] = useState(deal);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showPaymentNoticeModal, setShowPaymentNoticeModal] = useState(false);
+  const [showReviewModal, setShowReviewModal] = useState(false);
 
   useEffect(() => {
     if (deal) {
@@ -264,9 +266,38 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
 
       {/* Course Completed / Deal Closed Indicator */}
       {currentStatus === 'completed' && (
-        <div className="p-3 bg-stone-100 rounded-2xl border border-stone-200 text-center text-xs font-bold text-stone-700 flex items-center justify-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-          <span>Course Completed &bull; Deal Closed</span>
+        <div className="space-y-2">
+          <div className="p-3 bg-stone-100 rounded-2xl border border-stone-200 text-center text-xs font-bold text-stone-700 flex items-center justify-center gap-2">
+            <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+            <span>Course Completed &bull; Deal Closed</span>
+          </div>
+
+          {/* Student Review Prompt / Status */}
+          {isStudentUser && (
+            <div className="p-3 bg-[#faf8f5] rounded-2xl border border-[#ebe3d3] flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-amber-500 fill-amber-400 shrink-0" />
+                <span className="text-xs font-bold text-stone-800">
+                  {dealState.isReviewed ? 'Review Published' : 'Rate Your Teacher'}
+                </span>
+              </div>
+              {dealState.isReviewed ? (
+                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Submitted ★★★★★</span>
+                </span>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setShowReviewModal(true)}
+                  className="px-3 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer border border-[#d4a359]/30"
+                >
+                  <Star className="w-3.5 h-3.5 text-[#d4a359] fill-[#d4a359]" />
+                  <span>Leave Review</span>
+                </button>
+              )}
+            </div>
+          )}
         </div>
       )}
 
@@ -433,6 +464,21 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
           onClose={() => setShowPaymentModal(false)}
           onSuccess={(updatedDeal) => {
             const updated = updatedDeal || { ...dealState, paymentStatus: 'submitted_proof' };
+            setDealState(updated);
+            if (onDealUpdated) onDealUpdated(updated);
+          }}
+        />
+      )}
+
+      {/* Student Leave Review Modal */}
+      {showReviewModal && (
+        <LeaveReviewModal
+          isOpen={showReviewModal}
+          onClose={() => setShowReviewModal(false)}
+          deal={dealState}
+          tutor={dealState.tutor}
+          onSuccess={(reviewData) => {
+            const updated = { ...dealState, isReviewed: true, studentReview: reviewData };
             setDealState(updated);
             if (onDealUpdated) onDealUpdated(updated);
           }}

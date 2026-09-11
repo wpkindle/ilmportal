@@ -215,6 +215,17 @@ exports.getMessages = async (req, res) => {
           ]
         }).sort({ updatedAt: -1, createdAt: -1 }).lean();
       }
+
+      if (latestDeal && req.user && req.user.role === 'student') {
+        const studentReview = await Review.findOne({
+          student: req.user.id,
+          deal: latestDeal._id
+        }).lean();
+        if (studentReview) {
+          latestDeal.isReviewed = true;
+          latestDeal.studentReview = studentReview;
+        }
+      }
     }
 
     res.status(200).json({

@@ -34,7 +34,7 @@ export async function generateMetadata({ params }) {
       const tutorLocation = tutorArea ? `${tutorArea}, ${tutorCity}` : tutorCity;
       return {
         title: `${tutorName} - Verified Tutor Profile | IlmiDunya Pakistan`,
-        description: `${tutorName} (${tutorLocation}) specializes in ${tutor.qualifications || 'Quran & Academic Tutoring'}. Rating: ${tutor.averageRating?.toFixed(1) || '5.0'}/5. In-platform live video classes available.`,
+        description: `${tutorName} (${tutorLocation}) specializes in ${tutor.qualifications || 'Quran & Academic Tutoring'}. Rating: ${(tutor.ratingAverage ?? tutor.averageRating ?? 5.0).toFixed(1)}/5. In-platform live video classes available.`,
         alternates: {
           canonical: `https://ilmidunya.com/tutors/${params.id}`,
         },
@@ -109,8 +109,8 @@ export default async function TutorProfilePage({ params }) {
         ...(reviews.length > 0 ? {
           aggregateRating: {
             '@type': 'AggregateRating',
-            ratingValue: tutor.averageRating || 5.0,
-            reviewCount: reviews.length,
+            ratingValue: tutor.ratingAverage ?? tutor.averageRating ?? 5.0,
+            reviewCount: reviews.length || tutor.ratingCount || 1,
             bestRating: '5',
             worstRating: '1'
           }

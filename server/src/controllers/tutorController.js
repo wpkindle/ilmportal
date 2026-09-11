@@ -233,6 +233,8 @@ exports.getPublicTutors = async (req, res) => {
       const obj = tp.toObject ? tp.toObject() : { ...tp };
       const uId = obj.user?._id || obj.user?.id || obj.user;
       obj.isOnline = isUserOnline ? Boolean(isUserOnline(uId)) : false;
+      obj.averageRating = obj.ratingAverage !== undefined ? obj.ratingAverage : 5.0;
+      obj.totalReviews = obj.ratingCount !== undefined ? obj.ratingCount : 0;
       return obj;
     });
 
@@ -291,16 +293,23 @@ exports.getTutorById = async (req, res) => {
       });
     }
 
-    // Fetch verified reviews for this tutor
-    const reviews = await Review.find({ tutor: tutor.user._id, isHidden: false })
+    // Fetch verified published reviews for this tutor
+    const reviews = await Review.find({
+      $or: [
+        { tutor: tutorUserId },
+        { tutor: tutor._id }
+      ],
+      status: 'published'
+    })
       .populate('student', 'name avatar city')
-      .sort({ createdAt: -1 })
-      .limit(10);
+      .sort({ createdAt: -1 });
 
     const isUserOnline = req.app.get('isUserOnline');
     const tutorObj = tutor.toObject ? tutor.toObject() : { ...tutor };
     const uId = tutorObj.user?._id || tutorObj.user?.id || tutorObj.user;
     tutorObj.isOnline = isUserOnline ? Boolean(isUserOnline(uId)) : false;
+    tutorObj.averageRating = tutorObj.ratingAverage !== undefined ? tutorObj.ratingAverage : 5.0;
+    tutorObj.totalReviews = tutorObj.ratingCount !== undefined ? tutorObj.ratingCount : reviews.length;
 
     res.status(200).json({
       success: true,

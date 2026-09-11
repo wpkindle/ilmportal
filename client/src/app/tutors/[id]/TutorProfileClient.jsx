@@ -304,12 +304,12 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
 
                 <div className="flex items-center flex-wrap gap-x-3 gap-y-1 pt-0.5">
                   <div className="flex items-center gap-1.5">
-                    <RatingStars rating={tutor.averageRating || 5} size="sm" showScore={false} />
+                    <RatingStars rating={tutor.ratingAverage ?? tutor.averageRating ?? 5} size="sm" showScore={false} />
                     <span className="text-xs font-bold text-slate-800">
-                      {tutor.averageRating?.toFixed(1) || '5.0'}
+                      {(tutor.ratingAverage ?? tutor.averageRating ?? 5.0).toFixed(1)}
                     </span>
                     <span className="text-xs text-slate-400">
-                      ({reviews.length} reviews)
+                      ({reviews.length || tutor.ratingCount || tutor.totalReviews || 0} reviews)
                     </span>
                   </div>
 
@@ -595,10 +595,10 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
         {/* Student Reviews Section */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e6ded1] shadow-2xs space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-black text-slate-900 font-serif">Student Reviews &amp; Ratings ({reviews.length})</h2>
+            <h2 className="text-base font-black text-slate-900 font-serif">Student Reviews &amp; Ratings ({reviews.length || tutor.ratingCount || tutor.totalReviews || 0})</h2>
             <div className="flex items-center gap-1.5">
-              <RatingStars rating={tutor.averageRating || 5} size="xs" showScore={false} />
-              <span className="text-xs font-bold text-slate-800">{tutor.averageRating?.toFixed(1) || '5.0'} / 5.0</span>
+              <RatingStars rating={tutor.ratingAverage ?? tutor.averageRating ?? 5} size="xs" showScore={false} />
+              <span className="text-xs font-bold text-slate-800">{(tutor.ratingAverage ?? tutor.averageRating ?? 5.0).toFixed(1)} / 5.0</span>
             </div>
           </div>
 
@@ -607,16 +607,26 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
           ) : (
             <div className="space-y-4">
               {reviews.map((rev) => (
-                <div key={rev._id} className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-2">
+                <div key={rev._id} className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-2.5">
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-xs text-slate-900">
-                      {rev.student?.name || 'Verified Student'}
-                    </span>
+                    <div className="flex items-center gap-2.5">
+                      <div className="w-8 h-8 rounded-full bg-[#0c2217] text-[#d4a359] font-bold text-xs flex items-center justify-center border border-[#d4a359]/30 shrink-0">
+                        {(rev.student?.name || 'S').charAt(0).toUpperCase()}
+                      </div>
+                      <div>
+                        <span className="font-bold text-xs text-slate-900 block">
+                          {rev.student?.name || 'Verified Student'}
+                        </span>
+                        {rev.student?.city && (
+                          <span className="text-[10px] text-slate-500 font-medium block">{rev.student.city}</span>
+                        )}
+                      </div>
+                    </div>
                     <RatingStars rating={rev.rating} size="xs" />
                   </div>
-                  <p className="text-xs text-slate-600 italic">"{rev.comment}"</p>
+                  {rev.comment && <p className="text-xs text-slate-700 leading-relaxed">&ldquo;{rev.comment}&rdquo;</p>}
                   <span className="text-[10px] text-slate-400 font-mono block">
-                    {new Date(rev.createdAt).toLocaleDateString()}
+                    {new Date(rev.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                   </span>
                 </div>
               ))}

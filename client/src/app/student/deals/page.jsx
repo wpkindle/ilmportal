@@ -50,6 +50,9 @@ export default function MyDealsPage() {
       });
       if (res.success) {
         setReviewSuccess(true);
+        setDeals((prev) =>
+          prev.map((d) => (d._id === reviewModalDeal._id ? { ...d, isReviewed: true } : d))
+        );
         setTimeout(() => {
           setReviewModalDeal(null);
           setReviewSuccess(false);
@@ -144,13 +147,20 @@ export default function MyDealsPage() {
                       </Link>
                     )}
 
-                    <button
-                      onClick={() => setReviewModalDeal(deal)}
-                      className="px-3.5 py-2 bg-[#fdf6ec] hover:bg-[#faebd4] text-[#b8863b] font-bold text-xs rounded-xl border border-[#f2dfbe] transition-colors flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <Star className="w-3.5 h-3.5 fill-[#d4a359] text-[#d4a359]" />
-                      <span>Rate &amp; Review</span>
-                    </button>
+                    {deal.isReviewed ? (
+                      <span className="px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-xs rounded-xl flex items-center gap-1.5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Reviewed ★★★★★</span>
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => setReviewModalDeal(deal)}
+                        className="px-3.5 py-2 bg-[#fdf6ec] hover:bg-[#faebd4] text-[#b8863b] font-bold text-xs rounded-xl border border-[#f2dfbe] transition-colors flex items-center gap-1.5 cursor-pointer"
+                      >
+                        <Star className="w-3.5 h-3.5 fill-[#d4a359] text-[#d4a359]" />
+                        <span>Rate &amp; Review</span>
+                      </button>
+                    )}
 
                     {deal.status !== 'completed' ? (
                       <Link

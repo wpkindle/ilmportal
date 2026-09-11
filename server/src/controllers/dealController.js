@@ -330,6 +330,24 @@ exports.getMyDeals = async (req, res) => {
       }
     }
 
+    // For students, populate review status on completed deals
+    if (req.user.role === 'student') {
+      const completedDealIds = deals.filter(d => d.status === 'completed').map(d => d._id);
+      if (completedDealIds.length > 0) {
+        const studentReviews = await Review.find({ student: req.user.id, deal: { $in: completedDealIds } }).lean();
+        const reviewMap = new Map(studentReviews.map(r => [r.deal?.toString(), r]));
+        deals.forEach(deal => {
+          if (deal.status === 'completed' && reviewMap.has(deal._id.toString())) {
+            deal.isReviewed = true;
+            if (deal._doc) {
+              deal._doc.isReviewed = true;
+              deal._doc.studentReview = reviewMap.get(deal._id.toString());
+            }
+          }
+        });
+      }
+    }
+
     res.status(200).json({
       success: true,
       count: deals.length,
@@ -961,10 +979,24 @@ exports.completeDeal = async (req, res) => {
     // Notify connected clients via Socket.IO
     const io = req.app.get('io');
     if (io) {
-      io.to(tutorId).emit('deal-completed', { dealId: deal._id, status: 'completed' });
-      io.to(studentId).emit('deal-completed', { dealId: deal._id, status: 'completed' });
-      io.to(`user_${tutorId}`).emit('deal-completed', { dealId: deal._id, status: 'completed' });
-      io.to(`user_${studentId}`).emit('deal-completed', { dealId: deal._id, status: 'completed' });
+      const dealCompletedPayload = {
+        dealId: deal._id,
+        status: 'completed',
+        tutorId,
+        studentId,
+        tutorName: deal.tutor?.name || 'Your Tutor',
+        subject: deal.subject,
+        deal
+      };
+
+      io.to(tutorId).emit('deal-completed', dealCompletedPayload);
+      io.to(studentId).emit('deal-completed', dealCompletedPayload);
+      io.to(`user_${tutorId}`).emit('deal-completed', dealCompletedPayload);
+      io.to(`user_${studentId}`).emit('deal-completed', dealCompletedPayload);
+      io.to(convId1).emit('deal-completed', dealCompletedPayload);
+      io.to(convId2).emit('deal-completed', dealCompletedPayload);
+      io.to(`conv_${convId1}`).emit('deal-completed', dealCompletedPayload);
+      io.to(`conv_${convId2}`).emit('deal-completed', dealCompletedPayload);
 
       io.to(convId1).emit('conversation-cleared', { conversationId: convId1, dealId: deal._id });
       io.to(convId2).emit('conversation-cleared', { conversationId: convId2, dealId: deal._id });

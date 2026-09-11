@@ -208,6 +208,27 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
     expect(verifyRes.body.deal.status).toEqual('active_paid');
   });
 
+  test('Tutor sends in-person deal offer with physical mode and succeeds without validation error', async () => {
+    const User = require('../src/models/User');
+    const student = await User.findOne({ email: 'teststudent@pakistanlms.pk' });
+
+    const physicalOfferRes = await request(app)
+      .post('/api/deals/offer')
+      .set('Authorization', `Bearer ${tutorToken}`)
+      .send({
+        studentId: student._id.toString(),
+        subject: 'Hifz-ul-Quran (In-Person)',
+        price: 8000,
+        priceUnit: 'per_month',
+        mode: 'physical',
+        scheduleDetails: 'Starts 15 Sep • Mon, Wed, Fri at 5 PM PKT • In-Person Home Tuition (DHA Phase 5, Lahore)'
+      });
+
+    expect(physicalOfferRes.statusCode).toEqual(201);
+    expect(physicalOfferRes.body.success).toEqual(true);
+    expect(['in_person', 'physical']).toContain(physicalOfferRes.body.deal.mode);
+  });
+
   test('Public CMS routes return categories and Pakistani locations', async () => {
     const catRes = await request(app).get('/api/cms/categories');
     expect(catRes.statusCode).toEqual(200);

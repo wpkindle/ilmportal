@@ -17,8 +17,9 @@ const dealSchema = new mongoose.Schema({
   },
   mode: {
     type: String,
-    enum: ['online', 'in_person'],
-    default: 'online'
+    enum: ['online', 'in_person', 'physical'],
+    default: 'online',
+    set: (v) => (v === 'physical' ? 'in_person' : v)
   },
   price: {
     type: Number,

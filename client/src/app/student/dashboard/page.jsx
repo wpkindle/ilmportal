@@ -181,7 +181,7 @@ export default function StudentDashboardPage() {
                     </div>
 
                     <div className="flex items-center gap-2 flex-wrap">
-                      {deal.status !== 'completed' && deal.mode !== 'in_person' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && !deal.accessRestricted && (
+                      {deal.status !== 'completed' && deal.mode !== 'in_person' && deal.mode !== 'physical' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && !deal.accessRestricted && (
                         <Link
                           href={`/classroom/${[user?.id || user?._id, deal.tutor?._id].sort().join('_')}`}
                           className="px-4 py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-sm border border-[#d4a359]/30 transition-all"

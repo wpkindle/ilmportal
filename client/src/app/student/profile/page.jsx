@@ -843,7 +843,7 @@ function StudentProfileContent() {
                         </div>
                         <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-[#ebe3d3]">
                           <span className="font-semibold text-[#0c2217]">
-                            {deal.mode === 'in_person' ? 'In-Person (Home)' : 'Online WebRTC'}
+                            {deal.mode === 'in_person' || deal.mode === 'physical' ? 'In-Person (Home)' : 'Online WebRTC'}
                           </span>
                           <span>
                             {deal.createdAt ? new Date(deal.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : ''}

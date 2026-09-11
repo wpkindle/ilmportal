@@ -147,7 +147,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
         subject: finalSubject,
         price: Number(price),
         priceUnit,
-        mode,
+        mode: mode === 'physical' ? 'in_person' : mode,
         scheduleDetails: computedSchedule
       });
 

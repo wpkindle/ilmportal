@@ -151,7 +151,7 @@ export default function TutorDealsPage() {
 
                   <div className="flex items-center gap-2 flex-wrap">
                     {/* Join Live Classroom */}
-                    {deal.status !== 'completed' && deal.mode !== 'in_person' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && (deal.tutorFeePaid || !deal.tutorFeeDueDate || new Date(deal.tutorFeeDueDate) >= new Date() || (deal.trialEndDate && new Date(deal.trialEndDate) >= new Date())) && (
+                    {deal.status !== 'completed' && deal.mode !== 'in_person' && deal.mode !== 'physical' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && (deal.tutorFeePaid || !deal.tutorFeeDueDate || new Date(deal.tutorFeeDueDate) >= new Date() || (deal.trialEndDate && new Date(deal.trialEndDate) >= new Date())) && (
                       <Link
                         href={`/classroom/${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
                         className="px-3.5 py-2 rounded-xl bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] text-xs font-bold flex items-center gap-1.5 shadow-xs border border-[#d4a359]/30 transition-all cursor-pointer"

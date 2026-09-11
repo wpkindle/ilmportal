@@ -32,13 +32,16 @@ exports.scheduleSession = async (req, res) => {
 
     const roomId = `ilm-${crypto.randomBytes(4).toString('hex')}-${Date.now().toString().slice(-4)}`;
 
+    const targetMode = mode || deal.mode || 'online';
+    const sessionMode = (targetMode === 'physical' || targetMode === 'in_person') ? 'in_person' : 'online';
+
     const session = await Session.create({
       deal: deal._id,
       roomId,
       tutor: deal.tutor._id,
       student: deal.student._id,
       title: title || `${deal.subject} Live Class`,
-      mode: mode || deal.mode || 'online',
+      mode: sessionMode,
       scheduledStartTime: new Date(scheduledStartTime),
       scheduledEndTime: new Date(scheduledEndTime),
       sessionNotes: sessionNotes || ''

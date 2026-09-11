@@ -128,13 +128,13 @@ export default function MyDealsPage() {
                         )}
                       </div>
                       <p className="text-xs text-stone-500 mt-0.5">
-                        Tutor: <strong className="text-stone-800">{deal.tutor?.name}</strong> &bull; Mode: <span className="capitalize text-[#143d2b] font-medium">{deal.mode}</span>
+                        Tutor: <strong className="text-stone-800">{deal.tutor?.name}</strong> &bull; Mode: <span className="text-[#143d2b] font-medium">{deal.mode === 'online' ? 'Online' : 'In-Person'}</span>
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
-                    {deal.status !== 'completed' && deal.mode !== 'in_person' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && !deal.accessRestricted && (
+                    {deal.status !== 'completed' && deal.mode !== 'in_person' && deal.mode !== 'physical' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && !deal.accessRestricted && (
                       <Link
                         href={`/classroom/${[user?.id || user?._id, deal.tutor?._id].sort().join('_')}`}
                         className="px-3.5 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-xs border border-[#d4a359]/30 transition-all"

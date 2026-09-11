@@ -30,6 +30,8 @@ exports.createDealOffer = async (req, res) => {
       });
     }
 
+    const normalizedMode = (mode === 'physical' || mode === 'in_person') ? 'in_person' : (mode || 'online');
+
     const deal = await Deal.create({
       student: student._id,
       tutor: req.user.id,
@@ -37,7 +39,7 @@ exports.createDealOffer = async (req, res) => {
       price: Number(price),
       priceUnit: priceUnit || 'per_month',
       scheduleDetails: scheduleDetails || '3 sessions per week (1 hr each)',
-      mode: mode || 'online',
+      mode: normalizedMode,
       status: 'pending_offer'
     });
 
@@ -49,7 +51,7 @@ exports.createDealOffer = async (req, res) => {
       recipient: student._id,
       deal: deal._id,
       messageType: 'deal_offer',
-      text: `Deal Offer: ${subject} - PKR ${price} / ${priceUnit === 'per_hour' ? 'hr' : priceUnit === 'total' ? 'course' : 'month'} (${mode === 'online' ? 'Online WebRTC Video' : 'In-Person'})`,
+      text: `Deal Offer: ${subject} - PKR ${price} / ${priceUnit === 'per_hour' ? 'hr' : priceUnit === 'total' ? 'course' : 'month'} (${normalizedMode === 'online' ? 'Online WebRTC Video' : 'In-Person'})`,
       dealOfferData: {
         _id: deal._id,
         dealId: deal._id,
@@ -58,7 +60,7 @@ exports.createDealOffer = async (req, res) => {
         priceUnit: priceUnit || 'per_month',
         schedule: scheduleDetails,
         scheduleDetails: scheduleDetails,
-        mode: mode || 'online',
+        mode: deal.mode || normalizedMode,
         status: 'pending_offer',
         student: student._id,
         tutor: req.user.id,

@@ -29,7 +29,8 @@ export function getNotificationPermission() {
 }
 
 /**
- * Display native OS notification banner with vibration and sound
+ * In-App audio and haptic alert runner.
+ * Note: Default browser OS notifications are disabled in favor of our custom styled in-app notification notice (InAppNotificationToast).
  */
 export async function showNativeNotification({
   title,
@@ -55,75 +56,6 @@ export async function showNativeNotification({
     } catch (e) {}
   }
 
-  // 3. Check browser OS notification permission
-  if (!('Notification' in window)) return null;
-
-  if (Notification.permission === 'default') {
-    try {
-      const res = await Notification.requestPermission();
-      if (res !== 'granted') return null;
-    } catch (e) {
-      return null;
-    }
-  }
-
-  if (Notification.permission !== 'granted') {
-    return null;
-  }
-
-  // Windows 10/11 and Android OS require absolute raster image URLs for native notification toasts
-  const origin = typeof window !== 'undefined' ? window.location.origin : '';
-  const validIcon = `${origin}/icon.png`;
-  const validBadge = `${origin}/icon.png`;
-
-  const notificationOptions = {
-    body: body || '',
-    icon: validIcon,
-    badge: validBadge,
-    vibrate: [150, 80, 150],
-    tag: tag || undefined,
-    renotify: true,
-    silent: false,
-    data: { url }
-  };
-
-  // 4. Show Notification via Service Worker (preferred for mobile & PWA) or fall back to window.Notification
-  let shownViaSW = false;
-  if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-    try {
-      const reg = await navigator.serviceWorker.getRegistration();
-      if (reg && reg.active && typeof reg.showNotification === 'function') {
-        await reg.showNotification(title, notificationOptions);
-        shownViaSW = true;
-      }
-    } catch (swErr) {}
-  }
-
-  // 5. Desktop browser Notification (Only if NOT already shown via Service Worker)
-  if (!shownViaSW) {
-    try {
-      const notification = new Notification(title, notificationOptions);
-
-      notification.onclick = function (event) {
-        try {
-          event.preventDefault();
-          window.focus();
-          notification.close();
-          if (url && url !== '#' && url !== '/') {
-            const currentUrl = window.location.pathname + window.location.search;
-            if (currentUrl !== url) {
-              window.dispatchEvent(new CustomEvent('ilmportal:navigate', { detail: { url } }));
-            }
-          }
-        } catch (err) {
-          console.warn('Notification click handling error:', err);
-        }
-      };
-
-      return notification;
-    } catch (err) {
-      console.warn('Desktop Notification constructor note:', err);
-      return null;
-    }
-  }
+  // Default browser notifications are suppressed so users exclusively see our own custom in-app notification notice
+  return null;
 }

@@ -6,7 +6,6 @@ import { useAuth } from './AuthContext';
 import { useSocket } from './SocketContext';
 import { soundEngine } from '../utils/soundEffects';
 import {
-  showNativeNotification,
   requestNotificationPermission,
   getNotificationPermission
 } from '../utils/notificationManager';
@@ -44,14 +43,16 @@ export const NotificationProvider = ({ children }) => {
   const requestPermission = async () => {
     const status = await requestNotificationPermission();
     setPermissionStatus(status);
-    if (status === 'granted') {
-      showNativeNotification({
-        title: 'IlmiDunya Alerts Enabled',
-        body: 'You will now receive instant desktop & mobile alerts with sound for messages & classroom updates.',
-        url: '#',
-        soundType: 'message'
-      });
-    }
+    soundEngine.playMessageSound();
+    setToastAlert({
+      title: 'IlmiDunya Alerts Active',
+      message: 'Instant sound and visual notifications are enabled for all messages and classroom updates.',
+      type: 'general',
+      senderAvatar: '/icon.png',
+      link: '#'
+    });
+    if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+    toastTimeoutRef.current = setTimeout(() => setToastAlert(null), 5000);
     return status;
   };
 
@@ -122,27 +123,13 @@ export const NotificationProvider = ({ children }) => {
       setToastAlert(alertData);
       fetchNotifications();
 
-      // 3. Trigger OS desktop/mobile push notification banner with sound & vibration
+      // Play audio chime for in-app alert notice
       const isMessageAlert = alertData.type === 'new_message';
-      const defaultUrl = isMessageAlert
-        ? (user?.role === 'tutor' ? '/tutor/messages' : '/student/messages')
-        : (alertData.link || '/');
-
-      // Deterministic tag allows the OS notification daemon to collapse identical alerts
-      const notificationTag = alertData.messageId
-        ? `msg-${alertData.messageId}`
-        : (alertData.conversationId
-            ? `conv-${alertData.conversationId}`
-            : `ilmidunya-${alertData.type || 'general'}`);
-
-      showNativeNotification({
-        title: alertData.title || 'IlmiDunya Notification',
-        body: alertData.message || 'New update on your IlmiDunya account',
-        icon: alertData.senderAvatar || '/icon.png',
-        url: alertData.link || defaultUrl,
-        tag: notificationTag,
-        soundType: isMessageAlert ? 'message' : 'alert'
-      });
+      if (isMessageAlert) {
+        soundEngine.playMessageSound();
+      } else {
+        soundEngine.playNotificationSound();
+      }
 
       if (toastTimeoutRef.current) {
         clearTimeout(toastTimeoutRef.current);

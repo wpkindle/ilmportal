@@ -39,7 +39,7 @@ export default function CinematicHeroBackground({
               <img
                 src={slide.image}
                 alt={slide.alt || 'Tutoring scene'}
-                className={`w-full h-full object-cover object-center filter contrast-[1.05] brightness-[0.74] ${
+                className={`w-full h-full object-cover object-center filter contrast-[1.05] brightness-[0.70] ${
                   isActive ? animClass : ''
                 }`}
                 loading={idx === 0 ? 'eager' : 'lazy'}
@@ -51,12 +51,12 @@ export default function CinematicHeroBackground({
       </div>
 
       {/* 3. Directional Gradient Scrim: Solid text protection on left, cinematic dark overlay on right */}
-      <div className="absolute inset-0 bg-[#07150e]/50" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#07150e] via-[#07150e]/90 via-50% to-[#07150e]/50 hidden lg:block" />
-      <div className="absolute inset-0 bg-[#07150e]/85 lg:hidden" />
+      <div className="absolute inset-0 bg-[#07150e]/60" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#07150e] via-[#07150e]/95 via-45% to-[#07150e]/50 hidden lg:block" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/95 via-[#07150e]/88 to-[#07150e] lg:hidden" />
 
       {/* 4. Vertical Framing Vignette (Blends into Navbar and next section) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/80 via-transparent to-[#07150e]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/85 via-transparent to-[#07150e]" />
 
       {/* 6. Ambient Golden Light Bloom (Warm Subtle Editorial Glow) */}
       <div

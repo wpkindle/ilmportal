@@ -189,7 +189,7 @@ export default function Hero() {
   ];
 
   return (
-    <section className="relative overflow-hidden bg-[#07150e] text-[#faf8f5] pt-10 pb-16 sm:pt-14 sm:pb-20 border-b border-[#0c2217]">
+    <section className="relative overflow-hidden bg-[#07150e] text-[#faf8f5] pt-6 pb-12 sm:pt-14 sm:pb-20 border-b border-[#0c2217]">
       {/* Living Cinematic Motion Slideshow Background */}
       <CinematicHeroBackground
         slides={heroSlides}
@@ -198,71 +198,77 @@ export default function Hero() {
         isPaused={isPaused}
       />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pt-4 sm:pt-6 pb-6">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pt-2 sm:pt-6 pb-4 sm:pb-6">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-8 lg:gap-10 items-center">
           
           {/* Left Column (7 cols): Editorial Typography & Assurances */}
-          <div className="order-1 lg:col-span-7 space-y-6 text-left">
+          <div className="order-1 lg:col-span-7 space-y-4 sm:space-y-6 text-left">
             
             {/* Regional Trust Eyebrow */}
             <div className="flex items-center gap-2">
               <Link
                 href="/safety"
-                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-black/60 hover:bg-black/80 border border-[#d4a359]/60 text-[#f5d799] text-xs font-bold transition-all shadow-lg group backdrop-blur-md cursor-pointer"
+                className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1 sm:py-1.5 rounded-full bg-black/60 hover:bg-black/80 border border-[#d4a359]/60 text-[#f5d799] text-[11px] sm:text-xs font-bold transition-all shadow-lg group backdrop-blur-md cursor-pointer"
               >
-                <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-                <span>Female-First Safety • Verified Qaris, Alimahs &amp; Academic Tutors</span>
-                <ChevronRight className="w-3 h-3 text-[#d4a359] group-hover:translate-x-0.5 transition-transform" />
+                <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
+                <span className="sm:hidden">Female-First Safety • 100% Verified</span>
+                <span className="hidden sm:inline">Female-First Safety • Verified Qaris, Alimahs &amp; Academic Tutors</span>
+                <ChevronRight className="w-3 h-3 text-[#d4a359] group-hover:translate-x-0.5 transition-transform shrink-0" />
               </Link>
             </div>
 
             {/* Main Editorial Headline in Exactly Two Lines */}
-            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.15rem] xl:text-[2.65rem] 2xl:text-5xl font-serif font-black tracking-tight text-[#faf8f5] leading-[1.14] sm:leading-[1.18] lg:leading-[1.2]">
-              <span className="block sm:whitespace-nowrap">Connecting Verified Tutors</span>
-              <span className="block sm:whitespace-nowrap">
+            <h1 className="text-[clamp(1.35rem,5.6vw,2.15rem)] sm:text-3xl md:text-4xl lg:text-[2.15rem] xl:text-[2.65rem] 2xl:text-5xl font-serif font-black tracking-tight text-[#faf8f5] leading-[1.15] sm:leading-[1.18] lg:leading-[1.2]">
+              <span className="block whitespace-nowrap">Connecting Verified Tutors</span>
+              <span className="block whitespace-nowrap">
                 With Students <span className="hand-drawn-underline-gold text-[#faf8f5]">Across Pakistan</span>
               </span>
             </h1>
 
             {/* Humanized, Colloquial Pakistani Copy */}
-            <p className="text-sm sm:text-base text-[#d6e3dd] max-w-2xl leading-relaxed font-normal">
-              Designed specifically for female learners, daughters, and mothers to feel 100% comfortable and protected. Verified female Alimahs from Wafaq-ul-Madaris, certified Qaris, and top school tutors. 1-on-1 classes with camera-off privacy by default, zero personal contact sharing, and agreed fees directly with your tutor.
+            <p className="text-xs sm:text-base text-[#d6e3dd] max-w-2xl leading-relaxed font-normal">
+              <span className="sm:hidden">
+                Designed for female learners, daughters, and families. 1-on-1 classes with verified female Alimahs, certified Qaris, and academic school tutors with camera-off privacy by default.
+              </span>
+              <span className="hidden sm:inline">
+                Designed specifically for female learners, daughters, and mothers to feel 100% comfortable and protected. Verified female Alimahs from Wafaq-ul-Madaris, certified Qaris, and top school tutors. 1-on-1 classes with camera-off privacy by default, zero personal contact sharing, and agreed fees directly with your tutor.
+              </span>
             </p>
 
             {/* Key Assurance Signals */}
-            <div className="flex flex-wrap items-center gap-2 pt-1 text-xs font-semibold">
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-                <span>100% Female Privacy &amp; Comfort</span>
+            <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 pt-0.5 sm:pt-1 text-[11px] sm:text-xs font-semibold">
+              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs truncate">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
+                <span className="truncate">100% Female Privacy</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs">
-                <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-                <span>Verified Qaris &amp; Alimahs (Sanad)</span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs truncate">
+                <Award className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
+                <span className="truncate">Verified Sanad Tutors</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs">
-                <Lock className="w-3.5 h-3.5 text-[#d4a359]" />
-                <span>Camera-Off by Default</span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs truncate">
+                <Lock className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
+                <span className="truncate">Camera-Off by Default</span>
               </span>
-              <span className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Zero Personal Contact Sharing</span>
+              <span className="inline-flex items-center gap-1.5 px-2.5 sm:px-3.5 py-1.5 rounded-xl sm:rounded-full bg-white/10 backdrop-blur-md border border-white/20 text-[#faf8f5] shadow-xs truncate">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span className="truncate">Zero Contact Sharing</span>
               </span>
             </div>
 
           </div>
 
           {/* Right Column (5 cols): Buttons & Quick Tags Showcase (Transparent Glass with Darker Hover) */}
-          <div className="order-3 lg:order-2 lg:col-span-5 relative mt-6 lg:mt-0">
-            <div className="rounded-3xl bg-black/20 hover:bg-black/75 border border-white/20 hover:border-white/40 p-5 sm:p-6 shadow-xl hover:shadow-2xl space-y-5 transition-all duration-300">
+          <div className="order-3 lg:order-2 lg:col-span-5 relative mt-3 sm:mt-6 lg:mt-0">
+            <div className="rounded-2xl sm:rounded-3xl bg-black/35 lg:bg-black/20 lg:hover:bg-black/75 border border-white/20 hover:border-white/40 p-4 sm:p-6 shadow-xl hover:shadow-2xl space-y-3.5 sm:space-y-5 transition-all duration-300 backdrop-blur-md">
               
               {/* Header: Popular Subjects & Faculty Modes */}
-              <div className="space-y-1 pb-3 border-b border-white/15">
+              <div className="space-y-1 pb-2.5 sm:pb-3 border-b border-white/15">
                 <div className="flex items-center justify-between gap-2">
                   <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5 drop-shadow-xs">
                     <BookOpen className="w-3.5 h-3.5 text-[#d4a359]" />
                     <span>Popular Subjects &amp; Faculty</span>
                   </span>
-                  <span className="text-[11px] font-semibold text-[#d4a359] bg-[#d4a359]/20 px-2.5 py-0.5 rounded-full border border-[#d4a359]/40">
+                  <span className="text-[10px] sm:text-[11px] font-semibold text-[#d4a359] bg-[#d4a359]/20 px-2 sm:px-2.5 py-0.5 rounded-full border border-[#d4a359]/40">
                     Direct 1-on-1
                   </span>
                 </div>
@@ -272,10 +278,10 @@ export default function Hero() {
               </div>
 
               {/* Faculty Modes & Quick Subject Tags (Transparent Glass Pills) */}
-              <div className="flex flex-wrap items-center gap-2 text-xs">
+              <div className="flex flex-wrap items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs">
                 <Link
                   href="/tutors?gender=female"
-                  className="px-3 py-1.5 rounded-xl bg-[#b85d34]/30 hover:bg-[#b85d34]/50 text-[#fde4d8] font-bold border border-[#b85d34]/60 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group cursor-pointer"
+                  className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-[#b85d34]/30 hover:bg-[#b85d34]/50 text-[#fde4d8] font-bold border border-[#b85d34]/60 shadow-xs transition-all inline-flex items-center gap-1 active:scale-95 group cursor-pointer"
                   title="Browse verified female tutors across all academic & Quran subjects"
                 >
                   <UserCheck className="w-3.5 h-3.5 text-[#f5a882]" />
@@ -283,7 +289,7 @@ export default function Hero() {
                 </Link>
                 <Link
                   href="/tutors?gender=female&faculty=alimah"
-                  className="px-3 py-1.5 rounded-xl bg-[#d4a359]/30 hover:bg-[#d4a359]/50 text-[#fef3d6] font-bold border border-[#d4a359]/60 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group cursor-pointer"
+                  className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-[#d4a359]/30 hover:bg-[#d4a359]/50 text-[#fef3d6] font-bold border border-[#d4a359]/60 shadow-xs transition-all inline-flex items-center gap-1 active:scale-95 group cursor-pointer"
                   title="Browse verified female Alimahs for Quran, Tajweed & Islamic studies"
                 >
                   <ShieldCheck className="w-3.5 h-3.5 text-[#f5d799]" />
@@ -291,17 +297,17 @@ export default function Hero() {
                 </Link>
                 <Link
                   href="/tutors?mode=physical"
-                  className="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-[#faf8f5] font-bold border border-white/25 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group cursor-pointer"
+                  className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-[#faf8f5] font-bold border border-white/25 shadow-xs transition-all inline-flex items-center gap-1 active:scale-95 group cursor-pointer"
                   title="Find verified male home tutors visiting your residence"
                 >
                   <Home className="w-3.5 h-3.5 text-[#d4a359]" />
-                  <span>In-Person Home Tutors</span>
+                  <span>Home Tutors</span>
                 </Link>
                 {quickSubjects.map((sub) => (
                   <Link
                     key={sub.slug}
                     href={`/tutors?category=${sub.slug}`}
-                    className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-[#faf8f5] hover:text-white text-xs font-medium border border-white/20 shadow-xs transition-all active:scale-95 cursor-pointer"
+                    className="px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-[#faf8f5] hover:text-white text-[11px] sm:text-xs font-medium border border-white/20 shadow-xs transition-all active:scale-95 cursor-pointer"
                   >
                     {sub.label}
                   </Link>
@@ -309,34 +315,34 @@ export default function Hero() {
               </div>
 
               {/* Action Buttons: Community Gateways */}
-              <div className="pt-3 border-t border-white/15 space-y-2.5">
-                <div className="flex flex-col sm:flex-row items-center gap-2.5">
+              <div className="pt-2.5 sm:pt-3 border-t border-white/15 space-y-2 sm:space-y-2.5">
+                <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-row items-center sm:gap-2.5">
                   <Link
                     href="/login?role=student&mode=signup"
-                    className="w-full sm:w-1/2 py-3 px-4 rounded-xl bg-gradient-to-r from-[#b85d34]/90 to-[#9e4e2a]/90 hover:from-[#c9673b] hover:to-[#b0552e] text-white font-bold text-xs sm:text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#b85d34]/60 active:scale-98"
+                    className="w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl bg-gradient-to-r from-[#b85d34]/90 to-[#9e4e2a]/90 hover:from-[#c9673b] hover:to-[#b0552e] text-white font-bold text-xs sm:text-sm shadow-lg transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer border border-[#b85d34]/60 active:scale-98 text-center"
                   >
-                    <GraduationCap className="w-4 h-4" />
+                    <GraduationCap className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
                     <span>Join as Student</span>
-                    <ArrowRight className="w-3.5 h-3.5" />
+                    <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 hidden xs:inline" />
                   </Link>
                   <Link
                     href="/login?role=tutor&mode=signup"
-                    className="w-full sm:w-1/2 py-3 px-4 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/25 active:scale-98"
+                    className="w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm shadow-lg transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer border border-white/25 active:scale-98 text-center"
                   >
-                    <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
+                    <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#d4a359] shrink-0" />
                     <span>Apply as Tutor</span>
-                    <ArrowRight className="w-3.5 h-3.5 text-[#d4a359]" />
+                    <ArrowRight className="w-3.5 h-3.5 text-[#d4a359] shrink-0 hidden xs:inline" />
                   </Link>
                 </div>
 
                 {/* Direct Female Tutors Action Button */}
                 <Link
                   href="/tutors?gender=female"
-                  className="w-full py-2.5 px-4 rounded-xl bg-[#d4a359]/20 hover:bg-[#d4a359]/30 text-[#f5d799] border border-[#d4a359]/50 font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all active:scale-98 cursor-pointer"
+                  className="w-full py-2 sm:py-2.5 px-3 sm:px-4 rounded-xl bg-[#d4a359]/20 hover:bg-[#d4a359]/30 text-[#f5d799] border border-[#d4a359]/50 font-bold text-xs flex items-center justify-center gap-2 shadow-sm transition-all active:scale-98 cursor-pointer"
                 >
-                  <UserCheck className="w-4 h-4 text-[#d4a359]" />
+                  <UserCheck className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
                   <span>Browse Verified Female Tutors &amp; Alimahs</span>
-                  <ChevronRight className="w-3.5 h-3.5 text-[#d4a359]" />
+                  <ChevronRight className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
                 </Link>
 
                 {/* Chrome App Download trigger */}
@@ -346,8 +352,8 @@ export default function Hero() {
                     onClick={() => setChromeModalOpen(true)}
                     className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#c5d8cf] hover:text-white transition-colors cursor-pointer"
                   >
-                    <Chrome className="w-3.5 h-3.5 text-[#d4a359]" />
-                    <span>Install IlmiDunya App for Chrome / Windows / Android (Free PWA)</span>
+                    <Chrome className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
+                    <span>Install IlmiDunya App (Free PWA)</span>
                   </button>
                 </div>
               </div>
@@ -356,14 +362,14 @@ export default function Hero() {
           </div>
 
           {/* Full-Width Search Engine Row (Spans all 12 columns across container) */}
-          <div className="order-2 lg:order-3 col-span-12 w-full pt-2 sm:pt-4">
+          <div className="order-2 lg:order-3 col-span-12 w-full pt-1 sm:pt-4">
             <form
               onSubmit={handleSearchSubmit}
               className="bg-white p-2 sm:p-2.5 rounded-2xl sm:rounded-full shadow-2xl border-2 border-[#d4a359]/70 flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full"
             >
               {/* Search Text */}
-              <div className="flex items-center gap-3 px-4 py-2 w-full sm:flex-1 text-left min-w-0">
-                <Search className="w-5 h-5 text-slate-400 shrink-0" />
+              <div className="flex items-center gap-2.5 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-2 w-full sm:flex-1 text-left min-w-0">
+                <Search className="w-4 h-4 sm:w-5 sm:h-5 text-slate-400 shrink-0" />
                 <input
                   type="text"
                   placeholder="Search subject (Tajweed, Math, Physics...)"
@@ -373,6 +379,7 @@ export default function Hero() {
                 />
               </div>
 
+              <div className="w-full h-px sm:hidden bg-slate-100" />
               <div className="hidden sm:block w-px h-9 bg-slate-200" />
 
               {/* City Selector */}
@@ -385,14 +392,14 @@ export default function Hero() {
                   icon={MapPin}
                   searchable={true}
                   variant="hero"
-                  placement="top"
+                  placement="bottom"
                 />
               </div>
 
               {/* Terracotta Action Button */}
               <button
                 type="submit"
-                className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#b85d34] to-[#9e4e2a] hover:from-[#c9673b] hover:to-[#b0552e] text-white font-bold text-sm sm:text-base rounded-xl sm:rounded-full shadow-lg shadow-[#b85d34]/40 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer active:scale-95"
+                className="w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-3.5 bg-gradient-to-r from-[#b85d34] to-[#9e4e2a] hover:from-[#c9673b] hover:to-[#b0552e] text-white font-bold text-sm sm:text-base rounded-xl sm:rounded-full shadow-lg shadow-[#b85d34]/40 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer active:scale-95"
               >
                 <span>Find Tutors</span>
                 <ArrowRight className="w-4 h-4" />
@@ -400,7 +407,7 @@ export default function Hero() {
             </form>
 
             {/* Quick Trust Guarantees below search */}
-            <div className="pt-2.5 flex flex-wrap items-center justify-start gap-x-6 gap-y-1.5 text-xs text-[#d6e3dd] w-full">
+            <div className="pt-2 sm:pt-2.5 flex flex-wrap items-center justify-center sm:justify-start gap-x-4 sm:gap-x-6 gap-y-1 text-[11px] sm:text-xs text-[#d6e3dd] w-full">
               <span className="inline-flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Direct fee agreement in chat</span>
@@ -419,50 +426,62 @@ export default function Hero() {
         </div>
 
         {/* Editorial Trust Ledger (Frosted Glass Trust Cards) */}
-        <div className="pt-8 mt-8 border-t border-white/15">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 text-left">
+        <div className="pt-6 sm:pt-8 mt-6 sm:mt-8 border-t border-white/15">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-6 text-left">
             
             {/* Feature 1: Verification */}
-            <div className="p-4 rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 shadow-md space-y-1">
-              <div className="flex items-center gap-2 text-white font-bold text-xs">
-                <ShieldCheck className="w-4 h-4 shrink-0 text-[#d4a359]" />
-                <span>100% CNIC &amp; Sanad Audited</span>
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 shadow-md space-y-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-white font-bold text-xs">
+                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-[#d4a359]" />
+                <span className="truncate">100% CNIC Audited</span>
               </div>
-              <p className="text-xs text-[#d6e3dd] leading-relaxed">
+              <p className="text-[11px] sm:text-xs text-[#d6e3dd] leading-relaxed hidden sm:block">
                 National ID cards, degrees, and Qirat credentials checked by administration before any tutor is listed.
+              </p>
+              <p className="text-[11px] text-[#d6e3dd] leading-tight sm:hidden">
+                Verified National ID cards, degrees &amp; Sanads.
               </p>
             </div>
 
             {/* Feature 2: Female Safety & Comfort */}
-            <div className="p-4 rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 shadow-md space-y-1">
-              <div className="flex items-center gap-2 text-white font-bold text-xs">
-                <ShieldCheck className="w-4 h-4 shrink-0 text-[#d4a359]" />
-                <span>Female Safety &amp; Comfort</span>
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 shadow-md space-y-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-white font-bold text-xs">
+                <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-[#d4a359]" />
+                <span className="truncate">Female Comfort</span>
               </div>
-              <p className="text-xs text-[#d6e3dd] leading-relaxed">
+              <p className="text-[11px] sm:text-xs text-[#d6e3dd] leading-relaxed hidden sm:block">
                 Camera-off by default, verified female Alimahs for daughters, and private messaging with zero personal numbers shared.
+              </p>
+              <p className="text-[11px] text-[#d6e3dd] leading-tight sm:hidden">
+                Camera-off by default &amp; zero number sharing.
               </p>
             </div>
 
             {/* Feature 3: Live Classroom */}
-            <div className="p-4 rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 shadow-md space-y-1">
-              <div className="flex items-center gap-2 text-white font-bold text-xs">
-                <Video className="w-4 h-4 shrink-0 text-[#d4a359]" />
-                <span>Direct In-Browser Classroom</span>
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 shadow-md space-y-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-white font-bold text-xs">
+                <Video className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-[#d4a359]" />
+                <span className="truncate">Live Classroom</span>
               </div>
-              <p className="text-xs text-[#d6e3dd] leading-relaxed">
+              <p className="text-[11px] sm:text-xs text-[#d6e3dd] leading-relaxed hidden sm:block">
                 No third-party app downloads. High-definition WebRTC video with page-by-page digital Quran recitation.
+              </p>
+              <p className="text-[11px] text-[#d6e3dd] leading-tight sm:hidden">
+                In-browser WebRTC video with digital Quran.
               </p>
             </div>
 
             {/* Feature 4: Transparent Fee */}
-            <div className="p-4 rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 shadow-md space-y-1">
-              <div className="flex items-center gap-2 text-white font-bold text-xs">
-                <Sparkles className="w-4 h-4 shrink-0 text-[#b85d34]" />
-                <span>Agreed Direct Monthly Rates</span>
+            <div className="p-3 sm:p-4 rounded-xl sm:rounded-2xl bg-black/40 backdrop-blur-md border border-white/15 shadow-md space-y-1">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-white font-bold text-xs">
+                <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 text-[#b85d34]" />
+                <span className="truncate">Direct Rates</span>
               </div>
-              <p className="text-xs text-[#d6e3dd] leading-relaxed">
+              <p className="text-[11px] sm:text-xs text-[#d6e3dd] leading-relaxed hidden sm:block">
                 Chat for free with tutors and agree on fair monthly fees payable via EasyPaisa, JazzCash, or bank transfer.
+              </p>
+              <p className="text-[11px] text-[#d6e3dd] leading-tight sm:hidden">
+                Direct monthly fees via JazzCash or EasyPaisa.
               </p>
             </div>
 

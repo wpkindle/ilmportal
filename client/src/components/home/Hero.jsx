@@ -263,7 +263,7 @@ export default function Hero() {
 
           {/* Right Column (5 cols on desktop): Buttons & Quick Tags Showcase (Full Width on Mobile) */}
           <div className="w-full order-3 lg:order-2 lg:col-span-5 relative mt-1 sm:mt-6 lg:mt-0">
-            <div className="w-full rounded-2xl sm:rounded-3xl bg-black/20 hover:bg-black/75 border border-white/20 hover:border-white/40 p-4 sm:p-6 shadow-xl hover:shadow-2xl space-y-3.5 sm:space-y-5 transition-all duration-300 backdrop-blur-md">
+            <div className="w-full rounded-2xl sm:rounded-3xl bg-black/45 hover:bg-black/80 border border-white/20 hover:border-white/40 p-4 sm:p-6 shadow-xl hover:shadow-2xl space-y-3.5 sm:space-y-5 transition-all duration-300 backdrop-blur-md">
               
               {/* Header: Popular Subjects & Faculty Modes */}
               <div className="space-y-1 pb-2.5 sm:pb-3 border-b border-white/15">

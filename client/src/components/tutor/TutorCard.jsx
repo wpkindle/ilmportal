@@ -12,10 +12,12 @@ import {
   MessageSquare,
   Sparkles,
   Wifi,
-  User
+  User,
+  Award,
+  CheckCircle2
 } from 'lucide-react';
 import RatingStars from '../common/RatingStars';
-import SanadBadge, { SanadModal } from '../common/SanadBadge';
+import { SanadModal } from '../common/SanadBadge';
 import StudentAuthModal from '../common/StudentAuthModal';
 import FemaleTutorGateModal from '../common/FemaleTutorGateModal';
 import ChatRequestModal from '../common/ChatRequestModal';
@@ -182,118 +184,107 @@ const TutorCard = ({ tutor, tutorProfile }) => {
         <div className="space-y-3.5">
 
           {/* Top Header Row */}
-          <div className="flex items-start justify-between gap-3">
-            <div className="flex items-start gap-3 min-w-0">
-              {/* Avatar */}
-              <div className="relative shrink-0">
-                <img
-                  src={tutorAvatar}
-                  alt={tutorName}
-                  onError={(e) => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = getTutorAvatar({ name: tutorName }, tutorName);
-                  }}
-                  className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border-2 border-white shadow-md"
+          <div className="flex items-start gap-3 w-full">
+            {/* Avatar */}
+            <div className="relative shrink-0">
+              <img
+                src={tutorAvatar}
+                alt={tutorName}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = getTutorAvatar({ name: tutorName }, tutorName);
+                }}
+                className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl object-cover border-2 border-white shadow-md"
+              />
+
+              {/* Real-time Online / Offline Indicator Dot */}
+              {isTutorOnline ? (
+                <span
+                  className="absolute -top-1 -right-1 flex h-3.5 w-3.5 sm:h-4 sm:w-4 z-10"
+                  title="Online Now"
+                >
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 bg-emerald-500 border-2 border-white shadow-xs"></span>
+                </span>
+              ) : (
+                <span
+                  className="absolute -top-1 -right-1 inline-flex rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 bg-stone-400 border-2 border-white shadow-xs z-10"
+                  title="Offline"
                 />
+              )}
 
-                {/* Real-time Online / Offline Indicator Dot */}
-                {isTutorOnline ? (
-                  <span
-                    className="absolute -top-1 -right-1 flex h-3.5 w-3.5 sm:h-4 sm:w-4 z-10"
-                    title="Online Now"
-                  >
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 bg-emerald-500 border-2 border-white shadow-xs"></span>
-                  </span>
-                ) : (
-                  <span
-                    className="absolute -top-1 -right-1 inline-flex rounded-full h-3.5 w-3.5 sm:h-4 sm:w-4 bg-stone-400 border-2 border-white shadow-xs z-10"
-                    title="Offline"
-                  />
-                )}
-
-                {data.isSanadVerified && (
-                  <div className="absolute -bottom-1 -right-1 p-1 bg-[#143d2b] text-white rounded-full ring-2 ring-white shadow z-10" title="Sanad Verified Faculty">
-                    <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
-                  </div>
-                )}
-              </div>
-
-              {/* Name / location / rating */}
-              <div className="min-w-0">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  <Link
-                    href={`/tutors/${data._id}`}
-                    className="font-serif font-black text-sm sm:text-[15px] text-slate-900 hover:text-[#0c2217] transition-colors leading-tight line-clamp-1"
-                  >
-                    {tutorName}
-                  </Link>
-                  {isTutorOnline ? (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-md text-[9px] font-bold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                      <span>Online</span>
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-md text-[9px] font-semibold text-stone-500 bg-stone-100 border border-stone-200 shrink-0">
-                      <span className="w-1.5 h-1.5 rounded-full bg-stone-400" />
-                      <span>Offline</span>
-                    </span>
-                  )}
+              {data.isSanadVerified && (
+                <div className="absolute -bottom-1 -right-1 p-1 bg-[#143d2b] text-white rounded-full ring-2 ring-white shadow z-10" title="Sanad Verified Faculty">
+                  <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
                 </div>
-
-                <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500 mt-0.5">
-                  <span className="flex items-center gap-1">
-                    <MapPin className="w-3 h-3 text-[#b85d34] shrink-0" />
-                    {tutorArea ? `${tutorArea}, ${tutorCity}` : tutorCity}
-                  </span>
-                  <span className="text-slate-300">·</span>
-                  {isFemaleTutor ? (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#b85d34] bg-[#f5ebe6] px-2 py-0.5 rounded-full border border-[#b85d34]/30">
-                      <ShieldCheck className="w-3 h-3 text-[#b85d34]" />
-                      <span>{isAlimah ? 'Verified Female Alimah' : 'Verified Female Tutor'}</span>
-                    </span>
-                  ) : isMaleTutor ? (
-                    <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#0c2217] bg-[#f0ece1] px-2 py-0.5 rounded-full border border-[#d4a359]/30">
-                      <span>{isMaleQuran ? 'Male Quran Tutor' : 'Male Academic Tutor'}</span>
-                    </span>
-                  ) : (
-                    <span className="capitalize text-slate-600 font-medium">{data.gender || 'Tutor'}</span>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2 mt-1 flex-wrap">
-                  <div className="flex items-center gap-1.5">
-                    <RatingStars rating={data.averageRating || 5} size="xs" />
-                    <span className="text-[11px] font-bold text-slate-700">
-                      {data.averageRating?.toFixed(1) || '5.0'}
-                    </span>
-                    <span className="text-[10px] text-slate-400">
-                      ({data.totalReviews || 0} reviews)
-                    </span>
-                  </div>
-                  <span className="text-slate-300">·</span>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#faf8f5] border border-[#e6ded1] text-slate-700">
-                    {(data.experienceYears === 0 || data.experienceYears === '0' || data.experienceYears === 'fresh') ? (
-                      <>
-                        <Sparkles className="w-3 h-3 text-[#d4a359]" />
-                        <span className="text-[#0c2217]">Fresh Tutor</span>
-                      </>
-                    ) : (
-                      <span>{data.experienceYears || 1} yrs exp</span>
-                    )}
-                  </span>
-                </div>
-              </div>
+              )}
             </div>
 
-            {/* Sanad Badge */}
-            <div className="shrink-0">
-              <SanadBadge
-                isVerified={data.isSanadVerified}
-                documents={data.sanadDocuments || []}
-                documentsCount={data.sanadDocuments?.length || 0}
-                onClick={() => setSanadModalOpen(true)}
-              />
+            {/* Name / location / rating */}
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between gap-1.5">
+                <Link
+                  href={`/tutors/${data._id}`}
+                  className="font-serif font-black text-sm sm:text-base text-slate-900 hover:text-[#0c2217] transition-colors leading-tight truncate"
+                  title={tutorName}
+                >
+                  {tutorName}
+                </Link>
+                {isTutorOnline ? (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-bold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span>Online</span>
+                  </span>
+                ) : (
+                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[9px] font-semibold text-stone-500 bg-stone-100 border border-stone-200 shrink-0">
+                    <span className="w-1.5 h-1.5 rounded-full bg-stone-400" />
+                    <span>Offline</span>
+                  </span>
+                )}
+              </div>
+
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 text-[11px] text-slate-500 mt-0.5">
+                <span className="flex items-center gap-1 truncate max-w-[140px] sm:max-w-none">
+                  <MapPin className="w-3 h-3 text-[#b85d34] shrink-0" />
+                  <span className="truncate">{tutorArea ? `${tutorArea}, ${tutorCity}` : tutorCity}</span>
+                </span>
+                <span className="text-slate-300">·</span>
+                {isFemaleTutor ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#b85d34] bg-[#f5ebe6] px-2 py-0.5 rounded-full border border-[#b85d34]/30 shrink-0">
+                    <ShieldCheck className="w-3 h-3 text-[#b85d34]" />
+                    <span>{isAlimah ? 'Verified Female Alimah' : 'Verified Female Tutor'}</span>
+                  </span>
+                ) : isMaleTutor ? (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-[#0c2217] bg-[#f0ece1] px-2 py-0.5 rounded-full border border-[#d4a359]/30 shrink-0">
+                    <span>{isMaleQuran ? 'Male Quran Tutor' : 'Male Academic Tutor'}</span>
+                  </span>
+                ) : (
+                  <span className="capitalize text-slate-600 font-medium shrink-0">{data.gender || 'Tutor'}</span>
+                )}
+              </div>
+
+              <div className="flex items-center gap-2 mt-1 flex-wrap">
+                <div className="flex items-center gap-1.5">
+                  <RatingStars rating={data.averageRating || 5} size="xs" showScore={false} />
+                  <span className="text-[11px] font-bold text-slate-700">
+                    {data.averageRating?.toFixed(1) || '5.0'}
+                  </span>
+                  <span className="text-[10px] text-slate-400">
+                    ({data.totalReviews || 0} reviews)
+                  </span>
+                </div>
+                <span className="text-slate-300">·</span>
+                <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#faf8f5] border border-[#e6ded1] text-slate-700 shrink-0">
+                  {(data.experienceYears === 0 || data.experienceYears === '0' || data.experienceYears === 'fresh') ? (
+                    <>
+                      <Sparkles className="w-3 h-3 text-[#d4a359]" />
+                      <span className="text-[#0c2217]">Fresh Tutor</span>
+                    </>
+                  ) : (
+                    <span>{data.experienceYears || 1} yrs exp</span>
+                  )}
+                </span>
+              </div>
             </div>
           </div>
 
@@ -321,34 +312,50 @@ const TutorCard = ({ tutor, tutorProfile }) => {
           </div>
 
           {/* Credentials + Mode row */}
-          <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#e6ded1] text-xs">
+          <div className="pt-3 border-t border-[#e6ded1] space-y-2 text-xs">
             {/* Qualifications */}
-            <div className="space-y-0.5 min-w-0">
-              <div className="flex items-center justify-between gap-1">
-                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wide">
-                  Qualifications
+            <div className="space-y-1">
+              <div className="flex items-center justify-between gap-2">
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider flex items-center gap-1">
+                  <Award className="w-3 h-3 text-[#b85d34]" />
+                  <span>Qualifications</span>
                 </span>
-                {cardDegrees.length > 1 && (
-                  <span
-                    className="text-[9px] font-black uppercase text-[#b85d34] bg-[#f5ebe6] px-1.5 py-0.2 rounded border border-[#b85d34]/25 shrink-0"
-                    title={cardDegrees.join(' • ')}
+
+                {(data.isSanadVerified || data.sanadDocuments?.length > 0) && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSanadModalOpen(true);
+                    }}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/50 hover:bg-[#e6dfd5] transition-colors shadow-2xs cursor-pointer shrink-0"
+                    title="Click to inspect verified degrees & Sanad certificates"
                   >
-                    +{cardDegrees.length - 1} more
-                  </span>
+                    <ShieldCheck className="w-3 h-3 text-emerald-700" />
+                    <span>{data.sanadDocuments?.length > 0 ? `Sanad (${data.sanadDocuments.length})` : 'Verified Sanad'}</span>
+                  </button>
                 )}
               </div>
-              <p
-                className="font-bold text-slate-800 text-[11px] leading-tight line-clamp-2"
-                title={cardDegrees.join(' • ')}
-              >
-                {cardDegrees.join(' • ')}
-              </p>
+
+              {/* All degrees visible */}
+              <div className="flex flex-wrap gap-1.5">
+                {cardDegrees.map((deg, dIdx) => (
+                  <span
+                    key={dIdx}
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#faf8f5] text-slate-800 border border-[#e6ded1]"
+                    title={deg}
+                  >
+                    <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600 shrink-0" />
+                    <span>{deg}</span>
+                  </span>
+                ))}
+              </div>
             </div>
 
             {/* Teaching Modes */}
-            <div className="space-y-1 min-w-0">
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wide block">
-                Mode & Timing
+            <div className="flex items-center justify-between pt-1.5 border-t border-slate-100 gap-2">
+              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">
+                Teaching Mode
               </span>
               <div className="flex flex-wrap gap-1">
                 {hasOnline && <ModeBadge mode="online" />}

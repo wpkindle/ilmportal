@@ -278,7 +278,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
 
                 <div className="flex items-center flex-wrap gap-x-3 gap-y-1 pt-0.5">
                   <div className="flex items-center gap-1.5">
-                    <RatingStars rating={tutor.averageRating || 5} size="sm" />
+                    <RatingStars rating={tutor.averageRating || 5} size="sm" showScore={false} />
                     <span className="text-xs font-bold text-slate-800">
                       {tutor.averageRating?.toFixed(1) || '5.0'}
                     </span>
@@ -564,7 +564,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
           <div className="flex items-center justify-between">
             <h2 className="text-base font-black text-slate-900 font-serif">Student Reviews &amp; Ratings ({reviews.length})</h2>
             <div className="flex items-center gap-1.5">
-              <RatingStars rating={tutor.averageRating || 5} size="xs" />
+              <RatingStars rating={tutor.averageRating || 5} size="xs" showScore={false} />
               <span className="text-xs font-bold text-slate-800">{tutor.averageRating?.toFixed(1) || '5.0'} / 5.0</span>
             </div>
           </div>

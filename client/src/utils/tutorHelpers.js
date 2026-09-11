@@ -53,59 +53,95 @@ export function getTutorAvatar(tutorOrUser, fallbackName = "Verified Tutor") {
 }
 
 /**
- * Splits and normalizes tutor qualifications and sanad documents into distinct verified credentials.
- * Preserves parenthetical details like "(Dars-e-Nizami)" or "(Punjab University)" without chopping.
- * Splits on commas, semicolons, newlines, and bullets.
+ * Splits raw qualifications string on commas, semicolons, newlines, bullets, and middots.
+ * Preserves parenthetical context like "(NUST)" or "(Dars-e-Nizami)".
  */
-export function parseDegreesAndCertificates(qualificationsStr, sanadDocuments = []) {
+export function parseRawQualifications(qualificationsStr) {
   const list = [];
+  if (!qualificationsStr || typeof qualificationsStr !== 'string' || !qualificationsStr.trim()) {
+    return list;
+  }
 
-  if (qualificationsStr && typeof qualificationsStr === 'string' && qualificationsStr.trim()) {
-    const raw = qualificationsStr.trim();
-    let cur = '';
-    let parenDepth = 0;
+  const raw = qualificationsStr.trim();
+  let cur = '';
+  let parenDepth = 0;
 
-    for (let i = 0; i < raw.length; i++) {
-      const ch = raw[i];
-      if (ch === '(' || ch === '[' || ch === '{') parenDepth++;
-      else if (ch === ')' || ch === ']' || ch === '}') parenDepth = Math.max(0, parenDepth - 1);
+  for (let i = 0; i < raw.length; i++) {
+    const ch = raw[i];
+    if (ch === '(' || ch === '[' || ch === '{') parenDepth++;
+    else if (ch === ')' || ch === ']' || ch === '}') parenDepth = Math.max(0, parenDepth - 1);
 
-      if ((ch === ',' || ch === ';' || ch === '\n' || ch === '\r' || ch === '•' || ch === '·') && parenDepth === 0) {
-        const cleaned = cur.trim();
-        if (cleaned && cleaned.toLowerCase() !== 'tutor qualifications' && cleaned.toLowerCase() !== 'certified educator') {
-          if (!list.some(item => item.toLowerCase() === cleaned.toLowerCase())) {
-            list.push(cleaned);
-          }
+    if ((ch === ',' || ch === ';' || ch === '\n' || ch === '\r' || ch === '•' || ch === '·') && parenDepth === 0) {
+      const cleaned = cur.trim();
+      if (cleaned && cleaned.toLowerCase() !== 'tutor qualifications' && cleaned.toLowerCase() !== 'certified educator') {
+        if (!list.some(item => item.toLowerCase() === cleaned.toLowerCase())) {
+          list.push(cleaned);
         }
-        cur = '';
-      } else {
-        cur += ch;
       }
-    }
-
-    const last = cur.trim();
-    if (last && last.toLowerCase() !== 'tutor qualifications' && last.toLowerCase() !== 'certified educator') {
-      if (!list.some(item => item.toLowerCase() === last.toLowerCase())) {
-        list.push(last);
-      }
+      cur = '';
+    } else {
+      cur += ch;
     }
   }
 
-  // Also include titles of verified/approved sanad documents if not already in list
-  if (Array.isArray(sanadDocuments)) {
-    sanadDocuments.forEach(doc => {
-      const title = doc?.title?.trim();
-      if (title && title.toLowerCase() !== 'sanad / degree document' && title.toLowerCase() !== 'document') {
-        if (!list.some(item => item.toLowerCase() === title.toLowerCase())) {
-          list.push(title);
-        }
-      }
-    });
-  }
-
-  if (list.length === 0) {
-    return ['Verified Educator'];
+  const last = cur.trim();
+  if (last && last.toLowerCase() !== 'tutor qualifications' && last.toLowerCase() !== 'certified educator') {
+    if (!list.some(item => item.toLowerCase() === last.toLowerCase())) {
+      list.push(last);
+    }
   }
 
   return list;
+}
+
+/**
+ * Returns strictly the verified Sanad credentials for display in the Qualifications section.
+ * When a tutor has verified/approved Sanad documents, ONLY those verified Sanads are returned,
+ * preventing arbitrary unverified strings (like skills/marketing tags) from cluttering credentials.
+ */
+export function parseDegreesAndCertificates(qualificationsStr, sanadDocuments = [], isVerified = false) {
+  // 1. Filter for verified / approved Sanad documents
+  const verifiedDocs = (Array.isArray(sanadDocuments) ? sanadDocuments : []).filter(
+    doc => doc?.status === 'verified' || doc?.status === 'approved'
+  );
+
+  const parsedQuals = parseRawQualifications(qualificationsStr);
+
+  // 2. If the tutor has verified Sanad document(s), ONLY display the Sanad(s) that are verified!
+  if (verifiedDocs.length > 0) {
+    const list = [];
+    verifiedDocs.forEach((doc, idx) => {
+      let title = doc?.title?.trim();
+      // If doc title is generic placeholder like "Sanad / Degree Document",
+      // use the matching qualification title from qualificationsStr if available
+      const isGeneric = !title ||
+        title.toLowerCase() === 'sanad / degree document' ||
+        title.toLowerCase() === 'document' ||
+        title.toLowerCase() === 'sanad' ||
+        title.toLowerCase() === 'degree document';
+
+      if (isGeneric && parsedQuals[idx]) {
+        title = parsedQuals[idx];
+      } else if (!title) {
+        title = parsedQuals[idx] || parsedQuals[0] || 'Verified Sanad';
+      }
+
+      if (title && !list.some(item => item.toLowerCase() === title.toLowerCase())) {
+        list.push(title);
+      }
+    });
+
+    return list.length > 0 ? list : ['Verified Sanad'];
+  }
+
+  // 3. If tutor profile is marked isSanadVerified: true but documents array is empty
+  if (isVerified) {
+    if (parsedQuals.length > 0) {
+      return [parsedQuals[0]]; // Only display the 1 verified primary qualification
+    }
+    return ['Verified Sanad'];
+  }
+
+  // 4. If no verified sanads, fall back to parsed qualifications (unverified)
+  return parsedQuals.length > 0 ? parsedQuals : ['Verified Faculty'];
 }

@@ -57,9 +57,17 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
   const tutorCity = tutorUser.city || tutor?.city || 'Pakistan';
   const tutorAvatar = getTutorAvatar(tutor || tutorUser, tutorName);
 
+  const verifiedSanadDocs = React.useMemo(() => {
+    return (Array.isArray(tutor?.sanadDocuments) ? tutor.sanadDocuments : []).filter(
+      (doc) => doc?.status === 'verified' || doc?.status === 'approved'
+    );
+  }, [tutor?.sanadDocuments]);
+
+  const verifiedSanadCount = verifiedSanadDocs.length || (tutor?.isSanadVerified ? 1 : 0);
+
   const allDegrees = React.useMemo(() => {
-    return parseDegreesAndCertificates(tutor?.qualifications, tutor?.sanadDocuments);
-  }, [tutor?.qualifications, tutor?.sanadDocuments]);
+    return parseDegreesAndCertificates(tutor?.qualifications, tutor?.sanadDocuments, tutor?.isSanadVerified);
+  }, [tutor?.qualifications, tutor?.sanadDocuments, tutor?.isSanadVerified]);
 
   const tutorUserId = tutorUser._id || tutorUser.id || tutor?.user?._id || tutor?.user?.id || (typeof tutor?.user === 'string' ? tutor.user : null);
   const tutorUserIdStr = tutorUserId ? tutorUserId.toString() : null;
@@ -338,14 +346,14 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                   <Award className="w-4 h-4 text-[#b85d34]" />
                   <span>Verified Credentials &amp; Degrees ({allDegrees.length})</span>
                 </span>
-                {tutor.sanadDocuments?.length > 0 && (
+                {verifiedSanadCount > 0 && (
                   <button
                     type="button"
                     onClick={() => setSanadModalOpen(true)}
                     className="inline-flex items-center gap-1.5 px-3 py-1 bg-white hover:bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/50 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer"
                   >
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>View Sanad Scans ({tutor.sanadDocuments.length})</span>
+                    <span>View Sanad Scans ({verifiedSanadCount})</span>
                   </button>
                 )}
               </div>
@@ -420,14 +428,14 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
               </p>
             </div>
 
-            {tutor.sanadDocuments?.length > 0 && (
+            {verifiedSanadCount > 0 && (
               <button
                 type="button"
                 onClick={() => setSanadModalOpen(true)}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#0c2217] hover:bg-[#163826] text-[#f5d996] text-xs font-bold shadow-sm transition-all cursor-pointer"
               >
                 <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
-                <span>Inspect Verified Scans ({tutor.sanadDocuments.length})</span>
+                <span>Inspect Verified Scans ({verifiedSanadCount})</span>
               </button>
             )}
           </div>
@@ -459,11 +467,11 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
             ))}
           </div>
 
-          {tutor.sanadDocuments && tutor.sanadDocuments.length > 0 && (
+          {verifiedSanadDocs.length > 0 && (
             <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
               <span className="flex items-center gap-1.5 font-medium">
                 <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>{tutor.sanadDocuments.length} original credential certificate document(s) authenticated.</span>
+                <span>{verifiedSanadDocs.length} original credential certificate document(s) authenticated.</span>
               </span>
               <button
                 type="button"
@@ -617,7 +625,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
       <SanadModal
         isOpen={sanadModalOpen}
         onClose={() => setSanadModalOpen(false)}
-        documents={tutor.sanadDocuments || []}
+        documents={verifiedSanadDocs.length > 0 ? verifiedSanadDocs : (tutor.sanadDocuments || [])}
         degrees={allDegrees}
         tutorName={tutorName}
       />

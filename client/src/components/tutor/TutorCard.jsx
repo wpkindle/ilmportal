@@ -84,9 +84,18 @@ const TutorCard = ({ tutor, tutorProfile }) => {
   const tutorCity = tutorUser.city || data.city || 'Pakistan';
   const tutorArea = data.localArea || tutorUser.area || data.area || '';
   const tutorAvatar = getTutorAvatar(data, tutorName);
+  const verifiedSanadDocs = React.useMemo(() => {
+    return (Array.isArray(data.sanadDocuments) ? data.sanadDocuments : []).filter(
+      (doc) => doc?.status === 'verified' || doc?.status === 'approved'
+    );
+  }, [data.sanadDocuments]);
+
+  const verifiedSanadCount = verifiedSanadDocs.length || (data.isSanadVerified ? 1 : 0);
+  const hasVerifiedSanad = verifiedSanadCount > 0;
+
   const cardDegrees = React.useMemo(() => {
-    return parseDegreesAndCertificates(data.qualifications, data.sanadDocuments);
-  }, [data.qualifications, data.sanadDocuments]);
+    return parseDegreesAndCertificates(data.qualifications, data.sanadDocuments, data.isSanadVerified);
+  }, [data.qualifications, data.sanadDocuments, data.isSanadVerified]);
 
   const tutorUserId = tutorUser._id || tutorUser.id || data?.user?._id || data?.user?.id || (typeof data?.user === 'string' ? data.user : null);
   const tutorUserIdStr = tutorUserId ? tutorUserId.toString() : null;
@@ -321,7 +330,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                   <span>Qualifications</span>
                 </span>
 
-                {(data.isSanadVerified || data.sanadDocuments?.length > 0) && (
+                {hasVerifiedSanad && (
                   <button
                     type="button"
                     onClick={(e) => {
@@ -332,12 +341,12 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                     title="Click to inspect verified degrees & Sanad certificates"
                   >
                     <ShieldCheck className="w-3 h-3 text-emerald-700" />
-                    <span>{data.sanadDocuments?.length > 0 ? `Sanad (${data.sanadDocuments.length})` : 'Verified Sanad'}</span>
+                    <span>{verifiedSanadCount > 0 ? `Sanad (${verifiedSanadCount})` : 'Verified Sanad'}</span>
                   </button>
                 )}
               </div>
 
-              {/* All degrees visible */}
+              {/* Only verified Sanad degrees visible */}
               <div className="flex flex-wrap gap-1.5">
                 {cardDegrees.map((deg, dIdx) => (
                   <span
@@ -345,7 +354,11 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                     className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-bold bg-[#faf8f5] text-slate-800 border border-[#e6ded1]"
                     title={deg}
                   >
-                    <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600 shrink-0" />
+                    {hasVerifiedSanad ? (
+                      <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600 shrink-0" />
+                    ) : (
+                      <Award className="w-2.5 h-2.5 text-slate-400 shrink-0" />
+                    )}
                     <span>{deg}</span>
                   </span>
                 ))}
@@ -405,7 +418,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
       <SanadModal
         isOpen={sanadModalOpen}
         onClose={() => setSanadModalOpen(false)}
-        documents={data.sanadDocuments || []}
+        documents={verifiedSanadDocs.length > 0 ? verifiedSanadDocs : (data.sanadDocuments || [])}
         degrees={cardDegrees}
         tutorName={tutorName}
       />

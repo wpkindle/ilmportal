@@ -25,7 +25,7 @@ import {
   GraduationCap
 } from 'lucide-react';
 import RatingStars from '../../../components/common/RatingStars';
-import SanadBadge, { SanadModal } from '../../../components/common/SanadBadge';
+import { SanadModal } from '../../../components/common/SanadBadge';
 import StudentAuthModal from '../../../components/common/StudentAuthModal';
 import FemaleTutorGateModal from '../../../components/common/FemaleTutorGateModal';
 import ChatRequestModal from '../../../components/common/ChatRequestModal';
@@ -83,6 +83,17 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
   }, [tutorUserIdStr, isConnected]);
 
   const rawJoiningDate = tutorUser?.createdAt || tutor?.createdAt;
+  const rawModes = tutor?.teachingModes || (tutor?.teachingMode ? [tutor?.teachingMode] : ['online']);
+  const modes = Array.isArray(rawModes) ? rawModes : [rawModes];
+  const hasOnline = modes.includes('online');
+  const hasInPerson = modes.includes('in_person') || modes.includes('physical');
+  const teachingModeLabel = (hasOnline && hasInPerson) || tutor?.teachingMode === 'both'
+    ? 'Online & In-Person'
+    : hasOnline
+    ? 'Online Classes'
+    : hasInPerson
+    ? 'In-Person Tutoring'
+    : 'Online Classes';
   const formattedJoiningDate = rawJoiningDate
     ? new Date(rawJoiningDate).toLocaleDateString('en-US', {
         day: 'numeric',
@@ -185,10 +196,10 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Top Profile Card */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e6ded1] shadow-xs space-y-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+        <div className="bg-white rounded-3xl p-5 sm:p-7 md:p-8 border border-[#e6ded1] shadow-xs space-y-6">
+          <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6">
             
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 flex-1 min-w-0 w-full">
               <div className="relative shrink-0">
                 <img
                   src={tutorAvatar}
@@ -223,66 +234,73 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                 )}
               </div>
 
-              <div className="space-y-1.5">
+              <div className="space-y-2 flex-1 min-w-0">
                 <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-xl sm:text-2xl font-serif font-black text-slate-900">{tutorName}</h1>
+                  <h1 className="text-xl sm:text-2xl font-serif font-black text-slate-900 leading-tight break-words">
+                    {tutorName}
+                  </h1>
 
                   {/* Real-time Online / Offline Badge */}
                   {isTutorOnline ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-emerald-50 text-emerald-800 border border-emerald-200 shadow-2xs shrink-0">
                       <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                       <span>Online Now</span>
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-stone-100 text-stone-600 border border-stone-200">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-stone-100 text-stone-600 border border-stone-200 shrink-0">
                       <span className="w-2 h-2 rounded-full bg-stone-400" />
                       <span>Offline</span>
                     </span>
                   )}
 
                   {isFemaleTutor ? (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-[#f5ebe6] text-[#b85d34] border border-[#b85d34]/30">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-[#f5ebe6] text-[#b85d34] border border-[#b85d34]/30 shrink-0">
                       <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
                       <span>{isAlimah ? 'Verified Female Alimah' : 'Verified Female Tutor'}</span>
                     </span>
                   ) : isMaleTutor ? (
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 shrink-0">
                       <span>{isMaleQuran ? 'Male Quran Tutor' : 'Male Academic Tutor'}</span>
                     </span>
                   ) : (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-[#f0eae1] text-[#0c2217]">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-[#f0eae1] text-[#0c2217] shrink-0">
                       {tutor.gender || 'Teacher'}
                     </span>
                   )}
                   {tutorUser.status === 'under_review' ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-orange-100 text-orange-800 border border-orange-200">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-orange-100 text-orange-800 border border-orange-200 shrink-0">
                       <Search className="w-3 h-3" />
                       <span>Under Review</span>
                     </span>
                   ) : tutorUser.status === 'warned' ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-100 text-amber-800 border border-amber-200">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-100 text-amber-800 border border-amber-200 shrink-0">
                       <AlertTriangle className="w-3 h-3" />
                       <span>Policy Warning</span>
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40">
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 shrink-0">
                       <CheckCircle2 className="w-3 h-3 text-[#d4a359]" />
                       <span>Verified Faculty</span>
                     </span>
                   )}
                 </div>
 
-                <p className="text-xs sm:text-sm font-semibold text-slate-600 flex items-center flex-wrap gap-x-2 gap-y-1">
+                <div className="text-xs sm:text-sm font-medium text-slate-600 flex items-center flex-wrap gap-x-2.5 gap-y-1">
                   <span className="inline-flex items-center gap-1.5 text-slate-800">
                     <MapPin className="w-4 h-4 text-[#b85d34] shrink-0" />
                     <span>City: <strong className="text-slate-900">{tutorCity}</strong></span>
-                    {tutorArea && (
-                      <span className="text-stone-600 font-medium">&bull; Area: <strong className="text-slate-900">{tutorArea}</strong></span>
-                    )}
                   </span>
+                  {tutorArea && (
+                    <>
+                      <span className="text-stone-300">&bull;</span>
+                      <span className="text-stone-600">Area: <strong className="text-slate-900">{tutorArea}</strong></span>
+                    </>
+                  )}
                   <span className="text-stone-300">&bull;</span>
-                  <span className="capitalize">{tutor.teachingMode === 'both' ? 'Online & In-Person' : tutor.teachingMode}</span>
-                </p>
+                  <span className="inline-flex items-center gap-1 font-semibold text-[#0c2217]">
+                    <span className="capitalize">{teachingModeLabel}</span>
+                  </span>
+                </div>
 
                 <div className="flex items-center flex-wrap gap-x-3 gap-y-1 pt-0.5">
                   <div className="flex items-center gap-1.5">
@@ -309,17 +327,24 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
             </div>
 
             {/* Quick Action Buttons */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full md:w-auto">
-              <SanadBadge
-                isVerified={tutor.isSanadVerified}
-                documentsCount={tutor.sanadDocuments?.length || 0}
-                onClick={() => setSanadModalOpen(true)}
-              />
+            <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto shrink-0 pt-3 xl:pt-0 border-t xl:border-t-0 border-slate-100">
+              {verifiedSanadCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setSanadModalOpen(true)}
+                  className="px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold bg-[#f0ece1] hover:bg-[#e6ded1] text-[#0c2217] border border-[#d4a359]/50 transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-initial"
+                  title="Inspect verified degrees & Sanad certificates"
+                >
+                  <ShieldCheck className="w-4 h-4 text-emerald-700" />
+                  <span>Verified Sanad ({verifiedSanadCount})</span>
+                  <GraduationCap className="w-4 h-4 text-[#b85d34]" />
+                </button>
+              )}
 
               {mounted && !isTutorVisitor && !isOwnProfile && (
                 <button
                   onClick={handleStartChat}
-                  className="px-6 py-3 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-98 text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-[#b85d34]/20 transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  className="px-6 py-3 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-98 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md shadow-[#b85d34]/20 transition-all flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-initial"
                 >
                   <MessageSquare className="w-4 h-4" />
                   <span>Message &amp; Discuss Schedule</span>

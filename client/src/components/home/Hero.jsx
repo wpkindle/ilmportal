@@ -114,17 +114,17 @@ const heroSlides = [
     id: 4,
     tabLabel: 'Matric & FSc',
     tabIcon: Atom,
-    badgeText: 'Matric & FSc Science • Verified Female Tutors',
-    badgeIcon: Atom,
+    badgeText: 'Matric & FSc Science • 100% Live Video',
+    badgeIcon: Video,
     badgeColor: 'text-[#faf8f5]',
     dotColor: 'bg-[#b85d34]',
-    tag: 'Board Exam Preparation',
-    title: '1:1 Female Science Tutor • Matric & Intermediate',
-    desc: 'Comprehensive syllabus mastery in Biology, Chemistry, Physics & Mathematics with verified female educators for daughters and female learners.',
+    tag: 'Live Science WebRTC',
+    title: '1:1 Female Science Tutor • Live Interactive Screen',
+    desc: 'Encrypted 1-on-1 WebRTC video tutoring in Biology, Chemistry, Physics & Mathematics with verified female educators for daughters and female learners.',
     image: '/images/hero-stem-science.jpg',
-    alt: 'Pakistani female science tutor in modest dupatta guiding a teenage schoolgirl through Matric chemistry and biology textbooks and diagrams',
-    ctaLink: '/tutors?category=fsc-hssc',
-    ctaText: 'Find Science & Board Tutors'
+    alt: 'Pakistani female student attending live online video call with female science educator on laptop screen explaining biology and formulas',
+    ctaLink: '/tutors?category=fsc-hssc&gender=female',
+    ctaText: 'Find Female Science Tutors'
   },
   {
     id: 5,
@@ -162,17 +162,17 @@ const heroSlides = [
     id: 7,
     tabLabel: 'Primary & Junior',
     tabIcon: Users,
-    badgeText: 'Playgroup to Grade 5 • Warm Female Tutors',
-    badgeIcon: Users,
+    badgeText: 'Playgroup to Grade 5 • Live Screen Tutoring',
+    badgeIcon: Video,
     badgeColor: 'text-[#faf8f5]',
     dotColor: 'bg-[#b85d34]',
-    tag: 'Foundational Learning',
-    title: 'Early Childhood, Urdu Qaida & School Tuition',
-    desc: 'Caring female home and online tutors building strong foundations in Urdu reading, English phonics, mental math, and daily school homework.',
-    image: '/images/hero-primary-home.jpg',
-    alt: 'Pakistani female tutor teaching a young girl Urdu Qaida and school lessons at study table',
-    ctaLink: '/tutors?category=primary-junior',
-    ctaText: 'Find Primary Tutors'
+    tag: 'Live Junior WebRTC',
+    title: 'Early Childhood & Junior Lessons • Live Video Screen',
+    desc: 'Caring verified female tutors teaching young learners live on screen in geometry, Urdu reading, English phonics, and schoolwork.',
+    image: '/images/hero-female-live-junior.jpg',
+    alt: 'Young Pakistani student with headphones attending engaging live 1-on-1 online video call class with smiling female tutor on laptop screen',
+    ctaLink: '/tutors?category=primary-junior&gender=female',
+    ctaText: 'Find Female Junior Tutors'
   }
 ];
 

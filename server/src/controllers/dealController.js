@@ -330,22 +330,25 @@ exports.getMyDeals = async (req, res) => {
       }
     }
 
-    // For students, populate review status on completed deals
-    if (req.user.role === 'student') {
-      const completedDealIds = deals.filter(d => d.status === 'completed').map(d => d._id);
-      if (completedDealIds.length > 0) {
-        const studentReviews = await Review.find({ student: req.user.id, deal: { $in: completedDealIds } }).lean();
-        const reviewMap = new Map(studentReviews.map(r => [r.deal?.toString(), r]));
-        deals.forEach(deal => {
-          if (deal.status === 'completed' && reviewMap.has(deal._id.toString())) {
+    // For both students and tutors, populate review status on completed deals
+    const completedDealIds = deals.filter(d => d.status === 'completed').map(d => d._id);
+    if (completedDealIds.length > 0) {
+      const dealReviews = await Review.find({ deal: { $in: completedDealIds } }).lean();
+      const reviewMap = new Map(dealReviews.map(r => [r.deal?.toString(), r]));
+      deals.forEach(deal => {
+        if (deal.status === 'completed') {
+          if (reviewMap.has(deal._id.toString()) || deal.isReviewed) {
             deal.isReviewed = true;
             if (deal._doc) {
               deal._doc.isReviewed = true;
-              deal._doc.studentReview = reviewMap.get(deal._id.toString());
+              if (reviewMap.has(deal._id.toString())) {
+                deal._doc.review = reviewMap.get(deal._id.toString());
+                deal._doc.studentReview = reviewMap.get(deal._id.toString());
+              }
             }
           }
-        });
-      }
+        }
+      });
     }
 
     res.status(200).json({

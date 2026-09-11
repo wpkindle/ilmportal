@@ -7,7 +7,7 @@ import TrialBanner from '../../../components/common/TrialBanner';
 import Tutor72HourClock from '../../../components/tutor/Tutor72HourClock';
 import TutorPaymentModal from '../../../components/tutor/TutorPaymentModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
-import { BookOpen, MessageSquare, Plus, Video, CheckCircle2, Check, AlertTriangle, X, Loader2, Clock, CreditCard } from 'lucide-react';
+import { BookOpen, MessageSquare, Plus, Video, CheckCircle2, Check, AlertTriangle, X, Loader2, Clock, CreditCard, Star } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 
 export default function TutorDealsPage() {
@@ -244,9 +244,22 @@ export default function TutorDealsPage() {
                     })()}
 
                     {deal.status === 'completed' && (
-                      <div className="px-3 py-1.5 bg-[#f0ece1] border border-[#d4a359]/40 rounded-xl text-xs text-[#0c2217] font-semibold flex items-center gap-1.5">
-                        <Check className="w-3.5 h-3.5 text-[#d4a359]" />
-                        <span>Completed &bull; Storage Cleared</span>
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {deal.isReviewed ? (
+                          <span className="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-xs rounded-xl flex items-center gap-1 shadow-2xs">
+                            <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
+                            <span>Reviewed by Student</span>
+                          </span>
+                        ) : (
+                          <span className="px-2.5 py-1 bg-amber-50 border border-amber-200 text-amber-800 font-semibold text-xs rounded-xl flex items-center gap-1 shadow-2xs">
+                            <Clock className="w-3.5 h-3.5 text-amber-600" />
+                            <span>Student Review Pending</span>
+                          </span>
+                        )}
+                        <div className="px-3 py-1.5 bg-[#f0ece1] border border-[#d4a359]/40 rounded-xl text-xs text-[#0c2217] font-semibold flex items-center gap-1.5">
+                          <Check className="w-3.5 h-3.5 text-[#d4a359]" />
+                          <span>Completed &bull; Storage Cleared</span>
+                        </div>
                       </div>
                     )}
                   </div>

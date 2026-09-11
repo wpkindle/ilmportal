@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { api } from '../../../services/api';
 import TrialBanner from '../../../components/common/TrialBanner';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
+import LeaveReviewModal from '../../../components/common/LeaveReviewModal';
 import { BookOpen, Star, MessageSquare, CreditCard, X, CheckCircle2, Video } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 
@@ -16,10 +17,6 @@ export default function MyDealsPage() {
 
   // Review Modal State
   const [reviewModalDeal, setReviewModalDeal] = useState(null);
-  const [rating, setRating] = useState(5);
-  const [comment, setComment] = useState('');
-  const [submittingReview, setSubmittingReview] = useState(false);
-  const [reviewSuccess, setReviewSuccess] = useState(false);
 
   const fetchDeals = async () => {
     try {
@@ -35,36 +32,6 @@ export default function MyDealsPage() {
   useEffect(() => {
     fetchDeals();
   }, []);
-
-  const handleReviewSubmit = async (e) => {
-    e.preventDefault();
-    if (!reviewModalDeal) return;
-
-    setSubmittingReview(true);
-    try {
-      const res = await api.createReview({
-        tutorId: reviewModalDeal.tutor?._id || reviewModalDeal.tutor,
-        dealId: reviewModalDeal._id,
-        rating: Number(rating),
-        comment: comment.trim()
-      });
-      if (res.success) {
-        setReviewSuccess(true);
-        setDeals((prev) =>
-          prev.map((d) => (d._id === reviewModalDeal._id ? { ...d, isReviewed: true } : d))
-        );
-        setTimeout(() => {
-          setReviewModalDeal(null);
-          setReviewSuccess(false);
-          setComment('');
-        }, 2000);
-      }
-    } catch (err) {
-      alert(err.message || 'Error submitting review');
-    } finally {
-      setSubmittingReview(false);
-    }
-  };
 
   if (loading) return <LoadingSpinner />;
 
@@ -201,84 +168,18 @@ export default function MyDealsPage() {
 
       </div>
 
-      {/* Review Modal */}
-      {reviewModalDeal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-stone-900/60 backdrop-blur-xs">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl relative border border-[#e6dfd5] space-y-4">
-            <div className="flex items-center justify-between pb-3 border-b border-[#f3ede2]">
-              <h3 className="font-serif font-bold text-base text-stone-900">
-                Rate &amp; Review {reviewModalDeal.tutor?.name}
-              </h3>
-              <button
-                onClick={() => setReviewModalDeal(null)}
-                className="p-1 text-stone-400 hover:text-stone-700 rounded-lg"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            {reviewSuccess ? (
-              <div className="p-6 bg-[#f0ece1] rounded-2xl border border-[#d4a359]/40 text-center space-y-2">
-                <CheckCircle2 className="w-8 h-8 text-[#d4a359] mx-auto" />
-                <p className="font-bold text-xs text-[#0c2217]">Review Submitted Successfully!</p>
-              </div>
-            ) : (
-              <form onSubmit={handleReviewSubmit} className="space-y-4">
-                <div>
-                  <label className="text-xs font-bold text-stone-700 block mb-1.5">
-                    Star Rating (1 to 5 Stars)
-                  </label>
-                  <div className="flex items-center gap-2">
-                    {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        onClick={() => setRating(star)}
-                        className="p-1 text-[#d4a359] hover:scale-110 transition-transform cursor-pointer"
-                      >
-                        <Star
-                          className={`w-7 h-7 ${star <= rating ? 'fill-[#d4a359]' : 'text-stone-300'}`}
-                        />
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <label className="text-xs font-bold text-stone-700 block mb-1">
-                    Your Feedback &amp; Review Comments
-                  </label>
-                  <textarea
-                    rows="3"
-                    required
-                    placeholder="Share your experience regarding punctuality, Tajweed clarity, or exam guidance..."
-                    value={comment}
-                    onChange={(e) => setComment(e.target.value)}
-                    className="w-full p-3 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs text-stone-800 outline-none focus:border-[#0c2217] focus:bg-white"
-                  />
-                </div>
-
-                <div className="flex justify-end gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setReviewModalDeal(null)}
-                    className="px-4 py-2 rounded-xl border border-[#e6dfd5] text-xs font-semibold text-stone-700 hover:bg-[#faf8f5]"
-                  >
-                    Cancel
-                  </button>
-                  <button
-                    type="submit"
-                    disabled={submittingReview}
-                    className="px-5 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] text-xs font-bold rounded-xl shadow-sm disabled:opacity-50 border border-[#d4a359]/30"
-                  >
-                    {submittingReview ? 'Submitting...' : 'Post Review'}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </div>
-      )}
+      {/* Leave Review Modal */}
+      <LeaveReviewModal
+        isOpen={!!reviewModalDeal}
+        onClose={() => setReviewModalDeal(null)}
+        deal={reviewModalDeal}
+        tutor={reviewModalDeal?.tutor}
+        onSuccess={() => {
+          setDeals((prev) =>
+            prev.map((d) => (d._id === reviewModalDeal?._id ? { ...d, isReviewed: true } : d))
+          );
+        }}
+      />
 
     </div>
   );

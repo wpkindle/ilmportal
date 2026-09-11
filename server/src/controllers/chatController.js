@@ -821,7 +821,7 @@ exports.getStudentProfileForTutor = async (req, res) => {
       ChatRequest.findOne({ student: studentDoc._id, tutor: req.user.id }).sort({ createdAt: -1 }),
       Deal.findOne({ student: studentDoc._id, tutor: req.user.id }).sort({ createdAt: -1 }),
       Deal.find({ student: studentDoc._id })
-        .select('subject mode price priceUnit status createdAt trialStartDate trialEndDate tutor')
+        .select('subject mode price priceUnit status createdAt trialStartDate trialEndDate tutor isReviewed review')
         .populate('tutor', 'name avatar')
         .sort({ createdAt: -1 })
         .limit(10),
@@ -832,6 +832,20 @@ exports.getStudentProfileForTutor = async (req, res) => {
         .limit(10)
     ]);
 
+    // Enrich tuitions history with review status
+    const enrichedTuitionsHistory = (tuitionsHistory || []).map(d => {
+      const dealObj = d.toObject ? d.toObject() : { ...d };
+      const matchedReview = (reviews || []).find(r => 
+        (r.deal && r.deal.toString() === dealObj._id.toString()) ||
+        (dealObj.tutor && r.tutor && (r.tutor._id || r.tutor).toString() === (dealObj.tutor._id || dealObj.tutor).toString())
+      );
+      if (matchedReview || dealObj.isReviewed) {
+        dealObj.isReviewed = true;
+        if (matchedReview) dealObj.review = matchedReview;
+      }
+      return dealObj;
+    });
+
     res.status(200).json({
       success: true,
       student: sanitizedStudent,
@@ -841,7 +855,7 @@ exports.getStudentProfileForTutor = async (req, res) => {
       completedFields,
       latestRequest,
       latestDeal,
-      tuitionsHistory: tuitionsHistory || [],
+      tuitionsHistory: enrichedTuitionsHistory,
       reviews: reviews || []
     });
   } catch (error) {

@@ -401,9 +401,23 @@ export default function StudentProfileModal({
                               )}
                             </div>
                           </div>
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase shrink-0 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30">
-                            {t.status ? t.status.replace(/_/g, ' ') : 'Active'}
-                          </span>
+                          <div className="flex items-center gap-1.5 shrink-0">
+                            {t.status === 'completed' && (
+                              t.isReviewed ? (
+                                <span className="px-2 py-0.5 rounded-md text-[9.5px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-0.5">
+                                  <span>Reviewed</span>
+                                  <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
+                                </span>
+                              ) : (
+                                <span className="px-2 py-0.5 rounded-md text-[9.5px] font-semibold bg-amber-100 text-amber-800 border border-amber-300">
+                                  Review Pending
+                                </span>
+                              )
+                            )}
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase shrink-0 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30">
+                              {t.status ? t.status.replace(/_/g, ' ') : 'Active'}
+                            </span>
+                          </div>
                         </div>
                       ))}
                     </div>

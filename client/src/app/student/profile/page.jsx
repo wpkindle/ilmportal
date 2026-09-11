@@ -34,6 +34,7 @@ import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import SafetyReportsSection from '../../../components/profile/SafetyReportsSection';
 import { allPakistaniCities, pakistaniCityAreas } from '../../../data/pakistanAreas';
 import CustomSelect, { StyledNativeSelect } from '../../../components/common/CustomSelect';
+import LeaveReviewModal from '../../../components/common/LeaveReviewModal';
 
 const pakistaniCities = allPakistaniCities;
 
@@ -58,6 +59,7 @@ function StudentProfileContent() {
   const [tuitionHistory, setTuitionHistory] = useState([]);
   const [reviewsList, setReviewsList] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
+  const [reviewModalDeal, setReviewModalDeal] = useState(null);
 
   // Password Form State
   const [currentPassword, setCurrentPassword] = useState('');
@@ -798,6 +800,36 @@ function StudentProfileContent() {
                   <span>Tuition Records</span>
                 </h3>
 
+                {/* Pending Reviews Alert Banner */}
+                {tuitionHistory.some((d) => d.status === 'completed' && !d.isReviewed) && (
+                  <div className="p-4 bg-gradient-to-r from-amber-50 via-orange-50 to-amber-50 rounded-2xl border border-amber-300 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-xs">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center shrink-0 border border-amber-300">
+                        <Star className="w-5 h-5 fill-amber-500 text-amber-500" />
+                      </div>
+                      <div>
+                        <h4 className="font-bold text-xs text-stone-900">
+                          Course Completed &bull; Review Your Tutor
+                        </h4>
+                        <p className="text-[11px] text-stone-600">
+                          Your tutor has marked the course as completed. Please share your rating and review to support their profile.
+                        </p>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const target = tuitionHistory.find((d) => d.status === 'completed' && !d.isReviewed);
+                        if (target) setReviewModalDeal(target);
+                      }}
+                      className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-bold rounded-xl shadow-xs transition-all shrink-0 flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Star className="w-3.5 h-3.5 fill-white text-white" />
+                      <span>Leave Review</span>
+                    </button>
+                  </div>
+                )}
+
                 {loadingHistory ? (
                   <div className="py-6 text-center text-xs text-slate-400">Loading tuition history...</div>
                 ) : tuitionHistory.length > 0 ? (
@@ -813,9 +845,28 @@ function StudentProfileContent() {
                               {deal.tutor?.name ? `Tutor: ${deal.tutor.name}` : 'Tutor Assigned'}
                             </p>
                           </div>
-                          <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-white border border-[#d4a359]/40 text-[#0c2217] shrink-0">
-                            {deal.status ? deal.status.replace(/_/g, ' ') : 'Active'}
-                          </span>
+                          {deal.status === 'completed' ? (
+                            deal.isReviewed ? (
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200 shrink-0">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                <span>Reviewed ★★★★★</span>
+                              </span>
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={() => setReviewModalDeal(deal)}
+                                className="px-2.5 py-1 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[10.5px] font-bold rounded-lg shadow-2xs flex items-center gap-1 transition-all cursor-pointer shrink-0"
+                                title="Leave review for this tutor"
+                              >
+                                <Star className="w-3 h-3 fill-white text-white" />
+                                <span>Leave Review</span>
+                              </button>
+                            )
+                          ) : (
+                            <span className="px-2 py-0.5 rounded-md text-[10px] font-bold uppercase bg-white border border-[#d4a359]/40 text-[#0c2217] shrink-0">
+                              {deal.status ? deal.status.replace(/_/g, ' ') : 'Active'}
+                            </span>
+                          )}
                         </div>
                         <div className="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-[#ebe3d3]">
                           <span className="font-semibold text-[#0c2217]">
@@ -825,6 +876,18 @@ function StudentProfileContent() {
                             {deal.createdAt ? new Date(deal.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : ''}
                           </span>
                         </div>
+                        {deal.status === 'completed' && !deal.isReviewed && (
+                          <div className="pt-2 border-t border-[#ebe3d3] flex items-center justify-between">
+                            <span className="text-[10.5px] text-amber-900 font-medium">Course completed! Rate your tutor</span>
+                            <button
+                              type="button"
+                              onClick={() => setReviewModalDeal(deal)}
+                              className="text-xs font-bold text-[#b85d34] hover:text-[#9e4e2a] underline cursor-pointer"
+                            >
+                              Write Review &rarr;
+                            </button>
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -934,6 +997,24 @@ function StudentProfileContent() {
           onClose={() => setShowDeleteModal(false)}
           role="student"
           userName={name}
+        />
+      )}
+
+      {/* Student Leave Review Modal */}
+      {reviewModalDeal && (
+        <LeaveReviewModal
+          isOpen={!!reviewModalDeal}
+          onClose={() => setReviewModalDeal(null)}
+          deal={reviewModalDeal}
+          tutor={reviewModalDeal.tutor}
+          onSuccess={(newReview) => {
+            setTuitionHistory((prev) =>
+              prev.map((d) => (d._id === reviewModalDeal._id ? { ...d, isReviewed: true, studentReview: newReview } : d))
+            );
+            api.getMyReviews().then((r) => {
+              if (r?.success && r.reviews) setReviewsList(r.reviews);
+            });
+          }}
         />
       )}
 

@@ -13,13 +13,15 @@ import {
   Calendar,
   Sparkles,
   GraduationCap,
-  Award
+  Award,
+  Star
 } from 'lucide-react';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import TrialBanner from '../../../components/common/TrialBanner';
 import AccountStatusBanner from '../../../components/common/AccountStatusBanner';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
+import LeaveReviewModal from '../../../components/common/LeaveReviewModal';
 
 export default function StudentDashboardPage() {
   const { user } = useAuth();
@@ -29,6 +31,7 @@ export default function StudentDashboardPage() {
   const [sessions, setSessions] = useState([]);
   const [systemConfig, setSystemConfig] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [reviewModalDeal, setReviewModalDeal] = useState(null);
 
   const fetchDashboardData = async () => {
     try {
@@ -221,12 +224,21 @@ export default function StudentDashboardPage() {
                           Tutoring sessions for this course have concluded. Thank you for learning on IlmiDunya!
                         </p>
                       </div>
-                      <Link
-                        href="/student/deals"
-                        className="px-3.5 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl shadow-xs transition-all shrink-0"
-                      >
-                        Rate &amp; Review Tutor
-                      </Link>
+                      {deal.isReviewed ? (
+                        <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold shrink-0">
+                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                          <span>Reviewed ★★★★★</span>
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setReviewModalDeal(deal)}
+                          className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+                        >
+                          <Star className="w-3.5 h-3.5 fill-white text-white" />
+                          <span>Rate &amp; Review Tutor</span>
+                        </button>
+                      )}
                     </div>
                   ) : (
                     <TrialBanner deal={deal} />
@@ -283,6 +295,21 @@ export default function StudentDashboardPage() {
             </div>
           )}
         </div>
+
+      {/* Leave Review Modal */}
+      {reviewModalDeal && (
+        <LeaveReviewModal
+          isOpen={!!reviewModalDeal}
+          onClose={() => setReviewModalDeal(null)}
+          deal={reviewModalDeal}
+          tutor={reviewModalDeal.tutor}
+          onSuccess={(newReview) => {
+            setDeals((prev) =>
+              prev.map((d) => (d._id === reviewModalDeal._id ? { ...d, isReviewed: true, studentReview: newReview } : d))
+            );
+          }}
+        />
+      )}
 
       </div>
     </div>

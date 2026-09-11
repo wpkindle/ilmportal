@@ -303,7 +303,7 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
                 <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
                 <div>
                   <span className="text-xs font-black text-emerald-950 block">Platform Payment Verified</span>
-                  <p className="text-[10.5px] text-emerald-700 leading-none">Administration cleared platform fee. You can now close the deal.</p>
+                  <p className="text-[10.5px] text-emerald-700 leading-none">Administration cleared platform fee. You may continue your deal.</p>
                 </div>
               </div>
               <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100/90 px-2.5 py-0.5 rounded-full border border-emerald-300">

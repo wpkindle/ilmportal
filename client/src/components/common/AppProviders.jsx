@@ -7,7 +7,6 @@ import { SocketProvider } from '../../context/SocketContext';
 import { NotificationProvider } from '../../context/NotificationContext';
 import SupportPlatformWidget from './SupportPlatformWidget';
 import InAppNotificationToast from './InAppNotificationToast';
-import LiveActivityToast from './LiveActivityToast';
 import AiChatbotWidget from './AiChatbotWidget';
 
 export default function AppProviders({ children }) {
@@ -65,7 +64,6 @@ export default function AppProviders({ children }) {
       <SocketProvider>
         <NotificationProvider>
           <InAppNotificationToast />
-          <LiveActivityToast />
           <SupportPlatformWidget />
           <AiChatbotWidget />
           {children}

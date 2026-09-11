@@ -39,7 +39,7 @@ export default function CinematicHeroBackground({
               <img
                 src={slide.image}
                 alt={slide.alt || 'Tutoring scene'}
-                className={`w-full h-full object-cover object-center filter contrast-[1.05] brightness-[0.82] ${
+                className={`w-full h-full object-cover object-center filter contrast-[1.08] brightness-[0.70] ${
                   isActive ? animClass : ''
                 }`}
                 loading={idx === 0 ? 'eager' : 'lazy'}
@@ -50,16 +50,16 @@ export default function CinematicHeroBackground({
         })}
       </div>
 
-      {/* 3. Directional Gradient Scrim (Desktop): Solid emerald-black text protection on left (85-95%), 
-             opening to crystal-clear transparent on right so the background slideshow is vividly visible */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#07150e] via-[#07150e]/85 via-45% to-transparent hidden lg:block" />
+      {/* 3. Directional Gradient Scrim (Desktop): Solid emerald-black text protection on left (92-95%), 
+             smoothly feathering to a rich dark overlay (40%) on right so the slideshow has a dark tint and remains visible */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#07150e] via-[#07150e]/92 via-48% to-[#07150e]/40 hidden lg:block" />
 
       {/* 4. Mobile Scrim: Balanced dark coverage so typography is crisp while background slideshow remains visible */}
-      <div className="absolute inset-0 bg-[#07150e]/70 lg:hidden" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/90 via-[#07150e]/60 to-[#07150e]/90 lg:hidden" />
+      <div className="absolute inset-0 bg-[#07150e]/75 lg:hidden" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/95 via-[#07150e]/70 to-[#07150e]/95 lg:hidden" />
 
       {/* 5. Vertical Framing Vignette (Blends into Navbar and next section) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/60 via-transparent to-[#07150e]" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/70 via-transparent to-[#07150e]" />
 
       {/* 6. Ambient Golden Light Bloom (Warm Subtle Editorial Glow) */}
       <div

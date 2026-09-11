@@ -39,7 +39,7 @@ export default function CinematicHeroBackground({
               <img
                 src={slide.image}
                 alt={slide.alt || 'Tutoring scene'}
-                className={`w-full h-full object-cover object-center filter contrast-[1.05] brightness-[0.70] ${
+                className={`w-full h-full object-cover object-center filter contrast-[1.08] brightness-[0.62] ${
                   isActive ? animClass : ''
                 }`}
                 loading={idx === 0 ? 'eager' : 'lazy'}
@@ -50,13 +50,19 @@ export default function CinematicHeroBackground({
         })}
       </div>
 
-      {/* 3. Directional Gradient Scrim: Solid text protection on left, cinematic dark overlay on right */}
-      <div className="absolute inset-0 bg-[#07150e]/60" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#07150e] via-[#07150e]/95 via-45% to-[#07150e]/50 hidden lg:block" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/95 via-[#07150e]/88 to-[#07150e] lg:hidden" />
+      {/* 3. Main Hero Background Slideshow Dark Overlay:
+             Rich dark overlay across the entire background slideshow for premium contrast and depth */}
+      <div className="absolute inset-0 bg-[#07150e]/55" />
 
-      {/* 4. Vertical Framing Vignette (Blends into Navbar and next section) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/85 via-transparent to-[#07150e]" />
+      {/* 4. Directional Gradient Scrim: Deep emerald-black text protection on left (95%), 
+             smoothly feathering out towards the right so the slideshow motion remains visible through the transparent glass card */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#07150e]/95 via-[#07150e]/90 via-48% to-transparent hidden lg:block" />
+
+      {/* 5. Mobile Scrim: Balanced dark coverage so typography and UI are crisp on smaller screens */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/90 via-[#07150e]/75 to-[#07150e]/90 lg:hidden" />
+
+      {/* 6. Vertical Framing Vignette (Blends into Navbar and next section) */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/80 via-transparent to-[#07150e]" />
 
       {/* 6. Ambient Golden Light Bloom (Warm Subtle Editorial Glow) */}
       <div

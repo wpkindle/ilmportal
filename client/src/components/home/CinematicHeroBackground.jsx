@@ -50,9 +50,9 @@ export default function CinematicHeroBackground({
         })}
       </div>
 
-      {/* 3. Directional Gradient Scrim: Solid text protection on left, opening to clear view on right */}
+      {/* 3. Directional Gradient Scrim: Solid text protection on left, balanced view on right */}
       <div className="absolute inset-0 bg-[#07150e]/50" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#07150e] via-[#07150e]/92 via-55% to-[#07150e]/25 hidden lg:block" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#07150e] via-[#07150e]/90 via-50% to-[#07150e]/50 hidden lg:block" />
       <div className="absolute inset-0 bg-[#07150e]/85 lg:hidden" />
 
       {/* 4. Vertical Framing Vignette (Blends into Navbar and next section) */}

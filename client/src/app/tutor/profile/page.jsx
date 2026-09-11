@@ -43,6 +43,7 @@ import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import SafetyReportsSection from '../../../components/profile/SafetyReportsSection';
 import { allPakistaniCities, pakistaniCityAreas } from '../../../data/pakistanAreas';
 import CustomSelect, { StyledNativeSelect } from '../../../components/common/CustomSelect';
+import { parseDegreesAndCertificates } from '../../../utils/tutorHelpers';
 
 const pakistaniCities = allPakistaniCities;
 
@@ -1250,18 +1251,41 @@ function TutorProfileContent() {
                 </div>
 
                 {/* Educational Qualifications & Degrees */}
-                <div id="profile-qualifications" className="scroll-mt-28">
-                  <label className="text-xs font-bold text-slate-700 block mb-1">
-                    Academic Qualifications & Sanad Degrees *
-                  </label>
-                  <input
-                    type="text"
+                <div id="profile-qualifications" className="scroll-mt-28 space-y-2">
+                  <div className="flex items-center justify-between flex-wrap gap-1">
+                    <label className="text-xs font-bold text-slate-700 block">
+                      Academic Qualifications &amp; Sanad Degrees *
+                    </label>
+                    <span className="text-[10px] text-slate-500">Separate multiple degrees with commas (,) or new lines</span>
+                  </div>
+                  <textarea
+                    rows={2}
                     required
-                    placeholder="e.g. Dars-e-Nizami (Shahadat-ul-Almiya), Wifaq-ul-Madaris, Hafiz-e-Quran, BS Islamic Studies"
+                    placeholder="e.g. Shahadat-ul-Alimiyyah (Dars-e-Nizami), Sanad Tajweed & Qirat Sabaa, MA Islamic Studies"
                     value={qualifications}
                     onChange={(e) => setQualifications(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-medium"
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-medium leading-relaxed"
                   />
+                  {/* Live Credentials Preview */}
+                  {qualifications && qualifications.trim() && (
+                    <div className="p-3.5 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl space-y-1.5">
+                      <div className="flex items-center justify-between text-[10px] font-bold text-slate-500">
+                        <span>Live Preview (How students see your verified credentials):</span>
+                        <span className="text-[#b85d34]">{parseDegreesAndCertificates(qualifications).length} Degree(s) recognized</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {parseDegreesAndCertificates(qualifications).map((deg, dIdx) => (
+                          <span
+                            key={dIdx}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-[#e6ded1] rounded-xl text-xs font-bold text-slate-900 shadow-2xs"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>{deg}</span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Teaching Bio / Headline */}
@@ -1769,7 +1793,8 @@ function TutorProfileContent() {
         <SanadModal
           isOpen={selectedSanadModal}
           onClose={() => setSelectedSanadModal(false)}
-          sanads={uploadedSanads}
+          documents={uploadedSanads}
+          degrees={parseDegreesAndCertificates(qualifications, uploadedSanads)}
           tutorName={name || 'Tutor'}
         />
       )}

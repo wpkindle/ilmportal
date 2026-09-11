@@ -23,7 +23,7 @@ import { calculateClientCompletion } from '../common/ProfileCompletionMeter';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import { api } from '../../services/api';
-import { getTutorAvatar } from '../../utils/tutorHelpers';
+import { getTutorAvatar, parseDegreesAndCertificates } from '../../utils/tutorHelpers';
 
 // ─────────────────────────────────────────────
 // Mode Badge
@@ -82,6 +82,9 @@ const TutorCard = ({ tutor, tutorProfile }) => {
   const tutorCity = tutorUser.city || data.city || 'Pakistan';
   const tutorArea = data.localArea || tutorUser.area || data.area || '';
   const tutorAvatar = getTutorAvatar(data, tutorName);
+  const cardDegrees = React.useMemo(() => {
+    return parseDegreesAndCertificates(data.qualifications, data.sanadDocuments);
+  }, [data.qualifications, data.sanadDocuments]);
 
   const tutorUserId = tutorUser._id || tutorUser.id || data?.user?._id || data?.user?.id || (typeof data?.user === 'string' ? data.user : null);
   const tutorUserIdStr = tutorUserId ? tutorUserId.toString() : null;
@@ -287,6 +290,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
             <div className="shrink-0">
               <SanadBadge
                 isVerified={data.isSanadVerified}
+                documents={data.sanadDocuments || []}
                 documentsCount={data.sanadDocuments?.length || 0}
                 onClick={() => setSanadModalOpen(true)}
               />
@@ -320,11 +324,24 @@ const TutorCard = ({ tutor, tutorProfile }) => {
           <div className="grid grid-cols-2 gap-3 pt-3 border-t border-[#e6ded1] text-xs">
             {/* Qualifications */}
             <div className="space-y-0.5 min-w-0">
-              <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wide">
-                Qualifications
-              </span>
-              <p className="font-semibold text-slate-800 text-[11px] truncate">
-                {data.qualifications || 'Certified Educator'}
+              <div className="flex items-center justify-between gap-1">
+                <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wide">
+                  Qualifications
+                </span>
+                {cardDegrees.length > 1 && (
+                  <span
+                    className="text-[9px] font-black uppercase text-[#b85d34] bg-[#f5ebe6] px-1.5 py-0.2 rounded border border-[#b85d34]/25 shrink-0"
+                    title={cardDegrees.join(' • ')}
+                  >
+                    +{cardDegrees.length - 1} more
+                  </span>
+                )}
+              </div>
+              <p
+                className="font-bold text-slate-800 text-[11px] leading-tight line-clamp-2"
+                title={cardDegrees.join(' • ')}
+              >
+                {cardDegrees.join(' • ')}
               </p>
             </div>
 
@@ -382,6 +399,7 @@ const TutorCard = ({ tutor, tutorProfile }) => {
         isOpen={sanadModalOpen}
         onClose={() => setSanadModalOpen(false)}
         documents={data.sanadDocuments || []}
+        degrees={cardDegrees}
         tutorName={tutorName}
       />
 

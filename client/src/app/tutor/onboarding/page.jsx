@@ -357,11 +357,13 @@ export default function TutorOnboardingPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="text-xs font-serif font-bold text-[#0c2217] block mb-1">Degree Title *</label>
+                  <label className="text-xs font-serif font-bold text-[#0c2217] block mb-1">
+                    Degrees &amp; Certifications *
+                  </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Shahadat-ul-Alimiyya / BS"
+                    placeholder="e.g. Shahadat-ul-Alimiyya, MA Islamic Studies, BS (separate with comma)"
                     value={qualifications}
                     onChange={(e) => setQualifications(e.target.value)}
                     className="w-full px-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white font-medium"

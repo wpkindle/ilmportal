@@ -201,8 +201,8 @@ export default function Hero() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full pt-4 sm:pt-6 pb-6">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
           
-          {/* Left Column (7 cols): Editorial Typography, Assurances & Search Engine */}
-          <div className="lg:col-span-7 space-y-6 text-left">
+          {/* Left Column (7 cols): Editorial Typography & Assurances */}
+          <div className="order-1 lg:col-span-7 space-y-6 text-left">
             
             {/* Regional Trust Eyebrow */}
             <div className="flex items-center gap-2">
@@ -223,7 +223,7 @@ export default function Hero() {
             </h1>
 
             {/* Humanized, Colloquial Pakistani Copy */}
-            <p className="text-sm sm:text-base text-[#d6e3dd] max-w-xl leading-relaxed font-normal">
+            <p className="text-sm sm:text-base text-[#d6e3dd] max-w-2xl leading-relaxed font-normal">
               Designed specifically for female learners, daughters, and mothers to feel 100% comfortable and protected. Verified female Alimahs from Wafaq-ul-Madaris, certified Qaris, and top school tutors. 1-on-1 classes with camera-off privacy by default, zero personal contact sharing, and agreed fees directly with your tutor.
             </p>
 
@@ -247,71 +247,10 @@ export default function Hero() {
               </span>
             </div>
 
-            {/* Search Input Box with Full Width */}
-            <div className="pt-2 w-full">
-              <form
-                onSubmit={handleSearchSubmit}
-                className="bg-white p-2 rounded-2xl sm:rounded-full shadow-2xl border-2 border-[#d4a359]/70 flex flex-col sm:flex-row items-center gap-2 w-full"
-              >
-                {/* Search Text */}
-                <div className="flex items-center gap-2.5 px-4 py-2 w-full sm:flex-1 text-left min-w-0">
-                  <Search className="w-4 h-4 text-slate-400 shrink-0" />
-                  <input
-                    type="text"
-                    placeholder="Search subject (Tajweed, Math, Physics...)"
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-transparent text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 font-medium outline-none"
-                  />
-                </div>
-
-                <div className="hidden sm:block w-px h-8 bg-slate-200" />
-
-                {/* City Selector */}
-                <div className="w-full sm:w-56 shrink-0 text-left">
-                  <CustomSelect
-                    options={availableCities}
-                    value={selectedCity}
-                    onChange={setSelectedCity}
-                    placeholder="All Pakistan Cities"
-                    icon={MapPin}
-                    searchable={true}
-                    variant="hero"
-                    placement="top"
-                  />
-                </div>
-
-                {/* Terracotta Action Button */}
-                <button
-                  type="submit"
-                  className="w-full sm:w-auto px-7 py-3 bg-gradient-to-r from-[#b85d34] to-[#9e4e2a] hover:from-[#c9673b] hover:to-[#b0552e] text-white font-bold text-xs sm:text-sm rounded-xl sm:rounded-full shadow-lg shadow-[#b85d34]/40 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer active:scale-95"
-                >
-                  <span>Find Tutors</span>
-                  <ArrowRight className="w-4 h-4" />
-                </button>
-              </form>
-            </div>
-
-            {/* Quick Trust Guarantees below search */}
-            <div className="pt-2 border-t border-white/15 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-[#d6e3dd] w-full">
-              <span className="inline-flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Direct fee agreement in chat</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Zero agency commission</span>
-              </span>
-              <span className="inline-flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Free trial class</span>
-              </span>
-            </div>
-
           </div>
 
           {/* Right Column (5 cols): Buttons & Quick Tags Showcase */}
-          <div className="lg:col-span-5 relative mt-6 lg:mt-0">
+          <div className="order-3 lg:order-2 lg:col-span-5 relative mt-6 lg:mt-0">
             <div className="rounded-3xl bg-black/40 backdrop-blur-md border border-white/15 p-5 sm:p-6 shadow-2xl space-y-5">
               
               {/* Header: Popular Subjects & Faculty Modes */}
@@ -411,6 +350,67 @@ export default function Hero() {
                 </div>
               </div>
 
+            </div>
+          </div>
+
+          {/* Full-Width Search Engine Row (Spans all 12 columns across container) */}
+          <div className="order-2 lg:order-3 col-span-12 w-full pt-2 sm:pt-4">
+            <form
+              onSubmit={handleSearchSubmit}
+              className="bg-white p-2 sm:p-2.5 rounded-2xl sm:rounded-full shadow-2xl border-2 border-[#d4a359]/70 flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full"
+            >
+              {/* Search Text */}
+              <div className="flex items-center gap-3 px-4 py-2 w-full sm:flex-1 text-left min-w-0">
+                <Search className="w-5 h-5 text-slate-400 shrink-0" />
+                <input
+                  type="text"
+                  placeholder="Search subject (Tajweed, Math, Physics...)"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="w-full bg-transparent text-sm sm:text-base text-slate-900 placeholder:text-slate-400 font-medium outline-none"
+                />
+              </div>
+
+              <div className="hidden sm:block w-px h-9 bg-slate-200" />
+
+              {/* City Selector */}
+              <div className="w-full sm:w-60 lg:w-72 shrink-0 text-left">
+                <CustomSelect
+                  options={availableCities}
+                  value={selectedCity}
+                  onChange={setSelectedCity}
+                  placeholder="All Pakistan Cities"
+                  icon={MapPin}
+                  searchable={true}
+                  variant="hero"
+                  placement="top"
+                />
+              </div>
+
+              {/* Terracotta Action Button */}
+              <button
+                type="submit"
+                className="w-full sm:w-auto px-8 py-3.5 bg-gradient-to-r from-[#b85d34] to-[#9e4e2a] hover:from-[#c9673b] hover:to-[#b0552e] text-white font-bold text-sm sm:text-base rounded-xl sm:rounded-full shadow-lg shadow-[#b85d34]/40 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer active:scale-95"
+              >
+                <span>Find Tutors</span>
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </form>
+
+            {/* Quick Trust Guarantees below search */}
+            <div className="pt-2.5 flex flex-wrap items-center justify-start gap-x-6 gap-y-1.5 text-xs text-[#d6e3dd] w-full">
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Direct fee agreement in chat</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Zero agency commission</span>
+              </span>
+              <span className="inline-flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Free trial class</span>
+              </span>
             </div>
           </div>
 

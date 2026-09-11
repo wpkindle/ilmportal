@@ -247,14 +247,14 @@ export default function Hero() {
               </span>
             </div>
 
-            {/* Search Input Box with Dual Fields */}
-            <div className="pt-2 max-w-xl w-full">
+            {/* Search Input Box with Full Width */}
+            <div className="pt-2 w-full">
               <form
                 onSubmit={handleSearchSubmit}
-                className="bg-white p-2 rounded-2xl sm:rounded-full shadow-2xl border-2 border-[#d4a359]/70 flex flex-col sm:flex-row items-center gap-2"
+                className="bg-white p-2 rounded-2xl sm:rounded-full shadow-2xl border-2 border-[#d4a359]/70 flex flex-col sm:flex-row items-center gap-2 w-full"
               >
                 {/* Search Text */}
-                <div className="flex items-center gap-2 px-4 py-2 w-full sm:flex-1 text-left">
+                <div className="flex items-center gap-2.5 px-4 py-2 w-full sm:flex-1 text-left min-w-0">
                   <Search className="w-4 h-4 text-slate-400 shrink-0" />
                   <input
                     type="text"
@@ -268,7 +268,7 @@ export default function Hero() {
                 <div className="hidden sm:block w-px h-8 bg-slate-200" />
 
                 {/* City Selector */}
-                <div className="w-full sm:w-48 text-left">
+                <div className="w-full sm:w-56 shrink-0 text-left">
                   <CustomSelect
                     options={availableCities}
                     value={selectedCity}
@@ -284,7 +284,7 @@ export default function Hero() {
                 {/* Terracotta Action Button */}
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-[#b85d34] to-[#9e4e2a] hover:from-[#c9673b] hover:to-[#b0552e] text-white font-bold text-xs sm:text-sm rounded-xl sm:rounded-full shadow-lg shadow-[#b85d34]/40 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer active:scale-95"
+                  className="w-full sm:w-auto px-7 py-3 bg-gradient-to-r from-[#b85d34] to-[#9e4e2a] hover:from-[#c9673b] hover:to-[#b0552e] text-white font-bold text-xs sm:text-sm rounded-xl sm:rounded-full shadow-lg shadow-[#b85d34]/40 transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer active:scale-95"
                 >
                   <span>Find Tutors</span>
                   <ArrowRight className="w-4 h-4" />
@@ -293,7 +293,7 @@ export default function Hero() {
             </div>
 
             {/* Quick Trust Guarantees below search */}
-            <div className="pt-2 border-t border-white/15 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-[#d6e3dd] max-w-xl">
+            <div className="pt-2 border-t border-white/15 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-xs text-[#d6e3dd] w-full">
               <span className="inline-flex items-center gap-1.5">
                 <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Direct fee agreement in chat</span>

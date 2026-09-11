@@ -217,9 +217,11 @@ export default function Hero() {
             </div>
 
             {/* Main Editorial Headline in Exactly Two Lines */}
-            <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-serif font-black tracking-tight text-[#faf8f5] leading-[1.18] sm:leading-[1.2] lg:leading-[1.22]">
-              Connecting Verified Tutors <br />
-              With Students <span className="hand-drawn-underline-gold text-[#faf8f5]">Across Pakistan</span>
+            <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[2.15rem] xl:text-[2.65rem] 2xl:text-5xl font-serif font-black tracking-tight text-[#faf8f5] leading-[1.14] sm:leading-[1.18] lg:leading-[1.2]">
+              <span className="block sm:whitespace-nowrap">Connecting Verified Tutors</span>
+              <span className="block sm:whitespace-nowrap">
+                With Students <span className="hand-drawn-underline-gold text-[#faf8f5]">Across Pakistan</span>
+              </span>
             </h1>
 
             {/* Humanized, Colloquial Pakistani Copy */}
@@ -249,50 +251,50 @@ export default function Hero() {
 
           </div>
 
-          {/* Right Column (5 cols): Buttons & Quick Tags Showcase */}
+          {/* Right Column (5 cols): Buttons & Quick Tags Showcase (Transparent Glass) */}
           <div className="order-3 lg:order-2 lg:col-span-5 relative mt-6 lg:mt-0">
-            <div className="rounded-3xl bg-black/40 backdrop-blur-md border border-white/15 p-5 sm:p-6 shadow-2xl space-y-5">
+            <div className="rounded-3xl bg-black/20 hover:bg-black/30 border border-white/20 p-5 sm:p-6 shadow-xl space-y-5 transition-colors">
               
               {/* Header: Popular Subjects & Faculty Modes */}
-              <div className="space-y-1 pb-3 border-b border-white/10">
+              <div className="space-y-1 pb-3 border-b border-white/15">
                 <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-white uppercase tracking-wider flex items-center gap-1.5 drop-shadow-xs">
                     <BookOpen className="w-3.5 h-3.5 text-[#d4a359]" />
                     <span>Popular Subjects &amp; Faculty</span>
                   </span>
-                  <span className="text-[11px] font-semibold text-[#d4a359] bg-[#d4a359]/15 px-2.5 py-0.5 rounded-full border border-[#d4a359]/30">
+                  <span className="text-[11px] font-semibold text-[#d4a359] bg-[#d4a359]/20 px-2.5 py-0.5 rounded-full border border-[#d4a359]/40">
                     Direct 1-on-1
                   </span>
                 </div>
-                <p className="text-[11px] text-[#d6e3dd]">
+                <p className="text-[11px] text-[#e0ece6] drop-shadow-xs">
                   Select a category to instantly browse verified tutors in your city:
                 </p>
               </div>
 
-              {/* Faculty Modes & Quick Subject Tags */}
+              {/* Faculty Modes & Quick Subject Tags (Transparent Glass Pills) */}
               <div className="flex flex-wrap items-center gap-2 text-xs">
                 <Link
                   href="/tutors?gender=female"
-                  className="px-3 py-1.5 rounded-xl bg-[#f5ebe6] hover:bg-[#ede0d8] text-[#b85d34] font-bold border border-[#b85d34]/40 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-[#b85d34]/30 hover:bg-[#b85d34]/50 text-[#fde4d8] font-bold border border-[#b85d34]/60 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group cursor-pointer"
                   title="Browse verified female tutors across all academic & Quran subjects"
                 >
-                  <UserCheck className="w-3.5 h-3.5 text-[#b85d34]" />
+                  <UserCheck className="w-3.5 h-3.5 text-[#f5a882]" />
                   <span>Female Tutors</span>
                 </Link>
                 <Link
                   href="/tutors?gender=female&faculty=alimah"
-                  className="px-3 py-1.5 rounded-xl bg-white hover:bg-[#f5f0e6] text-[#0c2217] font-bold border border-[#d4a359]/50 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-[#d4a359]/30 hover:bg-[#d4a359]/50 text-[#fef3d6] font-bold border border-[#d4a359]/60 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group cursor-pointer"
                   title="Browse verified female Alimahs for Quran, Tajweed & Islamic studies"
                 >
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#f5d799]" />
                   <span>Female Alimahs</span>
                 </Link>
                 <Link
                   href="/tutors?mode=physical"
-                  className="px-3 py-1.5 rounded-xl bg-[#f4ebe1] hover:bg-[#ebdcd3] text-[#0c2217] font-bold border border-[#d4a359]/60 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group cursor-pointer"
+                  className="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-[#faf8f5] font-bold border border-white/25 shadow-xs transition-all inline-flex items-center gap-1.5 active:scale-95 group cursor-pointer"
                   title="Find verified male home tutors visiting your residence"
                 >
-                  <Home className="w-3.5 h-3.5 text-[#b85d34]" />
+                  <Home className="w-3.5 h-3.5 text-[#d4a359]" />
                   <span>In-Person Home Tutors</span>
                 </Link>
                 {quickSubjects.map((sub) => (
@@ -307,11 +309,11 @@ export default function Hero() {
               </div>
 
               {/* Action Buttons: Community Gateways */}
-              <div className="pt-3 border-t border-white/10 space-y-2.5">
+              <div className="pt-3 border-t border-white/15 space-y-2.5">
                 <div className="flex flex-col sm:flex-row items-center gap-2.5">
                   <Link
                     href="/login?role=student&mode=signup"
-                    className="w-full sm:w-1/2 py-3 px-4 rounded-xl bg-gradient-to-r from-[#b85d34] to-[#9e4e2a] hover:from-[#c9673b] hover:to-[#b0552e] text-white font-bold text-xs sm:text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#b85d34]/50 active:scale-98"
+                    className="w-full sm:w-1/2 py-3 px-4 rounded-xl bg-gradient-to-r from-[#b85d34]/90 to-[#9e4e2a]/90 hover:from-[#c9673b] hover:to-[#b0552e] text-white font-bold text-xs sm:text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#b85d34]/60 active:scale-98"
                   >
                     <GraduationCap className="w-4 h-4" />
                     <span>Join as Student</span>
@@ -319,7 +321,7 @@ export default function Hero() {
                   </Link>
                   <Link
                     href="/login?role=tutor&mode=signup"
-                    className="w-full sm:w-1/2 py-3 px-4 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/20 active:scale-98"
+                    className="w-full sm:w-1/2 py-3 px-4 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer border border-white/25 active:scale-98"
                   >
                     <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
                     <span>Apply as Tutor</span>
@@ -342,7 +344,7 @@ export default function Hero() {
                   <button
                     type="button"
                     onClick={() => setChromeModalOpen(true)}
-                    className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#a5b8b0] hover:text-white transition-colors cursor-pointer"
+                    className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-[#c5d8cf] hover:text-white transition-colors cursor-pointer"
                   >
                     <Chrome className="w-3.5 h-3.5 text-[#d4a359]" />
                     <span>Install IlmiDunya App for Chrome / Windows / Android (Free PWA)</span>

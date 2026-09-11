@@ -73,7 +73,7 @@ export default function ChatRequestModal({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm p-3 sm:p-4 md:p-6 flex min-h-full items-center justify-center animate-in fade-in duration-200">
       <div
-        className="relative w-full max-w-lg md:max-w-4xl bg-white rounded-3xl shadow-2xl border border-[#e6ded1] overflow-hidden text-slate-800 my-auto max-h-[94vh] flex flex-col animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-xl md:max-w-4xl bg-white rounded-3xl shadow-2xl border border-[#e6ded1] overflow-hidden text-slate-800 my-auto max-h-[94vh] flex flex-col animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {submitted ? (

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { api } from '../services/api';
 import { useAuth } from './AuthContext';
 import { useSocket } from './SocketContext';
@@ -21,6 +21,8 @@ export const NotificationProvider = ({ children }) => {
   const [toastAlert, setToastAlert] = useState(null);
   const [permissionStatus, setPermissionStatus] = useState('default');
   const [soundEnabled, setSoundEnabledState] = useState(true);
+  const recentAlertsRef = useRef(new Map());
+  const toastTimeoutRef = useRef(null);
 
   // Sync initial sound and notification permissions
   useEffect(() => {
@@ -80,25 +82,72 @@ export const NotificationProvider = ({ children }) => {
     if (!socket) return;
 
     const handleNotification = (alertData) => {
+      if (!alertData) return;
+
+      // 1. In-memory deduplication (5-second window by messageId or hash)
+      const alertKey = alertData.messageId
+        ? `msg_${alertData.messageId}`
+        : (alertData.conversationId
+            ? `conv_${alertData.conversationId}_${alertData.message || ''}`
+            : `${alertData.type || 'alert'}_${alertData.title || ''}_${alertData.message || ''}`);
+
+      const now = Date.now();
+      if (recentAlertsRef.current.has(alertKey)) {
+        const lastTime = recentAlertsRef.current.get(alertKey);
+        if (now - lastTime < 5000) {
+          return; // Suppress duplicate notification within 5 seconds
+        }
+      }
+      recentAlertsRef.current.set(alertKey, now);
+
+      // Clean up older keys
+      for (const [key, timestamp] of recentAlertsRef.current.entries()) {
+        if (now - timestamp > 12000) {
+          recentAlertsRef.current.delete(key);
+        }
+      }
+
+      // 2. Check if the user is currently focused and reading this exact conversation
+      if (typeof window !== 'undefined' && typeof document !== 'undefined') {
+        const currentPath = window.location.pathname;
+        const currentSearch = window.location.search;
+        const isFocused = document.visibilityState === 'visible' && (document.hasFocus ? document.hasFocus() : true);
+        if (isFocused && currentPath.includes('/messages') && alertData.conversationId && currentSearch.includes(alertData.conversationId)) {
+          // User is actively reading this exact conversation; refresh unread list silently without popup banner
+          fetchNotifications();
+          return;
+        }
+      }
+
       setToastAlert(alertData);
       fetchNotifications();
 
-      // Trigger OS desktop/mobile push notification banner with sound & vibration
-      const isMessageAlert = alertData?.type === 'new_message';
+      // 3. Trigger OS desktop/mobile push notification banner with sound & vibration
+      const isMessageAlert = alertData.type === 'new_message';
       const defaultUrl = isMessageAlert
         ? (user?.role === 'tutor' ? '/tutor/messages' : '/student/messages')
-        : (alertData?.link || '/');
+        : (alertData.link || '/');
+
+      // Deterministic tag allows the OS notification daemon to collapse identical alerts
+      const notificationTag = alertData.messageId
+        ? `msg-${alertData.messageId}`
+        : (alertData.conversationId
+            ? `conv-${alertData.conversationId}`
+            : `ilmidunya-${alertData.type || 'general'}`);
 
       showNativeNotification({
-        title: alertData?.title || 'IlmiDunya Notification',
-        body: alertData?.message || 'New update on your IlmiDunya account',
-        icon: alertData?.senderAvatar || '/icon.png',
-        url: alertData?.link || defaultUrl,
-        tag: `ilmidunya-${alertData?.type || 'general'}-${Date.now()}`,
+        title: alertData.title || 'IlmiDunya Notification',
+        body: alertData.message || 'New update on your IlmiDunya account',
+        icon: alertData.senderAvatar || '/icon.png',
+        url: alertData.link || defaultUrl,
+        tag: notificationTag,
         soundType: isMessageAlert ? 'message' : 'alert'
       });
 
-      setTimeout(() => {
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
+      toastTimeoutRef.current = setTimeout(() => {
         setToastAlert(null);
       }, 5000);
     };
@@ -107,6 +156,9 @@ export const NotificationProvider = ({ children }) => {
 
     return () => {
       socket.off('notification-alert', handleNotification);
+      if (toastTimeoutRef.current) {
+        clearTimeout(toastTimeoutRef.current);
+      }
     };
   }, [socket, user]);
 
@@ -145,7 +197,10 @@ export const NotificationProvider = ({ children }) => {
         testChime,
         markAsRead,
         markAllAsRead,
-        clearToast: () => setToastAlert(null),
+        clearToast: () => {
+          if (toastTimeoutRef.current) clearTimeout(toastTimeoutRef.current);
+          setToastAlert(null);
+        },
         refreshNotifications: fetchNotifications
       }}
     >

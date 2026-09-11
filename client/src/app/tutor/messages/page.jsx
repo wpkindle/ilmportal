@@ -19,8 +19,6 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { useSocket } from '../../../context/SocketContext';
-import { soundEngine } from '../../../utils/soundEffects';
-import { showNativeNotification } from '../../../utils/notificationManager';
 
 function TutorMessagesContent() {
   const router = useRouter();
@@ -177,35 +175,10 @@ function TutorMessagesContent() {
           return curr;
         });
       });
-
-      const currentUserId = (user?._id || user?.id)?.toString();
-      const senderId = (msg?.sender?._id || msg?.sender)?.toString();
-      if (currentUserId && senderId && senderId !== currentUserId) {
-        if (msg?.conversationId !== activeConversation?.conversationId) {
-          soundEngine.playMessageSound();
-          showNativeNotification({
-            title: `${msg?.sender?.name || 'New Message'}`,
-            body: msg?.text || (msg?.voiceData ? 'Sent a voice note' : 'Sent an update'),
-            icon: '/icon.png',
-            url: `/tutor/messages?conversation=${msg?.conversationId}`,
-            tag: `msg-${msg?._id}`,
-            soundType: 'none'
-          });
-        }
-      }
     };
 
     const handleNewChatRequest = (newReq) => {
       fetchRequests();
-      soundEngine.playNotificationSound();
-      showNativeNotification({
-        title: `New Message Request from ${newReq?.student?.name || 'Student'}`,
-        body: newReq?.details || 'Sent a new message request.',
-        icon: '/icon.png',
-        url: `/tutor/messages?request=${newReq?._id}`,
-        tag: `req-${newReq?._id}`,
-        soundType: 'none'
-      });
     };
 
     const handleDealUpdated = (updatedDeal) => {

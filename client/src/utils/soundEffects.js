@@ -8,6 +8,8 @@ class SoundEngine {
   constructor() {
     this.audioCtx = null;
     this.soundEnabled = true;
+    this.lastMessageSoundTime = 0;
+    this.lastNotificationSoundTime = 0;
 
     if (typeof window !== 'undefined') {
       const stored = localStorage.getItem('ilmportal_sound_enabled');
@@ -56,6 +58,12 @@ class SoundEngine {
    */
   playMessageSound() {
     if (!this.soundEnabled) return;
+    const nowMs = Date.now();
+    if (this.lastMessageSoundTime && nowMs - this.lastMessageSoundTime < 600) {
+      return;
+    }
+    this.lastMessageSoundTime = nowMs;
+
     try {
       const ctx = this.getAudioContext();
       if (!ctx) return;
@@ -105,6 +113,12 @@ class SoundEngine {
    */
   playNotificationSound() {
     if (!this.soundEnabled) return;
+    const nowMs = Date.now();
+    if (this.lastNotificationSoundTime && nowMs - this.lastNotificationSoundTime < 600) {
+      return;
+    }
+    this.lastNotificationSoundTime = nowMs;
+
     try {
       const ctx = this.getAudioContext();
       if (!ctx) return;

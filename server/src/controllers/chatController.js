@@ -345,14 +345,24 @@ exports.sendMessage = async (req, res) => {
         ? `/tutor/messages?conversation=${conversationId}` 
         : `/student/messages?conversation=${conversationId}`;
 
+      const senderRole = req.user.role;
+      const senderRoleLabel = senderRole === 'tutor' ? 'Tutor' : (senderRole === 'student' ? 'Student' : 'User');
+      const senderName = req.user.name || 'User';
+      const messageSnippet = voiceData 
+        ? `Sent a voice note (${voiceDuration ? `${voiceDuration}s` : 'audio'})`
+        : (text ? text.slice(0, 120) : 'Sent a course offer');
+
       io.to(`conv_${conversationId}`).emit('new-message', populatedMsg);
       if (recipientIdStr) {
         io.to(`user_${recipientIdStr}`).emit('new-message', populatedMsg);
         io.to(`user_${recipientIdStr}`).emit('notification-alert', {
-          title: `New Message from ${req.user.name}`,
-          message: `${voiceData ? 'Voice message' : (text ? text.slice(0, 70) : 'Sent a course offer')}`,
+          title: `${senderName} (${senderRoleLabel})`,
+          message: messageSnippet,
           type: 'new_message',
+          messageId: message._id.toString(),
           conversationId,
+          senderName,
+          senderRole: senderRoleLabel.toLowerCase(),
           senderAvatar: req.user.avatar || '/icon.svg',
           link: targetChatLink
         });

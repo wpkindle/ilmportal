@@ -30,8 +30,6 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import { useNotifications } from '../../context/NotificationContext';
-import { soundEngine } from '../../utils/soundEffects';
-import { showNativeNotification } from '../../utils/notificationManager';
 import { api } from '../../services/api';
 import PromotionTopBar from './PromotionTopBar';
 import BrandLogo from './BrandLogo';
@@ -111,27 +109,6 @@ const Navbar = () => {
       const currentUserId = (user?._id || user?.id)?.toString();
       const senderId = (msg?.sender?._id || msg?.sender)?.toString();
 
-      // If this incoming message is from someone else
-      if (currentUserId && senderId && senderId !== currentUserId) {
-        soundEngine.playMessageSound();
-
-        // If not actively on the messages page, show native OS desktop & mobile notification banner
-        if (!pathname?.includes('/messages')) {
-          showNativeNotification({
-            title: `${msg?.sender?.name || 'New Message'} (${msg?.sender?.role || 'User'})`,
-            body: msg?.text || (msg?.voiceData ? 'Sent a voice note' : 'Sent an update'),
-            icon: msg?.sender?.avatar || '/icon.png',
-            url: isTutor 
-              ? `/tutor/messages?conversation=${msg?.conversationId}` 
-              : isStudent 
-              ? `/student/messages?conversation=${msg?.conversationId}` 
-              : '/admin/chats',
-            tag: `chat-${msg?.conversationId || 'new'}`,
-            soundType: 'none'
-          });
-        }
-      }
-
       if (pathname?.includes('/messages')) {
         api.getConversations().then((res) => {
           if (res.success && res.conversations) {
@@ -139,13 +116,13 @@ const Navbar = () => {
             setUnreadMessagesCount(totalUnread);
           }
         });
-      } else {
+      } else if (currentUserId && senderId && senderId !== currentUserId) {
         setUnreadMessagesCount((prev) => prev + 1);
       }
     };
 
     const handleNotificationAlert = (data) => {
-      if (data?.type === 'new_message' || data?.type === 'deal_offer') {
+      if (data?.type === 'deal_offer') {
         if (!pathname?.includes('/messages')) {
           setUnreadMessagesCount((prev) => prev + 1);
         }

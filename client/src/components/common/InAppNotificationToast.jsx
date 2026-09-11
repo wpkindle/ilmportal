@@ -62,7 +62,11 @@ export default function InAppNotificationToast() {
           <div className="flex-1 min-w-0 pr-6">
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-bold text-[#b85d34] uppercase tracking-wider">
-                {isMessage ? 'New Chat Message' : 'Notification'}
+                {toastAlert.senderRole === 'tutor'
+                  ? 'Message from Tutor'
+                  : toastAlert.senderRole === 'student'
+                  ? 'Message from Student'
+                  : (isMessage ? 'New Chat Message' : 'Notification')}
               </span>
             </div>
 

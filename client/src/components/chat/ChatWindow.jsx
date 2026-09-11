@@ -39,7 +39,6 @@ import { useSocket } from '../../context/SocketContext';
 import { useNotifications } from '../../context/NotificationContext';
 import { soundEngine } from '../../utils/soundEffects';
 import { getTutorAvatar } from '../../utils/tutorHelpers';
-import { showNativeNotification } from '../../utils/notificationManager';
 import DealOfferCard from './DealOfferCard';
 import DealOfferModal from '../tutor/DealOfferModal';
 import TutorPaymentModal from '../tutor/TutorPaymentModal';
@@ -304,20 +303,6 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
         if (currentUserId && senderId !== currentUserId) {
           // Play notification sound chime
           soundEngine.playMessageSound();
-
-          // If document is not currently focused/visible, show native desktop/mobile OS notification banner
-          if (typeof document !== 'undefined' && document.visibilityState !== 'visible') {
-            showNativeNotification({
-              title: `${msg.sender?.name || partner?.name || 'New Message'}`,
-              body: msg.text || (msg.voiceData ? 'Sent a voice note' : 'Sent an offer update'),
-              icon: msg.sender?.avatar || partner?.avatar || '/icon.png',
-              url: isTutor 
-                ? `/tutor/messages?conversation=${conversationId}` 
-                : `/student/messages?conversation=${conversationId}`,
-              tag: `msg-${msg._id}`,
-              soundType: 'none'
-            });
-          }
 
           // ONLY mark as seen if the recipient is ACTUALLY viewing and focused on this window right now
           const isActivelyFocused = 

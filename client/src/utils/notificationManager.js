@@ -87,40 +87,43 @@ export async function showNativeNotification({
     data: { url }
   };
 
-  // 4. Trigger Service Worker showNotification if active (for Android PWA / Windows Action Center)
+  // 4. Show Notification via Service Worker (preferred for mobile & PWA) or fall back to window.Notification
+  let shownViaSW = false;
   if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
     try {
-      navigator.serviceWorker.getRegistration().then((reg) => {
-        if (reg && reg.showNotification) {
-          reg.showNotification(title, notificationOptions);
-        }
-      }).catch(() => {});
+      const reg = await navigator.serviceWorker.getRegistration();
+      if (reg && reg.active && typeof reg.showNotification === 'function') {
+        await reg.showNotification(title, notificationOptions);
+        shownViaSW = true;
+      }
     } catch (swErr) {}
   }
 
-  // 5. Desktop browser Notification (Fires instantly on Windows 11, Chromebook, macOS, Linux)
-  try {
-    const notification = new Notification(title, notificationOptions);
+  // 5. Desktop browser Notification (Only if NOT already shown via Service Worker)
+  if (!shownViaSW) {
+    try {
+      const notification = new Notification(title, notificationOptions);
 
-    notification.onclick = function (event) {
-      try {
-        event.preventDefault();
-        window.focus();
-        notification.close();
-        if (url && url !== '#' && url !== '/') {
-          const currentUrl = window.location.pathname + window.location.search;
-          if (currentUrl !== url) {
-            window.dispatchEvent(new CustomEvent('ilmportal:navigate', { detail: { url } }));
+      notification.onclick = function (event) {
+        try {
+          event.preventDefault();
+          window.focus();
+          notification.close();
+          if (url && url !== '#' && url !== '/') {
+            const currentUrl = window.location.pathname + window.location.search;
+            if (currentUrl !== url) {
+              window.dispatchEvent(new CustomEvent('ilmportal:navigate', { detail: { url } }));
+            }
           }
+        } catch (err) {
+          console.warn('Notification click handling error:', err);
         }
-      } catch (err) {
-        console.warn('Notification click handling error:', err);
-      }
-    };
+      };
 
-    return notification;
-  } catch (err) {
-    console.warn('Desktop Notification constructor note:', err);
-    return null;
+      return notification;
+    } catch (err) {
+      console.warn('Desktop Notification constructor note:', err);
+      return null;
+    }
   }
 }

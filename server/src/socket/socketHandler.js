@@ -455,16 +455,29 @@ const initSocket = (io, app) => {
           ? `/tutor/messages?conversation=${conversationId}` 
           : `/student/messages?conversation=${conversationId}`;
 
+        const senderRole = populatedMsg.sender?.role;
+        const senderRoleLabel = senderRole === 'tutor' ? 'Tutor' : (senderRole === 'student' ? 'Student' : 'User');
+        const senderName = populatedMsg.sender?.name || 'User';
+
+        const messageSnippet = voiceData 
+          ? `Sent a voice note (${voiceDuration ? `${voiceDuration}s` : 'audio'})`
+          : (fileUrl 
+              ? `Sent a file: ${fileName || 'Attachment'}` 
+              : (text ? text.slice(0, 120) : 'Sent a course offer'));
+
         const alertPayload = {
-          title: `New Message from ${populatedMsg.sender.name}`,
-          message: voiceData ? 'Sent a voice message' : (fileUrl ? `Sent a file: ${fileName || 'Attachment'}` : (text ? text.slice(0, 70) : 'Sent a course offer')),
+          title: `${senderName} (${senderRoleLabel})`,
+          message: messageSnippet,
           type: 'new_message',
+          messageId: message._id.toString(),
           conversationId,
-          senderAvatar: populatedMsg.sender.avatar || '/icon.png',
+          senderName,
+          senderRole: senderRoleLabel.toLowerCase(),
+          senderAvatar: populatedMsg.sender?.avatar || '/icon.png',
           link: targetChatLink
         };
 
-        // 1. Broadcast to active conversation room
+        // 1. Broadcast to active conversation room for live chat view
         io.to(`conv_${conversationId}`).emit('new-message', populatedMsg);
 
         // Also broadcast to alternate canonical conversation room if needed
@@ -473,27 +486,15 @@ const initSocket = (io, app) => {
           io.to(`conv_${altConvId}`).emit('new-message', populatedMsg);
         }
 
-        // 2. Guarantee sender's own socket & user room receives the populated message
-        socket.emit('new-message', populatedMsg);
-        if (senderIdStr) {
-          io.to(`user_${senderIdStr}`).emit('new-message', populatedMsg);
-        }
-
-        // 3. Broadcast to recipient's personal user room (for users on dashboard, home, courses, etc.)
+        // 2. Deliver new-message and single notification-alert to recipient's user room
         if (recipientIdStr) {
           io.to(`user_${recipientIdStr}`).emit('new-message', populatedMsg);
           io.to(`user_${recipientIdStr}`).emit('notification-alert', alertPayload);
+        }
 
-          // Direct socket emission fallback for all active sockets of the recipient
-          const directSockets = onlineUsers.get(recipientIdStr);
-          if (directSockets && directSockets.size > 0) {
-            for (const dsId of directSockets) {
-              if (dsId !== socket.id) {
-                io.to(dsId).emit('new-message', populatedMsg);
-                io.to(dsId).emit('notification-alert', alertPayload);
-              }
-            }
-          }
+        // 3. Confirm to sender's own user room for multi-device sync
+        if (senderIdStr) {
+          socket.to(`user_${senderIdStr}`).emit('new-message', populatedMsg);
         }
       } catch (err) {
         console.error('Socket send-message error:', err);

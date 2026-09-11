@@ -39,7 +39,7 @@ export default function CinematicHeroBackground({
               <img
                 src={slide.image}
                 alt={slide.alt || 'Tutoring scene'}
-                className={`w-full h-full object-cover object-center filter contrast-[1.05] brightness-[0.85] ${
+                className={`w-full h-full object-cover object-center filter contrast-[1.05] brightness-[0.58] ${
                   isActive ? animClass : ''
                 }`}
                 loading={idx === 0 ? 'eager' : 'lazy'}
@@ -50,24 +50,33 @@ export default function CinematicHeroBackground({
         })}
       </div>
 
-      {/* 3. Deep Emerald Contrast Scrim (Guarantees Typography Legibility) */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#0c2217]/95 via-[#0c2217]/88 to-[#0c2217]/75 lg:from-[#0c2217]/94 lg:via-[#0c2217]/86 lg:to-[#0c2217]/70" />
+      {/* 3. Deep Uniform Emerald/Black Scrim (Dark overlay for maximum text clarity) */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/95 via-[#07150e]/88 to-[#07150e]/96" />
 
-      {/* 4. Vertical Framing Vignette (Blends into Navbar and next section) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#0c2217]/80 via-transparent to-[#0c2217]/95" />
-
-      {/* 5. Ambient Golden Light Bloom (Warm Editorial Glow) */}
+      {/* 4. Center Vignette Scrim (Focuses depth right behind the centered content) */}
       <div
-        className="absolute inset-0 opacity-40 mix-blend-screen"
+        className="absolute inset-0"
         style={{
           backgroundImage:
-            'radial-gradient(circle at 75% 30%, rgba(212, 163, 89, 0.22) 0%, rgba(184, 93, 52, 0.08) 35%, transparent 70%)'
+            'radial-gradient(ellipse at center, rgba(7, 21, 14, 0.82) 0%, rgba(7, 21, 14, 0.95) 70%, #07150e 100%)'
         }}
       />
 
-      {/* 6. Subtle Architectural Micro-Grid Texture */}
+      {/* 5. Vertical Framing Vignette (Blends into Navbar and next section) */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e] via-transparent to-[#07150e]" />
+
+      {/* 6. Ambient Golden Light Bloom (Warm Subtle Editorial Glow) */}
       <div
-        className="absolute inset-0 opacity-[0.12] mix-blend-overlay"
+        className="absolute inset-0 opacity-25 mix-blend-screen pointer-events-none"
+        style={{
+          backgroundImage:
+            'radial-gradient(circle at 50% 35%, rgba(212, 163, 89, 0.20) 0%, rgba(184, 93, 52, 0.05) 45%, transparent 70%)'
+        }}
+      />
+
+      {/* 7. Subtle Architectural Micro-Grid Texture */}
+      <div
+        className="absolute inset-0 opacity-[0.08] mix-blend-overlay pointer-events-none"
         style={{
           backgroundImage:
             'radial-gradient(#ffffff 0.75px, transparent 0.75px)',
@@ -75,8 +84,8 @@ export default function CinematicHeroBackground({
         }}
       />
 
-      {/* 7. Bottom Gradient Fade to Page Canvas */}
-      <div className="absolute bottom-0 inset-x-0 h-24 bg-gradient-to-t from-[#0c2217] to-transparent" />
+      {/* 8. Bottom Gradient Fade to Page Canvas */}
+      <div className="absolute bottom-0 inset-x-0 h-28 bg-gradient-to-t from-[#07150e] to-transparent" />
     </div>
   );
 }

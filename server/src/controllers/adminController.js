@@ -853,12 +853,24 @@ exports.verifyDealPayment = async (req, res) => {
 
     if (status === 'verified') {
       deal.paymentStatus = 'verified';
+      deal.tutorFeePaid = true;
       deal.status = 'active_paid';
       deal.paymentVerifiedAt = new Date();
       deal.paymentVerifiedBy = req.user.id;
       deal.accessRestricted = false;
       deal.restrictionType = 'none';
       await deal.save();
+
+      // Real-time socket broadcast
+      const studentId = (deal.student?._id || deal.student)?.toString();
+      const tutorId = (deal.tutor?._id || deal.tutor)?.toString();
+      const conversationId = [studentId, tutorId].sort().join('_');
+      const io = req.app.get('io');
+      if (io) {
+        io.to(`conv_${conversationId}`).emit('deal-status-updated', deal);
+        if (tutorId) io.to(tutorId).emit('deal-updated', deal);
+        if (studentId) io.to(studentId).emit('deal-updated', deal);
+      }
 
       // Notify Student & Tutor
       await Notification.create({
@@ -889,6 +901,17 @@ exports.verifyDealPayment = async (req, res) => {
     } else {
       deal.paymentStatus = 'rejected';
       await deal.save();
+
+      // Real-time socket broadcast
+      const studentId = (deal.student?._id || deal.student)?.toString();
+      const tutorId = (deal.tutor?._id || deal.tutor)?.toString();
+      const conversationId = [studentId, tutorId].sort().join('_');
+      const io = req.app.get('io');
+      if (io) {
+        io.to(`conv_${conversationId}`).emit('deal-status-updated', deal);
+        if (tutorId) io.to(tutorId).emit('deal-updated', deal);
+        if (studentId) io.to(studentId).emit('deal-updated', deal);
+      }
 
       await Notification.create({
         recipient: deal.student._id,

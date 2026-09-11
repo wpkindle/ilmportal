@@ -7,7 +7,7 @@ import TrialBanner from '../../../components/common/TrialBanner';
 import Tutor72HourClock from '../../../components/tutor/Tutor72HourClock';
 import TutorPaymentModal from '../../../components/tutor/TutorPaymentModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
-import { BookOpen, MessageSquare, Plus, Video, CheckCircle2, Check, AlertTriangle, X, Loader2 } from 'lucide-react';
+import { BookOpen, MessageSquare, Plus, Video, CheckCircle2, Check, AlertTriangle, X, Loader2, Clock, CreditCard } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 
 export default function TutorDealsPage() {
@@ -183,30 +183,65 @@ export default function TutorDealsPage() {
                       </Link>
                     )}
 
-                    {/* Mark Completed Button */}
-                    {deal.status !== 'completed' && deal.status !== 'cancelled' && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const isCleared = Boolean(deal.tutorFeePaid || deal.paymentStatus === 'verified' || deal.platformFee === 0);
-                          if (!isCleared) {
-                            alert(
-                              deal.paymentStatus === 'submitted_proof'
-                                ? 'Notice: Your platform payment proof has been submitted and is awaiting admin verification. You can mark this deal as completed once admin verifies the payment.'
-                                : 'Notice: Platform Payment Required!\n\nYou cannot mark this deal as completed until the platform fee has been cleared. Please submit your payment proof first.'
-                            );
-                            setSelectedDealForPay(deal);
-                            return;
-                          }
-                          setDealToComplete(deal);
-                        }}
-                        className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-black text-[#faf8f5] text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer hover:scale-[1.02]"
-                        title="Mark deal completed and clear chat messages to save storage"
-                      >
-                        <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
-                        <span>Mark Completed</span>
-                      </button>
-                    )}
+                    {/* Mark Completed Button & Clearance Status */}
+                    {deal.status !== 'completed' && deal.status !== 'cancelled' && (() => {
+                      const isCleared = Boolean(deal.tutorFeePaid || deal.paymentStatus === 'verified' || deal.platformFee === 0);
+                      return (
+                        <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap sm:flex-nowrap">
+                          {isCleared ? (
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold shadow-2xs">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                              <span>Payment Verified</span>
+                            </span>
+                          ) : deal.paymentStatus === 'submitted_proof' ? (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedDealForPay(deal)}
+                              className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
+                              title="Payment proof submitted • Under review by admin (Click to view or update)"
+                            >
+                              <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse shrink-0" />
+                              <span>Proof Under Review</span>
+                            </button>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedDealForPay(deal)}
+                              className="px-2.5 py-1.5 rounded-xl bg-[#0c2217] hover:bg-[#143d2b] text-white text-xs font-bold flex items-center gap-1.5 border border-[#d4a359]/30 transition-all cursor-pointer shadow-2xs"
+                              title="Submit platform fee payment proof"
+                            >
+                              <CreditCard className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
+                              <span>Pay Platform Fee</span>
+                            </button>
+                          )}
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              if (!isCleared) {
+                                alert(
+                                  deal.paymentStatus === 'submitted_proof'
+                                    ? 'Notice: Your platform payment proof has been submitted and is currently under review by administration. You can mark this deal as completed once admin verifies the payment.'
+                                    : 'Notice: Platform Payment Required!\n\nYou cannot mark this deal as completed until the platform fee has been cleared. Please submit your payment proof first.'
+                                );
+                                setSelectedDealForPay(deal);
+                                return;
+                              }
+                              setDealToComplete(deal);
+                            }}
+                            className={`px-3.5 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer hover:scale-[1.02] ${
+                              isCleared
+                                ? 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm ring-1 ring-emerald-400/30'
+                                : 'bg-stone-100 hover:bg-amber-50 text-stone-400 border border-stone-200'
+                            }`}
+                            title={isCleared ? 'Mark deal completed and clear chat messages to save storage' : 'Platform payment clearance required before completing deal'}
+                          >
+                            <CheckCircle2 className={`w-3.5 h-3.5 ${isCleared ? 'text-white' : 'text-stone-400'}`} />
+                            <span>Mark Completed</span>
+                          </button>
+                        </div>
+                      );
+                    })()}
 
                     {deal.status === 'completed' && (
                       <div className="px-3 py-1.5 bg-[#f0ece1] border border-[#d4a359]/40 rounded-xl text-xs text-[#0c2217] font-semibold flex items-center gap-1.5">

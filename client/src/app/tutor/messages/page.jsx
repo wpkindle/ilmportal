@@ -6,6 +6,7 @@ import { api } from '../../../services/api';
 import ChatWindow from '../../../components/chat/ChatWindow';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import StudentProfileModal from '../../../components/common/StudentProfileModal';
+import { calculateClientCompletion } from '../../../components/common/ProfileCompletionMeter';
 import {
   MessageSquare,
   ArrowLeft,
@@ -294,19 +295,30 @@ function TutorMessagesContent() {
                     <ShieldCheck className="w-8 h-8 text-slate-300 mx-auto mb-1" />
                     <p className="font-bold text-slate-600">No message requests</p>
                     <p className="text-[11px] text-slate-400 max-w-[200px] mx-auto">
-                      When students with 100% verified profiles request to connect, they will appear here.
+                      When students send lesson requests to connect, they will appear here.
                     </p>
                   </div>
                 ) : (
                   requests.map((req) => {
                     const student = req.student || {};
                     const snapshot = req.studentProfileSnapshot || {};
-                    const name = student.name || snapshot.name || 'Verified Student';
+                    const name = student.name || snapshot.name || 'Student';
                     const avatar = student.avatar || snapshot.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=0c2217&color=d4a359`;
                     const age = student.age || snapshot.age;
                     const gender = student.gender || snapshot.gender;
                     const city = student.city || snapshot.city || 'Pakistan';
                     const isResponding = respondingId === req._id;
+
+                    const studentObj = {
+                      name: student.name || snapshot.name,
+                      isVerified: Boolean(student.isVerified ?? snapshot.isVerified),
+                      avatar: student.avatar || snapshot.avatar,
+                      age: student.age || snapshot.age,
+                      gender: student.gender || snapshot.gender,
+                      city: student.city || snapshot.city
+                    };
+                    const { percentage: reqStrength } = calculateClientCompletion(studentObj, null);
+                    const isReq100 = reqStrength >= 100;
 
                     return (
                       <div
@@ -345,9 +357,17 @@ function TutorMessagesContent() {
                               <span>{city}</span>
                             </div>
 
-                            <div className="inline-flex items-center gap-1 mt-1 text-[10px] font-bold text-[#0c2217] bg-[#f0ece1] px-2 py-0.5 rounded-md border border-[#d4a359]/40">
-                              <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
-                              <span>100% Profile Strength</span>
+                            <div className={`inline-flex items-center gap-1 mt-1 text-[10px] font-bold px-2 py-0.5 rounded-md border ${
+                              isReq100
+                                ? 'text-[#0c2217] bg-[#f0ece1] border-[#d4a359]/40'
+                                : 'text-amber-900 bg-amber-50 border-amber-300'
+                            }`}>
+                              {isReq100 ? (
+                                <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
+                              ) : (
+                                <Clock className="w-3 h-3 text-amber-600" />
+                              )}
+                              <span>{reqStrength}% Profile Strength</span>
                             </div>
                           </div>
                         </div>

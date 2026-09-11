@@ -835,7 +835,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               type="button"
               onClick={() => setStudentProfileModalOpen(true)}
               className="p-2 sm:px-3 sm:py-2 bg-stone-800 hover:bg-stone-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-stone-700"
-              title="Inspect Student's Verified Profile"
+              title="Inspect Student Profile"
             >
               <User className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
               <span className="hidden sm:inline">Student Profile</span>
@@ -843,54 +843,89 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
           )}
 
           {/* Tutor Action: Mark Deal Completed */}
-          {isTutor && partnerDeal && ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) && (
-            <button
-              type="button"
-              onClick={async () => {
-                const isCleared = Boolean(
-                  partnerDeal.tutorFeePaid === true ||
-                  partnerDeal.paymentStatus === 'verified' ||
-                  partnerDeal.platformFee === 0
-                );
-                if (!isCleared) {
-                  alert(
-                    partnerDeal.paymentStatus === 'submitted_proof'
-                      ? 'Notice: Your platform payment proof has been submitted and is awaiting admin verification. You can mark this deal as completed once admin verifies the payment.'
-                      : 'Notice: Platform Payment Required!\n\nYou cannot mark this deal as completed until the platform fee has been cleared. Please clear your platform fee or submit payment proof first.'
-                  );
-                  setTutorPaymentModalOpen(true);
-                  return;
-                }
+          {isTutor && partnerDeal && ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) && (() => {
+            const isCleared = Boolean(
+              partnerDeal.tutorFeePaid === true ||
+              partnerDeal.paymentStatus === 'verified' ||
+              partnerDeal.platformFee === 0
+            );
+            return (
+              <div className="flex items-center gap-1.5">
+                {isCleared ? (
+                  <span className="hidden lg:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-xs font-bold">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Payment Verified</span>
+                  </span>
+                ) : partnerDeal.paymentStatus === 'submitted_proof' ? (
+                  <button
+                    type="button"
+                    onClick={() => setTutorPaymentModalOpen(true)}
+                    className="p-2 sm:px-2.5 sm:py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 font-bold text-xs rounded-xl shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer"
+                    title="Payment proof submitted • Under review by administration"
+                  >
+                    <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse shrink-0" />
+                    <span className="hidden sm:inline">Proof Under Review</span>
+                  </button>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setTutorPaymentModalOpen(true)}
+                    className="p-2 sm:px-2.5 sm:py-1.5 bg-[#0c2217] hover:bg-[#143d2b] text-white font-bold text-xs rounded-xl shadow-2xs flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30"
+                    title="Submit platform fee payment proof"
+                  >
+                    <CreditCard className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
+                    <span className="hidden sm:inline">Pay Fee</span>
+                  </button>
+                )}
 
-                const ok = window.confirm(
-                  'Are you sure you want to mark this deal as completed?\n\nNotice: This will close the course and permanently delete all conversation messages between you and this student to free up database storage.'
-                );
-                if (!ok) return;
-                try {
-                  const res = await api.completeDeal(partnerDeal._id);
-                  setPartnerDeal({ ...partnerDeal, status: 'completed' });
-                  setMessages([]);
-                  alert(res?.message || 'Deal completed! Chat history deleted to optimize database storage.');
-                } catch (err) {
-                  if (err.message && err.message.toLowerCase().includes('already')) {
-                    setPartnerDeal({ ...partnerDeal, status: 'completed' });
-                    setMessages([]);
-                    alert('Deal completed! Chat history deleted to optimize database storage.');
-                  } else if (err.message && (err.message.toLowerCase().includes('platform fee') || err.message.toLowerCase().includes('cleared'))) {
-                    alert(err.message);
-                    setTutorPaymentModalOpen(true);
-                  } else {
-                    alert(err.message || 'Error completing deal');
-                  }
-                }
-              }}
-              className="p-2 sm:px-3 sm:py-2 bg-stone-900 hover:bg-black text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-stone-800"
-              title="Mark this deal as completed and clear chat storage"
-            >
-              <CheckCircle2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
-              <span className="hidden sm:inline">Complete Deal</span>
-            </button>
-          )}
+                <button
+                  type="button"
+                  onClick={async () => {
+                    if (!isCleared) {
+                      alert(
+                        partnerDeal.paymentStatus === 'submitted_proof'
+                          ? 'Notice: Your platform payment proof has been submitted and is currently under review by administration. You can mark this deal as completed once admin verifies the payment.'
+                          : 'Notice: Platform Payment Required!\n\nYou cannot mark this deal as completed until the platform fee has been cleared. Please submit your payment proof first.'
+                      );
+                      setTutorPaymentModalOpen(true);
+                      return;
+                    }
+
+                    const ok = window.confirm(
+                      'Are you sure you want to mark this deal as completed?\n\nNotice: This will close the course and permanently delete all conversation messages between you and this student to free up database storage.'
+                    );
+                    if (!ok) return;
+                    try {
+                      const res = await api.completeDeal(partnerDeal._id);
+                      setPartnerDeal({ ...partnerDeal, status: 'completed' });
+                      setMessages([]);
+                      alert(res?.message || 'Deal completed! Chat history deleted to optimize database storage.');
+                    } catch (err) {
+                      if (err.message && err.message.toLowerCase().includes('already')) {
+                        setPartnerDeal({ ...partnerDeal, status: 'completed' });
+                        setMessages([]);
+                        alert('Deal completed! Chat history deleted to optimize database storage.');
+                      } else if (err.message && (err.message.toLowerCase().includes('platform fee') || err.message.toLowerCase().includes('cleared'))) {
+                        alert(err.message);
+                        setTutorPaymentModalOpen(true);
+                      } else {
+                        alert(err.message || 'Error completing deal');
+                      }
+                    }
+                  }}
+                  className={`p-2 sm:px-3 sm:py-2 font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer ${
+                    isCleared
+                      ? 'bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-500 ring-1 ring-emerald-400/30'
+                      : 'bg-stone-100 text-stone-400 border border-stone-200'
+                  }`}
+                  title={isCleared ? 'Mark this deal as completed and clear chat storage' : 'Platform fee clearance required before completing deal'}
+                >
+                  <CheckCircle2 className={`w-4 h-4 sm:w-3.5 sm:h-3.5 shrink-0 ${isCleared ? 'text-white' : 'text-stone-400'}`} />
+                  <span className="hidden sm:inline">Mark Completed</span>
+                </button>
+              </div>
+            );
+          })()}
 
           {/* Tutor Action: Send Deal Offer */}
           {isTutor && (!partnerDeal || !['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status)) && (
@@ -1564,10 +1599,10 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
           deal={partnerDeal}
           isOpen={tutorPaymentModalOpen}
           onClose={() => setTutorPaymentModalOpen(false)}
-          onSuccess={() => {
-            setTutorPaymentModalOpen(false);
+          onSuccess={(updatedDeal) => {
+            const dealObj = updatedDeal || { paymentStatus: 'submitted_proof', tutorPaymentProofReference: 'Submitted' };
             setPartnerDeal((prev) =>
-              prev ? { ...prev, paymentStatus: 'submitted_proof', tutorPaymentProofReference: 'Submitted' } : prev
+              prev ? { ...prev, ...dealObj, paymentStatus: 'submitted_proof' } : prev
             );
           }}
         />

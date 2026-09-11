@@ -141,7 +141,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
 
       if (res.success) {
         setSuccess(true);
-        if (onSuccess) onSuccess();
+        if (onSuccess) onSuccess(res.deal);
         setTimeout(() => {
           setSuccess(false);
           setNotes('');
@@ -198,7 +198,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                 Payment Screenshot Submitted!
               </h4>
               <p className="text-xs sm:text-sm text-stone-700 leading-relaxed">
-                Your payment screenshot has been sent directly to administration. Your classroom access will be cleared shortly.
+                Your payment screenshot has been sent directly to administration for review. Once verified from the admin dashboard, your platform fee will display as <strong>Payment Verified</strong> and the <strong>Mark Completed</strong> action will be unlocked.
               </p>
             </div>
           ) : (

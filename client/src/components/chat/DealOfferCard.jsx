@@ -273,24 +273,61 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
       {/* Tutor Action: Mark Deal Completed / Closed */}
       {isTutorUser && ['active_trial', 'continuation_agreed', 'active_paid'].includes(currentStatus) && (
         <div className="pt-2 border-t border-[#ebe3d3] space-y-2">
-          {!isFeeCleared && (
-            <div className="p-2.5 bg-amber-50/80 border border-amber-200/90 rounded-2xl flex items-start gap-2 text-xs">
-              <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+          {!isFeeCleared && dealState.paymentStatus === 'submitted_proof' && (
+            <div className="p-2.5 bg-amber-50/90 border border-amber-200/90 rounded-2xl flex items-start gap-2 text-xs">
+              <Clock className="w-4 h-4 text-amber-600 shrink-0 mt-0.5 animate-pulse" />
               <div className="flex-1">
-                <span className="text-[11px] font-bold text-amber-900 block">Platform Fee Clearance Required</span>
+                <span className="text-[11px] font-bold text-amber-900 block">Payment Proof Under Review</span>
                 <p className="text-[10.5px] text-amber-800 leading-snug">
-                  {dealState.paymentStatus === 'submitted_proof'
-                    ? 'Payment proof submitted • Pending admin verification before deal can be closed.'
-                    : 'Platform fee must be cleared with admin before you can mark this deal as completed.'}
+                  Your payment screenshot proof has been submitted and is currently being reviewed by administration. Once verified, the &quot;Mark Completed&quot; button will become active.
                 </p>
               </div>
             </div>
           )}
 
-          <div className="flex items-center justify-between gap-2">
+          {!isFeeCleared && dealState.paymentStatus !== 'submitted_proof' && (
+            <div className="p-2.5 bg-amber-50/80 border border-amber-200/90 rounded-2xl flex items-start gap-2 text-xs">
+              <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+              <div className="flex-1">
+                <span className="text-[11px] font-bold text-amber-900 block">Platform Fee Clearance Required</span>
+                <p className="text-[10.5px] text-amber-800 leading-snug">
+                  Platform fee must be cleared with administration before you can mark this deal as completed.
+                </p>
+              </div>
+            </div>
+          )}
+
+          {isFeeCleared && (
+            <div className="p-2.5 bg-emerald-50/90 border border-emerald-200 rounded-2xl flex items-center justify-between gap-2 text-xs">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                <div>
+                  <span className="text-xs font-black text-emerald-950 block">Platform Payment Verified</span>
+                  <p className="text-[10.5px] text-emerald-700 leading-none">Administration cleared platform fee. You can now close the deal.</p>
+                </div>
+              </div>
+              <span className="text-[10px] font-black uppercase tracking-wider text-emerald-700 bg-emerald-100/90 px-2.5 py-0.5 rounded-full border border-emerald-300">
+                Verified
+              </span>
+            </div>
+          )}
+
+          <div className="flex items-center justify-between gap-2 pt-0.5">
             <span className="text-[10.5px] text-stone-500">Course completed?</span>
             <div className="flex items-center gap-2">
-              {!isFeeCleared && (
+              {dealState.paymentStatus === 'submitted_proof' && !isFeeCleared && (
+                <button
+                  type="button"
+                  onClick={() => setShowPaymentModal(true)}
+                  className="px-3 py-1.5 bg-amber-50 hover:bg-amber-100 text-amber-900 border border-amber-300 rounded-xl text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-2xs"
+                  title="Payment proof submitted • Click to view or update screenshot"
+                >
+                  <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
+                  <span>Proof Under Review</span>
+                </button>
+              )}
+
+              {!isFeeCleared && dealState.paymentStatus !== 'submitted_proof' && (
                 <button
                   type="button"
                   onClick={() => setShowPaymentModal(true)}
@@ -298,8 +335,15 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
                   title="Clear platform fee payment"
                 >
                   <CreditCard className="w-3 h-3 text-[#d4a359]" />
-                  <span>{dealState.paymentStatus === 'submitted_proof' ? 'Payment Proof' : 'Pay Platform Fee'}</span>
+                  <span>Pay Platform Fee</span>
                 </button>
+              )}
+
+              {isFeeCleared && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-bold">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>Payment Verified</span>
+                </span>
               )}
 
               <button
@@ -308,8 +352,8 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
                 disabled={loading}
                 className={`px-3.5 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-sm disabled:opacity-50 ${
                   isFeeCleared
-                    ? 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
-                    : 'bg-stone-100 hover:bg-amber-100 text-stone-600 border border-stone-200 hover:border-amber-300'
+                    ? 'bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white shadow-md ring-2 ring-emerald-400/30'
+                    : 'bg-stone-100 hover:bg-amber-50 text-stone-400 border border-stone-200'
                 }`}
                 title={isFeeCleared ? 'Mark this deal as completed and permanently delete chat to free storage' : 'Platform payment clearance required before completing deal'}
               >
@@ -388,7 +432,6 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
           isOpen={showPaymentModal}
           onClose={() => setShowPaymentModal(false)}
           onSuccess={(updatedDeal) => {
-            setShowPaymentModal(false);
             const updated = updatedDeal || { ...dealState, paymentStatus: 'submitted_proof' };
             setDealState(updated);
             if (onDealUpdated) onDealUpdated(updated);

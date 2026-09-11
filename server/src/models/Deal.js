@@ -92,8 +92,8 @@ const dealSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['jazzcash', 'easypaisa', 'bank_transfer', 'cash', 'other'],
-    default: 'jazzcash'
+    enum: ['jazzcash', 'easypaisa', 'meezan', 'upaisa', 'raast', 'bank_transfer', 'cash', 'other'],
+    default: 'meezan'
   },
   paymentProofReference: {
     type: String,

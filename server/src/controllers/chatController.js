@@ -12,16 +12,29 @@ const {
   sendChatRequestStatusEmail
 } = require('../utils/emailService');
 
-// Helper to check 100% student profile completion (6 core required fields)
+// Helper to calculate student profile completion strength (6 core required fields matching frontend weights)
+const calculateStudentProfileStrength = (user) => {
+  if (!user) return { percentage: 0, is100Percent: false, completedFields: [], missingFields: [] };
+  const checks = [
+    { key: 'name', label: 'Student Name', weight: 20, done: Boolean(user.name && user.name.trim() !== '') },
+    { key: 'email', label: 'Verified Email', weight: 20, done: Boolean(user.isVerified) },
+    { key: 'avatar', label: 'Profile Picture', weight: 15, done: Boolean(user.avatar && user.avatar.trim() !== '') },
+    { key: 'age', label: 'Student Age', weight: 15, done: Boolean(user.age && user.age >= 3) },
+    { key: 'gender', label: 'Gender', weight: 15, done: Boolean(user.gender && user.gender.trim() !== '') },
+    { key: 'city', label: 'City Location', weight: 15, done: Boolean(user.city && user.city.trim() !== '') }
+  ];
+  const percentage = Math.min(100, Math.max(0, checks.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0)));
+  const is100Percent = percentage === 100;
+  return {
+    percentage,
+    is100Percent,
+    completedFields: checks.filter(c => c.done).map(c => c.key),
+    missingFields: checks.filter(c => !c.done).map(c => c.key)
+  };
+};
+
 const isStudentProfile100Percent = (user) => {
-  if (!user) return false;
-  const hasName = !!user.name?.trim();
-  const hasVerifiedEmail = !!user.isVerified;
-  const hasAvatar = !!user.avatar?.trim();
-  const hasAge = !!user.age && user.age >= 3;
-  const hasGender = !!user.gender && user.gender.trim() !== '';
-  const hasCity = !!user.city && user.city.trim() !== '';
-  return hasName && hasVerifiedEmail && hasAvatar && hasAge && hasGender && hasCity;
+  return calculateStudentProfileStrength(user).is100Percent;
 };
 
 // @desc    Get all conversation threads for logged-in user
@@ -773,7 +786,7 @@ exports.getStudentProfileForTutor = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Student not found' });
     }
 
-    const is100Percent = isStudentProfile100Percent(studentDoc);
+    const { percentage: profileStrength, is100Percent, missingFields, completedFields } = calculateStudentProfileStrength(studentDoc);
 
     // Sanitize student profile: Never expose contact details (email, username, password, phone) to tutors
     const sanitizedStudent = {
@@ -812,7 +825,9 @@ exports.getStudentProfileForTutor = async (req, res) => {
       success: true,
       student: sanitizedStudent,
       is100Percent,
-      profileStrength: is100Percent ? 100 : 85,
+      profileStrength,
+      missingFields,
+      completedFields,
       latestRequest,
       latestDeal,
       tuitionsHistory: tuitionsHistory || [],

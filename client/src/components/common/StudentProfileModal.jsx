@@ -10,6 +10,8 @@ import {
   X,
   Sparkles,
   CheckCircle2,
+  XCircle,
+  AlertCircle,
   Clock,
   BookOpen,
   MessageSquare,
@@ -19,6 +21,7 @@ import {
 } from 'lucide-react';
 import { api } from '../../services/api';
 import LoadingSpinner from './LoadingSpinner';
+import { calculateClientCompletion } from './ProfileCompletionMeter';
 
 export default function StudentProfileModal({
   isOpen,
@@ -74,14 +77,23 @@ export default function StudentProfileModal({
 
   if (!isOpen) return null;
 
-  const studentName = profile?.name || 'Verified Student';
+  const studentName = profile?.name || 'Student';
   const studentAvatar = profile?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(studentName)}&background=0c2217&color=d4a359`;
   const studentAge = profile?.age;
   const studentGender = profile?.gender;
-  const studentCity = profile?.city || 'Pakistan';
+  const studentCity = profile?.city || '';
   const joinedDate = profile?.createdAt
     ? new Date(profile.createdAt).toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })
     : null;
+
+  // Accurately compute client completion and use API strength if present
+  const clientCalc = calculateClientCompletion(profile || {}, null);
+  const strengthPercentage = typeof profile?.profileStrength === 'number'
+    ? profile.profileStrength
+    : clientCalc.percentage;
+  const is100Percent = strengthPercentage >= 100;
+  const isVerifiedEmail = Boolean(profile?.isVerified);
+  const checklistItems = clientCalc.items || [];
 
   const rawMode = profile?.tuitionMode || profile?.preferredMode || 'both';
   const modeBadge = (() => {
@@ -125,8 +137,14 @@ export default function StudentProfileModal({
               <User className="w-5 h-5 sm:w-6 sm:h-6" />
             </div>
             <div>
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#d4a359] bg-[#143d2b] px-2.5 py-0.5 rounded-full border border-[#d4a359]/40">
-                Verified Student Profile
+              <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${
+                is100Percent && isVerifiedEmail
+                  ? 'text-emerald-300 bg-emerald-950/60 border-emerald-500/40'
+                  : 'text-amber-300 bg-amber-950/60 border-amber-500/40'
+              }`}>
+                {is100Percent && isVerifiedEmail
+                  ? '100% Verified Profile'
+                  : `${strengthPercentage}% Profile Strength`}
               </span>
               <h2 className="text-base sm:text-xl font-black text-white mt-0.5">
                 Student Overview
@@ -158,9 +176,15 @@ export default function StudentProfileModal({
                       alt={studentName}
                       className="w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 rounded-3xl object-cover border-4 border-white shadow-md ring-2 ring-[#d4a359]/40"
                     />
-                    <div className="absolute -bottom-1 -right-1 p-1.5 rounded-xl bg-[#0c2217] text-[#f5d996] border border-[#d4a359]/40 shadow-xs" title="Verified Learner">
-                      <ShieldCheck className="w-4 h-4" />
-                    </div>
+                    {is100Percent && isVerifiedEmail ? (
+                      <div className="absolute -bottom-1 -right-1 p-1.5 rounded-xl bg-[#0c2217] text-[#f5d996] border border-[#d4a359]/40 shadow-xs" title="100% Verified Learner">
+                        <ShieldCheck className="w-4 h-4" />
+                      </div>
+                    ) : (
+                      <div className="absolute -bottom-1 -right-1 p-1.5 rounded-xl bg-amber-500 text-white border border-amber-300 shadow-xs" title={`${strengthPercentage}% Profile Strength`}>
+                        <Clock className="w-4 h-4" />
+                      </div>
+                    )}
                   </div>
 
                   <div className="space-y-1">
@@ -169,14 +193,71 @@ export default function StudentProfileModal({
                     </h3>
                     <div className="flex items-center justify-center gap-1.5 text-xs text-slate-600">
                       <MapPin className="w-3.5 h-3.5 text-[#d4a359]" />
-                      <span className="font-semibold">{studentCity}</span>
+                      <span className="font-semibold">{studentCity || 'City Not Specified'}</span>
                     </div>
                   </div>
 
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-white text-[#0c2217] border border-[#d4a359]/50 shadow-2xs">
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-                    <span>100% Profile Strength</span>
-                  </span>
+                  {is100Percent && isVerifiedEmail ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>100% Profile Strength</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold bg-amber-50 text-amber-900 border border-amber-300 shadow-2xs">
+                      <Clock className="w-3.5 h-3.5 text-amber-600" />
+                      <span>{strengthPercentage}% Profile Strength</span>
+                    </span>
+                  )}
+
+                  {/* Profile Health Progress Bar */}
+                  <div className="w-full space-y-1.5 pt-1 px-1">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="font-semibold text-slate-500">Profile Health</span>
+                      <span className={`font-mono font-black ${is100Percent ? 'text-emerald-700' : 'text-amber-700'}`}>
+                        {strengthPercentage}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-slate-200/80 rounded-full h-2 overflow-hidden border border-slate-200">
+                      <div
+                        className={`h-full transition-all duration-500 rounded-full ${
+                          is100Percent ? 'bg-emerald-600' : strengthPercentage >= 50 ? 'bg-amber-500' : 'bg-rose-500'
+                        }`}
+                        style={{ width: `${Math.max(strengthPercentage, 5)}%` }}
+                      />
+                    </div>
+                    {!is100Percent && (
+                      <p className="text-[10.5px] text-amber-800 font-medium leading-tight">
+                        Fresh / Incomplete Profile ({strengthPercentage}% filled)
+                      </p>
+                    )}
+                  </div>
+
+                  {/* Checklist breakdown for incomplete profile */}
+                  {!is100Percent && checklistItems.length > 0 && (
+                    <div className="w-full text-[10.5px] text-slate-600 bg-white p-2.5 rounded-2xl border border-[#ebe3d3] space-y-1 text-left">
+                      <span className="text-[9.5px] uppercase font-bold text-slate-400 block tracking-wider">
+                        Completion Checklist
+                      </span>
+                      <div className="space-y-1">
+                        {checklistItems.map((item) => (
+                          <div key={item.key} className="flex items-center justify-between">
+                            <span className="truncate">{item.label}</span>
+                            {item.done ? (
+                              <span className="text-emerald-700 font-bold flex items-center gap-0.5 shrink-0">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                                <span>Done</span>
+                              </span>
+                            ) : (
+                              <span className="text-amber-600 font-medium flex items-center gap-0.5 shrink-0">
+                                <Clock className="w-3 h-3 text-amber-500" />
+                                <span>Missing</span>
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
 
                   {joinedDate && (
                     <div className="text-[11px] font-semibold text-slate-600 flex items-center gap-1.5 pt-2 border-t border-[#ebe3d3] w-full justify-center">
@@ -189,10 +270,24 @@ export default function StudentProfileModal({
                 {/* Account Status Pill */}
                 <div className="p-3.5 rounded-2xl bg-white border border-slate-200 shadow-2xs flex items-center justify-between">
                   <span className="text-xs font-bold text-slate-500">Account Status</span>
-                  <span className="text-xs font-black text-[#0c2217] flex items-center gap-1">
-                    <CheckCircle2 className="w-3.5 h-3.5 text-[#10b981]" />
-                    <span>Active &amp; Verified</span>
-                  </span>
+                  {isVerifiedEmail ? (
+                    is100Percent ? (
+                      <span className="text-xs font-black text-emerald-800 flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Active &amp; 100% Complete</span>
+                      </span>
+                    ) : (
+                      <span className="text-xs font-bold text-amber-800 flex items-center gap-1">
+                        <Clock className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Email Verified ({strengthPercentage}% Profile)</span>
+                      </span>
+                    )
+                  ) : (
+                    <span className="text-xs font-bold text-rose-700 flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5 text-rose-500" />
+                      <span>Unverified Account ({strengthPercentage}%)</span>
+                    </span>
+                  )}
                 </div>
 
                 {/* Active Deal / Course Card (if any) */}
@@ -218,22 +313,22 @@ export default function StudentProfileModal({
                 <div className="grid grid-cols-2 gap-3">
                   <div className="p-3.5 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] shadow-2xs">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Student Age</span>
-                    <span className="text-xs sm:text-sm font-black text-slate-800 mt-1 block">
-                      {studentAge ? `${studentAge} Years Old` : 'Age Not Specified'}
+                    <span className={`text-xs sm:text-sm font-black mt-1 block ${studentAge ? 'text-slate-800' : 'text-slate-400 font-normal'}`}>
+                      {studentAge ? `${studentAge} Years Old` : 'Not Specified'}
                     </span>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] shadow-2xs">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">Gender</span>
-                    <span className="text-xs sm:text-sm font-black text-slate-800 mt-1 capitalize block">
-                      {studentGender || 'Student'}
+                    <span className={`text-xs sm:text-sm font-black mt-1 capitalize block ${studentGender ? 'text-slate-800' : 'text-slate-400 font-normal'}`}>
+                      {studentGender || 'Not Specified'}
                     </span>
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] shadow-2xs">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">City / Location</span>
-                    <span className="text-xs sm:text-sm font-black text-slate-800 mt-1 block">
-                      {studentCity}
+                    <span className={`text-xs sm:text-sm font-black mt-1 block ${studentCity ? 'text-slate-800' : 'text-slate-400 font-normal'}`}>
+                      {studentCity || 'Not Specified'}
                     </span>
                   </div>
 
@@ -403,7 +498,7 @@ export default function StudentProfileModal({
         <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-100 flex items-center justify-between shrink-0">
           <div className="hidden sm:flex items-center gap-2 text-xs text-slate-500 font-medium">
             <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
-            <span>Official Verified Student Record • IlmiDunya Academic Council</span>
+            <span>Official Student Profile Record &bull; IlmiDunya Learning Portal</span>
           </div>
           <button
             type="button"

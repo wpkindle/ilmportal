@@ -429,11 +429,24 @@ exports.submitPaymentProof = async (req, res) => {
     }
 
     deal.paymentStatus = 'submitted_proof';
-    deal.paymentMethod = paymentMethod || 'meezan';
+    const validMethods = ['jazzcash', 'easypaisa', 'meezan', 'upaisa', 'raast', 'bank_transfer', 'cash', 'other'];
+    const rawMethod = String(paymentMethod || '').toLowerCase().trim();
+    deal.paymentMethod = validMethods.includes(rawMethod) ? rawMethod : 'meezan';
     deal.paymentProofReference = (referenceCode || '').trim() || 'Screenshot Proof Attached';
     deal.paymentProofNotes = notes || '';
     if (proofImageUrl) deal.proofImageUrl = proofImageUrl;
     await deal.save();
+
+    // Real-time socket broadcast
+    const studentId = (deal.student?._id || deal.student)?.toString();
+    const tutorId = (deal.tutor?._id || deal.tutor)?.toString();
+    const conversationId = [studentId, tutorId].sort().join('_');
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`conv_${conversationId}`).emit('deal-status-updated', deal);
+      if (tutorId) io.to(tutorId).emit('deal-updated', deal);
+      if (studentId) io.to(studentId).emit('deal-updated', deal);
+    }
 
     // Notify Admin
     const admin = await User.findOne({ role: 'admin' });

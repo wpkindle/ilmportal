@@ -39,6 +39,14 @@ export default function TutorDealsPage() {
     e.preventDefault();
     if (!dealToComplete || completing) return;
 
+    const isCleared = Boolean(dealToComplete.tutorFeePaid || dealToComplete.paymentStatus === 'verified' || dealToComplete.platformFee === 0);
+    if (!isCleared) {
+      alert('Platform Payment Required: Please clear your platform fee or submit payment proof before marking this deal completed.');
+      setSelectedDealForPay(dealToComplete);
+      setDealToComplete(null);
+      return;
+    }
+
     setCompleting(true);
     setFeedback(null);
     try {
@@ -61,6 +69,10 @@ export default function TutorDealsPage() {
         });
         await fetchDeals();
         setTimeout(() => setFeedback(null), 6000);
+      } else if (err.message && (err.message.toLowerCase().includes('platform fee') || err.message.toLowerCase().includes('cleared'))) {
+        alert(err.message);
+        setSelectedDealForPay(dealToComplete);
+        setDealToComplete(null);
       } else {
         alert(err.message || 'Error completing deal');
       }
@@ -175,7 +187,19 @@ export default function TutorDealsPage() {
                     {deal.status !== 'completed' && deal.status !== 'cancelled' && (
                       <button
                         type="button"
-                        onClick={() => setDealToComplete(deal)}
+                        onClick={() => {
+                          const isCleared = Boolean(deal.tutorFeePaid || deal.paymentStatus === 'verified' || deal.platformFee === 0);
+                          if (!isCleared) {
+                            alert(
+                              deal.paymentStatus === 'submitted_proof'
+                                ? 'Notice: Your platform payment proof has been submitted and is awaiting admin verification. You can mark this deal as completed once admin verifies the payment.'
+                                : 'Notice: Platform Payment Required!\n\nYou cannot mark this deal as completed until the platform fee has been cleared. Please submit your payment proof first.'
+                            );
+                            setSelectedDealForPay(deal);
+                            return;
+                          }
+                          setDealToComplete(deal);
+                        }}
                         className="px-3.5 py-2 rounded-xl bg-stone-900 hover:bg-black text-[#faf8f5] text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all cursor-pointer hover:scale-[1.02]"
                         title="Mark deal completed and clear chat messages to save storage"
                       >

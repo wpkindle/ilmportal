@@ -847,6 +847,21 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             <button
               type="button"
               onClick={async () => {
+                const isCleared = Boolean(
+                  partnerDeal.tutorFeePaid === true ||
+                  partnerDeal.paymentStatus === 'verified' ||
+                  partnerDeal.platformFee === 0
+                );
+                if (!isCleared) {
+                  alert(
+                    partnerDeal.paymentStatus === 'submitted_proof'
+                      ? 'Notice: Your platform payment proof has been submitted and is awaiting admin verification. You can mark this deal as completed once admin verifies the payment.'
+                      : 'Notice: Platform Payment Required!\n\nYou cannot mark this deal as completed until the platform fee has been cleared. Please clear your platform fee or submit payment proof first.'
+                  );
+                  setTutorPaymentModalOpen(true);
+                  return;
+                }
+
                 const ok = window.confirm(
                   'Are you sure you want to mark this deal as completed?\n\nNotice: This will close the course and permanently delete all conversation messages between you and this student to free up database storage.'
                 );
@@ -861,6 +876,9 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                     setPartnerDeal({ ...partnerDeal, status: 'completed' });
                     setMessages([]);
                     alert('Deal completed! Chat history deleted to optimize database storage.');
+                  } else if (err.message && (err.message.toLowerCase().includes('platform fee') || err.message.toLowerCase().includes('cleared'))) {
+                    alert(err.message);
+                    setTutorPaymentModalOpen(true);
                   } else {
                     alert(err.message || 'Error completing deal');
                   }

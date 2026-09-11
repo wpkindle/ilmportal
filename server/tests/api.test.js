@@ -229,6 +229,42 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
     expect(['in_person', 'physical']).toContain(physicalOfferRes.body.deal.mode);
   });
 
+  test('Tutor cannot mark deal as completed if platform fee is unpaid, but succeeds once cleared', async () => {
+    const Deal = require('../src/models/Deal');
+    // Ensure the deal has uncleared fee
+    await Deal.findByIdAndUpdate(dealId, {
+      tutorFeePaid: false,
+      paymentStatus: 'unpaid',
+      platformFee: 400
+    });
+
+    // Attempt completion by tutor - should fail with 400 and PLATFORM_FEE_UNCLEARED
+    const failRes = await request(app)
+      .put(`/api/deals/${dealId}/complete`)
+      .set('Authorization', `Bearer ${tutorToken}`)
+      .send({ notes: 'Finished course early' });
+
+    expect(failRes.statusCode).toEqual(400);
+    expect(failRes.body.success).toEqual(false);
+    expect(failRes.body.code).toEqual('PLATFORM_FEE_UNCLEARED');
+
+    // Admin clears the platform fee
+    await Deal.findByIdAndUpdate(dealId, {
+      tutorFeePaid: true,
+      paymentStatus: 'verified'
+    });
+
+    // Attempt completion by tutor again - should succeed
+    const successRes = await request(app)
+      .put(`/api/deals/${dealId}/complete`)
+      .set('Authorization', `Bearer ${tutorToken}`)
+      .send({ notes: 'Course successfully completed and student graduated!' });
+
+    expect(successRes.statusCode).toEqual(200);
+    expect(successRes.body.success).toEqual(true);
+    expect(successRes.body.deal.status).toEqual('completed');
+  });
+
   test('Public CMS routes return categories and Pakistani locations', async () => {
     const catRes = await request(app).get('/api/cms/categories');
     expect(catRes.statusCode).toEqual(200);

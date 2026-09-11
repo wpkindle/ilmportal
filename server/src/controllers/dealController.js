@@ -881,6 +881,21 @@ exports.completeDeal = async (req, res) => {
       });
     }
 
+    // Require platform payment to be cleared before tutor can mark deal as completed
+    const isPlatformFeeCleared = Boolean(
+      deal.tutorFeePaid === true ||
+      deal.paymentStatus === 'verified' ||
+      deal.platformFee === 0
+    );
+
+    if (req.user.role !== 'admin' && !isPlatformFeeCleared) {
+      return res.status(400).json({
+        success: false,
+        code: 'PLATFORM_FEE_UNCLEARED',
+        message: 'You cannot mark this deal as completed until the platform fee payment has been cleared by administration. Please clear your platform fee or submit payment proof first.'
+      });
+    }
+
     const isAlreadyCompleted = deal.status === 'completed';
 
     if (!isAlreadyCompleted) {

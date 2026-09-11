@@ -874,16 +874,16 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             </button>
           )}
 
-          {/* Tutor Action: Send Course Offer */}
+          {/* Tutor Action: Send Deal Offer */}
           {isTutor && (!partnerDeal || !['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status)) && (
             <button
               type="button"
               onClick={() => setDealModalOpen(true)}
               className="p-2 sm:px-3 sm:py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30"
-              title="Send Course Offer"
+              title="Send Deal Offer"
             >
               <Sparkles className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
-              <span className="hidden sm:inline">Send Course Offer</span>
+              <span className="hidden sm:inline">Send Deal Offer</span>
             </button>
           )}
 
@@ -972,7 +972,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                     className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-[#0c2217] font-bold cursor-pointer"
                   >
                     <Sparkles className="w-4 h-4 text-[#d4a359]" />
-                    <span>Send Course Offer</span>
+                    <span>Send Deal Offer</span>
                   </button>
                 )}
 

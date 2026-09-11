@@ -165,30 +165,20 @@ const TrialBanner = ({ deal, onPayClick }) => {
     );
   }
 
-  // 5. Active Trial
+  // 5. Active Classes (Direct Deal)
   if (deal.status === 'active_trial') {
     return (
-      <div className="p-3.5 bg-[#faf8f5] rounded-2xl border border-[#d4a359]/40 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs shadow-2xs">
+      <div className="p-3 bg-[#faf8f5] rounded-2xl border border-[#ebe3d3] flex items-center justify-between text-xs shadow-2xs">
         <div className="flex items-center gap-2.5">
           <div className="p-1.5 bg-[#f5f0e6] text-[#b85d34] border border-[#d4a359]/30 rounded-xl">
             <Sparkles className="w-4 h-4" />
           </div>
           <div>
-            <div className="flex items-center gap-2">
-              <span className="font-bold text-stone-900">
-                {isStudent ? 'Complimentary 3-Day Free Trial' : `Active Course Trial: ${deal.subject}`}
-              </span>
-              {timeLeft && (
-                <span className="px-2 py-0.5 rounded-full bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/30 font-bold text-[10px] flex items-center gap-1">
-                  <Clock className="w-3 h-3 text-[#0c2217]" />
-                  <span>{timeLeft}</span>
-                </span>
-              )}
-            </div>
+            <span className="font-bold text-[#0c2217]">
+              Active Deal &bull; {deal.subject}
+            </span>
             <p className="text-[11px] text-stone-600 mt-0.5">
-              {isStudent
-                ? `Free trial classes active. Decide whether to continue anytime during your trial.`
-                : `Agreed Fee: PKR ${deal.price?.toLocaleString()} / ${deal.priceUnit === 'per_hour' ? 'hr' : 'mo'} &bull; ${deal.mode === 'online' ? 'Live WebRTC' : 'In-Person'}`}
+              Direct Agreement &bull; PKR {deal.price?.toLocaleString()} / {deal.priceUnit === 'per_hour' ? 'hr' : 'mo'} &bull; {deal.mode === 'online' ? 'Live WebRTC' : 'In-Person'}
             </p>
           </div>
         </div>

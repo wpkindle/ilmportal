@@ -109,7 +109,7 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
           </div>
           <div>
             <span className="text-[10px] uppercase font-bold tracking-widest text-[#b85d34] block">
-              Official Course Offer
+              Official Deal Offer
             </span>
             <h4 className="font-serif font-bold text-sm text-[#0c2217]">{dealState.subject}</h4>
           </div>
@@ -122,7 +122,7 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
             ? 'bg-rose-50 text-rose-800 border border-rose-300'
             : 'bg-amber-50 text-amber-800 border border-amber-300 animate-pulse'
         }`}>
-          {isAccepted ? 'Active Course' : isDeclined ? 'Declined' : 'Pending Acceptance'}
+          {isAccepted ? 'Active Deal' : isDeclined ? 'Declined' : 'Pending Acceptance'}
         </span>
       </div>
 
@@ -162,12 +162,12 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
         </div>
       )}
 
-      {/* 3-Day Free Trial Notice for Student */}
+      {/* Direct Deal Notice for Student */}
       {isPending && isStudentUser && (
-        <div className="p-3 bg-emerald-50/70 border border-emerald-300 rounded-2xl text-[11px] text-emerald-950 flex items-start gap-2">
-          <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+        <div className="p-3 bg-[#faf8f5] border border-[#ebe3d3] rounded-2xl text-[11px] text-stone-700 flex items-start gap-2">
+          <ShieldCheck className="w-4 h-4 text-[#0c2217] shrink-0 mt-0.5" />
           <p className="leading-snug">
-            Accepting unlocks your <strong>3-Day Free Trial</strong> immediately. No payment is required until you complete your trial classes.
+            Review the agreed tuition fee and schedule above. Accepting confirms your deal directly with your tutor.
           </p>
         </div>
       )}
@@ -190,7 +190,7 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
             className="w-2/3 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-bold rounded-xl shadow-md transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
           >
             <CheckCircle2 className="w-4 h-4 text-white" />
-            <span>{loading ? 'Activating...' : 'Accept & Start 3-Day Trial'}</span>
+            <span>{loading ? 'Accepting...' : 'Accept Deal Offer'}</span>
           </button>
         </div>
       )}
@@ -203,64 +203,16 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
         </div>
       )}
 
-      {/* Active Trial & Continuation Decision Area */}
-      {currentStatus === 'active_trial' && isStudentUser && (
-        <div className="p-3.5 bg-amber-50/80 border border-amber-300 rounded-2xl space-y-2.5">
+      {/* Active Deal - Notice for Student */}
+      {(currentStatus === 'active_trial' || currentStatus === 'continuation_agreed') && isStudentUser && (
+        <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-2xl space-y-1 text-xs text-emerald-950">
           <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-600 animate-ping" />
-            <span className="text-xs font-bold text-amber-900">Free Trial In Progress</span>
+            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            <span className="font-bold text-emerald-900">Deal Active &bull; Classes in Progress</span>
           </div>
           <p className="text-[11px] text-stone-700 leading-relaxed">
-            Are you satisfied with your trial classes? Choose whether you would like to continue regular tutoring with this teacher:
+            Your tutoring arrangement is active directly with your teacher.
           </p>
-          <div className="flex items-center gap-2 pt-1">
-            <button
-              type="button"
-              onClick={async () => {
-                if (!confirm('Are you sure you do not wish to continue classes after the trial?')) return;
-                setLoading(true);
-                try {
-                  const res = await api.respondToTrialContinuation(dealId, { decision: 'decline' });
-                  if (res.success) {
-                    setDealState(res.deal);
-                    if (onDealUpdated) onDealUpdated(res.deal);
-                  }
-                } catch (e) {
-                  alert(e.message);
-                } finally {
-                  setLoading(false);
-                }
-              }}
-              disabled={loading}
-              className="w-1/3 py-2 bg-stone-800 hover:bg-stone-700 text-stone-300 text-xs font-bold rounded-xl transition-colors cursor-pointer border border-stone-700"
-            >
-              Decline
-            </button>
-
-            <button
-              type="button"
-              onClick={async () => {
-                setLoading(true);
-                try {
-                  const res = await api.respondToTrialContinuation(dealId, { decision: 'continue' });
-                  if (res.success) {
-                    runConfetti();
-                    setDealState(res.deal);
-                    if (onDealUpdated) onDealUpdated(res.deal);
-                  }
-                } catch (e) {
-                  alert(e.message);
-                } finally {
-                  setLoading(false);
-                }
-              }}
-              disabled={loading}
-              className="w-2/3 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-bold rounded-xl shadow-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-            >
-              <CheckCircle2 className="w-4 h-4 text-white" />
-              <span>Continue Regular Classes</span>
-            </button>
-          </div>
         </div>
       )}
 
@@ -270,19 +222,6 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
           deal={dealState}
           className="text-slate-900"
         />
-      )}
-
-      {/* Continuation Agreed - Notice for Student */}
-      {currentStatus === 'continuation_agreed' && isStudentUser && (
-        <div className="p-3.5 bg-emerald-50 border border-emerald-300 rounded-2xl space-y-1.5 text-xs text-emerald-950">
-          <div className="flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span className="font-bold text-emerald-900">Continuation Confirmed!</span>
-          </div>
-          <p className="text-[11px] text-stone-700 leading-relaxed">
-            You have chosen to continue regular classes. Live classes are active.
-          </p>
-        </div>
       )}
 
       {/* Active Paid Classes */}

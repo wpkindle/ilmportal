@@ -174,9 +174,9 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
             </div>
             <div className="min-w-0">
               <h3 className="font-bold text-xs sm:text-sm md:text-base text-slate-900 flex flex-wrap items-center gap-1.5 leading-tight">
-                <span>Send Course Agreement Offer</span>
+                <span>Send Deal Offer</span>
                 <span className="text-[10px] font-bold px-2 py-0.5 bg-[#f0ece1] text-[#0c2217] rounded-full border border-[#d4a359]/40 shrink-0">
-                  3-Day Free Trial
+                  Direct Deal
                 </span>
               </h3>
               <p className="text-[10px] sm:text-xs text-slate-500 truncate mt-0.5">
@@ -500,11 +500,11 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
 
           </div>
 
-          {/* Safety & Trial Guarantee Banner */}
+          {/* Safety & Agreement Notice */}
           <div className="p-3 bg-[#faf8f5] rounded-2xl border border-[#e6ded1] text-[11px] text-slate-800 flex items-start gap-2">
             <ShieldCheck className="w-4 h-4 text-[#0c2217] shrink-0 mt-0.5" />
             <p className="leading-snug">
-              When sent, the student receives the offer in chat and can immediately activate the <strong>3-Day Free Trial</strong> with zero advance payment.
+              When sent, the student receives the offer in chat to accept directly. Once accepted, classes begin directly and you will have 3 days (72 hours) to submit the platform fee.
             </p>
           </div>
 
@@ -513,7 +513,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
         {/* Modal Footer (Pinned at Bottom, ALWAYS visible) */}
         <div className="p-3 sm:p-4 bg-slate-50 border-t border-slate-100 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-between gap-2.5 shrink-0 z-10">
           <p className="text-[11px] text-slate-500 hidden sm:block">
-            Zero advance fee &bull; 3-Day Free Trial
+            Direct Student Deal &bull; 72h Tutor Platform Fee Window
           </p>
           <div className="flex items-center justify-end gap-2 w-full sm:w-auto">
             <button
@@ -530,7 +530,7 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
               className="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white font-bold text-xs sm:text-sm rounded-xl shadow-md shadow-[#b85d34]/25 transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-1.5 active:scale-95"
             >
               <Sparkles className="w-4 h-4 text-white/80 shrink-0" />
-              <span>{loading ? 'Sending Offer...' : 'Send Course Offer'}</span>
+              <span>{loading ? 'Sending Offer...' : 'Send Deal Offer'}</span>
             </button>
           </div>
         </div>

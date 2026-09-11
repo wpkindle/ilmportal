@@ -78,7 +78,7 @@ exports.createDealOffer = async (req, res) => {
     if (io) {
       io.to(`conv_${conversationId}`).emit('new-message', populatedOfferMsg);
       io.to(`user_${student._id}`).emit('notification-alert', {
-        title: 'New Course Offer Received',
+        title: 'New Deal Offer Received',
         message: `${req.user.name} sent you a tutoring offer for ${subject} (PKR ${price} / ${priceUnit}).`,
         type: 'deal_offer',
         conversationId
@@ -174,7 +174,7 @@ exports.respondToDealOffer = async (req, res) => {
         recipient: deal.tutor._id,
         deal: deal._id,
         messageType: 'deal_accept',
-        text: `Deal Accepted! Free ${trialDays}-day trial started. Both parties can now start scheduling live sessions.`,
+        text: `Deal Accepted! Both parties can now start scheduling live sessions directly.`,
         dealOfferData: {
           _id: deal._id,
           dealId: deal._id,
@@ -209,7 +209,7 @@ exports.respondToDealOffer = async (req, res) => {
         recipient: deal.tutor._id,
         sender: req.user.id,
         title: 'Deal Offer Accepted!',
-        message: `${req.user.name} accepted your tutoring offer for ${deal.subject}. Your ${trialDays}-day free trial is now active!`,
+        message: `${req.user.name} accepted your tutoring offer for ${deal.subject}. Your deal is now active! Please clear the platform fee within 72 hours.`,
         type: 'deal_accepted',
         link: `/tutor/deals`
       });
@@ -220,8 +220,8 @@ exports.respondToDealOffer = async (req, res) => {
         await Notification.create({
           recipient: admin._id,
           sender: req.user.id,
-          title: 'New Active Trial Deal',
-          message: `Deal between Student ${deal.student.name} and Tutor ${deal.tutor.name} (${deal.subject}, PKR ${deal.price}) is now in active trial.`,
+          title: 'New Active Deal',
+          message: `Deal between Student ${deal.student.name} and Tutor ${deal.tutor.name} (${deal.subject}, PKR ${deal.price}) is now active.`,
           type: 'deal_accepted',
           link: `/admin/deals`
         });
@@ -229,7 +229,7 @@ exports.respondToDealOffer = async (req, res) => {
 
       return res.status(200).json({
         success: true,
-        message: `Deal accepted! Your ${trialDays}-day free trial has started.`,
+        message: `Deal accepted! Your classes can now begin directly.`,
         deal
       });
     } else if (action === 'decline') {

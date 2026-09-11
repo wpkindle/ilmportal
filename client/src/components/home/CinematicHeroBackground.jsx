@@ -39,7 +39,7 @@ export default function CinematicHeroBackground({
               <img
                 src={slide.image}
                 alt={slide.alt || 'Tutoring scene'}
-                className={`w-full h-full object-cover object-center filter contrast-[1.05] brightness-[0.58] ${
+                className={`w-full h-full object-cover object-center filter contrast-[1.05] brightness-[0.72] ${
                   isActive ? animClass : ''
                 }`}
                 loading={idx === 0 ? 'eager' : 'lazy'}
@@ -50,20 +50,13 @@ export default function CinematicHeroBackground({
         })}
       </div>
 
-      {/* 3. Deep Uniform Emerald/Black Scrim (Dark overlay for maximum text clarity) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/95 via-[#07150e]/88 to-[#07150e]/96" />
+      {/* 3. Directional Gradient Scrim: Solid text protection on left, opening to clear view on right */}
+      <div className="absolute inset-0 bg-[#07150e]/50" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#07150e] via-[#07150e]/92 via-55% to-[#07150e]/25 hidden lg:block" />
+      <div className="absolute inset-0 bg-[#07150e]/85 lg:hidden" />
 
-      {/* 4. Center Vignette Scrim (Focuses depth right behind the centered content) */}
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage:
-            'radial-gradient(ellipse at center, rgba(7, 21, 14, 0.82) 0%, rgba(7, 21, 14, 0.95) 70%, #07150e 100%)'
-        }}
-      />
-
-      {/* 5. Vertical Framing Vignette (Blends into Navbar and next section) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e] via-transparent to-[#07150e]" />
+      {/* 4. Vertical Framing Vignette (Blends into Navbar and next section) */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/80 via-transparent to-[#07150e]" />
 
       {/* 6. Ambient Golden Light Bloom (Warm Subtle Editorial Glow) */}
       <div

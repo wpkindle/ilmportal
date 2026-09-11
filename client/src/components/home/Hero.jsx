@@ -21,7 +21,11 @@ import {
   Lock,
   Chrome,
   Camera,
-  Award
+  Award,
+  Atom,
+  Code,
+  Laptop,
+  BookMarked
 } from 'lucide-react';
 import CustomSelect from '../common/CustomSelect';
 import ChromeAppInstallModal from '../common/ChromeAppInstallModal';
@@ -105,6 +109,70 @@ const heroSlides = [
     alt: 'Pakistani student with headphones attending online WebRTC Quran recitation class with digital Quran on laptop screen',
     ctaLink: '/tutors?category=tajweed-al-quran',
     ctaText: 'Explore Quran Classrooms'
+  },
+  {
+    id: 4,
+    tabLabel: 'Matric & FSc',
+    tabIcon: Atom,
+    badgeText: 'Matric & FSc Science • Verified Female Tutors',
+    badgeIcon: Atom,
+    badgeColor: 'text-[#faf8f5]',
+    dotColor: 'bg-[#b85d34]',
+    tag: 'Board Exam Preparation',
+    title: '1:1 Female Science Tutor • Matric & Intermediate',
+    desc: 'Comprehensive syllabus mastery in Biology, Chemistry, Physics & Mathematics with verified female educators for daughters and female learners.',
+    image: '/images/hero-stem-science.jpg',
+    alt: 'Pakistani female science tutor in modest dupatta guiding a teenage schoolgirl through Matric chemistry and biology textbooks and diagrams',
+    ctaLink: '/tutors?category=fsc-hssc',
+    ctaText: 'Find Science & Board Tutors'
+  },
+  {
+    id: 5,
+    tabLabel: 'Coding & Tech',
+    tabIcon: Code,
+    badgeText: 'Python, Web Dev & Computer Science',
+    badgeIcon: Laptop,
+    badgeColor: 'text-[#d4a359]',
+    dotColor: 'bg-[#d4a359]',
+    tag: 'Tech & Skills',
+    title: 'Modern Coding, Software & Tech Skills Mentorship',
+    desc: 'Hands-on programming tuition in Python, JavaScript, algorithmic problem-solving, and web development from verified computer science graduates.',
+    image: '/images/hero-computer-coding.jpg',
+    alt: 'Pakistani software tutor mentoring a student in coding, algorithms, and web development on laptop',
+    ctaLink: '/tutors?category=computer-science',
+    ctaText: 'Find Coding Tutors'
+  },
+  {
+    id: 6,
+    tabLabel: 'Hifz Revision',
+    tabIcon: BookMarked,
+    badgeText: 'Hifz-ul-Quran • Sanad-Certified Qaris',
+    badgeIcon: Award,
+    badgeColor: 'text-[#d4a359]',
+    dotColor: 'bg-[#d4a359]',
+    tag: 'Quran Memorization',
+    title: 'Hifz-ul-Quran Memorization & Tajweed Revision',
+    desc: 'Daily Sabaq, Sabqi, and Manzil revision routines with patient Sanad-verified Huffaz and Qaris for lifelong retention and perfect pronunciation.',
+    image: '/images/hero-hifz-quran.jpg',
+    alt: 'Pakistani male Qari listening to young boy student reciting Holy Quran on wooden rihal in traditional Islamic library',
+    ctaLink: '/tutors?category=hifz-al-quran',
+    ctaText: 'Find Hifz & Tajweed Qaris'
+  },
+  {
+    id: 7,
+    tabLabel: 'Primary & Junior',
+    tabIcon: Users,
+    badgeText: 'Playgroup to Grade 5 • Warm Female Tutors',
+    badgeIcon: Users,
+    badgeColor: 'text-[#faf8f5]',
+    dotColor: 'bg-[#b85d34]',
+    tag: 'Foundational Learning',
+    title: 'Early Childhood, Urdu Qaida & School Tuition',
+    desc: 'Caring female home and online tutors building strong foundations in Urdu reading, English phonics, mental math, and daily school homework.',
+    image: '/images/hero-primary-home.jpg',
+    alt: 'Pakistani female tutor teaching a young girl Urdu Qaida and school lessons at study table',
+    ctaLink: '/tutors?category=primary-junior',
+    ctaText: 'Find Primary Tutors'
   }
 ];
 

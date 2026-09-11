@@ -6,7 +6,7 @@ import React from 'react';
  * CinematicHeroBackground
  * 
  * High-performance full-bleed ambient motion backdrop:
- * 1. 4 High-resolution authentic Pakistani tutoring scenes with GPU-accelerated Ken-Burns pan & zoom.
+ * 1. 8 High-resolution authentic Pakistani tutoring scenes with GPU-accelerated Ken-Burns pan & zoom.
  * 2. Smooth 1.2s crossfade transitions synchronized with the hero state.
  * 3. Multi-layer contrast scrim (Deep forest green #0c2217 + radial gold ambient light + top/bottom vignettes)
  *    guaranteeing 100% crystal-clear readability and WCAG AAA compliance for hero typography.
@@ -42,8 +42,8 @@ export default function CinematicHeroBackground({
                 className={`w-full h-full object-cover object-center filter contrast-[1.05] brightness-[0.76] ${
                   isActive ? animClass : ''
                 }`}
-                loading={idx === 0 ? 'eager' : 'lazy'}
-                fetchPriority={idx === 0 ? 'high' : 'auto'}
+                loading={idx < 3 ? 'eager' : 'lazy'}
+                fetchPriority={idx < 2 ? 'high' : 'auto'}
               />
             </div>
           );

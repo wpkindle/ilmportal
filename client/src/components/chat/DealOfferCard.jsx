@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Sparkles, CheckCircle2, XCircle, Clock, Video, MapPin, CreditCard, ShieldCheck, Award } from 'lucide-react';
+import { Sparkles, CheckCircle2, XCircle, Clock, Video, Home, MapPin, CreditCard, ShieldCheck, Award } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import Tutor72HourClock from '../tutor/Tutor72HourClock';

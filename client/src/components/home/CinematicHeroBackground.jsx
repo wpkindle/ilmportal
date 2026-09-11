@@ -24,7 +24,7 @@ export default function CinematicHeroBackground({
       <div className="absolute inset-0 bg-[#07150e]" />
 
       {/* 2. Living Motion Slide Imagery (Ken-Burns Pan & Zoom) */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden">
+      <div className="absolute inset-0 w-full h-full overflow-hidden z-0 isolate">
         {slides.map((slide, idx) => {
           const isActive = currentSlide === idx;
           const animClass = idx % 2 === 0 ? 'animate-kenburns-1' : 'animate-kenburns-2';
@@ -39,7 +39,7 @@ export default function CinematicHeroBackground({
               <img
                 src={slide.image}
                 alt={slide.alt || 'Tutoring scene'}
-                className={`w-full h-full object-cover object-center filter contrast-[1.08] brightness-[0.70] ${
+                className={`w-full h-full object-cover object-center filter contrast-[1.08] brightness-[0.65] ${
                   isActive ? animClass : ''
                 }`}
                 loading={idx === 0 ? 'eager' : 'lazy'}
@@ -50,16 +50,19 @@ export default function CinematicHeroBackground({
         })}
       </div>
 
-      {/* 3. Directional Gradient Scrim (Desktop): Solid emerald-black text protection on left (92-95%), 
-             smoothly feathering to a rich dark overlay (40%) on right so the slideshow has a dark tint and remains visible */}
-      <div className="absolute inset-0 bg-gradient-to-r from-[#07150e] via-[#07150e]/92 via-48% to-[#07150e]/40 hidden lg:block" />
+      {/* 3. Base Dark Overlay across entire slideshow (Guaranteed on top of images with z-10) */}
+      <div className="absolute inset-0 bg-[#07150e]/50 z-10" />
 
-      {/* 4. Mobile Scrim: Balanced dark coverage so typography is crisp while background slideshow remains visible */}
-      <div className="absolute inset-0 bg-[#07150e]/75 lg:hidden" />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/95 via-[#07150e]/70 to-[#07150e]/95 lg:hidden" />
+      {/* 4. Directional Gradient Scrim (Desktop): Solid emerald-black text protection on left (95%), 
+             smoothly feathering to transparent on right so the darkened slideshow is visible */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#07150e] via-[#07150e]/92 via-48% to-transparent z-10 hidden lg:block" />
 
-      {/* 5. Vertical Framing Vignette (Blends into Navbar and next section) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/70 via-transparent to-[#07150e]" />
+      {/* 5. Mobile Scrim: Balanced dark coverage so typography is crisp while background slideshow remains visible */}
+      <div className="absolute inset-0 bg-[#07150e]/75 z-10 lg:hidden" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/95 via-[#07150e]/70 to-[#07150e]/95 z-10 lg:hidden" />
+
+      {/* 6. Vertical Framing Vignette (Blends into Navbar and next section) */}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07150e]/75 via-transparent to-[#07150e] z-10" />
 
       {/* 6. Ambient Golden Light Bloom (Warm Subtle Editorial Glow) */}
       <div

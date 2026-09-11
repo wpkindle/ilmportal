@@ -218,7 +218,7 @@ export default function Hero() {
             </div>
 
             {/* Main Editorial Headline in Exactly Two Lines */}
-            <h1 className="text-2xl xs:text-[1.75rem] sm:text-3xl md:text-4xl lg:text-[2.15rem] xl:text-[2.65rem] 2xl:text-5xl font-serif font-black tracking-tight text-[#faf8f5] leading-[1.18] sm:leading-[1.2]">
+            <h1 className="text-2xl xs:text-[1.75rem] sm:text-3xl md:text-4xl lg:text-[2.15rem] xl:text-[2.65rem] 2xl:text-5xl font-serif font-black tracking-tight text-[#faf8f5] leading-[1.18] sm:leading-[1.2] drop-shadow-[0_2px_12px_rgba(0,0,0,0.85)]">
               <span className="block sm:whitespace-nowrap">Connecting Verified Tutors</span>
               <span className="block sm:whitespace-nowrap">
                 With Students <span className="hand-drawn-underline-gold text-[#faf8f5]">Across Pakistan</span>
@@ -226,7 +226,7 @@ export default function Hero() {
             </h1>
 
             {/* Humanized, Colloquial Pakistani Copy */}
-            <p className="text-xs sm:text-base text-[#d6e3dd] max-w-2xl leading-relaxed font-normal">
+            <p className="text-xs sm:text-base text-[#d6e3dd] max-w-2xl leading-relaxed font-normal drop-shadow-sm">
               <span className="sm:hidden">
                 Designed for female learners, daughters, and families. 1-on-1 classes with verified female Alimahs, certified Qaris, and academic school tutors with camera-off privacy by default.
               </span>

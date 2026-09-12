@@ -85,8 +85,8 @@ const tutorProfileSchema = new mongoose.Schema({
   },
   ratingAverage: {
     type: Number,
-    default: 5.0,
-    min: 1,
+    default: 0,
+    min: 0,
     max: 5
   },
   ratingCount: {

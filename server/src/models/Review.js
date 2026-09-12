@@ -40,6 +40,21 @@ const reviewSchema = new mongoose.Schema({
     enum: ['published', 'hidden', 'flagged'],
     default: 'published'
   },
+  isReported: {
+    type: Boolean,
+    default: false
+  },
+  reportedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  reportReason: {
+    type: String,
+    default: ''
+  },
+  reportedAt: {
+    type: Date
+  },
   reviewer: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User'

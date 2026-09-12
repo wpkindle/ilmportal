@@ -14,7 +14,8 @@ import {
   Sparkles,
   GraduationCap,
   Award,
-  Star
+  Star,
+  Flag
 } from 'lucide-react';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
@@ -22,6 +23,7 @@ import TrialBanner from '../../../components/common/TrialBanner';
 import AccountStatusBanner from '../../../components/common/AccountStatusBanner';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import LeaveReviewModal from '../../../components/common/LeaveReviewModal';
+import ReportReviewModal from '../../../components/common/ReportReviewModal';
 
 export default function StudentDashboardPage() {
   const { user } = useAuth();
@@ -32,6 +34,9 @@ export default function StudentDashboardPage() {
   const [systemConfig, setSystemConfig] = useState(null);
   const [loading, setLoading] = useState(true);
   const [reviewModalDeal, setReviewModalDeal] = useState(null);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [selectedReviewToReport, setSelectedReviewToReport] = useState(null);
+  const [reportedReviewIds, setReportedReviewIds] = useState(new Set());
 
   const fetchDashboardData = async () => {
     try {
@@ -224,9 +229,28 @@ export default function StudentDashboardPage() {
                           Tutoring sessions for this course have concluded. Thank you for learning on IlmiDunya!
                         </p>
                         {deal.isTutorReviewed && deal.tutorReview?.comment && (
-                          <div className="pt-1.5 border-t border-[#d4a359]/20 text-[11px]">
-                            <span className="font-bold text-[#0c2217]">Teacher Evaluation: </span>
-                            <span className="italic text-stone-700">&ldquo;{deal.tutorReview.comment}&rdquo;</span>
+                          <div className="pt-1.5 border-t border-[#d4a359]/20 text-[11px] flex items-center justify-between gap-2">
+                            <div>
+                              <span className="font-bold text-[#0c2217]">Teacher Evaluation: </span>
+                              <span className="italic text-stone-700">&ldquo;{deal.tutorReview.comment}&rdquo;</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedReviewToReport(deal.tutorReview);
+                                setReportModalOpen(true);
+                              }}
+                              disabled={deal.tutorReview.isReported || reportedReviewIds.has(deal.tutorReview._id)}
+                              className={`inline-flex items-center gap-1 text-[10px] font-semibold transition-colors cursor-pointer shrink-0 ${
+                                (deal.tutorReview.isReported || reportedReviewIds.has(deal.tutorReview._id))
+                                  ? 'text-amber-600 cursor-default'
+                                  : 'text-slate-400 hover:text-rose-600'
+                              }`}
+                              title={(deal.tutorReview.isReported || reportedReviewIds.has(deal.tutorReview._id)) ? 'Under Admin Review' : 'Report this review to administration'}
+                            >
+                              <Flag className="w-3 h-3" />
+                              <span>{(deal.tutorReview.isReported || reportedReviewIds.has(deal.tutorReview._id)) ? 'Under Admin Review' : 'Report'}</span>
+                            </button>
                           </div>
                         )}
                       </div>
@@ -318,6 +342,16 @@ export default function StudentDashboardPage() {
           }}
         />
       )}
+
+      {/* Report Review Modal */}
+      <ReportReviewModal
+        review={selectedReviewToReport}
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        onSuccess={(revId) => {
+          setReportedReviewIds((prev) => new Set([...prev, revId]));
+        }}
+      />
 
       </div>
     </div>

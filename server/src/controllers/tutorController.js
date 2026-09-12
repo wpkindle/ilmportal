@@ -233,8 +233,9 @@ exports.getPublicTutors = async (req, res) => {
       const obj = tp.toObject ? tp.toObject() : { ...tp };
       const uId = obj.user?._id || obj.user?.id || obj.user;
       obj.isOnline = isUserOnline ? Boolean(isUserOnline(uId)) : false;
-      obj.averageRating = obj.ratingAverage !== undefined ? obj.ratingAverage : 5.0;
-      obj.totalReviews = obj.ratingCount !== undefined ? obj.ratingCount : 0;
+      const realCount = obj.ratingCount || 0;
+      obj.averageRating = (realCount > 0 && typeof obj.ratingAverage === 'number') ? obj.ratingAverage : 0;
+      obj.totalReviews = realCount;
       return obj;
     });
 
@@ -322,8 +323,13 @@ exports.getTutorById = async (req, res) => {
     const tutorObj = tutor.toObject ? tutor.toObject() : { ...tutor };
     const uId = tutorObj.user?._id || tutorObj.user?.id || tutorObj.user;
     tutorObj.isOnline = isUserOnline ? Boolean(isUserOnline(uId)) : false;
-    tutorObj.averageRating = tutorObj.ratingAverage !== undefined ? tutorObj.ratingAverage : 5.0;
-    tutorObj.totalReviews = tutorObj.ratingCount !== undefined ? tutorObj.ratingCount : reviews.length;
+    const genuineReviewsCount = reviews.length;
+    const genuineAverage = genuineReviewsCount > 0
+      ? Math.round((reviews.reduce((acc, r) => acc + (r.rating || 0), 0) / genuineReviewsCount) * 10) / 10
+      : 0;
+
+    tutorObj.averageRating = genuineAverage;
+    tutorObj.totalReviews = genuineReviewsCount;
 
     res.status(200).json({
       success: true,

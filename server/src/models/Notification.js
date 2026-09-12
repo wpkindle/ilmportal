@@ -37,6 +37,7 @@ const notificationSchema = new mongoose.Schema({
       'chat_request_declined',
       'session_reminder',
       'safety_report',
+      'review_reported',
       'human_support_request',
       'admin_alert'
     ],

@@ -110,7 +110,7 @@ export default async function TutorProfilePage({ params }) {
           aggregateRating: {
             '@type': 'AggregateRating',
             ratingValue: tutor.ratingAverage ?? tutor.averageRating ?? 5.0,
-            reviewCount: reviews.length || tutor.ratingCount || 1,
+            reviewCount: reviews.length,
             bestRating: '5',
             worstRating: '1'
           }

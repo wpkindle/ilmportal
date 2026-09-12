@@ -22,7 +22,8 @@ import {
   BookOpen,
   Calendar,
   GraduationCap,
-  Star
+  Star,
+  Flag
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { useSocket } from '../../../context/SocketContext';
@@ -35,6 +36,7 @@ import SafetyReportsSection from '../../../components/profile/SafetyReportsSecti
 import { allPakistaniCities, pakistaniCityAreas } from '../../../data/pakistanAreas';
 import CustomSelect, { StyledNativeSelect } from '../../../components/common/CustomSelect';
 import LeaveReviewModal from '../../../components/common/LeaveReviewModal';
+import ReportReviewModal from '../../../components/common/ReportReviewModal';
 
 const pakistaniCities = allPakistaniCities;
 
@@ -60,6 +62,9 @@ function StudentProfileContent() {
   const [reviewsList, setReviewsList] = useState([]);
   const [loadingHistory, setLoadingHistory] = useState(true);
   const [reviewModalDeal, setReviewModalDeal] = useState(null);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [selectedReviewToReport, setSelectedReviewToReport] = useState(null);
+  const [reportedReviewIds, setReportedReviewIds] = useState(new Set());
 
   // Password Form State
   const [currentPassword, setCurrentPassword] = useState('');
@@ -979,6 +984,29 @@ function StudentProfileContent() {
                               ))}
                             </div>
                           )}
+
+                          <div className="flex items-center justify-between pt-1 border-t border-slate-200/60">
+                            <span className="text-[10px] text-slate-400">
+                              {rev.createdAt ? new Date(rev.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
+                            </span>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedReviewToReport(rev);
+                                setReportModalOpen(true);
+                              }}
+                              disabled={rev.isReported || reportedReviewIds.has(rev._id)}
+                              className={`inline-flex items-center gap-1 text-[10px] font-semibold transition-colors cursor-pointer ${
+                                (rev.isReported || reportedReviewIds.has(rev._id))
+                                  ? 'text-amber-600 cursor-default'
+                                  : 'text-slate-400 hover:text-rose-600'
+                              }`}
+                              title={(rev.isReported || reportedReviewIds.has(rev._id)) ? 'Under Admin Review' : 'Report this review to administration'}
+                            >
+                              <Flag className="w-3 h-3" />
+                              <span>{(rev.isReported || reportedReviewIds.has(rev._id)) ? 'Under Admin Review' : 'Report'}</span>
+                            </button>
+                          </div>
                         </div>
                       );
                     })}
@@ -1058,6 +1086,16 @@ function StudentProfileContent() {
           }}
         />
       )}
+
+      {/* Report Review Modal */}
+      <ReportReviewModal
+        review={selectedReviewToReport}
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        onSuccess={(revId) => {
+          setReportedReviewIds((prev) => new Set([...prev, revId]));
+        }}
+      />
 
     </div>
   );

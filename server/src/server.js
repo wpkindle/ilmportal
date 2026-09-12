@@ -199,6 +199,45 @@ const startServer = async () => {
         console.warn('Primary category sync note:', catErr.message);
       }
 
+      // Synchronize genuine review counts and ratings for all tutor profiles (strip fake/stale reviews)
+      try {
+        const TutorProfile = require('./models/TutorProfile');
+        const Review = require('./models/Review');
+        const tutorProfiles = await TutorProfile.find({});
+        for (const tp of tutorProfiles) {
+          const uId = tp.user?._id || tp.user?.id || tp.user;
+          const publishedReviews = await Review.find({
+            $or: [
+              { tutor: uId },
+              { targetUser: uId }
+            ],
+            $and: [
+              {
+                $or: [
+                  { targetRole: 'tutor' },
+                  { reviewerRole: 'student' },
+                  { targetRole: { $exists: false } }
+                ]
+              }
+            ],
+            status: 'published'
+          });
+          const realCount = publishedReviews.length;
+          const realAvg = realCount > 0
+            ? Math.round((publishedReviews.reduce((sum, r) => sum + r.rating, 0) / realCount) * 10) / 10
+            : 0;
+
+          if (tp.ratingCount !== realCount || tp.ratingAverage !== realAvg) {
+            tp.ratingCount = realCount;
+            tp.ratingAverage = realAvg;
+            await tp.save();
+          }
+        }
+        console.log('✅ Genuine review metrics synchronized for all faculty profiles.');
+      } catch (revSyncErr) {
+        console.warn('Review metrics sync note:', revSyncErr.message);
+      }
+
       server.on('error', (e) => {
         if (e.code === 'EADDRINUSE') {
           console.error(`Port ${PORT} is currently in use. Exiting for clean supervisor restart...`);

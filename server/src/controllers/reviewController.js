@@ -2,6 +2,8 @@ const mongoose = require('mongoose');
 const Review = require('../models/Review');
 const TutorProfile = require('../models/TutorProfile');
 const Deal = require('../models/Deal');
+const User = require('../models/User');
+const Notification = require('../models/Notification');
 
 // @desc    Create a review (Student reviewing Tutor OR Tutor reviewing Student)
 // @route   POST /api/reviews
@@ -355,3 +357,108 @@ exports.getMyReviews = async (req, res) => {
     });
   }
 };
+
+// @desc    Report a review for administration moderation
+// @route   POST /api/reviews/:id/report
+// @access  Private (Student & Tutor)
+exports.reportReview = async (req, res) => {
+  try {
+    const { reason, details } = req.body;
+    const reviewId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+      return res.status(400).json({ success: false, message: 'Invalid review ID' });
+    }
+
+    const review = await Review.findById(reviewId)
+      .populate('student', 'name email role')
+      .populate('tutor', 'name email role')
+      .populate('reviewer', 'name email role');
+
+    if (!review) {
+      return res.status(404).json({ success: false, message: 'Review not found' });
+    }
+
+    const reportReasonText = [reason, details].filter(Boolean).join(': ').trim() || 'Flagged for moderation by user';
+
+    review.isReported = true;
+    review.status = 'flagged';
+    review.reportedBy = req.user.id;
+    review.reportReason = reportReasonText;
+    review.reportedAt = new Date();
+    await review.save();
+
+    // Recalculate tutor's rating average and count so flagged reviews are excluded from published ratings
+    const tutorUserId = review.tutor?._id || review.tutor;
+    if (tutorUserId) {
+      const allTutorReviews = await Review.find({
+        $or: [
+          { tutor: tutorUserId },
+          { targetUser: tutorUserId }
+        ],
+        $and: [
+          {
+            $or: [
+              { targetRole: 'tutor' },
+              { reviewerRole: 'student' },
+              { targetRole: { $exists: false } }
+            ]
+          }
+        ],
+        status: 'published'
+      });
+      const count = allTutorReviews.length;
+      const avg = count > 0 ? (allTutorReviews.reduce((sum, r) => sum + r.rating, 0) / count) : 0;
+      await TutorProfile.findOneAndUpdate(
+        { $or: [{ user: tutorUserId }, { _id: tutorUserId }] },
+        {
+          ratingAverage: count > 0 ? Math.round(avg * 10) / 10 : 0,
+          ratingCount: count
+        }
+      );
+    }
+
+    // Send notifications to all admins
+    const admins = await User.find({ role: 'admin' });
+    for (const admin of admins) {
+      await Notification.create({
+        recipient: admin._id,
+        sender: req.user.id,
+        title: 'Review Reported for Moderation',
+        message: `${req.user.name} (${req.user.role}) reported a review: "${reportReasonText.substring(0, 100)}"`,
+        type: 'review_reported',
+        link: '/admin/reviews'
+      });
+    }
+
+    // Socket alert to admins
+    const io = req.app.get('io');
+    if (io) {
+      for (const admin of admins) {
+        io.to(`user_${admin._id}`).emit('notification-alert', {
+          title: 'Review Reported',
+          message: `${req.user.name} reported a review for moderation.`,
+          type: 'review_reported',
+          reviewId: review._id
+        });
+      }
+      io.emit('review-status-changed', {
+        reviewId: review._id,
+        status: 'flagged'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Review has been reported to administration. Our moderation team will investigate promptly.',
+      review
+    });
+  } catch (error) {
+    console.error('Error reporting review:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error reporting review'
+    });
+  }
+};
+

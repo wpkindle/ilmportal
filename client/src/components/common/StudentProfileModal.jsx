@@ -17,10 +17,12 @@ import {
   MessageSquare,
   Globe,
   Star,
-  GraduationCap
+  GraduationCap,
+  Flag
 } from 'lucide-react';
 import { api } from '../../services/api';
 import LoadingSpinner from './LoadingSpinner';
+import ReportReviewModal from './ReportReviewModal';
 import { calculateClientCompletion } from './ProfileCompletionMeter';
 
 export default function StudentProfileModal({
@@ -32,6 +34,9 @@ export default function StudentProfileModal({
   const [profile, setProfile] = useState(studentData);
   const [loading, setLoading] = useState(!studentData && !!studentId);
   const [error, setError] = useState('');
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [selectedReviewToReport, setSelectedReviewToReport] = useState(null);
+  const [reportedReviewIds, setReportedReviewIds] = useState(new Set());
 
   useEffect(() => {
     if (studentData) {
@@ -482,11 +487,30 @@ export default function StudentProfileModal({
                               ))}
                             </div>
                           )}
-                          {(r.reviewer?.name || r.tutor?.name) && (
-                            <div className="text-[10px] font-medium text-slate-500">
-                              Feedback from Tutor: {r.reviewer?.name || r.tutor?.name}
-                            </div>
-                          )}
+                          <div className="flex items-center justify-between pt-1 border-t border-slate-100">
+                            {(r.reviewer?.name || r.tutor?.name) ? (
+                              <div className="text-[10px] font-medium text-slate-500">
+                                Feedback from Tutor: {r.reviewer?.name || r.tutor?.name}
+                              </div>
+                            ) : <div />}
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedReviewToReport(r);
+                                setReportModalOpen(true);
+                              }}
+                              disabled={r.isReported || reportedReviewIds.has(r._id)}
+                              className={`inline-flex items-center gap-1 text-[10px] font-semibold transition-colors cursor-pointer ${
+                                (r.isReported || reportedReviewIds.has(r._id))
+                                  ? 'text-amber-600 cursor-default'
+                                  : 'text-slate-400 hover:text-rose-600'
+                              }`}
+                              title={(r.isReported || reportedReviewIds.has(r._id)) ? 'Reported to admin' : 'Report this review to admin'}
+                            >
+                              <Flag className="w-2.5 h-2.5" />
+                              <span>{(r.isReported || reportedReviewIds.has(r._id)) ? 'Reported' : 'Report'}</span>
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>
@@ -531,6 +555,16 @@ export default function StudentProfileModal({
             Close
           </button>
         </div>
+
+        {/* Report Review Modal */}
+        <ReportReviewModal
+          review={selectedReviewToReport}
+          isOpen={reportModalOpen}
+          onClose={() => setReportModalOpen(false)}
+          onSuccess={(revId) => {
+            setReportedReviewIds((prev) => new Set([...prev, revId]));
+          }}
+        />
       </div>
     </div>
   );

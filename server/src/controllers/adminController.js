@@ -1101,11 +1101,21 @@ exports.deleteAdminConversation = async (req, res) => {
 exports.getAllReviews = async (req, res) => {
   try {
     const { status } = req.query;
-    const query = status && status !== 'all' ? { status } : {};
+    let query = {};
+    if (status && status !== 'all') {
+      if (status === 'flagged') {
+        query = { $or: [{ status: 'flagged' }, { isReported: true }] };
+      } else {
+        query = { status };
+      }
+    }
 
     const reviews = await Review.find(query)
-      .populate('student', 'name email avatar city')
-      .populate('tutor', 'name email avatar city')
+      .populate('student', 'name email avatar city role')
+      .populate('tutor', 'name email avatar city role')
+      .populate('reviewer', 'name email avatar city role')
+      .populate('targetUser', 'name email avatar city role')
+      .populate('reportedBy', 'name email role')
       .populate('deal', 'subject price mode')
       .sort({ createdAt: -1 });
 
@@ -1141,22 +1151,35 @@ exports.overrideReview = async (req, res) => {
 
     if (rating !== undefined) review.rating = Number(rating);
     if (comment !== undefined) review.comment = comment;
-    if (status !== undefined) review.status = status;
+    if (status !== undefined) {
+      review.status = status;
+      if (status === 'published' || status === 'hidden') {
+        review.isReported = false;
+      } else if (status === 'flagged') {
+        review.isReported = true;
+      }
+    }
 
     await review.save();
 
-    // Recalculate tutor's rating average and count
-    const allTutorReviews = await Review.find({ tutor: review.tutor, status: 'published' });
-    const count = allTutorReviews.length;
-    const avg = count > 0 ? (allTutorReviews.reduce((sum, r) => sum + r.rating, 0) / count) : 5.0;
+    // Recalculate tutor's rating average and count strictly from published reviews
+    const tutorId = review.tutor || review.targetUser;
+    if (tutorId) {
+      const allTutorReviews = await Review.find({
+        $or: [{ tutor: tutorId }, { targetUser: tutorId }],
+        status: 'published'
+      });
+      const count = allTutorReviews.length;
+      const avg = count > 0 ? (allTutorReviews.reduce((sum, r) => sum + r.rating, 0) / count) : 0;
 
-    await TutorProfile.findOneAndUpdate(
-      { user: review.tutor },
-      {
-        ratingAverage: Math.round(avg * 10) / 10,
-        ratingCount: count
-      }
-    );
+      await TutorProfile.findOneAndUpdate(
+        { $or: [{ user: tutorId }, { _id: tutorId }] },
+        {
+          ratingAverage: count > 0 ? Math.round(avg * 10) / 10 : 0,
+          ratingCount: count
+        }
+      );
+    }
 
     await logAction(req.user.id, 'OVERRIDE_REVIEW', 'review', review._id, {
       newRating: review.rating,
@@ -1186,21 +1209,26 @@ exports.deleteReview = async (req, res) => {
       return res.status(404).json({ success: false, message: 'Review not found' });
     }
 
-    const tutorId = review.tutor;
+    const tutorId = review.tutor || review.targetUser;
     await Review.findByIdAndDelete(req.params.id);
 
-    // Recalculate tutor's rating average and count
-    const allTutorReviews = await Review.find({ tutor: tutorId, status: 'published' });
-    const count = allTutorReviews.length;
-    const avg = count > 0 ? (allTutorReviews.reduce((sum, r) => sum + r.rating, 0) / count) : 5.0;
+    // Recalculate tutor's rating average and count strictly from remaining published reviews
+    if (tutorId) {
+      const allTutorReviews = await Review.find({
+        $or: [{ tutor: tutorId }, { targetUser: tutorId }],
+        status: 'published'
+      });
+      const count = allTutorReviews.length;
+      const avg = count > 0 ? (allTutorReviews.reduce((sum, r) => sum + r.rating, 0) / count) : 0;
 
-    await TutorProfile.findOneAndUpdate(
-      { user: tutorId },
-      {
-        ratingAverage: Math.round(avg * 10) / 10,
-        ratingCount: count
-      }
-    );
+      await TutorProfile.findOneAndUpdate(
+        { $or: [{ user: tutorId }, { _id: tutorId }] },
+        {
+          ratingAverage: count > 0 ? Math.round(avg * 10) / 10 : 0,
+          ratingCount: count
+        }
+      );
+    }
 
     await logAction(req.user.id, 'DELETE_REVIEW', 'review', req.params.id, { tutorId }, req);
 

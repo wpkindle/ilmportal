@@ -273,15 +273,26 @@ const TutorCard = ({ tutor, tutorProfile }) => {
               </div>
 
               <div className="flex items-center gap-2 mt-1 flex-wrap">
-                <div className="flex items-center gap-1.5">
-                  <RatingStars rating={data.averageRating || 5} size="xs" showScore={false} />
-                  <span className="text-[11px] font-bold text-slate-700">
-                    {data.averageRating?.toFixed(1) || '5.0'}
-                  </span>
-                  <span className="text-[10px] text-slate-400">
-                    ({data.totalReviews || 0} reviews)
-                  </span>
-                </div>
+                {data.totalReviews > 0 ? (
+                  <div className="flex items-center gap-1.5">
+                    <RatingStars rating={data.averageRating || 5} size="xs" showScore={false} />
+                    <span className="text-[11px] font-bold text-slate-700">
+                      {data.averageRating?.toFixed(1) || '5.0'}
+                    </span>
+                    <span className="text-[10px] text-slate-400">
+                      ({data.totalReviews} {data.totalReviews === 1 ? 'review' : 'reviews'})
+                    </span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-1.5">
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-50 text-emerald-800 text-[10px] font-bold border border-emerald-200">
+                      New Tutor
+                    </span>
+                    <span className="text-[10px] text-slate-400 font-medium">
+                      No reviews yet
+                    </span>
+                  </div>
+                )}
                 <span className="text-slate-300">·</span>
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#faf8f5] border border-[#e6ded1] text-slate-700 shrink-0">
                   {(data.experienceYears === 0 || data.experienceYears === '0' || data.experienceYears === 'fresh') ? (

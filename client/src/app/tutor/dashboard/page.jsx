@@ -18,7 +18,8 @@ import {
   Check,
   X,
   Loader2,
-  Star
+  Star,
+  Flag
 } from 'lucide-react';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
@@ -28,6 +29,7 @@ import TutorPaymentModal from '../../../components/tutor/TutorPaymentModal';
 import LeaveReviewModal from '../../../components/common/LeaveReviewModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import AccountStatusBanner from '../../../components/common/AccountStatusBanner';
+import ReportReviewModal from '../../../components/common/ReportReviewModal';
 
 export default function TutorDashboardPage() {
   const { user, tutorProfile } = useAuth();
@@ -40,6 +42,9 @@ export default function TutorDashboardPage() {
   const [completionNotes, setCompletionNotes] = useState('');
   const [completing, setCompleting] = useState(false);
   const [feedback, setFeedback] = useState(null);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [selectedReviewToReport, setSelectedReviewToReport] = useState(null);
+  const [reportedReviewIds, setReportedReviewIds] = useState(new Set());
 
   const fetchData = async () => {
     try {
@@ -413,9 +418,34 @@ export default function TutorDashboardPage() {
                           Tutoring sessions have concluded. Both you and your student can exchange verified reviews to build mutual reputation.
                         </p>
                         {(deal.isStudentReviewed || deal.isReviewed) && (deal.studentReview?.comment || deal.review?.comment) && (
-                          <div className="pt-1.5 border-t border-[#d4a359]/20 text-[11px]">
-                            <span className="font-bold text-[#0c2217]">Student Review: </span>
-                            <span className="italic text-stone-700">&ldquo;{deal.studentReview?.comment || deal.review?.comment}&rdquo;</span>
+                          <div className="pt-1.5 border-t border-[#d4a359]/20 text-[11px] flex items-center justify-between gap-2">
+                            <div>
+                              <span className="font-bold text-[#0c2217]">Student Review: </span>
+                              <span className="italic text-stone-700">&ldquo;{deal.studentReview?.comment || deal.review?.comment}&rdquo;</span>
+                            </div>
+                            {(() => {
+                              const rev = deal.studentReview || deal.review;
+                              const isReported = rev?.isReported || (rev?._id && reportedReviewIds.has(rev._id));
+                              return (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setSelectedReviewToReport(rev);
+                                    setReportModalOpen(true);
+                                  }}
+                                  disabled={isReported}
+                                  className={`inline-flex items-center gap-1 text-[10px] font-semibold transition-colors cursor-pointer shrink-0 ${
+                                    isReported
+                                      ? 'text-amber-600 cursor-default'
+                                      : 'text-slate-400 hover:text-rose-600'
+                                  }`}
+                                  title={isReported ? 'Under Admin Review' : 'Report this review to administration'}
+                                >
+                                  <Flag className="w-3 h-3" />
+                                  <span>{isReported ? 'Under Admin Review' : 'Report'}</span>
+                                </button>
+                              );
+                            })()}
                           </div>
                         )}
                       </div>
@@ -570,6 +600,16 @@ export default function TutorDashboardPage() {
           }}
         />
       )}
+
+      {/* Report Review Modal */}
+      <ReportReviewModal
+        review={selectedReviewToReport}
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        onSuccess={(revId) => {
+          setReportedReviewIds((prev) => new Set([...prev, revId]));
+        }}
+      />
     </div>
   );
 }

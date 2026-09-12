@@ -362,7 +362,7 @@ const seedDatabase = async () => {
       gender: 'male',
       verificationStatus: 'approved',
       ratingAverage: 5.0,
-      ratingCount: 28,
+      ratingCount: 1,
       isFeatured: true,
       sanadDocuments: [{
         title: 'Sanad Tajweed & Qirat (Wifaq-ul-Madaris)',
@@ -405,8 +405,8 @@ const seedDatabase = async () => {
       teachingModes: ['online', 'in_person'],
       gender: 'female',
       verificationStatus: 'approved',
-      ratingAverage: 4.9,
-      ratingCount: 19,
+      ratingAverage: 5.0,
+      ratingCount: 1,
       isFeatured: true,
       sanadDocuments: [{
         title: 'Shahadat-ul-Alimiyyah Degree',
@@ -441,8 +441,8 @@ const seedDatabase = async () => {
       teachingModes: ['online', 'in_person'],
       gender: 'male',
       verificationStatus: 'approved',
-      ratingAverage: 4.9,
-      ratingCount: 22,
+      ratingAverage: 0,
+      ratingCount: 0,
       isFeatured: true,
       sanadDocuments: [{
         title: 'MS Degree Document (NUST)',
@@ -460,9 +460,9 @@ const seedDatabase = async () => {
       password: 'Password@123',
       role: 'tutor',
       isVerified: true,
-      age: 34,
+      age: 29,
       city: 'Lahore',
-      phone: '+92 345 5566778',
+      phone: '+92 300 1122334',
       avatar: '/images/dr-ayesha.jpg'
     });
 
@@ -477,8 +477,8 @@ const seedDatabase = async () => {
       teachingModes: ['online'],
       gender: 'female',
       verificationStatus: 'approved',
-      ratingAverage: 5.0,
-      ratingCount: 31,
+      ratingAverage: 0,
+      ratingCount: 0,
       isFeatured: true,
       sanadDocuments: [{
         title: 'KEMU MBBS Degree & PMDC Registration',
@@ -513,8 +513,8 @@ const seedDatabase = async () => {
       teachingModes: ['online', 'in_person'],
       gender: 'male',
       verificationStatus: 'approved',
-      ratingAverage: 4.8,
-      ratingCount: 15,
+      ratingAverage: 0,
+      ratingCount: 0,
       sanadDocuments: [{
         title: 'MA Arabic Degree Document',
         fileUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600',

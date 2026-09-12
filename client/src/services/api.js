@@ -436,6 +436,11 @@ export const api = {
   getMyReviews: () => fetch(`${API_BASE}/reviews/my-reviews`, {
     headers: getHeaders()
   }).then(handleResponse),
+  reportReview: (id, body) => fetch(`${API_BASE}/reviews/${id}/report`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
 
   // Sessions
   scheduleSession: (body) => fetch(`${API_BASE}/sessions/schedule`, {

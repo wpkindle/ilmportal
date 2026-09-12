@@ -22,13 +22,15 @@ import {
   Layers,
   Search,
   AlertTriangle,
-  GraduationCap
+  GraduationCap,
+  Flag
 } from 'lucide-react';
 import RatingStars from '../../../components/common/RatingStars';
 import { SanadModal } from '../../../components/common/SanadBadge';
 import StudentAuthModal from '../../../components/common/StudentAuthModal';
 import FemaleTutorGateModal from '../../../components/common/FemaleTutorGateModal';
 import ChatRequestModal from '../../../components/common/ChatRequestModal';
+import ReportReviewModal from '../../../components/common/ReportReviewModal';
 import { calculateClientCompletion } from '../../../components/common/ProfileCompletionMeter';
 import { useAuth } from '../../../context/AuthContext';
 import { useSocket } from '../../../context/SocketContext';
@@ -45,6 +47,18 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
   const [chatRequestModalOpen, setChatRequestModalOpen] = useState(false);
   const [authoredCourses, setAuthoredCourses] = useState([]);
   const [reviewsList, setReviewsList] = useState(reviews || []);
+  const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [selectedReviewToReport, setSelectedReviewToReport] = useState(null);
+  const [reportedReviewIds, setReportedReviewIds] = useState(new Set());
+
+  const handleOpenReportModal = (rev) => {
+    if (!isAuthenticated) {
+      setAuthModalOpen(true);
+      return;
+    }
+    setSelectedReviewToReport(rev);
+    setReportModalOpen(true);
+  };
 
   const { onlineStatusMap, refreshUserOnlineStatus, isConnected } = useSocket();
 
@@ -325,15 +339,28 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                 </div>
 
                 <div className="flex items-center flex-wrap gap-x-3 gap-y-1 pt-0.5">
-                  <div className="flex items-center gap-1.5">
-                    <RatingStars rating={tutor.ratingAverage ?? tutor.averageRating ?? 5} size="sm" showScore={false} />
-                    <span className="text-xs font-bold text-slate-800">
-                      {(tutor.ratingAverage ?? tutor.averageRating ?? 5.0).toFixed(1)}
-                    </span>
-                    <span className="text-xs text-slate-400">
-                      ({reviews.length || tutor.ratingCount || tutor.totalReviews || 0} reviews)
-                    </span>
-                  </div>
+                  {reviewsList.length > 0 ? (
+                    <div className="flex items-center gap-1.5">
+                      <RatingStars
+                        rating={reviewsList.reduce((acc, r) => acc + (r.rating || 5), 0) / reviewsList.length}
+                        size="sm"
+                        showScore={false}
+                      />
+                      <span className="text-xs font-bold text-slate-800">
+                        {(reviewsList.reduce((acc, r) => acc + (r.rating || 5), 0) / reviewsList.length).toFixed(1)}
+                      </span>
+                      <span className="text-xs text-slate-400">
+                        ({reviewsList.length} {reviewsList.length === 1 ? 'review' : 'reviews'})
+                      </span>
+                    </div>
+                  ) : (
+                    <div className="flex items-center gap-1.5">
+                      <span className="px-2.5 py-0.5 rounded-full bg-emerald-50 text-emerald-800 font-bold text-xs border border-emerald-200">
+                        New Tutor
+                      </span>
+                      <span className="text-xs text-slate-400 font-medium">No reviews yet</span>
+                    </div>
+                  )}
 
                   {formattedJoiningDate && (
                     <>
@@ -618,65 +645,78 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e6ded1] shadow-2xs space-y-6">
           <div className="flex items-center justify-between">
             <h2 className="text-base font-black text-slate-900 font-serif">
-              Student Reviews &amp; Ratings ({reviewsList.length || tutor.ratingCount || tutor.totalReviews || 0})
+              Student Reviews &amp; Ratings ({reviewsList.length})
             </h2>
-            <div className="flex items-center gap-1.5">
-              <RatingStars
-                rating={
-                  reviewsList.length > 0
-                    ? reviewsList.reduce((acc, r) => acc + (r.rating || 5), 0) / reviewsList.length
-                    : (tutor.ratingAverage ?? tutor.averageRating ?? 5)
-                }
-                size="xs"
-                showScore={false}
-              />
-              <span className="text-xs font-bold text-slate-800">
-                {(
-                  reviewsList.length > 0
-                    ? (reviewsList.reduce((acc, r) => acc + (r.rating || 5), 0) / reviewsList.length).toFixed(1)
-                    : (tutor.ratingAverage ?? tutor.averageRating ?? 5.0).toFixed(1)
-                )} / 5.0
-              </span>
-            </div>
+            {reviewsList.length > 0 ? (
+              <div className="flex items-center gap-1.5">
+                <RatingStars
+                  rating={reviewsList.reduce((acc, r) => acc + (r.rating || 5), 0) / reviewsList.length}
+                  size="xs"
+                  showScore={false}
+                />
+                <span className="text-xs font-bold text-slate-800">
+                  {(reviewsList.reduce((acc, r) => acc + (r.rating || 5), 0) / reviewsList.length).toFixed(1)} / 5.0
+                </span>
+              </div>
+            ) : (
+              <span className="text-xs text-slate-400 font-medium">No ratings yet</span>
+            )}
           </div>
 
           {reviewsList.length === 0 ? (
             <p className="text-xs text-slate-400 py-4">No reviews recorded yet for this tutor.</p>
           ) : (
             <div className="space-y-4">
-              {reviewsList.map((rev) => (
-                <div key={rev._id} className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-2.5">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2.5">
-                      <div className="w-8 h-8 rounded-full bg-[#0c2217] text-[#d4a359] font-bold text-xs flex items-center justify-center border border-[#d4a359]/30 shrink-0">
-                        {((rev.student?.name || rev.reviewer?.name || 'S').charAt(0)).toUpperCase()}
+              {reviewsList.map((rev) => {
+                const isReported = rev.isReported || reportedReviewIds.has(rev._id);
+                return (
+                  <div key={rev._id} className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-2.5">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-full bg-[#0c2217] text-[#d4a359] font-bold text-xs flex items-center justify-center border border-[#d4a359]/30 shrink-0">
+                          {((rev.student?.name || rev.reviewer?.name || 'S').charAt(0)).toUpperCase()}
+                        </div>
+                        <div>
+                          <span className="font-bold text-xs text-slate-900 block">
+                            {rev.student?.name || rev.reviewer?.name || 'Verified Student'}
+                          </span>
+                          {(rev.student?.city || rev.reviewer?.city) && (
+                            <span className="text-[10px] text-slate-500 font-medium block">{rev.student?.city || rev.reviewer?.city}</span>
+                          )}
+                        </div>
                       </div>
-                      <div>
-                        <span className="font-bold text-xs text-slate-900 block">
-                          {rev.student?.name || rev.reviewer?.name || 'Verified Student'}
-                        </span>
-                        {(rev.student?.city || rev.reviewer?.city) && (
-                          <span className="text-[10px] text-slate-500 font-medium block">{rev.student?.city || rev.reviewer?.city}</span>
-                        )}
-                      </div>
+                      <RatingStars rating={rev.rating} size="xs" />
                     </div>
-                    <RatingStars rating={rev.rating} size="xs" />
+                    {rev.comment && <p className="text-xs text-slate-700 leading-relaxed">&ldquo;{rev.comment}&rdquo;</p>}
+                    {rev.quickTags && rev.quickTags.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 pt-0.5">
+                        {rev.quickTags.map((tag, idx) => (
+                          <span key={idx} className="px-2 py-0.5 rounded-md bg-[#f0ece1] text-[#0c2217] text-[10px] font-semibold border border-[#d4a359]/30">
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    <div className="flex items-center justify-between pt-1 border-t border-slate-200/60">
+                      <span className="text-[10px] text-slate-400 font-mono block">
+                        {new Date(rev.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => handleOpenReportModal(rev)}
+                        disabled={isReported}
+                        className={`inline-flex items-center gap-1 text-[10px] font-semibold transition-colors cursor-pointer ${
+                          isReported ? 'text-amber-600 cursor-default' : 'text-slate-400 hover:text-rose-600'
+                        }`}
+                        title={isReported ? 'This review has been reported to administration' : 'Report this review to administration'}
+                      >
+                        <Flag className="w-3 h-3" />
+                        <span>{isReported ? 'Under Admin Review' : 'Report'}</span>
+                      </button>
+                    </div>
                   </div>
-                  {rev.comment && <p className="text-xs text-slate-700 leading-relaxed">&ldquo;{rev.comment}&rdquo;</p>}
-                  {rev.quickTags && rev.quickTags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 pt-0.5">
-                      {rev.quickTags.map((tag, idx) => (
-                        <span key={idx} className="px-2 py-0.5 rounded-md bg-[#f0ece1] text-[#0c2217] text-[10px] font-semibold border border-[#d4a359]/30">
-                          #{tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  <span className="text-[10px] text-slate-400 font-mono block">
-                    {new Date(rev.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
-                  </span>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -738,6 +778,16 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
           setTimeout(() => {
             router.push(`/student/messages?conversation=${conversationId}&tutorId=${tutorTargetId}`);
           }, 1200);
+        }}
+      />
+
+      {/* Report Review Modal */}
+      <ReportReviewModal
+        review={selectedReviewToReport}
+        isOpen={reportModalOpen}
+        onClose={() => setReportModalOpen(false)}
+        onSuccess={(revId) => {
+          setReportedReviewIds((prev) => new Set([...prev, revId]));
         }}
       />
 

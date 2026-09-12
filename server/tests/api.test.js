@@ -336,6 +336,50 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
     expect(studentReviewsRes.body.reviews[0].quickTags).toContain('Dedicated Learner');
   });
 
+  test('Tutor reports an inappropriate review to admin and admin overrides rating and comment', async () => {
+    const Deal = require('../src/models/Deal');
+    const deal = await Deal.findById(dealId);
+    const reviewId = deal.studentReview;
+
+    // 1. Tutor reports the student review
+    const reportRes = await request(app)
+      .post(`/api/reviews/${reviewId}/report`)
+      .set('Authorization', `Bearer ${tutorToken}`)
+      .send({
+        reason: 'disputed_claim',
+        details: 'Review contains inaccurate information regarding lesson schedule.'
+      });
+
+    expect(reportRes.statusCode).toEqual(200);
+    expect(reportRes.body.success).toBe(true);
+    expect(reportRes.body.review.status).toEqual('flagged');
+    expect(reportRes.body.review.isReported).toBe(true);
+
+    // 2. Admin fetches all reviews filtered by flagged
+    const adminReviewsRes = await request(app)
+      .get('/api/admin/reviews?status=flagged')
+      .set('Authorization', `Bearer ${adminToken}`);
+
+    expect(adminReviewsRes.statusCode).toEqual(200);
+    expect(adminReviewsRes.body.reviews.some(r => r._id.toString() === reviewId.toString())).toBe(true);
+
+    // 3. Admin moderates and overrides the review
+    const overrideRes = await request(app)
+      .put(`/api/admin/reviews/${reviewId}/override`)
+      .set('Authorization', `Bearer ${adminToken}`)
+      .send({
+        rating: 5,
+        comment: 'Outstanding tutor! Verified by administration.',
+        status: 'published'
+      });
+
+    expect(overrideRes.statusCode).toEqual(200);
+    expect(overrideRes.body.success).toBe(true);
+    expect(overrideRes.body.review.adminEdited).toBe(true);
+    expect(overrideRes.body.review.status).toEqual('published');
+    expect(overrideRes.body.review.isReported).toBe(false);
+  });
+
   test('Public CMS routes return categories and Pakistani locations', async () => {
     const catRes = await request(app).get('/api/cms/categories');
     expect(catRes.statusCode).toEqual(200);

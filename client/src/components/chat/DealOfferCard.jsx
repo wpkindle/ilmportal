@@ -86,11 +86,13 @@ const DealOfferCard = ({ deal, onDealUpdated, onRequestNewDeal, onStartNewDeal, 
     dealState.paymentStatus === 'verified' ||
     dealState.platformFee === 0
   );
+  const isInPerson = dealState.mode === 'in_person' || dealState.mode === 'physical';
+  const isPlatformFeeDue = isInPerson || Boolean(dealState.tutorFeeDueDate);
 
   const handleComplete = async () => {
     if (!dealId) return;
 
-    if (isTutorUser && !isFeeCleared) {
+    if (isTutorUser && !isFeeCleared && isPlatformFeeDue) {
       setShowPaymentNoticeModal(true);
       return;
     }
@@ -627,7 +629,7 @@ const DealOfferCard = ({ deal, onDealUpdated, onRequestNewDeal, onStartNewDeal, 
             </div>
           )}
 
-          {!isFeeCleared && dealState.paymentStatus !== 'submitted_proof' && (
+          {!isFeeCleared && isPlatformFeeDue && dealState.paymentStatus !== 'submitted_proof' && (
             <div className="p-2.5 bg-amber-50/80 border border-amber-200/90 rounded-2xl flex items-start gap-2 text-xs">
               <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
               <div className="flex-1">
@@ -674,7 +676,7 @@ const DealOfferCard = ({ deal, onDealUpdated, onRequestNewDeal, onStartNewDeal, 
                 </div>
               )}
 
-              {!isFeeCleared && dealState.paymentStatus !== 'submitted_proof' && (
+              {!isFeeCleared && isPlatformFeeDue && dealState.paymentStatus !== 'submitted_proof' && (
                 <button
                   type="button"
                   onClick={() => setShowPaymentModal(true)}

@@ -144,34 +144,53 @@ exports.getSessionByRoomId = async (req, res) => {
 
         if (deal && ['active_trial', 'continuation_agreed', 'active_paid', 'restricted'].includes(deal.status)) {
           const now = new Date();
-          if (!deal.tutorFeeDueDate) {
+          const isInPerson = deal.mode === 'in_person' || deal.mode === 'physical';
+
+          // For in-person deals, initialize 3-day clock on start if missing;
+          // For online deals, tutorFeeDueDate only starts when tutor approves student payment
+          if (isInPerson && !deal.tutorFeeDueDate) {
             deal.tutorFeeDueDate = deal.trialEndDate
               || (deal.trialStartDate ? new Date(new Date(deal.trialStartDate).getTime() + 72 * 60 * 60 * 1000) : null)
               || (deal.continuationAgreedAt ? new Date(new Date(deal.continuationAgreedAt).getTime() + 72 * 60 * 60 * 1000) : null)
               || new Date(now.getTime() + 72 * 60 * 60 * 1000);
           }
 
-          if (deal.tutorFeeDueDate && new Date(deal.tutorFeeDueDate) < now && !deal.tutorFeePaid) {
-            deal.accessRestricted = true;
-            deal.status = 'restricted';
-            deal.restrictionType = 'suspend_access';
-            await deal.save();
-          } else if (!deal.tutorFeePaid && new Date(deal.tutorFeeDueDate) >= now && !deal.hasOverduePayment) {
-            // Still within 72-hour window: live video classroom remains 100% active and unlocked!
-            deal.accessRestricted = false;
-            deal.restrictionType = 'none';
-            if (deal.status === 'restricted') {
-              deal.status = deal.continuationAgreed ? 'continuation_agreed' : 'active_trial';
+          if (deal.tutorFeeDueDate) {
+            if (new Date(deal.tutorFeeDueDate) < now && !deal.tutorFeePaid) {
+              deal.accessRestricted = true;
+              deal.status = 'restricted';
+              deal.restrictionType = 'suspend_access';
+              await deal.save();
+            } else if (!deal.tutorFeePaid && new Date(deal.tutorFeeDueDate) >= now && !deal.hasOverduePayment) {
+              // Still within 3-day window: live video classroom remains 100% active and unlocked!
+              deal.accessRestricted = false;
+              deal.restrictionType = 'none';
+              if (deal.status === 'restricted') {
+                deal.status = deal.continuationAgreed ? 'continuation_agreed' : 'active_trial';
+              }
+              await deal.save();
             }
-            await deal.save();
+          } else {
+            // Online deal with no tutorFeeDueDate set yet: classroom is accessible without platform fee!
+            if (deal.accessRestricted && deal.restrictionType === 'suspend_access' && !deal.hasOverduePayment) {
+              deal.accessRestricted = false;
+              deal.restrictionType = 'none';
+              if (deal.status === 'restricted') {
+                deal.status = deal.continuationAgreed ? 'continuation_agreed' : 'active_trial';
+              }
+              await deal.save();
+            }
           }
         }
 
         // Enforce that video call requires an accepted deal and not restricted
         if (req.user?.role !== 'admin') {
           const isPaymentOverdue = Boolean(deal?.hasOverduePayment);
-          const isPlatformFeeOverdue = (deal?.tutorFeeDueDate && new Date(deal.tutorFeeDueDate) < new Date() && !deal?.tutorFeePaid)
-            || (!deal?.tutorFeeDueDate && deal?.trialEndDate && new Date(deal.trialEndDate) < new Date() && !deal?.tutorFeePaid);
+          const isPlatformFeeOverdue = Boolean(
+            deal?.tutorFeeDueDate &&
+            new Date(deal.tutorFeeDueDate) < new Date() &&
+            !deal?.tutorFeePaid
+          );
           const isOverdue = isPaymentOverdue || isPlatformFeeOverdue || deal?.accessRestricted || deal?.status === 'restricted';
 
           if (!deal || !['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) || isOverdue) {
@@ -179,10 +198,11 @@ exports.getSessionByRoomId = async (req, res) => {
               success: false,
               isRestricted: isOverdue,
               hasOverduePayment: isPaymentOverdue,
+              isPlatformFeeOverdue,
               message: isPaymentOverdue
                 ? 'Classroom access is restricted. A tuition fee payment was requested with a 3-day threshold and has not been cleared by the tutor. Please complete and clear the payment to resume live video classes.'
                 : (isPlatformFeeOverdue
-                  ? 'Video classroom access is restricted. The 72-hour tutor platform fee clearance period has expired without payment verification.'
+                  ? 'Video classroom access is restricted. The 3-day tutor platform fee clearance period has expired without payment verification. Please clear your platform fee with administration.'
                   : 'Live video classroom is only available after a tuition deal offer has been accepted.')
             });
           }

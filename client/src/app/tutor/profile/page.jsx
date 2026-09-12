@@ -30,7 +30,9 @@ import {
   BookOpen,
   Search,
   X,
-  Compass
+  Compass,
+  CreditCard,
+  AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { useSocket } from '../../../context/SocketContext';
@@ -46,6 +48,7 @@ import CustomSelect, { StyledNativeSelect } from '../../../components/common/Cus
 import { parseDegreesAndCertificates } from '../../../utils/tutorHelpers';
 import VideoIntroPlayer from '../../../components/common/VideoIntroPlayer';
 import TutorPaymentMethodsManager from '../../../components/tutor/TutorPaymentMethodsManager';
+import TutorPaymentModal from '../../../components/tutor/TutorPaymentModal';
 
 
 const pakistaniCities = allPakistaniCities;
@@ -126,6 +129,25 @@ function TutorProfileContent() {
   const [sanadSuccess, setSanadSuccess] = useState('');
   const [sanadError, setSanadError] = useState('');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
+
+  // Deals state for platform fee monitoring
+  const [deals, setDeals] = useState([]);
+  const [selectedDealForPay, setSelectedDealForPay] = useState(null);
+
+  const fetchDeals = async () => {
+    try {
+      const res = await api.getMyDeals();
+      if (res.success) {
+        setDeals(res.deals || []);
+      }
+    } catch (err) {
+      console.error('Failed to load deals in tutor profile:', err);
+    }
+  };
+
+  useEffect(() => {
+    fetchDeals();
+  }, []);
 
   // Fetch available categories / disciplines from API
   useEffect(() => {
@@ -597,6 +619,12 @@ function TutorProfileContent() {
     }
   };
 
+  const overdueDeals = deals.filter(d => {
+    const isCleared = Boolean(d.tutorFeePaid || d.paymentStatus === 'verified' || d.platformFee === 0);
+    if (isCleared) return false;
+    return Boolean(d.tutorFeeDueDate && new Date(d.tutorFeeDueDate) < new Date() && !d.tutorFeePaid);
+  });
+
   if (authLoading) {
     return <LoadingSpinner />;
   }
@@ -647,6 +675,51 @@ function TutorProfileContent() {
               <p className="text-xs text-stone-700 leading-relaxed font-medium">
                 Welcome to IlmiDunya! Your email address is confirmed. Please complete your profile 100%, then the administration will review it. Profile will be visible to the public on approval from administration.
               </p>
+            </div>
+          </div>
+        )}
+
+        {/* Overdue Platform Fee Warning Notice in Tutor Profile */}
+        {overdueDeals.length > 0 && (
+          <div className="p-5 sm:p-6 bg-rose-50 border-2 border-rose-400 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-rose-950 shadow-md animate-in fade-in">
+            <div className="flex items-start sm:items-center gap-3.5">
+              <div className="w-11 h-11 rounded-2xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-600/20">
+                <AlertTriangle className="w-6 h-6" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-sm sm:text-base font-black text-rose-950">
+                    Urgent Policy Notice: Platform Fee Payment Overdue ({overdueDeals.length} {overdueDeals.length === 1 ? 'Course' : 'Courses'})
+                  </h3>
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-rose-600 text-white animate-pulse">
+                    Live Classroom Locked
+                  </span>
+                </div>
+                <p className="text-xs text-rose-800 leading-relaxed font-medium">
+                  The 3-day payment clearance period has expired for {overdueDeals.map(d => `"${d.subject}" (PKR ${(d.platformFee || Math.round((d.price || 0) * 0.10)).toLocaleString()})`).join(', ')}. As per platform rules, your live video classroom access is paused until payment is submitted and cleared.
+                </p>
+                {overdueDeals[0]?.paymentStatus === 'submitted_proof' && (
+                  <p className="text-[11px] font-semibold text-amber-900 bg-amber-100/80 px-2.5 py-1 rounded-xl border border-amber-300 w-fit">
+                    Payment proof is currently submitted and under review by administration.
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto flex-wrap">
+              <button
+                type="button"
+                onClick={() => setSelectedDealForPay(overdueDeals[0])}
+                className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-1.5 hover:scale-105"
+              >
+                <CreditCard className="w-4 h-4" />
+                <span>Pay Platform Fee Now</span>
+              </button>
+              <Link
+                href="/tutor/deals"
+                className="px-3.5 py-2.5 bg-white hover:bg-rose-100 text-rose-900 border border-rose-300 font-bold text-xs rounded-xl transition-all"
+              >
+                View Deals
+              </Link>
             </div>
           </div>
         )}
@@ -2090,6 +2163,19 @@ function TutorProfileContent() {
           onClose={() => setShowDeleteModal(false)}
           role="tutor"
           userName={name}
+        />
+      )}
+
+      {/* Tutor Platform Payment Modal */}
+      {selectedDealForPay && (
+        <TutorPaymentModal
+          deal={selectedDealForPay}
+          isOpen={Boolean(selectedDealForPay)}
+          onClose={() => setSelectedDealForPay(null)}
+          onSuccess={() => {
+            setSelectedDealForPay(null);
+            fetchDeals();
+          }}
         />
       )}
 

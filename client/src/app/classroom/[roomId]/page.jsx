@@ -90,14 +90,20 @@ export default function VideoClassroomPage() {
             {sessionData.error || 'Access to this live video classroom is restricted. A 3-day payment threshold for tuition fees has expired without clearance.'}
           </p>
           <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 text-xs text-amber-400 font-semibold space-y-1">
-            <p>⚡ 3-Day Threshold Notice</p>
-            <p className="text-[11px] text-slate-400">Tuition fees must be paid via tutor's Bank, Raast, EasyPaisa, JazzCash, or UPaisa and cleared by the tutor to unlock classes.</p>
+            <p>⚡ {sessionData.isPlatformFeeOverdue ? 'Platform Fee Clearance Notice' : '3-Day Threshold Notice'}</p>
+            <p className="text-[11px] text-slate-400">
+              {sessionData.isPlatformFeeOverdue
+                ? 'The 3-day tutor platform fee clearance period expired. Please pay your platform fee to resume live video classes.'
+                : "Tuition fees must be paid via tutor's Bank, Raast, EasyPaisa, JazzCash, or UPaisa and cleared by the tutor to unlock classes."}
+            </p>
           </div>
           <button
             onClick={() => window.location.href = user?.role === 'tutor' ? '/tutor/deals' : '/student/deals'}
             className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-md"
           >
-            {user?.role === 'tutor' ? 'Go to Deals & Clear Payment' : 'Go to Deals & Pay Tuition Fee'}
+            {user?.role === 'tutor'
+              ? (sessionData.isPlatformFeeOverdue ? 'Go to Deals & Pay Platform Fee' : 'Go to Deals & Clear Payment')
+              : 'Go to Deals & Pay Tuition Fee'}
           </button>
         </div>
       </div>

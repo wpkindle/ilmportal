@@ -124,10 +124,8 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
     isTutor &&
     partnerDeal &&
     !partnerDeal.tutorFeePaid &&
-    (
-      (partnerDeal.tutorFeeDueDate && new Date(partnerDeal.tutorFeeDueDate) < new Date()) ||
-      (!partnerDeal.tutorFeeDueDate && partnerDeal.trialEndDate && new Date(partnerDeal.trialEndDate) < new Date())
-    )
+    partnerDeal.tutorFeeDueDate &&
+    new Date(partnerDeal.tutorFeeDueDate) < new Date()
   );
 
   // Video call / Live class option is ONLY visible when deal has been accepted AND tutor is not restricted!

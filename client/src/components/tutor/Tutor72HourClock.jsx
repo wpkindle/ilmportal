@@ -12,15 +12,23 @@ export default function Tutor72HourClock({ deal, onPayClick, className = '' }) {
     formatted: '72h 00m 00s'
   });
 
+  const isInPerson = deal?.mode === 'in_person' || deal?.mode === 'physical';
+  const hasFeeDueDate = Boolean(deal?.tutorFeeDueDate);
+
   useEffect(() => {
     if (!deal) return;
 
-    // Calculate due date (72 hours from deal start)
+    // For online classes, if tutorFeeDueDate is not set yet, don't run timer
+    if (!isInPerson && !hasFeeDueDate) return;
+
+    // Calculate due date
     const dueDate = deal.tutorFeeDueDate
       ? new Date(deal.tutorFeeDueDate)
-      : deal.trialEndDate
-      ? new Date(deal.trialEndDate)
-      : new Date(new Date(deal.trialStartDate || deal.continuationAgreedAt || deal.createdAt || Date.now()).getTime() + 72 * 60 * 60 * 1000);
+      : isInPerson
+      ? new Date(new Date(deal.createdAt || Date.now()).getTime() + 72 * 60 * 60 * 1000)
+      : null;
+
+    if (!dueDate) return;
 
     const updateTimer = () => {
       const now = new Date();
@@ -55,9 +63,14 @@ export default function Tutor72HourClock({ deal, onPayClick, className = '' }) {
     updateTimer();
     const timer = setInterval(updateTimer, 1000);
     return () => clearInterval(timer);
-  }, [deal]);
+  }, [deal, isInPerson, hasFeeDueDate]);
 
   if (!deal) return null;
+
+  // For online classes, if tutor has not approved student payment yet (no tutorFeeDueDate) and fee is not paid, don't show platform fee button/clock yet
+  if (!isInPerson && !hasFeeDueDate && !deal.tutorFeePaid && deal.paymentStatus !== 'verified') {
+    return null;
+  }
 
   // Case 1: Platform fee paid and verified by administration
   if (deal.tutorFeePaid || deal.paymentStatus === 'verified') {

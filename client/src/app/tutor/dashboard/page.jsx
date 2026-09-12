@@ -118,6 +118,11 @@ export default function TutorDashboardPage() {
 
   const activeTrialDeals = deals.filter(d => d.status === 'active_trial');
   const activePaidDeals = deals.filter(d => d.status === 'active_paid');
+  const overdueDeals = deals.filter(d => {
+    const isCleared = Boolean(d.tutorFeePaid || d.paymentStatus === 'verified' || d.platformFee === 0);
+    if (isCleared) return false;
+    return Boolean(d.tutorFeeDueDate && new Date(d.tutorFeeDueDate) < new Date() && !d.tutorFeePaid);
+  });
 
   return (
     <div className="py-6 md:py-8 pb-24 md:pb-12 bg-[#faf8f5] min-h-screen text-stone-900">
@@ -125,6 +130,38 @@ export default function TutorDashboardPage() {
         
         {/* Account Status / Warning Notice / Audit Banner */}
         <AccountStatusBanner user={user} role="tutor" />
+
+        {/* Overdue Platform Fee Warning Notice */}
+        {overdueDeals.length > 0 && (
+          <div className="p-5 bg-rose-50 border-2 border-rose-400 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-rose-950 shadow-md animate-in fade-in">
+            <div className="flex items-start sm:items-center gap-3.5">
+              <div className="w-10 h-10 rounded-2xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-600/20">
+                <AlertTriangle className="w-5 h-5" />
+              </div>
+              <div className="space-y-0.5">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h4 className="font-serif font-black text-sm text-rose-950">
+                    Urgent: Platform Fee Overdue ({overdueDeals.length} {overdueDeals.length === 1 ? 'Course' : 'Courses'})
+                  </h4>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-rose-600 text-white animate-pulse">
+                    Live Classes Locked
+                  </span>
+                </div>
+                <p className="text-xs text-rose-800 leading-relaxed font-medium">
+                  The 3-day payment clearance period has expired for: {overdueDeals.map(d => `"${d.subject}" (PKR ${(d.platformFee || Math.round((d.price || 0) * 0.10)).toLocaleString()})`).join(', ')}. Live video classroom access is paused until payment is cleared.
+                </p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={() => setSelectedDealForPay(overdueDeals[0])}
+              className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs shrink-0 cursor-pointer flex items-center gap-2 transition-all hover:scale-105"
+            >
+              <CreditCard className="w-4 h-4" />
+              <span>Pay Platform Fee Now</span>
+            </button>
+          </div>
+        )}
 
         {/* Feedback / Alert Banner */}
         {feedback && (
@@ -293,15 +330,31 @@ export default function TutorDashboardPage() {
 
                     <div className="flex items-center gap-2 flex-wrap">
                       {/* Join Live Classroom */}
-                      {deal.status !== 'completed' && deal.mode !== 'in_person' && deal.mode !== 'physical' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && (deal.tutorFeePaid || !deal.tutorFeeDueDate || new Date(deal.tutorFeeDueDate) >= new Date() || (deal.trialEndDate && new Date(deal.trialEndDate) >= new Date())) && (
-                        <Link
-                          href={`/classroom/${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
-                          className="px-3.5 py-2 rounded-xl bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] text-xs font-bold flex items-center gap-1.5 shadow-xs border border-[#d4a359]/30 transition-all cursor-pointer"
-                        >
-                          <Video className="w-4 h-4 text-[#d4a359]" />
-                          <span>Join Live Class</span>
-                        </Link>
-                      )}
+                      {deal.status !== 'completed' && deal.mode !== 'in_person' && deal.mode !== 'physical' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && (() => {
+                        const isOverdue = Boolean(deal.tutorFeeDueDate && new Date(deal.tutorFeeDueDate) < new Date() && !deal.tutorFeePaid);
+                        if (isOverdue) {
+                          return (
+                            <button
+                              type="button"
+                              onClick={() => setSelectedDealForPay(deal)}
+                              className="px-3.5 py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-bold flex items-center gap-1.5 shadow-xs border border-rose-300 transition-all cursor-pointer"
+                              title="Live classroom is locked because the 3-day platform fee threshold has expired. Click to pay platform fee."
+                            >
+                              <Video className="w-4 h-4 text-rose-500" />
+                              <span>Class Locked (Pay Fee)</span>
+                            </button>
+                          );
+                        }
+                        return (
+                          <Link
+                            href={`/classroom/${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
+                            className="px-3.5 py-2 rounded-xl bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] text-xs font-bold flex items-center gap-1.5 shadow-xs border border-[#d4a359]/30 transition-all cursor-pointer"
+                          >
+                            <Video className="w-4 h-4 text-[#d4a359]" />
+                            <span>Join Live Class</span>
+                          </Link>
+                        );
+                      })()}
 
                       {deal.status !== 'completed' && (
                         <Link
@@ -316,6 +369,10 @@ export default function TutorDashboardPage() {
                       {/* Mark Completed Button & Clearance Status */}
                       {deal.status !== 'completed' && deal.status !== 'cancelled' && (() => {
                         const isCleared = Boolean(deal.tutorFeePaid || deal.paymentStatus === 'verified' || deal.platformFee === 0);
+                        const isInPerson = deal.mode === 'in_person' || deal.mode === 'physical';
+                        const isPlatformFeeDue = isInPerson || Boolean(deal.tutorFeeDueDate);
+                        const isOverdue = Boolean(deal.tutorFeeDueDate && new Date(deal.tutorFeeDueDate) < new Date() && !deal.tutorFeePaid);
+
                         return (
                           <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap sm:flex-nowrap">
                             {isCleared ? (
@@ -333,17 +390,19 @@ export default function TutorDashboardPage() {
                                 <Clock className="w-3.5 h-3.5 text-amber-600 animate-pulse shrink-0" />
                                 <span>Proof Under Review</span>
                               </button>
-                            ) : (
+                            ) : isPlatformFeeDue ? (
                               <button
                                 type="button"
                                 onClick={() => setSelectedDealForPay(deal)}
-                                className="px-2.5 py-1.5 rounded-xl bg-[#0c2217] hover:bg-[#143d2b] text-white text-xs font-bold flex items-center gap-1.5 border border-[#d4a359]/30 transition-all cursor-pointer shadow-2xs"
-                                title="Submit platform fee payment proof"
+                                className={`px-2.5 py-1.5 rounded-xl text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs ${
+                                  isOverdue ? 'bg-rose-600 hover:bg-rose-700 animate-pulse' : 'bg-[#0c2217] hover:bg-[#143d2b] border border-[#d4a359]/30'
+                                }`}
+                                title={isOverdue ? '72h Platform Fee Overdue! Click to clear payment.' : 'Submit platform fee payment proof'}
                               >
                                 <CreditCard className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
-                                <span>Pay Platform Fee</span>
+                                <span>{isOverdue ? 'Pay Overdue Fee' : 'Pay Platform Fee'}</span>
                               </button>
-                            )}
+                            ) : null}
 
                             <button
                               type="button"

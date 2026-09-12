@@ -150,12 +150,14 @@ exports.respondToDealOffer = async (req, res) => {
 
       const now = new Date();
       const trialEndDate = new Date(now.getTime() + trialDays * 24 * 60 * 60 * 1000);
-      const feeDueDate = new Date(now.getTime() + 72 * 60 * 60 * 1000); // 72-hour grace period clock starts when deal starts!
+      const isInPerson = deal.mode === 'in_person' || deal.mode === 'physical';
+      const feeDueDate = new Date(now.getTime() + 72 * 60 * 60 * 1000); // 72-hour clock for in-person deals starts when deal starts
 
       deal.status = 'active_trial';
       deal.trialStartDate = now;
       deal.trialEndDate = trialEndDate;
-      deal.tutorFeeDueDate = feeDueDate;
+      // In-person deals start 3-day clearance immediately; online deals wait until tutor clears student payment
+      deal.tutorFeeDueDate = isInPerson ? feeDueDate : null;
       deal.tutorFeePaid = false;
       deal.accessRestricted = false;
 
@@ -309,9 +311,11 @@ exports.getMyDeals = async (req, res) => {
         await evaluatePaymentOverdue(deal);
       }
       if (['active_trial', 'continuation_agreed', 'active_paid', 'restricted'].includes(deal.status)) {
-        // Accurately resolve 72-hour due date:
-        // Priority: existing tutorFeeDueDate -> trialEndDate -> trialStartDate+72h -> continuationAgreedAt+72h -> now+72h
-        if (!deal.tutorFeeDueDate) {
+        const isInPerson = deal.mode === 'in_person' || deal.mode === 'physical';
+
+        // Only in-person deals auto-initialize tutorFeeDueDate on start;
+        // Online deals receive tutorFeeDueDate only when tutor clears student tuition payment
+        if (isInPerson && !deal.tutorFeeDueDate) {
           deal.tutorFeeDueDate = deal.trialEndDate
             || (deal.trialStartDate ? new Date(new Date(deal.trialStartDate).getTime() + 72 * 60 * 60 * 1000) : null)
             || (deal.continuationAgreedAt ? new Date(new Date(deal.continuationAgreedAt).getTime() + 72 * 60 * 60 * 1000) : null)
@@ -319,17 +323,29 @@ exports.getMyDeals = async (req, res) => {
         }
 
         // Check if 72-hour window passed without payment verification
-        if (deal.tutorFeeDueDate && new Date(deal.tutorFeeDueDate) < now && !deal.tutorFeePaid) {
-          deal.accessRestricted = true;
-          deal.restrictionType = 'suspend_access';
-          deal.status = 'restricted';
-          await deal.save();
-        } else if (!deal.tutorFeePaid && new Date(deal.tutorFeeDueDate) >= now) {
-          // Within 72-hour window: full access MUST be granted to chat and video!
-          if (deal.accessRestricted || deal.status === 'restricted') {
+        if (deal.tutorFeeDueDate) {
+          if (new Date(deal.tutorFeeDueDate) < now && !deal.tutorFeePaid) {
+            deal.accessRestricted = true;
+            deal.restrictionType = 'suspend_access';
+            deal.status = 'restricted';
+            await deal.save();
+          } else if (!deal.tutorFeePaid && new Date(deal.tutorFeeDueDate) >= now) {
+            // Within 72-hour window: full access MUST be granted to chat and video!
+            if (deal.accessRestricted || deal.status === 'restricted') {
+              deal.accessRestricted = false;
+              deal.restrictionType = 'none';
+              deal.status = deal.continuationAgreed ? 'continuation_agreed' : 'active_trial';
+              await deal.save();
+            }
+          }
+        } else {
+          // Online class where tutorFeeDueDate is not set yet: live classes remain active without platform fee
+          if (deal.accessRestricted && deal.restrictionType === 'suspend_access' && !deal.hasOverduePayment) {
             deal.accessRestricted = false;
             deal.restrictionType = 'none';
-            deal.status = deal.continuationAgreed ? 'continuation_agreed' : 'active_trial';
+            if (deal.status === 'restricted') {
+              deal.status = deal.continuationAgreed ? 'continuation_agreed' : 'active_trial';
+            }
             await deal.save();
           }
         }
@@ -612,7 +628,8 @@ exports.respondToTrialContinuation = async (req, res) => {
 
     if (decision === 'continue') {
       const now = new Date();
-      const feeDueDate = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000); // 3-day deadline!
+      const isInPerson = deal.mode === 'in_person' || deal.mode === 'physical';
+      const feeDueDate = isInPerson ? new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000) : null;
 
       deal.status = 'continuation_agreed';
       deal.continuationAgreed = true;

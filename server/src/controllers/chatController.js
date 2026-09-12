@@ -345,7 +345,11 @@ exports.sendMessage = async (req, res) => {
 
       if (deal) {
         const now = new Date();
-        if (!deal.tutorFeeDueDate && ['active_trial', 'continuation_agreed', 'active_paid', 'restricted'].includes(deal.status)) {
+        const isInPerson = deal.mode === 'in_person' || deal.mode === 'physical';
+
+        // For in-person deals, initialize 3-day clock on start if missing;
+        // For online deals, tutorFeeDueDate only starts when tutor clears student tuition payment
+        if (isInPerson && !deal.tutorFeeDueDate && ['active_trial', 'continuation_agreed', 'active_paid', 'restricted'].includes(deal.status)) {
           deal.tutorFeeDueDate = deal.trialEndDate
             || (deal.trialStartDate ? new Date(new Date(deal.trialStartDate).getTime() + 72 * 60 * 60 * 1000) : null)
             || (deal.continuationAgreedAt ? new Date(new Date(deal.continuationAgreedAt).getTime() + 72 * 60 * 60 * 1000) : null)
@@ -361,10 +365,20 @@ exports.sendMessage = async (req, res) => {
           return res.status(403).json({
             success: false,
             code: 'TUTOR_FEE_OVERDUE',
-            message: 'Chat access restricted: The 72-hour grace period for platform fee clearance has expired without payment verification. Please clear the platform fee with admin to resume chatting.'
+            message: 'Chat access restricted: The 3-day grace period for platform fee clearance has expired without payment verification. Please clear the platform fee with admin to resume chatting.'
           });
-        } else if (!deal.tutorFeePaid && new Date(deal.tutorFeeDueDate) >= now) {
+        } else if (!deal.tutorFeePaid && deal.tutorFeeDueDate && new Date(deal.tutorFeeDueDate) >= now) {
           if (deal.accessRestricted || deal.status === 'restricted') {
+            deal.accessRestricted = false;
+            deal.restrictionType = 'none';
+            if (deal.status === 'restricted') {
+              deal.status = deal.continuationAgreed ? 'continuation_agreed' : 'active_trial';
+            }
+            await deal.save();
+          }
+        } else if (!deal.tutorFeeDueDate) {
+          // Online class where tutorFeeDueDate is not set yet: keep active
+          if (deal.accessRestricted && deal.restrictionType === 'suspend_access' && !deal.hasOverduePayment) {
             deal.accessRestricted = false;
             deal.restrictionType = 'none';
             if (deal.status === 'restricted') {

@@ -39,6 +39,8 @@ const notificationSchema = new mongoose.Schema({
       'safety_report',
       'review_reported',
       'human_support_request',
+      'continuation_agreed',
+      'fee_due',
       'admin_alert'
     ],
     default: 'admin_alert'

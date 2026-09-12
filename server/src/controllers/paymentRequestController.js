@@ -431,7 +431,7 @@ exports.clearPaymentRequest = async (req, res) => {
     paymentRequest.isClassRestricted = false;
     await paymentRequest.save();
 
-    // Unlock deal & classroom sessions
+    // Unlock deal & classroom sessions, and initiate 3-day threshold for tutor platform fee
     const deal = await Deal.findById(paymentRequest.deal._id);
     if (deal) {
       deal.accessRestricted = false;
@@ -440,7 +440,40 @@ exports.clearPaymentRequest = async (req, res) => {
       if (['active_trial', 'continuation_agreed'].includes(deal.status)) {
         deal.status = 'active_paid';
       }
+
+      // Online classes: tutor gets 3 days threshold to pay platform fee right after approving student payment
+      const now = new Date();
+      const threeDaysLater = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+      deal.tutorFeeDueDate = threeDaysLater;
+      deal.tutorFeePaid = deal.platformFee === 0;
+
+      // Auto-calculate 10% platform fee if not already set by admin
+      if (deal.platformFee === null || deal.platformFee === undefined) {
+        deal.platformFee = Math.round(deal.price * 0.10);
+        deal.platformFeeAssignedAt = now;
+        deal.platformFeeNotes = 'Auto-calculated: 10% of deal price';
+      }
+
       await deal.save();
+
+      // Notify Tutor about 3-day platform fee threshold
+      try {
+        const dueDateStr = threeDaysLater.toLocaleDateString('en-PK', {
+          day: 'numeric',
+          month: 'short',
+          year: 'numeric'
+        });
+        await Notification.create({
+          recipient: paymentRequest.tutor,
+          sender: req.user.id,
+          type: 'continuation_agreed',
+          title: 'Platform Fee Due (3-Day Clearance Notice)',
+          message: `You cleared the student's tuition payment for ${deal.subject}. Please clear your platform fee of PKR ${deal.platformFee.toLocaleString()} within 3 days (by ${dueDateStr}) to keep classroom access uninterrupted.`,
+          link: '/tutor/deals'
+        });
+      } catch (tErr) {
+        console.error('Tutor notification note:', tErr);
+      }
     }
 
     // Notify student

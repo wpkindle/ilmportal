@@ -203,6 +203,37 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
             </div>
           ) : (
             <form id="tutor-fee-modal-form" onSubmit={handleSubmit}>
+              {/* Payment Under Review Notice in Dialogue */}
+              {deal.paymentStatus === 'submitted_proof' && (
+                <div className="mb-4 p-3.5 sm:p-4 bg-gradient-to-r from-amber-50 via-[#f0ece1]/80 to-amber-50 border-2 border-amber-300/80 rounded-2xl space-y-2 shadow-xs animate-in fade-in">
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <div className="flex items-center gap-2 text-amber-950 font-bold text-xs sm:text-sm">
+                      <Clock className="w-4 h-4 text-amber-600 animate-pulse shrink-0" />
+                      <span>Your Payment is Under Review</span>
+                    </div>
+                    <span className="px-2.5 py-0.5 bg-amber-200/90 text-amber-950 text-[10px] font-black rounded-full uppercase tracking-wider border border-amber-300">
+                      Under Admin Review
+                    </span>
+                  </div>
+                  <p className="text-[11px] sm:text-xs text-stone-700 leading-relaxed">
+                    You have already submitted a payment screenshot for this deal and it is currently being verified by administration. If you need to re-upload or sent the wrong screenshot, attach a new screenshot below and click <strong>Submit Again</strong>.
+                  </p>
+                  {(deal.proofImageUrl || deal.tutorPaymentProofUrl) && (
+                    <div className="pt-0.5">
+                      <a
+                        href={deal.proofImageUrl || deal.tutorPaymentProofUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[11px] text-[#b85d34] hover:text-[#9e4e2a] font-bold underline inline-flex items-center gap-1"
+                      >
+                        <ExternalLink className="w-3.5 h-3.5" />
+                        <span>View Previously Submitted Screenshot</span>
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )}
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 lg:gap-5 items-start">
 
                 {/* ── Left Column: Payment Method & Barcode Details ── */}
@@ -472,7 +503,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                 onClick={onClose}
                 className="flex-1 sm:flex-initial px-3.5 py-1.5 sm:py-2 rounded-xl border border-stone-300 text-xs font-bold text-stone-700 hover:bg-stone-100 transition-colors cursor-pointer text-center"
               >
-                Cancel
+                {deal.paymentStatus === 'submitted_proof' ? 'Close' : 'Cancel'}
               </button>
               <button
                 type="submit"
@@ -484,6 +515,11 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
                   <>
                     <Clock className="w-3.5 h-3.5 animate-spin" />
                     <span>Submitting...</span>
+                  </>
+                ) : deal.paymentStatus === 'submitted_proof' ? (
+                  <>
+                    <Upload className="w-3.5 h-3.5" />
+                    <span>Submit Again</span>
                   </>
                 ) : (
                   <>

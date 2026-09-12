@@ -32,7 +32,8 @@ import {
   X,
   File,
   CreditCard,
-  Star
+  Star,
+  Upload
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -930,33 +931,19 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             </button>
           )}
 
-          {/* Completed Deal Header Indicator & Mutual Review CTA */}
+          {/* Mutual Review Action in Header (Only shown when deal is completed AND review is NOT yet submitted) */}
           {partnerDeal?.status === 'completed' && (
-            <div className="flex items-center gap-1.5 shrink-0">
-              {/* Completed pill: visible on sm+ screens, hidden on small mobile to give maximum room to the name */}
-              <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-bold shadow-2xs">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                <span>Completed</span>
-              </span>
-
-              {/* Review CTA Button or High-Contrast Reviewed Badge */}
-              {(isStudent || user?.role === 'student' ? (!partnerDeal.isStudentReviewed && !partnerDeal.isReviewed) : !partnerDeal.isTutorReviewed) ? (
-                <button
-                  type="button"
-                  onClick={() => setShowStudentReviewModal(true)}
-                  className="px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
-                  title="Leave Review"
-                >
-                  <Star className="w-3.5 h-3.5 fill-white text-white shrink-0" />
-                  <span>{isStudent || user?.role === 'student' ? 'Rate Tutor' : 'Rate Student'}</span>
-                </button>
-              ) : (
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-50 border border-amber-300/80 text-amber-950 text-xs font-bold shadow-2xs shrink-0">
-                  <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-600 shrink-0" />
-                  <span>Reviewed</span>
-                </span>
-              )}
-            </div>
+            (isStudent || user?.role === 'student' ? (!partnerDeal.isStudentReviewed && !partnerDeal.isReviewed) : !partnerDeal.isTutorReviewed) && (
+              <button
+                type="button"
+                onClick={() => setShowStudentReviewModal(true)}
+                className="px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+                title="Leave Review"
+              >
+                <Star className="w-3.5 h-3.5 fill-white text-white shrink-0" />
+                <span>{isStudent || user?.role === 'student' ? 'Rate Tutor' : 'Rate Student'}</span>
+              </button>
+            )
           )}
 
           {/* Tutor Action: Send Deal Offer or New Deal Offer */}
@@ -1607,14 +1594,31 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               The 72-hour grace period for platform fee clearance has expired without payment verification. Chat messaging and video classroom joining are paused until the platform fee is cleared with administration.
             </p>
             {partnerDeal && (
-              <button
-                type="button"
-                onClick={() => setTutorPaymentModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-black text-xs rounded-xl shadow transition-all cursor-pointer hover:scale-105"
-              >
-                <CreditCard className="w-3.5 h-3.5" />
-                <span>Pay Platform Fee ({partnerDeal.platformFee ? `PKR ${partnerDeal.platformFee.toLocaleString()}` : 'Contact Admin'})</span>
-              </button>
+              partnerDeal.paymentStatus === 'submitted_proof' ? (
+                <div className="flex flex-col sm:flex-row items-center justify-center gap-2 pt-1">
+                  <div className="px-3.5 py-2 bg-amber-100 text-amber-950 border border-amber-300 rounded-xl text-xs font-bold flex items-center gap-2 shadow-xs">
+                    <Clock className="w-4 h-4 text-amber-600 animate-pulse shrink-0" />
+                    <span>Your payment is under review</span>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setTutorPaymentModalOpen(true)}
+                    className="px-3.5 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30"
+                  >
+                    <Upload className="w-3.5 h-3.5 text-[#d4a359]" />
+                    <span>Submit Again</span>
+                  </button>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => setTutorPaymentModalOpen(true)}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-black text-xs rounded-xl shadow transition-all cursor-pointer hover:scale-105"
+                >
+                  <CreditCard className="w-3.5 h-3.5" />
+                  <span>Pay Platform Fee ({partnerDeal.platformFee ? `PKR ${partnerDeal.platformFee.toLocaleString()}` : 'Contact Admin'})</span>
+                </button>
+              )
             )}
           </div>
         ) : user?.role === 'tutor' && partner?.role === 'tutor' ? (

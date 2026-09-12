@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
-import { Clock, AlertCircle, CheckCircle2, CreditCard, ShieldCheck, Sparkles } from 'lucide-react';
+import { Clock, AlertCircle, CheckCircle2, CreditCard, ShieldCheck, Sparkles, Upload } from 'lucide-react';
 
 export default function Tutor72HourClock({ deal, onPayClick, className = '' }) {
   const [timeLeft, setTimeLeft] = useState({
@@ -82,21 +82,32 @@ export default function Tutor72HourClock({ deal, onPayClick, className = '' }) {
   // Case 2: Payment proof submitted, waiting for admin approval
   if (deal.paymentStatus === 'submitted_proof' || deal.tutorPaymentProofReference) {
     return (
-      <div className={`p-3.5 bg-blue-50 border border-blue-200/90 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-blue-900 shadow-2xs ${className}`}>
+      <div className={`p-3.5 bg-gradient-to-r from-amber-50 via-[#f0ece1]/60 to-orange-50 border border-amber-300 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-amber-950 shadow-2xs ${className}`}>
         <div className="flex items-center gap-2.5">
-          <Clock className="w-4 h-4 text-blue-600 animate-pulse shrink-0" />
+          <Clock className="w-4 h-4 text-amber-600 animate-pulse shrink-0" />
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-bold text-blue-950">Platform Fee Proof Submitted</span>
-              <span className="px-2 py-0.5 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 text-[10px] font-bold rounded-full">
-                Classroom &amp; Chat Active
+              <span className="font-bold text-amber-950">Payment Proof Under Review</span>
+              <span className="px-2 py-0.5 bg-amber-200 text-amber-950 text-[10px] font-bold rounded-full border border-amber-300">
+                Under Admin Review
               </span>
             </div>
-            <p className="text-[11px] text-blue-700 mt-0.5">
-              Ref/TID: <strong className="font-mono">{deal.tutorPaymentProofReference || deal.paymentProofReference}</strong> &bull; Administration is reviewing your verification.
+            <p className="text-[11px] text-amber-800 mt-0.5">
+              Ref: <strong className="font-mono">{deal.tutorPaymentProofReference || deal.paymentProofReference}</strong> &bull; Administration is reviewing your screenshot verification.
             </p>
           </div>
         </div>
+
+        {onPayClick && (
+          <button
+            type="button"
+            onClick={onPayClick}
+            className="px-3 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30 shrink-0"
+          >
+            <Upload className="w-3.5 h-3.5 text-[#d4a359]" />
+            <span>Submit Again</span>
+          </button>
+        )}
       </div>
     );
   }

@@ -6,7 +6,7 @@ import { api } from '../../../services/api';
 import TrialBanner from '../../../components/common/TrialBanner';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import LeaveReviewModal from '../../../components/common/LeaveReviewModal';
-import { BookOpen, Star, MessageSquare, CreditCard, X, CheckCircle2, Video } from 'lucide-react';
+import { BookOpen, Star, MessageSquare, CreditCard, X, CheckCircle2, Video, Sparkles } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 
 export default function MyDealsPage() {

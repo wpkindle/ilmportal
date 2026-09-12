@@ -8,7 +8,7 @@ import Tutor72HourClock from '../../../components/tutor/Tutor72HourClock';
 import TutorPaymentModal from '../../../components/tutor/TutorPaymentModal';
 import LeaveReviewModal from '../../../components/common/LeaveReviewModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
-import { BookOpen, MessageSquare, Plus, Video, CheckCircle2, Check, AlertTriangle, X, Loader2, Clock, CreditCard, Star } from 'lucide-react';
+import { BookOpen, MessageSquare, Plus, Video, CheckCircle2, Check, AlertTriangle, X, Loader2, Clock, CreditCard, Star, Sparkles } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 
 export default function TutorDealsPage() {

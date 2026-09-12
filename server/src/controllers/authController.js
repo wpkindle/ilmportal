@@ -27,7 +27,7 @@ const calculateProfileCompletion = (user, tutorProfile) => {
       { key: 'name', label: 'Full Name', weight: 10, done: !!user.name?.trim() },
       { key: 'email', label: 'Verified Email', weight: 10, done: !!user.isVerified },
       { key: 'avatar', label: 'Profile Picture', weight: 10, done: !!user.avatar?.trim() },
-      { key: 'age', label: 'Tutor Age', weight: 10, done: !!user.age },
+      { key: 'age', label: 'Tutor Age', weight: 5, done: !!user.age },
       { key: 'gender', label: 'Gender', weight: 5, done: !!(user.gender?.trim() || tutorProfile?.gender?.trim()) },
       { key: 'city', label: 'City Location', weight: 10, done: !!(user.city?.trim() || tutorProfile?.city?.trim()) },
       { key: 'subjects', label: 'Subjects & Classes', weight: 10, done: Array.isArray(tutorProfile?.subjects) && tutorProfile.subjects.length > 0 },
@@ -36,10 +36,16 @@ const calculateProfileCompletion = (user, tutorProfile) => {
       {
         key: 'sanad',
         label: 'Sanad / Degree Approved',
-        weight: 10,
+        weight: 5,
         done: Array.isArray(tutorProfile?.sanadDocuments) &&
               tutorProfile.sanadDocuments.length > 0 &&
               tutorProfile.sanadDocuments.some(doc => doc.status === 'verified' || doc.status === 'approved')
+      },
+      {
+        key: 'paymentMethods',
+        label: 'Payment Method (Required)',
+        weight: 10,
+        done: Array.isArray(tutorProfile?.paymentMethods) && tutorProfile.paymentMethods.length > 0
       }
     ];
 

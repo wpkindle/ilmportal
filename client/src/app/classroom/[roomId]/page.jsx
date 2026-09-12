@@ -37,9 +37,12 @@ export default function VideoClassroomPage() {
         }
       } catch (err) {
         console.error('Error joining classroom:', err);
+        const data = err.data || {};
         setSessionData({
-          error: err.message || 'Unable to join classroom.',
-          isDenied: err.status === 403 || err.message?.includes('deal')
+          error: data.message || err.message || 'Unable to join classroom.',
+          isRestricted: Boolean(data.isRestricted),
+          hasOverduePayment: Boolean(data.hasOverduePayment),
+          isDenied: Boolean(!data.isRestricted && (err.status === 403 || err.message?.includes('deal')))
         });
       } finally {
         setLoading(false);
@@ -74,7 +77,7 @@ export default function VideoClassroomPage() {
     );
   }
 
-  // Block classroom if deal is restricted pending admin payment clearance
+  // Block classroom if deal is restricted (3-day tuition fee threshold or platform fee)
   if (sessionData?.isRestricted && user?.role !== 'admin') {
     return (
       <div className="h-screen w-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-white text-center fixed inset-0 z-50">
@@ -84,17 +87,17 @@ export default function VideoClassroomPage() {
           </div>
           <h2 className="text-xl font-black text-white">Classroom Access Restricted</h2>
           <p className="text-xs text-slate-300 leading-relaxed">
-            {sessionData.error || 'Access to this live video classroom is paused. The 72-hour grace period for platform fee clearance has expired without payment verification.'}
+            {sessionData.error || 'Access to this live video classroom is restricted. A 3-day payment threshold for tuition fees has expired without clearance.'}
           </p>
-          <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 text-xs text-emerald-400 font-semibold space-y-1">
-            <p>Official Support: <a href="mailto:info@ilmidunya.com" className="underline hover:text-emerald-300">info@ilmidunya.com</a></p>
-            <p className="text-[11px] text-slate-400">Meezan Bank &bull; Raast &bull; JazzCash &bull; EasyPaisa</p>
+          <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 text-xs text-amber-400 font-semibold space-y-1">
+            <p>⚡ 3-Day Threshold Notice</p>
+            <p className="text-[11px] text-slate-400">Tuition fees must be paid via tutor's Bank, Raast, EasyPaisa, JazzCash, or UPaisa and cleared by the tutor to unlock classes.</p>
           </div>
           <button
-            onClick={() => window.location.href = user?.role === 'tutor' ? '/tutor/deals' : '/student/messages'}
+            onClick={() => window.location.href = user?.role === 'tutor' ? '/tutor/deals' : '/student/deals'}
             className="w-full py-3 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-md"
           >
-            {user?.role === 'tutor' ? 'Go to Deals & Submit Fee' : 'Return to Messages'}
+            {user?.role === 'tutor' ? 'Go to Deals & Clear Payment' : 'Go to Deals & Pay Tuition Fee'}
           </button>
         </div>
       </div>

@@ -408,7 +408,8 @@ exports.updateMyTutorProfile = async (req, res) => {
       gender,
       sanadDocuments,
       verificationStatus,
-      videoIntro
+      videoIntro,
+      paymentMethods
     } = req.body;
 
     const normalizedExp = (experienceYears !== undefined && experienceYears !== null && experienceYears !== '')
@@ -453,6 +454,17 @@ exports.updateMyTutorProfile = async (req, res) => {
         profile.teachingModes = teachingModes;
       } else if (teachingMode !== undefined) {
         profile.teachingModes = teachingMode === 'both' ? ['online', 'in_person'] : [teachingMode === 'physical' ? 'in_person' : teachingMode];
+      }
+      if (Array.isArray(paymentMethods)) {
+        profile.paymentMethods = paymentMethods.filter(pm => pm && pm.method && pm.accountTitle && pm.accountNumber).map((pm, idx) => ({
+          _id: pm._id,
+          method: pm.method,
+          bankName: (pm.bankName || '').trim(),
+          accountTitle: (pm.accountTitle || '').trim(),
+          accountNumber: (pm.accountNumber || '').trim(),
+          instructions: (pm.instructions || '').trim(),
+          isDefault: Boolean(pm.isDefault || idx === 0)
+        }));
       }
     }
 
@@ -722,3 +734,230 @@ exports.uploadVideoIntro = async (req, res) => {
     });
   }
 };
+
+// @desc    Get tutor's payment methods
+// @route   GET /api/tutors/payment-methods
+exports.getMyPaymentMethods = async (req, res) => {
+  try {
+    const profile = await TutorProfile.findOne({ user: req.user.id });
+    const paymentMethods = profile?.paymentMethods || [];
+    res.status(200).json({
+      success: true,
+      paymentMethods
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error fetching payment methods'
+    });
+  }
+};
+
+// @desc    Add a payment method
+// @route   POST /api/tutors/payment-methods
+exports.addPaymentMethod = async (req, res) => {
+  try {
+    const { method, bankName, accountTitle, accountNumber, instructions, isDefault } = req.body;
+
+    const validMethods = ['bank', 'raast', 'easypaisa', 'jazzcash', 'upaisa'];
+    if (!validMethods.includes(method)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid payment method. Must be Bank, Raast, EasyPaisa, JazzCash, or UPaisa.'
+      });
+    }
+
+    if (!accountTitle?.trim() || !accountNumber?.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Account Title and Account Number / IBAN are required.'
+      });
+    }
+
+    if (method === 'bank' && !bankName?.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Bank Name is required for Bank Transfer payment method.'
+      });
+    }
+
+    let profile = await TutorProfile.findOne({ user: req.user.id });
+    if (!profile) {
+      profile = new TutorProfile({
+        user: req.user.id,
+        verificationStatus: 'under_review'
+      });
+    }
+
+    if (!Array.isArray(profile.paymentMethods)) {
+      profile.paymentMethods = [];
+    }
+
+    const shouldBeDefault = Boolean(isDefault) || profile.paymentMethods.length === 0;
+
+    if (shouldBeDefault) {
+      profile.paymentMethods.forEach(pm => { pm.isDefault = false; });
+    }
+
+    profile.paymentMethods.push({
+      method,
+      bankName: (bankName || '').trim(),
+      accountTitle: accountTitle.trim(),
+      accountNumber: accountNumber.trim(),
+      instructions: (instructions || '').trim(),
+      isDefault: shouldBeDefault,
+      createdAt: new Date()
+    });
+
+    await profile.save();
+
+    const user = await User.findById(req.user.id);
+    const completion = calculateProfileCompletion(user, profile);
+
+    res.status(201).json({
+      success: true,
+      message: 'Payment method added successfully!',
+      paymentMethods: profile.paymentMethods,
+      completion
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error adding payment method'
+    });
+  }
+};
+
+// @desc    Update a payment method
+// @route   PUT /api/tutors/payment-methods/:id
+exports.updatePaymentMethod = async (req, res) => {
+  try {
+    const { method, bankName, accountTitle, accountNumber, instructions, isDefault } = req.body;
+    const { id } = req.params;
+
+    let profile = await TutorProfile.findOne({ user: req.user.id });
+    if (!profile) {
+      return res.status(404).json({ success: false, message: 'Tutor profile not found' });
+    }
+
+    const item = profile.paymentMethods.id(id);
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Payment method not found' });
+    }
+
+    if (method) {
+      const validMethods = ['bank', 'raast', 'easypaisa', 'jazzcash', 'upaisa'];
+      if (!validMethods.includes(method)) {
+        return res.status(400).json({ success: false, message: 'Invalid payment method' });
+      }
+      item.method = method;
+    }
+
+    if (accountTitle !== undefined) item.accountTitle = accountTitle.trim();
+    if (accountNumber !== undefined) item.accountNumber = accountNumber.trim();
+    if (bankName !== undefined) item.bankName = bankName.trim();
+    if (instructions !== undefined) item.instructions = instructions.trim();
+
+    if (isDefault) {
+      profile.paymentMethods.forEach(pm => {
+        pm.isDefault = pm._id.toString() === id.toString();
+      });
+    }
+
+    await profile.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Payment method updated successfully!',
+      paymentMethods: profile.paymentMethods
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error updating payment method'
+    });
+  }
+};
+
+// @desc    Delete a payment method
+// @route   DELETE /api/tutors/payment-methods/:id
+exports.deletePaymentMethod = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    let profile = await TutorProfile.findOne({ user: req.user.id });
+    if (!profile) {
+      return res.status(404).json({ success: false, message: 'Tutor profile not found' });
+    }
+
+    const item = profile.paymentMethods.id(id);
+    if (!item) {
+      return res.status(404).json({ success: false, message: 'Payment method not found' });
+    }
+
+    const wasDefault = item.isDefault;
+    profile.paymentMethods.pull(id);
+
+    if (wasDefault && profile.paymentMethods.length > 0) {
+      profile.paymentMethods[0].isDefault = true;
+    }
+
+    await profile.save();
+
+    const user = await User.findById(req.user.id);
+    const completion = calculateProfileCompletion(user, profile);
+
+    res.status(200).json({
+      success: true,
+      message: 'Payment method removed successfully!',
+      paymentMethods: profile.paymentMethods,
+      completion
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error deleting payment method'
+    });
+  }
+};
+
+// @desc    Set default payment method
+// @route   PATCH /api/tutors/payment-methods/:id/default
+exports.setDefaultPaymentMethod = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    let profile = await TutorProfile.findOne({ user: req.user.id });
+    if (!profile) {
+      return res.status(404).json({ success: false, message: 'Tutor profile not found' });
+    }
+
+    let found = false;
+    profile.paymentMethods.forEach(pm => {
+      if (pm._id.toString() === id.toString()) {
+        pm.isDefault = true;
+        found = true;
+      } else {
+        pm.isDefault = false;
+      }
+    });
+
+    if (!found) {
+      return res.status(404).json({ success: false, message: 'Payment method not found' });
+    }
+
+    await profile.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Default payment method updated!',
+      paymentMethods: profile.paymentMethods
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error setting default payment method'
+    });
+  }
+};
+

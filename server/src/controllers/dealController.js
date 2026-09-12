@@ -295,14 +295,19 @@ exports.getMyDeals = async (req, res) => {
       ? { student: req.user.id }
       : {};
 
+    const { evaluatePaymentOverdue } = require('./paymentRequestController');
     const deals = await Deal.find(filter)
       .populate('student', req.user.role === 'tutor' ? 'name avatar city' : 'name email phone avatar city')
       .populate('tutor', 'name email phone avatar city')
+      .populate('latestPaymentRequest')
       .sort({ createdAt: -1 });
 
     // Check if any deals have overdue tutor fees or expired 72-hour grace period
     const now = new Date();
     for (const deal of deals) {
+      if (evaluatePaymentOverdue) {
+        await evaluatePaymentOverdue(deal);
+      }
       if (['active_trial', 'continuation_agreed', 'active_paid', 'restricted'].includes(deal.status)) {
         // Accurately resolve 72-hour due date:
         // Priority: existing tutorFeeDueDate -> trialEndDate -> trialStartDate+72h -> continuationAgreedAt+72h -> now+72h

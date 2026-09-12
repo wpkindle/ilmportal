@@ -6,7 +6,8 @@ import { api } from '../../../services/api';
 import TrialBanner from '../../../components/common/TrialBanner';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import LeaveReviewModal from '../../../components/common/LeaveReviewModal';
-import { BookOpen, Star, MessageSquare, CreditCard, X, CheckCircle2, Video, Sparkles } from 'lucide-react';
+import StudentPaymentRequestModal from '../../../components/tutor/StudentPaymentRequestModal';
+import { BookOpen, Star, MessageSquare, CreditCard, X, CheckCircle2, Video, Sparkles, Clock, AlertTriangle } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 
 export default function MyDealsPage() {
@@ -17,6 +18,10 @@ export default function MyDealsPage() {
 
   // Review Modal State
   const [reviewModalDeal, setReviewModalDeal] = useState(null);
+
+  // Tuition Payment Request Modal State
+  const [selectedPrForPay, setSelectedPrForPay] = useState(null);
+  const [selectedPrDeal, setSelectedPrDeal] = useState(null);
 
   const fetchDeals = async () => {
     try {
@@ -186,7 +191,102 @@ export default function MyDealsPage() {
                     )}
                   </div>
                 ) : (
-                  <TrialBanner deal={deal} onPayClick={() => {}} />
+                  <div className="space-y-3">
+                    {/* Active Tuition Fee Payment Request Banner */}
+                    {deal.latestPaymentRequest && (
+                      <div className="space-y-2">
+                        {deal.latestPaymentRequest.status === 'proof_submitted' ? (
+                          <div className="p-4 bg-amber-50 border border-amber-300 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-950 shadow-2xs">
+                            <div className="flex items-start sm:items-center gap-2.5">
+                              <Clock className="w-5 h-5 text-amber-600 animate-pulse shrink-0 mt-0.5 sm:mt-0" />
+                              <div>
+                                <div className="font-bold text-amber-950 text-sm">
+                                  Tuition Payment Proof Submitted
+                                </div>
+                                <p className="text-[11px] text-amber-800">
+                                  Amount: <strong>PKR {deal.latestPaymentRequest.amount?.toLocaleString()}</strong> &bull; Trx ID: <code className="bg-white px-1.5 py-0.5 rounded border border-amber-200 font-mono font-bold text-amber-900">{deal.latestPaymentRequest.paymentProof?.transactionId}</code> &bull; Your teacher has been notified to verify.
+                                </p>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedPrForPay(deal.latestPaymentRequest);
+                                setSelectedPrDeal(deal);
+                              }}
+                              className="px-4 py-2 bg-amber-700 hover:bg-amber-800 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer shrink-0 self-start sm:self-auto"
+                            >
+                              View / Update Proof
+                            </button>
+                          </div>
+                        ) : deal.latestPaymentRequest.status === 'overdue' ? (
+                          <div className="p-4 bg-rose-50 border border-rose-300 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-rose-950 shadow-2xs">
+                            <div className="flex items-start sm:items-center gap-2.5">
+                              <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5 sm:mt-0" />
+                              <div>
+                                <div className="font-black text-rose-950 text-sm">
+                                  3-Day Payment Threshold Expired &bull; Classroom Access Restricted
+                                </div>
+                                <p className="text-[11px] text-rose-800">
+                                  Tuition fee of PKR {deal.latestPaymentRequest.amount?.toLocaleString()} has not been cleared. Please transfer via your tutor&apos;s receiving accounts and submit proof to unlock live video classes.
+                                </p>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedPrForPay(deal.latestPaymentRequest);
+                                setSelectedPrDeal(deal);
+                              }}
+                              className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer shrink-0 self-start sm:self-auto"
+                            >
+                              Pay Tuition Fee Now
+                            </button>
+                          </div>
+                        ) : deal.latestPaymentRequest.status === 'cleared' ? (
+                          <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between gap-2 text-xs text-emerald-950">
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                              <span className="font-bold">Tuition Fee Cleared by Tutor (PKR {deal.latestPaymentRequest.amount?.toLocaleString()}) &bull; Classes Fully Unlocked</span>
+                            </div>
+                            <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-600 text-white">
+                              CLEARED
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="p-4 bg-[#fbf9f5] border-2 border-[#b85d34]/40 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-stone-900 shadow-xs">
+                            <div className="flex items-start sm:items-center gap-2.5">
+                              <CreditCard className="w-5 h-5 text-[#b85d34] shrink-0 mt-0.5 sm:mt-0" />
+                              <div>
+                                <div className="font-black text-stone-900 text-sm flex items-center gap-2 flex-wrap">
+                                  <span>Tuition Fee Requested: PKR {deal.latestPaymentRequest.amount?.toLocaleString()}</span>
+                                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-100 text-amber-900">
+                                    3-Day Threshold Active
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-stone-600 mt-0.5">
+                                  Your teacher has sent a tuition payment request. Transfer fee via Bank, Raast, EasyPaisa, JazzCash, or UPaisa within 3 days.
+                                </p>
+                              </div>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setSelectedPrForPay(deal.latestPaymentRequest);
+                                setSelectedPrDeal(deal);
+                              }}
+                              className="px-4 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer shrink-0 self-start sm:self-auto flex items-center gap-1.5"
+                            >
+                              <CreditCard className="w-3.5 h-3.5 text-[#d4a359]" />
+                              <span>View Accounts &amp; Pay</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    )}
+
+                    <TrialBanner deal={deal} onPayClick={() => {}} />
+                  </div>
                 )}
               </div>
             ))}
@@ -209,6 +309,22 @@ export default function MyDealsPage() {
           );
         }}
       />
+
+      {/* Student Tuition Payment Request Modal */}
+      {selectedPrForPay && (
+        <StudentPaymentRequestModal
+          paymentRequest={selectedPrForPay}
+          deal={selectedPrDeal}
+          isOpen={!!selectedPrForPay}
+          onClose={() => {
+            setSelectedPrForPay(null);
+            setSelectedPrDeal(null);
+          }}
+          onSuccess={() => {
+            fetchDeals();
+          }}
+        />
+      )}
 
     </div>
   );

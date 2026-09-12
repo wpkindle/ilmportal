@@ -45,6 +45,7 @@ import { allPakistaniCities, pakistaniCityAreas } from '../../../data/pakistanAr
 import CustomSelect, { StyledNativeSelect } from '../../../components/common/CustomSelect';
 import { parseDegreesAndCertificates } from '../../../utils/tutorHelpers';
 import VideoIntroPlayer from '../../../components/common/VideoIntroPlayer';
+import TutorPaymentMethodsManager from '../../../components/tutor/TutorPaymentMethodsManager';
 
 
 const pakistaniCities = allPakistaniCities;
@@ -1758,7 +1759,20 @@ function TutorProfileContent() {
               )}
             </div>
 
-            {/* 4. Security & Password Change Form */}
+            {/* 4. Payment Methods (Required for Tuition Fee Ingestion & Profile Completion) */}
+            <TutorPaymentMethodsManager
+              initialMethods={tutorProfile?.paymentMethods || []}
+              onMethodsUpdated={(updatedMethods) => {
+                if (updateTutorProfileState) {
+                  updateTutorProfileState({
+                    ...(tutorProfile || {}),
+                    paymentMethods: updatedMethods
+                  });
+                }
+              }}
+            />
+
+            {/* 5. Security & Password Change Form */}
             <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-xs space-y-5">
               <div className="border-b border-slate-100 pb-3">
                 <h2 className="text-sm font-black text-slate-900 flex items-center gap-2">

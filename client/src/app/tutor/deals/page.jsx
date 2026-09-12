@@ -6,6 +6,8 @@ import { api } from '../../../services/api';
 import TrialBanner from '../../../components/common/TrialBanner';
 import Tutor72HourClock from '../../../components/tutor/Tutor72HourClock';
 import TutorPaymentModal from '../../../components/tutor/TutorPaymentModal';
+import TutorSendPaymentRequestModal from '../../../components/tutor/TutorSendPaymentRequestModal';
+import TutorClearPaymentModal from '../../../components/tutor/TutorClearPaymentModal';
 import LeaveReviewModal from '../../../components/common/LeaveReviewModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import { BookOpen, MessageSquare, Plus, Video, CheckCircle2, Check, AlertTriangle, X, Loader2, Clock, CreditCard, Star, Sparkles } from 'lucide-react';
@@ -16,6 +18,9 @@ export default function TutorDealsPage() {
   const [deals, setDeals] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDealForPay, setSelectedDealForPay] = useState(null);
+  const [dealForTuitionRequest, setDealForTuitionRequest] = useState(null);
+  const [prForClearModal, setPrForClearModal] = useState(null);
+  const [clearModalDeal, setClearModalDeal] = useState(null);
   const [dealToComplete, setDealToComplete] = useState(null);
   const [reviewModalDeal, setReviewModalDeal] = useState(null);
   const [completionNotes, setCompletionNotes] = useState('');
@@ -183,6 +188,19 @@ export default function TutorDealsPage() {
                       <span>Chat</span>
                     </Link>
 
+                    {/* Request Tuition Fee Button */}
+                    {deal.status !== 'completed' && deal.status !== 'cancelled' && (
+                      <button
+                        type="button"
+                        onClick={() => setDealForTuitionRequest(deal)}
+                        className="px-3.5 py-2 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-bold flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
+                        title="Send tuition fee payment request to student with 3-day threshold"
+                      >
+                        <CreditCard className="w-3.5 h-3.5 text-[#d4a359]" />
+                        <span>Request Tuition Fee</span>
+                      </button>
+                    )}
+
                     {/* Mark Completed Button & Clearance Status */}
                     {deal.status !== 'completed' && deal.status !== 'cancelled' && (() => {
                       const isCleared = Boolean(deal.tutorFeePaid || deal.paymentStatus === 'verified' || deal.platformFee === 0);
@@ -289,6 +307,81 @@ export default function TutorDealsPage() {
                     )}
                   </div>
                 </div>
+
+                {/* Active Tuition Fee Status & Student Proof Banner */}
+                {deal.status !== 'completed' && deal.latestPaymentRequest && (
+                  <div className="space-y-2">
+                    {deal.latestPaymentRequest.status === 'proof_submitted' ? (
+                      <div className="p-4 bg-amber-50 border border-amber-300 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-950 shadow-2xs">
+                        <div className="flex items-start sm:items-center gap-2.5">
+                          <Clock className="w-5 h-5 text-amber-600 animate-pulse shrink-0 mt-0.5 sm:mt-0" />
+                          <div>
+                            <div className="font-black text-amber-950 text-sm">
+                              Student Submitted Tuition Payment Proof!
+                            </div>
+                            <p className="text-[11px] text-amber-800">
+                              Amount: <strong>PKR {deal.latestPaymentRequest.amount?.toLocaleString()}</strong> &bull; Method: <strong>{deal.latestPaymentRequest.paymentProof?.method?.toUpperCase()}</strong> &bull; Trx ID: <code className="bg-white px-1.5 py-0.5 rounded border border-amber-200 font-mono font-bold text-amber-900">{deal.latestPaymentRequest.paymentProof?.transactionId}</code>
+                            </p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPrForClearModal(deal.latestPaymentRequest);
+                            setClearModalDeal(deal);
+                          }}
+                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-1.5 shrink-0 self-start sm:self-auto"
+                        >
+                          <CheckCircle2 className="w-4 h-4" />
+                          <span>Review Proof &amp; Clear Payment</span>
+                        </button>
+                      </div>
+                    ) : deal.latestPaymentRequest.status === 'overdue' ? (
+                      <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl flex items-center justify-between gap-2 text-xs text-rose-950">
+                        <div className="flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+                          <div>
+                            <span className="font-bold text-rose-950">3-Day Payment Threshold Expired &bull; Classes Restricted</span>
+                            <p className="text-[11px] text-rose-800">Payment of PKR {deal.latestPaymentRequest.amount?.toLocaleString()} has not been cleared. Live video classes are paused.</p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPrForClearModal(deal.latestPaymentRequest);
+                            setClearModalDeal(deal);
+                          }}
+                          className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer shrink-0"
+                        >
+                          Clear Payment Manually
+                        </button>
+                      </div>
+                    ) : deal.latestPaymentRequest.status === 'cleared' ? (
+                      <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between gap-2 text-xs text-emerald-950">
+                        <div className="flex items-center gap-2">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                          <span className="font-bold">Tuition Fee Cleared (PKR {deal.latestPaymentRequest.amount?.toLocaleString()}) &bull; Classroom Unlocked</span>
+                        </div>
+                        <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-600 text-white">
+                          CLEARED
+                        </span>
+                      </div>
+                    ) : (
+                      <div className="p-3 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl flex items-center justify-between gap-2 text-xs text-stone-800">
+                        <div className="flex items-center gap-2">
+                          <CreditCard className="w-4 h-4 text-[#b85d34] shrink-0" />
+                          <div>
+                            <span className="font-bold">Tuition Fee Requested: PKR {deal.latestPaymentRequest.amount?.toLocaleString()}</span>
+                            <p className="text-[11px] text-stone-500">Student has 3 days (72 hours) to transfer fee via your receiving accounts.</p>
+                          </div>
+                        </div>
+                        <span className="px-2.5 py-1 bg-amber-50 text-amber-800 border border-amber-200 rounded-xl text-[10px] font-bold uppercase">
+                          Pending Student Transfer
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {deal.status !== 'completed' ? (
                   <Tutor72HourClock
@@ -447,6 +540,44 @@ export default function TutorDealsPage() {
           onSuccess={async () => {
             await fetchDeals();
             setReviewModalDeal(null);
+          }}
+        />
+      )}
+
+      {/* Tuition Payment Request Modal (Strict 3-Day Threshold) */}
+      {dealForTuitionRequest && (
+        <TutorSendPaymentRequestModal
+          deal={dealForTuitionRequest}
+          isOpen={!!dealForTuitionRequest}
+          onClose={() => setDealForTuitionRequest(null)}
+          onSuccess={() => {
+            fetchDeals();
+            setFeedback({
+              type: 'success',
+              message: 'Tuition payment request sent to student with 3-day payment threshold!'
+            });
+            setTimeout(() => setFeedback(null), 5000);
+          }}
+        />
+      )}
+
+      {/* Tutor Clear Payment Modal */}
+      {prForClearModal && (
+        <TutorClearPaymentModal
+          paymentRequest={prForClearModal}
+          deal={clearModalDeal}
+          isOpen={!!prForClearModal}
+          onClose={() => {
+            setPrForClearModal(null);
+            setClearModalDeal(null);
+          }}
+          onSuccess={() => {
+            fetchDeals();
+            setFeedback({
+              type: 'success',
+              message: 'Tuition payment cleared successfully! Live video classes are unrestricted.'
+            });
+            setTimeout(() => setFeedback(null), 5000);
           }}
         />
       )}

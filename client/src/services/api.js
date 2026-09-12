@@ -327,6 +327,66 @@ export const api = {
     body: formData
   }).then(handleResponse),
 
+  // Tutor Payment Methods (Bank, Raast, EasyPaisa, JazzCash, UPaisa)
+  getPaymentMethods: () => fetch(`${API_BASE}/tutors/payment-methods`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  addPaymentMethod: (body) => fetch(`${API_BASE}/tutors/payment-methods`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  updatePaymentMethod: (id, body) => fetch(`${API_BASE}/tutors/payment-methods/${id}`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  deletePaymentMethod: (id) => fetch(`${API_BASE}/tutors/payment-methods/${id}`, {
+    method: 'DELETE',
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  setDefaultPaymentMethod: (id) => fetch(`${API_BASE}/tutors/payment-methods/${id}/default`, {
+    method: 'PATCH',
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  // Tuition Payment Requests (with 3-day threshold)
+  createPaymentRequest: (body) => fetch(`${API_BASE}/payment-requests`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  getPaymentRequestsByDeal: (dealId) => fetch(`${API_BASE}/payment-requests/deal/${dealId}`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  getPaymentRequestById: (id) => fetch(`${API_BASE}/payment-requests/${id}`, {
+    headers: getHeaders()
+  }).then(handleResponse),
+
+  submitPaymentProof: (id, body) => fetch(`${API_BASE}/payment-requests/${id}/proof`, {
+    method: 'POST',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  clearPaymentRequest: (id, body = {}) => fetch(`${API_BASE}/payment-requests/${id}/clear`, {
+    method: 'PATCH',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
+  cancelPaymentRequest: (id, body = {}) => fetch(`${API_BASE}/payment-requests/${id}/cancel`, {
+    method: 'PATCH',
+    headers: getHeaders(),
+    body: JSON.stringify(body)
+  }).then(handleResponse),
+
 
   // Deals
   createDealOffer: (body) => fetch(`${API_BASE}/deals/offer`, {

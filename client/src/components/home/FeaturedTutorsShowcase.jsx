@@ -117,19 +117,29 @@ export default function FeaturedTutorsShowcase({ initialTutors = [] }) {
             ))}
           </div>
         ) : tutors.length === 0 ? (
-          <div className="bg-white rounded-3xl p-12 text-center border border-dashed border-slate-300 space-y-3">
-            <Users className="w-12 h-12 text-slate-400 mx-auto" />
-            <h3 className="text-base font-bold text-slate-800">Faculty Profiles Loading</h3>
-            <p className="text-xs text-slate-500 max-w-md mx-auto">
-              Please check back in a moment or visit the complete tutors directory.
+          <div className="bg-white rounded-3xl p-10 sm:p-14 text-center border border-[#ebe3d3] shadow-xs space-y-3 max-w-xl mx-auto">
+            <div className="w-14 h-14 rounded-2xl bg-[#143d2b]/10 text-[#143d2b] flex items-center justify-center mx-auto">
+              <ShieldCheck className="w-7 h-7 text-[#d4a359]" />
+            </div>
+            <h3 className="text-lg font-serif font-black text-[#141c19]">Faculty Credentials Under Review</h3>
+            <p className="text-xs text-[#5c6e69] leading-relaxed">
+              New educator applications are currently undergoing manual verification and Sanad validation. Explore available subjects or browse our tutors directory.
             </p>
-            <Link
-              href="/tutors"
-              className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer"
-            >
-              <span>Explore All Tutors</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/tutors"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-bold rounded-xl shadow-md transition-all cursor-pointer"
+              >
+                <span>Browse Tutors</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+              <Link
+                href="/register/tutor"
+                className="inline-flex items-center gap-2 px-5 py-2.5 bg-[#f5f0e6] hover:bg-[#ebe3d3] text-[#0c2217] border border-[#ebe3d3] text-xs font-bold rounded-xl transition-all cursor-pointer"
+              >
+                <span>Apply as Tutor</span>
+              </Link>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

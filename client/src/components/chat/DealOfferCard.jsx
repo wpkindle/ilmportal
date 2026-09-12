@@ -253,14 +253,22 @@ const DealOfferCard = ({ deal, onDealUpdated, onRequestNewDeal, onStartNewDeal }
 
       {/* Restricted Classes */}
       {(currentStatus === 'restricted' || dealState.accessRestricted) && (
-        <div className="p-3.5 bg-rose-50 rounded-2xl border border-rose-300 text-xs text-rose-950 space-y-1">
+        <div className="p-3.5 bg-rose-50 rounded-2xl border border-rose-300 text-xs text-rose-950 space-y-2">
           <div className="flex items-center gap-2 font-bold text-rose-800">
             <XCircle className="w-4 h-4 text-rose-600 shrink-0" />
             <span>Classroom Access Suspended</span>
           </div>
           <p className="text-[11px] text-stone-700 leading-relaxed">
-            Classes are temporarily paused pending tutor platform fee clearance with admin.
+            {dealState.hasOverduePayment
+              ? 'Live video classes are paused. The 3-day tuition fee payment threshold has expired without clearance.'
+              : 'Classes are temporarily paused pending fee clearance.'}
           </p>
+          <a
+            href={isStudentUser ? '/student/deals' : '/tutor/deals'}
+            className="inline-flex items-center gap-1 font-bold text-xs text-rose-800 underline hover:text-rose-950"
+          >
+            <span>{isStudentUser ? 'View Tutor Accounts & Pay Tuition Fee' : 'Go to Deals to Clear Payment'}</span>
+          </a>
         </div>
       )}
 

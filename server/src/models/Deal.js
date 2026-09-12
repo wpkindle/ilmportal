@@ -123,6 +123,17 @@ const dealSchema = new mongoose.Schema({
     enum: ['none', 'warn', 'limit_chat', 'suspend_access'],
     default: 'none'
   },
+  latestPaymentRequest: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'PaymentRequest'
+  },
+  hasOverduePayment: {
+    type: Boolean,
+    default: false
+  },
+  overduePaymentThresholdAt: {
+    type: Date
+  },
   completedAt: {
     type: Date
   },

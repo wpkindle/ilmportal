@@ -60,7 +60,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       {
         key: 'age',
         label: 'Tutor Age',
-        weight: 10,
+        weight: 5,
         done: !!user.age,
         link: '/tutor/profile#profile-age',
         actionLabel: 'Set Age'
@@ -112,7 +112,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
           : hasPendingSanad
             ? 'Sanad / Degree (Pending Admin Review)'
             : 'Sanad / Degree Document',
-        weight: 10,
+        weight: 5,
         done: hasApprovedSanad,
         link: '/tutor/profile#profile-sanads',
         actionLabel: hasApprovedSanad
@@ -120,6 +120,14 @@ export const calculateClientCompletion = (user, tutorProfile) => {
           : hasPendingSanad
             ? 'Pending Review'
             : 'Upload Sanad'
+      },
+      {
+        key: 'paymentMethods',
+        label: 'Payment Method (Required)',
+        weight: 10,
+        done: Array.isArray(tutorProfile?.paymentMethods) && tutorProfile.paymentMethods.length > 0,
+        link: '/tutor/profile#profile-payment-methods',
+        actionLabel: 'Add Payment Method'
       }
     ];
 

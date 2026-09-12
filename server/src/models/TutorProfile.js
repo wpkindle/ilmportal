@@ -110,7 +110,42 @@ const tutorProfileSchema = new mongoose.Schema({
     type: String,
     default: '',
     trim: true
-  }
+  },
+  paymentMethods: [{
+    method: {
+      type: String,
+      enum: ['bank', 'raast', 'easypaisa', 'jazzcash', 'upaisa'],
+      required: true
+    },
+    bankName: {
+      type: String,
+      default: '',
+      trim: true
+    },
+    accountTitle: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    accountNumber: {
+      type: String,
+      required: true,
+      trim: true
+    },
+    isDefault: {
+      type: Boolean,
+      default: false
+    },
+    instructions: {
+      type: String,
+      default: '',
+      trim: true
+    },
+    createdAt: {
+      type: Date,
+      default: Date.now
+    }
+  }]
 }, {
   timestamps: true,
   toJSON: { virtuals: true },

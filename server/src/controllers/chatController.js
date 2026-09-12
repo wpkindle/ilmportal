@@ -430,7 +430,9 @@ exports.sendMessage = async (req, res) => {
       const senderName = req.user.name || 'User';
       const messageSnippet = voiceData 
         ? `Sent a voice note (${voiceDuration ? `${voiceDuration}s` : 'audio'})`
-        : (text ? text.slice(0, 120) : 'Sent a course offer');
+        : (messageType === 'deal_request'
+            ? `Requested a tutoring deal offer for ${dealOfferData?.subject || 'classes'}`
+            : (text ? text.slice(0, 120) : 'Sent a course offer'));
 
       io.to(`conv_${conversationId}`).emit('new-message', populatedMsg);
       if (recipientIdStr) {

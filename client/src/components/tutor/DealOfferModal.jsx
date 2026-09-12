@@ -63,7 +63,7 @@ const dayPresets = [
   { label: 'Daily (Mon-Sat)', days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] }
 ];
 
-const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }) => {
+const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent, initialSubject = '', initialMode = '' }) => {
   const [selectedSubject, setSelectedSubject] = useState('Tajweed al-Quran Basics (Noorani Qaida)');
   const [customSubjectText, setCustomSubjectText] = useState('');
   
@@ -71,6 +71,23 @@ const DealOfferModal = ({ isOpen, onClose, studentId, studentName, onOfferSent }
   const [price, setPrice] = useState(4000);
   const [priceUnit, setPriceUnit] = useState('per_month');
   const [mode, setMode] = useState('online');
+
+  useEffect(() => {
+    if (isOpen) {
+      if (initialSubject) {
+        const found = subjectOptions.find((opt) => opt.value.toLowerCase() === initialSubject.toLowerCase() || opt.label.toLowerCase().includes(initialSubject.toLowerCase()));
+        if (found && found.value !== 'custom') {
+          setSelectedSubject(found.value);
+        } else {
+          setSelectedSubject('custom');
+          setCustomSubjectText(initialSubject);
+        }
+      }
+      if (initialMode) {
+        setMode(initialMode === 'in_person' || initialMode === 'physical' ? 'physical' : 'online');
+      }
+    }
+  }, [isOpen, initialSubject, initialMode]);
 
   // Calendar & Schedule Selection
   const todayStr = new Date().toISOString().split('T')[0];

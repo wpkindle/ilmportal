@@ -273,6 +273,14 @@ export default function TutorDealsPage() {
                           </button>
                         )}
 
+                        <Link
+                          href={`/tutor/messages?conversation=${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
+                          className="px-3 py-1.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                        >
+                          <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
+                          <span>New Deal Offer</span>
+                        </Link>
+
                         <div className="px-3 py-1.5 bg-[#f0ece1] border border-[#d4a359]/40 rounded-xl text-xs text-[#0c2217] font-semibold flex items-center gap-1.5">
                           <Check className="w-3.5 h-3.5 text-[#d4a359]" />
                           <span>Completed &bull; Concluded</span>

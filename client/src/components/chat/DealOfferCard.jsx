@@ -23,7 +23,7 @@ const runConfetti = async () => {
   }
 };
 
-const DealOfferCard = ({ deal, onDealUpdated }) => {
+const DealOfferCard = ({ deal, onDealUpdated, onRequestNewDeal, onStartNewDeal }) => {
   const { user, isStudent: authIsStudent, isTutor: authIsTutor } = useAuth();
   const [loading, setLoading] = useState(false);
   const [dealState, setDealState] = useState(deal);
@@ -369,6 +369,40 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
               )}
             </div>
           )}
+
+          {/* Renewal / Next Month Action for Both Parties */}
+          <div className="p-3 bg-[#faf8f5] rounded-2xl border border-[#ebe3d3] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs">
+            <div>
+              <span className="font-bold text-stone-800 block">
+                {isStudentUser ? 'Continue with this Teacher?' : 'Start Next Month or Subject?'}
+              </span>
+              <p className="text-[11px] text-stone-500">
+                {isStudentUser
+                  ? 'Request a new deal to renew your monthly classes or begin another course.'
+                  : 'Send a new deal offer to renew or continue classes with this student.'}
+              </p>
+            </div>
+            {isStudentUser && onRequestNewDeal && (
+              <button
+                type="button"
+                onClick={onRequestNewDeal}
+                className="px-3.5 py-2 bg-[#0c2217] hover:bg-[#143d2b] active:scale-95 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer border border-[#d4a359]/30 shrink-0"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
+                <span>Request New Deal</span>
+              </button>
+            )}
+            {isTutorUser && onStartNewDeal && (
+              <button
+                type="button"
+                onClick={onStartNewDeal}
+                className="px-3.5 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-95 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer border border-[#d4a359]/30 shrink-0"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
+                <span>Send New Deal Offer</span>
+              </button>
+            )}
+          </div>
         </div>
       )}
 

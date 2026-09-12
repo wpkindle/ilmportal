@@ -41,7 +41,9 @@ import { useNotifications } from '../../context/NotificationContext';
 import { soundEngine } from '../../utils/soundEffects';
 import { getTutorAvatar } from '../../utils/tutorHelpers';
 import DealOfferCard from './DealOfferCard';
+import DealRequestCard from './DealRequestCard';
 import DealOfferModal from '../tutor/DealOfferModal';
+import StudentDealRequestModal from './StudentDealRequestModal';
 import TutorPaymentModal from '../tutor/TutorPaymentModal';
 import LeaveReviewModal from '../common/LeaveReviewModal';
 import VoiceMessagePlayer from './VoiceMessagePlayer';
@@ -78,6 +80,9 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
   const [inputText, setInputText] = useState('');
   const [loading, setLoading] = useState(true);
   const [dealModalOpen, setDealModalOpen] = useState(false);
+  const [dealRequestModalOpen, setDealRequestModalOpen] = useState(false);
+  const [prefilledSubject, setPrefilledSubject] = useState('');
+  const [prefilledMode, setPrefilledMode] = useState('');
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [partnerDeal, setPartnerDeal] = useState(initialDeal || null);
   const [showStudentReviewModal, setShowStudentReviewModal] = useState(false);
@@ -954,16 +959,35 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             </div>
           )}
 
-          {/* Tutor Action: Send Deal Offer (Desktop only, excluded when completed) */}
-          {isTutor && (!partnerDeal || !['active_trial', 'continuation_agreed', 'active_paid', 'completed'].includes(partnerDeal.status)) && (
+          {/* Tutor Action: Send Deal Offer or New Deal Offer */}
+          {(isTutor || user?.role === 'tutor') && (!partnerDeal || !['active_trial', 'continuation_agreed', 'active_paid', 'pending_offer'].includes(partnerDeal.status)) && (
             <button
               type="button"
-              onClick={() => setDealModalOpen(true)}
-              className="hidden md:inline-flex px-3 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white font-bold text-xs rounded-xl shadow-md items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30 shrink-0"
-              title="Send Deal Offer"
+              onClick={() => {
+                setPrefilledSubject(partnerDeal?.subject || '');
+                setPrefilledMode(partnerDeal?.mode || '');
+                setDealModalOpen(true);
+              }}
+              className="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30 shrink-0"
+              title={partnerDeal?.status === 'completed' ? 'Send New Deal Offer for Next Month / Course' : 'Send Deal Offer'}
             >
               <Sparkles className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
-              <span>Send Deal Offer</span>
+              <span className="hidden sm:inline">{partnerDeal?.status === 'completed' ? 'New Deal Offer' : 'Send Deal Offer'}</span>
+              <span className="sm:hidden">{partnerDeal?.status === 'completed' ? 'New Deal' : 'Offer Deal'}</span>
+            </button>
+          )}
+
+          {/* Student Action: Request Deal Offer or Request New Deal */}
+          {(isStudent || user?.role === 'student') && partner?.role === 'tutor' && (!partnerDeal || !['active_trial', 'continuation_agreed', 'active_paid', 'pending_offer'].includes(partnerDeal.status)) && (
+            <button
+              type="button"
+              onClick={() => setDealRequestModalOpen(true)}
+              className="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] font-bold text-xs rounded-xl shadow-md border border-[#d4a359]/40 flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+              title={partnerDeal?.status === 'completed' ? 'Request New Deal for Next Month / Course' : 'Request Tutoring Deal Offer'}
+            >
+              <Sparkles className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
+              <span className="hidden sm:inline">{partnerDeal?.status === 'completed' ? 'Request New Deal' : 'Request Deal Offer'}</span>
+              <span className="sm:hidden">{partnerDeal?.status === 'completed' ? 'New Deal' : 'Request Deal'}</span>
             </button>
           )}
 
@@ -1070,17 +1094,33 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                   </Link>
                 )}
 
-                {isTutor && (!partnerDeal || !['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status)) && (
+                {(isTutor || user?.role === 'tutor') && (!partnerDeal || !['active_trial', 'continuation_agreed', 'active_paid', 'pending_offer'].includes(partnerDeal.status)) && (
                   <button
                     type="button"
                     onClick={() => {
+                      setPrefilledSubject(partnerDeal?.subject || '');
+                      setPrefilledMode(partnerDeal?.mode || '');
                       setDealModalOpen(true);
                       setMenuOpen(false);
                     }}
                     className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-[#0c2217] font-bold cursor-pointer"
                   >
                     <Sparkles className="w-4 h-4 text-[#d4a359]" />
-                    <span>Send Deal Offer</span>
+                    <span>{partnerDeal?.status === 'completed' ? 'Send New Deal Offer' : 'Send Deal Offer'}</span>
+                  </button>
+                )}
+
+                {(isStudent || user?.role === 'student') && partner?.role === 'tutor' && (!partnerDeal || !['active_trial', 'continuation_agreed', 'active_paid', 'pending_offer'].includes(partnerDeal.status)) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setDealRequestModalOpen(true);
+                      setMenuOpen(false);
+                    }}
+                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-[#0c2217] font-bold cursor-pointer"
+                  >
+                    <Sparkles className="w-4 h-4 text-[#d4a359]" />
+                    <span>{partnerDeal?.status === 'completed' ? 'Request New Deal' : 'Request Deal Offer'}</span>
                   </button>
                 )}
 
@@ -1319,6 +1359,34 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                       <span>Your Review Submitted ★★★★★</span>
                     </div>
                   )}
+
+                  {/* Renewal / Next Month Action */}
+                  <div className="pt-2.5 border-t border-[#ebe3d3] flex items-center justify-between gap-2 text-xs">
+                    <span className="text-[11px] text-stone-600 font-medium">Ready for next month?</span>
+                    {(isStudent || user?.role === 'student') ? (
+                      <button
+                        type="button"
+                        onClick={() => setDealRequestModalOpen(true)}
+                        className="px-3 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] text-white text-[11px] font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
+                        <span>Request New Deal</span>
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setPrefilledSubject(partnerDeal?.subject || '');
+                          setPrefilledMode(partnerDeal?.mode || '');
+                          setDealModalOpen(true);
+                        }}
+                        className="px-3 py-1.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[11px] font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
+                        <span>Send New Deal Offer</span>
+                      </button>
+                    )}
+                  </div>
                 </div>
               </div>
             );
@@ -1329,10 +1397,27 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               key={msg._id}
               className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
             >
-              {msg.isDealOffer || msg.messageType === 'deal_offer' || msg.messageType === 'deal_accept' ? (
+              {msg.messageType === 'deal_request' ? (
+                <DealRequestCard
+                  message={msg}
+                  isMe={isMe}
+                  isTutor={isTutor || user?.role === 'tutor'}
+                  onCreateDealOffer={(reqData) => {
+                    setPrefilledSubject(reqData?.subject || '');
+                    setPrefilledMode(reqData?.mode || '');
+                    setDealModalOpen(true);
+                  }}
+                />
+              ) : msg.isDealOffer || msg.messageType === 'deal_offer' || msg.messageType === 'deal_accept' ? (
                 <DealOfferCard
                   deal={msg.deal || msg.dealOfferData || partnerDeal}
                   onDealUpdated={(updated) => setPartnerDeal(updated)}
+                  onRequestNewDeal={() => setDealRequestModalOpen(true)}
+                  onStartNewDeal={() => {
+                    setPrefilledSubject(partnerDeal?.subject || '');
+                    setPrefilledMode(partnerDeal?.mode || '');
+                    setDealModalOpen(true);
+                  }}
                 />
               ) : isVoiceMsg ? (
                 <VoiceMessagePlayer
@@ -1714,13 +1799,33 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
       </div>
 
       {/* Tutor Deal Modal */}
-      {isTutor && (
+      {(isTutor || user?.role === 'tutor') && (
         <DealOfferModal
           isOpen={dealModalOpen}
-          onClose={() => setDealModalOpen(false)}
+          onClose={() => {
+            setDealModalOpen(false);
+            setPrefilledSubject('');
+            setPrefilledMode('');
+          }}
           studentId={partner?._id}
           studentName={partner?.name}
+          initialSubject={prefilledSubject}
+          initialMode={prefilledMode}
           onOfferSent={handleOfferSent}
+        />
+      )}
+
+      {/* Student Deal Request Modal */}
+      {(isStudent || user?.role === 'student') && (
+        <StudentDealRequestModal
+          isOpen={dealRequestModalOpen}
+          onClose={() => setDealRequestModalOpen(false)}
+          tutor={partner}
+          previousSubject={partnerDeal?.subject || ''}
+          onRequestSent={() => {
+            setDealRequestModalOpen(false);
+            fetchMessages();
+          }}
         />
       )}
 

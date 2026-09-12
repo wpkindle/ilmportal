@@ -148,11 +148,18 @@ export default function MyDealsPage() {
 
                 {deal.status === 'completed' ? (
                   <div className="p-4 bg-[#f0ece1] border border-[#d4a359]/40 rounded-2xl space-y-2.5 text-xs text-[#0c2217]">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
                       <span className="font-bold flex items-center gap-1.5">
                         <CheckCircle2 className="w-4 h-4 text-[#d4a359]" />
                         <span>Course Completed Successfully!</span>
                       </span>
+                      <Link
+                        href={`/student/messages?conversation=${[user?.id || user?._id, deal.tutor?._id].sort().join('_')}`}
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] text-white text-[11px] font-bold rounded-xl shadow-xs border border-[#d4a359]/30 transition-all cursor-pointer"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
+                        <span>Request Next Month / New Deal</span>
+                      </Link>
                     </div>
                     <p className="text-[11px] text-stone-600 leading-relaxed">
                       Tutoring sessions for this course have concluded. All records and chat conversations are preserved.

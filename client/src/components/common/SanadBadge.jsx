@@ -8,17 +8,36 @@ const SanadBadge = ({ documents = [], documentsCount = 0, isVerified = true, onC
   const count = (Array.isArray(documents) ? documents.length : 0) || documentsCount || 0;
   if (!isVerified && count === 0) return null;
 
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/50 hover:bg-[#e6dfd5] transition-colors shadow-2xs cursor-pointer"
-      title="Click to inspect verified degrees & Sanad certificates"
-    >
+  const content = (
+    <>
       <ShieldCheck className="w-4 h-4 text-[#0c2217]" />
       <span>{count > 0 ? `Verified Sanad (${count})` : 'Verified Credentials'}</span>
       <GraduationCap className="w-3.5 h-3.5 text-[#b85d34] ml-0.5" />
-    </button>
+    </>
+  );
+
+  const className = "inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/50 shadow-2xs select-none";
+
+  if (onClick) {
+    return (
+      <button
+        type="button"
+        onClick={onClick}
+        className={`${className} hover:bg-[#e6dfd5] transition-colors cursor-pointer`}
+        title="View verified degree & qualification titles"
+      >
+        {content}
+      </button>
+    );
+  }
+
+  return (
+    <span
+      className={className}
+      title="Authenticated by IlmiDunya Administration"
+    >
+      {content}
+    </span>
   );
 };
 
@@ -29,10 +48,12 @@ export const SanadModal = ({
   degrees = [],
   tutorName = '',
   isAdmin = false,
+  canViewScans = false,
   onVerifyDoc = null,
   onRejectDoc = null
 }) => {
   const [mounted, setMounted] = useState(false);
+  const allowScanView = Boolean(isAdmin || canViewScans);
 
   useEffect(() => {
     setMounted(true);
@@ -166,14 +187,16 @@ export const SanadModal = ({
                         <span>{isDocRejected ? 'Rejected (Update)' : 'Reject Doc'}</span>
                       </button>
                     )}
-                    <a
-                      href={doc.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs font-bold text-[#b85d34] hover:text-[#9e4e2a] inline-flex items-center gap-1 ml-1"
-                    >
-                      Full View <ExternalLink className="w-3 h-3" />
-                    </a>
+                    {allowScanView && doc.fileUrl && (
+                      <a
+                        href={doc.fileUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs font-bold text-[#b85d34] hover:text-[#9e4e2a] inline-flex items-center gap-1 ml-1"
+                      >
+                        Full View <ExternalLink className="w-3 h-3" />
+                      </a>
+                    )}
                   </div>
                 </div>
 
@@ -183,31 +206,40 @@ export const SanadModal = ({
                     <span><strong>Rejection note:</strong> {doc.rejectionReason}</span>
                   </div>
                 )}
-                <div className="p-2 flex justify-center bg-slate-900/5">
-                  {doc.fileUrl && (doc.fileUrl.endsWith('.pdf') || doc.fileType === 'application/pdf' || doc.fileUrl.startsWith('data:application/pdf')) ? (
-                    <div className="p-8 text-center text-slate-600">
-                    <FileText className="w-12 h-12 mx-auto text-red-500 mb-2" />
-                    <p className="text-sm font-medium">PDF Sanad / Degree Document</p>
-                    <a
-                      href={doc.fileUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="mt-2 inline-block px-3 py-1.5 bg-slate-800 text-white text-xs rounded-lg hover:bg-slate-700"
-                    >
-                      Open PDF in New Tab
-                    </a>
+
+                {/* Document Scans: ONLY visible to Administrators and owner tutor in settings. Never exposed to public. */}
+                {allowScanView ? (
+                  <div className="p-2 flex justify-center bg-slate-900/5">
+                    {doc.fileUrl && (doc.fileUrl.endsWith('.pdf') || doc.fileType === 'application/pdf' || doc.fileUrl.startsWith('data:application/pdf')) ? (
+                      <div className="p-8 text-center text-slate-600">
+                        <FileText className="w-12 h-12 mx-auto text-red-500 mb-2" />
+                        <p className="text-sm font-medium">PDF Sanad / Degree Document</p>
+                        <a
+                          href={doc.fileUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="mt-2 inline-block px-3 py-1.5 bg-slate-800 text-white text-xs rounded-lg hover:bg-slate-700"
+                        >
+                          Open PDF in New Tab
+                        </a>
+                      </div>
+                    ) : (
+                      <img
+                        src={doc.fileUrl}
+                        alt={doc.title || 'Sanad / Degree Document'}
+                        className="max-h-96 w-auto object-contain rounded shadow-sm"
+                      />
+                    )}
                   </div>
                 ) : (
-                  <img
-                    src={doc.fileUrl}
-                    alt={doc.title || 'Sanad / Degree Document'}
-                    className="max-h-96 w-auto object-contain rounded shadow-sm"
-                  />
+                  <div className="px-4 py-3 bg-white/70 border-t border-stone-100 flex items-center gap-2 text-xs text-stone-500">
+                    <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span>Degree title authenticated by IlmiDunya Administration. Document scans are stored securely for platform verification and are not publicly viewable.</span>
+                  </div>
                 )}
               </div>
-            </div>
-          );
-        })}
+            );
+          })}
         </div>
 
         <div className="pt-4 border-t border-slate-100 flex justify-end">

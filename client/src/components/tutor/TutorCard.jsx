@@ -27,7 +27,6 @@ import { getTutorAvatar, parseDegreesAndCertificates } from '../../utils/tutorHe
 const StudentAuthModal = dynamic(() => import('../common/StudentAuthModal'), { ssr: false });
 const FemaleTutorGateModal = dynamic(() => import('../common/FemaleTutorGateModal'), { ssr: false });
 const ChatRequestModal = dynamic(() => import('../common/ChatRequestModal'), { ssr: false });
-const SanadModal = dynamic(() => import('../common/SanadBadge').then(m => m.SanadModal), { ssr: false });
 
 // ─────────────────────────────────────────────
 // Mode Badge
@@ -71,7 +70,6 @@ const TutorCard = ({ tutor, tutorProfile }) => {
   const { onlineStatusMap } = useSocket();
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
-  const [sanadModalOpen, setSanadModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [femaleGateModalOpen, setFemaleGateModalOpen] = useState(false);
   const [chatRequestModalOpen, setChatRequestModalOpen] = useState(false);
@@ -350,18 +348,13 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                 </span>
 
                 {hasVerifiedSanad && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSanadModalOpen(true);
-                    }}
-                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/50 hover:bg-[#e6dfd5] transition-colors shadow-2xs cursor-pointer shrink-0"
-                    title="Click to inspect verified degrees & Sanad certificates"
+                  <span
+                    className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-[10px] font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/50 shadow-2xs shrink-0 select-none"
+                    title="Credentials authenticated by IlmiDunya Administration"
                   >
                     <ShieldCheck className="w-3 h-3 text-emerald-700" />
                     <span>{verifiedSanadCount > 0 ? `Sanad (${verifiedSanadCount})` : 'Verified Sanad'}</span>
-                  </button>
+                  </span>
                 )}
               </div>
 
@@ -432,17 +425,6 @@ const TutorCard = ({ tutor, tutorProfile }) => {
         </div>
       </div>
     </CardHoverWrapper>
-
-      {/* Sanad Preview Modal - dynamically mounted on demand */}
-      {sanadModalOpen && (
-        <SanadModal
-          isOpen={sanadModalOpen}
-          onClose={() => setSanadModalOpen(false)}
-          documents={verifiedSanadDocs.length > 0 ? verifiedSanadDocs : (data.sanadDocuments || [])}
-          degrees={cardDegrees}
-          tutorName={tutorName}
-        />
-      )}
 
       {/* Student Login / Registration Modal - dynamically mounted on demand */}
       {authModalOpen && (

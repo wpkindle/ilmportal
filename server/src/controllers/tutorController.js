@@ -237,6 +237,18 @@ exports.getPublicTutors = async (req, res) => {
       const realCount = obj.ratingCount || 0;
       obj.averageRating = (realCount > 0 && typeof obj.ratingAverage === 'number') ? obj.ratingAverage : 0;
       obj.totalReviews = realCount;
+
+      // Sanitize sanadDocuments: omit private fileUrl/document scans from public directory
+      if (Array.isArray(obj.sanadDocuments)) {
+        obj.sanadDocuments = obj.sanadDocuments.map(doc => ({
+          _id: doc._id,
+          title: doc.title,
+          status: doc.status,
+          createdAt: doc.createdAt,
+          uploadedAt: doc.uploadedAt
+        }));
+      }
+
       return obj;
     });
 
@@ -346,6 +358,17 @@ exports.getTutorById = async (req, res) => {
 
     tutorObj.averageRating = genuineAverage;
     tutorObj.totalReviews = genuineReviewsCount;
+
+    // Sanitize sanadDocuments: only admin or owner tutor can view private document file URLs
+    if (!isAdmin && !isOwner && Array.isArray(tutorObj.sanadDocuments)) {
+      tutorObj.sanadDocuments = tutorObj.sanadDocuments.map(doc => ({
+        _id: doc._id,
+        title: doc.title,
+        status: doc.status,
+        createdAt: doc.createdAt,
+        uploadedAt: doc.uploadedAt
+      }));
+    }
 
     res.status(200).json({
       success: true,

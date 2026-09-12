@@ -1463,6 +1463,15 @@ function TutorProfileContent() {
                 )}
               </div>
 
+              {/* Privacy Notice Banner */}
+              <div className="p-3.5 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl flex items-start gap-2.5 text-xs text-stone-700">
+                <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
+                <div className="leading-relaxed">
+                  <span className="font-bold text-[#0c2217]">Privacy Guarantee: </span>
+                  Your uploaded degree &amp; certificate documents are strictly confidential and only visible to IlmiDunya administrators for verification. Only the degree title you specify will be displayed publicly on your profile with a verified badge.
+                </div>
+              </div>
+
               {sanadSuccess && (
                 <div className="p-3 bg-[#f0ece1] border border-[#d4a359]/40 text-[#0c2217] text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
                   <CheckCircle2 className="w-4 h-4 text-[#b85d34] shrink-0" />
@@ -1565,11 +1574,11 @@ function TutorProfileContent() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <div>
                     <label className="text-xs font-bold text-slate-700 block mb-1">
-                      Document Title / Degree Name *
+                      Degree / Qualification Title * <span className="text-[10px] text-slate-400 font-normal">(Shown publicly on profile)</span>
                     </label>
                     <input
                       type="text"
-                      placeholder="e.g. Shahadat-ul-Almiya / BS Degree"
+                      placeholder="e.g. Dars-e-Nizami Shahadat-ul-Almiya / BS Computer Science / Hifz-ul-Quran"
                       value={newSanadTitle}
                       onChange={(e) => setNewSanadTitle(e.target.value)}
                       className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-medium"
@@ -2070,6 +2079,7 @@ function TutorProfileContent() {
           documents={uploadedSanads}
           degrees={parseDegreesAndCertificates(qualifications, uploadedSanads)}
           tutorName={name || 'Tutor'}
+          canViewScans={true}
         />
       )}
 

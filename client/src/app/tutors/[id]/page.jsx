@@ -15,7 +15,6 @@ import {
   Clock
 } from 'lucide-react';
 import RatingStars from '../../../components/common/RatingStars';
-import SanadBadge, { SanadModal } from '../../../components/common/SanadBadge';
 import { api } from '../../../services/api';
 import TutorProfileClient from './TutorProfileClient';
 import { getTutorAvatar } from '../../../utils/tutorHelpers';

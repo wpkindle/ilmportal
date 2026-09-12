@@ -432,18 +432,16 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
                     }`}
                   >
                     {hasSanad && (
-                      <button
-                        type="button"
-                        onClick={() => setSanadModalOpen(true)}
+                      <div
                         className={`${
                           canMessage ? 'w-full sm:w-auto xl:w-full' : 'w-full sm:w-auto'
-                        } py-2.5 px-3 rounded-2xl text-xs font-bold bg-[#f0ece1] hover:bg-[#e6ded1] text-[#0c2217] border border-[#d4a359]/50 transition-all shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap`}
-                        title="Inspect verified degrees & Sanad certificates"
+                        } py-2.5 px-3 rounded-2xl text-xs font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/50 shadow-2xs flex items-center justify-center gap-1.5 whitespace-nowrap select-none`}
+                        title="Qualifications authenticated by IlmiDunya Administration"
                       >
                         <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
                         <span className="truncate">Verified Sanad ({verifiedSanadCount})</span>
                         <GraduationCap className="w-3.5 h-3.5 text-[#b85d34] shrink-0 hidden sm:inline" />
-                      </button>
+                      </div>
                     )}
 
                     {hasVideo && (
@@ -494,16 +492,21 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
                   <Award className="w-4 h-4 text-[#b85d34]" />
                   <span>Verified Credentials &amp; Degrees ({allDegrees.length})</span>
                 </span>
-                {verifiedSanadCount > 0 && (
+                {user?.role === 'admin' && verifiedSanadCount > 0 ? (
                   <button
                     type="button"
                     onClick={() => setSanadModalOpen(true)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-white hover:bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/50 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer"
+                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/50 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer"
                   >
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>View Sanad Scans ({verifiedSanadCount})</span>
+                    <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
+                    <span>Admin: Review Documents ({verifiedSanadCount})</span>
                   </button>
-                )}
+                ) : verifiedSanadCount > 0 ? (
+                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white text-[#0c2217] border border-[#d4a359]/50 rounded-xl text-xs font-bold shadow-2xs select-none">
+                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Verified by Administration</span>
+                  </span>
+                ) : null}
               </div>
 
               {/* All degrees rendered cleanly as wrap-friendly badges with green verification checkmark */}
@@ -609,14 +612,14 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
               </p>
             </div>
 
-            {verifiedSanadCount > 0 && (
+            {user?.role === 'admin' && verifiedSanadCount > 0 && (
               <button
                 type="button"
                 onClick={() => setSanadModalOpen(true)}
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#0c2217] hover:bg-[#163826] text-[#f5d996] text-xs font-bold shadow-sm transition-all cursor-pointer"
               >
                 <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
-                <span>Inspect Verified Scans ({verifiedSanadCount})</span>
+                <span>Admin: Inspect Documents ({verifiedSanadCount})</span>
               </button>
             )}
           </div>
@@ -652,16 +655,11 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
             <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
               <span className="flex items-center gap-1.5 font-medium">
                 <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>{verifiedSanadDocs.length} original credential certificate document(s) authenticated.</span>
+                <span>{verifiedSanadDocs.length} credential qualification(s) verified by IlmiDunya administration.</span>
               </span>
-              <button
-                type="button"
-                onClick={() => setSanadModalOpen(true)}
-                className="text-[#b85d34] hover:underline font-bold inline-flex items-center gap-1 cursor-pointer"
-              >
-                <span>View Full Certificate Scans</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </button>
+              <span className="text-slate-400 text-[11px] italic">
+                Official documents verified &amp; archived securely
+              </span>
             </div>
           )}
         </div>
@@ -840,24 +838,37 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
           <span>Message &amp; Book Free Trial</span>
         </button>
 
-        <button
-          onClick={() => setSanadModalOpen(true)}
-          className="py-3 px-3.5 min-h-[48px] bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 font-bold text-xs rounded-2xl flex items-center justify-center gap-1.5 active:bg-[#e6ded1] transition-colors shrink-0"
-          title="Inspect verified credentials"
-        >
-          <ShieldCheck className="w-4 h-4 text-[#0c2217]" />
-          <span>Sanad</span>
-        </button>
+        {user?.role === 'admin' ? (
+          <button
+            onClick={() => setSanadModalOpen(true)}
+            className="py-3 px-3.5 min-h-[48px] bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/40 font-bold text-xs rounded-2xl flex items-center justify-center gap-1.5 active:bg-[#163826] transition-colors shrink-0 cursor-pointer"
+            title="Admin: Inspect verified credentials"
+          >
+            <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
+            <span>Review</span>
+          </button>
+        ) : (
+          <div
+            className="py-3 px-3.5 min-h-[48px] bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 font-bold text-xs rounded-2xl flex items-center justify-center gap-1.5 select-none shrink-0"
+            title="Verified Sanad credentials on record"
+          >
+            <ShieldCheck className="w-4 h-4 text-[#0c2217]" />
+            <span>Sanad</span>
+          </div>
+        )}
       </div>
 
-      {/* Sanad Modal */}
-      <SanadModal
-        isOpen={sanadModalOpen}
-        onClose={() => setSanadModalOpen(false)}
-        documents={verifiedSanadDocs.length > 0 ? verifiedSanadDocs : (tutor.sanadDocuments || [])}
-        degrees={allDegrees}
-        tutorName={tutorName}
-      />
+      {/* Sanad Modal - Scans restricted to Admin only */}
+      {sanadModalOpen && (
+        <SanadModal
+          isOpen={sanadModalOpen}
+          onClose={() => setSanadModalOpen(false)}
+          documents={verifiedSanadDocs.length > 0 ? verifiedSanadDocs : (tutor.sanadDocuments || [])}
+          degrees={allDegrees}
+          tutorName={tutorName}
+          isAdmin={user?.role === 'admin'}
+        />
+      )}
 
       {/* Student Login / Registration Modal */}
       <StudentAuthModal

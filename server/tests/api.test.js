@@ -594,5 +594,56 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
     expect(clearPRRes.body.paymentRequest.status).toBe('cleared');
     expect(clearPRRes.body.deal.accessRestricted).toBe(false);
   });
+
+  test('Public tutor endpoints omit fileUrl from sanadDocuments for non-admins to ensure document privacy', async () => {
+    const TutorProfile = require('../src/models/TutorProfile');
+    const User = require('../src/models/User');
+
+    // Create admin user & token for testing admin visibility
+    let adminUser = await User.findOne({ email: 'testadmin@pakistanlms.pk' });
+    if (!adminUser) {
+      adminUser = await User.create({
+        name: 'Super Admin',
+        email: 'testadmin@pakistanlms.pk',
+        password: 'Password@123',
+        role: 'admin',
+        isVerified: true
+      });
+    }
+    const jwt = require('jsonwebtoken');
+    adminToken = jwt.sign({ id: adminUser._id, role: 'admin' }, process.env.JWT_SECRET || 'fallback_jwt_secret_for_pakistan_lms_2026', { expiresIn: '1d' });
+
+    // Ensure tutor profile has verified sanad documents with fileUrl
+    const tutor = await User.findOne({ email: 'testtutor@pakistanlms.pk' });
+    const profile = await TutorProfile.findOne({ user: tutor._id });
+    profile.sanadDocuments = [{
+      title: 'Shahadat-ul-Alimiyyah (Dars-e-Nizami)',
+      fileUrl: 'https://storage.ilmidunya.com/sanads/secret-degree-12345.pdf',
+      fileType: 'application/pdf',
+      status: 'verified'
+    }];
+    await profile.save();
+
+    // 1. Public GET /api/tutors/:id (unauthenticated / student)
+    const publicRes = await request(app).get(`/api/tutors/${profile._id}`);
+    expect(publicRes.statusCode).toEqual(200);
+    expect(publicRes.body.success).toBe(true);
+    expect(publicRes.body.tutor.sanadDocuments).toBeDefined();
+    expect(publicRes.body.tutor.sanadDocuments.length).toBeGreaterThanOrEqual(1);
+    // Degree title must be visible
+    expect(publicRes.body.tutor.sanadDocuments[0].title).toBe('Shahadat-ul-Alimiyyah (Dars-e-Nizami)');
+    // fileUrl must NOT be leaked to public!
+    expect(publicRes.body.tutor.sanadDocuments[0].fileUrl).toBeUndefined();
+
+    // 2. Admin GET /api/tutors/:id (authenticated admin)
+    const adminRes = await request(app)
+      .get(`/api/tutors/${profile._id}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect(adminRes.statusCode).toEqual(200);
+    expect(adminRes.body.tutor.sanadDocuments[0].fileUrl).toBe('https://storage.ilmidunya.com/sanads/secret-degree-12345.pdf');
+
+    // Clean up admin user
+    await User.deleteOne({ email: 'testadmin@pakistanlms.pk' });
+  });
 });
 

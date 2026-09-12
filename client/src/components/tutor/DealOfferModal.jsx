@@ -34,9 +34,14 @@ const subjectOptions = [
   { value: 'Chemistry (Organic & Inorganic)', label: 'Chemistry (Organic & Inorganic)', sublabel: 'Matric / FSc / MDCAT', badge: 'Academic' },
   { value: 'Biology & Medical Sciences (MDCAT Prep)', label: 'Biology & Medical Sciences (MDCAT Prep)', sublabel: 'Pre-Medical Curriculum', badge: 'Academic' },
   { value: 'Computer Science & Programming (Python/Web)', label: 'Computer Science & Programming (Python/Web)', sublabel: 'Coding & ICS', badge: 'Academic' },
+  { value: 'Political Science', label: 'Political Science', sublabel: 'State, Government & Politics', badge: 'Academic' },
+  { value: 'Civics & Citizenship', label: 'Civics & Citizenship', sublabel: 'Rights, Duties & Civic Education', badge: 'Academic' },
+  { value: 'Pakistan Ideology & Studies', label: 'Pakistan Ideology & Studies', sublabel: 'Nazria-e-Pakistan & History', badge: 'Academic' },
+  { value: 'Constitution & Constitutional Law', label: 'Constitution & Constitutional Law', sublabel: '1973 Constitution & Legal Rights', badge: 'Academic' },
   { value: 'English Grammar, Composition & IELTS', label: 'English Grammar, Composition & IELTS', sublabel: 'Spoken & Academic English', badge: 'Language' },
   { value: 'Urdu Literature & Grammar (Adab)', label: 'Urdu Literature & Grammar (Adab)', sublabel: 'School & College Urdu', badge: 'Language' },
-  { value: 'Junior / Primary All Subjects (Grade 1-8)', label: 'Junior / Primary All Subjects (Grade 1-8)', sublabel: 'School Foundation', badge: 'School' },
+  { value: 'Primary School (Class 1 to 5)', label: 'Primary School (Class 1 to 5)', sublabel: 'Early Education & Foundational Skills', badge: 'School' },
+  { value: 'Middle School (Class 6 to 8)', label: 'Middle School (Class 6 to 8)', sublabel: 'Class 6, 7 & 8 All Subjects', badge: 'School' },
   { value: 'custom', label: 'Other / Custom Subject Title...', sublabel: 'Type custom title' }
 ];
 

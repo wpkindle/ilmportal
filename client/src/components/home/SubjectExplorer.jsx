@@ -12,7 +12,10 @@ import {
   ArrowRight,
   Sparkles,
   Users,
-  GraduationCap
+  GraduationCap,
+  Landmark,
+  Compass,
+  Scale
 } from 'lucide-react';
 import { api } from '../../services/api';
 
@@ -24,7 +27,10 @@ const iconMap = {
   Languages,
   ShieldCheck,
   Users,
-  GraduationCap
+  GraduationCap,
+  Landmark,
+  Compass,
+  Scale
 };
 
 const SubjectExplorer = () => {

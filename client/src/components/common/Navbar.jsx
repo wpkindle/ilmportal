@@ -233,9 +233,11 @@ const Navbar = () => {
       color: 'text-[#b85d34] bg-[#faf0eb]',
       items: [
         { name: 'Primary School (Class 1 to 5)', link: '/tutors?category=primary-school-1-to-5' },
-        { name: 'Middle School Academic (Class 6-8)', link: '/tutors?category=middle-school-academic' },
+        { name: 'Middle School (Class 6 to 8)', link: '/tutors?category=middle-school-academic' },
         { name: 'Matric / SSC Science & Arts', link: '/tutors?category=matric-ssc-science' },
         { name: 'FSc Pre-Medical & Engineering', link: '/tutors?category=fsc-pre-engineering' },
+        { name: 'Political Science & Civics', link: '/tutors?category=political-science' },
+        { name: 'Pakistan Ideology & Constitution', link: '/tutors?category=pakistan-ideology' },
         { name: 'Board Exam Preparation', link: '/tutors?category=board-exam-prep' },
         { name: 'MDCAT & ECAT Entry Prep', link: '/tutors?category=entry-test-prep' }
       ]
@@ -888,11 +890,32 @@ const Navbar = () => {
                 &bull; Primary School (Class 1 to 5)
               </Link>
               <Link
+                href="/tutors?category=middle-school-academic"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-700 hover:bg-[#ede6db] transition-colors"
+              >
+                &bull; Middle School (Class 6 to 8)
+              </Link>
+              <Link
                 href="/tutors?category=matric-ssc-science"
                 onClick={() => setMobileMenuOpen(false)}
                 className="block px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-700 hover:bg-[#ede6db] transition-colors"
               >
                 &bull; School &amp; College Academics
+              </Link>
+              <Link
+                href="/tutors?category=political-science"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-700 hover:bg-[#ede6db] transition-colors"
+              >
+                &bull; Political Science &amp; Civics
+              </Link>
+              <Link
+                href="/tutors?category=pakistan-ideology"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block px-3.5 py-2.5 min-h-[44px] rounded-xl text-xs font-semibold text-slate-700 hover:bg-[#ede6db] transition-colors"
+              >
+                &bull; Pakistan Ideology &amp; Constitution
               </Link>
               <Link
                 href="/tutors?category=board-exam-prep"

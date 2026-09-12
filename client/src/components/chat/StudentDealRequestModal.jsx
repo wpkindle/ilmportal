@@ -11,7 +11,12 @@ const SUBJECT_PRESETS = [
   'Urdu Language & Literature',
   'Islamic Studies (Deeniyat / Fiqh)',
   'Arabic Language & Grammar',
-  'Primary School Tutoring (All Subjects)',
+  'Primary School Tutoring (Class 1 to 5)',
+  'Middle School Tutoring (Class 6 to 8)',
+  'Political Science',
+  'Civics & Citizenship',
+  'Pakistan Ideology & Studies',
+  'Constitution & Constitutional Law',
   'English Language & Grammar',
   'General Mathematics',
   'custom'

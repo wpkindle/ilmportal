@@ -260,6 +260,11 @@ export default function Hero() {
     { label: 'Noorani Qaida', slug: 'noorani-qaida' },
     { label: 'Hifz Memorization', slug: 'hifz-al-quran' },
     { label: 'Class 1 to 5', slug: 'primary-school-1-to-5' },
+    { label: 'Class 6 to 8', slug: 'middle-school-academic' },
+    { label: 'Political Science', slug: 'political-science' },
+    { label: 'Civics', slug: 'civics' },
+    { label: 'Pakistan Ideology', slug: 'pakistan-ideology' },
+    { label: 'Constitution', slug: 'constitution-law' },
     { label: 'Board Exam Prep', slug: 'board-exam-prep' },
     { label: 'FSc Pre-Medical', slug: 'fsc-hssc' },
     { label: 'Matric Science', slug: 'matric-ssc-science' }

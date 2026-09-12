@@ -239,12 +239,44 @@ const categoriesData = [
     subtopics: ['Class 1 to 5 All Subjects', 'Primary English Phonics', 'Urdu Reading & Writing', 'Basic Math & Tables', 'General Science & Social Studies']
   },
   {
-    name: 'Middle School Academic (Class 6 - 8)',
+    name: 'Middle School (Class 6 to 8)',
     slug: 'middle-school-academic',
     type: 'academic',
-    icon: 'BookOpen',
-    description: 'Foundation building in Mathematics, General Science, English, and Urdu for middle school grades.',
-    subtopics: ['Middle School Math (Class 6-8)', 'General Science Foundation', 'English Grammar & Comprehension', 'Urdu & Social Studies']
+    icon: 'GraduationCap',
+    description: 'Structured coaching for Grade 6, 7, and 8 students in Mathematics, General Science, English Grammar, Urdu, and Social Studies.',
+    subtopics: ['Class 6 All Subjects', 'Class 7 All Subjects', 'Class 8 All Subjects', 'Middle School Math (Class 6-8)', 'General Science (Class 6-8)', 'English Grammar & Comprehension']
+  },
+  {
+    name: 'Political Science',
+    slug: 'political-science',
+    type: 'academic',
+    icon: 'Landmark',
+    description: 'In-depth tutoring in Political Theory, Western & Islamic Political Thought, Comparative Politics, International Relations, and Government of Pakistan.',
+    subtopics: ['Political Theory & State Concepts', 'Comparative Politics & Systems', 'Western & Islamic Political Philosophy', 'Constitution & Politics of Pakistan', 'International Relations']
+  },
+  {
+    name: 'Civics',
+    slug: 'civics',
+    type: 'academic',
+    icon: 'ShieldCheck',
+    description: 'Civics education for Matric, Intermediate, and College students: citizenship rights, civic duties, state organs, and public administration.',
+    subtopics: ['Civics (Class 9 & 10 Matric)', 'Civics (FA Intermediate Part 1 & 2)', 'Citizenship, Rights & Responsibilities', 'State Organs & Local Government', 'Social Ethics & Public Administration']
+  },
+  {
+    name: 'Pakistan Ideology & Studies',
+    slug: 'pakistan-ideology',
+    type: 'academic',
+    icon: 'Compass',
+    description: 'Nazria-e-Pakistan (Pakistan Ideology), Two-Nation Theory, freedom struggle, teachings of Allama Iqbal and Quaid-e-Azam, and compulsory Pakistan Studies for all boards.',
+    subtopics: ['Nazria-e-Pakistan (Pakistan Ideology)', 'Two-Nation Theory & Historical Evolution', 'Vision of Quaid-e-Azam & Allama Iqbal', 'Pakistan Movement (1857-1947)', 'Pakistan Studies (Matric, FSc & Degree)']
+  },
+  {
+    name: 'Constitution & Constitutional Law',
+    slug: 'constitution-law',
+    type: 'academic',
+    icon: 'Scale',
+    description: 'Comprehensive study of the 1973 Constitution of Pakistan, Constitutional History, Fundamental Rights, Parliament, Judiciary, and Legal Systems for academia, CSS, PMS & LLB.',
+    subtopics: ['1973 Constitution of Pakistan', 'Fundamental Rights & Principles of Policy', 'Parliament, Senate & Federal Executive', 'Supreme Court, High Courts & Judicial System', 'Constitutional Amendments & History']
   },
   {
     name: 'Computer Science & Coding',
@@ -437,7 +469,16 @@ const seedDatabase = async () => {
       qualifications: 'MS Electrical Engineering (NUST), Board Exam Specialist',
       experienceYears: 7,
       hourlyRate: 2500, // PKR
-      subjects: [catMap['primary-school-1-to-5'], catMap['middle-school-academic'], catMap['board-exam-prep'], catMap['fsc-hssc']],
+      subjects: [
+        catMap['primary-school-1-to-5'],
+        catMap['middle-school-academic'],
+        catMap['political-science'],
+        catMap['civics'],
+        catMap['pakistan-ideology'],
+        catMap['constitution-law'],
+        catMap['board-exam-prep'],
+        catMap['fsc-hssc']
+      ],
       cities: [locMap['Karachi'], locMap['Hyderabad']],
       teachingModes: ['online', 'in_person'],
       gender: 'male',

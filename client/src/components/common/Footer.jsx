@@ -314,12 +314,27 @@ const Footer = () => {
               </li>
               <li>
                 <Link href="/tutors?category=middle-school-academic" className="hover:text-white transition-colors block">
-                  Middle School Academic (6th-8th)
+                  Middle School (Class 6 to 8)
                 </Link>
               </li>
               <li>
                 <Link href="/tutors?category=matric-ssc-science" className="hover:text-white transition-colors block">
                   Matric Science (9th &amp; 10th)
+                </Link>
+              </li>
+              <li>
+                <Link href="/tutors?category=political-science" className="hover:text-white transition-colors block">
+                  Political Science &amp; Civics
+                </Link>
+              </li>
+              <li>
+                <Link href="/tutors?category=pakistan-ideology" className="hover:text-white transition-colors block">
+                  Pakistan Ideology &amp; Studies
+                </Link>
+              </li>
+              <li>
+                <Link href="/tutors?category=constitution-law" className="hover:text-white transition-colors block">
+                  Constitution &amp; Constitutional Law
                 </Link>
               </li>
               <li>

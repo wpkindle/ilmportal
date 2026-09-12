@@ -181,25 +181,79 @@ const startServer = async () => {
         console.warn('Contact page sync note:', contactSyncErr.message);
       }
 
-      // Ensure 'Primary School (Class 1 to 5)' category exists
+      // Ensure academic categories exist in database
       try {
         const Category = require('./models/Category');
-        await Category.findOneAndUpdate(
-          { slug: 'primary-school-1-to-5' },
+        const categoriesToEnsure = [
           {
-            $setOnInsert: {
-              name: 'Primary School (Class 1 to 5)',
-              slug: 'primary-school-1-to-5',
-              type: 'academic',
-              icon: 'Users',
-              description: 'Foundational learning for young learners in English, Urdu, Basic Mathematics, General Science, and daily schoolwork guidance.',
-              subtopics: ['Class 1 to 5 All Subjects', 'Primary English Phonics', 'Urdu Reading & Writing', 'Basic Math & Tables', 'General Science & Social Studies']
-            }
+            name: 'Primary School (Class 1 to 5)',
+            slug: 'primary-school-1-to-5',
+            type: 'academic',
+            icon: 'Users',
+            description: 'Foundational learning for young learners in English, Urdu, Basic Mathematics, General Science, and daily schoolwork guidance.',
+            subtopics: ['Class 1 to 5 All Subjects', 'Primary English Phonics', 'Urdu Reading & Writing', 'Basic Math & Tables', 'General Science & Social Studies']
           },
-          { upsert: true, new: true }
-        );
+          {
+            name: 'Middle School (Class 6 to 8)',
+            slug: 'middle-school-academic',
+            type: 'academic',
+            icon: 'GraduationCap',
+            description: 'Structured coaching for Grade 6, 7, and 8 students in Mathematics, General Science, English Grammar, Urdu, and Social Studies.',
+            subtopics: ['Class 6 All Subjects', 'Class 7 All Subjects', 'Class 8 All Subjects', 'Middle School Math (Class 6-8)', 'General Science (Class 6-8)', 'English Grammar & Comprehension']
+          },
+          {
+            name: 'Political Science',
+            slug: 'political-science',
+            type: 'academic',
+            icon: 'Landmark',
+            description: 'In-depth tutoring in Political Theory, Western & Islamic Political Thought, Comparative Politics, International Relations, and Government of Pakistan.',
+            subtopics: ['Political Theory & State Concepts', 'Comparative Politics & Systems', 'Western & Islamic Political Philosophy', 'Constitution & Politics of Pakistan', 'International Relations']
+          },
+          {
+            name: 'Civics',
+            slug: 'civics',
+            type: 'academic',
+            icon: 'ShieldCheck',
+            description: 'Civics education for Matric, Intermediate, and College students: citizenship rights, civic duties, state organs, and public administration.',
+            subtopics: ['Civics (Class 9 & 10 Matric)', 'Civics (FA Intermediate Part 1 & 2)', 'Citizenship, Rights & Responsibilities', 'State Organs & Local Government', 'Social Ethics & Public Administration']
+          },
+          {
+            name: 'Pakistan Ideology & Studies',
+            slug: 'pakistan-ideology',
+            type: 'academic',
+            icon: 'Compass',
+            description: 'Nazria-e-Pakistan (Pakistan Ideology), Two-Nation Theory, freedom struggle, teachings of Allama Iqbal and Quaid-e-Azam, and compulsory Pakistan Studies for all boards.',
+            subtopics: ['Nazria-e-Pakistan (Pakistan Ideology)', 'Two-Nation Theory & Historical Evolution', 'Vision of Quaid-e-Azam & Allama Iqbal', 'Pakistan Movement (1857-1947)', 'Pakistan Studies (Matric, FSc & Degree)']
+          },
+          {
+            name: 'Constitution & Constitutional Law',
+            slug: 'constitution-law',
+            type: 'academic',
+            icon: 'Scale',
+            description: 'Comprehensive study of the 1973 Constitution of Pakistan, Constitutional History, Fundamental Rights, Parliament, Judiciary, and Legal Systems for academia, CSS, PMS & LLB.',
+            subtopics: ['1973 Constitution of Pakistan', 'Fundamental Rights & Principles of Policy', 'Parliament, Senate & Federal Executive', 'Supreme Court, High Courts & Judicial System', 'Constitutional Amendments & History']
+          }
+        ];
+
+        for (const cat of categoriesToEnsure) {
+          await Category.findOneAndUpdate(
+            { slug: cat.slug },
+            {
+              $setOnInsert: {
+                name: cat.name,
+                slug: cat.slug,
+                type: cat.type,
+                icon: cat.icon,
+                description: cat.description,
+                subtopics: cat.subtopics
+              },
+              $set: { isActive: true }
+            },
+            { upsert: true, new: true }
+          );
+        }
       } catch (catErr) {
-        console.warn('Primary category sync note:', catErr.message);
+        console.warn('Academic categories sync note:', catErr.message);
       }
 
       // Synchronize genuine review counts and ratings for all tutor profiles (strip fake/stale reviews)

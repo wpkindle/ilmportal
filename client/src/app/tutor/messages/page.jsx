@@ -190,16 +190,37 @@ function TutorMessagesContent() {
       });
     };
 
+    const handlePaymentRequestUpdated = ({ dealId, paymentRequest }) => {
+      if (paymentRequest) {
+        setActiveConversation((curr) => {
+          if (!curr || !curr.deal) return curr;
+          const currId = (curr.deal._id || curr.deal.id)?.toString();
+          if (currId === dealId?.toString()) {
+            return {
+              ...curr,
+              deal: {
+                ...curr.deal,
+                latestPaymentRequest: paymentRequest
+              }
+            };
+          }
+          return curr;
+        });
+      }
+    };
+
     socket.on('unread-count-updated', handleUnreadUpdate);
     socket.on('new-message', handleNewMessage);
     socket.on('chat-request-received', handleNewChatRequest);
     socket.on('deal-status-updated', handleDealUpdated);
+    socket.on('payment-request-updated', handlePaymentRequestUpdated);
 
     return () => {
       socket.off('unread-count-updated', handleUnreadUpdate);
       socket.off('new-message', handleNewMessage);
       socket.off('chat-request-received', handleNewChatRequest);
       socket.off('deal-status-updated', handleDealUpdated);
+      socket.off('payment-request-updated', handlePaymentRequestUpdated);
     };
   }, [socket, fetchConversations, fetchRequests, activeConversation]);
 
@@ -515,6 +536,16 @@ function TutorMessagesContent() {
                 partner={activeConversation.partner}
                 initialDeal={activeConversation.deal}
                 onBack={() => setMobileView('list')}
+                onDealUpdated={(updatedDeal) => {
+                  setActiveConversation((curr) => (curr ? { ...curr, deal: updatedDeal } : curr));
+                  setConversations((prev) =>
+                    prev.map((c) =>
+                      c.conversationId === activeConversation.conversationId
+                        ? { ...c, deal: updatedDeal }
+                        : c
+                    )
+                  );
+                }}
               />
             ) : (
               <div

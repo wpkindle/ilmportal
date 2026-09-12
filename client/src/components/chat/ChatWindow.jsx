@@ -74,7 +74,7 @@ const formatFileSize = (bytes) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
-const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversationDeleted }) => {
+const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversationDeleted, onDealUpdated }) => {
   const { user, isTutor, isStudent } = useAuth();
   const isTutorToTutor = (isTutor || user?.role === 'tutor') && partner?.role === 'tutor';
   const { socket, onlineUsers, onlineStatusMap, refreshUserOnlineStatus } = useSocket();
@@ -105,7 +105,17 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
 
   useEffect(() => {
     if (initialDeal) {
-      setPartnerDeal(initialDeal);
+      setPartnerDeal((prev) => {
+        if (prev?.latestPaymentRequest && typeof prev.latestPaymentRequest === 'object' && prev.latestPaymentRequest.status) {
+          if (!initialDeal.latestPaymentRequest || typeof initialDeal.latestPaymentRequest === 'string' || !initialDeal.latestPaymentRequest.status) {
+            return {
+              ...initialDeal,
+              latestPaymentRequest: prev.latestPaymentRequest
+            };
+          }
+        }
+        return initialDeal;
+      });
     }
   }, [initialDeal]);
 
@@ -565,11 +575,14 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
       const res = await api.completeDeal(partnerDeal._id);
       const updated = res.deal || { ...partnerDeal, status: 'completed' };
       setPartnerDeal(updated);
+      if (onDealUpdated) onDealUpdated(updated);
       fetchMessages();
       alert(res?.message || 'Course completed! Both you and the student can now leave a review.');
     } catch (err) {
       if (err.message && err.message.toLowerCase().includes('already')) {
-        setPartnerDeal({ ...partnerDeal, status: 'completed' });
+        const updated = { ...partnerDeal, status: 'completed' };
+        setPartnerDeal(updated);
+        if (onDealUpdated) onDealUpdated(updated);
         fetchMessages();
         alert('Course marked as completed! Both you and the student can now leave a review.');
       } else if (err.message && (err.message.toLowerCase().includes('platform fee') || err.message.toLowerCase().includes('cleared'))) {
@@ -841,9 +854,11 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
   return (
     <div className="flex flex-col h-[calc(100dvh-132px)] lg:h-[calc(100dvh-125px)] bg-white rounded-2xl sm:rounded-3xl border border-slate-200/90 shadow-sm overflow-hidden">
       
-      {/* Top Chat Header (Responsive, Fiverr/Upwork Style Online/Offline Badge) */}
-      <div className="p-2.5 sm:p-4 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between gap-2 sm:gap-3 shrink-0">
-        <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
+      {/* Top Chat Header (Responsive, Protected Left Identity & Streamlined Actions) */}
+      <div className="p-2 sm:p-3 md:p-3.5 bg-slate-50/90 border-b border-slate-200/80 flex items-center justify-between gap-2 shrink-0">
+        
+        {/* Left Side: Avatar, Name & Online Status (Protected min-width, never squeezed or overlapped) */}
+        <div className="flex items-center gap-2 sm:gap-2.5 min-w-[130px] sm:min-w-[170px] max-w-[45%] sm:max-w-[50%] shrink-0">
           {onBack && (
             <button
               type="button"
@@ -870,7 +885,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                 e.currentTarget.onerror = null;
                 e.currentTarget.src = getTutorAvatar({ name: partner?.name }, partner?.name || 'User');
               }}
-              className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl object-cover border-2 border-white shadow-sm"
+              className="w-9 h-9 sm:w-10 sm:h-10 rounded-2xl object-cover border-2 border-white shadow-sm"
             />
             {isPartnerOnline ? (
               <span
@@ -912,7 +927,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                 </span>
               )}
 
-              {/* Location: shown on sm+ screens so mobile has maximum space for name and status */}
+              {/* Location: shown on sm+ screens */}
               <span className="text-stone-300 shrink-0 hidden sm:inline">&bull;</span>
               <span className="text-stone-500 truncate hidden sm:inline">
                 {(partner?.localArea || partner?.area) ? `${partner.localArea || partner.area}, ${partner.city || 'Pakistan'}` : (partner?.city || 'Pakistan')}
@@ -921,43 +936,18 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
           </div>
         </div>
 
-        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 max-w-[65%] sm:max-w-none overflow-x-auto no-scrollbar py-0.5">
-          {/* Live In-Platform Video Classroom Button (only visible after deal is accepted and not completed) */}
+        {/* Right Side: Primary Actions + Sound + 3-Dots Dropdown */}
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink min-w-0 justify-end py-0.5">
+          {/* Live In-Platform Video Classroom Button */}
           {!isTutorToTutor && isDealAccepted && partnerDeal?.status !== 'completed' && (
             <Link
               href={`/classroom/${conversationId}`}
-              className="p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] font-bold text-xs rounded-xl shadow-md border border-[#d4a359]/40 flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+              className="p-1.5 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] font-bold text-xs rounded-xl shadow-md border border-[#d4a359]/40 flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
               title="Start or Join In-Platform HD Video Class"
             >
               <Video className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
-              <span className="hidden sm:inline">Join Class</span>
+              <span className="hidden md:inline">Join Class</span>
             </Link>
-          )}
-
-          {/* Action: Inspect Student Profile (Desktop only; on mobile accessible via clicking name/avatar or in 3-dots menu) */}
-          {(isTutor || partner?.role === 'student') && (
-            <button
-              type="button"
-              onClick={() => setStudentProfileModalOpen(true)}
-              className="hidden lg:inline-flex px-3 py-2 bg-stone-800 hover:bg-stone-700 text-white font-bold text-xs rounded-xl shadow-sm items-center gap-1.5 transition-all cursor-pointer border border-stone-700 shrink-0"
-              title="Inspect Student Profile"
-            >
-              <User className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
-              <span>Student Profile</span>
-            </button>
-          )}
-
-          {/* Tutor Action: Mark Deal Completed (Active deals only) */}
-          {isTutor && partnerDeal && ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) && (
-            <button
-              type="button"
-              onClick={handleMarkDealCompleted}
-              className="p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-emerald-500 ring-1 ring-emerald-400/30 shrink-0"
-              title="Mark deal as completed"
-            >
-              <CheckCircle2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" />
-              <span className="hidden sm:inline">Completed</span>
-            </button>
           )}
 
           {/* Tutor Action: Dynamic Tuition Fee Request / Status Button */}
@@ -966,7 +956,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               <button
                 type="button"
                 onClick={() => setTutorClearModalOpen(true)}
-                className="p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-emerald-500 ring-1 ring-emerald-400/50 animate-pulse shrink-0"
+                className="px-2 py-1.5 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-emerald-500 ring-1 ring-emerald-400/50 animate-pulse shrink-0"
                 title="Student submitted tuition payment proof - click to review and verify"
               >
                 <CheckCircle2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" />
@@ -977,19 +967,18 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               <button
                 type="button"
                 onClick={() => setTutorTuitionModalOpen(true)}
-                className="p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-amber-500 ring-1 ring-amber-400/40 shrink-0"
+                className="px-2 py-1.5 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-amber-500 ring-1 ring-amber-400/40 shrink-0"
                 title="Payment request pending from student. Click to view details or update."
               >
-                <Clock className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" />
-                <span className="hidden md:inline">Payment Requested (Pending)</span>
-                <span className="hidden sm:inline md:hidden">Pending</span>
-                <span className="sm:hidden">Pending</span>
+                <Clock className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0 animate-pulse" />
+                <span className="hidden md:inline">Pending Payment</span>
+                <span className="md:hidden">Pending</span>
               </button>
             ) : partnerDeal.latestPaymentRequest?.status === 'overdue' ? (
               <button
                 type="button"
                 onClick={() => setTutorTuitionModalOpen(true)}
-                className="p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-rose-500 ring-1 ring-rose-400/40 shrink-0"
+                className="px-2 py-1.5 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-rose-500 ring-1 ring-rose-400/40 shrink-0"
                 title="Payment is overdue. Click to resend or modify."
               >
                 <AlertTriangle className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" />
@@ -1000,18 +989,18 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               <button
                 type="button"
                 onClick={() => setTutorTuitionModalOpen(true)}
-                className="p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/40 shrink-0"
+                className="px-2 py-1.5 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/40 shrink-0"
                 title="Previous tuition fee cleared. Click to request next month tuition fee."
               >
                 <CreditCard className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
-                <span className="hidden sm:inline">Paid (Request Next)</span>
+                <span className="hidden sm:inline">Request Next Fee</span>
                 <span className="sm:hidden">Request</span>
               </button>
             ) : (
               <button
                 type="button"
                 onClick={() => setTutorTuitionModalOpen(true)}
-                className="p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/40 ring-1 ring-[#d4a359]/30 shrink-0"
+                className="px-2 py-1.5 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/40 ring-1 ring-[#d4a359]/30 shrink-0"
                 title="Send tuition fee payment request to student (3-day threshold)"
               >
                 <CreditCard className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
@@ -1026,7 +1015,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             <button
               type="button"
               onClick={() => setStudentTuitionModalOpen(true)}
-              className={`p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer shrink-0 ${
+              className={`px-2 py-1.5 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer shrink-0 ${
                 partnerDeal.latestPaymentRequest.status === 'proof_submitted'
                   ? 'bg-emerald-600 hover:bg-emerald-700 border border-emerald-500'
                   : partnerDeal.latestPaymentRequest.status === 'overdue'
@@ -1051,17 +1040,18 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             </button>
           )}
 
-          {/* Mutual Review Action in Header (Only shown when deal is completed AND review is NOT yet submitted) */}
+          {/* Mutual Review Action in Header */}
           {partnerDeal?.status === 'completed' && (
             (isStudent || user?.role === 'student' ? (!partnerDeal.isStudentReviewed && !partnerDeal.isReviewed) : !partnerDeal.isTutorReviewed) && (
               <button
                 type="button"
                 onClick={() => setShowStudentReviewModal(true)}
-                className="px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+                className="px-2 py-1.5 sm:px-3 sm:py-1.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
                 title="Leave Review"
               >
                 <Star className="w-3.5 h-3.5 fill-white text-white shrink-0" />
-                <span>{isStudent || user?.role === 'student' ? 'Rate Tutor' : 'Rate Student'}</span>
+                <span className="hidden sm:inline">{isStudent || user?.role === 'student' ? 'Rate Tutor' : 'Rate Student'}</span>
+                <span className="sm:hidden">Rate</span>
               </button>
             )
           )}
@@ -1075,12 +1065,12 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                 setPrefilledMode(partnerDeal?.mode || '');
                 setDealModalOpen(true);
               }}
-              className="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30 shrink-0"
+              className="px-2 py-1.5 sm:px-3 sm:py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30 shrink-0"
               title={partnerDeal?.status === 'completed' ? 'Send New Deal Offer for Next Month / Course' : 'Send Deal Offer'}
             >
               <Sparkles className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
               <span className="hidden sm:inline">{partnerDeal?.status === 'completed' ? 'New Deal Offer' : 'Send Deal Offer'}</span>
-              <span className="sm:hidden">{partnerDeal?.status === 'completed' ? 'New Deal' : 'Offer Deal'}</span>
+              <span className="sm:hidden">{partnerDeal?.status === 'completed' ? 'New Deal' : 'Offer'}</span>
             </button>
           )}
 
@@ -1089,71 +1079,60 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             <button
               type="button"
               onClick={() => setDealRequestModalOpen(true)}
-              className="px-2.5 py-1.5 sm:px-3 sm:py-2 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] font-bold text-xs rounded-xl shadow-md border border-[#d4a359]/40 flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+              className="px-2 py-1.5 sm:px-3 sm:py-2 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] font-bold text-xs rounded-xl shadow-md border border-[#d4a359]/40 flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
               title={partnerDeal?.status === 'completed' ? 'Request New Deal for Next Month / Course' : 'Request Tutoring Deal Offer'}
             >
               <Sparkles className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
               <span className="hidden sm:inline">{partnerDeal?.status === 'completed' ? 'Request New Deal' : 'Request Deal Offer'}</span>
-              <span className="sm:hidden">{partnerDeal?.status === 'completed' ? 'New Deal' : 'Request Deal'}</span>
+              <span className="sm:hidden">{partnerDeal?.status === 'completed' ? 'New Deal' : 'Request'}</span>
             </button>
           )}
 
-          {/* Desktop Inline Actions: Sound, Alerts, Report, Block */}
-          <div className="hidden md:flex items-center gap-1.5">
-            {permissionStatus !== 'granted' && (
-              <button
-                type="button"
-                onClick={requestPermission}
-                className="px-2.5 py-1.5 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 text-amber-900 text-[11px] font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
-                title="Turn on desktop notifications"
-              >
-                <Bell className="w-3.5 h-3.5 text-amber-600 animate-pulse" />
-                <span>Enable Alerts</span>
-              </button>
-            )}
+          {/* Sound Toggle (Always visible, compact) */}
+          <button
+            type="button"
+            onClick={() => toggleSound()}
+            className={`p-1.5 sm:p-2 rounded-xl border text-xs transition-all cursor-pointer shrink-0 ${
+              soundEnabled
+                ? 'bg-[#f0ece1] border-[#d4a359]/40 text-[#0c2217] hover:bg-[#e6dfd5]'
+                : 'bg-stone-100 border-stone-200 text-stone-400 hover:bg-stone-200'
+            }`}
+            title={soundEnabled ? 'Mute chime' : 'Enable chime'}
+          >
+            {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+          </button>
 
+          {/* Desktop-only secondary buttons on extra wide screens (2xl: only) */}
+          {(isTutor || partner?.role === 'student') && (
             <button
               type="button"
-              onClick={() => toggleSound()}
-              className={`p-2 rounded-xl border text-xs transition-all cursor-pointer ${
-                soundEnabled
-                  ? 'bg-[#f0ece1] border-[#d4a359]/40 text-[#0c2217] hover:bg-[#e6dfd5]'
-                  : 'bg-stone-100 border-stone-200 text-stone-400 hover:bg-stone-200'
-              }`}
-              title={soundEnabled ? 'Mute chime' : 'Enable chime'}
+              onClick={() => setStudentProfileModalOpen(true)}
+              className="hidden 2xl:inline-flex px-2.5 py-1.5 bg-stone-800 hover:bg-stone-700 text-white font-bold text-xs rounded-xl shadow-sm items-center gap-1.5 transition-all cursor-pointer border border-stone-700 shrink-0"
+              title="Inspect Student Profile"
             >
-              {soundEnabled ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+              <User className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
+              <span>Profile</span>
             </button>
+          )}
 
-            {partner && (
-              <button
-                type="button"
-                onClick={() => setReportModalOpen(true)}
-                className="px-2.5 py-2 bg-rose-50 hover:bg-rose-100 active:bg-rose-200 text-rose-700 border border-rose-200/80 font-bold text-xs rounded-xl flex items-center gap-1.5 transition-colors cursor-pointer"
-                title="Report user to platform admin"
-              >
-                <Flag className="w-3.5 h-3.5 text-rose-500" />
-                <span>Report</span>
-              </button>
-            )}
-
+          {isTutor && partnerDeal && ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) && (
             <button
               type="button"
-              onClick={handleDeleteConversation}
-              className="p-2 rounded-xl text-stone-400 hover:text-rose-600 hover:bg-rose-50 border border-transparent hover:border-rose-200 transition-colors cursor-pointer"
-              title="Delete this chat history"
-              aria-label="Delete this chat"
+              onClick={handleMarkDealCompleted}
+              className="hidden 2xl:inline-flex px-2.5 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm items-center gap-1.5 transition-all cursor-pointer border border-emerald-500 shrink-0"
+              title="Mark deal as completed"
             >
-              <Trash2 className="w-4 h-4" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-white shrink-0" />
+              <span>Completed</span>
             </button>
-          </div>
+          )}
 
-          {/* Mobile Secondary Actions Dropdown (3-Dots Menu) */}
-          <div className="relative md:hidden" ref={menuRef}>
+          {/* 3-DOTS OVERFLOW MENU (ALWAYS VISIBLE on all viewports!) */}
+          <div className="relative flex items-center shrink-0" ref={menuRef}>
             <button
               type="button"
               onClick={() => setMenuOpen((prev) => !prev)}
-              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+              className="p-1.5 sm:p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
               title="More Options"
               aria-label="More Options"
             >
@@ -1161,7 +1140,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-1.5 w-52 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 py-1.5 text-xs text-slate-700 animate-in fade-in zoom-in-95 duration-150">
+              <div className="absolute right-0 top-full mt-1.5 w-56 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 py-1.5 text-xs text-slate-700 animate-in fade-in zoom-in-95 duration-150">
                 {(isTutor || partner?.role === 'student') && (
                   <button
                     type="button"
@@ -1169,7 +1148,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                       setStudentProfileModalOpen(true);
                       setMenuOpen(false);
                     }}
-                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-[#0c2217] font-bold cursor-pointer"
+                    className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 hover:bg-slate-50 text-[#0c2217] font-bold cursor-pointer"
                   >
                     <User className="w-4 h-4 text-[#d4a359]" />
                     <span>View Student Profile</span>
@@ -1183,7 +1162,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                       setMenuOpen(false);
                       handleMarkDealCompleted();
                     }}
-                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-emerald-50 text-emerald-800 font-bold cursor-pointer"
+                    className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 hover:bg-emerald-50 text-emerald-800 font-bold cursor-pointer"
                   >
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     <span>Mark Deal Completed</span>
@@ -1198,7 +1177,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                         setMenuOpen(false);
                         setTutorClearModalOpen(true);
                       }}
-                      className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-emerald-50 text-emerald-800 font-bold cursor-pointer"
+                      className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 hover:bg-emerald-50 text-emerald-800 font-bold cursor-pointer"
                     >
                       <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                       <span>Review Tuition Proof</span>
@@ -1210,10 +1189,10 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                         setMenuOpen(false);
                         setTutorTuitionModalOpen(true);
                       }}
-                      className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-amber-50 text-amber-800 font-bold cursor-pointer"
+                      className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 hover:bg-amber-50 text-amber-800 font-bold cursor-pointer"
                     >
                       <Clock className="w-4 h-4 text-amber-600" />
-                      <span>Payment Requested (Pending)</span>
+                      <span>Payment Pending Details</span>
                     </button>
                   ) : partnerDeal.latestPaymentRequest?.status === 'overdue' ? (
                     <button
@@ -1222,7 +1201,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                         setMenuOpen(false);
                         setTutorTuitionModalOpen(true);
                       }}
-                      className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-rose-50 text-rose-800 font-bold cursor-pointer"
+                      className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 hover:bg-rose-50 text-rose-800 font-bold cursor-pointer"
                     >
                       <AlertTriangle className="w-4 h-4 text-rose-600" />
                       <span>Payment Request Overdue</span>
@@ -1234,7 +1213,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                         setMenuOpen(false);
                         setTutorTuitionModalOpen(true);
                       }}
-                      className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-amber-50 text-[#b85d34] font-bold cursor-pointer"
+                      className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 hover:bg-amber-50 text-[#b85d34] font-bold cursor-pointer"
                     >
                       <CreditCard className="w-4 h-4 text-[#b85d34]" />
                       <span>{partnerDeal.latestPaymentRequest?.status === 'cleared' ? 'Request Next Month Tuition' : 'Request Tuition Fee'}</span>
@@ -1249,7 +1228,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                       setMenuOpen(false);
                       setStudentTuitionModalOpen(true);
                     }}
-                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-amber-50 text-[#b85d34] font-bold cursor-pointer"
+                    className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 hover:bg-amber-50 text-[#b85d34] font-bold cursor-pointer"
                   >
                     <CreditCard className="w-4 h-4 text-[#b85d34]" />
                     <span>{partnerDeal.latestPaymentRequest.status === 'proof_submitted' ? 'View Payment Proof' : 'Pay Tuition Fee'}</span>
@@ -1260,10 +1239,10 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                   <Link
                     href={`/classroom/${conversationId}`}
                     onClick={() => setMenuOpen(false)}
-                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-[#0c2217] font-bold cursor-pointer"
+                    className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 hover:bg-slate-50 text-[#0c2217] font-bold cursor-pointer"
                   >
                     <Video className="w-4 h-4 text-[#d4a359]" />
-                    <span>Join Live Class</span>
+                    <span>Join Live Video Class</span>
                   </Link>
                 )}
 
@@ -1276,7 +1255,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                       setDealModalOpen(true);
                       setMenuOpen(false);
                     }}
-                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-[#0c2217] font-bold cursor-pointer"
+                    className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 hover:bg-slate-50 text-[#0c2217] font-bold cursor-pointer"
                   >
                     <Sparkles className="w-4 h-4 text-[#d4a359]" />
                     <span>{partnerDeal?.status === 'completed' ? 'Send New Deal Offer' : 'Send Deal Offer'}</span>
@@ -1290,7 +1269,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                       setDealRequestModalOpen(true);
                       setMenuOpen(false);
                     }}
-                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-[#0c2217] font-bold cursor-pointer"
+                    className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 hover:bg-slate-50 text-[#0c2217] font-bold cursor-pointer"
                   >
                     <Sparkles className="w-4 h-4 text-[#d4a359]" />
                     <span>{partnerDeal?.status === 'completed' ? 'Request New Deal' : 'Request Deal Offer'}</span>
@@ -1299,18 +1278,6 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
 
                 <div className="h-px bg-slate-100 my-1" />
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    toggleSound();
-                    setMenuOpen(false);
-                  }}
-                  className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 cursor-pointer"
-                >
-                  {soundEnabled ? <Volume2 className="w-4 h-4 text-[#d4a359]" /> : <VolumeX className="w-4 h-4 text-slate-400" />}
-                  <span>{soundEnabled ? 'Mute Sound' : 'Enable Sound'}</span>
-                </button>
-
                 {permissionStatus !== 'granted' && (
                   <button
                     type="button"
@@ -1318,28 +1285,26 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                       requestPermission();
                       setMenuOpen(false);
                     }}
-                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-amber-50 text-amber-900 font-semibold cursor-pointer"
+                    className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 hover:bg-amber-50 text-amber-900 font-medium cursor-pointer"
                   >
                     <Bell className="w-4 h-4 text-amber-600" />
-                    <span>Enable Alerts</span>
+                    <span>Enable Desktop Alerts</span>
                   </button>
                 )}
 
-                <div className="h-px bg-slate-100 my-1" />
-
-                <button
-                  type="button"
-                  onClick={() => {
-                    setReportModalOpen(true);
-                    setMenuOpen(false);
-                  }}
-                  className="w-full px-3 py-2 text-left flex items-center gap-2 text-rose-600 hover:bg-rose-50 font-semibold cursor-pointer"
-                >
-                  <Flag className="w-4 h-4" />
-                  <span>Report to Admin</span>
-                </button>
-
-                <div className="h-px bg-slate-100 my-1" />
+                {partner && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setReportModalOpen(true);
+                      setMenuOpen(false);
+                    }}
+                    className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 hover:bg-rose-50 text-rose-700 font-medium cursor-pointer"
+                  >
+                    <Flag className="w-4 h-4 text-rose-500" />
+                    <span>Report User to Admin</span>
+                  </button>
+                )}
 
                 <button
                   type="button"
@@ -1347,10 +1312,10 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                     setMenuOpen(false);
                     handleDeleteConversation();
                   }}
-                  className="w-full px-3 py-2 text-left flex items-center gap-2 text-rose-600 hover:bg-rose-50 font-semibold cursor-pointer"
+                  className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 hover:bg-rose-50 text-rose-700 font-medium cursor-pointer"
                 >
-                  <Trash2 className="w-4 h-4" />
-                  <span>Delete Chat</span>
+                  <Trash2 className="w-4 h-4 text-rose-500" />
+                  <span>Delete Conversation</span>
                 </button>
 
                 <div className="h-px bg-slate-100 my-1" />
@@ -1361,7 +1326,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                     window.dispatchEvent(new CustomEvent('ilmportal:open-support'));
                     setMenuOpen(false);
                   }}
-                  className="w-full px-3 py-2 text-left flex items-center gap-2 text-[#0c2217] hover:bg-[#f0ece1] font-bold cursor-pointer"
+                  className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 text-[#0c2217] hover:bg-[#f0ece1] font-bold cursor-pointer"
                 >
                   <Heart className="w-4 h-4 text-rose-500 fill-rose-500" />
                   <span>Support Platform</span>
@@ -1649,7 +1614,10 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                 ) : showDealCard ? (
                   <DealOfferCard
                     deal={msg.deal || msg.dealOfferData || partnerDeal}
-                    onDealUpdated={(updated) => setPartnerDeal(updated)}
+                    onDealUpdated={(updated) => {
+                      setPartnerDeal(updated);
+                      if (onDealUpdated) onDealUpdated(updated);
+                    }}
                     onRequestNewDeal={() => setDealRequestModalOpen(true)}
                     onStartNewDeal={() => {
                       setPrefilledSubject(partnerDeal?.subject || '');
@@ -2185,14 +2153,16 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
           student={partnerDeal?.student || (user?.role === 'tutor' ? partner : user)}
           targetRole={user?.role === 'tutor' ? 'student' : 'tutor'}
           onSuccess={(reviewData) => {
-            setPartnerDeal((prev) => ({
-              ...(prev || {}),
+            const updated = {
+              ...(partnerDeal || {}),
               isReviewed: true,
-              isStudentReviewed: user?.role === 'student' ? true : prev?.isStudentReviewed,
-              isTutorReviewed: user?.role === 'tutor' ? true : prev?.isTutorReviewed,
-              studentReview: user?.role === 'student' ? reviewData : prev?.studentReview,
-              tutorReview: user?.role === 'tutor' ? reviewData : prev?.tutorReview,
-            }));
+              isStudentReviewed: user?.role === 'student' ? true : partnerDeal?.isStudentReviewed,
+              isTutorReviewed: user?.role === 'tutor' ? true : partnerDeal?.isTutorReviewed,
+              studentReview: user?.role === 'student' ? reviewData : partnerDeal?.studentReview,
+              tutorReview: user?.role === 'tutor' ? reviewData : partnerDeal?.tutorReview,
+            };
+            setPartnerDeal(updated);
+            if (onDealUpdated) onDealUpdated(updated);
           }}
         />
       )}
@@ -2204,10 +2174,12 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
           isOpen={tutorTuitionModalOpen}
           onClose={() => setTutorTuitionModalOpen(false)}
           onSuccess={(pr) => {
-            setPartnerDeal((prev) => ({
-              ...(prev || {}),
+            const updated = {
+              ...(partnerDeal || {}),
               latestPaymentRequest: pr
-            }));
+            };
+            setPartnerDeal(updated);
+            if (onDealUpdated) onDealUpdated(updated);
             fetchMessages();
             try {
               soundEngine.playMessageSound();
@@ -2216,11 +2188,11 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             }
             setToastNotice({
               type: 'success',
-              message: `Payment request of PKR ${Number(pr?.amount || 0).toLocaleString()} sent to student!`,
+              message: `Tuition fee payment request of PKR ${Number(pr?.amount || 0).toLocaleString()} sent to student! Status: Pending Student Payment.`,
             });
             setTimeout(() => {
               setToastNotice((prev) => (prev?.type === 'success' ? null : prev));
-            }, 6000);
+            }, 7000);
           }}
         />
       )}
@@ -2233,10 +2205,12 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
           isOpen={tutorClearModalOpen}
           onClose={() => setTutorClearModalOpen(false)}
           onSuccess={(pr) => {
-            setPartnerDeal((prev) => ({
-              ...(prev || {}),
+            const updated = {
+              ...(partnerDeal || {}),
               latestPaymentRequest: pr
-            }));
+            };
+            setPartnerDeal(updated);
+            if (onDealUpdated) onDealUpdated(updated);
             fetchMessages();
             try {
               soundEngine.playMessageSound();
@@ -2249,7 +2223,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             });
             setTimeout(() => {
               setToastNotice((prev) => (prev?.type === 'success' ? null : prev));
-            }, 6000);
+            }, 7000);
           }}
         />
       )}
@@ -2262,10 +2236,12 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
           isOpen={studentTuitionModalOpen}
           onClose={() => setStudentTuitionModalOpen(false)}
           onSuccess={(pr) => {
-            setPartnerDeal((prev) => ({
-              ...(prev || {}),
+            const updated = {
+              ...(partnerDeal || {}),
               latestPaymentRequest: pr
-            }));
+            };
+            setPartnerDeal(updated);
+            if (onDealUpdated) onDealUpdated(updated);
             fetchMessages();
             try {
               soundEngine.playMessageSound();
@@ -2278,7 +2254,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             });
             setTimeout(() => {
               setToastNotice((prev) => (prev?.type === 'success' ? null : prev));
-            }, 6000);
+            }, 7000);
           }}
         />
       )}

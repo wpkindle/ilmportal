@@ -144,14 +144,26 @@ exports.createPaymentRequest = async (req, res) => {
           link: `/student/messages?conversation=${convId}`
         });
 
-        io.to(`user_${studentId}`).emit('payment-request-updated', {
+        const populatedDeal = await Deal.findById(deal._id)
+          .populate('student', 'name avatar role city')
+          .populate('tutor', 'name avatar role city')
+          .populate('latestPaymentRequest')
+          .lean();
+
+        const prPayload = {
           dealId: deal._id,
           paymentRequest
-        });
-        io.to(`user_${tutorId}`).emit('payment-request-updated', {
-          dealId: deal._id,
-          paymentRequest
-        });
+        };
+
+        io.to(convId).emit('payment-request-updated', prPayload);
+        io.to(`conversation_${convId}`).emit('payment-request-updated', prPayload);
+        io.to(`user_${studentId}`).emit('payment-request-updated', prPayload);
+        io.to(`user_${tutorId}`).emit('payment-request-updated', prPayload);
+
+        io.to(convId).emit('deal-status-updated', populatedDeal);
+        io.to(`conversation_${convId}`).emit('deal-status-updated', populatedDeal);
+        io.to(`user_${studentId}`).emit('deal-status-updated', populatedDeal);
+        io.to(`user_${tutorId}`).emit('deal-status-updated', populatedDeal);
       }
     } catch (mErr) {
       console.error('Message creation error:', mErr);

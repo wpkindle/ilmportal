@@ -79,6 +79,7 @@ exports.getConversations = async (req, res) => {
     })
       .populate('student', 'name avatar role city')
       .populate('tutor', 'name avatar role city')
+      .populate('latestPaymentRequest')
       .sort({ updatedAt: -1, createdAt: -1 })
       .lean();
 

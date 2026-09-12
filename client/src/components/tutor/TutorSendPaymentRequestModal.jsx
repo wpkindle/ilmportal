@@ -24,9 +24,10 @@ export default function TutorSendPaymentRequestModal({
   onClose,
   onSuccess
 }) {
-  const [amount, setAmount] = useState(deal?.price || '');
-  const [title, setTitle] = useState(`Monthly Tuition Fee - ${new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}`);
-  const [description, setDescription] = useState('');
+  const isPending = deal?.latestPaymentRequest?.status === 'pending';
+  const [amount, setAmount] = useState(deal?.latestPaymentRequest?.amount || deal?.price || '');
+  const [title, setTitle] = useState(deal?.latestPaymentRequest?.title || `Monthly Tuition Fee - ${new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}`);
+  const [description, setDescription] = useState(deal?.latestPaymentRequest?.description || '');
   const [tutorPaymentMethods, setTutorPaymentMethods] = useState([]);
   const [loadingMethods, setLoadingMethods] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -35,9 +36,9 @@ export default function TutorSendPaymentRequestModal({
 
   useEffect(() => {
     if (isOpen) {
-      setAmount(deal?.price || '');
-      setTitle(`Monthly Tuition Fee - ${new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}`);
-      setDescription(`Tuition fee for ${deal?.subject || 'learning classes'}.`);
+      setAmount(deal?.latestPaymentRequest?.amount || deal?.price || '');
+      setTitle(deal?.latestPaymentRequest?.title || `Monthly Tuition Fee - ${new Date().toLocaleString('default', { month: 'long', year: 'numeric' })}`);
+      setDescription(deal?.latestPaymentRequest?.description || `Tuition fee for ${deal?.subject || 'learning classes'}.`);
       setError('');
       setSuccessNotice(false);
       fetchTutorPaymentMethods();
@@ -142,11 +143,33 @@ export default function TutorSendPaymentRequestModal({
               <div className="p-3.5 bg-emerald-50 border border-emerald-300 text-emerald-900 rounded-2xl flex items-center gap-2.5 animate-in zoom-in-95">
                 <CheckCircle2 className="w-5 h-5 text-emerald-600 shrink-0 animate-bounce" />
                 <div>
-                  <h4 className="font-bold text-xs sm:text-sm text-emerald-950">Payment Request Dispatched!</h4>
+                  <h4 className="font-bold text-xs sm:text-sm text-emerald-950">{isPending ? 'Payment Request Updated!' : 'Payment Request Dispatched!'}</h4>
                   <p className="text-[11px] text-emerald-800">
                     Student has been notified with your accounts and a 3-day (72-hour) payment countdown.
                   </p>
                 </div>
+              </div>
+            )}
+
+            {/* If pending already, show existing request status */}
+            {isPending && !successNotice && (
+              <div className="p-3 sm:p-3.5 bg-amber-50/90 border border-amber-300 rounded-2xl space-y-1.5 text-xs text-amber-950 shadow-2xs">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-1.5 font-bold text-amber-900">
+                    <Clock className="w-4 h-4 text-amber-600 shrink-0 animate-pulse" />
+                    <span>Payment Request Active &bull; Pending Student</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-200 text-amber-900 border border-amber-300">
+                    Pending
+                  </span>
+                </div>
+                <p className="text-[11px] text-amber-900 leading-relaxed">
+                  You requested <strong>PKR {Number(deal.latestPaymentRequest.amount || 0).toLocaleString()}</strong> on{' '}
+                  {new Date(deal.latestPaymentRequest.createdAt || Date.now()).toLocaleDateString(undefined, { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}.
+                </p>
+                <p className="text-[11px] text-amber-800">
+                  Student has received your receiving accounts. You can edit and re-send the request below if you need to update the amount or notes.
+                </p>
               </div>
             )}
 
@@ -274,7 +297,7 @@ export default function TutorSendPaymentRequestModal({
             {successNotice ? (
               <div className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 bg-emerald-700 text-white text-xs font-bold rounded-2xl shadow-xs">
                 <CheckCircle2 className="w-4 h-4 text-emerald-200" />
-                <span>Request Dispatched ✓</span>
+                <span>{isPending ? 'Request Updated ✓' : 'Request Dispatched ✓'}</span>
               </div>
             ) : (
               <button
@@ -283,7 +306,7 @@ export default function TutorSendPaymentRequestModal({
                 className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-white text-xs font-bold rounded-2xl shadow-xs transition-all cursor-pointer disabled:opacity-50"
               >
                 <Send className="w-3.5 h-3.5 text-[#d4a359]" />
-                <span>{submitting ? 'Dispatching...' : 'Dispatch Request (3-Day Limit)'}</span>
+                <span>{submitting ? 'Dispatching...' : isPending ? 'Update & Re-send Request' : 'Dispatch Request (3-Day Limit)'}</span>
               </button>
             )}
           </div>

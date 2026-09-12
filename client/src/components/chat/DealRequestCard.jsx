@@ -116,3 +116,4 @@ const DealRequestCard = ({ message, isMe, isTutor, onCreateDealOffer }) => {
 };
 
 export default DealRequestCard;
+

@@ -70,3 +70,4 @@ export const ADMIN_PAYMENT_ACCOUNTS = [
     badgeText: 'State Bank Raast'
   }
 ];
+

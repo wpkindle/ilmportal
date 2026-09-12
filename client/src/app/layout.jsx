@@ -92,8 +92,10 @@ const orgSchema = {
         availableLanguage: ['Urdu', 'English']
       },
       sameAs: [
-        'https://facebook.com/ilmidunya',
-        'https://twitter.com/ilmidunya'
+        'https://www.facebook.com/ilmidunyapakistan',
+        'https://www.instagram.com/ilmidunya_com',
+        'https://www.youtube.com/@ilmidunyapakistan',
+        'https://whatsapp.com/channel/0029VbDT9HCI7Be90yESwo3y'
       ]
     },
     {

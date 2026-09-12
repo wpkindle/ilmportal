@@ -44,6 +44,8 @@ import SafetyReportsSection from '../../../components/profile/SafetyReportsSecti
 import { allPakistaniCities, pakistaniCityAreas } from '../../../data/pakistanAreas';
 import CustomSelect, { StyledNativeSelect } from '../../../components/common/CustomSelect';
 import { parseDegreesAndCertificates } from '../../../utils/tutorHelpers';
+import VideoIntroPlayer from '../../../components/common/VideoIntroPlayer';
+
 
 const pakistaniCities = allPakistaniCities;
 
@@ -95,6 +97,15 @@ function TutorProfileContent() {
   const [newSanadFileUrl, setNewSanadFileUrl] = useState('');
   const [uploadingSanad, setUploadingSanad] = useState(false);
   const [selectedSanadModal, setSelectedSanadModal] = useState(false);
+
+  // Video Intro State (Optional)
+  const [videoIntro, setVideoIntro] = useState('');
+  const [videoIntroInput, setVideoIntroInput] = useState('');
+  const [videoUploadLoading, setVideoUploadLoading] = useState(false);
+  const [videoSuccess, setVideoSuccess] = useState('');
+  const [videoError, setVideoError] = useState('');
+  const [videoTab, setVideoTab] = useState('link'); // 'link' | 'upload'
+
 
   // Security / Password State
   const [currentPassword, setCurrentPassword] = useState('');
@@ -169,6 +180,8 @@ function TutorProfileContent() {
       }
       setHourlyRate(tutorProfile.hourlyRate || 1500);
       setUploadedSanads(tutorProfile.sanadDocuments || []);
+      setVideoIntro(tutorProfile.videoIntro || '');
+      setVideoIntroInput(tutorProfile.videoIntro || '');
       const modes = Array.isArray(tutorProfile.teachingModes) && tutorProfile.teachingModes.length > 0
         ? tutorProfile.teachingModes
         : ['online'];
@@ -354,7 +367,8 @@ function TutorProfileContent() {
         qualifications: qualifications.trim(),
         experienceYears: Number(experienceYears),
         hourlyRate: Number(hourlyRate),
-        teachingModes
+        teachingModes,
+        videoIntro: (videoIntroInput || videoIntro || '').trim()
       });
 
       try {
@@ -369,9 +383,16 @@ function TutorProfileContent() {
           qualifications: qualifications.trim(),
           experienceYears: Number(experienceYears),
           hourlyRate: Number(hourlyRate),
-          teachingModes
+          teachingModes,
+          videoIntro: (videoIntroInput || videoIntro || '').trim()
         });
-        if (tutorRes?.profile) updateTutorProfileState(tutorRes.profile);
+        if (tutorRes?.profile) {
+          updateTutorProfileState(tutorRes.profile);
+          if (tutorRes.profile.videoIntro !== undefined) {
+            setVideoIntro(tutorRes.profile.videoIntro);
+            setVideoIntroInput(tutorRes.profile.videoIntro);
+          }
+        }
       } catch (tErr) {
         console.error('Error syncing tutor profile:', tErr);
       }
@@ -381,9 +402,94 @@ function TutorProfileContent() {
         setTimeout(() => setProfileSuccess(''), 4000);
       }
     } catch (err) {
-      setProfileError(err.message || 'Failed to update tutor profile');
+      setProfileError(err.message || 'Failed to update profile');
     } finally {
       setSavingProfile(false);
+    }
+  };
+
+  // Video Intro Handlers (Optional - Does NOT affect profile health)
+  const handleSaveVideoLink = async (e) => {
+    if (e) e.preventDefault();
+    setVideoSuccess('');
+    setVideoError('');
+    setVideoUploadLoading(true);
+
+    try {
+      const cleanUrl = videoIntroInput.trim();
+      const res = await api.updateMyTutorProfile({
+        videoIntro: cleanUrl
+      });
+
+      if (res.success) {
+        setVideoIntro(cleanUrl);
+        setVideoIntroInput(cleanUrl);
+        if (res.profile) updateTutorProfileState(res.profile);
+        setVideoSuccess(cleanUrl ? 'Video introduction link saved successfully!' : 'Video introduction cleared.');
+        setTimeout(() => setVideoSuccess(''), 4000);
+      }
+    } catch (err) {
+      setVideoError(err.message || 'Failed to save video introduction link');
+    } finally {
+      setVideoUploadLoading(false);
+    }
+  };
+
+  const handleVideoFileSelect = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 50 * 1024 * 1024) {
+      setVideoError('Video file size exceeds 50MB. Please choose a smaller video or paste a YouTube / Loom link.');
+      return;
+    }
+
+    setVideoSuccess('');
+    setVideoError('');
+    setVideoUploadLoading(true);
+
+    try {
+      const formData = new FormData();
+      formData.append('video', file);
+
+      const res = await api.uploadVideoIntro(formData);
+      if (res.success) {
+        const uploadedUrl = res.videoIntro || res.profile?.videoIntro;
+        setVideoIntro(uploadedUrl);
+        setVideoIntroInput(uploadedUrl);
+        if (res.profile) updateTutorProfileState(res.profile);
+        setVideoSuccess('Video introduction file uploaded and saved successfully!');
+        setTimeout(() => setVideoSuccess(''), 5000);
+      }
+    } catch (err) {
+      setVideoError(err.message || 'Error uploading video file');
+    } finally {
+      setVideoUploadLoading(false);
+      e.target.value = '';
+    }
+  };
+
+  const handleRemoveVideo = async () => {
+    if (!window.confirm('Are you sure you want to remove your video introduction?')) return;
+    setVideoSuccess('');
+    setVideoError('');
+    setVideoUploadLoading(true);
+
+    try {
+      const res = await api.updateMyTutorProfile({
+        videoIntro: ''
+      });
+      if (res.success) {
+        setVideoIntro('');
+        setVideoIntroInput('');
+        if (res.profile) updateTutorProfileState(res.profile);
+        setVideoSuccess('Video introduction removed.');
+        setTimeout(() => setVideoSuccess(''), 3000);
+      }
+    } catch (err) {
+      setVideoError(err.message || 'Failed to remove video');
+    } finally {
+      setVideoUploadLoading(false);
     }
   };
 
@@ -1498,7 +1604,161 @@ function TutorProfileContent() {
 
             </div>
 
-            {/* 3. Security & Password Change Form */}
+            {/* 3. Video Introduction (Optional - Does NOT affect profile health) */}
+            <div id="profile-video-intro" className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-xs space-y-5 scroll-mt-28">
+              <div className="border-b border-slate-100 pb-3 flex items-center justify-between flex-wrap gap-2">
+                <div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center">
+                      <Video className="w-4 h-4 text-[#b85d34]" />
+                    </div>
+                    <h2 className="text-sm font-black text-slate-900 font-serif">
+                      Video Introduction (Optional)
+                    </h2>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1 max-w-xl">
+                    Introduce yourself, your teaching philosophy, or Tajweed recitation style to prospective students. 
+                    <strong className="text-emerald-700 font-semibold"> 100% Optional</strong> — does not affect your profile health score.
+                  </p>
+                </div>
+
+                {videoIntro ? (
+                  <span className="px-3 py-1 bg-emerald-50 text-emerald-800 border border-emerald-200 text-[11px] font-bold rounded-xl flex items-center gap-1.5 shadow-2xs">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Active Intro Video</span>
+                  </span>
+                ) : (
+                  <span className="px-3 py-1 bg-slate-50 text-slate-600 border border-slate-200 text-[11px] font-bold rounded-xl flex items-center gap-1.5 shadow-2xs">
+                    <span>Optional · 0 Penalty</span>
+                  </span>
+                )}
+              </div>
+
+              {videoSuccess && (
+                <div className="p-3 bg-[#f0ece1] border border-[#d4a359]/40 text-[#0c2217] text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
+                  <CheckCircle2 className="w-4 h-4 text-[#b85d34] shrink-0" />
+                  <span>{videoSuccess}</span>
+                </div>
+              )}
+
+              {videoError && (
+                <div className="p-3 bg-rose-50 border border-rose-200 text-rose-700 text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
+                  <AlertCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                  <span>{videoError}</span>
+                </div>
+              )}
+
+              {/* Mode Toggle: Video Link vs Upload File */}
+              <div className="flex items-center gap-2 border-b border-slate-100 pb-3">
+                <button
+                  type="button"
+                  onClick={() => setVideoTab('link')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    videoTab === 'link'
+                      ? 'bg-[#0c2217] text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  Paste Video Link (YouTube / Loom / Vimeo)
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setVideoTab('upload')}
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    videoTab === 'upload'
+                      ? 'bg-[#0c2217] text-white shadow-xs'
+                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  }`}
+                >
+                  Upload Video File (MP4 / WebM)
+                </button>
+              </div>
+
+              {/* Option A: Link Input */}
+              {videoTab === 'link' && (
+                <form onSubmit={handleSaveVideoLink} className="space-y-3">
+                  <div>
+                    <label className="text-xs font-bold text-slate-700 block mb-1">
+                      Video URL (YouTube, Vimeo, Loom, or Direct MP4)
+                    </label>
+                    <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
+                      <input
+                        type="url"
+                        placeholder="e.g. https://www.youtube.com/watch?v=... or https://www.loom.com/share/..."
+                        value={videoIntroInput}
+                        onChange={(e) => setVideoIntroInput(e.target.value)}
+                        className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-2xl text-xs text-slate-900 outline-none focus:border-[#0c2217] font-medium"
+                      />
+                      <button
+                        type="submit"
+                        disabled={videoUploadLoading}
+                        className="px-5 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-2xl shadow-xs transition-all cursor-pointer shrink-0 disabled:opacity-50"
+                      >
+                        {videoUploadLoading ? 'Saving...' : 'Save Video Link'}
+                      </button>
+                    </div>
+                    <p className="text-[11px] text-slate-400 mt-1.5">
+                      Supports YouTube (standard, shorts, embed), Vimeo, Loom recordings, and direct .mp4 video links.
+                    </p>
+                  </div>
+                </form>
+              )}
+
+              {/* Option B: Direct Video File Upload */}
+              {videoTab === 'upload' && (
+                <div className="space-y-3">
+                  <label className="text-xs font-bold text-slate-700 block mb-1">
+                    Upload Short Video File (Max 50MB)
+                  </label>
+                  <input
+                    type="file"
+                    accept="video/mp4,video/webm,video/quicktime,video/*"
+                    disabled={videoUploadLoading}
+                    onChange={handleVideoFileSelect}
+                    className="w-full text-xs text-slate-600 file:mr-3 file:py-2 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-[#f0ece1] file:text-[#0c2217] hover:file:bg-[#e6ded1] cursor-pointer"
+                  />
+                  {videoUploadLoading && (
+                    <div className="p-3 bg-amber-50 border border-amber-200 text-amber-900 text-xs font-medium rounded-xl flex items-center gap-2">
+                      <div className="w-4 h-4 border-2 border-amber-600 border-t-transparent rounded-full animate-spin shrink-0" />
+                      <span>Uploading video file to server... please keep this window open.</span>
+                    </div>
+                  )}
+                  <p className="text-[11px] text-slate-400">
+                    Recommended formats: MP4 or WebM recorded at 720p or 1080p.
+                  </p>
+                </div>
+              )}
+
+              {/* Live Preview Player & Remove Option */}
+              {(videoIntro || videoIntroInput) && (
+                <div className="pt-4 border-t border-slate-100 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                      <Video className="w-3.5 h-3.5 text-[#b85d34]" />
+                      <span>Live Video Preview (Student View)</span>
+                    </span>
+                    <button
+                      type="button"
+                      onClick={handleRemoveVideo}
+                      disabled={videoUploadLoading}
+                      className="text-xs font-bold text-rose-600 hover:text-rose-800 flex items-center gap-1 cursor-pointer transition-colors"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span>Remove Video</span>
+                    </button>
+                  </div>
+
+                  <div className="max-w-xl mx-auto">
+                    <VideoIntroPlayer
+                      videoUrl={videoIntro || videoIntroInput}
+                      tutorName={name || 'Tutor'}
+                    />
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 4. Security & Password Change Form */}
             <div className="bg-white p-6 sm:p-7 rounded-3xl border border-slate-200 shadow-xs space-y-5">
               <div className="border-b border-slate-100 pb-3">
                 <h2 className="text-sm font-black text-slate-900 flex items-center gap-2">

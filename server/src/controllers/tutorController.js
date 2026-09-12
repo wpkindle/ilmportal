@@ -391,7 +391,8 @@ exports.updateMyTutorProfile = async (req, res) => {
       tutoringType,
       gender,
       sanadDocuments,
-      verificationStatus
+      verificationStatus,
+      videoIntro
     } = req.body;
 
     const normalizedExp = (experienceYears !== undefined && experienceYears !== null && experienceYears !== '')
@@ -411,6 +412,7 @@ exports.updateMyTutorProfile = async (req, res) => {
         localArea: (localArea !== undefined ? localArea : area || '').trim(),
         tutoringType: tutoringType || 'both',
         gender: gender || 'male',
+        videoIntro: typeof videoIntro === 'string' ? videoIntro.trim() : '',
         subjects: Array.isArray(subjects) ? subjects : [],
         teachingModes: Array.isArray(teachingModes) && teachingModes.length > 0
           ? teachingModes
@@ -424,6 +426,7 @@ exports.updateMyTutorProfile = async (req, res) => {
       if (hourlyRate !== undefined) profile.hourlyRate = Number(hourlyRate);
       if (gender !== undefined) profile.gender = gender;
       if (tutoringType !== undefined) profile.tutoringType = tutoringType;
+      if (videoIntro !== undefined) profile.videoIntro = typeof videoIntro === 'string' ? videoIntro.trim() : '';
       if (subjects !== undefined) profile.subjects = subjects;
       if (cities !== undefined) profile.cities = cities;
       if (city !== undefined) profile.city = city.trim();
@@ -624,6 +627,48 @@ exports.uploadSanad = async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message
+    });
+  }
+};
+
+// @desc    Upload Video Intro for tutor profile
+// @route   POST /api/tutors/video-intro/upload
+exports.uploadVideoIntro = async (req, res) => {
+  try {
+    let videoUrl = '';
+
+    if (req.file) {
+      videoUrl = `/uploads/${req.file.filename}`;
+    } else if (req.body.videoUrl || req.body.videoIntro) {
+      videoUrl = (req.body.videoUrl || req.body.videoIntro).trim();
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'Please provide a valid video file (MP4, WEBM, MOV) or video URL'
+      });
+    }
+
+    let profile = await TutorProfile.findOne({ user: req.user.id });
+    if (!profile) {
+      profile = new TutorProfile({
+        user: req.user.id,
+        verificationStatus: 'under_review'
+      });
+    }
+
+    profile.videoIntro = videoUrl;
+    await profile.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Video intro saved successfully!',
+      videoIntro: profile.videoIntro,
+      profile
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error uploading video intro'
     });
   }
 };

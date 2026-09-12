@@ -319,6 +319,13 @@ export const api = {
     body: formData
   }).then(handleResponse),
 
+  uploadVideoIntro: (formData) => fetch(`${API_BASE}/tutors/video-intro/upload`, {
+    method: 'POST',
+    headers: getHeaders(true),
+    body: formData
+  }).then(handleResponse),
+
+
   // Deals
   createDealOffer: (body) => fetch(`${API_BASE}/deals/offer`, {
     method: 'POST',

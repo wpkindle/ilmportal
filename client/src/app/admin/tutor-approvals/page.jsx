@@ -16,8 +16,11 @@ import {
   ExternalLink,
   Clock,
   AlertCircle,
-  ShieldCheck
+  ShieldCheck,
+  Video
 } from 'lucide-react';
+import VideoIntroPlayer from '../../../components/common/VideoIntroPlayer';
+
 
 export default function TutorApprovalPage() {
   const [tutors, setTutors] = useState([]);
@@ -373,6 +376,37 @@ export default function TutorApprovalPage() {
                       <p className="text-xs text-slate-600 bg-slate-50 p-3 rounded-2xl">
                         {tutor.bio || 'No teaching bio written yet.'}
                       </p>
+
+                      {/* Video Introduction Inspection (Optional) */}
+                      {tutor.videoIntro && (
+                        <div className="p-4 bg-violet-50/60 border border-violet-200 rounded-2xl space-y-3">
+                          <div className="flex items-center justify-between flex-wrap gap-2 pb-2 border-b border-violet-200/60">
+                            <div className="flex items-center gap-2">
+                              <div className="p-1.5 bg-violet-100 text-violet-800 rounded-lg">
+                                <Video className="w-4 h-4" />
+                              </div>
+                              <div>
+                                <h4 className="text-xs font-black text-slate-800 uppercase tracking-wide">
+                                  Applicant Video Introduction
+                                </h4>
+                                <p className="text-[11px] text-slate-500">
+                                  Optional video intro provided by tutor. Preview playback before approving profile.
+                                </p>
+                              </div>
+                            </div>
+                            <span className="text-[10px] font-bold text-violet-700 bg-white border border-violet-200 px-2.5 py-1 rounded-full shadow-2xs">
+                              Video Attached
+                            </span>
+                          </div>
+                          <div className="max-w-md mx-auto">
+                            <VideoIntroPlayer
+                              videoUrl={tutor.videoIntro}
+                              tutorName={tutor.user?.name || 'Applicant'}
+                            />
+                          </div>
+                        </div>
+                      )}
+
 
                       {/* ========================================================= */}
                       {/* INLINE SANAD & DEGREE DOCUMENTS REVIEW PANEL             */}

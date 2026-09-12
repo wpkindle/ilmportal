@@ -31,6 +31,7 @@ import StudentAuthModal from '../../../components/common/StudentAuthModal';
 import FemaleTutorGateModal from '../../../components/common/FemaleTutorGateModal';
 import ChatRequestModal from '../../../components/common/ChatRequestModal';
 import ReportReviewModal from '../../../components/common/ReportReviewModal';
+import VideoIntroPlayer from '../../../components/common/VideoIntroPlayer';
 import { calculateClientCompletion } from '../../../components/common/ProfileCompletionMeter';
 import { useAuth } from '../../../context/AuthContext';
 import { useSocket } from '../../../context/SocketContext';
@@ -390,6 +391,17 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                 </button>
               )}
 
+              {tutor.videoIntro && (
+                <a
+                  href="#tutor-video-intro"
+                  className="px-4 py-3 rounded-2xl text-xs sm:text-sm font-bold bg-[#faf8f5] hover:bg-[#f0ece1] text-[#0c2217] border border-[#e6ded1] hover:border-[#b85d34]/40 transition-all shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer flex-1 sm:flex-initial"
+                  title="Watch tutor video introduction"
+                >
+                  <Video className="w-4 h-4 text-[#b85d34]" />
+                  <span>Watch Video Intro</span>
+                </a>
+              )}
+
               {mounted && !isTutorVisitor && !isOwnProfile && (
                 <button
                   onClick={handleStartChat}
@@ -484,6 +496,39 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
           </div>
 
         </div>
+
+        {/* Tutor Video Introduction Section (Displayed only if tutor has added one) */}
+        {tutor.videoIntro && (
+          <div id="tutor-video-intro" className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e6ded1] shadow-2xs space-y-4 scroll-mt-24">
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <div>
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-[#f0ece1] text-[#0c2217]">
+                    <Video className="w-5 h-5 text-[#b85d34]" />
+                  </div>
+                  <h2 className="text-base sm:text-lg font-black text-slate-900 font-serif">
+                    Tutor Video Introduction
+                  </h2>
+                </div>
+                <p className="text-xs text-slate-500 mt-1">
+                  Watch {tutorName}&apos;s video introduction and teaching style before booking a session.
+                </p>
+              </div>
+
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[10px] font-bold uppercase bg-[#f5ebe6] text-[#b85d34] border border-[#b85d34]/30 shrink-0">
+                <Video className="w-3.5 h-3.5 text-[#b85d34]" />
+                <span>Verified Video Intro</span>
+              </span>
+            </div>
+
+            <div className="max-w-3xl mx-auto pt-1">
+              <VideoIntroPlayer
+                videoUrl={tutor.videoIntro}
+                tutorName={tutorName}
+              />
+            </div>
+          </div>
+        )}
 
         {/* Verified Degrees, Sanads & Certifications Section */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e6ded1] shadow-2xs space-y-5">

@@ -389,4 +389,52 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
     expect(locRes.statusCode).toEqual(200);
     expect(Array.isArray(locRes.body.locations)).toBe(true);
   });
+
+  test('Tutor can set optional video intro without affecting profile completion or health', async () => {
+    // 1. Tutor updates profile with videoIntro URL
+    const updateRes = await request(app)
+      .put('/api/tutors/profile/me')
+      .set('Authorization', `Bearer ${tutorToken}`)
+      .send({
+        videoIntro: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+      });
+
+    expect(updateRes.statusCode).toEqual(200);
+    expect(updateRes.body.success).toBe(true);
+    expect(updateRes.body.profile.videoIntro).toEqual('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+
+    // Profile health/completion must remain 100%
+    expect(updateRes.body.completion.percentage).toEqual(100);
+
+    // 2. Fetch public profile and verify videoIntro is returned
+    const publicRes = await request(app).get(`/api/tutors/${tutorProfileId}`);
+    expect(publicRes.statusCode).toEqual(200);
+    expect(publicRes.body.success).toBe(true);
+    expect(publicRes.body.tutor.videoIntro).toEqual('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
+
+    // 3. Test video-intro upload endpoint with videoUrl payload
+    const uploadRes = await request(app)
+      .post('/api/tutors/video-intro/upload')
+      .set('Authorization', `Bearer ${tutorToken}`)
+      .send({
+        videoUrl: 'https://www.loom.com/share/test12345'
+      });
+
+    expect(uploadRes.statusCode).toEqual(200);
+    expect(uploadRes.body.success).toBe(true);
+    expect(uploadRes.body.videoIntro).toEqual('https://www.loom.com/share/test12345');
+
+    // 4. Tutor can clear video intro and completion remains 100%
+    const clearRes = await request(app)
+      .put('/api/tutors/profile/me')
+      .set('Authorization', `Bearer ${tutorToken}`)
+      .send({
+        videoIntro: ''
+      });
+
+    expect(clearRes.statusCode).toEqual(200);
+    expect(clearRes.body.profile.videoIntro).toEqual('');
+    expect(clearRes.body.completion.percentage).toEqual(100);
+  });
 });
+

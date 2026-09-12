@@ -364,6 +364,7 @@ const seedDatabase = async () => {
       ratingAverage: 5.0,
       ratingCount: 1,
       isFeatured: true,
+      videoIntro: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
       sanadDocuments: [{
         title: 'Sanad Tajweed & Qirat (Wifaq-ul-Madaris)',
         fileUrl: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=600',

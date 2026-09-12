@@ -693,6 +693,9 @@ exports.updateProfile = async (req, res) => {
       if (hourlyRate !== undefined) tutorProfile.hourlyRate = Number(hourlyRate);
       if (gender) tutorProfile.gender = gender;
       if (req.body.tutoringType !== undefined) tutorProfile.tutoringType = req.body.tutoringType;
+      if (req.body.videoIntro !== undefined) {
+        tutorProfile.videoIntro = typeof req.body.videoIntro === 'string' ? req.body.videoIntro.trim() : '';
+      }
       if (req.body.subjects !== undefined) tutorProfile.subjects = req.body.subjects;
       if (Array.isArray(req.body.teachingModes) && req.body.teachingModes.length > 0) {
         tutorProfile.teachingModes = req.body.teachingModes;

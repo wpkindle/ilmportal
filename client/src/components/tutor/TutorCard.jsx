@@ -270,6 +270,12 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                 ) : (
                   <span className="capitalize text-slate-600 font-medium shrink-0">{data.gender || 'Tutor'}</span>
                 )}
+                {data.videoIntro && (
+                  <span className="inline-flex items-center gap-1 text-[10px] font-bold text-violet-700 bg-violet-50 px-2 py-0.5 rounded-full border border-violet-200 shrink-0">
+                    <Video className="w-3 h-3 text-violet-600" />
+                    <span>Video Intro</span>
+                  </span>
+                )}
               </div>
 
               <div className="flex items-center gap-2 mt-1 flex-wrap">

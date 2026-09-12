@@ -42,6 +42,7 @@ export default function TutorOnboardingPage() {
   const [localArea, setLocalArea] = useState('');
   const [isCustomArea, setIsCustomArea] = useState(false);
   const [teachingModes, setTeachingModes] = useState(['online']);
+  const [videoIntro, setVideoIntro] = useState('');
   const [selectedSubjects, setSelectedSubjects] = useState([]);
   const [selectedCities, setSelectedCities] = useState([]);
 
@@ -90,6 +91,7 @@ export default function TutorOnboardingPage() {
             setExperienceYears(p.experienceYears);
           }
           if (p.hourlyRate) setHourlyRate(p.hourlyRate);
+          if (p.videoIntro) setVideoIntro(p.videoIntro);
           if (p.subjects) setSelectedSubjects(p.subjects.map(s => s._id || s));
         }
       } catch (err) {
@@ -124,6 +126,7 @@ export default function TutorOnboardingPage() {
         localArea: localArea.trim(),
         area: localArea.trim(),
         teachingModes,
+        videoIntro: videoIntro.trim(),
         subjects: selectedSubjects,
         cities: selectedCities
       });
@@ -579,6 +582,29 @@ export default function TutorOnboardingPage() {
                     );
                   })}
                 </div>
+              </div>
+
+              {/* Video Introduction (Optional) */}
+              <div className="space-y-1">
+                <div className="flex items-center justify-between">
+                  <label className="text-xs font-serif font-bold text-[#0c2217] block flex items-center gap-1.5">
+                    <Video className="w-3.5 h-3.5 text-[#b85d34]" />
+                    <span>Video Introduction (Optional)</span>
+                  </label>
+                  <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
+                    Optional · 0 Impact on Health
+                  </span>
+                </div>
+                <input
+                  type="url"
+                  placeholder="Paste YouTube, Vimeo, Loom or direct video link (optional)"
+                  value={videoIntro}
+                  onChange={(e) => setVideoIntro(e.target.value)}
+                  className="w-full px-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] outline-none focus:border-[#0c2217] focus:bg-white font-medium"
+                />
+                <p className="text-[10px] text-stone-500">
+                  Introduce yourself to prospective students. You can also upload a video file or update this anytime in your profile.
+                </p>
               </div>
 
               {/* Sanad Already Attached Notice */}

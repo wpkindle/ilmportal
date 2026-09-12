@@ -105,6 +105,11 @@ const tutorProfileSchema = new mongoose.Schema({
   isFeatured: {
     type: Boolean,
     default: false
+  },
+  videoIntro: {
+    type: String,
+    default: '',
+    trim: true
   }
 }, {
   timestamps: true,

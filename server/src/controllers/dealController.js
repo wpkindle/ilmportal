@@ -411,7 +411,8 @@ exports.getDealById = async (req, res) => {
   try {
     const deal = await Deal.findById(req.params.id)
       .populate('student', 'name email phone avatar city')
-      .populate('tutor', 'name email phone avatar city');
+      .populate('tutor', 'name email phone avatar city')
+      .populate('latestPaymentRequest');
 
     if (!deal) {
       return res.status(404).json({

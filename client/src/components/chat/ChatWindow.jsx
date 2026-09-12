@@ -46,6 +46,9 @@ import DealRequestCard from './DealRequestCard';
 import DealOfferModal from '../tutor/DealOfferModal';
 import StudentDealRequestModal from './StudentDealRequestModal';
 import TutorPaymentModal from '../tutor/TutorPaymentModal';
+import TutorSendPaymentRequestModal from '../tutor/TutorSendPaymentRequestModal';
+import TutorClearPaymentModal from '../tutor/TutorClearPaymentModal';
+import StudentPaymentRequestModal from '../tutor/StudentPaymentRequestModal';
 import LeaveReviewModal from '../common/LeaveReviewModal';
 import VoiceMessagePlayer from './VoiceMessagePlayer';
 import ReportModal from './ReportModal';
@@ -87,6 +90,9 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [partnerDeal, setPartnerDeal] = useState(initialDeal || null);
   const [showStudentReviewModal, setShowStudentReviewModal] = useState(false);
+  const [tutorTuitionModalOpen, setTutorTuitionModalOpen] = useState(false);
+  const [tutorClearModalOpen, setTutorClearModalOpen] = useState(false);
+  const [studentTuitionModalOpen, setStudentTuitionModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const menuRef = useRef(null);
 
@@ -931,6 +937,47 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             </button>
           )}
 
+          {/* Tutor Action: Request Tuition Payment (Active deals only) */}
+          {isTutor && partnerDeal && ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) && (
+            <button
+              type="button"
+              onClick={() => setTutorTuitionModalOpen(true)}
+              className="p-2 sm:px-3 sm:py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/40 ring-1 ring-[#d4a359]/30 shrink-0"
+              title="Send tuition fee payment request to student (3-day threshold)"
+            >
+              <CreditCard className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
+              <span className="hidden sm:inline">Request Payment</span>
+            </button>
+          )}
+
+          {/* Tutor Action: Review Proof if student submitted tuition proof */}
+          {isTutor && partnerDeal?.latestPaymentRequest?.status === 'proof_submitted' && (
+            <button
+              type="button"
+              onClick={() => setTutorClearModalOpen(true)}
+              className="p-2 sm:px-3 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-emerald-500 animate-pulse shrink-0"
+              title="Student submitted tuition payment proof - click to review and clear"
+            >
+              <CheckCircle2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" />
+              <span className="hidden sm:inline">Review Proof</span>
+            </button>
+          )}
+
+          {/* Student Action: Pay Tuition Fee if requested */}
+          {(isStudent || user?.role === 'student') && partnerDeal?.latestPaymentRequest && ['pending', 'proof_submitted', 'overdue'].includes(partnerDeal.latestPaymentRequest.status) && (
+            <button
+              type="button"
+              onClick={() => setStudentTuitionModalOpen(true)}
+              className="p-2 sm:px-3 sm:py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+              title="View tuition fee details and submit payment proof"
+            >
+              <CreditCard className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
+              <span className="hidden sm:inline">
+                {partnerDeal.latestPaymentRequest.status === 'proof_submitted' ? 'View Proof' : 'Pay Tuition Fee'}
+              </span>
+            </button>
+          )}
+
           {/* Mutual Review Action in Header (Only shown when deal is completed AND review is NOT yet submitted) */}
           {partnerDeal?.status === 'completed' && (
             (isStudent || user?.role === 'student' ? (!partnerDeal.isStudentReviewed && !partnerDeal.isReviewed) : !partnerDeal.isTutorReviewed) && (
@@ -1067,6 +1114,48 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                   >
                     <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                     <span>Mark Deal Completed</span>
+                  </button>
+                )}
+
+                {isTutor && partnerDeal && ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setTutorTuitionModalOpen(true);
+                    }}
+                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-amber-50 text-[#b85d34] font-bold cursor-pointer"
+                  >
+                    <CreditCard className="w-4 h-4 text-[#b85d34]" />
+                    <span>Request Tuition Fee</span>
+                  </button>
+                )}
+
+                {isTutor && partnerDeal?.latestPaymentRequest?.status === 'proof_submitted' && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setTutorClearModalOpen(true);
+                    }}
+                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-emerald-50 text-emerald-800 font-bold cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Review Tuition Proof</span>
+                  </button>
+                )}
+
+                {(isStudent || user?.role === 'student') && partnerDeal?.latestPaymentRequest && ['pending', 'proof_submitted', 'overdue'].includes(partnerDeal.latestPaymentRequest.status) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      setStudentTuitionModalOpen(true);
+                    }}
+                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-amber-50 text-[#b85d34] font-bold cursor-pointer"
+                  >
+                    <CreditCard className="w-4 h-4 text-[#b85d34]" />
+                    <span>{partnerDeal.latestPaymentRequest.status === 'proof_submitted' ? 'View Payment Proof' : 'Pay Tuition Fee'}</span>
                   </button>
                 )}
 
@@ -1443,6 +1532,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                       setPrefilledMode(partnerDeal?.mode || '');
                       setDealModalOpen(true);
                     }}
+                    onRequestPayment={() => setTutorTuitionModalOpen(true)}
                   />
                 ) : isVoiceMsg ? (
                 <VoiceMessagePlayer
@@ -1571,7 +1661,44 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                         : 'bg-white border border-stone-200/90 text-stone-800 rounded-bl-none shadow-2xs'
                     }`}
                   >
-                    {msg.text}
+                    {msg.text?.includes('Tuition Fee Payment Request') ? (
+                      <div className="space-y-2.5">
+                        <div className="whitespace-pre-line leading-relaxed font-sans">{msg.text}</div>
+                        {(isStudent || user?.role === 'student') ? (
+                          <button
+                            type="button"
+                            onClick={() => setStudentTuitionModalOpen(true)}
+                            className="w-full py-2.5 px-3.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                          >
+                            <CreditCard className="w-3.5 h-3.5 text-[#d4a359]" />
+                            <span>Pay Tuition Fee &bull; View Tutor Accounts</span>
+                          </button>
+                        ) : (isTutor || user?.role === 'tutor') ? (
+                          <div className="flex items-center gap-2 pt-2 border-t border-white/20">
+                            <button
+                              type="button"
+                              onClick={() => setTutorTuitionModalOpen(true)}
+                              className="py-1.5 px-2.5 bg-[#143d2b] hover:bg-[#1b5038] text-white font-bold text-[11px] rounded-lg transition-all flex items-center gap-1 cursor-pointer border border-[#d4a359]/30"
+                            >
+                              <CreditCard className="w-3 h-3 text-[#d4a359]" />
+                              <span>Update Request</span>
+                            </button>
+                            {partnerDeal?.latestPaymentRequest?.status === 'proof_submitted' && (
+                              <button
+                                type="button"
+                                onClick={() => setTutorClearModalOpen(true)}
+                                className="py-1.5 px-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+                              >
+                                <CheckCircle2 className="w-3 h-3" />
+                                <span>Review &amp; Clear</span>
+                              </button>
+                            )}
+                          </div>
+                        ) : null}
+                      </div>
+                    ) : (
+                      msg.text
+                    )}
                   </div>
 
                   {!isMe && (
@@ -1942,6 +2069,56 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               studentReview: user?.role === 'student' ? reviewData : prev?.studentReview,
               tutorReview: user?.role === 'tutor' ? reviewData : prev?.tutorReview,
             }));
+          }}
+        />
+      )}
+
+      {/* Tutor Tuition Fee Payment Request Modal (3-day threshold) */}
+      {partnerDeal && (
+        <TutorSendPaymentRequestModal
+          deal={partnerDeal}
+          isOpen={tutorTuitionModalOpen}
+          onClose={() => setTutorTuitionModalOpen(false)}
+          onSuccess={(pr) => {
+            setPartnerDeal((prev) => ({
+              ...(prev || {}),
+              latestPaymentRequest: pr
+            }));
+            fetchMessages();
+          }}
+        />
+      )}
+
+      {/* Tutor Clear Payment Modal */}
+      {partnerDeal?.latestPaymentRequest && (
+        <TutorClearPaymentModal
+          paymentRequest={partnerDeal.latestPaymentRequest}
+          deal={partnerDeal}
+          isOpen={tutorClearModalOpen}
+          onClose={() => setTutorClearModalOpen(false)}
+          onSuccess={(pr) => {
+            setPartnerDeal((prev) => ({
+              ...(prev || {}),
+              latestPaymentRequest: pr
+            }));
+            fetchMessages();
+          }}
+        />
+      )}
+
+      {/* Student Pay Tuition Fee Modal */}
+      {partnerDeal?.latestPaymentRequest && (
+        <StudentPaymentRequestModal
+          paymentRequest={partnerDeal.latestPaymentRequest}
+          deal={partnerDeal}
+          isOpen={studentTuitionModalOpen}
+          onClose={() => setStudentTuitionModalOpen(false)}
+          onSuccess={(pr) => {
+            setPartnerDeal((prev) => ({
+              ...(prev || {}),
+              latestPaymentRequest: pr
+            }));
+            fetchMessages();
           }}
         />
       )}

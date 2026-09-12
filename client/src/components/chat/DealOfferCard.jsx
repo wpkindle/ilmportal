@@ -6,6 +6,9 @@ import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
 import Tutor72HourClock from '../tutor/Tutor72HourClock';
 import TutorPaymentModal from '../tutor/TutorPaymentModal';
+import TutorSendPaymentRequestModal from '../tutor/TutorSendPaymentRequestModal';
+import TutorClearPaymentModal from '../tutor/TutorClearPaymentModal';
+import StudentPaymentRequestModal from '../tutor/StudentPaymentRequestModal';
 import LeaveReviewModal from '../common/LeaveReviewModal';
 
 const runConfetti = async () => {
@@ -23,13 +26,16 @@ const runConfetti = async () => {
   }
 };
 
-const DealOfferCard = ({ deal, onDealUpdated, onRequestNewDeal, onStartNewDeal }) => {
+const DealOfferCard = ({ deal, onDealUpdated, onRequestNewDeal, onStartNewDeal, onRequestPayment }) => {
   const { user, isStudent: authIsStudent, isTutor: authIsTutor } = useAuth();
   const [loading, setLoading] = useState(false);
   const [dealState, setDealState] = useState(deal);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [showPaymentNoticeModal, setShowPaymentNoticeModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
+  const [showTuitionModal, setShowTuitionModal] = useState(false);
+  const [showClearModal, setShowClearModal] = useState(false);
+  const [showStudentPayModal, setShowStudentPayModal] = useState(false);
 
   useEffect(() => {
     if (deal) {
@@ -115,6 +121,23 @@ const DealOfferCard = ({ deal, onDealUpdated, onRequestNewDeal, onStartNewDeal }
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleOpenTuitionRequest = () => {
+    if (onRequestPayment) {
+      onRequestPayment();
+    } else {
+      setShowTuitionModal(true);
+    }
+  };
+
+  const handleTuitionRequestSuccess = (newPr) => {
+    const updated = {
+      ...dealState,
+      latestPaymentRequest: newPr
+    };
+    setDealState(updated);
+    if (onDealUpdated) onDealUpdated(updated);
   };
 
   return (
@@ -263,12 +286,187 @@ const DealOfferCard = ({ deal, onDealUpdated, onRequestNewDeal, onStartNewDeal }
               ? 'Live video classes are paused. The 3-day tuition fee payment threshold has expired without clearance.'
               : 'Classes are temporarily paused pending fee clearance.'}
           </p>
-          <a
-            href={isStudentUser ? '/student/deals' : '/tutor/deals'}
-            className="inline-flex items-center gap-1 font-bold text-xs text-rose-800 underline hover:text-rose-950"
-          >
-            <span>{isStudentUser ? 'View Tutor Accounts & Pay Tuition Fee' : 'Go to Deals to Clear Payment'}</span>
-          </a>
+          <div className="flex items-center gap-2 pt-1 flex-wrap">
+            {isStudentUser && dealState.latestPaymentRequest ? (
+              <button
+                type="button"
+                onClick={() => setShowStudentPayModal(true)}
+                className="px-3.5 py-1.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold text-xs shadow-xs cursor-pointer"
+              >
+                Pay Tuition Fee Now
+              </button>
+            ) : null}
+            <a
+              href={isStudentUser ? '/student/deals' : '/tutor/deals'}
+              className="inline-flex items-center gap-1 font-bold text-xs text-rose-800 underline hover:text-rose-950"
+            >
+              <span>{isStudentUser ? 'View Details on Deals Page' : 'Go to Deals to Clear Payment'}</span>
+            </a>
+          </div>
+        </div>
+      )}
+
+      {/* Tuition Payment Request & Student Payment Box (Active deals) */}
+      {['active_trial', 'continuation_agreed', 'active_paid', 'restricted'].includes(currentStatus) && (
+        <div className="space-y-2">
+          {dealState.latestPaymentRequest ? (
+            <>
+              {dealState.latestPaymentRequest.status === 'proof_submitted' ? (
+                <div className="p-3.5 bg-amber-50 border border-amber-300 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-amber-950 shadow-2xs">
+                  <div className="flex items-start sm:items-center gap-2.5">
+                    <Clock className="w-5 h-5 text-amber-600 animate-pulse shrink-0 mt-0.5 sm:mt-0" />
+                    <div>
+                      <div className="font-bold text-amber-950 text-xs">
+                        {isTutorUser ? 'Student Submitted Tuition Payment Proof!' : 'Tuition Payment Proof Submitted'}
+                      </div>
+                      <p className="text-[11px] text-amber-800">
+                        Amount: <strong>PKR {dealState.latestPaymentRequest.amount?.toLocaleString()}</strong>
+                        {dealState.latestPaymentRequest.paymentProof?.method && (
+                          <> &bull; Method: <strong>{dealState.latestPaymentRequest.paymentProof.method.toUpperCase()}</strong></>
+                        )}
+                        {dealState.latestPaymentRequest.paymentProof?.transactionId && (
+                          <> &bull; Trx ID: <code className="bg-white px-1.5 py-0.5 rounded border border-amber-200 font-mono font-bold text-amber-900">{dealState.latestPaymentRequest.paymentProof.transactionId}</code></>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                  {isTutorUser ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowClearModal(true)}
+                      className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-1.5 shrink-0 self-start sm:self-auto"
+                    >
+                      <CheckCircle2 className="w-4 h-4" />
+                      <span>Review &amp; Clear Payment</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setShowStudentPayModal(true)}
+                      className="px-3 py-1.5 bg-amber-700 hover:bg-amber-800 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer shrink-0 self-start sm:self-auto"
+                    >
+                      <span>View / Update Proof</span>
+                    </button>
+                  )}
+                </div>
+              ) : dealState.latestPaymentRequest.status === 'overdue' ? (
+                <div className="p-3.5 bg-rose-50 border border-rose-300 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-rose-950 shadow-2xs">
+                  <div className="flex items-start sm:items-center gap-2.5">
+                    <AlertTriangle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5 sm:mt-0" />
+                    <div>
+                      <div className="font-bold text-rose-950 text-xs">
+                        3-Day Payment Threshold Expired &bull; Classes Restricted
+                      </div>
+                      <p className="text-[11px] text-rose-800">
+                        Tuition fee of PKR {dealState.latestPaymentRequest.amount?.toLocaleString()} has not been cleared.
+                      </p>
+                    </div>
+                  </div>
+                  {isStudentUser ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowStudentPayModal(true)}
+                      className="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer shrink-0 self-start sm:self-auto"
+                    >
+                      <span>Pay Tuition Fee Now</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleOpenTuitionRequest}
+                      className="px-3 py-1.5 bg-rose-700 hover:bg-rose-800 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer shrink-0 self-start sm:self-auto"
+                    >
+                      <span>Send New Request</span>
+                    </button>
+                  )}
+                </div>
+              ) : dealState.latestPaymentRequest.status === 'cleared' ? (
+                <div className="p-2.5 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-center justify-between gap-2 text-xs text-emerald-950">
+                  <div className="flex items-center gap-2">
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    <span className="font-bold">
+                      Tuition Fee Cleared (PKR {dealState.latestPaymentRequest.amount?.toLocaleString()}) &bull; Active
+                    </span>
+                  </div>
+                  {isTutorUser ? (
+                    <button
+                      type="button"
+                      onClick={handleOpenTuitionRequest}
+                      className="px-2.5 py-1 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[11px] font-bold rounded-lg transition-all cursor-pointer"
+                      title="Request payment for next month/cycle"
+                    >
+                      Request Next Fee
+                    </button>
+                  ) : (
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-black uppercase bg-emerald-600 text-white">
+                      CLEARED
+                    </span>
+                  )}
+                </div>
+              ) : (
+                /* Pending tuition fee */
+                <div className="p-3.5 bg-[#fbf9f5] border-2 border-[#b85d34]/40 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-stone-900 shadow-xs">
+                  <div className="flex items-start sm:items-center gap-2.5">
+                    <CreditCard className="w-5 h-5 text-[#b85d34] shrink-0 mt-0.5 sm:mt-0" />
+                    <div>
+                      <div className="font-bold text-stone-900 text-xs flex items-center gap-1.5">
+                        <span>Tuition Fee Due: PKR {dealState.latestPaymentRequest.amount?.toLocaleString()}</span>
+                        <span className="px-1.5 py-0.5 rounded text-[9px] font-bold uppercase bg-amber-100 text-amber-900">
+                          3-Day Threshold
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-stone-600">
+                        {isStudentUser
+                          ? 'Transfer via Bank, Raast, EasyPaisa, or JazzCash and submit screenshot proof.'
+                          : 'Awaiting student payment via your configured receiving accounts.'}
+                      </p>
+                    </div>
+                  </div>
+                  {isStudentUser ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowStudentPayModal(true)}
+                      className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer shrink-0 self-start sm:self-auto"
+                    >
+                      Pay Tuition Fee
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={handleOpenTuitionRequest}
+                      className="px-3 py-1.5 bg-stone-100 hover:bg-stone-200 text-stone-700 text-[11px] font-bold rounded-xl transition-all cursor-pointer shrink-0 self-start sm:self-auto"
+                      title="Update or re-send payment request"
+                    >
+                      Update Request
+                    </button>
+                  )}
+                </div>
+              )}
+            </>
+          ) : isTutorUser ? (
+            /* No tuition payment requested yet - Prompt Tutor to Request Tuition */
+            <div className="p-3 bg-gradient-to-r from-[#faf8f5] to-[#f5efe4] rounded-2xl border border-[#d4a359]/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 text-xs shadow-2xs">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-[#b85d34]/10 text-[#b85d34] flex items-center justify-center shrink-0 border border-[#b85d34]/20">
+                  <CreditCard className="w-4 h-4" />
+                </div>
+                <div>
+                  <span className="font-bold text-[#0c2217] block">Student Tuition Payment</span>
+                  <p className="text-[11px] text-stone-600">
+                    Request tuition fee directly to your Bank, Raast, EasyPaisa, or JazzCash.
+                  </p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={handleOpenTuitionRequest}
+                className="px-3.5 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-95 text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0 self-start sm:self-auto"
+              >
+                <CreditCard className="w-3.5 h-3.5 text-[#d4a359]" />
+                <span>Request Tuition Fee</span>
+              </button>
+            </div>
+          ) : null}
         </div>
       )}
 
@@ -495,6 +693,17 @@ const DealOfferCard = ({ deal, onDealUpdated, onRequestNewDeal, onStartNewDeal }
                 </span>
               )}
 
+              {/* Request Tuition Fee Button for Tutor */}
+              <button
+                type="button"
+                onClick={handleOpenTuitionRequest}
+                className="px-3.5 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-95 text-white rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+                title="Send tuition fee payment request to student (3-day threshold)"
+              >
+                <CreditCard className="w-3.5 h-3.5 text-[#d4a359]" />
+                <span>Request Tuition Fee</span>
+              </button>
+
               <button
                 type="button"
                 onClick={handleComplete}
@@ -613,6 +822,38 @@ const DealOfferCard = ({ deal, onDealUpdated, onRequestNewDeal, onStartNewDeal }
           <XCircle className="w-4 h-4 text-red-400" />
           <span>{currentStatus === 'trial_declined' ? 'Trial concluded without continuation.' : 'This course offer was declined.'}</span>
         </div>
+      )}
+
+      {/* Tuition Payment Request Modal for Tutor */}
+      {showTuitionModal && (
+        <TutorSendPaymentRequestModal
+          deal={dealState}
+          isOpen={showTuitionModal}
+          onClose={() => setShowTuitionModal(false)}
+          onSuccess={handleTuitionRequestSuccess}
+        />
+      )}
+
+      {/* Tutor Clear Payment Modal */}
+      {showClearModal && dealState.latestPaymentRequest && (
+        <TutorClearPaymentModal
+          paymentRequest={dealState.latestPaymentRequest}
+          deal={dealState}
+          isOpen={showClearModal}
+          onClose={() => setShowClearModal(false)}
+          onSuccess={handleTuitionRequestSuccess}
+        />
+      )}
+
+      {/* Student Pay Tuition Fee Modal */}
+      {showStudentPayModal && dealState.latestPaymentRequest && (
+        <StudentPaymentRequestModal
+          paymentRequest={dealState.latestPaymentRequest}
+          deal={dealState}
+          isOpen={showStudentPayModal}
+          onClose={() => setShowStudentPayModal(false)}
+          onSuccess={handleTuitionRequestSuccess}
+        />
       )}
 
     </div>

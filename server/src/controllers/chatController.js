@@ -199,7 +199,10 @@ exports.getMessages = async (req, res) => {
     const rawMessages = await Message.find(query)
       .populate('sender', 'name avatar role city')
       .populate('recipient', 'name avatar role city')
-      .populate('deal')
+      .populate({
+        path: 'deal',
+        populate: { path: 'latestPaymentRequest' }
+      })
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
@@ -237,6 +240,7 @@ exports.getMessages = async (req, res) => {
       })
         .populate('student', 'name avatar role city')
         .populate('tutor', 'name avatar role city')
+        .populate('latestPaymentRequest')
         .sort({ updatedAt: -1, createdAt: -1 })
         .lean();
 
@@ -249,6 +253,7 @@ exports.getMessages = async (req, res) => {
         })
           .populate('student', 'name avatar role city')
           .populate('tutor', 'name avatar role city')
+          .populate('latestPaymentRequest')
           .sort({ updatedAt: -1, createdAt: -1 })
           .lean();
       }

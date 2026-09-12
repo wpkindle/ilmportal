@@ -11,6 +11,7 @@ import { NotificationProvider } from '../../context/NotificationContext';
 const SupportPlatformWidget = dynamic(() => import('./SupportPlatformWidget'), { ssr: false });
 const InAppNotificationToast = dynamic(() => import('./InAppNotificationToast'), { ssr: false });
 const AiChatbotWidget = dynamic(() => import('./AiChatbotWidget'), { ssr: false });
+const SocialUpdatesPopup = dynamic(() => import('./SocialUpdatesPopup'), { ssr: false });
 
 export default function AppProviders({ children }) {
   const router = useRouter();
@@ -68,6 +69,7 @@ export default function AppProviders({ children }) {
         <NotificationProvider>
           <InAppNotificationToast />
           <SupportPlatformWidget />
+          <SocialUpdatesPopup />
           <AiChatbotWidget />
           {children}
         </NotificationProvider>

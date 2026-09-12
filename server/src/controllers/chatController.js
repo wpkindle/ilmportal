@@ -884,8 +884,20 @@ exports.getStudentProfileForTutor = async (req, res) => {
         .sort({ createdAt: -1 })
         .limit(10),
       Review.find({
-        student: studentDoc._id,
-        $or: [{ reviewerRole: 'tutor' }, { targetRole: 'student' }, { targetUser: studentDoc._id }],
+        $and: [
+          {
+            $or: [
+              { student: studentDoc._id },
+              { targetUser: studentDoc._id }
+            ]
+          },
+          {
+            $or: [
+              { reviewerRole: 'tutor' },
+              { targetRole: 'student' }
+            ]
+          }
+        ],
         status: 'published'
       })
         .select('rating comment createdAt deal tutor reviewer reviewerRole quickTags')

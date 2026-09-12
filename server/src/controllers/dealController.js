@@ -4,6 +4,7 @@ const User = require('../models/User');
 const Message = require('../models/Message');
 const Notification = require('../models/Notification');
 const SystemConfig = require('../models/SystemConfig');
+const Review = require('../models/Review');
 const {
   sendTrialContinuationTutorEmail,
   sendTutorFeeClearedEmail

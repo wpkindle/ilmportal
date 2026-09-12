@@ -215,7 +215,7 @@ export default function StudentDashboardPage() {
 
                   {deal.status === 'completed' ? (
                     <div className="p-4 bg-[#f0ece1] border border-[#d4a359]/40 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[#0c2217]">
-                      <div className="space-y-0.5">
+                      <div className="space-y-1">
                         <span className="font-bold flex items-center gap-1.5 text-[#0c2217]">
                           <CheckCircle2 className="w-4 h-4 text-[#d4a359]" />
                           <span>Course Completed Successfully!</span>
@@ -223,22 +223,30 @@ export default function StudentDashboardPage() {
                         <p className="text-[11px] text-stone-600">
                           Tutoring sessions for this course have concluded. Thank you for learning on IlmiDunya!
                         </p>
+                        {deal.isTutorReviewed && deal.tutorReview?.comment && (
+                          <div className="pt-1.5 border-t border-[#d4a359]/20 text-[11px]">
+                            <span className="font-bold text-[#0c2217]">Teacher Evaluation: </span>
+                            <span className="italic text-stone-700">&ldquo;{deal.tutorReview.comment}&rdquo;</span>
+                          </div>
+                        )}
                       </div>
-                      {deal.isReviewed ? (
-                        <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold shrink-0">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                          <span>Reviewed ★★★★★</span>
-                        </span>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={() => setReviewModalDeal(deal)}
-                          className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
-                        >
-                          <Star className="w-3.5 h-3.5 fill-white text-white" />
-                          <span>Rate &amp; Review Tutor</span>
-                        </button>
-                      )}
+                      <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                        {deal.isReviewed || deal.isStudentReviewed ? (
+                          <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold shrink-0">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Your Review Submitted ★★★★★</span>
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setReviewModalDeal(deal)}
+                            className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+                          >
+                            <Star className="w-3.5 h-3.5 fill-white text-white" />
+                            <span>Rate &amp; Review Tutor</span>
+                          </button>
+                        )}
+                      </div>
                     </div>
                   ) : (
                     <TrialBanner deal={deal} />

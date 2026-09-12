@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const Review = require('../models/Review');
 const TutorProfile = require('../models/TutorProfile');
 const Deal = require('../models/Deal');
@@ -240,20 +241,25 @@ exports.createReview = async (req, res) => {
 // @route   GET /api/reviews/tutor/:tutorId
 exports.getTutorReviews = async (req, res) => {
   try {
-    let tutorUserId = req.params.tutorId;
+    const rawId = req.params.tutorId;
+    let tutorUserId = rawId;
+    let tutorProfileId = rawId;
 
-    // Check if parameter is a TutorProfile ID, resolve to user ID
-    const tutorProfileDoc = await TutorProfile.findById(tutorUserId);
-    if (tutorProfileDoc && tutorProfileDoc.user) {
-      tutorUserId = tutorProfileDoc.user.toString();
+    if (mongoose.Types.ObjectId.isValid(rawId)) {
+      const tutorProfileDoc = await TutorProfile.findById(rawId) || await TutorProfile.findOne({ user: rawId });
+      if (tutorProfileDoc) {
+        if (tutorProfileDoc.user) tutorUserId = tutorProfileDoc.user.toString();
+        if (tutorProfileDoc._id) tutorProfileId = tutorProfileDoc._id.toString();
+      }
     }
+
+    const idList = [rawId, tutorUserId, tutorProfileId].filter(id => id && mongoose.Types.ObjectId.isValid(id));
+    const uniqueIds = [...new Set(idList)];
 
     const reviews = await Review.find({
       $or: [
-        { tutor: tutorUserId },
-        { tutor: req.params.tutorId },
-        { targetUser: tutorUserId },
-        { targetUser: req.params.tutorId }
+        { tutor: { $in: uniqueIds } },
+        { targetUser: { $in: uniqueIds } }
       ],
       $and: [
         {

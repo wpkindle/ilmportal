@@ -295,13 +295,27 @@ exports.getTutorById = async (req, res) => {
 
     // Fetch verified published reviews for this tutor
     const reviews = await Review.find({
-      $or: [
-        { tutor: tutorUserId },
-        { tutor: tutor._id }
+      $and: [
+        {
+          $or: [
+            { tutor: tutorUserId },
+            { tutor: tutor._id },
+            { targetUser: tutorUserId },
+            { targetUser: tutor._id }
+          ]
+        },
+        {
+          $or: [
+            { targetRole: 'tutor' },
+            { reviewerRole: 'student' },
+            { targetRole: { $exists: false } }
+          ]
+        }
       ],
       status: 'published'
     })
       .populate('student', 'name avatar city')
+      .populate('reviewer', 'name avatar city role')
       .sort({ createdAt: -1 });
 
     const isUserOnline = req.app.get('isUserOnline');

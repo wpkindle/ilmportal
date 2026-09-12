@@ -17,13 +17,15 @@ import {
   CheckCircle2,
   Check,
   X,
-  Loader2
+  Loader2,
+  Star
 } from 'lucide-react';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
 import TrialBanner from '../../../components/common/TrialBanner';
 import Tutor72HourClock from '../../../components/tutor/Tutor72HourClock';
 import TutorPaymentModal from '../../../components/tutor/TutorPaymentModal';
+import LeaveReviewModal from '../../../components/common/LeaveReviewModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import AccountStatusBanner from '../../../components/common/AccountStatusBanner';
 
@@ -33,6 +35,7 @@ export default function TutorDashboardPage() {
   const [sessions, setSessions] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selectedDealForPay, setSelectedDealForPay] = useState(null);
+  const [reviewModalDeal, setReviewModalDeal] = useState(null);
   const [dealToComplete, setDealToComplete] = useState(null);
   const [completionNotes, setCompletionNotes] = useState('');
   const [completing, setCompleting] = useState(false);
@@ -366,9 +369,29 @@ export default function TutorDashboardPage() {
                       })()}
 
                       {deal.status === 'completed' && (
-                        <div className="px-3 py-1.5 bg-[#f0ece1] border border-[#d4a359]/40 rounded-xl text-xs text-[#0c2217] font-semibold flex items-center gap-1.5">
-                          <Check className="w-3.5 h-3.5 text-[#d4a359]" />
-                          <span>Completed &bull; Storage Cleared</span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          {deal.isTutorReviewed ? (
+                            <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold shrink-0">
+                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                              <span>Reviewed Student ★★★★★</span>
+                            </span>
+                          ) : (
+                            <button
+                              type="button"
+                              onClick={() => setReviewModalDeal(deal)}
+                              className="px-3.5 py-1.5 bg-[#d4a359] hover:bg-[#c39248] text-[#0c2217] font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+                            >
+                              <Star className="w-3.5 h-3.5 fill-[#0c2217] text-[#0c2217]" />
+                              <span>Rate Student</span>
+                            </button>
+                          )}
+                          <Link
+                            href={`/tutor/messages?conversation=${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
+                            className="px-3 py-1.5 bg-[#faf8f5] hover:bg-[#f3ede2] text-stone-700 text-xs font-semibold flex items-center gap-1.5 border border-[#e6dfd5] rounded-xl cursor-pointer"
+                          >
+                            <MessageSquare className="w-3.5 h-3.5 text-[#143d2b]" />
+                            <span>Chat</span>
+                          </Link>
                         </div>
                       )}
                     </div>
@@ -380,13 +403,38 @@ export default function TutorDashboardPage() {
                       onPayClick={() => setSelectedDealForPay(deal)}
                     />
                   ) : (
-                    <div className="p-3.5 bg-[#f0ece1] border border-[#d4a359]/40 rounded-2xl flex items-center justify-between text-xs text-[#0c2217]">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
-                        <div>
-                          <span className="font-bold">Course Completed &bull; Closed</span>
-                          <p className="text-[11px] text-stone-600">All conversation messages, media attachments, and audio recordings have been cleared to save database storage.</p>
-                        </div>
+                    <div className="p-4 bg-[#f0ece1] border border-[#d4a359]/40 rounded-2xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs text-[#0c2217]">
+                      <div className="space-y-1">
+                        <span className="font-bold flex items-center gap-1.5 text-[#0c2217]">
+                          <CheckCircle2 className="w-4 h-4 text-[#d4a359]" />
+                          <span>Course Completed Successfully</span>
+                        </span>
+                        <p className="text-[11px] text-stone-600">
+                          Tutoring sessions have concluded. Both you and your student can exchange verified reviews to build mutual reputation.
+                        </p>
+                        {(deal.isStudentReviewed || deal.isReviewed) && (deal.studentReview?.comment || deal.review?.comment) && (
+                          <div className="pt-1.5 border-t border-[#d4a359]/20 text-[11px]">
+                            <span className="font-bold text-[#0c2217]">Student Review: </span>
+                            <span className="italic text-stone-700">&ldquo;{deal.studentReview?.comment || deal.review?.comment}&rdquo;</span>
+                          </div>
+                        )}
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                        {deal.isTutorReviewed ? (
+                          <span className="inline-flex items-center gap-1 px-3 py-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200 rounded-xl text-xs font-bold">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>Your Review Submitted ★★★★★</span>
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setReviewModalDeal(deal)}
+                            className="px-4 py-2 bg-[#d4a359] hover:bg-[#c39248] text-[#0c2217] font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer"
+                          >
+                            <Star className="w-3.5 h-3.5 fill-[#0c2217] text-[#0c2217]" />
+                            <span>Rate Student</span>
+                          </button>
+                        )}
                       </div>
                     </div>
                   )}
@@ -506,6 +554,21 @@ export default function TutorDashboardPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Leave Review for Student Modal */}
+      {reviewModalDeal && (
+        <LeaveReviewModal
+          isOpen={!!reviewModalDeal}
+          onClose={() => setReviewModalDeal(null)}
+          deal={reviewModalDeal}
+          student={reviewModalDeal.student}
+          tutor={user}
+          targetRole="student"
+          onSuccess={() => {
+            fetchData();
+          }}
+        />
       )}
     </div>
   );

@@ -1319,8 +1319,8 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               : partnerDeal?.isTutorReviewed;
 
             return (
-              <div key={msg._id} className="w-full my-4 flex flex-col items-center justify-center">
-                <div className="max-w-md w-full p-4.5 rounded-2xl bg-white border border-[#d4a359]/40 text-center space-y-2.5 shadow-sm">
+              <div key={msg._id} className="w-full my-4 flex flex-col items-center justify-center px-2">
+                <div className="max-w-md w-full p-4 sm:p-5 rounded-3xl bg-white border border-[#d4a359]/40 text-center space-y-3 shadow-sm">
                   <div className="w-10 h-10 rounded-xl bg-[#0c2217] text-[#d4a359] flex items-center justify-center mx-auto border border-[#d4a359]/40 shadow-xs">
                     <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                   </div>
@@ -1348,13 +1348,13 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                   )}
 
                   {/* Renewal / Next Month Action */}
-                  <div className="pt-2.5 border-t border-[#ebe3d3] flex items-center justify-between gap-2 text-xs">
+                  <div className="pt-3 border-t border-[#ebe3d3] flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
                     <span className="text-[11px] text-stone-600 font-medium">Ready for next month?</span>
                     {(isStudent || user?.role === 'student') ? (
                       <button
                         type="button"
                         onClick={() => setDealRequestModalOpen(true)}
-                        className="px-3 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] text-white text-[11px] font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30"
+                        className="w-full sm:w-auto px-3.5 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-white text-[11px] font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30"
                       >
                         <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
                         <span>Request New Deal</span>
@@ -1367,7 +1367,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                           setPrefilledMode(partnerDeal?.mode || '');
                           setDealModalOpen(true);
                         }}
-                        className="px-3 py-1.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[11px] font-bold rounded-xl flex items-center gap-1.5 transition-all cursor-pointer"
+                        className="w-full sm:w-auto px-3.5 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[11px] font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
                       >
                         <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
                         <span>Send New Deal Offer</span>

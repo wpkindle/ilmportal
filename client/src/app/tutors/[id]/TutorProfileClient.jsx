@@ -44,12 +44,34 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
   const [femaleGateModalOpen, setFemaleGateModalOpen] = useState(false);
   const [chatRequestModalOpen, setChatRequestModalOpen] = useState(false);
   const [authoredCourses, setAuthoredCourses] = useState([]);
+  const [reviewsList, setReviewsList] = useState(reviews || []);
 
   const { onlineStatusMap, refreshUserOnlineStatus, isConnected } = useSocket();
 
   React.useEffect(() => {
     setMounted(true);
   }, []);
+
+  // Sync initial reviews prop if changed
+  useEffect(() => {
+    if (Array.isArray(reviews) && reviews.length > 0) {
+      setReviewsList(reviews);
+    }
+  }, [reviews]);
+
+  // Client-side fetch fresh reviews on mount to avoid stale ISR cache
+  useEffect(() => {
+    const idToFetch = tutorUserIdStr || tutor?._id || tutorUser?._id || tutorUser?.id;
+    if (idToFetch) {
+      api.getTutorReviews(idToFetch).then((res) => {
+        if (res?.success && Array.isArray(res.reviews)) {
+          setReviewsList(res.reviews);
+        }
+      }).catch((err) => {
+        console.error('Error fetching client-side tutor reviews:', err);
+      });
+    }
+  }, [tutorUserIdStr, tutor?._id, tutorUser?._id]);
 
   const tutorUser = tutor?.user || {};
   const tutorName = tutorUser.name || 'Verified Tutor';
@@ -595,18 +617,34 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
         {/* Student Reviews Section */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e6ded1] shadow-2xs space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-black text-slate-900 font-serif">Student Reviews &amp; Ratings ({reviews.length || tutor.ratingCount || tutor.totalReviews || 0})</h2>
+            <h2 className="text-base font-black text-slate-900 font-serif">
+              Student Reviews &amp; Ratings ({reviewsList.length || tutor.ratingCount || tutor.totalReviews || 0})
+            </h2>
             <div className="flex items-center gap-1.5">
-              <RatingStars rating={tutor.ratingAverage ?? tutor.averageRating ?? 5} size="xs" showScore={false} />
-              <span className="text-xs font-bold text-slate-800">{(tutor.ratingAverage ?? tutor.averageRating ?? 5.0).toFixed(1)} / 5.0</span>
+              <RatingStars
+                rating={
+                  reviewsList.length > 0
+                    ? reviewsList.reduce((acc, r) => acc + (r.rating || 5), 0) / reviewsList.length
+                    : (tutor.ratingAverage ?? tutor.averageRating ?? 5)
+                }
+                size="xs"
+                showScore={false}
+              />
+              <span className="text-xs font-bold text-slate-800">
+                {(
+                  reviewsList.length > 0
+                    ? (reviewsList.reduce((acc, r) => acc + (r.rating || 5), 0) / reviewsList.length).toFixed(1)
+                    : (tutor.ratingAverage ?? tutor.averageRating ?? 5.0).toFixed(1)
+                )} / 5.0
+              </span>
             </div>
           </div>
 
-          {reviews.length === 0 ? (
+          {reviewsList.length === 0 ? (
             <p className="text-xs text-slate-400 py-4">No reviews recorded yet for this tutor.</p>
           ) : (
             <div className="space-y-4">
-              {reviews.map((rev) => (
+              {reviewsList.map((rev) => (
                 <div key={rev._id} className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-2.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">

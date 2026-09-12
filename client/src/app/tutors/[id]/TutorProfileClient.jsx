@@ -51,6 +51,15 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
   const [selectedReviewToReport, setSelectedReviewToReport] = useState(null);
   const [reportedReviewIds, setReportedReviewIds] = useState(new Set());
 
+  const tutorUser = tutor?.user || {};
+  const tutorName = tutorUser.name || 'Verified Tutor';
+  const tutorArea = tutor?.localArea || tutorUser.area || tutor?.area || '';
+  const tutorCity = tutorUser.city || tutor?.city || 'Pakistan';
+  const tutorAvatar = getTutorAvatar(tutor || tutorUser, tutorName);
+
+  const tutorUserId = tutorUser._id || tutorUser.id || tutor?.user?._id || tutor?.user?.id || (typeof tutor?.user === 'string' ? tutor.user : null);
+  const tutorUserIdStr = tutorUserId ? tutorUserId.toString() : null;
+
   const handleOpenReportModal = (rev) => {
     if (!isAuthenticated) {
       setAuthModalOpen(true);
@@ -87,12 +96,6 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
     }
   }, [tutorUserIdStr, tutor?._id, tutorUser?._id]);
 
-  const tutorUser = tutor?.user || {};
-  const tutorName = tutorUser.name || 'Verified Tutor';
-  const tutorArea = tutor?.localArea || tutorUser.area || tutor?.area || '';
-  const tutorCity = tutorUser.city || tutor?.city || 'Pakistan';
-  const tutorAvatar = getTutorAvatar(tutor || tutorUser, tutorName);
-
   const verifiedSanadDocs = React.useMemo(() => {
     return (Array.isArray(tutor?.sanadDocuments) ? tutor.sanadDocuments : []).filter(
       (doc) => doc?.status === 'verified' || doc?.status === 'approved'
@@ -104,9 +107,6 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
   const allDegrees = React.useMemo(() => {
     return parseDegreesAndCertificates(tutor?.qualifications, tutor?.sanadDocuments, tutor?.isSanadVerified);
   }, [tutor?.qualifications, tutor?.sanadDocuments, tutor?.isSanadVerified]);
-
-  const tutorUserId = tutorUser._id || tutorUser.id || tutor?.user?._id || tutor?.user?.id || (typeof tutor?.user === 'string' ? tutor.user : null);
-  const tutorUserIdStr = tutorUserId ? tutorUserId.toString() : null;
 
   // Real-time online check, falling back to initial SSR isOnline flag
   const isOnlineLive = tutorUserIdStr ? (onlineStatusMap?.[tutorUserIdStr] === true) : false;

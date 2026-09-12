@@ -79,47 +79,51 @@ export const SocketProvider = ({ children }) => {
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
-    const socketUrl = getSocketUrl();
-    console.log('[WebSocket] Connecting to:', socketUrl);
+    let timer = null;
+    let initialized = false;
 
-    const newSocket = io(socketUrl, {
-      transports: ['websocket', 'polling'],
-      reconnectionAttempts: 15,
-      reconnectionDelay: 1500,
-      timeout: 20000
-    });
+    const connectSocket = () => {
+      if (initialized || socketRef.current) return;
+      initialized = true;
 
-    socketRef.current = newSocket;
-    setSocket(newSocket);
-
-    const registerCurrentUser = () => {
-      const u = userRef.current;
-      if (u?._id || u?.id) {
-        const uId = (u._id || u.id).toString();
-        newSocket.emit('register-user', uId);
-      }
-    };
-
-    newSocket.on('connect', () => {
-      setIsConnected(true);
-      console.log('[WebSocket] Connected successfully!');
-      registerCurrentUser();
-
-      // Query online users immediately on connection
-      newSocket.emit('get-online-status', [], (statusMap) => {
-        if (statusMap && typeof statusMap === 'object') {
-          setOnlineStatusMap(prev => ({ ...prev, ...statusMap }));
-        }
+      const socketUrl = getSocketUrl();
+      const newSocket = io(socketUrl, {
+        transports: ['websocket', 'polling'],
+        reconnectionAttempts: 15,
+        reconnectionDelay: 1500,
+        timeout: 20000
       });
 
-      // Query admin status immediately on connection
-      newSocket.emit('check-admin-online-status', (res) => {
-        if (res && typeof res.isOnline === 'boolean') {
-          setIsAdminOnline(res.isOnline);
-          setOnlineAdminsCount(res.onlineAdmins || 0);
+      socketRef.current = newSocket;
+      setSocket(newSocket);
+
+      const registerCurrentUser = () => {
+        const u = userRef.current;
+        if (u?._id || u?.id) {
+          const uId = (u._id || u.id).toString();
+          newSocket.emit('register-user', uId);
         }
+      };
+
+      newSocket.on('connect', () => {
+        setIsConnected(true);
+        registerCurrentUser();
+
+        // Query online users immediately on connection
+        newSocket.emit('get-online-status', [], (statusMap) => {
+          if (statusMap && typeof statusMap === 'object') {
+            setOnlineStatusMap(prev => ({ ...prev, ...statusMap }));
+          }
+        });
+
+        // Query admin status immediately on connection
+        newSocket.emit('check-admin-online-status', (res) => {
+          if (res && typeof res.isOnline === 'boolean') {
+            setIsAdminOnline(res.isOnline);
+            setOnlineAdminsCount(res.onlineAdmins || 0);
+          }
+        });
       });
-    });
 
     newSocket.io.on('reconnect', () => {
       console.log('[WebSocket] Reconnected to server');
@@ -194,13 +198,27 @@ export const SocketProvider = ({ children }) => {
       }
     };
     window.addEventListener('ilmidunya:logout', handleImmediateLogout);
+  };
+
+    if (isAuthenticated) {
+      connectSocket();
+    } else {
+      // Defer WebSocket connection for unauthenticated guest visitors so it doesn't block critical page hydration
+      if ('requestIdleCallback' in window) {
+        window.requestIdleCallback(connectSocket, { timeout: 3000 });
+      } else {
+        timer = setTimeout(connectSocket, 2000);
+      }
+    }
 
     return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('ilmidunya:logout', handleImmediateLogout);
-      newSocket.disconnect();
+      if (timer) clearTimeout(timer);
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
     };
-  }, []);
+  }, [isAuthenticated]);
 
   const unregisterCurrentSocket = () => {
     if (socketRef.current?.connected) {

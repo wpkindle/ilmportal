@@ -5,6 +5,7 @@ import Footer from '../components/common/Footer';
 import MobileBottomNav from '../components/common/MobileBottomNav';
 import NotificationPermissionPrompt from '../components/common/NotificationPermissionPrompt';
 import SiteAmbientBackdrop from '../components/common/SiteAmbientBackdrop';
+import SiteInitialLoader from '../components/common/SiteInitialLoader';
 
 export const viewport = {
   width: 'device-width',
@@ -124,7 +125,7 @@ export default function RootLayout({ children }) {
         <link
           rel="preload"
           as="style"
-          href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=optional"
         />
         <script
           dangerouslySetInnerHTML={{
@@ -132,7 +133,7 @@ export default function RootLayout({ children }) {
               (function() {
                 var l = document.createElement('link');
                 l.rel = 'stylesheet';
-                l.href = 'https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap';
+                l.href = 'https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=optional';
                 document.head.appendChild(l);
               })();
             `,
@@ -141,7 +142,7 @@ export default function RootLayout({ children }) {
         <noscript>
           <link
             rel="stylesheet"
-            href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+            href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,600;0,700;0,800;0,900;1,600;1,700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=optional"
           />
         </noscript>
         <script
@@ -166,6 +167,7 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="min-h-screen flex flex-col bg-site-canvas text-[#1c2826] font-sans antialiased selection:bg-[#143d2b] selection:text-white relative">
+        <SiteInitialLoader />
         <SiteAmbientBackdrop />
         <AppProviders>
           <Navbar />

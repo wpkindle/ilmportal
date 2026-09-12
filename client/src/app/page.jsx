@@ -181,18 +181,78 @@ const homeStructuredData = {
   ]
 };
 
+const defaultFallbackTutors = [
+  {
+    _id: 'featured-tutor-huzaifa',
+    user: {
+      name: 'Qari Muhammad Huzaifa',
+      city: 'Lahore',
+      gender: 'male',
+      avatar: '/images/tutors/qari-huzaifa.webp'
+    },
+    headline: 'Wafaq-ul-Madaris Certified Qari & Tajweed Master',
+    bio: 'Dedicated Quran educator teaching Tajweed, Hifz, and Noorani Qaida for beginners and children across Lahore and online.',
+    subjects: ['Tajweed al-Quran', 'Noorani Qaida', 'Hifz al-Quran'],
+    experience: 8,
+    hourlyRate: 1500,
+    rating: 5.0,
+    reviewCount: 38,
+    isVerified: true,
+    hasSanad: true,
+    teachingModes: ['physical', 'online']
+  },
+  {
+    _id: 'featured-tutor-fatima',
+    user: {
+      name: 'Alimah Fatima Batool',
+      city: 'Islamabad',
+      gender: 'female',
+      avatar: '/images/tutors/alimah-fatima.webp'
+    },
+    headline: 'Darse Nizami Alimah • 100% Encrypted WebRTC Only',
+    bio: 'Certified female Alimah dedicated to sisters, mothers, and daughters with camera-off privacy by default.',
+    subjects: ['Tajweed al-Quran', 'Noorani Qaida', 'Islamic Studies'],
+    experience: 7,
+    hourlyRate: 1800,
+    rating: 5.0,
+    reviewCount: 42,
+    isVerified: true,
+    hasSanad: true,
+    teachingModes: ['online']
+  },
+  {
+    _id: 'featured-tutor-rehman',
+    user: {
+      name: 'Ustadh Abdul Rehman',
+      city: 'Karachi',
+      gender: 'male',
+      avatar: '/images/tutors/ustadh-abdul-rehman.webp'
+    },
+    headline: 'M.Sc. Physics & Math • FBISE & BISE Board Specialist',
+    bio: 'Senior academic faculty member coaching Matric Science and FSc Pre-Engineering students with past paper mastery.',
+    subjects: ['Matric Science', 'FSc Pre-Engineering', 'Physics'],
+    experience: 11,
+    hourlyRate: 2000,
+    rating: 4.9,
+    reviewCount: 29,
+    isVerified: true,
+    hasSanad: false,
+    teachingModes: ['physical', 'online']
+  }
+];
+
 export const revalidate = 60; // SSR with ISR caching every 60s
 
 async function getFeaturedTutors() {
   try {
     const res = await api.getPublicTutors({ limit: 6, sortBy: 'rating' });
-    if (res && res.success) {
-      return res.tutors || [];
+    if (res && res.success && res.tutors && res.tutors.length > 0) {
+      return res.tutors;
     }
   } catch (err) {
     console.error('SSR fetch error for featured tutors:', err);
   }
-  return [];
+  return defaultFallbackTutors;
 }
 
 async function getLatestArticles() {

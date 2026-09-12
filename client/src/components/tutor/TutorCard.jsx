@@ -2,8 +2,8 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
-import { motion } from 'framer-motion';
 import {
   MapPin,
   ShieldCheck,
@@ -17,15 +17,17 @@ import {
   CheckCircle2
 } from 'lucide-react';
 import RatingStars from '../common/RatingStars';
-import { SanadModal } from '../common/SanadBadge';
-import StudentAuthModal from '../common/StudentAuthModal';
-import FemaleTutorGateModal from '../common/FemaleTutorGateModal';
-import ChatRequestModal from '../common/ChatRequestModal';
 import { calculateClientCompletion } from '../common/ProfileCompletionMeter';
 import { useAuth } from '../../context/AuthContext';
 import { useSocket } from '../../context/SocketContext';
 import { api } from '../../services/api';
 import { getTutorAvatar, parseDegreesAndCertificates } from '../../utils/tutorHelpers';
+
+// Dynamically load modals on demand so they never block initial card hydration
+const StudentAuthModal = dynamic(() => import('../common/StudentAuthModal'), { ssr: false });
+const FemaleTutorGateModal = dynamic(() => import('../common/FemaleTutorGateModal'), { ssr: false });
+const ChatRequestModal = dynamic(() => import('../common/ChatRequestModal'), { ssr: false });
+const SanadModal = dynamic(() => import('../common/SanadBadge').then(m => m.SanadModal), { ssr: false });
 
 // ─────────────────────────────────────────────
 // Mode Badge
@@ -417,57 +419,65 @@ const TutorCard = ({ tutor, tutorProfile }) => {
             </Link>
 
             {mounted && !isTutorVisitor && !isOwnCard && (
-              <motion.button
+              <button
+                type="button"
                 onClick={handleStartChat}
-                whileTap={{ scale: 0.94 }}
-                className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-md shadow-[#b85d34]/25 transition-colors flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-95 text-white font-bold text-xs rounded-xl shadow-md shadow-[#b85d34]/25 transition-all flex items-center gap-1.5 cursor-pointer"
               >
                 <MessageSquare className="w-3.5 h-3.5 shrink-0" />
                 <span className="whitespace-nowrap">Message Tutor</span>
-              </motion.button>
+              </button>
             )}
           </div>
         </div>
       </div>
     </CardHoverWrapper>
 
-      {/* Sanad Preview Modal */}
-      <SanadModal
-        isOpen={sanadModalOpen}
-        onClose={() => setSanadModalOpen(false)}
-        documents={verifiedSanadDocs.length > 0 ? verifiedSanadDocs : (data.sanadDocuments || [])}
-        degrees={cardDegrees}
-        tutorName={tutorName}
-      />
+      {/* Sanad Preview Modal - dynamically mounted on demand */}
+      {sanadModalOpen && (
+        <SanadModal
+          isOpen={sanadModalOpen}
+          onClose={() => setSanadModalOpen(false)}
+          documents={verifiedSanadDocs.length > 0 ? verifiedSanadDocs : (data.sanadDocuments || [])}
+          degrees={cardDegrees}
+          tutorName={tutorName}
+        />
+      )}
 
-      {/* Student Login / Registration Modal */}
-      <StudentAuthModal
-        isOpen={authModalOpen}
-        onClose={() => setAuthModalOpen(false)}
-        tutor={data}
-      />
+      {/* Student Login / Registration Modal - dynamically mounted on demand */}
+      {authModalOpen && (
+        <StudentAuthModal
+          isOpen={authModalOpen}
+          onClose={() => setAuthModalOpen(false)}
+          tutor={data}
+        />
+      )}
 
       {/* Female Tutor Gate Modal (<100% profile strength) */}
-      <FemaleTutorGateModal
-        isOpen={femaleGateModalOpen}
-        onClose={() => setFemaleGateModalOpen(false)}
-        user={user}
-        tutorName={tutorName}
-        tutorAvatar={tutorAvatar}
-      />
+      {femaleGateModalOpen && (
+        <FemaleTutorGateModal
+          isOpen={femaleGateModalOpen}
+          onClose={() => setFemaleGateModalOpen(false)}
+          user={user}
+          tutorName={tutorName}
+          tutorAvatar={tutorAvatar}
+        />
+      )}
 
       {/* Female Tutor Message Request Modal (100% profile strength) */}
-      <ChatRequestModal
-        isOpen={chatRequestModalOpen}
-        onClose={() => setChatRequestModalOpen(false)}
-        tutor={data}
-        studentUser={user}
-        onSuccess={() => {
-          setTimeout(() => {
-            router.push(`/student/messages?conversation=${conversationId}&tutorId=${tutorTargetId}`);
-          }, 1200);
-        }}
-      />
+      {chatRequestModalOpen && (
+        <ChatRequestModal
+          isOpen={chatRequestModalOpen}
+          onClose={() => setChatRequestModalOpen(false)}
+          tutor={data}
+          studentUser={user}
+          onSuccess={() => {
+            setTimeout(() => {
+              router.push(`/student/messages?conversation=${conversationId}&tutorId=${tutorTargetId}`);
+            }, 1200);
+          }}
+        />
+      )}
     </>
   );
 };

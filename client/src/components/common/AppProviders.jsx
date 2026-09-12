@@ -1,13 +1,16 @@
 'use client';
 
 import React, { useEffect } from 'react';
+import dynamic from 'next/dynamic';
 import { useRouter } from 'next/navigation';
 import { AuthProvider } from '../../context/AuthContext';
 import { SocketProvider } from '../../context/SocketContext';
 import { NotificationProvider } from '../../context/NotificationContext';
-import SupportPlatformWidget from './SupportPlatformWidget';
-import InAppNotificationToast from './InAppNotificationToast';
-import AiChatbotWidget from './AiChatbotWidget';
+
+// Dynamically load heavy floating widgets with ssr: false so they don't block critical page hydration
+const SupportPlatformWidget = dynamic(() => import('./SupportPlatformWidget'), { ssr: false });
+const InAppNotificationToast = dynamic(() => import('./InAppNotificationToast'), { ssr: false });
+const AiChatbotWidget = dynamic(() => import('./AiChatbotWidget'), { ssr: false });
 
 export default function AppProviders({ children }) {
   const router = useRouter();

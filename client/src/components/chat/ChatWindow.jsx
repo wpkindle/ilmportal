@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import Link from 'next/link';
 import {
   Send,
@@ -94,6 +94,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
   const [tutorClearModalOpen, setTutorClearModalOpen] = useState(false);
   const [studentTuitionModalOpen, setStudentTuitionModalOpen] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [toastNotice, setToastNotice] = useState(null);
   const menuRef = useRef(null);
 
   // File upload state
@@ -209,58 +210,52 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
     }
   };
 
-  // Fetch initial messages and active deal (Seen is ONLY emitted when tab has active focus)
   // Fetch initial messages and active deal (Immediate display with background deal verification)
-  useEffect(() => {
-    let isMounted = true;
-    const fetchMessages = async () => {
-      setLoading(true);
+  const fetchMessages = useCallback(async (showLoading = false) => {
+    if (showLoading) setLoading(true);
+    try {
+      const res = await api.getChatMessages(conversationId);
+      if (res.success) {
+        setMessages(res.messages || []);
+        if (res.deal) {
+          setPartnerDeal(res.deal);
+        }
+      }
+    } catch (err) {
+      console.error('Error loading chat messages:', err);
+    } finally {
+      if (showLoading) {
+        setLoading(false);
+        setTimeout(() => scrollToBottom(false), 50);
+      }
+    }
+
+    // Background deal verification without blocking message UI
+    const pId = (partner?._id || partner?.id)?.toString();
+    const myId = (user?._id || user?.id)?.toString();
+    if (pId) {
       try {
-        const res = await api.getChatMessages(conversationId);
-        if (!isMounted) return;
-        if (res.success) {
-          setMessages(res.messages || []);
-          if (res.deal) {
-            setPartnerDeal(res.deal);
-          }
+        const dealsRes = await api.getMyDeals();
+        if (dealsRes?.success && dealsRes.deals) {
+          const currentDeal = dealsRes.deals.find((d) => {
+            const tId = (d.tutor?._id || d.tutor)?.toString();
+            const sId = (d.student?._id || d.student)?.toString();
+            return (
+              ((tId === myId && sId === pId) || (tId === pId && sId === myId)) &&
+              ['active_trial', 'continuation_agreed', 'active_paid', 'pending_offer', 'completed'].includes(d.status)
+            );
+          });
+          if (currentDeal) setPartnerDeal(currentDeal);
         }
-      } catch (err) {
-        console.error('Error loading chat messages:', err);
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-          setTimeout(() => scrollToBottom(false), 50);
-        }
+      } catch (dealErr) {
+        console.warn('Background deal verification warning:', dealErr);
       }
+    }
+  }, [conversationId, partner, user]);
 
-      // Background deal verification without blocking message UI
-      const pId = (partner?._id || partner?.id)?.toString();
-      const myId = (user?._id || user?.id)?.toString();
-      if (pId && isMounted) {
-        try {
-          const dealsRes = await api.getMyDeals();
-          if (isMounted && dealsRes?.success && dealsRes.deals) {
-            const currentDeal = dealsRes.deals.find((d) => {
-              const tId = (d.tutor?._id || d.tutor)?.toString();
-              const sId = (d.student?._id || d.student)?.toString();
-              return (
-                ((tId === myId && sId === pId) || (tId === pId && sId === myId)) &&
-                ['active_trial', 'continuation_agreed', 'active_paid', 'pending_offer', 'completed'].includes(d.status)
-              );
-            });
-            if (currentDeal) setPartnerDeal(currentDeal);
-          }
-        } catch (dealErr) {
-          console.warn('Background deal verification warning:', dealErr);
-        }
-      }
-    };
-
-    fetchMessages();
-    return () => {
-      isMounted = false;
-    };
-  }, [conversationId]);
+  useEffect(() => {
+    fetchMessages(true);
+  }, [conversationId, fetchMessages]);
 
   // Socket listener for new incoming messages, deal updates, and seen receipts
   useEffect(() => {
@@ -398,6 +393,32 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
       }
     };
 
+    const handlePaymentRequestUpdated = (data) => {
+      if (data?.paymentRequest) {
+        setPartnerDeal((prev) => ({
+          ...(prev || {}),
+          latestPaymentRequest: data.paymentRequest
+        }));
+        fetchMessages(false);
+        try {
+          soundEngine.playMessageSound();
+        } catch {
+          // ignore audio autoplay policy blocks
+        }
+        if (data.paymentRequest.status === 'proof_submitted') {
+          setToastNotice({
+            type: 'success',
+            message: 'Student submitted tuition payment proof! Review proof from the header.',
+          });
+        } else if (data.paymentRequest.status === 'cleared') {
+          setToastNotice({
+            type: 'success',
+            message: 'Tuition fee cleared & verified successfully!',
+          });
+        }
+      }
+    };
+
     socket.on('new-message', handleReceiveMessage);
     socket.on('messages-seen', handleMessagesSeen);
     socket.on('messages-delivered', handleMessagesDelivered);
@@ -405,6 +426,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
     socket.on('deal-completed', handleDealCompleted);
     socket.on('conversation-cleared', handleConversationCleared);
     socket.on('conversation-deleted', handleConversationDeleted);
+    socket.on('payment-request-updated', handlePaymentRequestUpdated);
 
     return () => {
       socket.off('new-message', handleReceiveMessage);
@@ -414,6 +436,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
       socket.off('deal-completed', handleDealCompleted);
       socket.off('conversation-cleared', handleConversationCleared);
       socket.off('conversation-deleted', handleConversationDeleted);
+      socket.off('payment-request-updated', handlePaymentRequestUpdated);
     };
   }, [socket, conversationId, user]);
 
@@ -898,16 +921,16 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
           </div>
         </div>
 
-        <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
+        <div className="flex items-center gap-1 sm:gap-1.5 shrink-0 max-w-[65%] sm:max-w-none overflow-x-auto no-scrollbar py-0.5">
           {/* Live In-Platform Video Classroom Button (only visible after deal is accepted and not completed) */}
           {!isTutorToTutor && isDealAccepted && partnerDeal?.status !== 'completed' && (
             <Link
               href={`/classroom/${conversationId}`}
-              className="p-2 sm:px-3 sm:py-2 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] font-bold text-xs rounded-xl shadow-md border border-[#d4a359]/40 flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+              className="p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] font-bold text-xs rounded-xl shadow-md border border-[#d4a359]/40 flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
               title="Start or Join In-Platform HD Video Class"
             >
               <Video className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
-              <span className="hidden sm:inline">Join Live Class</span>
+              <span className="hidden sm:inline">Join Class</span>
             </Link>
           )}
 
@@ -916,7 +939,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             <button
               type="button"
               onClick={() => setStudentProfileModalOpen(true)}
-              className="hidden md:inline-flex px-3 py-2 bg-stone-800 hover:bg-stone-700 text-white font-bold text-xs rounded-xl shadow-sm items-center gap-1.5 transition-all cursor-pointer border border-stone-700 shrink-0"
+              className="hidden lg:inline-flex px-3 py-2 bg-stone-800 hover:bg-stone-700 text-white font-bold text-xs rounded-xl shadow-sm items-center gap-1.5 transition-all cursor-pointer border border-stone-700 shrink-0"
               title="Inspect Student Profile"
             >
               <User className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
@@ -929,38 +952,73 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             <button
               type="button"
               onClick={handleMarkDealCompleted}
-              className="p-2 sm:px-3 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-emerald-500 ring-1 ring-emerald-400/30 shrink-0"
+              className="p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-emerald-500 ring-1 ring-emerald-400/30 shrink-0"
               title="Mark deal as completed"
             >
               <CheckCircle2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" />
-              <span className="hidden sm:inline">Mark Completed</span>
+              <span className="hidden sm:inline">Completed</span>
             </button>
           )}
 
-          {/* Tutor Action: Request Tuition Payment (Active deals only) */}
+          {/* Tutor Action: Dynamic Tuition Fee Request / Status Button */}
           {isTutor && partnerDeal && ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) && (
-            <button
-              type="button"
-              onClick={() => setTutorTuitionModalOpen(true)}
-              className="p-2 sm:px-3 sm:py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/40 ring-1 ring-[#d4a359]/30 shrink-0"
-              title="Send tuition fee payment request to student (3-day threshold)"
-            >
-              <CreditCard className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
-              <span className="hidden sm:inline">Request Payment</span>
-            </button>
-          )}
-
-          {/* Tutor Action: Review Proof if student submitted tuition proof */}
-          {isTutor && partnerDeal?.latestPaymentRequest?.status === 'proof_submitted' && (
-            <button
-              type="button"
-              onClick={() => setTutorClearModalOpen(true)}
-              className="p-2 sm:px-3 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-emerald-500 animate-pulse shrink-0"
-              title="Student submitted tuition payment proof - click to review and clear"
-            >
-              <CheckCircle2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" />
-              <span className="hidden sm:inline">Review Proof</span>
-            </button>
+            partnerDeal.latestPaymentRequest?.status === 'proof_submitted' ? (
+              <button
+                type="button"
+                onClick={() => setTutorClearModalOpen(true)}
+                className="p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-emerald-500 ring-1 ring-emerald-400/50 animate-pulse shrink-0"
+                title="Student submitted tuition payment proof - click to review and verify"
+              >
+                <CheckCircle2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" />
+                <span className="hidden sm:inline">Review Proof</span>
+                <span className="sm:hidden">Review</span>
+              </button>
+            ) : partnerDeal.latestPaymentRequest?.status === 'pending' ? (
+              <button
+                type="button"
+                onClick={() => setTutorTuitionModalOpen(true)}
+                className="p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-amber-600 hover:bg-amber-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-amber-500 ring-1 ring-amber-400/40 shrink-0"
+                title="Payment request pending from student. Click to view details or update."
+              >
+                <Clock className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" />
+                <span className="hidden md:inline">Payment Requested (Pending)</span>
+                <span className="hidden sm:inline md:hidden">Pending</span>
+                <span className="sm:hidden">Pending</span>
+              </button>
+            ) : partnerDeal.latestPaymentRequest?.status === 'overdue' ? (
+              <button
+                type="button"
+                onClick={() => setTutorTuitionModalOpen(true)}
+                className="p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-rose-500 ring-1 ring-rose-400/40 shrink-0"
+                title="Payment is overdue. Click to resend or modify."
+              >
+                <AlertTriangle className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" />
+                <span className="hidden sm:inline">Payment Overdue</span>
+                <span className="sm:hidden">Overdue</span>
+              </button>
+            ) : partnerDeal.latestPaymentRequest?.status === 'cleared' ? (
+              <button
+                type="button"
+                onClick={() => setTutorTuitionModalOpen(true)}
+                className="p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/40 shrink-0"
+                title="Previous tuition fee cleared. Click to request next month tuition fee."
+              >
+                <CreditCard className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
+                <span className="hidden sm:inline">Paid (Request Next)</span>
+                <span className="sm:hidden">Request</span>
+              </button>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setTutorTuitionModalOpen(true)}
+                className="p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/40 ring-1 ring-[#d4a359]/30 shrink-0"
+                title="Send tuition fee payment request to student (3-day threshold)"
+              >
+                <CreditCard className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
+                <span className="hidden sm:inline">Request Payment</span>
+                <span className="sm:hidden">Request</span>
+              </button>
+            )
           )}
 
           {/* Student Action: Pay Tuition Fee if requested */}
@@ -968,12 +1026,27 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             <button
               type="button"
               onClick={() => setStudentTuitionModalOpen(true)}
-              className="p-2 sm:px-3 sm:py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
+              className={`p-2 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer shrink-0 ${
+                partnerDeal.latestPaymentRequest.status === 'proof_submitted'
+                  ? 'bg-emerald-600 hover:bg-emerald-700 border border-emerald-500'
+                  : partnerDeal.latestPaymentRequest.status === 'overdue'
+                  ? 'bg-rose-600 hover:bg-rose-700 border border-rose-500 animate-pulse'
+                  : 'bg-[#b85d34] hover:bg-[#9e4e2a] border border-[#d4a359]/40'
+              }`}
               title="View tuition fee details and submit payment proof"
             >
               <CreditCard className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
               <span className="hidden sm:inline">
-                {partnerDeal.latestPaymentRequest.status === 'proof_submitted' ? 'View Proof' : 'Pay Tuition Fee'}
+                {partnerDeal.latestPaymentRequest.status === 'proof_submitted'
+                  ? 'View Proof'
+                  : partnerDeal.latestPaymentRequest.status === 'overdue'
+                  ? 'Pay Overdue Fee'
+                  : 'Pay Tuition Fee'}
+              </span>
+              <span className="sm:hidden">
+                {partnerDeal.latestPaymentRequest.status === 'proof_submitted'
+                  ? 'Proof'
+                  : 'Pay Fee'}
               </span>
             </button>
           )}
@@ -1118,31 +1191,55 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                 )}
 
                 {isTutor && partnerDeal && ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setTutorTuitionModalOpen(true);
-                    }}
-                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-amber-50 text-[#b85d34] font-bold cursor-pointer"
-                  >
-                    <CreditCard className="w-4 h-4 text-[#b85d34]" />
-                    <span>Request Tuition Fee</span>
-                  </button>
-                )}
-
-                {isTutor && partnerDeal?.latestPaymentRequest?.status === 'proof_submitted' && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setMenuOpen(false);
-                      setTutorClearModalOpen(true);
-                    }}
-                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-emerald-50 text-emerald-800 font-bold cursor-pointer"
-                  >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-                    <span>Review Tuition Proof</span>
-                  </button>
+                  partnerDeal.latestPaymentRequest?.status === 'proof_submitted' ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setTutorClearModalOpen(true);
+                      }}
+                      className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-emerald-50 text-emerald-800 font-bold cursor-pointer"
+                    >
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                      <span>Review Tuition Proof</span>
+                    </button>
+                  ) : partnerDeal.latestPaymentRequest?.status === 'pending' ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setTutorTuitionModalOpen(true);
+                      }}
+                      className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-amber-50 text-amber-800 font-bold cursor-pointer"
+                    >
+                      <Clock className="w-4 h-4 text-amber-600" />
+                      <span>Payment Requested (Pending)</span>
+                    </button>
+                  ) : partnerDeal.latestPaymentRequest?.status === 'overdue' ? (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setTutorTuitionModalOpen(true);
+                      }}
+                      className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-rose-50 text-rose-800 font-bold cursor-pointer"
+                    >
+                      <AlertTriangle className="w-4 h-4 text-rose-600" />
+                      <span>Payment Request Overdue</span>
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMenuOpen(false);
+                        setTutorTuitionModalOpen(true);
+                      }}
+                      className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-amber-50 text-[#b85d34] font-bold cursor-pointer"
+                    >
+                      <CreditCard className="w-4 h-4 text-[#b85d34]" />
+                      <span>{partnerDeal.latestPaymentRequest?.status === 'cleared' ? 'Request Next Month Tuition' : 'Request Tuition Fee'}</span>
+                    </button>
+                  )
                 )}
 
                 {(isStudent || user?.role === 'student') && partnerDeal?.latestPaymentRequest && ['pending', 'proof_submitted', 'overdue'].includes(partnerDeal.latestPaymentRequest.status) && (
@@ -1274,6 +1371,33 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
           </div>
         </div>
       </div>
+
+      {/* Real-time Toast Notice Banner */}
+      {toastNotice && (
+        <div
+          className={`px-3 sm:px-4 py-2 sm:py-2.5 text-xs sm:text-sm font-semibold flex items-center justify-between gap-2 transition-all animate-in fade-in slide-in-from-top duration-200 shrink-0 ${
+            toastNotice.type === 'error'
+              ? 'bg-rose-50 border-b border-rose-200 text-rose-800'
+              : 'bg-emerald-50 border-b border-emerald-200 text-emerald-800'
+          }`}
+        >
+          <div className="flex items-center gap-2 truncate">
+            {toastNotice.type === 'error' ? (
+              <AlertTriangle className="w-4 h-4 text-rose-600 shrink-0" />
+            ) : (
+              <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+            )}
+            <span className="truncate">{toastNotice.message}</span>
+          </div>
+          <button
+            type="button"
+            onClick={() => setToastNotice(null)}
+            className="p-1 rounded-lg hover:bg-black/5 text-stone-500 hover:text-stone-800 shrink-0 cursor-pointer"
+          >
+            <X className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+          </button>
+        </div>
+      )}
 
       {/* End-to-End Encrypted & AI Moderation Safe Banner */}
       <div className="px-3 sm:px-4 py-1.5 sm:py-2 bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#07150e] text-white border-b border-[#d4a359]/30 flex items-center justify-between gap-1.5 text-[10px] sm:text-xs shrink-0">
@@ -2085,6 +2209,18 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               latestPaymentRequest: pr
             }));
             fetchMessages();
+            try {
+              soundEngine.playMessageSound();
+            } catch {
+              // ignore
+            }
+            setToastNotice({
+              type: 'success',
+              message: `Payment request of PKR ${Number(pr?.amount || 0).toLocaleString()} sent to student!`,
+            });
+            setTimeout(() => {
+              setToastNotice((prev) => (prev?.type === 'success' ? null : prev));
+            }, 6000);
           }}
         />
       )}
@@ -2102,6 +2238,18 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               latestPaymentRequest: pr
             }));
             fetchMessages();
+            try {
+              soundEngine.playMessageSound();
+            } catch {
+              // ignore
+            }
+            setToastNotice({
+              type: 'success',
+              message: 'Payment marked as cleared & verified! Tuition received confirmation dispatched.',
+            });
+            setTimeout(() => {
+              setToastNotice((prev) => (prev?.type === 'success' ? null : prev));
+            }, 6000);
           }}
         />
       )}
@@ -2119,6 +2267,18 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               latestPaymentRequest: pr
             }));
             fetchMessages();
+            try {
+              soundEngine.playMessageSound();
+            } catch {
+              // ignore
+            }
+            setToastNotice({
+              type: 'success',
+              message: 'Payment proof submitted successfully! Tutor has been notified to verify.',
+            });
+            setTimeout(() => {
+              setToastNotice((prev) => (prev?.type === 'success' ? null : prev));
+            }, 6000);
           }}
         />
       )}

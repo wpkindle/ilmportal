@@ -117,10 +117,10 @@ exports.createPaymentRequest = async (req, res) => {
       console.error('Notification error:', nErr);
     }
 
-    // Send Chat Message if conversation exists
+    // Send Chat Message if conversation exists and emit via socket
     try {
       const convId = [req.user.id.toString(), studentId].sort().join('_');
-      await Message.create({
+      const chatMsg = await Message.create({
         conversationId: convId,
         sender: req.user.id,
         recipient: studentId,
@@ -128,6 +128,31 @@ exports.createPaymentRequest = async (req, res) => {
         text: `💳 Tuition Fee Payment Request: PKR ${numericAmount.toLocaleString()} (${paymentRequest.title})\n\n⏰ 3-Day Payment Threshold: Please transfer via Bank / Raast / EasyPaisa / JazzCash / UPaisa and submit transaction proof within 3 days to avoid classroom restriction.`,
         messageType: 'text'
       });
+
+      const io = req.app.get('io');
+      if (io) {
+        const populatedMsg = await Message.findById(chatMsg._id).populate('sender', 'name avatar role');
+        io.to(convId).emit('receive-message', populatedMsg);
+        io.to(`conversation_${convId}`).emit('receive-message', populatedMsg);
+        io.to(`user_${studentId}`).emit('receive-message', populatedMsg);
+        io.to(`user_${tutorId}`).emit('receive-message', populatedMsg);
+
+        io.to(`user_${studentId}`).emit('notification-alert', {
+          title: 'Tuition Fee Payment Requested',
+          message: `${req.user.name} requested tuition fee of PKR ${numericAmount.toLocaleString()} (3-day threshold).`,
+          type: 'payment_pending',
+          link: `/student/messages?conversation=${convId}`
+        });
+
+        io.to(`user_${studentId}`).emit('payment-request-updated', {
+          dealId: deal._id,
+          paymentRequest
+        });
+        io.to(`user_${tutorId}`).emit('payment-request-updated', {
+          dealId: deal._id,
+          paymentRequest
+        });
+      }
     } catch (mErr) {
       console.error('Message creation error:', mErr);
     }
@@ -290,6 +315,39 @@ exports.submitPaymentProof = async (req, res) => {
       console.error('Notification error:', nErr);
     }
 
+    // Send chat confirmation and emit via socket
+    try {
+      const convId = [paymentRequest.tutor._id.toString(), req.user.id.toString()].sort().join('_');
+      const chatMsg = await Message.create({
+        conversationId: convId,
+        sender: req.user.id,
+        recipient: paymentRequest.tutor._id,
+        deal: paymentRequest.deal,
+        text: `📄 Tuition Payment Proof Uploaded: The student has submitted transaction reference "${transactionId || 'Receipt Image'}". Tutor review is pending.`,
+        messageType: 'text'
+      });
+
+      const io = req.app.get('io');
+      if (io) {
+        const populatedMsg = await Message.findById(chatMsg._id).populate('sender', 'name avatar role');
+        io.to(convId).emit('receive-message', populatedMsg);
+        io.to(`conversation_${convId}`).emit('receive-message', populatedMsg);
+        io.to(`user_${paymentRequest.tutor._id}`).emit('receive-message', populatedMsg);
+        io.to(`user_${paymentRequest.student._id}`).emit('receive-message', populatedMsg);
+
+        io.to(`user_${paymentRequest.tutor._id}`).emit('payment-request-updated', {
+          dealId: paymentRequest.deal,
+          paymentRequest
+        });
+        io.to(`user_${paymentRequest.student._id}`).emit('payment-request-updated', {
+          dealId: paymentRequest.deal,
+          paymentRequest
+        });
+      }
+    } catch (mErr) {
+      console.error('Proof chat message error:', mErr);
+    }
+
     res.status(200).json({
       success: true,
       message: 'Payment proof submitted successfully! Your tutor will verify and clear it.',
@@ -357,10 +415,10 @@ exports.clearPaymentRequest = async (req, res) => {
       console.error('Notification error:', nErr);
     }
 
-    // Send confirmation in chat
+    // Send confirmation in chat and emit via socket
     try {
       const convId = [req.user.id.toString(), paymentRequest.student._id.toString()].sort().join('_');
-      await Message.create({
+      const chatMsg = await Message.create({
         conversationId: convId,
         sender: req.user.id,
         recipient: paymentRequest.student._id,
@@ -368,6 +426,24 @@ exports.clearPaymentRequest = async (req, res) => {
         text: `✅ Payment Cleared: Tuition fee payment of PKR ${paymentRequest.amount.toLocaleString()} has been verified and cleared. Classes are fully unlocked!`,
         messageType: 'text'
       });
+
+      const io = req.app.get('io');
+      if (io) {
+        const populatedMsg = await Message.findById(chatMsg._id).populate('sender', 'name avatar role');
+        io.to(convId).emit('receive-message', populatedMsg);
+        io.to(`conversation_${convId}`).emit('receive-message', populatedMsg);
+        io.to(`user_${paymentRequest.student._id}`).emit('receive-message', populatedMsg);
+        io.to(`user_${paymentRequest.tutor}`).emit('receive-message', populatedMsg);
+
+        io.to(`user_${paymentRequest.student._id}`).emit('payment-request-updated', {
+          dealId: paymentRequest.deal._id,
+          paymentRequest
+        });
+        io.to(`user_${paymentRequest.tutor}`).emit('payment-request-updated', {
+          dealId: paymentRequest.deal._id,
+          paymentRequest
+        });
+      }
     } catch (mErr) {
       console.error('Message creation error:', mErr);
     }

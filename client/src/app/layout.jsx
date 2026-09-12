@@ -1,5 +1,4 @@
 import './globals.css';
-import Script from 'next/script';
 import AppProviders from '../components/common/AppProviders';
 import Navbar from '../components/common/Navbar';
 import Footer from '../components/common/Footer';
@@ -131,19 +130,21 @@ export default function RootLayout({ children }) {
           dangerouslySetInnerHTML={{ __html: JSON.stringify(orgSchema) }}
         />
         {/* Google tag (gtag.js) */}
-        <Script
+        <script
+          async
           src="https://www.googletagmanager.com/gtag/js?id=G-H8NMGWL4RF"
-          strategy="afterInteractive"
         />
-        <Script id="google-analytics" strategy="afterInteractive">
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag(){dataLayer.push(arguments);}
-            gtag('js', new Date());
-
-            gtag('config', 'G-H8NMGWL4RF');
-          `}
-        </Script>
+        <script
+          id="google-tag-init"
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-H8NMGWL4RF');
+            `,
+          }}
+        />
       </head>
       <body className="min-h-screen flex flex-col bg-site-canvas text-[#1c2826] font-sans antialiased selection:bg-[#143d2b] selection:text-white relative">
         <SiteAmbientBackdrop />

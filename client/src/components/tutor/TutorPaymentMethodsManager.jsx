@@ -598,3 +598,4 @@ export default function TutorPaymentMethodsManager({ onMethodsUpdated, initialMe
     </div>
   );
 }
+

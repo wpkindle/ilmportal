@@ -552,20 +552,7 @@ exports.leaveOfflineMessage = async (req, res) => {
 
     await session.save();
 
-    // 1. Dispatch Email notification to administrators
-    const { sendOfflineSupportInquiryEmail } = require('../utils/emailService');
-    try {
-      await sendOfflineSupportInquiryEmail({
-        userName: senderName,
-        userEmail,
-        messageText: message || '',
-        fileUrl,
-        fileName,
-        sessionId: sid
-      });
-    } catch (mailErr) {
-      console.warn('Failed to send offline support inquiry email notification:', mailErr.message);
-    }
+    // 1. Offline inquiries land exclusively in the Admin Dashboard (Notification + Socket.IO below); no external emails are sent
 
     // 2. Broadcast to Socket.IO
     const io = req.app.get('io');

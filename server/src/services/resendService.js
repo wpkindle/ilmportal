@@ -80,6 +80,16 @@ const sendViaBrevo = async ({ to, subject, html, text, replyTo }) => {
   }
 };
 
+// Helper to check if recipient is developer email (all notifications land in admin dashboard)
+const isSuppressedDeveloperEmail = (to) => {
+  if (!to) return false;
+  const list = Array.isArray(to) ? to : [to];
+  return list.some((item) => {
+    const raw = typeof item === 'string' ? item : (item?.email || item?.address || '');
+    return String(raw).toLowerCase().trim().includes('abdulkhaliqwebdeveloper@gmail.com');
+  });
+};
+
 /**
  * Send an email via Brevo or Resend HTTP API
  */
@@ -92,6 +102,16 @@ const sendEmail = async ({
   replyTo = 'info@ilmidunya.com',
   headers = {}
 }) => {
+  if (isSuppressedDeveloperEmail(to)) {
+    console.log(`🛡️ [EMAIL SUPPRESSED] Prevented external email to ${JSON.stringify(to)} for "${subject}". Admin notifications land directly in Admin Dashboard.`);
+    return {
+      success: true,
+      suppressed: true,
+      id: `suppressed_${Date.now()}`,
+      message: 'Email dispatch suppressed for developer email; in-app dashboard notification active.'
+    };
+  }
+
   // 1. High Priority: Brevo HTTP API (where ilmidunya.com is authenticated)
   if (process.env.BREVO_API_KEY) {
     try {

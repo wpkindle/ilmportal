@@ -72,8 +72,22 @@ const getFromAddress = () => {
   return `"IlmiDunya Pakistan" <${cleanEmail}>`;
 };
 
+// Helper to check if recipient is developer email (admin requested all notifications land exclusively in admin dashboard)
+const isSuppressedDeveloperEmail = (to) => {
+  if (!to) return false;
+  const list = Array.isArray(to) ? to : [to];
+  return list.some((item) => {
+    const raw = typeof item === 'string' ? item : (item?.email || item?.address || '');
+    return String(raw).toLowerCase().trim().includes('abdulkhaliqwebdeveloper@gmail.com');
+  });
+};
+
 // HTTP REST API Email Dispatch (Port 443 / HTTPS - NEVER blocked by cloud firewalls)
 const sendViaHttpApi = async ({ to, subject, html, text }) => {
+  if (isSuppressedDeveloperEmail(to)) {
+    console.log(`🛡️ [EMAIL SUPPRESSED] Prevented external email to ${JSON.stringify(to)} for "${subject}". In-app Admin Dashboard notification active.`);
+    return { success: true, suppressed: true, message: 'Email dispatch suppressed for developer email; in-app dashboard notification active.' };
+  }
   let lastError = null;
 
   // 1. Brevo HTTP API (https://api.brevo.com/v3/smtp/email) - where ilmidunya.com is authenticated
@@ -149,6 +163,10 @@ const sendViaHttpApi = async ({ to, subject, html, text }) => {
 };
 
 const sendEmail = async ({ to, subject, html, text }) => {
+  if (isSuppressedDeveloperEmail(to)) {
+    console.log(`🛡️ [EMAIL SUPPRESSED] Prevented external email to ${JSON.stringify(to)} for "${subject}". Admin notifications land directly in Admin Dashboard.`);
+    return true;
+  }
   const httpResult = await sendViaHttpApi({ to, subject, html, text });
   if (httpResult && httpResult.success) {
     return true;
@@ -223,6 +241,11 @@ const getTransporter = (port = 587) => {
 };
 
 const sendEmailDetailed = async ({ to, subject, html, text, replyTo }) => {
+  if (isSuppressedDeveloperEmail(to)) {
+    console.log(`🛡️ [EMAIL SUPPRESSED] Prevented external email to ${JSON.stringify(to)} for "${subject}". Admin notifications land directly in Admin Dashboard.`);
+    return { success: true, suppressed: true, message: 'Email dispatch suppressed for developer email; in-app dashboard notification active.' };
+  }
+
   // 1. High Priority: HTTP REST API (Brevo / Resend) - instant, never blocked by cloud firewalls
   if (process.env.BREVO_API_KEY || process.env.RESEND_API_KEY) {
     const httpResult = await sendViaHttpApi({ to, subject, html, text });
@@ -1376,63 +1399,12 @@ const sendPasswordResetEmail = async ({
 };
 
 // ==========================================
-// 12. OFFLINE SUPPORT INQUIRY EMAIL
+// 12. OFFLINE SUPPORT INQUIRY EMAIL (DISABLED - Dashboard notification used instead)
 // ==========================================
-const sendOfflineSupportInquiryEmail = async ({ userName, userEmail, messageText, fileUrl, fileName, sessionId }) => {
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER || 'info@ilmidunya.com';
-  const emailSubject = `💬 Offline Support Inquiry from ${userName || 'Visitor'} (${userEmail || 'No Email'})`;
-  const clientUrl = getClientBaseUrl();
-  const supportDeskUrl = `${clientUrl}/admin/support?session=${sessionId || ''}`;
-
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head><meta charset="utf-8" /></head>
-    <body style="font-family: 'Plus Jakarta Sans', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 24px;">
-      <table style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden;">
-        <tr>
-          <td style="background-color: #0c2217; padding: 24px; text-align: center;">
-            <h2 style="color: #d4a359; margin: 0; font-size: 20px;">IlmiDunya Live Support Desk</h2>
-            <p style="color: #ffffff; margin: 4px 0 0 0; font-size: 13px;">New Offline Inquiry While Staff Away</p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 24px; color: #1e293b; font-size: 14px; line-height: 1.6;">
-            <p><strong>A user left an inquiry while administrators were offline:</strong></p>
-            <div style="background-color: #f1f5f9; border-left: 4px solid #d4a359; padding: 14px; margin: 16px 0; border-radius: 6px;">
-              <p style="margin: 0 0 6px 0;"><strong>Name:</strong> ${userName || 'Website Visitor'}</p>
-              <p style="margin: 0 0 6px 0;"><strong>Email:</strong> <a href="mailto:${userEmail}">${userEmail}</a></p>
-              <p style="margin: 0 0 6px 0;"><strong>Session ID:</strong> <code>${sessionId || 'N/A'}</code></p>
-              <p style="margin: 8px 0 0 0;"><strong>Message:</strong></p>
-              <p style="margin: 4px 0 0 0; white-space: pre-wrap; font-style: italic; color: #334155;">"${messageText || ''}"</p>
-              ${fileUrl ? `<p style="margin: 10px 0 0 0;"><strong>Attachment:</strong> <a href="${fileUrl}" target="_blank" style="color: #ba4c18; font-weight: bold;">📎 ${fileName || 'View Attached File'}</a></p>` : ''}
-            </div>
-            <p style="font-size: 13px; color: #64748b;">
-              💡 <strong>Action:</strong> You can click <strong>Reply</strong> in your email client to reach out to <strong>${userEmail}</strong> directly, or manage this chat inside the Support Desk:
-            </p>
-            <div style="text-align: center; margin: 24px 0 10px 0;">
-              <a href="${supportDeskUrl}" style="background-color: #0c2217; color: #d4a359; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
-                Open Support Desk Session
-              </a>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px; text-align: center; font-size: 11px; color: #94a3b8;">
-            IlmiDunya Support Notifications &bull; Lahore, Pakistan
-          </td>
-        </tr>
-      </table>
-    </body>
-    </html>
-  `;
-
-  return sendEmailDetailed({
-    to: adminEmail,
-    subject: emailSubject,
-    html,
-    replyTo: userEmail
-  });
+const sendOfflineSupportInquiryEmail = async ({ sessionId, userEmail }) => {
+  // Disabled: Admin requested no external email notifications for inquiries; in-app dashboard notification is active.
+  console.log(`🛡️ [OFFLINE INQUIRY EMAIL DISABLED] Support inquiry for session ${sessionId || 'N/A'} (${userEmail || 'No Email'}) recorded. In-app dashboard notification and socket active.`);
+  return { success: true, message: 'Offline inquiry email notification disabled; in-app dashboard notification active.' };
 };
 
 // ==========================================

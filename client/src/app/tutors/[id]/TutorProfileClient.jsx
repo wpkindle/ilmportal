@@ -892,10 +892,12 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
         onClose={() => setChatRequestModalOpen(false)}
         tutor={tutor}
         studentUser={user}
+        onGoToMessages={() => {
+          setChatRequestModalOpen(false);
+          router.push(`/student/messages?conversation=${conversationId}&tutorId=${tutorTargetId}`);
+        }}
         onSuccess={() => {
-          setTimeout(() => {
-            router.push(`/student/messages?conversation=${conversationId}&tutorId=${tutorTargetId}`);
-          }, 1200);
+          // Request successfully dispatched; modal stays open until student closes it or navigates
         }}
       />
 

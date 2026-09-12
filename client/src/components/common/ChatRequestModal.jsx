@@ -19,7 +19,8 @@ export default function ChatRequestModal({
   onClose,
   tutor,
   studentUser,
-  onSuccess
+  onSuccess,
+  onGoToMessages
 }) {
   const [details, setDetails] = useState('');
   const [loading, setLoading] = useState(false);
@@ -71,13 +72,26 @@ export default function ChatRequestModal({
   };
 
   return (
-    <div className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm p-3 sm:p-4 md:p-6 flex min-h-full items-center justify-center animate-in fade-in duration-200">
+    <div
+      className="fixed inset-0 z-50 overflow-y-auto bg-black/60 backdrop-blur-sm p-3 sm:p-4 md:p-6 flex min-h-full items-center justify-center animate-in fade-in duration-200"
+      onClick={handleResetAndClose}
+    >
       <div
         className="relative w-full max-w-lg md:max-w-4xl bg-white rounded-3xl shadow-2xl border border-[#e6ded1] overflow-hidden text-slate-800 my-auto max-h-[94vh] flex flex-col animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {submitted ? (
-          <div className="p-6 sm:p-10 text-center space-y-4 max-w-md mx-auto my-auto">
+          <div className="p-6 sm:p-10 text-center space-y-4 max-w-md mx-auto my-auto relative">
+            {/* Top-right close button */}
+            <button
+              type="button"
+              onClick={handleResetAndClose}
+              className="absolute top-3 right-3 p-2 text-stone-400 hover:text-[#0c2217] rounded-full hover:bg-black/5 transition-colors cursor-pointer"
+              title="Close"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
             <div className="w-16 h-16 bg-[#f0ece1] text-[#0c2217] rounded-full flex items-center justify-center mx-auto ring-8 ring-[#faf8f5] shadow-inner">
               <CheckCircle2 className="w-9 h-9 text-[#0c2217]" />
             </div>
@@ -102,13 +116,28 @@ export default function ChatRequestModal({
               </ul>
             </div>
 
-            <button
-              type="button"
-              onClick={handleResetAndClose}
-              className="w-full py-3 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white rounded-xl text-xs font-black shadow-md shadow-[#b85d34]/25 transition-all cursor-pointer"
-            >
-              Done
-            </button>
+            <div className="pt-2 flex flex-col sm:flex-row gap-2.5">
+              {onGoToMessages && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    handleResetAndClose();
+                    if (onGoToMessages) onGoToMessages();
+                  }}
+                  className="flex-1 py-3 px-4 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#813f21] text-white rounded-xl text-xs font-black shadow-md shadow-[#b85d34]/25 transition-all cursor-pointer flex items-center justify-center gap-2"
+                >
+                  <MessageSquare className="w-4 h-4" />
+                  <span>Go to Messages</span>
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={handleResetAndClose}
+                className={`${onGoToMessages ? 'sm:w-auto px-5 bg-stone-100 hover:bg-stone-200 text-stone-700' : 'w-full bg-[#b85d34] hover:bg-[#9e4e2a] text-white shadow-md shadow-[#b85d34]/25'} py-3 rounded-xl text-xs font-bold transition-all cursor-pointer`}
+              >
+                Close
+              </button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-12 overflow-y-auto md:overflow-visible">

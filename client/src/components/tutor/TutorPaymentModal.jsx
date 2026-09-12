@@ -129,7 +129,7 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
     setError('');
 
     try {
-      const res = await api.submitPaymentProof(
+      const res = await api.submitDealPaymentProof(
         deal._id,
         {
           paymentMethod: selectedMethod,

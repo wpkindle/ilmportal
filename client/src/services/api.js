@@ -369,11 +369,34 @@ export const api = {
     headers: getHeaders()
   }).then(handleResponse),
 
-  submitPaymentProof: (id, body) => fetch(`${API_BASE}/payment-requests/${id}/proof`, {
-    method: 'POST',
-    headers: getHeaders(),
-    body: JSON.stringify(body)
-  }).then(handleResponse),
+  submitPaymentRequestProof: (id, bodyOrFormData, proofImageFile) => {
+    if (typeof window !== 'undefined' && bodyOrFormData instanceof FormData) {
+      return fetch(`${API_BASE}/payment-requests/${id}/proof`, {
+        method: 'POST',
+        headers: getHeaders(true),
+        body: bodyOrFormData
+      }).then(handleResponse);
+    }
+    if (proofImageFile) {
+      const formData = new FormData();
+      Object.keys(bodyOrFormData || {}).forEach((key) => {
+        if (bodyOrFormData[key] !== undefined && bodyOrFormData[key] !== null) {
+          formData.append(key, bodyOrFormData[key]);
+        }
+      });
+      formData.append('proofImage', proofImageFile);
+      return fetch(`${API_BASE}/payment-requests/${id}/proof`, {
+        method: 'POST',
+        headers: getHeaders(true),
+        body: formData
+      }).then(handleResponse);
+    }
+    return fetch(`${API_BASE}/payment-requests/${id}/proof`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(bodyOrFormData)
+    }).then(handleResponse);
+  },
 
   clearPaymentRequest: (id, body = {}) => fetch(`${API_BASE}/payment-requests/${id}/clear`, {
     method: 'PATCH',
@@ -409,11 +432,11 @@ export const api = {
     headers: getHeaders()
   }).then(handleResponse),
 
-  submitPaymentProof: (id, body, proofImageFile) => {
+  submitDealPaymentProof: (id, body, proofImageFile) => {
     const formData = new FormData();
-    formData.append('paymentMethod', body.paymentMethod || '');
-    formData.append('referenceCode', body.referenceCode || '');
-    formData.append('notes', body.notes || '');
+    formData.append('paymentMethod', body?.paymentMethod || '');
+    formData.append('referenceCode', body?.referenceCode || '');
+    formData.append('notes', body?.notes || '');
     if (proofImageFile) {
       formData.append('proofImage', proofImageFile);
     }
@@ -421,6 +444,36 @@ export const api = {
       method: 'POST',
       headers: getHeaders(true), // multipart — no Content-Type header
       body: formData
+    }).then(handleResponse);
+  },
+
+  // Backward compatibility alias for tuition payment proof
+  submitPaymentProof: (id, body, proofImageFile) => {
+    if (typeof window !== 'undefined' && body instanceof FormData) {
+      return fetch(`${API_BASE}/payment-requests/${id}/proof`, {
+        method: 'POST',
+        headers: getHeaders(true),
+        body
+      }).then(handleResponse);
+    }
+    if (proofImageFile) {
+      const formData = new FormData();
+      Object.keys(body || {}).forEach((key) => {
+        if (body[key] !== undefined && body[key] !== null) {
+          formData.append(key, body[key]);
+        }
+      });
+      formData.append('proofImage', proofImageFile);
+      return fetch(`${API_BASE}/payment-requests/${id}/proof`, {
+        method: 'POST',
+        headers: getHeaders(true),
+        body: formData
+      }).then(handleResponse);
+    }
+    return fetch(`${API_BASE}/payment-requests/${id}/proof`, {
+      method: 'POST',
+      headers: getHeaders(),
+      body: JSON.stringify(body)
     }).then(handleResponse);
   },
 

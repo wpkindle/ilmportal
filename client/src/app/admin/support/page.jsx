@@ -66,12 +66,12 @@ export default function AdminSupportDeskPage() {
 
   // Support Inbox State
   const [sessions, setSessions] = useState([]);
-  const [counts, setCounts] = useState({ all: 0, human_requested: 0, admin_joined: 0, resolved: 0 });
+  const [counts, setCounts] = useState({ all: 0, human_requested: 0, admin_joined: 0, offline_message: 0, resolved: 0 });
   const [selectedSessionId, setSelectedSessionId] = useState(null);
   const [selectedSession, setSelectedSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [loadingTranscript, setLoadingTranscript] = useState(false);
-  const [inboxTab, setInboxTab] = useState('human_requested'); // 'human_requested' | 'admin_joined' | 'resolved' | 'all'
+  const [inboxTab, setInboxTab] = useState('human_requested'); // 'human_requested' | 'admin_joined' | 'offline_message' | 'resolved' | 'all'
   const [messageText, setMessageText] = useState('');
   const [isSending, setIsSending] = useState(false);
   const [soundEnabled, setSoundEnabled] = useState(true);
@@ -648,6 +648,23 @@ export default function AdminSupportDeskPage() {
                   </button>
 
                   <button
+                    onClick={() => setInboxTab('offline_message')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 shrink-0 ${
+                      inboxTab === 'offline_message'
+                        ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    <Mail className="w-3 h-3 text-amber-400" />
+                    <span>Offline Enquiries</span>
+                    {counts.offline_message > 0 && (
+                      <span className="px-1.5 py-0.5 rounded-md text-[10px] bg-amber-500 text-slate-950 font-bold">
+                        {counts.offline_message}
+                      </span>
+                    )}
+                  </button>
+
+                  <button
                     onClick={() => setInboxTab('resolved')}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all shrink-0 ${
                       inboxTab === 'resolved'
@@ -815,13 +832,13 @@ export default function AdminSupportDeskPage() {
                           </a>
                         )}
 
-                        {selectedSession?.status === 'human_requested' && (
+                        {(selectedSession?.status === 'human_requested' || selectedSession?.status === 'offline_message') && (
                           <button
                             onClick={handleJoinSession}
                             className="px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold flex items-center gap-1.5 transition-all shadow-md cursor-pointer"
                           >
                             <Headphones className="w-3.5 h-3.5" />
-                            <span>Join as Support Staff</span>
+                            <span>{selectedSession?.status === 'offline_message' ? 'Take Over / Reply to Chat' : 'Join as Support Staff'}</span>
                           </button>
                         )}
 
@@ -972,6 +989,8 @@ export default function AdminSupportDeskPage() {
                           placeholder={
                             selectedSession?.status === 'admin_joined'
                               ? selectedFile ? 'Add caption (optional)...' : 'Reply directly to user as live staff...'
+                              : selectedSession?.status === 'offline_message'
+                              ? 'Click "Take Over / Reply to Chat" to message in chat, or use Email above...'
                               : 'Click "Join as Support Staff" to take over live chat...'
                           }
                           disabled={selectedSession?.status !== 'admin_joined' || isSending || uploadingFile}

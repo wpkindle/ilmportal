@@ -3,6 +3,7 @@ const SupportSession = require('../models/SupportSession');
 const Notification = require('../models/Notification');
 const FAQ = require('../models/FAQ');
 const User = require('../models/User');
+const EmailThread = require('../models/EmailThread');
 
 /**
  * Handle user message in Live Support Chat (routed directly to Admin Desk)
@@ -552,9 +553,74 @@ exports.leaveOfflineMessage = async (req, res) => {
 
     await session.save();
 
-    // 1. Offline inquiries land exclusively in the Admin Dashboard (Notification + Socket.IO below); no external emails are sent
+    // 1. Also create/update an EmailThread so inquiry immediately lands in Admin Mailbox (/admin/inbox)
+    let emailThreadId = `th_support_${sid}`;
+    try {
+      let emailThread = await EmailThread.findOne({
+        $or: [
+          { threadId: `th_support_${sid}` },
+          { 'from.address': userEmail, category: 'support', status: { $ne: 'archived' } }
+        ]
+      }).sort({ lastMessageAt: -1 });
 
-    // 2. Broadcast to Socket.IO
+      const emailMsgItem = {
+        messageId: `msg_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        direction: 'inbound',
+        from: { name: senderName, address: userEmail },
+        to: [{ name: 'IlmiDunya Support Desk', address: 'info@ilmidunya.com' }],
+        subject: `Support Inquiry from ${senderName}`,
+        text: (message || `[Attachment: ${fileName || 'File'}]`).trim(),
+        attachments: fileUrl ? [{
+          filename: fileName || 'attachment',
+          contentUrl: fileUrl,
+          contentType: fileType || 'application/octet-stream',
+          size: fileSize || 0
+        }] : [],
+        createdAt: new Date()
+      };
+
+      if (emailThread) {
+        emailThreadId = emailThread.threadId;
+        emailThread.messages.push(emailMsgItem);
+        emailThread.status = 'unread';
+        emailThread.lastMessageSnippet = previewText;
+        emailThread.lastMessageAt = new Date();
+        await emailThread.save();
+      } else {
+        emailThread = await EmailThread.create({
+          threadId: `th_support_${sid}`,
+          subject: `Support Inquiry from ${senderName}`,
+          from: { name: senderName, address: userEmail },
+          to: [{ name: 'IlmiDunya Support Desk', address: 'info@ilmidunya.com' }],
+          status: 'unread',
+          category: 'support',
+          priority: 'high',
+          userRef: req.user?._id || null,
+          userRole: req.user?.role || 'guest',
+          messages: [emailMsgItem],
+          lastMessageSnippet: previewText,
+          lastMessageAt: new Date()
+        });
+        emailThreadId = emailThread.threadId;
+      }
+
+      // Broadcast live socket event to connected admin dashboards
+      const ioEarly = req.app.get('io');
+      if (ioEarly) {
+        ioEarly.emit('email-received', {
+          threadId: emailThread.threadId,
+          from: emailThread.from,
+          subject: emailThread.subject,
+          snippet: emailThread.lastMessageSnippet,
+          category: emailThread.category,
+          userRole: emailThread.userRole
+        });
+      }
+    } catch (threadErr) {
+      console.error('Error creating EmailThread for offline support message:', threadErr);
+    }
+
+    // 2. Broadcast to Socket.IO for Live Support Desk
     const io = req.app.get('io');
     if (io) {
       io.to(`support_${sid}`).emit('support-message-received', {
@@ -577,17 +643,17 @@ exports.leaveOfflineMessage = async (req, res) => {
       });
     }
 
-    // 3. Create persistent Notification for all active admins
+    // 3. Create persistent Notification for all active admins (linking to both support desk and inbox)
     try {
       const admins = await User.find({ role: 'admin', isActive: true });
       for (const admin of admins) {
         await Notification.create({
           recipient: admin._id,
           type: 'human_support_request',
-          title: '✉️ New Offline Support Message',
-          message: `${senderName} (${userEmail}) left an offline inquiry: "${previewText.slice(0, 50)}..."`,
+          title: '✉️ New Support Inquiry',
+          message: `${senderName} (${userEmail}) submitted an inquiry: "${previewText.slice(0, 50)}..."`,
           link: `/admin/support?session=${sid}`,
-          data: { sessionId: sid, email: userEmail }
+          data: { sessionId: sid, email: userEmail, threadId: emailThreadId }
         });
       }
     } catch (nErr) {}

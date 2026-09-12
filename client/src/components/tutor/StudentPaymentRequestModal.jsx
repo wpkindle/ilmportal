@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   CreditCard,
   Clock,
@@ -16,7 +16,10 @@ import {
   Calendar,
   AlertTriangle,
   Lock,
-  ChevronRight
+  ChevronRight,
+  Upload,
+  Image as ImageIcon,
+  Trash2
 } from 'lucide-react';
 import { api } from '../../services/api';
 
@@ -30,14 +33,16 @@ export default function StudentPaymentRequestModal({
   const [activeTab, setActiveTab] = useState(0);
   const [copiedId, setCopiedId] = useState(null);
   const [selectedMethod, setSelectedMethod] = useState('');
-  const [transactionId, setTransactionId] = useState('');
-  const [senderAccountTitle, setSenderAccountTitle] = useState('');
-  const [notes, setNotes] = useState('');
+  const [senderAccountTitle, setSenderAccountTitle] = useState(paymentRequest?.paymentProof?.senderAccountTitle || '');
+  const [proofImage, setProofImage] = useState(null);
+  const [proofPreview, setProofPreview] = useState(paymentRequest?.paymentProof?.proofImageUrl || null);
+  const [notes, setNotes] = useState(paymentRequest?.paymentProof?.notes || '');
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [timeRemaining, setTimeRemaining] = useState('');
   const [isOverdue, setIsOverdue] = useState(false);
+  const fileInputRef = useRef(null);
 
   const methods = paymentRequest?.paymentMethods || [];
 
@@ -82,26 +87,67 @@ export default function StudentPaymentRequestModal({
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const handleFileChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith('image/')) {
+      setError('Please upload an image file (PNG, JPG, JPEG, WebP) for the payment proof.');
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Proof image exceeds the 10MB limit. Please select a smaller screenshot.');
+      return;
+    }
+
+    setError('');
+    setProofImage(file);
+    const url = URL.createObjectURL(file);
+    setProofPreview(url);
+  };
+
+  const handleClearProofImage = () => {
+    if (proofPreview && proofPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(proofPreview);
+    }
+    setProofImage(null);
+    setProofPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleProofSubmit = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (!transactionId.trim()) {
-      setError('Please provide the Transaction Reference ID (Trx ID) from your bank or wallet.');
+    if (!senderAccountTitle.trim()) {
+      setError('Please provide the Sender Account Title / Name used for the transfer.');
+      return;
+    }
+
+    if (!proofImage && !proofPreview) {
+      setError('Please upload a screenshot proof of your transfer.');
       return;
     }
 
     try {
       setSubmitting(true);
-      const res = await api.submitPaymentProof(paymentRequest._id, {
-        method: selectedMethod || 'bank',
-        transactionId: transactionId.trim(),
-        senderAccountTitle: senderAccountTitle.trim(),
-        notes: notes.trim()
-      });
+      const formData = new FormData();
+      formData.append('method', selectedMethod || 'bank');
+      formData.append('senderAccountTitle', senderAccountTitle.trim());
+      formData.append('notes', notes.trim());
+      if (proofImage) {
+        formData.append('proofImage', proofImage);
+      } else if (proofPreview) {
+        formData.append('proofImageUrl', proofPreview);
+      }
+
+      const res = await api.submitPaymentRequestProof(paymentRequest._id, formData);
 
       if (res.success) {
-        setSuccess('Payment proof submitted successfully! Your tutor will verify and clear it.');
+        setSuccess('Payment proof submitted successfully! Your tutor will review and clear it.');
         if (onSuccess) onSuccess(res.paymentRequest);
       } else {
         setError(res.message || 'Error submitting payment proof');
@@ -329,37 +375,52 @@ export default function StudentPaymentRequestModal({
             </p>
           </div>
         ) : paymentRequest.status === 'proof_submitted' && !success ? (
-          <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl space-y-2 text-xs text-amber-950">
+          <div className="p-4 bg-amber-50 border border-amber-200 rounded-2xl space-y-3 text-xs text-amber-950">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 font-bold text-amber-900">
                 <Clock className="w-4 h-4 text-amber-600 animate-pulse" />
                 <span>Proof Submitted &bull; Pending Tutor Clearance</span>
               </div>
-              <span className="text-[10px] font-mono bg-white px-2 py-0.5 rounded border border-amber-200 font-bold">
-                Trx: {paymentRequest.paymentProof?.transactionId}
+              <span className="text-[10px] bg-white px-2 py-0.5 rounded border border-amber-200 font-bold uppercase">
+                {paymentRequest.paymentProof?.method || 'Direct Transfer'}
               </span>
             </div>
             <p className="text-[11px] text-amber-800">
-              You submitted proof via <strong>{paymentRequest.paymentProof?.method?.toUpperCase()}</strong> on {new Date(paymentRequest.paymentProof?.submittedAt).toLocaleDateString()}. Your tutor has been notified to verify and clear the payment.
+              Sender Account: <strong>{paymentRequest.paymentProof?.senderAccountTitle || 'Student'}</strong> &bull; Submitted on {new Date(paymentRequest.paymentProof?.submittedAt).toLocaleDateString()}. Your tutor has been notified to verify and clear the payment.
             </p>
+
+            {paymentRequest.paymentProof?.proofImageUrl && (
+              <div className="p-2.5 bg-white border border-amber-200 rounded-xl flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <img
+                    src={paymentRequest.paymentProof.proofImageUrl}
+                    alt="Uploaded Proof"
+                    className="w-12 h-12 rounded-lg object-cover border border-slate-200 shrink-0"
+                  />
+                  <div className="min-w-0">
+                    <p className="text-xs font-bold text-slate-900 truncate">Proof Screenshot Uploaded</p>
+                    <a
+                      href={paymentRequest.paymentProof.proofImageUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-[10.5px] text-[#b85d34] font-bold hover:underline inline-flex items-center gap-1"
+                    >
+                      <ImageIcon className="w-3 h-3" />
+                      <span>View Full Screenshot</span>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            )}
+
             <div className="pt-2 border-t border-amber-200/60">
-              <span className="text-[11px] text-amber-700 font-semibold block mb-1">Need to update transaction ID?</span>
-              <form onSubmit={handleProofSubmit} className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="Update Transaction ID"
-                  value={transactionId}
-                  onChange={(e) => setTransactionId(e.target.value)}
-                  className="flex-1 px-3 py-1.5 bg-white border border-amber-300 rounded-xl text-xs font-mono"
-                />
-                <button
-                  type="submit"
-                  disabled={submitting}
-                  className="px-3 py-1.5 bg-amber-700 hover:bg-amber-800 text-white rounded-xl text-xs font-bold cursor-pointer"
-                >
-                  Update
-                </button>
-              </form>
+              <button
+                type="button"
+                onClick={() => setProofPreview(null)}
+                className="text-[11px] text-[#b85d34] hover:text-[#9e4e2a] font-bold underline cursor-pointer"
+              >
+                Need to re-upload or update payment proof?
+              </button>
             </div>
           </div>
         ) : (
@@ -389,45 +450,89 @@ export default function StudentPaymentRequestModal({
 
               <div>
                 <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                  Transaction Reference ID (Trx ID) *
+                  Sender Account Title / Name *
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. 1234567890 or EP-998877"
-                  value={transactionId}
-                  onChange={(e) => setTransactionId(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-mono font-medium text-slate-900 outline-none focus:border-[#0c2217]"
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              <div>
-                <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                  Sender Account Title / Name (Optional)
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Abdullah Khan"
+                  placeholder="e.g. Abdullah Khan or Fatimah Zahra"
                   value={senderAccountTitle}
                   onChange={(e) => setSenderAccountTitle(e.target.value)}
                   className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:border-[#0c2217]"
                 />
               </div>
+            </div>
 
-              <div>
-                <label className="text-[11px] font-bold text-slate-700 block mb-1">
-                  Notes / Remarks (Optional)
+            {/* Screenshot Upload Dropzone */}
+            <div>
+              <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                Payment Screenshot / Receipt Proof *
+              </label>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/png,image/jpeg,image/jpg,image/webp"
+                onChange={handleFileChange}
+                className="hidden"
+                id="tuition-proof-screenshot-input"
+              />
+
+              {proofPreview ? (
+                <div className="relative p-2 bg-slate-50 border border-emerald-300 rounded-2xl flex items-center justify-between gap-3">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <img
+                      src={proofPreview}
+                      alt="Proof Preview"
+                      className="w-14 h-14 object-cover rounded-xl border border-slate-200 shrink-0"
+                    />
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-slate-900 truncate">
+                        {proofImage?.name || 'Payment Proof Screenshot'}
+                      </p>
+                      <p className="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3" />
+                        <span>Screenshot attached {proofImage ? `(${(proofImage.size / 1024).toFixed(1)} KB)` : ''}</span>
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleClearProofImage}
+                    className="p-2 text-rose-500 hover:text-rose-700 hover:bg-rose-50 rounded-xl transition-colors cursor-pointer shrink-0"
+                    title="Remove Screenshot"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <label
+                  htmlFor="tuition-proof-screenshot-input"
+                  className="border-2 border-dashed border-slate-200 hover:border-[#b85d34] bg-slate-50 hover:bg-amber-50/40 rounded-2xl p-4 flex flex-col items-center justify-center gap-1.5 cursor-pointer transition-colors text-center group"
+                >
+                  <div className="w-9 h-9 rounded-xl bg-white border border-slate-200 text-[#b85d34] flex items-center justify-center group-hover:scale-105 transition-transform shadow-2xs">
+                    <Upload className="w-4 h-4" />
+                  </div>
+                  <span className="text-xs font-bold text-slate-800">
+                    Click to Upload Screenshot Proof
+                  </span>
+                  <span className="text-[10px] text-slate-500">
+                    Supports PNG, JPG, JPEG, WebP (Max 10MB)
+                  </span>
                 </label>
-                <input
-                  type="text"
-                  placeholder="e.g. Transferred from Meezan App"
-                  value={notes}
-                  onChange={(e) => setNotes(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:border-[#0c2217]"
-                />
-              </div>
+              )}
+            </div>
+
+            <div>
+              <label className="text-[11px] font-bold text-slate-700 block mb-1">
+                Notes / Remarks (Optional)
+              </label>
+              <input
+                type="text"
+                placeholder="e.g. Transferred via Meezan app to your EasyPaisa"
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 outline-none focus:border-[#0c2217]"
+              />
             </div>
 
             <div className="flex items-center justify-end gap-2 pt-2">

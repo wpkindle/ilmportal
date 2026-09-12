@@ -59,6 +59,7 @@ exports.getSystemConfig = async (req, res) => {
 const Page = require('../models/Page');
 const Notification = require('../models/Notification');
 const User = require('../models/User');
+const EmailThread = require('../models/EmailThread');
 const defaultPages = require('../utils/defaultPages');
 
 // @desc    Get all CMS pages
@@ -137,21 +138,92 @@ exports.submitContactMessage = async (req, res) => {
       });
     }
 
-    // Find admin user to notify
-    const adminUser = await User.findOne({ role: 'admin' });
-    if (adminUser) {
-      await Notification.create({
-        recipient: adminUser._id,
-        title: `New Inquiry from ${name}: ${subject || 'General Inquiry'}`,
-        message: `Contact: ${email} | Phone: ${phone || 'N/A'}\nMessage: ${message}`,
-        type: 'system',
-        link: '/admin/pages'
+    const cleanEmail = email.trim().toLowerCase();
+    const cleanName = name.trim();
+    const inquirySubject = (subject || 'Website Contact Inquiry').trim();
+    const cleanMessage = message.trim();
+
+    // Determine category based on subject and message
+    const lowerContent = `${inquirySubject} ${cleanMessage}`.toLowerCase();
+    let category = 'general';
+    if (lowerContent.includes('tutor') || lowerContent.includes('teach') || lowerContent.includes('faculty')) {
+      category = 'tutor_inquiry';
+    } else if (lowerContent.includes('student') || lowerContent.includes('admission') || lowerContent.includes('demo') || lowerContent.includes('class')) {
+      category = 'student_admission';
+    } else if (lowerContent.includes('sanad') || lowerContent.includes('certificate') || lowerContent.includes('ijazah')) {
+      category = 'sanad_verification';
+    } else if (lowerContent.includes('fee') || lowerContent.includes('payment') || lowerContent.includes('price') || lowerContent.includes('billing')) {
+      category = 'billing';
+    }
+
+    // Check if sender is an existing user in LMS
+    const matchedUser = await User.findOne({ email: cleanEmail }).select('_id role name');
+    const userRole = matchedUser ? matchedUser.role : 'guest';
+    const userRef = matchedUser ? matchedUser._id : null;
+
+    // Create EmailThread so enquiry immediately lands in Admin Mailbox (/admin/inbox)
+    let emailThread = null;
+    try {
+      const emailMsgItem = {
+        messageId: `msg_contact_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        direction: 'inbound',
+        from: { name: cleanName, address: cleanEmail },
+        to: [{ name: 'IlmiDunya Contact Desk', address: 'info@ilmidunya.com' }],
+        subject: inquirySubject,
+        text: `Sender Name: ${cleanName}\nEmail: ${cleanEmail}\nPhone: ${phone || 'N/A'}\n\nMessage:\n${cleanMessage}`,
+        createdAt: new Date()
+      };
+
+      emailThread = await EmailThread.create({
+        threadId: `th_contact_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
+        subject: inquirySubject,
+        from: { name: cleanName, address: cleanEmail },
+        to: [{ name: 'IlmiDunya Contact Desk', address: 'info@ilmidunya.com' }],
+        status: 'unread',
+        category,
+        priority: 'normal',
+        userRef,
+        userRole,
+        messages: [emailMsgItem],
+        lastMessageSnippet: cleanMessage.slice(0, 160).replace(/\s+/g, ' '),
+        lastMessageAt: new Date()
       });
+
+      // Broadcast live socket event to connected admin dashboards
+      const io = req.app.get('io');
+      if (io) {
+        io.emit('email-received', {
+          threadId: emailThread.threadId,
+          from: emailThread.from,
+          subject: emailThread.subject,
+          snippet: emailThread.lastMessageSnippet,
+          category: emailThread.category,
+          userRole: emailThread.userRole
+        });
+      }
+    } catch (threadErr) {
+      console.error('Error creating EmailThread for contact inquiry:', threadErr);
+    }
+
+    // Create persistent Notifications for ALL active admins
+    try {
+      const admins = await User.find({ role: 'admin', isActive: true });
+      for (const admin of admins) {
+        await Notification.create({
+          recipient: admin._id,
+          title: `📬 New Contact Inquiry from ${cleanName}`,
+          message: `Subject: ${inquirySubject} | Contact: ${cleanEmail} | Phone: ${phone || 'N/A'}\n"${cleanMessage.slice(0, 80)}..."`,
+          type: 'system',
+          link: emailThread ? `/admin/inbox?thread=${emailThread.threadId}` : '/admin/inbox'
+        });
+      }
+    } catch (nErr) {
+      console.error('Error creating admin notifications for contact inquiry:', nErr);
     }
 
     res.status(200).json({
       success: true,
-      message: 'Your message has been received! Our team will respond to your email promptly.'
+      message: 'Your message has been received! Our administration team has been notified and will respond to your email promptly.'
     });
   } catch (error) {
     res.status(500).json({

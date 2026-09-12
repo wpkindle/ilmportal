@@ -1164,19 +1164,19 @@ export default function LiveSupportWidget() {
                     className="sr-only"
                   />
 
-                  <div className="flex flex-col sm:flex-row gap-2.5 pt-2">
+                  <div className="space-y-2 pt-2">
                     <label
                       htmlFor="offline-support-file-input"
-                      className="w-full sm:w-auto py-2.5 px-4 rounded-xl bg-[#f0ece1] hover:bg-[#ebe3d3] active:bg-[#e4dac7] text-[#0c2217] text-xs font-semibold flex items-center justify-center gap-2 transition-colors cursor-pointer border border-[#ebe3d3] min-h-[44px] select-none active:scale-[0.98]"
+                      className="w-full py-2.5 px-4 rounded-xl bg-[#f0ece1] hover:bg-[#ebe3d3] active:bg-[#e4dac7] text-[#0c2217] text-xs font-bold flex items-center justify-center gap-2 transition-all cursor-pointer border border-[#ebe3d3] min-h-[44px] select-none active:scale-[0.99] text-center shadow-2xs"
                     >
                       <Paperclip className="w-4 h-4 text-[#059669] shrink-0" />
-                      <span className="truncate">{selectedFile ? 'Change File' : 'Attach File (PNG, JPG, PDF)'}</span>
+                      <span className="truncate">{selectedFile ? `Attached: ${selectedFile.name}` : 'Attach File (PNG, JPG, PDF)'}</span>
                     </label>
 
                     <button
                       type="submit"
                       disabled={offlineSending}
-                      className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-[#059669] to-[#0c2217] hover:from-[#10b981] hover:to-[#123323] hover:scale-[1.01] active:scale-[0.98] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md min-h-[44px] disabled:opacity-50"
+                      className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#059669] to-[#0c2217] hover:from-[#10b981] hover:to-[#123323] hover:scale-[1.01] active:scale-[0.98] text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md min-h-[46px] disabled:opacity-50"
                     >
                       {offlineSending ? (
                         <>

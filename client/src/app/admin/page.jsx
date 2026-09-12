@@ -436,6 +436,79 @@ export default function AdminDashboardPage() {
             </div>
 
             {/* ========================================================= */}
+            {/* INCOMING INQUIRIES & SUPPORT DESK OVERVIEW               */}
+            {/* ========================================================= */}
+            <div className="bg-gradient-to-br from-slate-900 via-slate-950 to-[#0c2217] text-white p-6 rounded-3xl border border-slate-800 shadow-lg space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="p-2.5 bg-amber-500/20 text-amber-400 border border-amber-500/30 rounded-2xl">
+                    <Mail className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <h3 className="text-base font-black text-white flex items-center gap-2">
+                      <span>Customer Inquiries &amp; Support Hub</span>
+                      {((stats?.unreadInquiriesCount || 0) > 0 || (stats?.offlineSupportCount || 0) > 0) && (
+                        <span className="px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider bg-rose-500 text-white rounded-full animate-pulse">
+                          {(stats?.unreadInquiriesCount || 0) + (stats?.offlineSupportCount || 0)} New
+                        </span>
+                      )}
+                    </h3>
+                    <p className="text-xs text-slate-400">
+                      All submitted contact forms, offline chatbot messages, and student admissions land here.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <Link
+                    href="/admin/inbox"
+                    className="px-3.5 py-1.5 rounded-xl bg-[#d4a359] hover:bg-[#b85d34] text-slate-950 font-bold text-xs flex items-center gap-1.5 transition-all shadow-xs"
+                  >
+                    <Mail className="w-3.5 h-3.5" />
+                    <span>Open Mailbox ({stats?.unreadInquiriesCount || 0} unread)</span>
+                  </Link>
+                  <Link
+                    href="/admin/support"
+                    className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs flex items-center gap-1.5 transition-all border border-slate-700"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Live Support ({stats?.offlineSupportCount || 0} offline)</span>
+                  </Link>
+                </div>
+              </div>
+
+              {/* Quick Recent Inquiries List */}
+              {stats?.recentInquiries && stats.recentInquiries.length > 0 ? (
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {stats.recentInquiries.slice(0, 3).map((item) => (
+                    <Link
+                      key={item._id || item.threadId}
+                      href={`/admin/inbox?thread=${item.threadId}`}
+                      className="p-3.5 rounded-2xl bg-slate-900/80 hover:bg-slate-800/90 border border-slate-800 hover:border-[#d4a359]/50 transition-all block group"
+                    >
+                      <div className="flex items-center justify-between gap-2 mb-1">
+                        <span className="font-bold text-xs text-white truncate group-hover:text-[#d4a359] transition-colors">
+                          {item.from?.name || item.from?.address || 'Inquirer'}
+                        </span>
+                        <span className="text-[10px] text-slate-500 font-mono shrink-0">
+                          {new Date(item.lastMessageAt || item.updatedAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}
+                        </span>
+                      </div>
+                      <p className="text-xs font-semibold text-slate-300 truncate mb-1">
+                        {item.subject || 'Website Inquiry'}
+                      </p>
+                      <p className="text-[11px] text-slate-400 line-clamp-1 font-mono">
+                        {item.lastMessageSnippet || 'No message preview'}
+                      </p>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-xs text-slate-500 italic">No recent inquiries recorded yet.</p>
+              )}
+            </div>
+
+            {/* ========================================================= */}
             {/* LIVE STUDENT & TUTOR MODERATION & MANAGEMENT CONSOLE      */}
             {/* ========================================================= */}
             <div className="bg-white p-6 rounded-3xl border border-slate-200 shadow-sm space-y-5">

@@ -10,6 +10,8 @@ const Notification = require('../models/Notification');
 const AuditLog = require('../models/AuditLog');
 const SystemConfig = require('../models/SystemConfig');
 const Report = require('../models/Report');
+const EmailThread = require('../models/EmailThread');
+const SupportSession = require('../models/SupportSession');
 const { sendTutorStatusEmail, sendAccountWarningEmail, sendAccountStatusEmail } = require('../utils/emailService');
 
 // Helper to log admin actions
@@ -74,6 +76,16 @@ exports.getDashboardStats = async (req, res) => {
     const totalCategories = await Category.countDocuments();
     const totalLocations = await Location.countDocuments();
 
+    // Inquiries & Live Support stats
+    const unreadInquiriesCount = await EmailThread.countDocuments({ status: 'unread' });
+    const totalInquiriesCount = await EmailThread.countDocuments({ status: { $ne: 'archived' } });
+    const offlineSupportCount = await SupportSession.countDocuments({ status: 'offline_message' });
+    const humanSupportCount = await SupportSession.countDocuments({ status: 'human_requested' });
+    const recentInquiries = await EmailThread.find({ status: { $ne: 'archived' } })
+      .sort({ lastMessageAt: -1 })
+      .limit(5)
+      .lean();
+
     res.status(200).json({
       success: true,
       stats: {
@@ -92,7 +104,12 @@ exports.getDashboardStats = async (req, res) => {
         recentReports,
         totalCategories,
         totalLocations,
-        locationStats
+        locationStats,
+        unreadInquiriesCount,
+        totalInquiriesCount,
+        offlineSupportCount,
+        humanSupportCount,
+        recentInquiries
       }
     });
   } catch (error) {

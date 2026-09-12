@@ -265,7 +265,7 @@ exports.getPaymentRequestById = async (req, res) => {
 // @route   POST /api/payment-requests/:id/proof
 exports.submitPaymentProof = async (req, res) => {
   try {
-    const { method, transactionId, senderAccountTitle, proofImageUrl, notes } = req.body;
+    const { method, transactionId, senderAccountTitle, proofImageUrl: bodyProofUrl, notes } = req.body;
     const paymentRequest = await PaymentRequest.findById(req.params.id)
       .populate('student', 'name email')
       .populate('tutor', 'name email');
@@ -282,18 +282,48 @@ exports.submitPaymentProof = async (req, res) => {
       return res.status(400).json({ success: false, message: 'Payment for this request has already been cleared' });
     }
 
-    if (!transactionId?.trim() && !proofImageUrl?.trim()) {
+    // Sender Account Title is required
+    if (!senderAccountTitle || !senderAccountTitle.trim()) {
       return res.status(400).json({
         success: false,
-        message: 'Please provide either a Transaction Reference ID or proof receipt screenshot'
+        message: 'Sender Account Title / Name is required'
+      });
+    }
+
+    // Handle proof screenshot upload
+    let proofImageUrl = (bodyProofUrl || '').trim();
+    if (req.file) {
+      if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+        const { cloudinary } = require('../config/cloudinary');
+        proofImageUrl = await new Promise((resolve, reject) => {
+          const stream = cloudinary.uploader.upload_stream(
+            { folder: 'ilmportal/tuition-proofs', resource_type: 'image' },
+            (error, result) => {
+              if (error) return reject(error);
+              resolve(result.secure_url);
+            }
+          );
+          stream.end(req.file.buffer);
+        });
+      } else {
+        // Fallback: base64 data URL
+        const base64 = req.file.buffer.toString('base64');
+        proofImageUrl = `data:${req.file.mimetype};base64,${base64}`;
+      }
+    }
+
+    if (!proofImageUrl && !transactionId?.trim()) {
+      return res.status(400).json({
+        success: false,
+        message: 'Please upload a screenshot proof of your payment'
       });
     }
 
     paymentRequest.paymentProof = {
-      method: (method || '').trim(),
+      method: (method || '').trim() || 'bank',
       transactionId: (transactionId || '').trim(),
-      senderAccountTitle: (senderAccountTitle || '').trim(),
-      proofImageUrl: (proofImageUrl || '').trim(),
+      senderAccountTitle: senderAccountTitle.trim(),
+      proofImageUrl: proofImageUrl || '',
       notes: (notes || '').trim(),
       submittedAt: new Date()
     };
@@ -308,7 +338,7 @@ exports.submitPaymentProof = async (req, res) => {
         sender: req.user.id,
         type: 'payment_pending',
         title: 'Tuition Payment Proof Submitted',
-        message: `${req.user.name} has submitted payment proof for PKR ${paymentRequest.amount.toLocaleString()}. Please review and clear payment.`,
+        message: `${req.user.name} (${senderAccountTitle.trim()}) has submitted payment proof for PKR ${paymentRequest.amount.toLocaleString()}. Please review and clear payment.`,
         link: '/tutor/deals'
       });
     } catch (nErr) {
@@ -323,7 +353,7 @@ exports.submitPaymentProof = async (req, res) => {
         sender: req.user.id,
         recipient: paymentRequest.tutor._id,
         deal: paymentRequest.deal,
-        text: `📄 Tuition Payment Proof Uploaded: The student has submitted transaction reference "${transactionId || 'Receipt Image'}". Tutor review is pending.`,
+        text: `📄 Tuition Payment Proof Uploaded: Sender "${senderAccountTitle.trim()}" has submitted payment proof screenshot. Tutor review is pending.`,
         messageType: 'text'
       });
 

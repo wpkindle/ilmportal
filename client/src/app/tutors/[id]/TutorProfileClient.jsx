@@ -257,13 +257,19 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
     router.push(`/student/messages?conversation=${conversationId}&tutorId=${tutor._id}`);
   };
 
+  const canMessage = mounted && !isTutorVisitor && !isOwnProfile;
+  const hasSanad = verifiedSanadCount > 0;
+  const hasVideo = !!effectiveVideoIntro;
+  const hasSecondary = hasSanad || hasVideo;
+  const hasBothSecondary = hasSanad && hasVideo;
+
   return (
     <div className="py-8 bg-[#faf8f5] min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Top Profile Card */}
         <div className="bg-white rounded-3xl p-5 sm:p-7 md:p-8 border border-[#e6ded1] shadow-xs space-y-6">
-          <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-6">
+          <div className="flex flex-col xl:flex-row items-start xl:items-center justify-between gap-5 sm:gap-6">
             
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-5 flex-1 min-w-0 w-full">
               <div className="relative shrink-0">
@@ -406,41 +412,68 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
             </div>
 
             {/* Quick Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3 w-full xl:w-auto shrink-0 pt-3 xl:pt-0 border-t xl:border-t-0 border-slate-100">
-              {verifiedSanadCount > 0 && (
-                <button
-                  type="button"
-                  onClick={() => setSanadModalOpen(true)}
-                  className="px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold bg-[#f0ece1] hover:bg-[#e6ded1] text-[#0c2217] border border-[#d4a359]/50 transition-all shadow-xs flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-initial"
-                  title="Inspect verified degrees & Sanad certificates"
-                >
-                  <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                  <span>Verified Sanad ({verifiedSanadCount})</span>
-                  <GraduationCap className="w-4 h-4 text-[#b85d34]" />
-                </button>
-              )}
+            {(canMessage || hasSecondary) && (
+              <div
+                className={`w-full shrink-0 pt-4 xl:pt-0 border-t xl:border-t-0 border-slate-100 flex ${
+                  canMessage
+                    ? 'xl:w-[320px] 2xl:w-[340px] flex-col sm:flex-row sm:items-center sm:justify-between xl:flex-col xl:items-stretch gap-2.5 sm:gap-3'
+                    : 'xl:w-auto flex-col sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3'
+                }`}
+              >
+                {/* Secondary CTAs: Verified Sanad & Watch Video Intro */}
+                {hasSecondary && (
+                  <div
+                    className={`${
+                      canMessage
+                        ? `grid ${hasBothSecondary ? 'grid-cols-2 sm:flex' : 'grid-cols-1 sm:flex'} sm:items-center xl:grid ${
+                            hasBothSecondary ? 'xl:grid-cols-2' : 'xl:grid-cols-1'
+                          } gap-2 w-full sm:w-auto xl:w-full order-2 sm:order-1 xl:order-2`
+                        : `grid ${hasBothSecondary ? 'grid-cols-2 sm:flex' : 'grid-cols-1 sm:flex'} sm:items-center gap-2 w-full sm:w-auto`
+                    }`}
+                  >
+                    {hasSanad && (
+                      <button
+                        type="button"
+                        onClick={() => setSanadModalOpen(true)}
+                        className={`${
+                          canMessage ? 'w-full sm:w-auto xl:w-full' : 'w-full sm:w-auto'
+                        } py-2.5 px-3 rounded-2xl text-xs font-bold bg-[#f0ece1] hover:bg-[#e6ded1] text-[#0c2217] border border-[#d4a359]/50 transition-all shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap`}
+                        title="Inspect verified degrees & Sanad certificates"
+                      >
+                        <ShieldCheck className="w-3.5 h-3.5 text-emerald-700 shrink-0" />
+                        <span className="truncate">Verified Sanad ({verifiedSanadCount})</span>
+                        <GraduationCap className="w-3.5 h-3.5 text-[#b85d34] shrink-0 hidden sm:inline" />
+                      </button>
+                    )}
 
-              {effectiveVideoIntro && (
-                <a
-                  href="#tutor-video-intro"
-                  className="px-4 py-3 rounded-2xl text-xs sm:text-sm font-bold bg-[#faf8f5] hover:bg-[#f0ece1] text-[#0c2217] border border-[#e6ded1] hover:border-[#b85d34]/40 transition-all shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer flex-1 sm:flex-initial"
-                  title="Watch tutor video introduction"
-                >
-                  <Video className="w-4 h-4 text-[#b85d34]" />
-                  <span>Watch Video Intro</span>
-                </a>
-              )}
+                    {hasVideo && (
+                      <a
+                        href="#tutor-video-intro"
+                        className={`${
+                          canMessage ? 'w-full sm:w-auto xl:w-full' : 'w-full sm:w-auto'
+                        } py-2.5 px-3 rounded-2xl text-xs font-bold bg-[#faf8f5] hover:bg-[#f0ece1] text-[#0c2217] border border-[#e6ded1] hover:border-[#b85d34]/40 transition-all shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap`}
+                        title="Watch tutor video introduction"
+                      >
+                        <Video className="w-3.5 h-3.5 text-[#b85d34] shrink-0" />
+                        <span className="truncate">Watch Video Intro</span>
+                      </a>
+                    )}
+                  </div>
+                )}
 
-              {mounted && !isTutorVisitor && !isOwnProfile && (
-                <button
-                  onClick={handleStartChat}
-                  className="px-6 py-3 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-98 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md shadow-[#b85d34]/20 transition-all flex items-center justify-center gap-2 cursor-pointer flex-1 sm:flex-initial"
-                >
-                  <MessageSquare className="w-4 h-4" />
-                  <span>Message &amp; Discuss Schedule</span>
-                </button>
-              )}
-            </div>
+                {/* Primary CTA: Message & Discuss Schedule */}
+                {canMessage && (
+                  <button
+                    type="button"
+                    onClick={handleStartChat}
+                    className="w-full sm:w-auto xl:w-full order-1 sm:order-2 xl:order-1 px-5 py-3 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-[0.99] text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md shadow-[#b85d34]/20 transition-all flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+                  >
+                    <MessageSquare className="w-4 h-4 shrink-0" />
+                    <span>Message &amp; Discuss Schedule</span>
+                  </button>
+                )}
+              </div>
+            )}
 
           </div>
 

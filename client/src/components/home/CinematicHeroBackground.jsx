@@ -18,6 +18,12 @@ export default function CinematicHeroBackground({
   onSlideChange,
   isPaused = false
 }) {
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none select-none z-0">
       {/* 1. Base Dark Slate Canvas */}
@@ -27,6 +33,23 @@ export default function CinematicHeroBackground({
       <div className="absolute inset-0 w-full h-full overflow-hidden z-0 isolate">
         {slides.map((slide, idx) => {
           const isActive = currentSlide === idx;
+          const isLcp = idx === 0;
+
+          // Before hydration / on initial SSR, only render slide 0 to prevent downloading 8 images on initial load
+          if (!mounted && !isLcp) {
+            return null;
+          }
+
+          // Once mounted, only keep active and adjacent slides in DOM to pre-buffer transitions
+          const isAdjacent =
+            Math.abs(currentSlide - idx) <= 1 ||
+            (currentSlide === slides.length - 1 && idx === 0) ||
+            (currentSlide === 0 && idx === slides.length - 1);
+
+          if (mounted && !isActive && !isAdjacent) {
+            return null;
+          }
+
           const animClass = idx % 2 === 0 ? 'animate-kenburns-1' : 'animate-kenburns-2';
 
           return (
@@ -36,15 +59,19 @@ export default function CinematicHeroBackground({
                 isActive ? 'opacity-100 z-10' : 'opacity-0 z-0'
               }`}
             >
-              <img
-                src={slide.image}
-                alt={slide.alt || 'Tutoring scene'}
-                className={`w-full h-full object-cover object-center filter contrast-[1.05] brightness-[0.76] ${
-                  isActive ? animClass : ''
-                }`}
-                loading={idx < 3 ? 'eager' : 'lazy'}
-                fetchPriority={idx < 2 ? 'high' : 'auto'}
-              />
+              <picture>
+                <source srcSet={slide.image} type="image/webp" />
+                <img
+                  src={slide.fallbackImage || slide.image}
+                  alt={slide.alt || 'Tutoring scene'}
+                  className={`w-full h-full object-cover object-center filter contrast-[1.05] brightness-[0.76] ${
+                    isActive ? animClass : ''
+                  }`}
+                  loading={isLcp ? 'eager' : 'lazy'}
+                  fetchPriority={isLcp ? 'high' : 'low'}
+                  decoding={isLcp ? 'sync' : 'async'}
+                />
+              </picture>
             </div>
           );
         })}

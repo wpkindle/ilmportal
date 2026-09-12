@@ -57,7 +57,8 @@ const heroSlides = [
     tag: 'Male In-Home Only',
     title: '1:1 Male Qari & Boy Student (Home Tuition)',
     desc: 'In-person 1-on-1 home tuition is exclusively for verified male Qaris and academic tutors visiting your residence.',
-    image: '/images/hero-home-tutoring.jpg',
+    image: '/images/hero-home-tutoring.webp',
+    fallbackImage: '/images/hero-home-tutoring.jpg',
     alt: 'Pakistani male Qari with beard and prayer cap teaching a young boy student the Holy Quran on a wooden rihal at home',
     ctaLink: '/tutors?mode=physical',
     ctaText: 'Find Home Tutors'
@@ -73,7 +74,8 @@ const heroSlides = [
     tag: 'Board & Academic STEM',
     title: '1:1 Male Academic Tutor & High-School Student',
     desc: 'Expert male subject specialists visiting your home or teaching online for Board exams, FSc, and Matric in Mathematics, Physics & Sciences.',
-    image: '/images/hero-academic-tutoring.jpg',
+    image: '/images/hero-academic-tutoring.webp',
+    fallbackImage: '/images/hero-academic-tutoring.jpg',
     alt: 'Pakistani male academic tutor guiding a high-school boy student through board exam physics and mathematics at study desk',
     ctaLink: '/tutors?category=matric-ssc-science',
     ctaText: 'Find Academic STEM Tutors'
@@ -89,7 +91,8 @@ const heroSlides = [
     tag: 'Alimah WebRTC Only',
     title: 'Female Alimahs • 100% WebRTC Video Only',
     desc: 'Female Alimahs teach exclusively online via encrypted in-browser WebRTC video calls with camera-off privacy by default. Zero home visits.',
-    image: '/images/hero-online-webrtc.jpg',
+    image: '/images/hero-online-webrtc.webp',
+    fallbackImage: '/images/hero-online-webrtc.jpg',
     alt: 'Pakistani girl student attending 1:1 online WebRTC video call with female Alimah in Naqab',
     ctaLink: '/tutors?gender=female',
     ctaText: 'Find Verified Female Alimahs'
@@ -105,7 +108,8 @@ const heroSlides = [
     tag: 'Digital Classroom',
     title: 'Interactive Online Quran & Tajweed Classroom',
     desc: 'Direct in-browser page-by-page digital Quran recitation, Noorani Qaida articulation points, and tajweed correction on any screen.',
-    image: '/images/hero-webrtc-quran.jpg',
+    image: '/images/hero-webrtc-quran.webp',
+    fallbackImage: '/images/hero-webrtc-quran.jpg',
     alt: 'Pakistani student with headphones attending online WebRTC Quran recitation class with digital Quran on laptop screen',
     ctaLink: '/tutors?category=tajweed-al-quran',
     ctaText: 'Explore Quran Classrooms'
@@ -121,7 +125,8 @@ const heroSlides = [
     tag: 'Live Science WebRTC',
     title: '1:1 Female Science Tutor • Live Interactive Screen',
     desc: 'Encrypted 1-on-1 WebRTC video tutoring in Biology, Chemistry, Physics & Mathematics with verified female educators for daughters and female learners.',
-    image: '/images/hero-stem-science.jpg',
+    image: '/images/hero-stem-science.webp',
+    fallbackImage: '/images/hero-stem-science.jpg',
     alt: 'Pakistani female student attending live online video call with female science educator on laptop screen explaining biology and formulas',
     ctaLink: '/tutors?category=fsc-hssc&gender=female',
     ctaText: 'Find Female Science Tutors'
@@ -137,7 +142,8 @@ const heroSlides = [
     tag: 'Tech & Skills',
     title: 'Modern Coding, Software & Tech Skills Mentorship',
     desc: 'Hands-on programming tuition in Python, JavaScript, algorithmic problem-solving, and web development from verified computer science graduates.',
-    image: '/images/hero-computer-coding.jpg',
+    image: '/images/hero-computer-coding.webp',
+    fallbackImage: '/images/hero-computer-coding.jpg',
     alt: 'Pakistani software tutor mentoring a student in coding, algorithms, and web development on laptop',
     ctaLink: '/tutors?category=computer-science',
     ctaText: 'Find Coding Tutors'
@@ -153,7 +159,8 @@ const heroSlides = [
     tag: 'Quran Memorization',
     title: 'Hifz-ul-Quran Memorization & Tajweed Revision',
     desc: 'Daily Sabaq, Sabqi, and Manzil revision routines with patient Sanad-verified Huffaz and Qaris for lifelong retention and perfect pronunciation.',
-    image: '/images/hero-hifz-quran.jpg',
+    image: '/images/hero-hifz-quran.webp',
+    fallbackImage: '/images/hero-hifz-quran.jpg',
     alt: 'Pakistani male Qari listening to young boy student reciting Holy Quran on wooden rihal in traditional Islamic library',
     ctaLink: '/tutors?category=hifz-al-quran',
     ctaText: 'Find Hifz & Tajweed Qaris'
@@ -169,7 +176,8 @@ const heroSlides = [
     tag: 'Primary School (1 to 5)',
     title: 'Primary School Classes 1 to 5 • Live Video Screen',
     desc: 'Caring verified tutors teaching young learners live on screen in geometry, Urdu reading, English phonics, and daily schoolwork.',
-    image: '/images/hero-female-live-junior.jpg',
+    image: '/images/hero-female-live-junior.webp',
+    fallbackImage: '/images/hero-female-live-junior.jpg',
     alt: 'Young Pakistani student with headphones attending engaging live 1-on-1 online video call class with smiling female tutor on laptop screen',
     ctaLink: '/tutors?category=primary-school-1-to-5',
     ctaText: 'Find Class 1 to 5 Tutors'

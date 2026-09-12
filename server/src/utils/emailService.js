@@ -53,7 +53,46 @@ const initTransporter = () => {
 
 initTransporter();
 
-const getClientBaseUrl = () => process.env.CLIENT_URL || 'https://ilmidunya.com';
+/**
+ * Returns the verified frontend base URL for email links.
+ * Overrides any obsolete 'ilmportal' or 'vercel.app' domains so links always
+ * go through https://ilmidunya.com.
+ */
+const getClientBaseUrl = (req = null) => {
+  if (req) {
+    const origin = req.headers?.origin || req.headers?.referer;
+    if (origin) {
+      try {
+        const parsed = new URL(origin);
+        if (
+          parsed.hostname === 'ilmidunya.com' ||
+          parsed.hostname.endsWith('.ilmidunya.com') ||
+          parsed.hostname === 'localhost' ||
+          parsed.hostname === '127.0.0.1'
+        ) {
+          return `${parsed.protocol}//${parsed.host}`;
+        }
+      } catch (e) {}
+    }
+  }
+
+  const rawUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL;
+  if (rawUrl) {
+    const trimmed = String(rawUrl).trim().replace(/\/$/, '');
+    // If the configured CLIENT_URL points to legacy ilmportal or vercel domains, force official ilmidunya.com
+    if (trimmed.includes('ilmportal') || trimmed.includes('vercel.app')) {
+      return 'https://ilmidunya.com';
+    }
+    if (trimmed.includes('localhost') || trimmed.includes('127.0.0.1')) {
+      return trimmed;
+    }
+    if (trimmed.includes('ilmidunya.com')) {
+      return trimmed;
+    }
+  }
+
+  return 'https://ilmidunya.com';
+};
 
 const extractEmailAddress = (raw) => {
   if (!raw) return 'info@ilmidunya.com';
@@ -314,20 +353,21 @@ const sendEmailDetailed = async ({ to, subject, html, text, replyTo }) => {
 // ==========================================
 // 1. VERIFICATION OTP EMAIL TEMPLATE
 // ==========================================
-const sendVerificationOtpEmail = async (to, name, otp, token, role = 'student') => {
+const sendVerificationOtpEmail = async (to, name, otp, token, role = 'student', req = null) => {
+  const isTutor = role === 'tutor';
+  const clientUrl = getClientBaseUrl(req);
+  const tokenParam = token || otp;
+  const verifyLink = `${clientUrl}/verify-email?token=${encodeURIComponent(tokenParam)}&email=${encodeURIComponent(to)}&role=${isTutor ? 'tutor' : 'student'}`;
+  const logoUrl = `${clientUrl}/logo-dark.png`;
+
   console.log(`\n======================================================`);
   console.log(`📧 [PREPARING 1-CLICK VERIFICATION EMAIL]`);
   console.log(`📬 To: ${to}`);
   console.log(`👤 Name: ${name}`);
   console.log(`🎭 Role: ${role}`);
   console.log(`🔑 Token: ${token || otp}`);
+  console.log(`🔗 Verification Link: ${verifyLink}`);
   console.log(`======================================================\n`);
-
-  const isTutor = role === 'tutor';
-  const clientUrl = getClientBaseUrl();
-  const tokenParam = token || otp;
-  const verifyLink = `${clientUrl}/verify-email?token=${encodeURIComponent(tokenParam)}&email=${encodeURIComponent(to)}&role=${isTutor ? 'tutor' : 'student'}`;
-  const logoUrl = `${clientUrl}/logo-dark.png`;
 
   const subject = isTutor
     ? `🎓 Verify Your Faculty Account - IlmiDunya Pakistan`
@@ -1572,6 +1612,7 @@ module.exports = {
   sendTrialContinuationTutorEmail,
   sendTutorFeeClearedEmail,
   sendPasswordResetEmail,
-  sendOfflineSupportInquiryEmail
+  sendOfflineSupportInquiryEmail,
+  getClientBaseUrl
 };
 

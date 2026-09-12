@@ -9,7 +9,8 @@ const Notification = require('../models/Notification');
 const {
   sendDedicatedChatInvitationEmail,
   sendChatRequestReceivedEmail,
-  sendChatRequestStatusEmail
+  sendChatRequestStatusEmail,
+  getClientBaseUrl
 } = require('../utils/emailService');
 
 // Helper to calculate student profile completion strength (6 core required fields matching frontend weights)
@@ -494,7 +495,7 @@ exports.sendChatInvitationEmail = async (req, res) => {
     }
 
     const convId = conversationId || [studentUser._id.toString(), tutor._id.toString()].sort().join('_');
-    const baseUrl = process.env.CLIENT_URL || 'http://localhost:3000';
+    const baseUrl = getClientBaseUrl(req);
     const studentChatUrl = `${baseUrl}/student/messages?conversation=${convId}&tutorId=${tutor._id}`;
     const tutorChatUrl = `${baseUrl}/tutor/messages?conversation=${convId}&studentId=${studentUser._id}`;
 
@@ -649,7 +650,7 @@ exports.sendChatRequest = async (req, res) => {
     }
 
     // Send email to female tutor
-    const baseUrl = process.env.CLIENT_URL || 'https://ilmportal.org';
+    const baseUrl = getClientBaseUrl(req);
     sendChatRequestReceivedEmail({
       to: tutorUser.email,
       tutorName: tutorUser.name,
@@ -765,7 +766,7 @@ exports.respondChatRequest = async (req, res) => {
     await request.save();
 
     const conversationId = [request.student._id.toString(), request.tutor._id.toString()].sort().join('_');
-    const baseUrl = process.env.CLIENT_URL || 'https://ilmportal.org';
+    const baseUrl = getClientBaseUrl(req);
     const studentChatUrl = `${baseUrl}/student/messages?conversation=${conversationId}&tutorId=${request.tutor._id}`;
     const findTutorsUrl = `${baseUrl}/tutors`;
 

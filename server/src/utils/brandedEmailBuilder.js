@@ -3,7 +3,22 @@
  * Produces responsive, email-client-compatible HTML matching the portal theme, logo, colors, and links.
  */
 
-const getClientBaseUrl = () => process.env.CLIENT_URL || 'https://ilmidunya.com';
+const getClientBaseUrl = () => {
+  const envUrl = process.env.CLIENT_URL || process.env.FRONTEND_URL;
+  if (envUrl) {
+    const trimmed = String(envUrl).trim().replace(/\/$/, '');
+    if (trimmed.includes('ilmportal') || trimmed.includes('vercel.app')) {
+      return 'https://ilmidunya.com';
+    }
+    if (trimmed.includes('localhost') || trimmed.includes('127.0.0.1')) {
+      return trimmed;
+    }
+    if (trimmed.includes('ilmidunya.com')) {
+      return trimmed;
+    }
+  }
+  return 'https://ilmidunya.com';
+};
 
 const CATEGORY_META = {
   sanad_verification: {

@@ -5,7 +5,8 @@ const {
   sendVerificationOtpEmail,
   sendEmailChangeOtpEmail,
   sendEmailDetailed,
-  sendPasswordResetEmail
+  sendPasswordResetEmail,
+  getClientBaseUrl
 } = require('../utils/emailService');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -187,7 +188,7 @@ exports.register = async (req, res) => {
     }
 
     // Send Verification Email asynchronously in background
-    sendVerificationOtpEmail(user.email, user.name, otp, verificationToken, userRole).catch((err) => {
+    sendVerificationOtpEmail(user.email, user.name, otp, verificationToken, userRole, req).catch((err) => {
       console.error('Async email dispatch notification:', err?.message || err);
     });
 
@@ -452,7 +453,7 @@ exports.resendOtp = async (req, res) => {
     await user.save();
 
     // Send Verification Email asynchronously in background (non-blocking for fast <100ms response)
-    sendVerificationOtpEmail(user.email, user.name, otp, verificationToken, user.role).catch((err) => {
+    sendVerificationOtpEmail(user.email, user.name, otp, verificationToken, user.role, req).catch((err) => {
       console.error('Async email dispatch notification:', err?.message || err);
     });
 
@@ -515,7 +516,7 @@ exports.login = async (req, res) => {
       user.verificationTokenExpires = tokenExpires;
       await user.save();
 
-      sendVerificationOtpEmail(user.email, user.name, otp, verificationToken, user.role).catch((err) => {
+      sendVerificationOtpEmail(user.email, user.name, otp, verificationToken, user.role, req).catch((err) => {
         console.error('Async email dispatch notification:', err?.message || err);
       });
 
@@ -826,7 +827,7 @@ exports.forgotPassword = async (req, res) => {
     user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 60 mins validity
     await user.save();
 
-    const clientUrl = process.env.CLIENT_URL || 'https://ilmportal.org';
+    const clientUrl = getClientBaseUrl(req);
     const resetUrl = `${clientUrl}/reset-password?token=${resetToken}`;
 
     // Send password reset email

@@ -13,6 +13,21 @@ const nextConfig = {
       { protocol: 'http', hostname: '127.0.0.1' },
     ],
   },
+  async redirects() {
+    return [
+      {
+        source: '/:path*',
+        has: [
+          {
+            type: 'host',
+            value: 'ilmportal.vercel.app',
+          },
+        ],
+        destination: 'https://ilmidunya.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
   async rewrites() {
     const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_BACKEND_URL || 'https://ilmportal-backend.onrender.com';
     return [

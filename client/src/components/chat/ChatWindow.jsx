@@ -1302,111 +1302,149 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
           </div>
         ) : null}
 
-        {messages.map((msg) => {
-          const currentUserId = (user?._id || user?.id)?.toString();
-          const msgSenderId = (msg.sender?._id || msg.sender)?.toString();
-          const isMe = msgSenderId === currentUserId;
-          const isVoiceMsg = msg.messageType === 'voice' || !!msg.voiceData;
-          const isFileMsg = msg.messageType === 'file' || !!msg.fileUrl;
-          const isImg =
-            isFileMsg &&
-            (msg.fileType?.startsWith('image/') ||
-              /\.(jpg|jpeg|png|webp|gif)$/i.test(msg.fileUrl || msg.fileName || ''));
+        {(() => {
+          const seenDealIds = new Set();
+          return messages.map((msg) => {
+            const currentUserId = (user?._id || user?.id)?.toString();
+            const msgSenderId = (msg.sender?._id || msg.sender)?.toString();
+            const isMe = msgSenderId === currentUserId;
+            const isVoiceMsg = msg.messageType === 'voice' || !!msg.voiceData;
+            const isFileMsg = msg.messageType === 'file' || !!msg.fileUrl;
+            const isImg =
+              isFileMsg &&
+              (msg.fileType?.startsWith('image/') ||
+                /\.(jpg|jpeg|png|webp|gif)$/i.test(msg.fileUrl || msg.fileName || ''));
 
-          if (msg.messageType === 'deal_complete') {
-            const hasReviewed = (isStudent || user?.role === 'student')
-              ? (partnerDeal?.isStudentReviewed || partnerDeal?.isReviewed)
-              : partnerDeal?.isTutorReviewed;
+            if (msg.messageType === 'deal_complete') {
+              const hasReviewed = (isStudent || user?.role === 'student')
+                ? (partnerDeal?.isStudentReviewed || partnerDeal?.isReviewed)
+                : partnerDeal?.isTutorReviewed;
 
-            return (
-              <div key={msg._id} className="w-full my-4 flex flex-col items-center justify-center px-2">
-                <div className="max-w-md w-full p-4 sm:p-5 rounded-3xl bg-white border border-[#d4a359]/40 text-center space-y-3 shadow-sm">
-                  <div className="w-10 h-10 rounded-xl bg-[#0c2217] text-[#d4a359] flex items-center justify-center mx-auto border border-[#d4a359]/40 shadow-xs">
-                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-                  </div>
-                  <div>
-                    <span className="text-[10px] uppercase font-bold tracking-wider text-[#b85d34] block">Course Concluded</span>
-                    <p className="text-xs font-serif font-bold text-stone-900 mt-0.5">{msg.text || 'Course marked as completed!'}</p>
-                  </div>
-                  <p className="text-[11px] text-stone-500">
-                    Both tutor and student can now rate &amp; review each other to build mutual verified reputation.
-                  </p>
-                  {!hasReviewed ? (
-                    <button
-                      type="button"
-                      onClick={() => setShowStudentReviewModal(true)}
-                      className="mt-1 px-4 py-2 bg-[#d4a359] hover:bg-[#c39248] text-[#0c2217] font-bold text-xs rounded-xl shadow-xs transition-all inline-flex items-center gap-1.5 cursor-pointer"
-                    >
-                      <Star className="w-3.5 h-3.5 fill-[#0c2217]" />
-                      <span>{isStudent || user?.role === 'student' ? 'Rate & Review Tutor' : 'Rate & Review Student'}</span>
-                    </button>
-                  ) : (
-                    <div className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl">
-                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>Your Review Submitted ★★★★★</span>
+              return (
+                <div key={msg._id} className="w-full my-4 flex flex-col items-center justify-center px-2">
+                  <div className="max-w-md w-full p-4 sm:p-5 rounded-3xl bg-white border border-[#d4a359]/40 text-center space-y-3 shadow-sm">
+                    <div className="w-10 h-10 rounded-xl bg-[#0c2217] text-[#d4a359] flex items-center justify-center mx-auto border border-[#d4a359]/40 shadow-xs">
+                      <CheckCircle2 className="w-5 h-5 text-emerald-400" />
                     </div>
-                  )}
-
-                  {/* Renewal / Next Month Action */}
-                  <div className="pt-3 border-t border-[#ebe3d3] flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
-                    <span className="text-[11px] text-stone-600 font-medium">Ready for next month?</span>
-                    {(isStudent || user?.role === 'student') ? (
+                    <div>
+                      <span className="text-[10px] uppercase font-bold tracking-wider text-[#b85d34] block">Course Concluded</span>
+                      <p className="text-xs font-serif font-bold text-stone-900 mt-0.5">{msg.text || 'Course marked as completed!'}</p>
+                    </div>
+                    <p className="text-[11px] text-stone-500">
+                      Both tutor and student can now rate &amp; review each other to build mutual verified reputation.
+                    </p>
+                    {!hasReviewed ? (
                       <button
                         type="button"
-                        onClick={() => setDealRequestModalOpen(true)}
-                        className="w-full sm:w-auto px-3.5 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-white text-[11px] font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30"
+                        onClick={() => setShowStudentReviewModal(true)}
+                        className="mt-1 px-4 py-2 bg-[#d4a359] hover:bg-[#c39248] text-[#0c2217] font-bold text-xs rounded-xl shadow-xs transition-all inline-flex items-center gap-1.5 cursor-pointer"
                       >
-                        <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
-                        <span>Request New Deal</span>
+                        <Star className="w-3.5 h-3.5 fill-[#0c2217]" />
+                        <span>{isStudent || user?.role === 'student' ? 'Rate & Review Tutor' : 'Rate & Review Student'}</span>
                       </button>
                     ) : (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setPrefilledSubject(partnerDeal?.subject || '');
-                          setPrefilledMode(partnerDeal?.mode || '');
-                          setDealModalOpen(true);
-                        }}
-                        className="w-full sm:w-auto px-3.5 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[11px] font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
-                      >
-                        <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
-                        <span>Send New Deal Offer</span>
-                      </button>
+                      <div className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Your Review Submitted ★★★★★</span>
+                      </div>
                     )}
+
+                    {/* Renewal / Next Month Action */}
+                    <div className="pt-3 border-t border-[#ebe3d3] flex flex-col sm:flex-row items-center justify-between gap-2.5 text-xs">
+                      <span className="text-[11px] text-stone-600 font-medium">Ready for next month?</span>
+                      {(isStudent || user?.role === 'student') ? (
+                        <button
+                          type="button"
+                          onClick={() => setDealRequestModalOpen(true)}
+                          className="w-full sm:w-auto px-3.5 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-white text-[11px] font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30"
+                        >
+                          <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
+                          <span>Request New Deal</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setPrefilledSubject(partnerDeal?.subject || '');
+                            setPrefilledMode(partnerDeal?.mode || '');
+                            setDealModalOpen(true);
+                          }}
+                          className="w-full sm:w-auto px-3.5 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[11px] font-bold rounded-xl flex items-center justify-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                        >
+                          <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
+                          <span>Send New Deal Offer</span>
+                        </button>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            );
-          }
+              );
+            }
 
-          return (
-            <div
-              key={msg._id}
-              className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
-            >
-              {msg.messageType === 'deal_request' ? (
-                <DealRequestCard
-                  message={msg}
-                  isMe={isMe}
-                  isTutor={isTutor || user?.role === 'tutor'}
-                  onCreateDealOffer={(reqData) => {
-                    setPrefilledSubject(reqData?.subject || '');
-                    setPrefilledMode(reqData?.mode || '');
-                    setDealModalOpen(true);
-                  }}
-                />
-              ) : msg.isDealOffer || msg.messageType === 'deal_offer' || msg.messageType === 'deal_accept' ? (
-                <DealOfferCard
-                  deal={msg.deal || msg.dealOfferData || partnerDeal}
-                  onDealUpdated={(updated) => setPartnerDeal(updated)}
-                  onRequestNewDeal={() => setDealRequestModalOpen(true)}
-                  onStartNewDeal={() => {
-                    setPrefilledSubject(partnerDeal?.subject || '');
-                    setPrefilledMode(partnerDeal?.mode || '');
-                    setDealModalOpen(true);
-                  }}
-                />
-              ) : isVoiceMsg ? (
+            if (msg.messageType === 'deal_accept') {
+              return (
+                <div key={msg._id} className="w-full flex justify-center my-2">
+                  <div className="max-w-md w-full p-3 rounded-2xl bg-emerald-50/90 border border-emerald-200 text-slate-800 shadow-2xs flex items-center gap-2.5">
+                    <div className="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                      <CheckCircle2 className="w-4.5 h-4.5" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <span className="text-xs font-black text-emerald-950 font-serif">Deal Offer Accepted</span>
+                        <span className="text-[9px] font-black uppercase px-2 py-0.5 bg-emerald-100 text-emerald-800 rounded-full border border-emerald-300">
+                          Active Deal
+                        </span>
+                      </div>
+                      <p className="text-[11px] text-stone-600 mt-0.5 leading-snug">
+                        {msg.text || 'Deal Accepted! Both parties can now start scheduling live sessions directly.'}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            const isDealOfferMsg = msg.isDealOffer || msg.messageType === 'deal_offer';
+            let showDealCard = false;
+            if (isDealOfferMsg) {
+              const dId = (msg.deal?._id || msg.deal || msg.dealOfferData?._id || msg.dealOfferData?.dealId || partnerDeal?._id)?.toString();
+              if (!dId || !seenDealIds.has(dId)) {
+                if (dId) seenDealIds.add(dId);
+                showDealCard = true;
+              } else {
+                // Duplicate deal card suppressed
+                return null;
+              }
+            }
+
+            return (
+              <div
+                key={msg._id}
+                className={`flex flex-col ${isMe ? 'items-end' : 'items-start'}`}
+              >
+                {msg.messageType === 'deal_request' ? (
+                  <DealRequestCard
+                    message={msg}
+                    isMe={isMe}
+                    isTutor={isTutor || user?.role === 'tutor'}
+                    onCreateDealOffer={(reqData) => {
+                      setPrefilledSubject(reqData?.subject || '');
+                      setPrefilledMode(reqData?.mode || '');
+                      setDealModalOpen(true);
+                    }}
+                  />
+                ) : showDealCard ? (
+                  <DealOfferCard
+                    deal={msg.deal || msg.dealOfferData || partnerDeal}
+                    onDealUpdated={(updated) => setPartnerDeal(updated)}
+                    onRequestNewDeal={() => setDealRequestModalOpen(true)}
+                    onStartNewDeal={() => {
+                      setPrefilledSubject(partnerDeal?.subject || '');
+                      setPrefilledMode(partnerDeal?.mode || '');
+                      setDealModalOpen(true);
+                    }}
+                  />
+                ) : isVoiceMsg ? (
                 <VoiceMessagePlayer
                   voiceData={msg.voiceData}
                   duration={msg.voiceDuration || 0}
@@ -1578,8 +1616,9 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               </div>
             </div>
           );
-        })}
-        <div ref={messagesEndRef} className="h-0 w-full" />
+        });
+      })()}
+      <div ref={messagesEndRef} className="h-0 w-full" />
       </div>
 
       {/* Bottom Message Input Area */}

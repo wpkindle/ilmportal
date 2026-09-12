@@ -456,9 +456,8 @@ const DealOfferCard = ({ deal, onDealUpdated, onRequestNewDeal, onStartNewDeal }
             </div>
           )}
 
-          <div className="flex items-center justify-between gap-2 pt-0.5">
-            <span className="text-[10.5px] text-stone-500">Course completed?</span>
-            <div className="flex items-center gap-2">
+          <div className="flex items-center justify-end gap-2 pt-0.5">
+            <div className="flex items-center gap-2 flex-wrap">
               {dealState.paymentStatus === 'submitted_proof' && !isFeeCleared && (
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="px-2.5 py-1.5 bg-amber-100 text-amber-950 border border-amber-300 rounded-xl text-[11px] font-bold flex items-center gap-1.5 shadow-2xs">

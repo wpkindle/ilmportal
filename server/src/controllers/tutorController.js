@@ -432,7 +432,8 @@ exports.updateMyTutorProfile = async (req, res) => {
       sanadDocuments,
       verificationStatus,
       videoIntro,
-      paymentMethods
+      paymentMethods,
+      preferredAccountChoice
     } = req.body;
 
     const normalizedExp = (experienceYears !== undefined && experienceYears !== null && experienceYears !== '')
@@ -457,7 +458,8 @@ exports.updateMyTutorProfile = async (req, res) => {
         teachingModes: Array.isArray(teachingModes) && teachingModes.length > 0
           ? teachingModes
           : (teachingMode ? (teachingMode === 'both' ? ['online', 'in_person'] : [teachingMode === 'physical' ? 'in_person' : teachingMode]) : ['online']),
-        verificationStatus: 'under_review'
+        verificationStatus: 'under_review',
+        preferredAccountChoice: ['own', 'admin'].includes(preferredAccountChoice) ? preferredAccountChoice : 'own'
       });
     } else {
       if (bio !== undefined) profile.bio = bio;
@@ -488,6 +490,9 @@ exports.updateMyTutorProfile = async (req, res) => {
           instructions: (pm.instructions || '').trim(),
           isDefault: Boolean(pm.isDefault || idx === 0)
         }));
+      }
+      if (['own', 'admin'].includes(preferredAccountChoice)) {
+        profile.preferredAccountChoice = preferredAccountChoice;
       }
     }
 
@@ -764,14 +769,52 @@ exports.getMyPaymentMethods = async (req, res) => {
   try {
     const profile = await TutorProfile.findOne({ user: req.user.id });
     const paymentMethods = profile?.paymentMethods || [];
+    const preferredAccountChoice = profile?.preferredAccountChoice || 'own';
     res.status(200).json({
       success: true,
-      paymentMethods
+      paymentMethods,
+      preferredAccountChoice
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: error.message || 'Error fetching payment methods'
+    });
+  }
+};
+
+// @desc    Set preferred receiving account mode for tuition fees ('own' vs 'admin')
+// @route   PATCH /api/tutors/payment-methods/preference
+exports.setPreferredAccountChoice = async (req, res) => {
+  try {
+    const { preferredAccountChoice } = req.body;
+    if (!['own', 'admin'].includes(preferredAccountChoice)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid preferred account choice. Must be "own" or "admin".'
+      });
+    }
+
+    let profile = await TutorProfile.findOne({ user: req.user.id });
+    if (!profile) {
+      profile = new TutorProfile({
+        user: req.user.id,
+        verificationStatus: 'under_review'
+      });
+    }
+
+    profile.preferredAccountChoice = preferredAccountChoice;
+    await profile.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Account receiving preference updated.',
+      preferredAccountChoice: profile.preferredAccountChoice
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error setting preferred account choice'
     });
   }
 };

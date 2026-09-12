@@ -174,6 +174,7 @@ export default function StudentPaymentRequestModal({
   };
 
   const currentMethod = methods[activeTab] || methods[0];
+  const isAdminMode = paymentRequest?.accountChoice === 'admin' || Boolean(currentMethod?.isAdminAccount);
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/75 backdrop-blur-xs p-3 sm:p-4 flex min-h-full items-center justify-center animate-in fade-in duration-200">
@@ -271,11 +272,31 @@ export default function StudentPaymentRequestModal({
               </div>
             </div>
 
-            {/* Tutor's Payment Accounts Selector */}
+            {/* Platform Official Administration Accounts Banner */}
+            {isAdminMode && (
+              <div className="p-3.5 bg-[#f8f6f0] border border-[#d4a359]/40 rounded-2xl flex items-center gap-3 text-xs text-[#0c2217]">
+                <div className="w-8 h-8 rounded-xl bg-[#0c2217] text-[#d4a359] flex items-center justify-center shrink-0 shadow-2xs">
+                  <ShieldCheck className="w-4 h-4" />
+                </div>
+                <div className="min-w-0">
+                  <div className="font-bold flex items-center gap-1.5 text-slate-900">
+                    <span>IlmiDunya Official Administration Accounts</span>
+                    <span className="px-1.5 py-0.5 text-[9px] bg-emerald-100 text-emerald-800 border border-emerald-300 rounded font-semibold uppercase tracking-wider">
+                      Platform Verified
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-600 leading-snug">
+                    Your tutor selected IlmiDunya&apos;s main administration accounts (same official accounts used in the Support Platform). Transfer to any account below and upload your receipt.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {/* Payment Accounts Selector */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-slate-800">
-                  Tutor&apos;s Verified Payment Methods:
+                  {isAdminMode ? 'IlmiDunya Official Payment Accounts:' : "Tutor's Verified Payment Methods:"}
                 </span>
                 <span className="text-[11px] text-slate-500">
                   Choose an account to transfer fee
@@ -284,7 +305,7 @@ export default function StudentPaymentRequestModal({
 
               {methods.length === 0 ? (
                 <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl text-center text-xs text-slate-500">
-                  No specific payment accounts listed by tutor. Please coordinate via chat.
+                  No specific payment accounts listed. Please coordinate via chat.
                 </div>
               ) : (
                 <div className="space-y-3">
@@ -292,7 +313,7 @@ export default function StudentPaymentRequestModal({
                   <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none">
                     {methods.map((m, idx) => (
                       <button
-                        key={m._id || idx}
+                        key={m._id || m.id || idx}
                         type="button"
                         onClick={() => {
                           setActiveTab(idx);
@@ -304,8 +325,8 @@ export default function StudentPaymentRequestModal({
                             : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
                         }`}
                       >
-                        <span className="uppercase">{m.method}</span>
-                        {m.method === 'bank' && m.bankName ? ` (${m.bankName.split(' ')[0]})` : ''}
+                        <span className="uppercase">{m.name || m.method}</span>
+                        {m.method === 'bank' && m.bankName && !m.name ? ` (${m.bankName.split(' ')[0]})` : ''}
                         {m.isDefault ? ' ★' : ''}
                       </button>
                     ))}
@@ -315,14 +336,21 @@ export default function StudentPaymentRequestModal({
                   {currentMethod && (
                     <div className="p-4 bg-slate-50 border border-slate-200 rounded-2xl space-y-2.5">
                       <div className="flex items-center justify-between">
-                        <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-800">
-                          {currentMethod.method === 'bank' ? currentMethod.bankName || 'Bank Transfer' : `${currentMethod.method.toUpperCase()} WALLET`}
+                        <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-white border border-slate-200 text-slate-800 flex items-center gap-1">
+                          {isAdminMode && <ShieldCheck className="w-3 h-3 text-emerald-600" />}
+                          <span>
+                            {currentMethod.name || (currentMethod.method === 'bank' ? currentMethod.bankName || 'Bank Transfer' : `${currentMethod.method.toUpperCase()} WALLET`)}
+                          </span>
                         </span>
-                        {currentMethod.isDefault && (
+                        {isAdminMode ? (
+                          <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
+                            Official Platform Account
+                          </span>
+                        ) : currentMethod.isDefault ? (
                           <span className="text-[10px] font-bold text-[#b85d34] bg-[#f0ece1] px-2 py-0.5 rounded">
                             Tutor&apos;s Preferred Method
                           </span>
-                        )}
+                        ) : null}
                       </div>
 
                       <div className="space-y-1.5 text-xs">
@@ -341,10 +369,10 @@ export default function StudentPaymentRequestModal({
                             </code>
                             <button
                               type="button"
-                              onClick={() => handleCopy(currentMethod.accountNumber, currentMethod._id || 'acc')}
+                              onClick={() => handleCopy(currentMethod.accountNumber, currentMethod._id || currentMethod.id || 'acc')}
                               className="px-2.5 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] text-white rounded-xl text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer shadow-2xs"
                             >
-                              {copiedId === (currentMethod._id || 'acc') ? (
+                              {copiedId === (currentMethod._id || currentMethod.id || 'acc') ? (
                                 <>
                                   <Check className="w-3.5 h-3.5 text-emerald-400" />
                                   <span>Copied!</span>
@@ -359,9 +387,47 @@ export default function StudentPaymentRequestModal({
                           </div>
                         </div>
 
+                        {/* QR Code Preview for Admin or Personal QR Accounts */}
+                        {currentMethod.qrImage && (
+                          <div className="pt-3 border-t border-slate-200/70 flex flex-col sm:flex-row items-center gap-3 bg-white p-3 rounded-xl border border-slate-200/80 mt-2">
+                            <a
+                              href={currentMethod.qrImage}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="relative group shrink-0"
+                              title="Click to enlarge QR code"
+                            >
+                              <img
+                                src={currentMethod.qrImage}
+                                alt={`${currentMethod.name || currentMethod.bankName || 'Payment'} QR Code`}
+                                className="w-24 h-24 sm:w-28 sm:h-28 object-contain rounded-lg border border-slate-200 bg-white p-1 group-hover:shadow-md transition-all"
+                              />
+                            </a>
+                            <div className="text-center sm:text-left min-w-0">
+                              <div className="text-xs font-bold text-slate-900 flex items-center justify-center sm:justify-start gap-1">
+                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
+                                <span>Scan QR Code to Pay Instantly</span>
+                              </div>
+                              <p className="text-[11px] text-slate-500 mt-0.5 leading-relaxed">
+                                Scan with your {currentMethod.name || currentMethod.bankName || 'banking'} app to transfer directly to <strong>{currentMethod.accountTitle}</strong>.
+                              </p>
+                              <a
+                                href={currentMethod.qrImage}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 text-[11px] font-bold text-[#b85d34] hover:underline mt-1"
+                              >
+                                <ImageIcon className="w-3 h-3" />
+                                <span>Enlarge / Download QR Code</span>
+                              </a>
+                            </div>
+                          </div>
+                        )}
+
                         {currentMethod.instructions && (
                           <p className="text-[11px] text-slate-600 italic pt-1 border-t border-slate-200/60 mt-1">
-                            Tutor note: {currentMethod.instructions}
+                            {isAdminMode ? 'Instructions: ' : 'Tutor note: '}
+                            {currentMethod.instructions}
                           </p>
                         )}
                       </div>

@@ -4,6 +4,7 @@ const TutorProfile = require('../models/TutorProfile');
 const User = require('../models/User');
 const Notification = require('../models/Notification');
 const Message = require('../models/Message');
+const { ADMIN_PAYMENT_ACCOUNTS } = require('../constants/adminPaymentAccounts');
 
 /**
  * Helper: check if a payment request is past 3-day threshold and mark deal restricted if not cleared
@@ -37,7 +38,7 @@ exports.evaluatePaymentOverdue = evaluatePaymentOverdue;
 // @route   POST /api/payment-requests
 exports.createPaymentRequest = async (req, res) => {
   try {
-    const { dealId, amount, title, description } = req.body;
+    const { dealId, amount, title, description, accountChoice } = req.body;
 
     if (!dealId) {
       return res.status(400).json({ success: false, message: 'Deal ID is required' });
@@ -65,15 +66,43 @@ exports.createPaymentRequest = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Only the tutor can request tuition fees for this deal' });
     }
 
-    // Verify tutor has at least 1 payment method configured
-    const tutorProfile = await TutorProfile.findOne({ user: req.user.id });
-    const paymentMethods = tutorProfile?.paymentMethods || [];
+    const isUsingAdminAccounts = accountChoice === 'admin';
+    let assignedPaymentMethods = [];
 
-    if (!paymentMethods || paymentMethods.length === 0) {
-      return res.status(400).json({
-        success: false,
-        message: 'You must add at least one payment method (Bank, Raast, EasyPaisa, JazzCash, or UPaisa) in your profile settings before sending payment requests.'
-      });
+    if (isUsingAdminAccounts) {
+      // Use platform's official administration accounts (as used in Support Platform)
+      assignedPaymentMethods = ADMIN_PAYMENT_ACCOUNTS.map(pm => ({
+        method: pm.method,
+        bankName: pm.bankName || '',
+        accountTitle: pm.accountTitle || '',
+        accountNumber: pm.accountNumber || '',
+        instructions: pm.instructions || '',
+        qrImage: pm.qrImage || '',
+        isAdminAccount: true,
+        isDefault: Boolean(pm.isDefault)
+      }));
+    } else {
+      // Verify tutor has at least 1 payment method configured
+      const tutorProfile = await TutorProfile.findOne({ user: req.user.id });
+      const paymentMethods = tutorProfile?.paymentMethods || [];
+
+      if (!paymentMethods || paymentMethods.length === 0) {
+        return res.status(400).json({
+          success: false,
+          message: 'You have chosen to use your personal accounts, but have not configured any receiving payment methods. Please add your account in profile settings or select IlmiDunya Administration Accounts.'
+        });
+      }
+
+      assignedPaymentMethods = paymentMethods.map(pm => ({
+        method: pm.method,
+        bankName: pm.bankName || '',
+        accountTitle: pm.accountTitle || '',
+        accountNumber: pm.accountNumber || '',
+        instructions: pm.instructions || '',
+        qrImage: '',
+        isAdminAccount: false,
+        isDefault: Boolean(pm.isDefault)
+      }));
     }
 
     // 3 Days (72 hours) threshold
@@ -86,14 +115,8 @@ exports.createPaymentRequest = async (req, res) => {
       amount: numericAmount,
       title: (title || 'Monthly Tuition Fee').trim(),
       description: (description || '').trim(),
-      paymentMethods: paymentMethods.map(pm => ({
-        method: pm.method,
-        bankName: pm.bankName || '',
-        accountTitle: pm.accountTitle || '',
-        accountNumber: pm.accountNumber || '',
-        instructions: pm.instructions || '',
-        isDefault: Boolean(pm.isDefault)
-      })),
+      accountChoice: isUsingAdminAccounts ? 'admin' : 'own',
+      paymentMethods: assignedPaymentMethods,
       dueDate,
       status: 'pending'
     });
@@ -105,12 +128,16 @@ exports.createPaymentRequest = async (req, res) => {
 
     // Create In-App Notification for Student
     try {
+      const accountNote = isUsingAdminAccounts
+        ? 'to IlmiDunya Official Administration Accounts'
+        : 'to tutor receiving accounts';
+
       await Notification.create({
         recipient: studentId,
         sender: req.user.id,
         type: 'payment_pending',
         title: 'Tuition Fee Payment Requested',
-        message: `${req.user.name} has requested tuition fee of PKR ${numericAmount.toLocaleString()}. You have 3 days (72 hours) to pay before classes are restricted.`,
+        message: `${req.user.name} has requested tuition fee of PKR ${numericAmount.toLocaleString()} ${accountNote}. You have 3 days (72 hours) to pay before classes are restricted.`,
         link: '/student/deals'
       });
     } catch (nErr) {
@@ -120,12 +147,16 @@ exports.createPaymentRequest = async (req, res) => {
     // Send Chat Message if conversation exists and emit via socket
     try {
       const convId = [req.user.id.toString(), studentId].sort().join('_');
+      const accountTypeLabel = isUsingAdminAccounts
+        ? 'IlmiDunya Official Administration Accounts (Support Platform Verified)'
+        : 'Tutor Direct Receiving Accounts';
+
       const chatMsg = await Message.create({
         conversationId: convId,
         sender: req.user.id,
         recipient: studentId,
         deal: deal._id,
-        text: `💳 Tuition Fee Payment Request: PKR ${numericAmount.toLocaleString()} (${paymentRequest.title})\n\n⏰ 3-Day Payment Threshold: Please transfer via Bank / Raast / EasyPaisa / JazzCash / UPaisa and submit transaction proof within 3 days to avoid classroom restriction.`,
+        text: `💳 Tuition Fee Payment Request: PKR ${numericAmount.toLocaleString()} (${paymentRequest.title})\n\n🏢 Receiving Accounts: ${accountTypeLabel}\n\n⏰ 3-Day Payment Threshold: Please transfer via Bank / Raast / EasyPaisa / JazzCash / UPaisa and submit transaction proof within 3 days to avoid classroom restriction.`,
         messageType: 'text'
       });
 

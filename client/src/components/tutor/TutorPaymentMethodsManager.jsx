@@ -19,6 +19,7 @@ import {
   ChevronRight
 } from 'lucide-react';
 import { api } from '../../services/api';
+import { ADMIN_PAYMENT_ACCOUNTS } from '../../data/adminPaymentAccounts';
 
 export const PAYMENT_METHOD_TYPES = [
   {
@@ -92,6 +93,9 @@ export default function TutorPaymentMethodsManager({ onMethodsUpdated, initialMe
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [copiedId, setCopiedId] = useState(null);
+  const [preferredChoice, setPreferredChoice] = useState('own');
+  const [updatingChoice, setUpdatingChoice] = useState(false);
+  const [showAdminAccounts, setShowAdminAccounts] = useState(false);
 
   // Form inputs
   const [selectedType, setSelectedType] = useState('bank');
@@ -107,6 +111,9 @@ export default function TutorPaymentMethodsManager({ onMethodsUpdated, initialMe
       const res = await api.getPaymentMethods();
       if (res.success && Array.isArray(res.paymentMethods)) {
         setMethods(res.paymentMethods);
+        if (res.preferredAccountChoice) {
+          setPreferredChoice(res.preferredAccountChoice);
+        }
         if (onMethodsUpdated) {
           onMethodsUpdated(res.paymentMethods);
         }
@@ -115,6 +122,23 @@ export default function TutorPaymentMethodsManager({ onMethodsUpdated, initialMe
       console.error('Error loading payment methods:', err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handlePreferenceChange = async (choice) => {
+    if (choice === preferredChoice) return;
+    try {
+      setUpdatingChoice(true);
+      const res = await api.setPreferredAccountChoice(choice);
+      if (res.success) {
+        setPreferredChoice(choice);
+        setSuccess(`Default tuition fee receiving mode updated to: ${choice === 'admin' ? 'Administration Accounts' : 'My Personal Accounts'}.`);
+        setTimeout(() => setSuccess(''), 4000);
+      }
+    } catch (err) {
+      alert(err.message || 'Failed to update preferred account mode');
+    } finally {
+      setUpdatingChoice(false);
     }
   };
 
@@ -280,6 +304,90 @@ export default function TutorPaymentMethodsManager({ onMethodsUpdated, initialMe
         </button>
       </div>
 
+      {/* Default Receiving Mode Switcher */}
+      <div className="p-4 bg-slate-50 border border-slate-200/90 rounded-2xl space-y-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <span className="text-xs font-bold text-slate-900 block flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
+              <span>Default Receiving Mode for Student Tuition Fees</span>
+            </span>
+            <span className="text-[11px] text-slate-500">
+              Select which accounts are selected by default when you dispatch payment requests
+            </span>
+          </div>
+          <div className="inline-flex items-center p-1 bg-white border border-slate-200 rounded-xl shadow-2xs">
+            <button
+              type="button"
+              disabled={updatingChoice}
+              onClick={() => handlePreferenceChange('own')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                preferredChoice === 'own'
+                  ? 'bg-[#0c2217] text-white shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              My Personal Accounts
+            </button>
+            <button
+              type="button"
+              disabled={updatingChoice}
+              onClick={() => handlePreferenceChange('admin')}
+              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                preferredChoice === 'admin'
+                  ? 'bg-[#0c2217] text-white shadow-2xs'
+                  : 'text-slate-600 hover:text-slate-900'
+              }`}
+            >
+              Administration Accounts
+            </button>
+          </div>
+        </div>
+
+        {/* Administration Accounts Quick Drawer */}
+        <div className="pt-2 border-t border-slate-200/60">
+          <button
+            type="button"
+            onClick={() => setShowAdminAccounts(!showAdminAccounts)}
+            className="text-[11.5px] font-bold text-[#b85d34] hover:underline inline-flex items-center gap-1 cursor-pointer"
+          >
+            <span>{showAdminAccounts ? 'Hide' : 'View'} Official Administration Accounts Reference (Support Platform)</span>
+            <ChevronRight className={`w-3.5 h-3.5 transition-transform ${showAdminAccounts ? 'rotate-90' : ''}`} />
+          </button>
+
+          {showAdminAccounts && (
+            <div className="mt-3 p-3 bg-white border border-slate-200 rounded-2xl space-y-2 animate-in fade-in duration-150">
+              <div className="flex items-center justify-between pb-1 border-b border-slate-100">
+                <span className="text-[11px] font-bold text-slate-800">
+                  IlmiDunya Official Support Accounts (Title: Abdul Khaliq)
+                </span>
+                <span className="text-[10px] text-emerald-700 font-bold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                  5 Verified Methods
+                </span>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                {ADMIN_PAYMENT_ACCOUNTS.map((m) => (
+                  <div key={m.id} className="p-2.5 bg-slate-50 border border-slate-100 rounded-xl space-y-1">
+                    <div className="flex items-center justify-between">
+                      <span className="font-bold text-slate-900 uppercase text-[10px]">{m.name}</span>
+                      <span className="text-[9px] font-semibold text-slate-500 bg-white px-1.5 py-0.5 rounded border border-slate-200">
+                        {m.badgeText}
+                      </span>
+                    </div>
+                    <div className="text-[11px] text-slate-600">
+                      Title: <strong className="text-slate-800">{m.accountTitle}</strong>
+                    </div>
+                    <div className="text-[11px] text-slate-600">
+                      Account: <code className="font-mono font-bold text-slate-900">{m.accountNumber}</code>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+
       {/* Notification banners */}
       {success && (
         <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold rounded-2xl flex items-center gap-2 animate-in fade-in">
@@ -292,16 +400,16 @@ export default function TutorPaymentMethodsManager({ onMethodsUpdated, initialMe
         <div className="p-4 bg-amber-50 border border-amber-200/80 rounded-2xl flex items-start gap-3 text-xs text-amber-900">
           <AlertCircle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div className="space-y-1">
-            <h4 className="font-bold text-amber-950">Action Required: At Least 1 Payment Method is Mandatory</h4>
+            <h4 className="font-bold text-amber-950">Add Personal Accounts or Use Administration Accounts</h4>
             <p className="text-amber-800 leading-relaxed text-[11px]">
-              To protect tutors and students, your profile completion requires at least one payment method (Bank, Raast ID, EasyPaisa, JazzCash, or UPaisa). You cannot request tuition fees until an account is added.
+              You can configure your personal Pakistani receiving accounts (Bank, Raast ID, EasyPaisa, JazzCash, or UPaisa) below. Alternatively, you can always choose <strong>Administration Accounts</strong> when dispatching fee requests so students pay through verified platform accounts.
             </p>
             <button
               type="button"
               onClick={openAddModal}
-              className="mt-2 inline-flex items-center gap-1.5 font-bold text-[#b85d34] hover:underline"
+              className="mt-2 inline-flex items-center gap-1.5 font-bold text-[#b85d34] hover:underline cursor-pointer"
             >
-              <span>Click here to add your first payment method</span>
+              <span>Click here to add your personal payment method</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>

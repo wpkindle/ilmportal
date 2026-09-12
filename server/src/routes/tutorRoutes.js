@@ -11,7 +11,8 @@ const {
   addPaymentMethod,
   updatePaymentMethod,
   deletePaymentMethod,
-  setDefaultPaymentMethod
+  setDefaultPaymentMethod,
+  setPreferredAccountChoice
 } = require('../controllers/tutorController');
 const { protect, optionalAuth } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
@@ -27,6 +28,7 @@ router.post('/video-intro/upload', protect, authorize('tutor'), videoUpload.sing
 // Tutor Payment Methods
 router.get('/payment-methods', protect, authorize('tutor'), getMyPaymentMethods);
 router.post('/payment-methods', protect, authorize('tutor'), addPaymentMethod);
+router.patch('/payment-methods/preference', protect, authorize('tutor'), setPreferredAccountChoice);
 router.put('/payment-methods/:id', protect, authorize('tutor'), updatePaymentMethod);
 router.delete('/payment-methods/:id', protect, authorize('tutor'), deletePaymentMethod);
 router.patch('/payment-methods/:id/default', protect, authorize('tutor'), setDefaultPaymentMethod);

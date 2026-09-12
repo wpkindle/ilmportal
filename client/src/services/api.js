@@ -354,6 +354,12 @@ export const api = {
     headers: getHeaders()
   }).then(handleResponse),
 
+  setPreferredAccountChoice: (preferredAccountChoice) => fetch(`${API_BASE}/tutors/payment-methods/preference`, {
+    method: 'PATCH',
+    headers: getHeaders(),
+    body: JSON.stringify({ preferredAccountChoice })
+  }).then(handleResponse),
+
   // Tuition Payment Requests (with 3-day threshold)
   createPaymentRequest: (body) => fetch(`${API_BASE}/payment-requests`, {
     method: 'POST',

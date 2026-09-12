@@ -595,6 +595,81 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
     expect(clearPRRes.body.deal.accessRestricted).toBe(false);
   });
 
+  test('Tutor can choose official administration accounts for payment request and student receives admin accounts with QR', async () => {
+    const Deal = require('../src/models/Deal');
+    const deal = await Deal.findById(dealId);
+    expect(deal).toBeDefined();
+
+    // 1. Tutor updates preferred account choice to admin
+    const prefRes = await request(app)
+      .patch('/api/tutors/payment-methods/preference')
+      .set('Authorization', `Bearer ${tutorToken}`)
+      .send({ preferredAccountChoice: 'admin' });
+
+    expect(prefRes.statusCode).toEqual(200);
+    expect(prefRes.body.success).toBe(true);
+    expect(prefRes.body.preferredAccountChoice).toBe('admin');
+
+    // 2. Verify GET /api/tutors/payment-methods returns preferredAccountChoice
+    const getRes = await request(app)
+      .get('/api/tutors/payment-methods')
+      .set('Authorization', `Bearer ${tutorToken}`);
+
+    expect(getRes.statusCode).toEqual(200);
+    expect(getRes.body.preferredAccountChoice).toBe('admin');
+
+    // 3. Tutor dispatches payment request choosing official administration accounts
+    const prRes = await request(app)
+      .post('/api/payment-requests')
+      .set('Authorization', `Bearer ${tutorToken}`)
+      .send({
+        dealId: deal._id.toString(),
+        amount: 8000,
+        title: 'Tuition Fee via Platform Admin Escrow',
+        description: 'Please pay via official IlmiDunya administration accounts',
+        accountChoice: 'admin'
+      });
+
+    expect(prRes.statusCode).toEqual(201);
+    expect(prRes.body.success).toBe(true);
+    const createdPR = prRes.body.paymentRequest;
+    expect(createdPR.accountChoice).toBe('admin');
+    expect(createdPR.amount).toBe(8000);
+    expect(createdPR.paymentMethods.length).toBe(5);
+
+    // Verify admin accounts contain Abdul Khaliq and valid QR images
+    const meezanMethod = createdPR.paymentMethods.find(m => m.method === 'bank');
+    expect(meezanMethod).toBeDefined();
+    expect(meezanMethod.accountTitle).toBe('Abdul Khaliq');
+    expect(meezanMethod.isAdminAccount).toBe(true);
+    expect(meezanMethod.qrImage).toBe('/images/qr-meezan.jpg');
+
+    // 4. Student submits proof to admin account
+    const proofRes = await request(app)
+      .post(`/api/payment-requests/${createdPR._id}/proof`)
+      .set('Authorization', `Bearer ${studentToken}`)
+      .send({
+        method: 'bank',
+        transactionId: 'MEZN-77889900',
+        senderAccountTitle: 'Test Student Lahore',
+        notes: 'Paid into Meezan Bank Abdul Khaliq'
+      });
+
+    expect(proofRes.statusCode).toEqual(200);
+    expect(proofRes.body.success).toBe(true);
+    expect(proofRes.body.paymentRequest.status).toBe('proof_submitted');
+
+    // 5. Clear payment request
+    const clearRes = await request(app)
+      .post(`/api/payment-requests/${createdPR._id}/clear`)
+      .set('Authorization', `Bearer ${tutorToken}`)
+      .send({ clearanceNotes: 'Verified received in Meezan official platform account' });
+
+    expect(clearRes.statusCode).toEqual(200);
+    expect(clearRes.body.success).toBe(true);
+    expect(clearRes.body.paymentRequest.status).toBe('cleared');
+  });
+
   test('Public tutor endpoints omit fileUrl from sanadDocuments for non-admins to ensure document privacy', async () => {
     const TutorProfile = require('../src/models/TutorProfile');
     const User = require('../src/models/User');

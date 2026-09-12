@@ -145,7 +145,12 @@ const tutorProfileSchema = new mongoose.Schema({
       type: Date,
       default: Date.now
     }
-  }]
+  }],
+  preferredAccountChoice: {
+    type: String,
+    enum: ['own', 'admin'],
+    default: 'own'
+  }
 }, {
   timestamps: true,
   toJSON: { virtuals: true },

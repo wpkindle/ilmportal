@@ -34,7 +34,14 @@ const paymentRequestSchema = new mongoose.Schema({
     default: '',
     trim: true
   },
-  // Snapshot of tutor payment methods at the time of request
+  // Receiving account choice: tutor personal methods vs platform administration accounts
+  accountChoice: {
+    type: String,
+    enum: ['own', 'admin'],
+    default: 'own',
+    index: true
+  },
+  // Snapshot of payment methods at the time of request
   paymentMethods: [{
     method: {
       type: String,
@@ -45,6 +52,8 @@ const paymentRequestSchema = new mongoose.Schema({
     accountTitle: { type: String, required: true },
     accountNumber: { type: String, required: true },
     instructions: { type: String, default: '' },
+    qrImage: { type: String, default: '' },
+    isAdminAccount: { type: Boolean, default: false },
     isDefault: { type: Boolean, default: false }
   }],
   // Threshold: 3 days (72 hours)

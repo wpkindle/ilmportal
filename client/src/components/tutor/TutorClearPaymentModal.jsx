@@ -106,6 +106,20 @@ export default function TutorClearPaymentModal({
 
           <div className="space-y-1.5 text-xs">
             <div className="flex items-center justify-between">
+              <span className="text-slate-500 text-[11px]">Receiving Mode:</span>
+              {paymentRequest.accountChoice === 'admin' ? (
+                <span className="font-bold text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded text-[11px] flex items-center gap-1">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                  <span>IlmiDunya Admin Accounts</span>
+                </span>
+              ) : (
+                <span className="font-bold text-slate-700 bg-white border border-slate-200 px-2 py-0.5 rounded text-[11px]">
+                  Tutor Personal Account
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center justify-between">
               <span className="text-slate-500 text-[11px]">Payment Method:</span>
               <span className="font-bold text-slate-800 uppercase px-2 py-0.5 bg-white border border-slate-200 rounded text-[11px]">
                 {proof.method || 'Direct Transfer'}

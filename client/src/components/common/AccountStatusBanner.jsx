@@ -48,66 +48,7 @@ export default function AccountStatusBanner({ user, tutorProfile, role = 'studen
     );
   }
 
-  // 2. UNDER REVIEW STATE (or Tutor awaiting profile approval)
-  const isTutorUnderReview = isTutor && (
-    tutorProfile?.verificationStatus === 'under_review' ||
-    tutorProfile?.verificationStatus === 'pending' ||
-    status === 'under_review'
-  );
-
-  if (isTutorUnderReview) {
-    return (
-      <div className="bg-blue-50 border-2 border-blue-300 rounded-3xl p-4 sm:p-5 shadow-xs space-y-2">
-        <div className="flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-2xl bg-blue-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-blue-600/20">
-            <Clock className="w-5 h-5 animate-pulse" />
-          </div>
-          <div className="space-y-1 flex-1">
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm sm:text-base font-black text-blue-950">
-                Profile 100% Complete — Under Administrative Review
-              </h3>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-blue-200 text-blue-900 border border-blue-300">
-                Under Review
-              </span>
-            </div>
-            <p className="text-xs text-blue-900 leading-relaxed font-medium">
-              Your profile has been automatically submitted to the administration. Profile will be visible to the public on approval from administration.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 3. TUTOR INCOMPLETE PROFILE STATE
-  const isTutorIncomplete = isTutor && tutorProfile?.verificationStatus === 'incomplete';
-  if (isTutorIncomplete) {
-    return (
-      <div className="bg-amber-50 border-2 border-amber-300 rounded-3xl p-4 sm:p-5 shadow-xs space-y-2">
-        <div className="flex items-start gap-3.5">
-          <div className="w-10 h-10 rounded-2xl bg-amber-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-amber-500/20">
-            <AlertCircle className="w-5 h-5" />
-          </div>
-          <div className="space-y-1 flex-1">
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm sm:text-base font-black text-amber-950">
-                Profile Incomplete — Action Required
-              </h3>
-              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-amber-200 text-amber-900 border border-amber-300">
-                Incomplete
-              </span>
-            </div>
-            <p className="text-xs text-amber-900 leading-relaxed font-medium">
-              Complete your profile 100%, then the administration will review it. Profile will be visible to public on approval from administration.
-            </p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  // 4. WARNED STATE / ACTIVE STRIKES
+  // 2. WARNED STATE / ACTIVE STRIKES
   if (status === 'warned' || warningCount > 0) {
     return (
       <div className="bg-amber-50 border-2 border-amber-300 rounded-3xl p-5 shadow-xs space-y-4">

@@ -365,7 +365,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
     const handleDealCompleted = (data) => {
       const incomingDeal = data?.deal || (partnerDeal ? { ...partnerDeal, status: 'completed' } : { status: 'completed' });
       setPartnerDeal((prev) => ({ ...(prev || {}), ...incomingDeal, status: 'completed' }));
-      setMessages([]);
+      fetchMessages();
 
       const currentUserId = (user?._id || user?.id)?.toString();
       const isStudentViewer = user?.role === 'student' || isStudent || (data?.studentId && data.studentId.toString() === currentUserId);
@@ -499,6 +499,50 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
     setFilePreview(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
+    }
+  };
+
+  // Mark Deal Completed Handler (invoked from desktop button or mobile dropdown menu)
+  const handleMarkDealCompleted = async () => {
+    if (!partnerDeal) return;
+    const isCleared = Boolean(
+      partnerDeal.tutorFeePaid === true ||
+      partnerDeal.paymentStatus === 'verified' ||
+      partnerDeal.platformFee === 0
+    );
+
+    if (!isCleared) {
+      alert(
+        partnerDeal.paymentStatus === 'submitted_proof'
+          ? 'Notice: Your platform payment proof has been submitted and is currently under review by administration. You can mark this deal as completed once admin verifies the payment.'
+          : 'Notice: Platform Payment Required!\n\nYou cannot mark this deal as completed until the platform fee has been cleared. Please submit your payment proof first.'
+      );
+      setTutorPaymentModalOpen(true);
+      return;
+    }
+
+    const ok = window.confirm(
+      'Are you sure you want to mark this deal as completed?\n\nBoth you and the student will be invited to rate and review each other.'
+    );
+    if (!ok) return;
+
+    try {
+      const res = await api.completeDeal(partnerDeal._id);
+      const updated = res.deal || { ...partnerDeal, status: 'completed' };
+      setPartnerDeal(updated);
+      fetchMessages();
+      alert(res?.message || 'Course completed! Both you and the student can now leave a review.');
+    } catch (err) {
+      if (err.message && err.message.toLowerCase().includes('already')) {
+        setPartnerDeal({ ...partnerDeal, status: 'completed' });
+        fetchMessages();
+        alert('Course marked as completed! Both you and the student can now leave a review.');
+      } else if (err.message && (err.message.toLowerCase().includes('platform fee') || err.message.toLowerCase().includes('cleared'))) {
+        alert(err.message);
+        setTutorPaymentModalOpen(true);
+      } else {
+        alert(err.message || 'Error completing deal');
+      }
     }
   };
 
@@ -775,7 +819,15 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               <ArrowLeft className="w-5 h-5" />
             </button>
           )}
-          <div className="relative shrink-0">
+
+          {/* Avatar with click to open profile for student/tutor */}
+          <div
+            className={`relative shrink-0 ${isTutor || partner?.role === 'student' ? 'cursor-pointer hover:opacity-90 transition-opacity' : ''}`}
+            onClick={() => {
+              if (isTutor || partner?.role === 'student') setStudentProfileModalOpen(true);
+            }}
+            title={isTutor || partner?.role === 'student' ? 'Click to inspect student profile' : undefined}
+          >
             <img
               src={getTutorAvatar(partner, partner?.name || 'User')}
               alt={partner?.name}
@@ -798,28 +850,36 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             )}
           </div>
 
-          <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <h3 className="font-serif font-bold text-xs sm:text-sm text-stone-900 truncate">
+          {/* Name & Status - Fully Responsive */}
+          <div
+            className={`min-w-0 flex-1 ${isTutor || partner?.role === 'student' ? 'cursor-pointer group' : ''}`}
+            onClick={() => {
+              if (isTutor || partner?.role === 'student') setStudentProfileModalOpen(true);
+            }}
+            title={isTutor || partner?.role === 'student' ? 'Click to inspect student profile' : undefined}
+          >
+            <div className="flex items-center gap-1.5">
+              <h3 className="font-serif font-bold text-xs sm:text-sm text-stone-900 truncate group-hover:text-[#0c2217] transition-colors">
                 {partner?.name || 'Tutoring Chat'}
               </h3>
             </div>
 
-            <div className="flex items-center gap-1.5 mt-0.5 text-[10.5px] sm:text-[11px] truncate">
+            <div className="flex items-center gap-1.5 mt-0.5 text-[10px] sm:text-[11px] text-stone-500 truncate">
               {isPartnerOnline ? (
-                <span className="inline-flex items-center gap-1 font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200 text-[9.5px] sm:text-[10px] shrink-0">
+                <span className="inline-flex items-center gap-1 font-semibold text-emerald-700 shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span>Online</span>
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-1 font-semibold text-stone-500 bg-stone-100 px-2 py-0.5 rounded-full border border-stone-200 text-[9.5px] sm:text-[10px] shrink-0">
+                <span className="inline-flex items-center gap-1 font-medium text-stone-500 shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-stone-400" />
                   <span>Offline</span>
                 </span>
               )}
 
-              <span className="text-stone-300 shrink-0">&bull;</span>
-              <span className="text-stone-500 truncate">
+              {/* Location: shown on sm+ screens so mobile has maximum space for name and status */}
+              <span className="text-stone-300 shrink-0 hidden sm:inline">&bull;</span>
+              <span className="text-stone-500 truncate hidden sm:inline">
                 {(partner?.localArea || partner?.area) ? `${partner.localArea || partner.area}, ${partner.city || 'Pakistan'}` : (partner?.city || 'Pakistan')}
               </span>
             </div>
@@ -827,11 +887,11 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
         </div>
 
         <div className="flex items-center gap-1.5 sm:gap-2 shrink-0">
-          {/* Live In-Platform Video Classroom Button (only visible after deal is accepted) */}
-          {!isTutorToTutor && isDealAccepted && (
+          {/* Live In-Platform Video Classroom Button (only visible after deal is accepted and not completed) */}
+          {!isTutorToTutor && isDealAccepted && partnerDeal?.status !== 'completed' && (
             <Link
               href={`/classroom/${conversationId}`}
-              className="p-2 sm:px-3 sm:py-2 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] font-bold text-xs rounded-xl shadow-md border border-[#d4a359]/40 flex items-center gap-1.5 transition-all cursor-pointer"
+              className="p-2 sm:px-3 sm:py-2 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] font-bold text-xs rounded-xl shadow-md border border-[#d4a359]/40 flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
               title="Start or Join In-Platform HD Video Class"
             >
               <Video className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
@@ -839,109 +899,71 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             </Link>
           )}
 
-          {/* Action: Inspect Student Profile (available to all tutors) */}
+          {/* Action: Inspect Student Profile (Desktop only; on mobile accessible via clicking name/avatar or in 3-dots menu) */}
           {(isTutor || partner?.role === 'student') && (
             <button
               type="button"
               onClick={() => setStudentProfileModalOpen(true)}
-              className="p-2 sm:px-3 sm:py-2 bg-stone-800 hover:bg-stone-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-stone-700"
+              className="hidden md:inline-flex px-3 py-2 bg-stone-800 hover:bg-stone-700 text-white font-bold text-xs rounded-xl shadow-sm items-center gap-1.5 transition-all cursor-pointer border border-stone-700 shrink-0"
               title="Inspect Student Profile"
             >
-              <User className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
-              <span className="hidden sm:inline">Student Profile</span>
+              <User className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
+              <span>Student Profile</span>
             </button>
           )}
 
-          {/* Tutor Action: Mark Deal Completed */}
-          {isTutor && partnerDeal && ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) && (() => {
-            const isCleared = Boolean(
-              partnerDeal.tutorFeePaid === true ||
-              partnerDeal.paymentStatus === 'verified' ||
-              partnerDeal.platformFee === 0
-            );
-            return (
-              <button
-                type="button"
-                onClick={async () => {
-                  if (!isCleared) {
-                    alert(
-                      partnerDeal.paymentStatus === 'submitted_proof'
-                        ? 'Notice: Your platform payment proof has been submitted and is currently under review by administration. You can mark this deal as completed once admin verifies the payment.'
-                        : 'Notice: Platform Payment Required!\n\nYou cannot mark this deal as completed until the platform fee has been cleared. Please submit your payment proof first.'
-                    );
-                    setTutorPaymentModalOpen(true);
-                    return;
-                  }
-
-                  const ok = window.confirm(
-                    'Are you sure you want to mark this deal as completed?\n\nBoth you and the student will be invited to rate and review each other.'
-                  );
-                  if (!ok) return;
-                  try {
-                    const res = await api.completeDeal(partnerDeal._id);
-                    const updated = res.deal || { ...partnerDeal, status: 'completed' };
-                    setPartnerDeal(updated);
-                    alert(res?.message || 'Course completed! Both you and the student can now leave a review.');
-                  } catch (err) {
-                    if (err.message && err.message.toLowerCase().includes('already')) {
-                      setPartnerDeal({ ...partnerDeal, status: 'completed' });
-                      alert('Course marked as completed! Both you and the student can now leave a review.');
-                    } else if (err.message && (err.message.toLowerCase().includes('platform fee') || err.message.toLowerCase().includes('cleared'))) {
-                      alert(err.message);
-                      setTutorPaymentModalOpen(true);
-                    } else {
-                      alert(err.message || 'Error completing deal');
-                    }
-                  }
-                }}
-                className={`p-2 sm:px-3 sm:py-2 font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer ${
-                  isCleared
-                    ? 'bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-500 ring-1 ring-emerald-400/30'
-                    : 'bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700'
-                }`}
-                title={isCleared ? 'Mark this deal as completed' : 'Platform fee clearance required before completing deal'}
-              >
-                <CheckCircle2 className={`w-4 h-4 sm:w-3.5 sm:h-3.5 shrink-0 ${isCleared ? 'text-white' : 'text-[#d4a359]'}`} />
-                <span className="hidden sm:inline">Mark Completed</span>
-              </button>
-            );
-          })()}
+          {/* Tutor Action: Mark Deal Completed (Active deals only) */}
+          {isTutor && partnerDeal && ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) && (
+            <button
+              type="button"
+              onClick={handleMarkDealCompleted}
+              className="p-2 sm:px-3 sm:py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 transition-all cursor-pointer border border-emerald-500 ring-1 ring-emerald-400/30 shrink-0"
+              title="Mark deal as completed"
+            >
+              <CheckCircle2 className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-white shrink-0" />
+              <span className="hidden sm:inline">Mark Completed</span>
+            </button>
+          )}
 
           {/* Completed Deal Header Indicator & Mutual Review CTA */}
           {partnerDeal?.status === 'completed' && (
-            <div className="flex items-center gap-1.5">
-              <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-950/80 border border-emerald-600/40 text-emerald-300 text-xs font-bold">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span className="hidden sm:inline">Completed</span>
+            <div className="flex items-center gap-1.5 shrink-0">
+              {/* Completed pill: visible on sm+ screens, hidden on small mobile to give maximum room to the name */}
+              <span className="hidden sm:inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-50 border border-emerald-300 text-emerald-900 text-xs font-bold shadow-2xs">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                <span>Completed</span>
               </span>
+
+              {/* Review CTA Button or High-Contrast Reviewed Badge */}
               {(isStudent || user?.role === 'student' ? (!partnerDeal.isStudentReviewed && !partnerDeal.isReviewed) : !partnerDeal.isTutorReviewed) ? (
                 <button
                   type="button"
                   onClick={() => setShowStudentReviewModal(true)}
-                  className="px-2.5 py-1.5 bg-[#d4a359] hover:bg-[#c39248] text-[#0c2217] font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1 cursor-pointer"
+                  className="px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:scale-95 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+                  title="Leave Review"
                 >
-                  <Star className="w-3.5 h-3.5 fill-[#0c2217]" />
+                  <Star className="w-3.5 h-3.5 fill-white text-white shrink-0" />
                   <span>{isStudent || user?.role === 'student' ? 'Rate Tutor' : 'Rate Student'}</span>
                 </button>
               ) : (
-                <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold">
-                  <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-amber-50 border border-amber-300/80 text-amber-950 text-xs font-bold shadow-2xs shrink-0">
+                  <Star className="w-3.5 h-3.5 fill-amber-500 text-amber-600 shrink-0" />
                   <span>Reviewed</span>
                 </span>
               )}
             </div>
           )}
 
-          {/* Tutor Action: Send Deal Offer */}
-          {isTutor && (!partnerDeal || !['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status)) && (
+          {/* Tutor Action: Send Deal Offer (Desktop only, excluded when completed) */}
+          {isTutor && (!partnerDeal || !['active_trial', 'continuation_agreed', 'active_paid', 'completed'].includes(partnerDeal.status)) && (
             <button
               type="button"
               onClick={() => setDealModalOpen(true)}
-              className="p-2 sm:px-3 sm:py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white font-bold text-xs rounded-xl shadow-md flex items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30"
+              className="hidden md:inline-flex px-3 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#874121] text-white font-bold text-xs rounded-xl shadow-md items-center gap-1.5 transition-all cursor-pointer border border-[#d4a359]/30 shrink-0"
               title="Send Deal Offer"
             >
-              <Sparkles className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
-              <span className="hidden sm:inline">Send Deal Offer</span>
+              <Sparkles className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
+              <span>Send Deal Offer</span>
             </button>
           )}
 
@@ -1000,7 +1022,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             <button
               type="button"
               onClick={() => setMenuOpen((prev) => !prev)}
-              className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
+              className="p-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-600 transition-colors cursor-pointer"
               title="More Options"
               aria-label="More Options"
             >
@@ -1008,8 +1030,36 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             </button>
 
             {menuOpen && (
-              <div className="absolute right-0 mt-1.5 w-48 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 py-1.5 text-xs text-slate-700 animate-in fade-in zoom-in-95 duration-150">
-                {!isTutorToTutor && isDealAccepted && (
+              <div className="absolute right-0 mt-1.5 w-52 bg-white border border-slate-200 rounded-2xl shadow-xl z-50 py-1.5 text-xs text-slate-700 animate-in fade-in zoom-in-95 duration-150">
+                {(isTutor || partner?.role === 'student') && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setStudentProfileModalOpen(true);
+                      setMenuOpen(false);
+                    }}
+                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-slate-50 text-[#0c2217] font-bold cursor-pointer"
+                  >
+                    <User className="w-4 h-4 text-[#d4a359]" />
+                    <span>View Student Profile</span>
+                  </button>
+                )}
+
+                {isTutor && partnerDeal && ['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status) && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setMenuOpen(false);
+                      handleMarkDealCompleted();
+                    }}
+                    className="w-full px-3 py-2 text-left flex items-center gap-2 hover:bg-emerald-50 text-emerald-800 font-bold cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600" />
+                    <span>Mark Deal Completed</span>
+                  </button>
+                )}
+
+                {!isTutorToTutor && isDealAccepted && partnerDeal?.status !== 'completed' && (
                   <Link
                     href={`/classroom/${conversationId}`}
                     onClick={() => setMenuOpen(false)}
@@ -1020,7 +1070,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                   </Link>
                 )}
 
-                {isTutor && (
+                {isTutor && (!partnerDeal || !['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status)) && (
                   <button
                     type="button"
                     onClick={() => {

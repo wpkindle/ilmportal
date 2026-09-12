@@ -611,20 +611,29 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-2.5">
                       <div className="w-8 h-8 rounded-full bg-[#0c2217] text-[#d4a359] font-bold text-xs flex items-center justify-center border border-[#d4a359]/30 shrink-0">
-                        {(rev.student?.name || 'S').charAt(0).toUpperCase()}
+                        {((rev.student?.name || rev.reviewer?.name || 'S').charAt(0)).toUpperCase()}
                       </div>
                       <div>
                         <span className="font-bold text-xs text-slate-900 block">
-                          {rev.student?.name || 'Verified Student'}
+                          {rev.student?.name || rev.reviewer?.name || 'Verified Student'}
                         </span>
-                        {rev.student?.city && (
-                          <span className="text-[10px] text-slate-500 font-medium block">{rev.student.city}</span>
+                        {(rev.student?.city || rev.reviewer?.city) && (
+                          <span className="text-[10px] text-slate-500 font-medium block">{rev.student?.city || rev.reviewer?.city}</span>
                         )}
                       </div>
                     </div>
                     <RatingStars rating={rev.rating} size="xs" />
                   </div>
                   {rev.comment && <p className="text-xs text-slate-700 leading-relaxed">&ldquo;{rev.comment}&rdquo;</p>}
+                  {rev.quickTags && rev.quickTags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5 pt-0.5">
+                      {rev.quickTags.map((tag, idx) => (
+                        <span key={idx} className="px-2 py-0.5 rounded-md bg-[#f0ece1] text-[#0c2217] text-[10px] font-semibold border border-[#d4a359]/30">
+                          #{tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                   <span className="text-[10px] text-slate-400 font-mono block">
                     {new Date(rev.createdAt).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' })}
                   </span>

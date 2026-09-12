@@ -403,7 +403,7 @@ export default function StudentProfileModal({
                           </div>
                           <div className="flex items-center gap-1.5 shrink-0">
                             {t.status === 'completed' && (
-                              t.isReviewed ? (
+                              (t.isReviewed || t.isStudentReviewed) ? (
                                 <span className="px-2 py-0.5 rounded-md text-[9.5px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-0.5">
                                   <span>Reviewed</span>
                                   <Star className="w-2.5 h-2.5 text-amber-500 fill-amber-500" />
@@ -473,9 +473,18 @@ export default function StudentProfileModal({
                               &ldquo;{r.comment}&rdquo;
                             </p>
                           )}
-                          {r.tutor?.name && (
+                          {r.quickTags && r.quickTags.length > 0 && (
+                            <div className="flex flex-wrap gap-1">
+                              {r.quickTags.map((tag, tIdx) => (
+                                <span key={tIdx} className="px-1.5 py-0.5 rounded bg-slate-100 text-slate-600 text-[9.5px] font-medium">
+                                  #{tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
+                          {(r.reviewer?.name || r.tutor?.name) && (
                             <div className="text-[10px] font-medium text-slate-500">
-                              Feedback from Tutor: {r.tutor.name}
+                              Feedback from Tutor: {r.reviewer?.name || r.tutor?.name}
                             </div>
                           )}
                         </div>

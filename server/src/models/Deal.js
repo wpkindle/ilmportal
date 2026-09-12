@@ -141,6 +141,22 @@ const dealSchema = new mongoose.Schema({
   review: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Review'
+  },
+  isStudentReviewed: {
+    type: Boolean,
+    default: false
+  },
+  studentReview: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Review'
+  },
+  isTutorReviewed: {
+    type: Boolean,
+    default: false
+  },
+  tutorReview: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Review'
   }
 }, {
   timestamps: true

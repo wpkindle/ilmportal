@@ -26,7 +26,7 @@ const messageSchema = new mongoose.Schema({
   },
   messageType: {
     type: String,
-    enum: ['text', 'voice', 'deal_offer', 'deal_accept', 'deal_decline', 'system_alert', 'file'],
+    enum: ['text', 'voice', 'deal_offer', 'deal_accept', 'deal_decline', 'deal_complete', 'system_alert', 'file'],
     default: 'text'
   },
   voiceData: {

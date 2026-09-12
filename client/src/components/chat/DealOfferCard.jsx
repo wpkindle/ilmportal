@@ -90,7 +90,7 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
     }
 
     const ok = window.confirm(
-      'Are you sure you want to mark this deal as completed?\n\nNotice: This will finalize the course and permanently delete all conversation messages between you and this student to free database storage.'
+      'Are you sure you want to mark this deal as completed?\n\nBoth you and the student will be invited to rate and review each other.'
     );
     if (!ok) return;
 
@@ -100,13 +100,13 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
       const updated = res.deal || { ...dealState, status: 'completed' };
       setDealState(updated);
       if (onDealUpdated) onDealUpdated(updated);
-      alert(res.message || 'Deal marked as completed! Conversation messages have been deleted to save storage.');
+      alert(res.message || 'Course marked as completed successfully! Both you and the student can now leave a review.');
     } catch (err) {
       if (err.message && err.message.toLowerCase().includes('already')) {
         const updated = { ...dealState, status: 'completed' };
         setDealState(updated);
         if (onDealUpdated) onDealUpdated(updated);
-        alert('Deal is marked as completed! Conversation messages have been deleted to save storage.');
+        alert('Course marked as completed! Both you and the student can now leave a review.');
       } else if (err.message && (err.message.toLowerCase().includes('platform fee') || err.message.toLowerCase().includes('cleared'))) {
         setShowPaymentNoticeModal(true);
       } else {
@@ -266,35 +266,106 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
 
       {/* Course Completed / Deal Closed Indicator */}
       {currentStatus === 'completed' && (
-        <div className="space-y-2">
+        <div className="space-y-2.5">
           <div className="p-3 bg-stone-100 rounded-2xl border border-stone-200 text-center text-xs font-bold text-stone-700 flex items-center justify-center gap-2">
             <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            <span>Course Completed &bull; Deal Closed</span>
+            <span>Course Completed &bull; Concluded</span>
           </div>
 
           {/* Student Review Prompt / Status */}
           {isStudentUser && (
-            <div className="p-3 bg-[#faf8f5] rounded-2xl border border-[#ebe3d3] flex items-center justify-between gap-2">
-              <div className="flex items-center gap-2">
-                <Star className="w-4 h-4 text-amber-500 fill-amber-400 shrink-0" />
-                <span className="text-xs font-bold text-stone-800">
-                  {dealState.isReviewed ? 'Review Published' : 'Rate Your Teacher'}
-                </span>
+            <div className="p-3 bg-[#faf8f5] rounded-2xl border border-[#ebe3d3] space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-amber-500 fill-amber-400 shrink-0" />
+                  <span className="text-xs font-bold text-stone-800">
+                    {(dealState.isStudentReviewed || dealState.isReviewed) ? 'Your Review for Teacher' : 'Rate Your Teacher'}
+                  </span>
+                </div>
+                {(dealState.isStudentReviewed || dealState.isReviewed) ? (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Submitted ★★★★★</span>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowReviewModal(true)}
+                    className="px-3 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer border border-[#d4a359]/30"
+                  >
+                    <Star className="w-3.5 h-3.5 text-[#d4a359] fill-[#d4a359]" />
+                    <span>Rate Tutor</span>
+                  </button>
+                )}
               </div>
-              {dealState.isReviewed ? (
-                <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>Submitted ★★★★★</span>
-                </span>
-              ) : (
-                <button
-                  type="button"
-                  onClick={() => setShowReviewModal(true)}
-                  className="px-3 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer border border-[#d4a359]/30"
-                >
-                  <Star className="w-3.5 h-3.5 text-[#d4a359] fill-[#d4a359]" />
-                  <span>Leave Review</span>
-                </button>
+
+              {/* Tutor's evaluation of this student if provided */}
+              {dealState.isTutorReviewed && (
+                <div className="p-2.5 rounded-xl bg-white border border-[#e6dfd5] text-xs space-y-1">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="font-bold text-stone-800 flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
+                      <span>Teacher Evaluation of You</span>
+                    </span>
+                    <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                      Verified ★
+                    </span>
+                  </div>
+                  {dealState.tutorReview?.comment && (
+                    <p className="text-[11px] text-stone-600 italic">
+                      &ldquo;{dealState.tutorReview.comment}&rdquo;
+                    </p>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Tutor Review Prompt / Status */}
+          {isTutorUser && (
+            <div className="p-3 bg-[#faf8f5] rounded-2xl border border-[#ebe3d3] space-y-2">
+              <div className="flex items-center justify-between gap-2">
+                <div className="flex items-center gap-2">
+                  <Star className="w-4 h-4 text-amber-500 fill-amber-400 shrink-0" />
+                  <span className="text-xs font-bold text-stone-800">
+                    {dealState.isTutorReviewed ? 'Your Student Evaluation' : 'Evaluate & Review Student'}
+                  </span>
+                </div>
+                {dealState.isTutorReviewed ? (
+                  <span className="inline-flex items-center gap-1 text-[11px] font-bold text-emerald-800 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Submitted ★★★★★</span>
+                  </span>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => setShowReviewModal(true)}
+                    className="px-3 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] text-white text-xs font-bold rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer border border-[#d4a359]/30"
+                  >
+                    <Star className="w-3.5 h-3.5 text-[#d4a359] fill-[#d4a359]" />
+                    <span>Rate Student</span>
+                  </button>
+                )}
+              </div>
+
+              {/* Student's review of this tutor if provided */}
+              {(dealState.isStudentReviewed || dealState.isReviewed) && (
+                <div className="p-2.5 rounded-xl bg-white border border-[#e6dfd5] text-xs space-y-1">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="font-bold text-stone-800 flex items-center gap-1">
+                      <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
+                      <span>Student Feedback on You</span>
+                    </span>
+                    <span className="font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                      Published ★
+                    </span>
+                  </div>
+                  {dealState.studentReview?.comment && (
+                    <p className="text-[11px] text-stone-600 italic">
+                      &ldquo;{dealState.studentReview.comment}&rdquo;
+                    </p>
+                  )}
+                </div>
               )}
             </div>
           )}
@@ -470,15 +541,19 @@ const DealOfferCard = ({ deal, onDealUpdated }) => {
         />
       )}
 
-      {/* Student Leave Review Modal */}
+      {/* Leave Review Modal (Mutual Review) */}
       {showReviewModal && (
         <LeaveReviewModal
           isOpen={showReviewModal}
           onClose={() => setShowReviewModal(false)}
           deal={dealState}
           tutor={dealState.tutor}
+          student={dealState.student}
+          targetRole={isTutorUser ? 'student' : 'tutor'}
           onSuccess={(reviewData) => {
-            const updated = { ...dealState, isReviewed: true, studentReview: reviewData };
+            const updated = isTutorUser
+              ? { ...dealState, isTutorReviewed: true, tutorReview: reviewData }
+              : { ...dealState, isStudentReviewed: true, isReviewed: true, studentReview: reviewData };
             setDealState(updated);
             if (onDealUpdated) onDealUpdated(updated);
           }}

@@ -39,9 +39,35 @@ const reviewSchema = new mongoose.Schema({
     type: String,
     enum: ['published', 'hidden', 'flagged'],
     default: 'published'
-  }
+  },
+  reviewer: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  reviewerRole: {
+    type: String,
+    enum: ['student', 'tutor', 'admin'],
+    default: 'student'
+  },
+  targetUser: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
+  targetRole: {
+    type: String,
+    enum: ['student', 'tutor'],
+    default: 'tutor'
+  },
+  quickTags: [{
+    type: String
+  }]
 }, {
   timestamps: true
 });
+
+reviewSchema.index({ targetUser: 1, status: 1 });
+reviewSchema.index({ tutor: 1, status: 1 });
+reviewSchema.index({ student: 1, status: 1 });
+reviewSchema.index({ deal: 1, reviewer: 1 });
 
 module.exports = mongoose.model('Review', reviewSchema);

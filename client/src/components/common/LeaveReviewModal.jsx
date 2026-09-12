@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Star, X, CheckCircle2, Sparkles, AlertCircle } from 'lucide-react';
 import { api } from '../../services/api';
+import { useAuth } from '../../context/AuthContext';
 import { getTutorAvatar } from '../../utils/tutorHelpers';
 
 const runConfetti = async () => {
@@ -28,7 +29,7 @@ const RATING_DESCRIPTIONS = {
   1: '⭐ Disappointing'
 };
 
-const QUICK_TAGS = [
+const STUDENT_QUICK_TAGS = [
   'Punctual & Patient',
   'Excellent Tajweed',
   'Clear Explanations',
@@ -37,13 +38,25 @@ const QUICK_TAGS = [
   'Thorough Homework Guidance'
 ];
 
+const TUTOR_QUICK_TAGS = [
+  'Dedicated Learner',
+  'Punctual & Respectful',
+  'Quick Learner',
+  'Completes Homework',
+  'Attentive in Class',
+  'Great Tajweed Progress'
+];
+
 export default function LeaveReviewModal({
   isOpen,
   onClose,
   deal,
   tutor,
+  student,
+  targetRole: explicitTargetRole,
   onSuccess
 }) {
+  const { user } = useAuth();
   const [rating, setRating] = useState(5);
   const [hoverRating, setHoverRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -53,15 +66,26 @@ export default function LeaveReviewModal({
 
   if (!isOpen) return null;
 
-  // Resolve tutor information
-  const resolvedTutor = tutor || deal?.tutor;
-  const tutorName = resolvedTutor?.name || 'Your Tutor';
-  const tutorId = resolvedTutor?._id || resolvedTutor?.id || (typeof resolvedTutor === 'string' ? resolvedTutor : null);
+  // Determine if reviewer is tutor reviewing student OR student reviewing tutor
+  const isTutorReviewing = explicitTargetRole === 'student' || user?.role === 'tutor';
+  const targetRole = isTutorReviewing ? 'student' : 'tutor';
+
+  // Resolve target information
+  const resolvedTarget = isTutorReviewing
+    ? (student || deal?.student)
+    : (tutor || deal?.tutor);
+
+  const targetName = resolvedTarget?.name || (isTutorReviewing ? 'Student' : 'Your Tutor');
+  const targetId = resolvedTarget?._id || resolvedTarget?.id || (typeof resolvedTarget === 'string' ? resolvedTarget : null);
   const dealId = deal?._id || deal?.id;
   const courseSubject = deal?.subject || 'Tutoring Course';
-  const avatarUrl = getTutorAvatar(resolvedTutor || {}, tutorName);
+  
+  const avatarUrl = isTutorReviewing
+    ? (resolvedTarget?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(targetName)}&background=0c2217&color=faf8f5`)
+    : getTutorAvatar(resolvedTarget || {}, targetName);
 
   const activeRating = hoverRating || rating;
+  const quickTags = isTutorReviewing ? TUTOR_QUICK_TAGS : STUDENT_QUICK_TAGS;
 
   const handleAddTag = (tag) => {
     setComment((prev) => {
@@ -87,8 +111,14 @@ export default function LeaveReviewModal({
         rating: Number(rating),
         comment: comment.trim(),
         dealId: dealId || undefined,
-        tutorId: tutorId || undefined
+        quickTags: quickTags.filter(t => comment.includes(t))
       };
+
+      if (isTutorReviewing) {
+        payload.studentId = targetId || undefined;
+      } else {
+        payload.tutorId = targetId || undefined;
+      }
 
       const res = await api.createReview(payload);
       if (res && res.success) {
@@ -97,7 +127,7 @@ export default function LeaveReviewModal({
           runConfetti();
         }
         if (onSuccess) {
-          onSuccess(res.review || { rating, comment, dealId, tutorId });
+          onSuccess(res.review || { rating, comment, dealId, [isTutorReviewing ? 'studentId' : 'tutorId']: targetId });
         }
         setTimeout(() => {
           onClose();
@@ -133,31 +163,31 @@ export default function LeaveReviewModal({
               <CheckCircle2 className="w-8 h-8 text-emerald-600" />
             </div>
             <h3 className="text-lg font-serif font-bold text-stone-900">
-              Review Published! 🎉
+              {isTutorReviewing ? 'Evaluation Published! 🎉' : 'Review Published! 🎉'}
             </h3>
             <p className="text-xs text-stone-600 max-w-xs mx-auto leading-relaxed">
-              Thank you! Your verified student feedback and <strong className="text-emerald-800">{rating} ★ rating</strong> have been applied to <strong className="text-stone-800">{tutorName}</strong>&apos;s public profile.
+              Thank you! Your verified {isTutorReviewing ? 'teacher evaluation' : 'student feedback'} and <strong className="text-emerald-800">{rating} ★ rating</strong> have been applied to <strong className="text-stone-800">{targetName}</strong>&apos;s profile.
             </p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
             
-            {/* Header with Tutor Info */}
+            {/* Header with Target Info */}
             <div className="flex items-center gap-3 pr-8 pb-3 border-b border-stone-100">
               <img
                 src={avatarUrl}
-                alt={tutorName}
+                alt={targetName}
                 className="w-12 h-12 rounded-2xl object-cover border-2 border-[#d4a359]/40 shrink-0 bg-stone-100"
               />
               <div className="min-w-0">
                 <span className="text-[10px] uppercase font-bold tracking-wider text-[#b85d34] block">
-                  Course Completed Review
+                  {isTutorReviewing ? 'Rate & Evaluate Student' : 'Rate & Review Teacher'}
                 </span>
                 <h3 className="font-serif font-bold text-sm sm:text-base text-stone-900 truncate">
-                  {tutorName}
+                  {targetName}
                 </h3>
                 <p className="text-[11px] text-stone-500 truncate">
-                  Subject: <span className="font-medium text-stone-700">{courseSubject}</span>
+                  Course: <span className="font-medium text-stone-700">{courseSubject}</span>
                 </p>
               </div>
             </div>
@@ -165,7 +195,9 @@ export default function LeaveReviewModal({
             {/* Star Rating Interactive Selector */}
             <div className="space-y-1.5 text-center bg-[#faf8f5] p-3.5 rounded-2xl border border-[#ebe3d3]">
               <span className="text-[11px] font-bold text-stone-700 block">
-                How would you rate your experience?
+                {isTutorReviewing
+                  ? `How would you evaluate ${targetName}'s learning progress?`
+                  : `How was your learning experience with ${targetName}?`}
               </span>
 
               <div className="flex items-center justify-center gap-2 py-1">
@@ -204,7 +236,7 @@ export default function LeaveReviewModal({
                 Quick Tags (Click to add)
               </span>
               <div className="flex flex-wrap gap-1.5">
-                {QUICK_TAGS.map((tag) => (
+                {quickTags.map((tag) => (
                   <button
                     key={tag}
                     type="button"
@@ -226,7 +258,11 @@ export default function LeaveReviewModal({
                 rows={3}
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                placeholder="Share your experience regarding Quran Tajweed clarity, punctuality, concept explanations, or general teaching attitude..."
+                placeholder={
+                  isTutorReviewing
+                    ? 'Share your feedback on student punctuality, homework consistency, attentiveness, and Tajweed progression...'
+                    : 'Share your experience regarding Quran Tajweed clarity, punctuality, concept explanations, or general teaching attitude...'
+                }
                 className="w-full p-3 bg-[#faf8f5] border border-stone-200 rounded-2xl text-xs text-stone-800 placeholder-stone-400 outline-none focus:border-[#0c2217] focus:bg-white transition-all resize-none"
               />
             </div>

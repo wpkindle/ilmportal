@@ -77,6 +77,8 @@ exports.getConversations = async (req, res) => {
     const userDeals = await Deal.find({
       $or: [{ student: userObjId }, { tutor: userObjId }]
     })
+      .populate('student', 'name avatar role city')
+      .populate('tutor', 'name avatar role city')
       .sort({ updatedAt: -1, createdAt: -1 })
       .lean();
 
@@ -110,6 +112,33 @@ exports.getConversations = async (req, res) => {
           unreadCount,
           deal
         });
+      }
+    }
+
+    // Also include any user who has a deal with current user, ensuring completed deals stay visible
+    for (const d of userDeals) {
+      const sId = (d.student?._id || d.student)?.toString();
+      const tId = (d.tutor?._id || d.tutor)?.toString();
+      const counterpartId = sId === userId.toString() ? tId : sId;
+      if (counterpartId && !conversationMap.has(counterpartId)) {
+        const partnerUser = sId === userId.toString() ? d.tutor : d.student;
+        if (partnerUser && partnerUser._id) {
+          const convId = [userId.toString(), counterpartId].sort().join('_');
+          conversationMap.set(counterpartId, {
+            conversationId: convId,
+            partner: partnerUser,
+            lastMessage: {
+              _id: `deal_msg_${d._id}`,
+              conversationId: convId,
+              text: `Course Deal: ${d.subject} (${d.status ? d.status.replace(/_/g, ' ') : 'Active'})`,
+              createdAt: d.updatedAt || d.createdAt,
+              isDealOffer: true,
+              deal: d
+            },
+            unreadCount: 0,
+            deal: d
+          });
+        }
       }
     }
 
@@ -204,8 +233,12 @@ exports.getMessages = async (req, res) => {
           { student: parts[0], tutor: parts[1] },
           { student: parts[1], tutor: parts[0] }
         ],
-        status: { $in: ['active_trial', 'continuation_agreed', 'active_paid', 'pending_offer'] }
-      }).sort({ updatedAt: -1, createdAt: -1 }).lean();
+        status: { $in: ['active_trial', 'continuation_agreed', 'active_paid', 'pending_offer', 'completed'] }
+      })
+        .populate('student', 'name avatar role city')
+        .populate('tutor', 'name avatar role city')
+        .sort({ updatedAt: -1, createdAt: -1 })
+        .lean();
 
       if (!latestDeal) {
         latestDeal = await Deal.findOne({
@@ -213,17 +246,40 @@ exports.getMessages = async (req, res) => {
             { student: parts[0], tutor: parts[1] },
             { student: parts[1], tutor: parts[0] }
           ]
-        }).sort({ updatedAt: -1, createdAt: -1 }).lean();
+        })
+          .populate('student', 'name avatar role city')
+          .populate('tutor', 'name avatar role city')
+          .sort({ updatedAt: -1, createdAt: -1 })
+          .lean();
       }
 
-      if (latestDeal && req.user && req.user.role === 'student') {
-        const studentReview = await Review.findOne({
-          student: req.user.id,
-          deal: latestDeal._id
-        }).lean();
-        if (studentReview) {
+      if (latestDeal) {
+        const [studentRev, tutorRev] = await Promise.all([
+          Review.findOne({
+            deal: latestDeal._id,
+            $or: [{ reviewerRole: 'student' }, { targetRole: 'tutor' }, { reviewerRole: { $exists: false } }],
+            status: 'published'
+          }).lean(),
+          Review.findOne({
+            deal: latestDeal._id,
+            $or: [{ reviewerRole: 'tutor' }, { targetRole: 'student' }],
+            status: 'published'
+          }).lean()
+        ]);
+
+        if (studentRev || latestDeal.isStudentReviewed || latestDeal.isReviewed) {
+          latestDeal.isStudentReviewed = true;
           latestDeal.isReviewed = true;
-          latestDeal.studentReview = studentReview;
+          if (studentRev) {
+            latestDeal.studentReview = studentRev;
+            latestDeal.review = studentRev;
+          }
+        }
+        if (tutorRev || latestDeal.isTutorReviewed) {
+          latestDeal.isTutorReviewed = true;
+          if (tutorRev) {
+            latestDeal.tutorReview = tutorRev;
+          }
         }
       }
     }
@@ -821,13 +877,18 @@ exports.getStudentProfileForTutor = async (req, res) => {
       ChatRequest.findOne({ student: studentDoc._id, tutor: req.user.id }).sort({ createdAt: -1 }),
       Deal.findOne({ student: studentDoc._id, tutor: req.user.id }).sort({ createdAt: -1 }),
       Deal.find({ student: studentDoc._id })
-        .select('subject mode price priceUnit status createdAt trialStartDate trialEndDate tutor isReviewed review')
+        .select('subject mode price priceUnit status createdAt trialStartDate trialEndDate tutor isReviewed review isStudentReviewed isTutorReviewed studentReview tutorReview')
         .populate('tutor', 'name avatar')
         .sort({ createdAt: -1 })
         .limit(10),
-      Review.find({ student: studentDoc._id, status: 'published' })
-        .select('rating comment createdAt deal tutor')
+      Review.find({
+        student: studentDoc._id,
+        $or: [{ reviewerRole: 'tutor' }, { targetRole: 'student' }, { targetUser: studentDoc._id }],
+        status: 'published'
+      })
+        .select('rating comment createdAt deal tutor reviewer reviewerRole quickTags')
         .populate('tutor', 'name avatar')
+        .populate('reviewer', 'name avatar')
         .sort({ createdAt: -1 })
         .limit(10)
     ]);
@@ -837,11 +898,15 @@ exports.getStudentProfileForTutor = async (req, res) => {
       const dealObj = d.toObject ? d.toObject() : { ...d };
       const matchedReview = (reviews || []).find(r => 
         (r.deal && r.deal.toString() === dealObj._id.toString()) ||
-        (dealObj.tutor && r.tutor && (r.tutor._id || r.tutor).toString() === (dealObj.tutor._id || dealObj.tutor).toString())
+        (dealObj.tutor && (r.tutor || r.reviewer) && ((r.tutor?._id || r.tutor || r.reviewer?._id || r.reviewer).toString() === (dealObj.tutor._id || dealObj.tutor).toString()))
       );
-      if (matchedReview || dealObj.isReviewed) {
+      if (matchedReview || dealObj.isTutorReviewed) {
+        dealObj.isTutorReviewed = true;
+        if (matchedReview) dealObj.tutorReview = matchedReview;
+      }
+      if (dealObj.isStudentReviewed || dealObj.isReviewed) {
+        dealObj.isStudentReviewed = true;
         dealObj.isReviewed = true;
-        if (matchedReview) dealObj.review = matchedReview;
       }
       return dealObj;
     });

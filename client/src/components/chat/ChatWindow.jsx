@@ -233,7 +233,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               const sId = (d.student?._id || d.student)?.toString();
               return (
                 ((tId === myId && sId === pId) || (tId === pId && sId === myId)) &&
-                ['active_trial', 'continuation_agreed', 'active_paid', 'pending_offer'].includes(d.status)
+                ['active_trial', 'continuation_agreed', 'active_paid', 'pending_offer', 'completed'].includes(d.status)
               );
             });
             if (currentDeal) setPartnerDeal(currentDeal);
@@ -874,19 +874,18 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                   }
 
                   const ok = window.confirm(
-                    'Are you sure you want to mark this deal as completed?\n\nNotice: This will close the course and permanently delete all conversation messages between you and this student to free up database storage.'
+                    'Are you sure you want to mark this deal as completed?\n\nBoth you and the student will be invited to rate and review each other.'
                   );
                   if (!ok) return;
                   try {
                     const res = await api.completeDeal(partnerDeal._id);
-                    setPartnerDeal({ ...partnerDeal, status: 'completed' });
-                    setMessages([]);
-                    alert(res?.message || 'Deal completed! Chat history deleted to optimize database storage.');
+                    const updated = res.deal || { ...partnerDeal, status: 'completed' };
+                    setPartnerDeal(updated);
+                    alert(res?.message || 'Course completed! Both you and the student can now leave a review.');
                   } catch (err) {
                     if (err.message && err.message.toLowerCase().includes('already')) {
                       setPartnerDeal({ ...partnerDeal, status: 'completed' });
-                      setMessages([]);
-                      alert('Deal completed! Chat history deleted to optimize database storage.');
+                      alert('Course marked as completed! Both you and the student can now leave a review.');
                     } else if (err.message && (err.message.toLowerCase().includes('platform fee') || err.message.toLowerCase().includes('cleared'))) {
                       alert(err.message);
                       setTutorPaymentModalOpen(true);
@@ -900,13 +899,38 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                     ? 'bg-emerald-600 hover:bg-emerald-700 text-white border border-emerald-500 ring-1 ring-emerald-400/30'
                     : 'bg-stone-800 hover:bg-stone-700 text-stone-300 border border-stone-700'
                 }`}
-                title={isCleared ? 'Mark this deal as completed and clear chat storage' : 'Platform fee clearance required before completing deal'}
+                title={isCleared ? 'Mark this deal as completed' : 'Platform fee clearance required before completing deal'}
               >
                 <CheckCircle2 className={`w-4 h-4 sm:w-3.5 sm:h-3.5 shrink-0 ${isCleared ? 'text-white' : 'text-[#d4a359]'}`} />
                 <span className="hidden sm:inline">Mark Completed</span>
               </button>
             );
           })()}
+
+          {/* Completed Deal Header Indicator & Mutual Review CTA */}
+          {partnerDeal?.status === 'completed' && (
+            <div className="flex items-center gap-1.5">
+              <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-emerald-950/80 border border-emerald-600/40 text-emerald-300 text-xs font-bold">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                <span className="hidden sm:inline">Completed</span>
+              </span>
+              {(isStudent || user?.role === 'student' ? (!partnerDeal.isStudentReviewed && !partnerDeal.isReviewed) : !partnerDeal.isTutorReviewed) ? (
+                <button
+                  type="button"
+                  onClick={() => setShowStudentReviewModal(true)}
+                  className="px-2.5 py-1.5 bg-[#d4a359] hover:bg-[#c39248] text-[#0c2217] font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1 cursor-pointer"
+                >
+                  <Star className="w-3.5 h-3.5 fill-[#0c2217]" />
+                  <span>{isStudent || user?.role === 'student' ? 'Rate Tutor' : 'Rate Student'}</span>
+                </button>
+              ) : (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-xl bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-bold">
+                  <Star className="w-3.5 h-3.5 fill-amber-300 text-amber-300" />
+                  <span>Reviewed</span>
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Tutor Action: Send Deal Offer */}
           {isTutor && (!partnerDeal || !['active_trial', 'continuation_agreed', 'active_paid'].includes(partnerDeal.status)) && (
@@ -1156,7 +1180,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                     <span>Rate &amp; Review Tutor</span>
                   </button>
                   <p className="text-[10px] text-stone-400">
-                    Chat history was cleared to optimize database storage.
+                    Your verified review will be displayed on your tutor&apos;s public profile.
                   </p>
                 </div>
               )
@@ -1169,8 +1193,23 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                   Course Deal Completed 🎉
                 </h3>
                 <p className="text-[11px] text-stone-600 leading-relaxed">
-                  This course has been concluded. Your student has been invited to leave a review for your public profile. Chat history has been cleared to optimize database storage.
+                  This course has concluded. Both tutor and student can now rate and review each other to build mutual verified profiles.
                 </p>
+                {!partnerDeal?.isTutorReviewed ? (
+                  <button
+                    type="button"
+                    onClick={() => setShowStudentReviewModal(true)}
+                    className="px-4 py-2 bg-[#d4a359] hover:bg-[#c39248] text-[#0c2217] text-xs font-bold rounded-xl shadow-xs transition-all inline-flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <Star className="w-3.5 h-3.5 fill-[#0c2217]" />
+                    <span>Rate Student</span>
+                  </button>
+                ) : (
+                  <div className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl">
+                    <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                    <span>Reviewed Student ★★★★★</span>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -1196,6 +1235,44 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             isFileMsg &&
             (msg.fileType?.startsWith('image/') ||
               /\.(jpg|jpeg|png|webp|gif)$/i.test(msg.fileUrl || msg.fileName || ''));
+
+          if (msg.messageType === 'deal_complete') {
+            const hasReviewed = (isStudent || user?.role === 'student')
+              ? (partnerDeal?.isStudentReviewed || partnerDeal?.isReviewed)
+              : partnerDeal?.isTutorReviewed;
+
+            return (
+              <div key={msg._id} className="w-full my-4 flex flex-col items-center justify-center">
+                <div className="max-w-md w-full p-4.5 rounded-2xl bg-white border border-[#d4a359]/40 text-center space-y-2.5 shadow-sm">
+                  <div className="w-10 h-10 rounded-xl bg-[#0c2217] text-[#d4a359] flex items-center justify-center mx-auto border border-[#d4a359]/40 shadow-xs">
+                    <CheckCircle2 className="w-5 h-5 text-emerald-400" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] uppercase font-bold tracking-wider text-[#b85d34] block">Course Concluded</span>
+                    <p className="text-xs font-serif font-bold text-stone-900 mt-0.5">{msg.text || 'Course marked as completed!'}</p>
+                  </div>
+                  <p className="text-[11px] text-stone-500">
+                    Both tutor and student can now rate &amp; review each other to build mutual verified reputation.
+                  </p>
+                  {!hasReviewed ? (
+                    <button
+                      type="button"
+                      onClick={() => setShowStudentReviewModal(true)}
+                      className="mt-1 px-4 py-2 bg-[#d4a359] hover:bg-[#c39248] text-[#0c2217] font-bold text-xs rounded-xl shadow-xs transition-all inline-flex items-center gap-1.5 cursor-pointer"
+                    >
+                      <Star className="w-3.5 h-3.5 fill-[#0c2217]" />
+                      <span>{isStudent || user?.role === 'student' ? 'Rate & Review Tutor' : 'Rate & Review Student'}</span>
+                    </button>
+                  ) : (
+                    <div className="inline-flex items-center gap-1 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1 rounded-xl">
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Your Review Submitted ★★★★★</span>
+                    </div>
+                  )}
+                </div>
+              </div>
+            );
+          }
 
           return (
             <div
@@ -1649,18 +1726,23 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
         />
       )}
 
-      {/* Student Leave Review Modal */}
+      {/* Mutual Leave Review Modal (Students review tutors & Tutors review students) */}
       {showStudentReviewModal && (
         <LeaveReviewModal
           isOpen={showStudentReviewModal}
           onClose={() => setShowStudentReviewModal(false)}
           deal={partnerDeal}
-          tutor={partner}
+          tutor={partnerDeal?.tutor || (user?.role === 'student' ? partner : user)}
+          student={partnerDeal?.student || (user?.role === 'tutor' ? partner : user)}
+          targetRole={user?.role === 'tutor' ? 'student' : 'tutor'}
           onSuccess={(reviewData) => {
             setPartnerDeal((prev) => ({
               ...(prev || {}),
               isReviewed: true,
-              studentReview: reviewData
+              isStudentReviewed: user?.role === 'student' ? true : prev?.isStudentReviewed,
+              isTutorReviewed: user?.role === 'tutor' ? true : prev?.isTutorReviewed,
+              studentReview: user?.role === 'student' ? reviewData : prev?.studentReview,
+              tutorReview: user?.role === 'tutor' ? reviewData : prev?.tutorReview,
             }));
           }}
         />

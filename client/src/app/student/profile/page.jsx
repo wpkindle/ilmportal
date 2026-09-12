@@ -846,7 +846,7 @@ function StudentProfileContent() {
                             </p>
                           </div>
                           {deal.status === 'completed' ? (
-                            deal.isReviewed ? (
+                            deal.isReviewed || deal.isStudentReviewed ? (
                               <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-lg border border-emerald-200 shrink-0">
                                 <CheckCircle2 className="w-3 h-3 text-emerald-600" />
                                 <span>Reviewed ★★★★★</span>
@@ -876,7 +876,7 @@ function StudentProfileContent() {
                             {deal.createdAt ? new Date(deal.createdAt).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : ''}
                           </span>
                         </div>
-                        {deal.status === 'completed' && !deal.isReviewed && (
+                        {deal.status === 'completed' && !deal.isReviewed && !deal.isStudentReviewed && (
                           <div className="pt-2 border-t border-[#ebe3d3] flex items-center justify-between">
                             <span className="text-[10.5px] text-amber-900 font-medium">Course completed! Rate your tutor</span>
                             <button
@@ -886,6 +886,24 @@ function StudentProfileContent() {
                             >
                               Write Review &rarr;
                             </button>
+                          </div>
+                        )}
+                        {deal.status === 'completed' && deal.isTutorReviewed && (
+                          <div className="pt-2 border-t border-[#ebe3d3] space-y-1">
+                            <div className="flex items-center justify-between text-[11px]">
+                              <span className="font-bold text-[#0c2217] flex items-center gap-1">
+                                <Sparkles className="w-3 h-3 text-[#d4a359]" />
+                                <span>Teacher Feedback for You</span>
+                              </span>
+                              <span className="text-emerald-700 bg-emerald-50 px-1.5 py-0.2 rounded text-[10px] font-bold border border-emerald-200">
+                                Verified Review ★
+                              </span>
+                            </div>
+                            {deal.tutorReview?.comment && (
+                              <p className="text-[11px] text-stone-600 italic">
+                                &ldquo;{deal.tutorReview.comment}&rdquo;
+                              </p>
+                            )}
                           </div>
                         )}
                       </div>
@@ -915,34 +933,55 @@ function StudentProfileContent() {
                   <div className="py-6 text-center text-xs text-slate-400">Loading reviews...</div>
                 ) : reviewsList.length > 0 ? (
                   <div className="space-y-2.5">
-                    {reviewsList.map((rev) => (
-                      <div key={rev._id} className="p-3.5 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] space-y-1.5 text-xs">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-1">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                              <Star
-                                key={star}
-                                className={`w-3.5 h-3.5 ${star <= (rev.rating || 5) ? 'text-amber-500 fill-amber-500' : 'text-slate-200'}`}
-                              />
-                            ))}
-                            <span className="font-black text-slate-900 ml-1 text-xs">{rev.rating || 5}.0</span>
+                    {reviewsList.map((rev) => {
+                      const isTutorReviewingStudent = rev.reviewerRole === 'tutor' || rev.targetRole === 'student';
+                      return (
+                        <div key={rev._id} className="p-3.5 rounded-2xl bg-[#faf8f5] border border-[#ebe3d3] space-y-1.5 text-xs">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1">
+                              {[1, 2, 3, 4, 5].map((star) => (
+                                <Star
+                                  key={star}
+                                  className={`w-3.5 h-3.5 ${star <= (rev.rating || 5) ? 'text-amber-500 fill-amber-500' : 'text-slate-200'}`}
+                                />
+                              ))}
+                              <span className="font-black text-slate-900 ml-1 text-xs">{rev.rating || 5}.0</span>
+                            </div>
+                            <span className="text-[10px] text-slate-400">
+                              {rev.createdAt ? new Date(rev.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
+                            </span>
                           </div>
-                          <span className="text-[10px] text-slate-400">
-                            {rev.createdAt ? new Date(rev.createdAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) : ''}
-                          </span>
+
+                          <div className="flex items-center gap-2">
+                            {isTutorReviewingStudent ? (
+                              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-200">
+                                Teacher Evaluation from {rev.reviewer?.name || rev.tutor?.name || 'Tutor'}
+                              </span>
+                            ) : (
+                              <span className="text-[10px] font-bold text-[#0c2217] bg-[#f0ece1] px-2 py-0.5 rounded-md border border-[#d4a359]/30">
+                                Your Review for {rev.targetUser?.name || rev.tutor?.name || 'Tutor'}
+                              </span>
+                            )}
+                          </div>
+
+                          {rev.comment && (
+                            <p className="text-slate-700 italic text-xs leading-relaxed">
+                              &ldquo;{rev.comment}&rdquo;
+                            </p>
+                          )}
+
+                          {rev.quickTags && rev.quickTags.length > 0 && (
+                            <div className="flex flex-wrap gap-1 pt-1">
+                              {rev.quickTags.map((tag, idx) => (
+                                <span key={idx} className="px-2 py-0.5 rounded-md bg-stone-100 text-stone-700 text-[10px] font-medium border border-stone-200/60">
+                                  #{tag}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
-                        {rev.comment && (
-                          <p className="text-slate-700 italic text-xs leading-relaxed">
-                            &ldquo;{rev.comment}&rdquo;
-                          </p>
-                        )}
-                        {rev.tutor?.name && (
-                          <p className="text-[10px] text-slate-500 font-medium">
-                            Tutor: {rev.tutor.name}
-                          </p>
-                        )}
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 ) : (
                   <p className="text-xs text-slate-500 italic p-3 bg-slate-50 rounded-2xl border border-slate-200">
@@ -1007,9 +1046,11 @@ function StudentProfileContent() {
           onClose={() => setReviewModalDeal(null)}
           deal={reviewModalDeal}
           tutor={reviewModalDeal.tutor}
+          student={user}
+          targetRole="tutor"
           onSuccess={(newReview) => {
             setTuitionHistory((prev) =>
-              prev.map((d) => (d._id === reviewModalDeal._id ? { ...d, isReviewed: true, studentReview: newReview } : d))
+              prev.map((d) => (d._id === reviewModalDeal._id ? { ...d, isReviewed: true, isStudentReviewed: true, studentReview: newReview } : d))
             );
             api.getMyReviews().then((r) => {
               if (r?.success && r.reviews) setReviewsList(r.reviews);

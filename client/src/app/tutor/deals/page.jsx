@@ -6,6 +6,7 @@ import { api } from '../../../services/api';
 import TrialBanner from '../../../components/common/TrialBanner';
 import Tutor72HourClock from '../../../components/tutor/Tutor72HourClock';
 import TutorPaymentModal from '../../../components/tutor/TutorPaymentModal';
+import LeaveReviewModal from '../../../components/common/LeaveReviewModal';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import { BookOpen, MessageSquare, Plus, Video, CheckCircle2, Check, AlertTriangle, X, Loader2, Clock, CreditCard, Star } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
@@ -16,6 +17,7 @@ export default function TutorDealsPage() {
   const [loading, setLoading] = useState(true);
   const [selectedDealForPay, setSelectedDealForPay] = useState(null);
   const [dealToComplete, setDealToComplete] = useState(null);
+  const [reviewModalDeal, setReviewModalDeal] = useState(null);
   const [completionNotes, setCompletionNotes] = useState('');
   const [completing, setCompleting] = useState(false);
   const [feedback, setFeedback] = useState(null);
@@ -55,7 +57,7 @@ export default function TutorDealsPage() {
       setCompletionNotes('');
       setFeedback({
         type: 'success',
-        message: res?.message || 'Deal marked as completed. Conversation messages removed to free storage.'
+        message: res?.message || 'Deal marked as completed! You and your student can now rate & review each other.'
       });
       await fetchDeals();
       setTimeout(() => setFeedback(null), 6000);
@@ -65,7 +67,7 @@ export default function TutorDealsPage() {
         setCompletionNotes('');
         setFeedback({
           type: 'success',
-          message: 'Deal is marked as completed. Conversation messages removed to free storage.'
+          message: 'Deal is marked as completed. You and your student can now rate & review each other.'
         });
         await fetchDeals();
         setTimeout(() => setFeedback(null), 6000);
@@ -173,15 +175,13 @@ export default function TutorDealsPage() {
                       </Link>
                     )}
 
-                    {deal.status !== 'completed' && (
-                      <Link
-                        href={`/tutor/messages?conversation=${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
-                        className="px-3.5 py-2 rounded-xl bg-[#faf8f5] hover:bg-[#f3ede2] text-stone-700 text-xs font-semibold flex items-center gap-1.5 border border-[#e6dfd5] cursor-pointer"
-                      >
-                        <MessageSquare className="w-4 h-4 text-[#143d2b]" />
-                        <span>Chat</span>
-                      </Link>
-                    )}
+                    <Link
+                      href={`/tutor/messages?conversation=${[user?.id || user?._id, deal.student?._id].sort().join('_')}`}
+                      className="px-3.5 py-2 rounded-xl bg-[#faf8f5] hover:bg-[#f3ede2] text-stone-700 text-xs font-semibold flex items-center gap-1.5 border border-[#e6dfd5] cursor-pointer"
+                    >
+                      <MessageSquare className="w-4 h-4 text-[#143d2b]" />
+                      <span>Chat</span>
+                    </Link>
 
                     {/* Mark Completed Button & Clearance Status */}
                     {deal.status !== 'completed' && deal.status !== 'cancelled' && (() => {
@@ -245,7 +245,7 @@ export default function TutorDealsPage() {
 
                     {deal.status === 'completed' && (
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        {deal.isReviewed ? (
+                        {deal.isReviewed || deal.isStudentReviewed ? (
                           <span className="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-xs rounded-xl flex items-center gap-1 shadow-2xs">
                             <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
                             <span>Reviewed by Student</span>
@@ -256,9 +256,26 @@ export default function TutorDealsPage() {
                             <span>Student Review Pending</span>
                           </span>
                         )}
+
+                        {deal.isTutorReviewed ? (
+                          <span className="px-2.5 py-1 bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-xs rounded-xl flex items-center gap-1 shadow-2xs">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>You Reviewed Student ★★★★★</span>
+                          </span>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setReviewModalDeal(deal)}
+                            className="px-2.5 py-1 bg-[#d4a359] hover:bg-[#c39248] text-[#0c2217] font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1 cursor-pointer"
+                          >
+                            <Star className="w-3.5 h-3.5 fill-[#0c2217]" />
+                            <span>Rate Student</span>
+                          </button>
+                        )}
+
                         <div className="px-3 py-1.5 bg-[#f0ece1] border border-[#d4a359]/40 rounded-xl text-xs text-[#0c2217] font-semibold flex items-center gap-1.5">
                           <Check className="w-3.5 h-3.5 text-[#d4a359]" />
-                          <span>Completed &bull; Storage Cleared</span>
+                          <span>Completed &bull; Concluded</span>
                         </div>
                       </div>
                     )}
@@ -271,14 +288,29 @@ export default function TutorDealsPage() {
                     onPayClick={() => setSelectedDealForPay(deal)}
                   />
                 ) : (
-                  <div className="p-3.5 bg-[#f0ece1] border border-[#d4a359]/40 rounded-2xl flex items-center justify-between text-xs text-[#0c2217]">
+                  <div className="p-3.5 bg-[#f0ece1] border border-[#d4a359]/40 rounded-2xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-[#0c2217]">
                     <div className="flex items-center gap-2">
                       <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
                       <div>
-                        <span className="font-bold">Course Completed &bull; Closed</span>
-                        <p className="text-[11px] text-stone-600">All conversation messages, media attachments, and audio recordings have been cleared to save database storage.</p>
+                        <span className="font-bold">Course Completed &bull; Concluded</span>
+                        <p className="text-[11px] text-stone-600">All conversation messages and learning records remain safely preserved.</p>
                       </div>
                     </div>
+                    {!deal.isTutorReviewed ? (
+                      <button
+                        type="button"
+                        onClick={() => setReviewModalDeal(deal)}
+                        className="px-3.5 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl transition-all inline-flex items-center gap-1.5 cursor-pointer self-start sm:self-auto border border-[#d4a359]/30"
+                      >
+                        <Star className="w-3.5 h-3.5 text-[#d4a359] fill-[#d4a359]" />
+                        <span>Rate &amp; Review Student</span>
+                      </button>
+                    ) : (
+                      <div className="text-[11px] font-bold text-emerald-800 flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Review Published</span>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
@@ -337,17 +369,14 @@ export default function TutorDealsPage() {
                 </div>
               </div>
 
-              {/* Database Storage Notice Callout */}
-              <div className="p-4 bg-amber-50 border border-amber-300/80 rounded-2xl space-y-1.5 text-amber-950">
-                <div className="flex items-center gap-2 font-black text-amber-900 text-xs">
-                  <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0" />
-                  <span>Important: Chat Conversation Cleanup</span>
+              {/* Course Completion & Review Notice Callout */}
+              <div className="p-4 bg-[#f0ece1] border border-[#d4a359]/40 rounded-2xl space-y-1.5 text-[#0c2217]">
+                <div className="flex items-center gap-2 font-black text-[#0c2217] text-xs">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>Course Completion &amp; Mutual Review</span>
                 </div>
-                <p className="text-[11px] text-amber-800 leading-relaxed">
-                  Marking this deal as completed will close the course. To optimize database storage, <strong>all chat messages, audio recordings, and file attachments between you and this student will be permanently deleted</strong>.
-                </p>
-                <p className="text-[10.5px] text-amber-700">
-                  This action cannot be undone. Please ensure you have concluded your correspondence.
+                <p className="text-[11px] text-stone-700 leading-relaxed">
+                  Marking this deal as completed will conclude the course. All messages, recordings, and learning history remain preserved, and both you and the student will be able to rate and review each other.
                 </p>
               </div>
 
@@ -382,7 +411,7 @@ export default function TutorDealsPage() {
                     {completing ? (
                       <>
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        <span>Completing Deal &amp; Cleaning Storage...</span>
+                        <span>Completing Course Deal...</span>
                       </>
                     ) : (
                       <>
@@ -396,6 +425,22 @@ export default function TutorDealsPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Mutual Leave Review Modal for Tutor reviewing Student */}
+      {reviewModalDeal && (
+        <LeaveReviewModal
+          isOpen={!!reviewModalDeal}
+          onClose={() => setReviewModalDeal(null)}
+          deal={reviewModalDeal}
+          student={reviewModalDeal.student}
+          tutor={user}
+          targetRole="student"
+          onSuccess={async () => {
+            await fetchDeals();
+            setReviewModalDeal(null);
+          }}
+        />
       )}
     </div>
   );

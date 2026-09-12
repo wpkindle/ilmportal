@@ -114,7 +114,7 @@ export default function MyDealsPage() {
                       </Link>
                     )}
 
-                    {deal.isReviewed ? (
+                    {deal.isReviewed || deal.isStudentReviewed ? (
                       <span className="px-3 py-1.5 bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-xs rounded-xl flex items-center gap-1.5">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
                         <span>Reviewed ★★★★★</span>
@@ -129,15 +129,15 @@ export default function MyDealsPage() {
                       </button>
                     )}
 
-                    {deal.status !== 'completed' ? (
-                      <Link
-                        href={`/student/messages?conversation=${[user?.id || user?._id, deal.tutor?._id].sort().join('_')}`}
-                        className="px-3.5 py-2 bg-[#faf8f5] hover:bg-[#f3ede2] text-stone-700 font-bold text-xs rounded-xl border border-[#e6dfd5] transition-colors flex items-center gap-1.5"
-                      >
-                        <MessageSquare className="w-3.5 h-3.5 text-[#143d2b]" />
-                        <span>Chat</span>
-                      </Link>
-                    ) : (
+                    <Link
+                      href={`/student/messages?conversation=${[user?.id || user?._id, deal.tutor?._id].sort().join('_')}`}
+                      className="px-3.5 py-2 bg-[#faf8f5] hover:bg-[#f3ede2] text-stone-700 font-bold text-xs rounded-xl border border-[#e6dfd5] transition-colors flex items-center gap-1.5"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5 text-[#143d2b]" />
+                      <span>Chat</span>
+                    </Link>
+
+                    {deal.status === 'completed' && (
                       <div className="px-3 py-1.5 bg-[#f0ece1] border border-[#d4a359]/40 rounded-xl text-xs text-[#0c2217] font-semibold flex items-center gap-1.5">
                         <CheckCircle2 className="w-3.5 h-3.5 text-[#d4a359]" />
                         <span>Completed &bull; Concluded</span>
@@ -147,16 +147,36 @@ export default function MyDealsPage() {
                 </div>
 
                 {deal.status === 'completed' ? (
-                  <div className="p-4 bg-[#f0ece1] border border-[#d4a359]/40 rounded-2xl flex items-center justify-between text-xs text-[#0c2217]">
-                    <div className="space-y-0.5">
+                  <div className="p-4 bg-[#f0ece1] border border-[#d4a359]/40 rounded-2xl space-y-2.5 text-xs text-[#0c2217]">
+                    <div className="flex items-center justify-between">
                       <span className="font-bold flex items-center gap-1.5">
                         <CheckCircle2 className="w-4 h-4 text-[#d4a359]" />
                         <span>Course Completed Successfully!</span>
                       </span>
-                      <p className="text-[11px] text-stone-600">
-                        Tutoring sessions for this course have concluded. Please leave a review for your teacher.
-                      </p>
                     </div>
+                    <p className="text-[11px] text-stone-600 leading-relaxed">
+                      Tutoring sessions for this course have concluded. All records and chat conversations are preserved.
+                    </p>
+
+                    {/* Tutor's Feedback on the Student */}
+                    {deal.isTutorReviewed && (
+                      <div className="mt-2 p-3 bg-white rounded-xl border border-[#e0d6c8] space-y-1">
+                        <div className="flex items-center justify-between text-[11px]">
+                          <span className="font-bold text-stone-800 flex items-center gap-1">
+                            <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-400" />
+                            <span>Teacher Feedback for You</span>
+                          </span>
+                          <span className="text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded text-[10px] font-bold border border-emerald-200">
+                            Verified Review ★
+                          </span>
+                        </div>
+                        {deal.tutorReview?.comment && (
+                          <p className="text-[11px] text-stone-600 italic">
+                            &ldquo;{deal.tutorReview.comment}&rdquo;
+                          </p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 ) : (
                   <TrialBanner deal={deal} onPayClick={() => {}} />
@@ -174,9 +194,11 @@ export default function MyDealsPage() {
         onClose={() => setReviewModalDeal(null)}
         deal={reviewModalDeal}
         tutor={reviewModalDeal?.tutor}
-        onSuccess={() => {
+        student={user}
+        targetRole="tutor"
+        onSuccess={(reviewData) => {
           setDeals((prev) =>
-            prev.map((d) => (d._id === reviewModalDeal?._id ? { ...d, isReviewed: true } : d))
+            prev.map((d) => (d._id === reviewModalDeal?._id ? { ...d, isReviewed: true, isStudentReviewed: true, studentReview: reviewData } : d))
           );
         }}
       />

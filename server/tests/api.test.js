@@ -303,6 +303,39 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
     expect(pubReviewsRes.body.reviews[0].comment).toContain('Outstanding tutor');
   });
 
+  test('Tutor leaves review for completed deal and review appears in student reviews endpoint', async () => {
+    const Deal = require('../src/models/Deal');
+    const deal = await Deal.findById(dealId);
+
+    const tutorReviewRes = await request(app)
+      .post('/api/reviews')
+      .set('Authorization', `Bearer ${tutorToken}`)
+      .send({
+        studentId: deal.student.toString(),
+        dealId: dealId,
+        rating: 5,
+        comment: 'Dedicated learner! Punctual, attentive, and completed all homework tasks on time.',
+        quickTags: ['Dedicated Learner', 'Punctual & Respectful']
+      });
+
+    expect(tutorReviewRes.statusCode).toEqual(201);
+    expect(tutorReviewRes.body.success).toEqual(true);
+    expect(tutorReviewRes.body.review.targetRole).toEqual('student');
+    expect(tutorReviewRes.body.review.reviewerRole).toEqual('tutor');
+
+    // Verify Deal is marked as tutor reviewed
+    const updatedDeal = await Deal.findById(dealId);
+    expect(updatedDeal.isTutorReviewed).toBe(true);
+    expect(updatedDeal.tutorReview).toBeDefined();
+
+    // Verify student reviews endpoint returns the review
+    const studentReviewsRes = await request(app).get(`/api/reviews/student/${deal.student}`);
+    expect(studentReviewsRes.statusCode).toEqual(200);
+    expect(studentReviewsRes.body.count).toEqual(1);
+    expect(studentReviewsRes.body.reviews[0].comment).toContain('Dedicated learner');
+    expect(studentReviewsRes.body.reviews[0].quickTags).toContain('Dedicated Learner');
+  });
+
   test('Public CMS routes return categories and Pakistani locations', async () => {
     const catRes = await request(app).get('/api/cms/categories');
     expect(catRes.statusCode).toEqual(200);

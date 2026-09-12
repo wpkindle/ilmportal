@@ -333,18 +333,53 @@ exports.getMyDeals = async (req, res) => {
     // For both students and tutors, populate review status on completed deals
     const completedDealIds = deals.filter(d => d.status === 'completed').map(d => d._id);
     if (completedDealIds.length > 0) {
-      const dealReviews = await Review.find({ deal: { $in: completedDealIds } }).lean();
-      const reviewMap = new Map(dealReviews.map(r => [r.deal?.toString(), r]));
+      const dealReviews = await Review.find({ deal: { $in: completedDealIds }, status: 'published' }).lean();
+
+      const studentReviewsMap = new Map();
+      const tutorReviewsMap = new Map();
+
+      for (const r of dealReviews) {
+        const dId = r.deal?.toString();
+        if (!dId) continue;
+        if (r.reviewerRole === 'tutor' || r.targetRole === 'student') {
+          tutorReviewsMap.set(dId, r);
+        } else {
+          studentReviewsMap.set(dId, r);
+        }
+      }
+
       deals.forEach(deal => {
         if (deal.status === 'completed') {
-          if (reviewMap.has(deal._id.toString()) || deal.isReviewed) {
+          const dId = deal._id.toString();
+          const sReview = studentReviewsMap.get(dId);
+          const tReview = tutorReviewsMap.get(dId);
+
+          if (sReview || deal.isStudentReviewed || deal.isReviewed) {
+            deal.isStudentReviewed = true;
             deal.isReviewed = true;
-            if (deal._doc) {
-              deal._doc.isReviewed = true;
-              if (reviewMap.has(deal._id.toString())) {
-                deal._doc.review = reviewMap.get(deal._id.toString());
-                deal._doc.studentReview = reviewMap.get(deal._id.toString());
-              }
+            if (sReview) {
+              deal.studentReview = sReview;
+              deal.review = sReview;
+            }
+          }
+
+          if (tReview || deal.isTutorReviewed) {
+            deal.isTutorReviewed = true;
+            if (tReview) {
+              deal.tutorReview = tReview;
+            }
+          }
+
+          if (deal._doc) {
+            deal._doc.isStudentReviewed = deal.isStudentReviewed;
+            deal._doc.isReviewed = deal.isReviewed;
+            deal._doc.isTutorReviewed = deal.isTutorReviewed;
+            if (sReview) {
+              deal._doc.studentReview = sReview;
+              deal._doc.review = sReview;
+            }
+            if (tReview) {
+              deal._doc.tutorReview = tReview;
             }
           }
         }
@@ -951,33 +986,31 @@ exports.completeDeal = async (req, res) => {
     const studentObjId = mongoose.Types.ObjectId.isValid(studentId) ? new mongoose.Types.ObjectId(studentId) : null;
     const dealObjId = mongoose.Types.ObjectId.isValid(deal._id.toString()) ? new mongoose.Types.ObjectId(deal._id.toString()) : deal._id;
 
-    // Delete all conversation messages between this tutor and student to free up database storage
+    // Keep conversation messages intact so completed deal and class history remain visible to both tutor and student.
     const convId1 = [tutorId, studentId].sort().join('_');
     const convId2 = `${tutorId}_${studentId}`;
-    const convId3 = `${studentId}_${tutorId}`;
 
-    const orConditions = [
-      { conversationId: convId1 },
-      { conversationId: convId2 },
-      { conversationId: convId3 },
-      { sender: tutorId, recipient: studentId },
-      { sender: studentId, recipient: tutorId },
-      { deal: deal._id },
-      { deal: dealObjId }
-    ];
+    // Post a visible course completion message into the chat
+    let populatedCompletionMsg = null;
+    try {
+      const completionMsg = await Message.create({
+        conversationId: convId1,
+        sender: req.user.id,
+        recipient: studentId === req.user.id.toString() ? tutorId : studentId,
+        deal: deal._id,
+        messageType: 'deal_complete',
+        text: `🎉 Course marked as completed! Both the tutor and the student can now rate & review each other.`
+      });
 
-    if (tutorId && studentId) {
-      orConditions.push({ conversationId: { $regex: new RegExp(`(${tutorId}.*${studentId}|${studentId}.*${tutorId})`) } });
+      populatedCompletionMsg = await Message.findById(completionMsg._id)
+        .populate('sender', 'name avatar role city')
+        .populate('recipient', 'name avatar role city')
+        .populate('deal');
+    } catch (msgErr) {
+      console.warn('[completeDeal] Could not create completion message:', msgErr.message);
     }
 
-    if (tutorObjId && studentObjId) {
-      orConditions.push({ sender: tutorObjId, recipient: studentObjId });
-      orConditions.push({ sender: studentObjId, recipient: tutorObjId });
-    }
-
-    const deleteResult = await Message.deleteMany({ $or: orConditions });
-
-    console.log(`[completeDeal] Deal ${deal._id} marked completed. Deleted ${deleteResult.deletedCount} messages between tutor ${tutorId} and student ${studentId}.`);
+    console.log(`[completeDeal] Deal ${deal._id} marked completed for tutor ${tutorId} and student ${studentId}.`);
 
     // Notify connected clients via Socket.IO
     const io = req.app.get('io');
@@ -988,6 +1021,7 @@ exports.completeDeal = async (req, res) => {
         tutorId,
         studentId,
         tutorName: deal.tutor?.name || 'Your Tutor',
+        studentName: deal.student?.name || 'Student',
         subject: deal.subject,
         deal
       };
@@ -1001,12 +1035,13 @@ exports.completeDeal = async (req, res) => {
       io.to(`conv_${convId1}`).emit('deal-completed', dealCompletedPayload);
       io.to(`conv_${convId2}`).emit('deal-completed', dealCompletedPayload);
 
-      io.to(convId1).emit('conversation-cleared', { conversationId: convId1, dealId: deal._id });
-      io.to(convId2).emit('conversation-cleared', { conversationId: convId2, dealId: deal._id });
-      io.to(`conv_${convId1}`).emit('conversation-cleared', { conversationId: convId1, dealId: deal._id });
-      io.to(`conv_${convId2}`).emit('conversation-cleared', { conversationId: convId2, dealId: deal._id });
       io.to(`conv_${convId1}`).emit('deal-status-updated', deal);
       io.to(`conv_${convId2}`).emit('deal-status-updated', deal);
+
+      if (populatedCompletionMsg) {
+        io.to(`conv_${convId1}`).emit('new-message', populatedCompletionMsg);
+        io.to(`conv_${convId2}`).emit('new-message', populatedCompletionMsg);
+      }
     }
 
     // In-app notification to the student
@@ -1016,7 +1051,7 @@ exports.completeDeal = async (req, res) => {
           recipient: studentObjId,
           sender: req.user.id,
           title: 'Course Deal Completed! 🎉',
-          message: `Tutor ${deal.tutor?.name || 'Your tutor'} marked the course for "${deal.subject}" as completed. Thank you for learning on IlmiDunya!`,
+          message: `Tutor ${deal.tutor?.name || 'Your tutor'} marked the course for "${deal.subject}" as completed. Please leave a review!`,
           type: 'deal_completed',
           link: '/student/deals'
         });
@@ -1027,9 +1062,8 @@ exports.completeDeal = async (req, res) => {
 
     return res.status(200).json({
       success: true,
-      message: `Deal marked as completed successfully. ${deleteResult.deletedCount > 0 ? `${deleteResult.deletedCount} chat messages were permanently deleted to free database storage.` : 'Conversation messages cleared.'}`,
-      deal,
-      deletedMessagesCount: deleteResult.deletedCount
+      message: 'Deal marked as completed successfully. Both tutor and student can now rate and review each other.',
+      deal
     });
   } catch (error) {
     console.error('Error completing deal:', error);

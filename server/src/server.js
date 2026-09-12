@@ -100,12 +100,14 @@ const startServer = async () => {
   try {
     await connectDB();
 
-    // Auto-seed if empty
     if (process.env.NODE_ENV !== 'test') {
-      const userCount = await User.countDocuments();
-      if (userCount === 0) {
-        console.log('Database empty. Automatically running Pakistan initial seed...');
-        await seedDatabase();
+      // Auto-seed only when explicitly requested (disabled by default in live/production)
+      if (process.env.AUTO_SEED === 'true') {
+        const userCount = await User.countDocuments();
+        if (userCount === 0) {
+          console.log('Database empty and AUTO_SEED=true. Running Pakistan initial seed...');
+          await seedDatabase();
+        }
       }
 
       // Clear legacy unintended default city/gender for accounts registered without them

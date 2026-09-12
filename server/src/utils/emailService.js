@@ -1436,99 +1436,13 @@ const sendOfflineSupportInquiryEmail = async ({ userName, userEmail, messageText
 };
 
 // ==========================================
-// 13. EARLY TUTOR REGISTRATION ADMIN NOTIFICATION
+// 13. EARLY TUTOR REGISTRATION ADMIN NOTIFICATION (DISABLED - Dashboard notification used instead)
 // ==========================================
-const sendEarlyTutorRegistrationAdminAlert = async ({
-  name,
-  email,
-  phone,
-  city,
-  whatWillYouTeach,
-  teachingMode,
-  gender,
-  registeredAt = new Date()
-}) => {
-  const adminEmail = process.env.ADMIN_EMAIL || process.env.SMTP_USER || 'info@ilmidunya.com';
-  const emailSubject = `🎓 New Early Tutor Application: ${name} (${city || 'Online'}) - ${whatWillYouTeach || 'Academics & Quran'}`;
-  const clientUrl = getClientBaseUrl();
-  const approvalsUrl = `${clientUrl}/admin/tutor-approvals`;
-
-  const html = `
-    <!DOCTYPE html>
-    <html>
-    <head><meta charset="utf-8" /></head>
-    <body style="font-family: 'Plus Jakarta Sans', Arial, sans-serif; background-color: #f8fafc; margin: 0; padding: 24px;">
-      <table style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 16px; border: 1px solid #e2e8f0; overflow: hidden; box-shadow: 0 4px 14px rgba(0,0,0,0.06);">
-        <tr>
-          <td style="background-color: #0c2217; padding: 26px; text-align: center;">
-            <h2 style="color: #d4a359; margin: 0; font-size: 22px; font-weight: 800;">IlmiDunya Early Tutor Registration</h2>
-            <p style="color: #ffffff; margin: 6px 0 0 0; font-size: 13px;">New Faculty Registration Received</p>
-          </td>
-        </tr>
-        <tr>
-          <td style="padding: 26px; color: #1e293b; font-size: 14px; line-height: 1.6;">
-            <p style="margin-top: 0;"><strong>A new educator has registered on IlmiDunya:</strong></p>
-            
-            <table style="width: 100%; border-collapse: collapse; margin: 18px 0; background-color: #f8fafc; border-radius: 10px; overflow: hidden; border: 1px solid #e2e8f0;">
-              <tr style="border-bottom: 1px solid #e2e8f0;">
-                <td style="padding: 12px 16px; font-weight: bold; color: #475569; width: 35%;">Tutor Name:</td>
-                <td style="padding: 12px 16px; font-weight: 700; color: #0f172a;">${name}</td>
-              </tr>
-              <tr style="border-bottom: 1px solid #e2e8f0;">
-                <td style="padding: 12px 16px; font-weight: bold; color: #475569;">Email Address:</td>
-                <td style="padding: 12px 16px; color: #0f172a;"><a href="mailto:${email}" style="color: #b85d34; font-weight: bold;">${email}</a></td>
-              </tr>
-              <tr style="border-bottom: 1px solid #e2e8f0;">
-                <td style="padding: 12px 16px; font-weight: bold; color: #475569;">WhatsApp Phone:</td>
-                <td style="padding: 12px 16px; font-weight: 700; color: #0f172a;">
-                  <a href="https://wa.me/${(phone || '').replace(/[^0-9]/g, '')}" target="_blank" style="color: #10b981; text-decoration: none;">💬 ${phone}</a>
-                </td>
-              </tr>
-              <tr style="border-bottom: 1px solid #e2e8f0;">
-                <td style="padding: 12px 16px; font-weight: bold; color: #475569;">What Will You Teach:</td>
-                <td style="padding: 12px 16px; font-weight: bold; color: #0c2217; background-color: #fef3c7;">${whatWillYouTeach || 'Not specified'}</td>
-              </tr>
-              <tr style="border-bottom: 1px solid #e2e8f0;">
-                <td style="padding: 12px 16px; font-weight: bold; color: #475569;">City:</td>
-                <td style="padding: 12px 16px; color: #0f172a; font-weight: 600;">${city || 'Not specified'}</td>
-              </tr>
-              <tr style="border-bottom: 1px solid #e2e8f0;">
-                <td style="padding: 12px 16px; font-weight: bold; color: #475569;">Teaching Mode:</td>
-                <td style="padding: 12px 16px; color: #0f172a;">${teachingMode === 'both' ? 'Online WebRTC & In-Person' : (teachingMode === 'in_person' ? 'In-Person (Home)' : 'Online (In-Browser WebRTC)')}</td>
-              </tr>
-              <tr>
-                <td style="padding: 12px 16px; font-weight: bold; color: #475569;">Gender:</td>
-                <td style="padding: 12px 16px; color: #0f172a; text-transform: capitalize;">${gender || 'Not specified'}</td>
-              </tr>
-            </table>
-
-            <div style="text-align: center; margin: 26px 0 10px 0;">
-              <a href="https://wa.me/${(phone || '').replace(/[^0-9]/g, '')}" style="background-color: #25D366; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block; margin-right: 8px;">
-                WhatsApp Tutor
-              </a>
-              <a href="${approvalsUrl}" style="background-color: #0c2217; color: #d4a359; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
-                Open Admin Queue
-              </a>
-            </div>
-          </td>
-        </tr>
-        <tr>
-          <td style="background-color: #f8fafc; border-top: 1px solid #e2e8f0; padding: 16px; text-align: center; font-size: 11px; color: #94a3b8;">
-            IlmiDunya Pakistan &bull; Faculty Onboarding &bull; Lahore, Pakistan
-          </td>
-        </tr>
-      </table>
-    </body>
-    </html>
-  `;
-
-  return sendEmailDetailed({
-    to: adminEmail,
-    subject: emailSubject,
-    html,
-    replyTo: email
-  });
+const sendEarlyTutorRegistrationAdminAlert = async () => {
+  // Disabled: Admin requested no new registrant email notifications; in-app dashboard notification is used instead.
+  return { success: true, message: 'Admin email notification disabled; in-app dashboard notification active.' };
 };
+
 
 // ==========================================
 // 14. EARLY TUTOR REGISTRATION CONFIRMATION NOTICE

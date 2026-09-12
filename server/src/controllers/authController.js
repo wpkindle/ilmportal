@@ -5,8 +5,7 @@ const {
   sendVerificationOtpEmail,
   sendEmailChangeOtpEmail,
   sendEmailDetailed,
-  sendPasswordResetEmail,
-  sendEarlyTutorRegistrationAdminAlert
+  sendPasswordResetEmail
 } = require('../utils/emailService');
 const jwt = require('jsonwebtoken');
 const crypto = require('crypto');
@@ -160,20 +159,7 @@ exports.register = async (req, res) => {
         verificationStatus: 'incomplete'
       });
 
-      // Send email alert with tutor data to info@ilmidunya.com
-      sendEarlyTutorRegistrationAdminAlert({
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        city: user.city,
-        whatWillYouTeach: (req.body.qualifications || req.body.whatWillYouTeach || req.body.bio || '').trim(),
-        teachingMode: req.body.teachingMode || 'online',
-        gender: user.gender
-      }).catch((err) => {
-        console.error('Admin early tutor registration alert email error:', err.message);
-      });
-
-      // Notify admin
+      // Notify admin in dashboard
       const adminUser = await User.findOne({ role: 'admin' });
       if (adminUser) {
         await Notification.create({
@@ -184,6 +170,19 @@ exports.register = async (req, res) => {
           type: 'tutor_application',
           link: '/admin/tutor-approvals'
         });
+      }
+    } else if (userRole === 'student') {
+      // Notify admin in dashboard for new student registration
+      const adminUser = await User.findOne({ role: 'admin' });
+      if (adminUser) {
+        await Notification.create({
+          recipient: adminUser._id,
+          sender: user._id,
+          title: 'New Student Registration',
+          message: `${user.name}${user.username ? ` (@${user.username})` : ''} registered as a student from ${user.city || 'Pakistan'}.`,
+          type: 'system',
+          link: '/admin/users'
+        }).catch(() => {});
       }
     }
 
@@ -288,17 +287,6 @@ exports.verifyOtp = async (req, res) => {
     let tutorProfile = null;
     if (user.role === 'tutor') {
       tutorProfile = await TutorProfile.findOne({ user: user._id });
-      sendEarlyTutorRegistrationAdminAlert({
-        name: user.name,
-        email: user.email,
-        phone: user.phone,
-        city: user.city,
-        whatWillYouTeach: tutorProfile?.qualifications || tutorProfile?.bio || '',
-        teachingMode: 'online',
-        gender: user.gender
-      }).catch((err) => {
-        console.error('Admin tutor verification alert email error:', err.message);
-      });
     }
 
     const completion = calculateProfileCompletion(user, tutorProfile);
@@ -1053,19 +1041,6 @@ exports.registerEarlyTutor = async (req, res) => {
       });
     }
 
-    // Send detailed email with tutor data to info@ilmidunya.com
-    // (Registrar does NOT receive any email; admin will follow up manually with info@ilmidunya.com)
-    sendEarlyTutorRegistrationAdminAlert({
-      name: user.name,
-      email: user.email,
-      phone: user.phone || userPhone,
-      city: user.city || userCity,
-      whatWillYouTeach: teachSubject || tutorProfile?.qualifications || '',
-      teachingMode: userTeachingMode,
-      gender: user.gender || userGender
-    }).catch((err) => {
-      console.error('Admin early tutor registration alert email error:', err.message);
-    });
 
     // Notify admin in database
     const adminUser = await User.findOne({ role: 'admin' });

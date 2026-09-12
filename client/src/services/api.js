@@ -301,7 +301,9 @@ export const api = {
     const query = new URLSearchParams(params).toString();
     return fetch(`${API_BASE}/tutors?${query}`).then(handleResponse);
   },
-  getTutorById: (id) => fetch(`${API_BASE}/tutors/${id}`).then(handleResponse),
+  getTutorById: (id) => fetch(`${API_BASE}/tutors/${id}`, {
+    headers: getHeaders()
+  }).then(handleResponse),
 
   getMyTutorProfile: () => fetch(`${API_BASE}/tutors/profile/me`, {
     headers: getHeaders()

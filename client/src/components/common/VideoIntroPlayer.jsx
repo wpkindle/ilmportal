@@ -36,9 +36,9 @@ export default function VideoIntroPlayer({
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Retry</span>
           </button>
-          {videoInfo.originalUrl && (
+          {(videoInfo.src || videoInfo.originalUrl) && (
             <a
-              href={videoInfo.originalUrl}
+              href={videoInfo.src || videoInfo.originalUrl}
               target="_blank"
               rel="noopener noreferrer"
               className="px-3 py-1.5 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-xs font-bold text-white flex items-center gap-1.5 transition-all shadow-sm"

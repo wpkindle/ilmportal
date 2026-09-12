@@ -38,6 +38,10 @@ const connectDB = async () => {
     if (!mongoServerInstance) {
       const dbDir = path.join(__dirname, '../../data/db');
       fs.mkdirSync(dbDir, { recursive: true });
+      try {
+        const lockFile = path.join(dbDir, 'mongod.lock');
+        if (fs.existsSync(lockFile)) fs.unlinkSync(lockFile);
+      } catch (_) {}
       console.log(`Starting persistent embedded MongoDB Server at: ${dbDir}...`);
       const { MongoMemoryServer } = require('mongodb-memory-server');
       mongoServerInstance = await MongoMemoryServer.create({

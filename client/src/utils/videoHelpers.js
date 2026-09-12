@@ -4,6 +4,30 @@
  * Supports: YouTube, Vimeo, Loom, Google Drive, and Direct Video Files (MP4/WebM/MOV).
  */
 
+export function getBackendOrigin() {
+  if (process.env.NEXT_PUBLIC_BACKEND_URL) {
+    return process.env.NEXT_PUBLIC_BACKEND_URL.replace(/\/+$/, '');
+  }
+  if (process.env.NEXT_PUBLIC_SOCKET_URL) {
+    return process.env.NEXT_PUBLIC_SOCKET_URL.replace(/\/+$/, '');
+  }
+  if (process.env.NEXT_PUBLIC_API_URL) {
+    return process.env.NEXT_PUBLIC_API_URL.replace(/\/api\/?$/, '');
+  }
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    if (
+      hostname === 'ilmidunya.com' ||
+      hostname.endsWith('.ilmidunya.com') ||
+      hostname === 'ilmportal.vercel.app' ||
+      hostname.includes('vercel.app')
+    ) {
+      return 'https://ilmportal-backend.onrender.com';
+    }
+  }
+  return 'http://localhost:5000';
+}
+
 export function getVideoEmbedInfo(url) {
   if (!url || typeof url !== 'string') return null;
   const trimmed = url.trim();
@@ -63,21 +87,23 @@ export function getVideoEmbedInfo(url) {
     };
   }
 
-  // 5. Direct Video File or Local Server Upload
+  // 5. Direct Video File, Cloudinary CDN, or Local Server Upload
+  const isCloudinary = trimmed.includes('res.cloudinary.com') && (trimmed.includes('/video/') || trimmed.includes('/upload/'));
   const isDirectVideo =
     trimmed.startsWith('/uploads/') ||
     trimmed.startsWith('data:video/') ||
     trimmed.startsWith('blob:') ||
+    isCloudinary ||
     /\.(mp4|webm|ogg|mov|mkv|avi)(\?.*)?$/i.test(trimmed);
 
-  const backendUrl = process.env.NEXT_PUBLIC_BACKEND_URL || 'http://localhost:5000';
+  const backendUrl = getBackendOrigin();
   const fullSrc = trimmed.startsWith('/')
     ? `${backendUrl}${trimmed}`
     : trimmed;
 
   return {
-    type: isDirectVideo ? 'direct' : 'direct',
-    platform: isDirectVideo ? 'Direct Video' : 'Web Video',
+    type: 'direct',
+    platform: isCloudinary ? 'Cloud Video' : (isDirectVideo ? 'Direct Video' : 'Web Video'),
     src: fullSrc,
     originalUrl: trimmed
   };

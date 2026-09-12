@@ -8,7 +8,7 @@ const {
   uploadSanad,
   uploadVideoIntro
 } = require('../controllers/tutorController');
-const { protect } = require('../middleware/authMiddleware');
+const { protect, optionalAuth } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 const upload = require('../middleware/uploadMiddleware');
 const videoUpload = require('../middleware/videoUploadMiddleware');
@@ -18,7 +18,7 @@ router.get('/profile/me', protect, authorize('tutor'), getMyTutorProfile);
 router.put('/profile/me', protect, authorize('tutor'), updateMyTutorProfile);
 router.post('/sanad/upload', protect, authorize('tutor'), upload.single('sanad'), uploadSanad);
 router.post('/video-intro/upload', protect, authorize('tutor'), videoUpload.single('video'), uploadVideoIntro);
-router.get('/:id', getTutorById);
+router.get('/:id', optionalAuth, getTutorById);
 
 module.exports = router;
 

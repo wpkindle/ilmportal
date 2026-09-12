@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const TutorProfile = require('../models/TutorProfile');
 const User = require('../models/User');
 const Category = require('../models/Category');
@@ -260,17 +261,32 @@ exports.getPublicTutors = async (req, res) => {
 // @route   GET /api/tutors/:id
 exports.getTutorById = async (req, res) => {
   try {
-    let tutor = await TutorProfile.findById(req.params.id)
-      .populate('user', 'name email avatar phone city area age gender role isVerified isActive createdAt')
-      .populate('subjects', 'name slug type icon description')
-      .populate('cities', 'name province isMajorCity');
+    let tutor = null;
+    const isValidObjectId = mongoose.Types.ObjectId.isValid(req.params.id);
 
-    // If ID was user ID instead of tutor profile ID
-    if (!tutor) {
-      tutor = await TutorProfile.findOne({ user: req.params.id })
+    if (isValidObjectId) {
+      tutor = await TutorProfile.findById(req.params.id)
         .populate('user', 'name email avatar phone city area age gender role isVerified isActive createdAt')
         .populate('subjects', 'name slug type icon description')
         .populate('cities', 'name province isMajorCity');
+
+      // If ID was user ID instead of tutor profile ID
+      if (!tutor) {
+        tutor = await TutorProfile.findOne({ user: req.params.id })
+          .populate('user', 'name email avatar phone city area age gender role isVerified isActive createdAt')
+          .populate('subjects', 'name slug type icon description')
+          .populate('cities', 'name province isMajorCity');
+      }
+    }
+
+    if (!tutor) {
+      const userDoc = await User.findOne({ username: req.params.id.toLowerCase() });
+      if (userDoc) {
+        tutor = await TutorProfile.findOne({ user: userDoc._id })
+          .populate('user', 'name email avatar phone city area age gender role isVerified isActive createdAt')
+          .populate('subjects', 'name slug type icon description')
+          .populate('cities', 'name province isMajorCity');
+      }
     }
 
     if (!tutor) {
@@ -638,7 +654,41 @@ exports.uploadVideoIntro = async (req, res) => {
     let videoUrl = '';
 
     if (req.file) {
-      videoUrl = `/uploads/${req.file.filename}`;
+      if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
+        try {
+          const { cloudinary } = require('../config/cloudinary');
+          if (req.file.path) {
+            const result = await cloudinary.uploader.upload(req.file.path, {
+              folder: 'ilmportal/tutor-videos',
+              resource_type: 'video',
+              chunk_size: 6000000
+            });
+            if (result && result.secure_url) {
+              videoUrl = result.secure_url;
+              try {
+                const fs = require('fs');
+                if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+              } catch (_) {}
+            }
+          } else if (req.file.buffer) {
+            videoUrl = await new Promise((resolve, reject) => {
+              const stream = cloudinary.uploader.upload_stream(
+                { folder: 'ilmportal/tutor-videos', resource_type: 'video' },
+                (error, result) => {
+                  if (error) return reject(error);
+                  resolve(result.secure_url);
+                }
+              );
+              stream.end(req.file.buffer);
+            });
+          }
+        } catch (cloudErr) {
+          console.warn('Cloudinary video upload failed, falling back to local file path:', cloudErr);
+          videoUrl = `/uploads/${req.file.filename}`;
+        }
+      } else {
+        videoUrl = `/uploads/${req.file.filename}`;
+      }
     } else if (req.body.videoUrl || req.body.videoIntro) {
       videoUrl = (req.body.videoUrl || req.body.videoIntro).trim();
     } else {

@@ -38,10 +38,12 @@ import { useSocket } from '../../../context/SocketContext';
 import { api } from '../../../services/api';
 import { getTutorAvatar, parseDegreesAndCertificates } from '../../../utils/tutorHelpers';
 
-export default function TutorProfileClient({ tutor, reviews = [] }) {
+export default function TutorProfileClient({ tutor: initialTutor, reviews = [], id }) {
   const router = useRouter();
-  const { user, isAuthenticated, isTutor } = useAuth();
+  const { user, isAuthenticated, isTutor, tutorProfile } = useAuth();
   const [mounted, setMounted] = useState(false);
+  const [currentTutor, setCurrentTutor] = useState(initialTutor);
+  const tutor = currentTutor || initialTutor || {};
   const [sanadModalOpen, setSanadModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [femaleGateModalOpen, setFemaleGateModalOpen] = useState(false);
@@ -76,6 +78,27 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
     setMounted(true);
   }, []);
 
+  // Sync if initialTutor prop changes
+  useEffect(() => {
+    if (initialTutor) {
+      setCurrentTutor(initialTutor);
+    }
+  }, [initialTutor]);
+
+  // Client-side fetch fresh tutor profile on mount to avoid stale ISR cache
+  useEffect(() => {
+    const idToFetch = id || tutorUserIdStr || tutor?._id || tutorUser?._id || tutorUser?.id;
+    if (idToFetch) {
+      api.getTutorById(idToFetch).then((res) => {
+        if (res?.success && res.tutor) {
+          setCurrentTutor(res.tutor);
+        }
+      }).catch((err) => {
+        console.error('Error fetching client-side tutor profile:', err);
+      });
+    }
+  }, [id, tutorUserIdStr, tutor?._id, tutorUser?._id]);
+
   // Sync initial reviews prop if changed
   useEffect(() => {
     if (Array.isArray(reviews) && reviews.length > 0) {
@@ -85,7 +108,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
 
   // Client-side fetch fresh reviews on mount to avoid stale ISR cache
   useEffect(() => {
-    const idToFetch = tutorUserIdStr || tutor?._id || tutorUser?._id || tutorUser?.id;
+    const idToFetch = id || tutorUserIdStr || tutor?._id || tutorUser?._id || tutorUser?.id;
     if (idToFetch) {
       api.getTutorReviews(idToFetch).then((res) => {
         if (res?.success && Array.isArray(res.reviews)) {
@@ -95,7 +118,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
         console.error('Error fetching client-side tutor reviews:', err);
       });
     }
-  }, [tutorUserIdStr, tutor?._id, tutorUser?._id]);
+  }, [id, tutorUserIdStr, tutor?._id, tutorUser?._id]);
 
   const verifiedSanadDocs = React.useMemo(() => {
     return (Array.isArray(tutor?.sanadDocuments) ? tutor.sanadDocuments : []).filter(
@@ -150,6 +173,12 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
 
   const tutorTargetId = tutorUser._id || tutorUser.id || tutor._id;
   const isOwnProfile = Boolean((user?._id || user?.id) && (user?._id || user?.id) === tutorTargetId);
+
+  const effectiveVideoIntro = (
+    tutor?.videoIntro ||
+    (isOwnProfile && tutorProfile?.videoIntro ? tutorProfile.videoIntro : '') ||
+    ''
+  ).trim();
 
   React.useEffect(() => {
     const fetchCourses = async () => {
@@ -391,7 +420,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
                 </button>
               )}
 
-              {tutor.videoIntro && (
+              {effectiveVideoIntro && (
                 <a
                   href="#tutor-video-intro"
                   className="px-4 py-3 rounded-2xl text-xs sm:text-sm font-bold bg-[#faf8f5] hover:bg-[#f0ece1] text-[#0c2217] border border-[#e6ded1] hover:border-[#b85d34]/40 transition-all shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer flex-1 sm:flex-initial"
@@ -498,7 +527,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
         </div>
 
         {/* Tutor Video Introduction Section (Displayed only if tutor has added one) */}
-        {tutor.videoIntro && (
+        {effectiveVideoIntro && (
           <div id="tutor-video-intro" className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e6ded1] shadow-2xs space-y-4 scroll-mt-24">
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
               <div>
@@ -523,7 +552,7 @@ export default function TutorProfileClient({ tutor, reviews = [] }) {
 
             <div className="max-w-3xl mx-auto pt-1">
               <VideoIntroPlayer
-                videoUrl={tutor.videoIntro}
+                videoUrl={effectiveVideoIntro}
                 tutorName={tutorName}
               />
             </div>

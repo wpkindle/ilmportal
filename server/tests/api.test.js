@@ -412,7 +412,24 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
     expect(publicRes.body.success).toBe(true);
     expect(publicRes.body.tutor.videoIntro).toEqual('https://www.youtube.com/watch?v=dQw4w9WgXcQ');
 
-    // 3. Test video-intro upload endpoint with videoUrl payload
+    // 3. Test video-intro upload endpoint with multipart file upload
+    const fileUploadRes = await request(app)
+      .post('/api/tutors/video-intro/upload')
+      .set('Authorization', `Bearer ${tutorToken}`)
+      .attach('video', Buffer.from('fake-mp4-video-stream'), 'intro.mp4');
+
+    expect(fileUploadRes.statusCode).toEqual(200);
+    expect(fileUploadRes.body.success).toBe(true);
+    expect(fileUploadRes.body.videoIntro).toMatch(/(\/uploads\/video-intro|res\.cloudinary\.com)/);
+
+    // 4. Fetch profile with auth token and verify videoIntro is populated
+    const authProfileRes = await request(app)
+      .get(`/api/tutors/${tutorProfileId}`)
+      .set('Authorization', `Bearer ${tutorToken}`);
+    expect(authProfileRes.statusCode).toEqual(200);
+    expect(authProfileRes.body.tutor.videoIntro).toEqual(fileUploadRes.body.videoIntro);
+
+    // 5. Test video-intro upload endpoint with videoUrl payload
     const uploadRes = await request(app)
       .post('/api/tutors/video-intro/upload')
       .set('Authorization', `Bearer ${tutorToken}`)
@@ -424,7 +441,7 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
     expect(uploadRes.body.success).toBe(true);
     expect(uploadRes.body.videoIntro).toEqual('https://www.loom.com/share/test12345');
 
-    // 4. Tutor can clear video intro and completion remains 100%
+    // 6. Tutor can clear video intro and completion remains 100%
     const clearRes = await request(app)
       .put('/api/tutors/profile/me')
       .set('Authorization', `Bearer ${tutorToken}`)

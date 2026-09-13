@@ -73,7 +73,13 @@ function TutorProfileContent() {
   const { isConnected } = useSocket();
 
   // Active Tab State & Scroll Ref for smooth mobile tab centering
-  const [activeTab, setActiveTab] = useState('personal');
+  const initialTab = searchParams.get('tab');
+  const [activeTab, setActiveTab] = useState(() => {
+    if (initialTab && ['personal', 'degrees', 'payments', 'video', 'security'].includes(initialTab)) {
+      return initialTab;
+    }
+    return 'personal';
+  });
   const tabBarRef = useRef(null);
   const activeTabBtnRef = useRef(null);
   const saveFeedbackTimeoutRef = useRef(null);
@@ -288,8 +294,13 @@ function TutorProfileContent() {
         if (focusable && typeof focusable.focus === 'function') {
           try { focusable.focus({ preventScroll: true }); } catch {}
         }
+      } else {
+        const workspace = document.getElementById('profile-tab-workspace');
+        if (workspace) {
+          workspace.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
       }
-    }, 80);
+    }, 100);
   };
 
   const navigateToSection = (targetUrlOrHash, item) => {
@@ -1187,7 +1198,7 @@ function TutorProfileContent() {
 
                 <div className="space-y-4">
                   {/* Profile Photo Uploader (Easy Access on Mobile) */}
-                  <div className="flex items-center gap-4 p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl">
+                  <div id="profile-avatar" className="scroll-mt-28 flex items-center gap-4 p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl">
                     <div className="relative inline-block shrink-0">
                       <img
                         src={avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Tutor')}&background=0c2217&color=faf8f5&size=200`}

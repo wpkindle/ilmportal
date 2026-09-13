@@ -226,12 +226,18 @@ export default function ProfileCompletionMeter({
   const handleItemClick = (e, item) => {
     if (!item) return;
 
-    // External link (e.g. /verify-email)
-    if (item.key === 'email' || item.link?.startsWith('/verify-email')) {
-      return; // Allow standard navigation
+    if (e && typeof e.preventDefault === 'function') {
+      e.preventDefault();
+      e.stopPropagation();
     }
 
-    e.preventDefault();
+    // External link (e.g. /verify-email)
+    if (item.key === 'email' || item.link?.startsWith('/verify-email')) {
+      if (typeof window !== 'undefined') {
+        window.location.href = item.link;
+      }
+      return;
+    }
 
     // 1. Direct onTabSelect callback to immediately switch active tab
     if (onTabSelect && item.tab) {
@@ -239,36 +245,35 @@ export default function ProfileCompletionMeter({
       return;
     }
 
-    // 2. Direct onNavigate callback
+    // 2. Direct DOM Tab Button click: physically trigger the tab button if on profile page
+    if (typeof window !== 'undefined' && item.tab) {
+      const tabBtn = document.getElementById(`tab-btn-${item.tab}`);
+      if (tabBtn) {
+        tabBtn.click();
+        if (item.targetFieldId) {
+          setTimeout(() => {
+            const el = document.getElementById(item.targetFieldId);
+            if (el) {
+              el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+              el.classList.add('ring-4', 'ring-[#d4a359]', 'ring-offset-4', 'transition-all', 'duration-500');
+              setTimeout(() => el.classList.remove('ring-4', 'ring-[#d4a359]', 'ring-offset-4'), 2500);
+            }
+          }, 120);
+        }
+        return;
+      }
+    }
+
+    // 3. Direct onNavigate callback
     if (onNavigate) {
       onNavigate(item.link || item.tab, item);
       return;
     }
 
-    // 3. Direct DOM Tab Button click: physically trigger the tab button
+    // 4. Fallback navigation: when clicked from another page (e.g. /tutor/dashboard)
     if (typeof window !== 'undefined') {
-      if (item.tab) {
-        const tabBtn = document.getElementById(`tab-btn-${item.tab}`);
-        if (tabBtn) {
-          tabBtn.click();
-          if (item.targetFieldId) {
-            setTimeout(() => {
-              const el = document.getElementById(item.targetFieldId);
-              if (el) {
-                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                el.classList.add('ring-4', 'ring-[#d4a359]', 'ring-offset-4', 'transition-all', 'duration-500');
-                setTimeout(() => el.classList.remove('ring-4', 'ring-[#d4a359]', 'ring-offset-4'), 2500);
-              }
-            }, 100);
-          }
-          return;
-        }
-      }
-
-      // 4. Fallback navigation
-      if (item.link) {
-        window.location.href = item.link;
-      }
+      const targetUrl = item.link || `/tutor/profile?tab=${item.tab || 'personal'}`;
+      window.location.href = targetUrl;
     }
   };
   const isApproved = tutorProfile?.verificationStatus === 'approved';
@@ -448,17 +453,32 @@ export default function ProfileCompletionMeter({
           {remainingItems.length > 0 && (
             <div className="flex flex-wrap items-center gap-2 pt-1">
               <span className="text-[11px] font-medium text-stone-500">Complete to reach 100%:</span>
-              {remainingItems.slice(0, 4).map((item) => (
-                <Link
-                  key={item.key}
-                  href={item.link}
-                  onClick={(e) => handleItemClick(e, item)}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#faf8f5] hover:bg-[#f5f0e6] text-[#0c2217] text-[11px] font-bold border border-[#ebe3d3] transition-all cursor-pointer shadow-xs"
-                >
-                  <span>{item.actionLabel}</span>
-                  <ArrowRight className="w-3 h-3 text-[#b85d34]" />
-                </Link>
-              ))}
+              {remainingItems.slice(0, 4).map((item) => {
+                const isExternal = item.key === 'email' || item.link?.startsWith('/verify-email');
+                if (isExternal) {
+                  return (
+                    <Link
+                      key={item.key}
+                      href={item.link}
+                      className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#faf8f5] hover:bg-[#f5f0e6] text-[#0c2217] text-[11px] font-bold border border-[#ebe3d3] transition-all cursor-pointer shadow-xs"
+                    >
+                      <span>{item.actionLabel}</span>
+                      <ArrowRight className="w-3 h-3 text-[#b85d34]" />
+                    </Link>
+                  );
+                }
+                return (
+                  <button
+                    key={item.key}
+                    type="button"
+                    onClick={(e) => handleItemClick(e, item)}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#faf8f5] hover:bg-[#f5f0e6] text-[#0c2217] text-[11px] font-bold border border-[#ebe3d3] transition-all cursor-pointer shadow-xs"
+                  >
+                    <span>{item.actionLabel}</span>
+                    <ArrowRight className="w-3 h-3 text-[#b85d34]" />
+                  </button>
+                );
+              })}
               {remainingItems.length > 4 && (
                 <button
                   type="button"
@@ -530,15 +550,23 @@ export default function ProfileCompletionMeter({
                       <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/80 border border-emerald-300 px-2 py-0.5 rounded-full">
                         Done
                       </span>
-                    ) : (
+                    ) : item.key === 'email' || item.link?.startsWith('/verify-email') ? (
                       <Link
                         href={item.link}
-                        onClick={(e) => handleItemClick(e, item)}
                         className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[10px] font-bold shadow-xs transition-all cursor-pointer"
                       >
                         <span>{item.actionLabel}</span>
                         <ArrowRight className="w-2.5 h-2.5" />
                       </Link>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={(e) => handleItemClick(e, item)}
+                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[10px] font-bold shadow-xs transition-all cursor-pointer"
+                      >
+                        <span>{item.actionLabel}</span>
+                        <ArrowRight className="w-2.5 h-2.5" />
+                      </button>
                     )}
                   </div>
                 </div>
@@ -605,17 +633,32 @@ export default function ProfileCompletionMeter({
       {remainingItems.length > 0 && (
         <div className="flex flex-wrap items-center gap-2 pt-0.5">
           <span className="text-[11px] font-bold text-slate-500">Remaining to reach 100%:</span>
-          {remainingItems.slice(0, 4).map((item) => (
-            <Link
-              key={item.key}
-              href={item.link}
-              onClick={(e) => handleItemClick(e, item)}
-              className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#f0ece1] hover:bg-[#e6dfd5] text-[#0c2217] text-[11px] font-bold border border-[#d4a359]/40 transition-all cursor-pointer"
-            >
-              <span>{item.actionLabel}</span>
-              <ArrowRight className="w-3 h-3 text-[#b85d34]" />
-            </Link>
-          ))}
+          {remainingItems.slice(0, 4).map((item) => {
+            const isExternal = item.key === 'email' || item.link?.startsWith('/verify-email');
+            if (isExternal) {
+              return (
+                <Link
+                  key={item.key}
+                  href={item.link}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#f0ece1] hover:bg-[#e6dfd5] text-[#0c2217] text-[11px] font-bold border border-[#d4a359]/40 transition-all cursor-pointer"
+                >
+                  <span>{item.actionLabel}</span>
+                  <ArrowRight className="w-3 h-3 text-[#b85d34]" />
+                </Link>
+              );
+            }
+            return (
+              <button
+                key={item.key}
+                type="button"
+                onClick={(e) => handleItemClick(e, item)}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#f0ece1] hover:bg-[#e6dfd5] text-[#0c2217] text-[11px] font-bold border border-[#d4a359]/40 transition-all cursor-pointer"
+              >
+                <span>{item.actionLabel}</span>
+                <ArrowRight className="w-3 h-3 text-[#b85d34]" />
+              </button>
+            );
+          })}
           {remainingItems.length > 4 && (
             <button
               type="button"
@@ -687,15 +730,23 @@ export default function ProfileCompletionMeter({
                   <span className="text-[10px] font-bold text-[#0c2217] bg-[#f0ece1] border border-[#d4a359]/30 px-2 py-0.5 rounded-full">
                     Done (+{item.weight}%)
                   </span>
-                ) : (
+                ) : item.key === 'email' || item.link?.startsWith('/verify-email') ? (
                   <Link
                     href={item.link}
-                    onClick={(e) => handleItemClick(e, item)}
                     className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[11px] font-bold shadow-2xs transition-all hover:scale-102 cursor-pointer"
                   >
                     <span>{item.actionLabel}</span>
                     <ArrowRight className="w-3 h-3" />
                   </Link>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={(e) => handleItemClick(e, item)}
+                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[11px] font-bold shadow-2xs transition-all hover:scale-102 cursor-pointer"
+                  >
+                    <span>{item.actionLabel}</span>
+                    <ArrowRight className="w-3 h-3" />
+                  </button>
                 )}
               </div>
             </div>

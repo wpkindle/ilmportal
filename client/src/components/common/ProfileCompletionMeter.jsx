@@ -196,10 +196,56 @@ export default function ProfileCompletionMeter({
   tutorProfile,
   className = '',
   alwaysShow = false,
-  showGreeting = true
+  showGreeting = true,
+  onNavigate
 }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const { percentage, items } = calculateClientCompletion(user, tutorProfile);
+
+  const handleItemClick = (e, item) => {
+    if (!item?.link) return;
+
+    // External link or non-hash link (e.g. /verify-email): let browser / Next.js navigate
+    if (!item.link.includes('#')) {
+      return;
+    }
+
+    if (onNavigate) {
+      e.preventDefault();
+      onNavigate(item.link, item);
+      return;
+    }
+
+    // Direct fallback if rendered without onNavigate prop
+    if (typeof window !== 'undefined') {
+      const [path, hash] = item.link.split('#');
+      if (!path || window.location.pathname === path || window.location.pathname.startsWith(path)) {
+        e.preventDefault();
+        const targetHash = `#${hash}`;
+        try {
+          window.history.pushState(null, '', targetHash);
+        } catch {
+          window.location.hash = hash;
+        }
+        window.dispatchEvent(new CustomEvent('tutor-profile-navigate', { detail: { hash: targetHash } }));
+        window.dispatchEvent(new CustomEvent('profile-navigate', { detail: { hash: targetHash } }));
+
+        // Also attempt direct scroll for single-page profiles
+        const el = document.getElementById(hash);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          el.classList.add('ring-4', 'ring-[#d4a359]', 'ring-offset-2', 'transition-all', 'duration-500');
+          setTimeout(() => {
+            el.classList.remove('ring-4', 'ring-[#d4a359]', 'ring-offset-2');
+          }, 2000);
+          const input = el.querySelector('input:not([type=hidden]), textarea, select');
+          if (input) {
+            try { input.focus({ preventScroll: true }); } catch {}
+          }
+        }
+      }
+    }
+  };
   const isApproved = tutorProfile?.verificationStatus === 'approved';
   const isTutor = user?.role === 'tutor' || !!tutorProfile;
   const hasPendingSanad = isTutor &&
@@ -381,6 +427,7 @@ export default function ProfileCompletionMeter({
                 <Link
                   key={item.key}
                   href={item.link}
+                  onClick={(e) => handleItemClick(e, item)}
                   className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-[#faf8f5] hover:bg-[#f5f0e6] text-[#0c2217] text-[11px] font-bold border border-[#ebe3d3] transition-all cursor-pointer shadow-xs"
                 >
                   <span>{item.actionLabel}</span>
@@ -461,6 +508,7 @@ export default function ProfileCompletionMeter({
                     ) : (
                       <Link
                         href={item.link}
+                        onClick={(e) => handleItemClick(e, item)}
                         className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[10px] font-bold shadow-xs transition-all cursor-pointer"
                       >
                         <span>{item.actionLabel}</span>
@@ -536,6 +584,7 @@ export default function ProfileCompletionMeter({
             <Link
               key={item.key}
               href={item.link}
+              onClick={(e) => handleItemClick(e, item)}
               className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#f0ece1] hover:bg-[#e6dfd5] text-[#0c2217] text-[11px] font-bold border border-[#d4a359]/40 transition-all cursor-pointer"
             >
               <span>{item.actionLabel}</span>
@@ -616,6 +665,7 @@ export default function ProfileCompletionMeter({
                 ) : (
                   <Link
                     href={item.link}
+                    onClick={(e) => handleItemClick(e, item)}
                     className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[11px] font-bold shadow-2xs transition-all hover:scale-102 cursor-pointer"
                   >
                     <span>{item.actionLabel}</span>

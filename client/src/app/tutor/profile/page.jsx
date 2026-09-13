@@ -175,20 +175,152 @@ function TutorProfileContent() {
     fetchDeals();
   }, []);
 
-  // Sync active tab with URL hash if present
-  useEffect(() => {
+  // Comprehensive Hash to Tab mapping for instant redirection across tabs
+  const HASH_TO_TAB_MAP = {
+    // Tab 2: Degrees & Sanads
+    'profile-sanads': 'degrees',
+    '#profile-sanads': 'degrees',
+    'profile-degrees': 'degrees',
+    '#profile-degrees': 'degrees',
+    'degrees': 'degrees',
+    '#degrees': 'degrees',
+    'sanads': 'degrees',
+    '#sanads': 'degrees',
+    'sanad': 'degrees',
+    '#sanad': 'degrees',
+    'upload-sanad': 'degrees',
+    '#upload-sanad': 'degrees',
+
+    // Tab 3: Tuition Payment Accounts
+    'profile-payment-methods': 'payments',
+    '#profile-payment-methods': 'payments',
+    'profile-payments': 'payments',
+    '#profile-payments': 'payments',
+    'payments': 'payments',
+    '#payments': 'payments',
+    'paymentMethods': 'payments',
+    '#paymentMethods': 'payments',
+    'payment-methods': 'payments',
+    '#payment-methods': 'payments',
+    'add-payment-method': 'payments',
+    '#add-payment-method': 'payments',
+
+    // Tab 4: Video Introduction
+    'profile-video-intro': 'video',
+    '#profile-video-intro': 'video',
+    'profile-video': 'video',
+    '#profile-video': 'video',
+    'video': 'video',
+    '#video': 'video',
+
+    // Tab 5: Account & Security
+    'change-email-section': 'security',
+    '#change-email-section': 'security',
+    'profile-security': 'security',
+    '#profile-security': 'security',
+    'security': 'security',
+    '#security': 'security',
+
+    // Tab 1: Personal & Academic Info (default)
+    'profile-name': 'personal',
+    '#profile-name': 'personal',
+    'profile-avatar': 'personal',
+    '#profile-avatar': 'personal',
+    'profile-age': 'personal',
+    '#profile-age': 'personal',
+    'profile-gender': 'personal',
+    '#profile-gender': 'personal',
+    'profile-city': 'personal',
+    '#profile-city': 'personal',
+    'profile-local-area': 'personal',
+    '#profile-local-area': 'personal',
+    'profile-area': 'personal',
+    '#profile-area': 'personal',
+    'profile-subjects': 'personal',
+    '#profile-subjects': 'personal',
+    'profile-qualifications': 'personal',
+    '#profile-qualifications': 'personal',
+    'profile-bio': 'personal',
+    '#profile-bio': 'personal',
+    'personal': 'personal',
+    '#personal': 'personal'
+  };
+
+  const navigateToSection = (targetUrlOrHash) => {
+    if (!targetUrlOrHash) return;
+
+    // Extract anchor ID
+    const hashPart = targetUrlOrHash.includes('#')
+      ? targetUrlOrHash.split('#')[1]
+      : targetUrlOrHash.replace(/^#/, '');
+
+    if (!hashPart) return;
+
+    const targetTab = HASH_TO_TAB_MAP[hashPart] || HASH_TO_TAB_MAP['#' + hashPart] || 'personal';
+
+    // 1. Switch active tab so target element is mounted in DOM
+    setActiveTab(targetTab);
+
+    // 2. Safely sync URL hash without causing harsh page jump
     if (typeof window !== 'undefined') {
-      const hash = window.location.hash;
-      if (hash === '#profile-sanads' || hash === '#profile-degrees' || hash === '#degrees') {
-        setActiveTab('degrees');
-      } else if (hash === '#profile-payment-methods' || hash === '#profile-payments' || hash === '#payments') {
-        setActiveTab('payments');
-      } else if (hash === '#profile-video-intro' || hash === '#profile-video' || hash === '#video') {
-        setActiveTab('video');
-      } else if (hash === '#change-email-section' || hash === '#profile-security' || hash === '#security') {
-        setActiveTab('security');
+      try {
+        window.history.pushState(null, '', `#${hashPart}`);
+      } catch {
+        window.location.hash = hashPart;
       }
     }
+
+    // 3. Scroll to target element with retry to ensure DOM has rendered
+    const executeScroll = (retryCount = 0) => {
+      const el = document.getElementById(hashPart);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+        // Highlight ring animation to guide user's attention
+        el.classList.add('ring-4', 'ring-[#d4a359]', 'ring-offset-4', 'transition-all', 'duration-500');
+        setTimeout(() => {
+          el.classList.remove('ring-4', 'ring-[#d4a359]', 'ring-offset-4');
+        }, 2500);
+
+        // Auto-focus first meaningful interactive element inside the section
+        const focusable = el.querySelector('input:not([type=hidden]):not([disabled]), textarea, select, button');
+        if (focusable && typeof focusable.focus === 'function') {
+          try {
+            focusable.focus({ preventScroll: true });
+          } catch {}
+        }
+      } else if (retryCount < 8) {
+        setTimeout(() => executeScroll(retryCount + 1), 60);
+      }
+    };
+
+    setTimeout(() => executeScroll(0), 100);
+  };
+
+  // Sync active tab with URL hash on mount, hashchange, or custom navigation
+  useEffect(() => {
+    const handleHashSync = () => {
+      if (typeof window !== 'undefined' && window.location.hash) {
+        navigateToSection(window.location.hash);
+      }
+    };
+
+    // Run on initial mount
+    handleHashSync();
+
+    const handleCustomNavigate = (e) => {
+      if (e?.detail?.hash) {
+        navigateToSection(e.detail.hash);
+      }
+    };
+
+    window.addEventListener('hashchange', handleHashSync);
+    window.addEventListener('tutor-profile-navigate', handleCustomNavigate);
+
+    return () => {
+      window.removeEventListener('hashchange', handleHashSync);
+      window.removeEventListener('tutor-profile-navigate', handleCustomNavigate);
+    };
   }, []);
 
   // Smoothly center active tab button horizontally on mobile
@@ -941,7 +1073,7 @@ function TutorProfileContent() {
         <AccountStatusBanner user={user} tutorProfile={tutorProfile} role="tutor" />
 
         {/* Dynamic Profile Completion Meter Widget */}
-        <ProfileCompletionMeter user={user} tutorProfile={tutorProfile} showGreeting={false} />
+        <ProfileCompletionMeter user={user} tutorProfile={tutorProfile} showGreeting={false} onNavigate={navigateToSection} />
 
         {/* Main Layout: Tabs on Top for Mobile, 2-Column on Desktop */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
@@ -1644,7 +1776,7 @@ function TutorProfileContent() {
 
             {/* TAB 2: DEGREES & SANAD DOCUMENTS */}
             {activeTab === 'degrees' && (
-              <div id="profile-sanads" className="bg-white p-5 sm:p-7 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-5 animate-in fade-in">
+              <div id="profile-sanads" className="scroll-mt-28 bg-white p-5 sm:p-7 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-5 animate-in fade-in">
                 <div className="border-b border-stone-100 pb-3 flex items-center justify-between">
                   <div>
                     <h2 className="text-sm font-black text-stone-900 flex items-center gap-2">
@@ -1861,7 +1993,7 @@ function TutorProfileContent() {
 
             {/* TAB 3: TUITION PAYMENT ACCOUNTS */}
             {activeTab === 'payments' && (
-              <div id="profile-payment-methods" className="space-y-5 animate-in fade-in">
+              <div id="profile-payment-methods" className="scroll-mt-28 space-y-5 animate-in fade-in">
                 {/* Informative Header Banner */}
                 <div className="p-3.5 sm:p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-3xl flex items-start gap-3 text-xs text-stone-700">
                   <CreditCard className="w-4 h-4 text-[#0c2217] shrink-0 mt-0.5" />
@@ -1926,7 +2058,7 @@ function TutorProfileContent() {
 
             {/* TAB 4: VIDEO INTRODUCTION */}
             {activeTab === 'video' && (
-              <div id="profile-video-intro" className="bg-white p-5 sm:p-7 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-5 animate-in fade-in">
+              <div id="profile-video-intro" className="scroll-mt-28 bg-white p-5 sm:p-7 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-5 animate-in fade-in">
                 <div className="border-b border-stone-100 pb-3 flex items-center justify-between flex-wrap gap-2">
                   <div>
                     <div className="flex items-center gap-2">
@@ -2110,7 +2242,7 @@ function TutorProfileContent() {
 
             {/* TAB 5: ACCOUNT & SECURITY */}
             {activeTab === 'security' && (
-              <div id="profile-security" className="space-y-5 sm:space-y-6 animate-in fade-in">
+              <div id="profile-security" className="scroll-mt-28 space-y-5 sm:space-y-6 animate-in fade-in">
                 
                 {/* 1. Change Password */}
                 <div className="bg-white p-5 sm:p-7 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-5">

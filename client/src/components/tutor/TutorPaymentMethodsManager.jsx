@@ -375,12 +375,12 @@ export default function TutorPaymentMethodsManager({
               Select which accounts are selected by default when you dispatch payment requests
             </span>
           </div>
-          <div className="inline-flex items-center p-1 bg-white border border-slate-200 rounded-xl shadow-2xs">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 w-full sm:w-auto p-1 bg-white border border-slate-200 rounded-xl shadow-2xs">
             <button
               type="button"
               disabled={updatingChoice}
               onClick={() => handlePreferenceChange('own')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer text-center ${
                 preferredChoice === 'own'
                   ? 'bg-[#0c2217] text-white shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900'
@@ -392,7 +392,7 @@ export default function TutorPaymentMethodsManager({
               type="button"
               disabled={updatingChoice}
               onClick={() => handlePreferenceChange('admin')}
-              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+              className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer text-center ${
                 preferredChoice === 'admin'
                   ? 'bg-[#0c2217] text-white shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900'

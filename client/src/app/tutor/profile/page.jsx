@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useMemo, Suspense } from 'react';
+import React, { useState, useEffect, useMemo, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import {
@@ -36,7 +36,8 @@ import {
   RotateCcw,
   Save,
   HelpCircle,
-  Info
+  Info,
+  ChevronRight
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { useSocket } from '../../../context/SocketContext';
@@ -57,11 +58,11 @@ import TutorPaymentModal from '../../../components/tutor/TutorPaymentModal';
 const pakistaniCities = allPakistaniCities;
 
 const PROFILE_TABS = [
-  { id: 'personal', label: 'Personal & Teaching', icon: User },
-  { id: 'degrees', label: 'Degrees & Sanads', icon: GraduationCap },
-  { id: 'payments', label: 'Tuition Accounts', icon: CreditCard },
-  { id: 'video', label: 'Video Intro', icon: Video },
-  { id: 'security', label: 'Security & Access', icon: Lock }
+  { id: 'personal', shortLabel: 'Personal', fullLabel: 'Personal & Teaching', icon: User },
+  { id: 'degrees', shortLabel: 'Degrees', fullLabel: 'Degrees & Sanads', icon: GraduationCap },
+  { id: 'payments', shortLabel: 'Payments', fullLabel: 'Tuition Accounts', icon: CreditCard },
+  { id: 'video', shortLabel: 'Video', fullLabel: 'Video Intro', icon: Video },
+  { id: 'security', shortLabel: 'Security', fullLabel: 'Security & Access', icon: Lock }
 ];
 
 function TutorProfileContent() {
@@ -70,8 +71,10 @@ function TutorProfileContent() {
   const { user, tutorProfile, updateUserProfile, updateTutorProfileState, loading: authLoading } = useAuth();
   const { isConnected } = useSocket();
 
-  // Active Tab State
+  // Active Tab State & Scroll Ref for smooth mobile tab centering
   const [activeTab, setActiveTab] = useState('personal');
+  const tabBarRef = useRef(null);
+  const activeTabBtnRef = useRef(null);
 
   // Basic Account Details
   const [name, setName] = useState('');
@@ -173,17 +176,28 @@ function TutorProfileContent() {
   useEffect(() => {
     if (typeof window !== 'undefined') {
       const hash = window.location.hash;
-      if (hash === '#profile-sanads' || hash === '#profile-degrees') {
+      if (hash === '#profile-sanads' || hash === '#profile-degrees' || hash === '#degrees') {
         setActiveTab('degrees');
-      } else if (hash === '#profile-payment-methods' || hash === '#profile-payments') {
+      } else if (hash === '#profile-payment-methods' || hash === '#profile-payments' || hash === '#payments') {
         setActiveTab('payments');
-      } else if (hash === '#profile-video-intro' || hash === '#profile-video') {
+      } else if (hash === '#profile-video-intro' || hash === '#profile-video' || hash === '#video') {
         setActiveTab('video');
       } else if (hash === '#change-email-section' || hash === '#profile-security' || hash === '#security') {
         setActiveTab('security');
       }
     }
   }, []);
+
+  // Smoothly center active tab button horizontally on mobile
+  useEffect(() => {
+    if (activeTabBtnRef.current && tabBarRef.current) {
+      activeTabBtnRef.current.scrollIntoView({
+        behavior: 'smooth',
+        block: 'nearest',
+        inline: 'center'
+      });
+    }
+  }, [activeTab]);
 
   // Fetch available categories / disciplines from API
   useEffect(() => {
@@ -402,7 +416,7 @@ function TutorProfileContent() {
     const reader = new FileReader();
     reader.onloadend = () => {
       setAvatar(reader.result);
-      setProfileSuccess('Photo selected! Click "Save Profile Changes" to apply.');
+      setProfileSuccess('Photo selected! Click "Save Profile Changes" below to apply.');
     };
     reader.readAsDataURL(file);
   };
@@ -760,11 +774,11 @@ function TutorProfileContent() {
   }
 
   return (
-    <div className="py-8 bg-[#faf8f5] min-h-screen text-stone-900 pb-28">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
+    <div className="py-6 sm:py-8 bg-[#faf8f5] min-h-screen text-stone-900 pb-28">
+      <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 space-y-5 sm:space-y-6">
         
-        {/* Top Header & Breadcrumb */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        {/* Top Header & Breadcrumb (Save button removed as requested) */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2 text-xs text-stone-500 mb-1">
               <Link href="/tutor/dashboard" className="hover:text-[#0c2217] font-semibold flex items-center gap-1">
@@ -782,33 +796,13 @@ function TutorProfileContent() {
             </p>
           </div>
 
-          <div className="flex items-center gap-2.5 self-start sm:self-center">
-            {hasUnsavedChanges && (
-              <button
-                type="button"
-                onClick={handleDiscardChanges}
-                disabled={savingProfile}
-                className="px-3.5 py-2 bg-white hover:bg-stone-50 border border-stone-300 rounded-2xl text-xs font-semibold text-stone-700 flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer"
-              >
-                <RotateCcw className="w-3.5 h-3.5 text-stone-500" />
-                <span>Discard</span>
-              </button>
-            )}
-
-            <button
-              type="button"
-              onClick={handleUnifiedSave}
-              disabled={savingProfile}
-              className={`px-5 py-2 rounded-2xl text-xs font-bold flex items-center gap-2 shadow-sm transition-all cursor-pointer ${
-                hasUnsavedChanges
-                  ? 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white shadow-[#b85d34]/20 animate-pulse'
-                  : 'bg-[#0c2217] hover:bg-[#143d2b] text-white'
-              }`}
-            >
-              <Save className="w-4 h-4 text-[#d4a359]" />
-              <span>{savingProfile ? 'Saving...' : 'Save Profile Changes'}</span>
-            </button>
-          </div>
+          <Link
+            href="/tutor/dashboard"
+            className="self-start sm:self-center px-4 py-2 bg-white hover:bg-stone-50 border border-[#e6dfd5] rounded-2xl text-xs font-semibold text-stone-700 flex items-center gap-1.5 shadow-2xs transition-colors"
+          >
+            <Layers className="w-3.5 h-3.5 text-[#143d2b]" />
+            <span>Dashboard</span>
+          </Link>
         </div>
 
         {/* 1-Click Email Verification Success Banner */}
@@ -831,7 +825,7 @@ function TutorProfileContent() {
 
         {/* Global Feedback Messages */}
         {profileSuccess && (
-          <div className="p-4 bg-[#f0ece1] border border-[#d4a359]/50 text-[#0c2217] text-xs font-bold rounded-2xl flex items-center justify-between gap-2 shadow-xs animate-in fade-in">
+          <div className="p-3.5 sm:p-4 bg-[#f0ece1] border border-[#d4a359]/50 text-[#0c2217] text-xs font-bold rounded-2xl flex items-center justify-between gap-2 shadow-xs animate-in fade-in">
             <div className="flex items-center gap-2.5">
               <CheckCircle2 className="w-4 h-4 text-[#b85d34] shrink-0" />
               <span>{profileSuccess}</span>
@@ -847,7 +841,7 @@ function TutorProfileContent() {
         )}
 
         {profileError && (
-          <div className="p-4 bg-rose-50 border border-rose-300 text-rose-800 text-xs font-bold rounded-2xl flex items-center justify-between gap-2 shadow-xs animate-in fade-in">
+          <div className="p-3.5 sm:p-4 bg-rose-50 border border-rose-300 text-rose-800 text-xs font-bold rounded-2xl flex items-center justify-between gap-2 shadow-xs animate-in fade-in">
             <div className="flex items-center gap-2.5">
               <AlertCircle className="w-4 h-4 text-rose-600 shrink-0" />
               <span>{profileError}</span>
@@ -864,42 +858,37 @@ function TutorProfileContent() {
 
         {/* Overdue Platform Fee Warning Notice */}
         {overdueDeals.length > 0 && (
-          <div className="p-5 sm:p-6 bg-rose-50 border-2 border-rose-400 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-rose-950 shadow-md animate-in fade-in">
+          <div className="p-4 sm:p-6 bg-rose-50 border-2 border-rose-400 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-rose-950 shadow-md animate-in fade-in">
             <div className="flex items-start sm:items-center gap-3.5">
-              <div className="w-11 h-11 rounded-2xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-600/20">
-                <AlertTriangle className="w-6 h-6" />
+              <div className="w-10 h-10 sm:w-11 sm:h-11 rounded-2xl bg-rose-600 text-white flex items-center justify-center shrink-0 shadow-md shadow-rose-600/20">
+                <AlertTriangle className="w-5 h-5 sm:w-6 sm:h-6" />
               </div>
               <div className="space-y-1">
                 <div className="flex items-center gap-2 flex-wrap">
                   <h3 className="text-sm sm:text-base font-black text-rose-950">
-                    Urgent Policy Notice: Platform Fee Payment Overdue ({overdueDeals.length} {overdueDeals.length === 1 ? 'Course' : 'Courses'})
+                    Urgent Policy Notice: Platform Fee Overdue ({overdueDeals.length} {overdueDeals.length === 1 ? 'Course' : 'Courses'})
                   </h3>
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-rose-600 text-white animate-pulse">
+                  <span className="px-2 py-0.5 rounded-full text-[9.5px] sm:text-[10px] font-black uppercase bg-rose-600 text-white animate-pulse">
                     Live Classroom Locked
                   </span>
                 </div>
                 <p className="text-xs text-rose-800 leading-relaxed font-medium">
-                  The 3-day payment clearance period has expired for {overdueDeals.map(d => `"${d.subject}" (PKR ${(d.platformFee || Math.round((d.price || 0) * 0.10)).toLocaleString()})`).join(', ')}. As per platform rules, your live video classroom access is paused until payment is submitted and cleared.
+                  The 3-day payment clearance period has expired for {overdueDeals.map(d => `"${d.subject}" (PKR ${(d.platformFee || Math.round((d.price || 0) * 0.10)).toLocaleString()})`).join(', ')}. Classroom access is paused until payment is cleared.
                 </p>
-                {overdueDeals[0]?.paymentStatus === 'submitted_proof' && (
-                  <p className="text-[11px] font-semibold text-amber-900 bg-amber-100/80 px-2.5 py-1 rounded-xl border border-amber-300 w-fit">
-                    Payment proof is currently submitted and under review by administration.
-                  </p>
-                )}
               </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto flex-wrap">
+            <div className="flex items-center gap-2 shrink-0 self-stretch sm:self-auto">
               <button
                 type="button"
                 onClick={() => setSelectedDealForPay(overdueDeals[0])}
-                className="px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer flex items-center gap-1.5 hover:scale-105"
+                className="flex-1 sm:flex-none px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer flex items-center justify-center gap-1.5"
               >
                 <CreditCard className="w-4 h-4" />
-                <span>Pay Platform Fee Now</span>
+                <span>Pay Fee</span>
               </button>
               <Link
                 href="/tutor/deals"
-                className="px-3.5 py-2.5 bg-white hover:bg-rose-100 text-rose-900 border border-rose-300 font-bold text-xs rounded-xl transition-all"
+                className="px-3.5 py-2.5 bg-white hover:bg-rose-100 text-rose-900 border border-rose-300 font-bold text-xs rounded-xl transition-all text-center"
               >
                 View Deals
               </Link>
@@ -913,208 +902,67 @@ function TutorProfileContent() {
         {/* Dynamic Profile Completion Meter Widget */}
         <ProfileCompletionMeter user={user} tutorProfile={tutorProfile} showGreeting={false} />
 
-        {/* Main Grid Layout: Profile Card (Left) + Tabs & Content (Right) */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* Main Layout: Tabs on Top for Mobile, 2-Column on Desktop */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
           
-          {/* Left Column: Quick Profile Summary Card */}
-          <div className="lg:col-span-4 space-y-5">
-            <div className="bg-white p-6 rounded-3xl border border-[#e6dfd5] shadow-xs text-center space-y-4">
-              <div id="profile-avatar" className="relative inline-block mx-auto">
-                <img
-                  src={avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Tutor')}&background=0c2217&color=faf8f5&size=200`}
-                  alt={name}
-                  className="w-28 h-28 rounded-full object-cover border-4 border-[#eef5f0] shadow-md mx-auto"
-                />
-
-                {isConnected ? (
-                  <span
-                    className="absolute top-1 right-1 flex h-5 w-5 z-10"
-                    title="Active / Online Now"
-                  >
-                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                    <span className="relative inline-flex rounded-full h-5 w-5 bg-emerald-500 border-2 border-white shadow-sm"></span>
-                  </span>
-                ) : (
-                  <span
-                    className="absolute top-1 right-1 inline-flex rounded-full h-5 w-5 bg-stone-400 border-2 border-white shadow-sm z-10"
-                    title="Offline"
-                  />
-                )}
-                
-                <label className="absolute bottom-0 right-0 p-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-full cursor-pointer shadow-md transition-transform hover:scale-105 z-10">
-                  <Camera className="w-4 h-4" />
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleAvatarChange}
-                    className="hidden"
-                  />
-                </label>
-              </div>
-
-              <div>
-                <h3 className="font-bold text-sm text-stone-900">{name || 'Tutor Name'}</h3>
-                <p className="text-xs text-stone-500">{email || 'tutor@example.com'}</p>
-                <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5">
-                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-[#f0ece1] text-[#0c2217]">
-                    Tutor
-                  </span>
-                  {tutorProfile?.verificationStatus === 'approved' ? (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#b85d34] text-white flex items-center gap-1 shadow-xs">
-                      <ShieldCheck className="w-3 h-3" />
-                      <span>Verified</span>
-                    </span>
-                  ) : tutorProfile?.verificationStatus === 'under_review' || tutorProfile?.verificationStatus === 'pending' ? (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
-                      <Clock className="w-3 h-3 text-amber-600 animate-pulse" />
-                      <span>Pending Review</span>
-                    </span>
-                  ) : (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 text-stone-700 border border-stone-200 flex items-center gap-1">
-                      <AlertCircle className="w-3 h-3 text-stone-500" />
-                      <span>Incomplete</span>
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              <div className="pt-3 border-t border-stone-100 text-left space-y-2.5 text-xs text-stone-600">
-                <div className="flex items-center justify-between">
-                  <span className="text-stone-400">Gender &amp; Age:</span>
-                  <span className="font-bold capitalize">{gender || 'Not set'}{age ? `, ${age} yrs` : ''}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-stone-400">Location:</span>
-                  <span className="font-bold text-right truncate max-w-[170px]">{localArea ? `${localArea}, ${city}` : (city || 'Not set')}</span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-stone-400">Subjects Selected:</span>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('personal')}
-                    className="font-bold text-[#b85d34] hover:underline flex items-center gap-1"
-                  >
-                    <span>{selectedSubjects.length} Classes</span>
-                    <span className="text-[10px]">&rarr;</span>
-                  </button>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-stone-400">Degrees / Sanads:</span>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('degrees')}
-                    className="font-bold text-[#0c2217] hover:underline flex items-center gap-1"
-                  >
-                    <span>{uploadedSanads.length} Uploaded</span>
-                    <span className="text-[10px]">&rarr;</span>
-                  </button>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-stone-400">Payment Accounts:</span>
-                  <button
-                    type="button"
-                    onClick={() => setActiveTab('payments')}
-                    className="font-bold text-[#0c2217] hover:underline flex items-center gap-1"
-                  >
-                    <span>{stagedPaymentMethods.length} Methods ({stagedPreferredChoice === 'admin' ? 'Admin' : 'Own'})</span>
-                    <span className="text-[10px]">&rarr;</span>
-                  </button>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-stone-400">Video Intro:</span>
-                  <span className="font-bold text-right">
-                    {videoIntroInput ? (
-                      <span className="text-emerald-700 font-bold flex items-center gap-1">
-                        <Check className="w-3 h-3" /> Active
-                      </span>
-                    ) : (
-                      <span className="text-stone-400 font-medium">None</span>
-                    )}
-                  </span>
-                </div>
-              </div>
-
-              {/* Single Save Action inside left panel */}
-              <div className="pt-3 border-t border-stone-100">
-                <button
-                  type="button"
-                  onClick={handleUnifiedSave}
-                  disabled={savingProfile}
-                  className={`w-full py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 shadow-xs ${
-                    hasUnsavedChanges
-                      ? 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white shadow-[#b85d34]/30'
-                      : 'bg-[#0c2217] hover:bg-[#143d2b] text-white'
-                  }`}
-                >
-                  <Save className="w-3.5 h-3.5 text-[#d4a359]" />
-                  <span>{savingProfile ? 'Saving All Changes...' : hasUnsavedChanges ? 'Save Unsaved Changes' : 'Save Profile Changes'}</span>
-                </button>
-                {hasUnsavedChanges && (
-                  <p className="text-[10px] text-amber-700 font-semibold mt-1.5">
-                    Unsaved changes detected. Click above to save.
-                  </p>
-                )}
-              </div>
-            </div>
-
-            {/* Quick Links / Help */}
-            <div className="p-4 bg-[#f0ece1]/50 border border-[#e6dfd5] rounded-3xl space-y-2 text-xs text-stone-600">
-              <div className="flex items-center gap-2 text-[#0c2217] font-bold">
-                <Info className="w-4 h-4 text-[#d4a359]" />
-                <span>Need assistance?</span>
-              </div>
-              <p className="text-[11px] leading-relaxed text-stone-500">
-                Degrees &amp; Sanads must be authentic government or Wafaq-ul-Madaris issued certificates. Administration reviews submissions within 24-48 hours.
-              </p>
-            </div>
-          </div>
-
-          {/* Right Column: Tabbed Interface (8 cols) */}
-          <div className="lg:col-span-8 space-y-5">
+          {/* Main Tab Workspace (Order 1 on mobile so it appears immediately!) */}
+          <div className="lg:col-span-8 space-y-5 order-1 lg:order-2">
             
-            {/* Segmented Navigation Tab Bar */}
-            <div className="bg-white p-1.5 rounded-3xl border border-[#e6dfd5] shadow-xs flex items-center gap-1 overflow-x-auto custom-scrollbar">
-              {PROFILE_TABS.map((tab) => {
-                const Icon = tab.icon;
-                const isActive = activeTab === tab.id;
+            {/* Fully Mobile-Responsive Segmented Navigation Bar */}
+            <div className="relative">
+              <div
+                ref={tabBarRef}
+                className="bg-white p-1 sm:p-1.5 rounded-2xl sm:rounded-3xl border border-[#e6dfd5] shadow-xs flex items-center gap-1 sm:gap-1.5 overflow-x-auto scrollbar-none overscroll-x-contain [-webkit-overflow-scrolling:touch]"
+              >
+                {PROFILE_TABS.map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
 
-                let badge = null;
-                if (tab.id === 'degrees' && uploadedSanads.length > 0) {
-                  badge = uploadedSanads.length;
-                } else if (tab.id === 'payments' && stagedPaymentMethods.length > 0) {
-                  badge = stagedPaymentMethods.length;
-                } else if (tab.id === 'video' && videoIntroInput) {
-                  badge = '✓';
-                }
+                  let badge = null;
+                  if (tab.id === 'degrees' && uploadedSanads.length > 0) {
+                    badge = uploadedSanads.length;
+                  } else if (tab.id === 'payments' && stagedPaymentMethods.length > 0) {
+                    badge = stagedPaymentMethods.length;
+                  } else if (tab.id === 'video' && videoIntroInput) {
+                    badge = '✓';
+                  }
 
-                return (
-                  <button
-                    key={tab.id}
-                    type="button"
-                    onClick={() => setActiveTab(tab.id)}
-                    className={`flex-1 min-w-[130px] px-3.5 py-2.5 rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-2 select-none ${
-                      isActive
-                        ? 'bg-[#0c2217] text-[#faf8f5] shadow-sm'
-                        : 'text-stone-600 hover:text-[#0c2217] hover:bg-[#faf8f5]'
-                    }`}
-                  >
-                    <Icon className={`w-4 h-4 ${isActive ? 'text-[#d4a359]' : 'text-stone-400'}`} />
-                    <span className="whitespace-nowrap">{tab.label}</span>
-                    {badge !== null && (
-                      <span className={`text-[10px] px-1.5 py-0.2 rounded-full font-mono ${
-                        isActive ? 'bg-[#143d2b] text-[#d4a359]' : 'bg-stone-100 text-stone-600'
-                      }`}>
-                        {badge}
-                      </span>
-                    )}
-                  </button>
-                );
-              })}
+                  return (
+                    <button
+                      key={tab.id}
+                      type="button"
+                      ref={isActive ? activeTabBtnRef : null}
+                      onClick={() => {
+                        setActiveTab(tab.id);
+                        if (typeof window !== 'undefined') {
+                          window.history.replaceState(null, '', `#${tab.id}`);
+                        }
+                      }}
+                      className={`shrink-0 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 select-none ${
+                        isActive
+                          ? 'bg-[#0c2217] text-[#faf8f5] shadow-sm'
+                          : 'text-stone-600 hover:text-[#0c2217] hover:bg-[#faf8f5]'
+                      }`}
+                    >
+                      <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${isActive ? 'text-[#d4a359]' : 'text-stone-400'}`} />
+                      <span className="hidden sm:inline whitespace-nowrap">{tab.fullLabel}</span>
+                      <span className="sm:hidden whitespace-nowrap">{tab.shortLabel}</span>
+                      {badge !== null && (
+                        <span className={`text-[9.5px] sm:text-[10px] px-1.5 py-0.2 rounded-full font-mono shrink-0 ${
+                          isActive ? 'bg-[#143d2b] text-[#d4a359]' : 'bg-stone-100 text-stone-600'
+                        }`}>
+                          {badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* TAB 1: PERSONAL & TEACHING INFO */}
             {activeTab === 'personal' && (
-              <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-5 animate-in fade-in">
+              <div className="bg-white p-5 sm:p-7 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-5 animate-in fade-in">
                 <div className="border-b border-stone-100 pb-3 flex items-center justify-between">
                   <div>
                     <h2 className="text-sm font-black text-stone-900 flex items-center gap-2">
@@ -1131,6 +979,27 @@ function TutorProfileContent() {
                 </div>
 
                 <div className="space-y-4">
+                  {/* Profile Photo Uploader (Easy Access on Mobile) */}
+                  <div className="flex items-center gap-4 p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl">
+                    <div className="relative inline-block shrink-0">
+                      <img
+                        src={avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Tutor')}&background=0c2217&color=faf8f5&size=200`}
+                        alt={name}
+                        className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover border-2 border-white shadow-md"
+                      />
+                      <label className="absolute bottom-0 right-0 p-1.5 sm:p-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-full cursor-pointer shadow-md transition-transform hover:scale-105">
+                        <Camera className="w-3.5 h-3.5" />
+                        <input type="file" accept="image/*" onChange={handleAvatarChange} className="hidden" />
+                      </label>
+                    </div>
+                    <div className="space-y-0.5 text-left">
+                      <span className="text-xs font-bold text-stone-800 block">Profile Avatar Photo</span>
+                      <p className="text-[11px] text-stone-500 leading-relaxed">
+                        A verified professional picture increases student booking and parent confidence. Max 5MB (JPG or PNG).
+                      </p>
+                    </div>
+                  </div>
+
                   {/* Full Name */}
                   <div id="profile-name" className="scroll-mt-28">
                     <label className="text-xs font-bold text-stone-700 block mb-1">
@@ -1201,8 +1070,8 @@ function TutorProfileContent() {
                       </button>
                     </div>
                     <div className="flex items-center justify-between px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-700">
-                      <span className="font-mono font-medium">{email || user?.email}</span>
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 flex items-center gap-1">
+                      <span className="font-mono font-medium truncate max-w-[200px] sm:max-w-none">{email || user?.email}</span>
+                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 flex items-center gap-1 shrink-0">
                         <CheckCircle2 className="w-3 h-3 text-[#0c2217]" />
                         <span>Verified</span>
                       </span>
@@ -1300,10 +1169,10 @@ function TutorProfileContent() {
                             <MapPin className="w-4 h-4 text-[#b85d34] absolute left-3.5 pointer-events-none z-10" />
                             <input
                               type="text"
-                              placeholder={city ? `Enter specific area / sector in ${city}...` : 'Enter local area name'}
+                              placeholder={city ? `Enter area / sector in ${city}...` : 'Enter local area name'}
                               value={localArea}
                               onChange={(e) => setLocalArea(e.target.value)}
-                              className="w-full pl-10 pr-28 py-2.5 bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-2 focus:ring-[#d4a359]/20 rounded-2xl text-xs text-stone-900 font-bold outline-none transition-all shadow-2xs h-[42px]"
+                              className="w-full pl-10 pr-24 py-2.5 bg-[#faf8f5] hover:bg-white focus:bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-2 focus:ring-[#d4a359]/20 rounded-2xl text-xs text-stone-900 font-bold outline-none transition-all shadow-2xs h-[42px]"
                             />
                             {city && pakistaniCityAreas[city] && pakistaniCityAreas[city].length > 0 && (
                               <button
@@ -1314,9 +1183,9 @@ function TutorProfileContent() {
                                     setLocalArea('');
                                   }
                                 }}
-                                className="absolute right-2 px-2.5 py-1 text-[10.5px] font-bold text-[#b85d34] hover:text-white hover:bg-[#b85d34] rounded-xl border border-[#b85d34]/30 transition-all cursor-pointer shadow-2xs"
+                                className="absolute right-2 px-2 py-1 text-[10px] font-bold text-[#b85d34] hover:text-white hover:bg-[#b85d34] rounded-xl border border-[#b85d34]/30 transition-all cursor-pointer shadow-2xs"
                               >
-                                Choose list
+                                List
                               </button>
                             )}
                           </div>
@@ -1326,13 +1195,13 @@ function TutorProfileContent() {
                   </div>
 
                   {/* Tutoring Discipline & Faculty Role */}
-                  <div className="p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl space-y-2">
+                  <div className="p-3.5 sm:p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl space-y-2">
                     <div className="flex items-center justify-between flex-wrap gap-1">
                       <label className="text-xs font-bold text-stone-800 flex items-center gap-1.5">
                         <GraduationCap className="w-3.5 h-3.5 text-[#0c2217]" />
                         <span>Primary Tutoring Discipline *</span>
                       </label>
-                      <span className="text-[10.5px] font-bold text-[#b85d34] bg-[#f5ebe6] px-2.5 py-0.5 rounded-full border border-[#b85d34]/30">
+                      <span className="text-[10px] sm:text-[10.5px] font-bold text-[#b85d34] bg-[#f5ebe6] px-2.5 py-0.5 rounded-full border border-[#b85d34]/30">
                         {gender === 'female'
                           ? tutoringType === 'quran'
                             ? 'Female Quran Faculty / Alimah'
@@ -1381,7 +1250,7 @@ function TutorProfileContent() {
                     <label className="text-xs font-bold text-stone-700 block">
                       Teaching Delivery Modes *
                     </label>
-                    <div className="grid grid-cols-2 gap-2.5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                       {[
                         { value: 'online', label: 'Online Tutoring', sub: 'Live WebRTC Video Classroom', icon: Video },
                         { value: 'in_person', label: 'In-Person Tutoring', sub: 'Home / Centre Tuition', icon: Home }
@@ -1425,17 +1294,17 @@ function TutorProfileContent() {
                   </div>
 
                   {/* Subject / Class / Discipline Selection Section */}
-                  <div id="profile-subjects" className="scroll-mt-28 p-4 sm:p-5 bg-[#faf8f5] border border-[#e6ded1] rounded-3xl space-y-4 shadow-2xs">
+                  <div id="profile-subjects" className="scroll-mt-28 p-3.5 sm:p-5 bg-[#faf8f5] border border-[#e6ded1] rounded-3xl space-y-4 shadow-2xs">
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-[#e6ded1] pb-3">
                       <div>
                         <div className="flex items-center gap-2">
                           <BookOpen className="w-4 h-4 text-[#0c2217]" />
                           <h3 className="text-xs sm:text-sm font-black text-stone-900 font-serif">
-                            Subjects, Classes &amp; Programs Offered *
+                            Subjects &amp; Tracks Offered *
                           </h3>
                         </div>
                         <p className="text-[11px] text-stone-500 mt-0.5">
-                          Select the academic grades, board classes, and Quranic disciplines you teach.
+                          Select the grades, board classes, and Quranic disciplines you teach.
                         </p>
                       </div>
 
@@ -1450,11 +1319,11 @@ function TutorProfileContent() {
                     {/* Discipline Filter Tabs & Search Bar */}
                     <div className="space-y-2.5">
                       <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-center justify-between">
-                        <div className="flex items-center gap-1 p-1 bg-white border border-[#e6ded1] rounded-2xl overflow-x-auto">
+                        <div className="flex items-center gap-1 p-1 bg-white border border-[#e6ded1] rounded-2xl overflow-x-auto scrollbar-none">
                           {[
-                            { id: 'all', label: 'All Disciplines', count: categories.length },
-                            { id: 'quran', label: 'Quranic Sciences', count: categories.filter(c => c.type === 'quran').length },
-                            { id: 'academic', label: 'Academic Classes', count: categories.filter(c => c.type === 'academic').length }
+                            { id: 'all', label: 'All', count: categories.length },
+                            { id: 'quran', label: 'Quranic', count: categories.filter(c => c.type === 'quran').length },
+                            { id: 'academic', label: 'Academic', count: categories.filter(c => c.type === 'academic').length }
                           ].map((tab) => (
                             <button
                               key={tab.id}
@@ -1476,7 +1345,7 @@ function TutorProfileContent() {
                           ))}
                         </div>
 
-                        <div className="flex items-center gap-1.5 text-[11px] font-bold self-end sm:self-auto">
+                        <div className="flex items-center justify-between sm:justify-end gap-2 text-[11px] font-bold">
                           <button
                             type="button"
                             onClick={() => handleSelectAllVisible(filteredCategories.map(c => c._id))}
@@ -1499,7 +1368,7 @@ function TutorProfileContent() {
                         <Search className="w-3.5 h-3.5 text-stone-400 absolute left-3.5 pointer-events-none" />
                         <input
                           type="text"
-                          placeholder="Filter by subject, class, or subtopic (e.g. Physics, Biology, Hifz, Class 9, Math)..."
+                          placeholder="Filter by subject, class, or subtopic (Physics, Math, Hifz)..."
                           value={subjectSearchQuery}
                           onChange={(e) => setSubjectSearchQuery(e.target.value)}
                           className="w-full pl-9 pr-8 py-2 bg-white border border-[#e6ded1] hover:border-[#d4a359] focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217] rounded-xl text-xs text-stone-800 outline-none placeholder:text-stone-400 transition-all shadow-2xs"
@@ -1524,7 +1393,7 @@ function TutorProfileContent() {
                       </div>
                     ) : filteredCategories.length === 0 ? (
                       <div className="p-6 text-center bg-white rounded-2xl border border-dashed border-[#e6ded1] text-xs text-stone-500">
-                        No subjects or classes found matching "{subjectSearchQuery}". Try a different keyword.
+                        No subjects found matching "{subjectSearchQuery}". Try another keyword.
                       </div>
                     ) : (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 max-h-80 overflow-y-auto pr-1 custom-scrollbar">
@@ -1664,7 +1533,7 @@ function TutorProfileContent() {
                     />
                     {qualifications && qualifications.trim() && (
                       <div className="p-3 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl space-y-1">
-                        <span className="text-[10px] font-bold text-stone-500 block">Recognized Degree Credentials:</span>
+                        <span className="text-[10px] font-bold text-stone-500 block">Recognized Credentials:</span>
                         <div className="flex flex-wrap gap-1.5">
                           {parseDegreesAndCertificates(qualifications).map((deg, dIdx) => (
                             <span
@@ -1695,10 +1564,10 @@ function TutorProfileContent() {
                     />
                   </div>
 
-                  {/* Action Bar for Tab 1 */}
+                  {/* Primary Save Action for Tab 1 */}
                   <div className="pt-3 border-t border-stone-100 flex items-center justify-between gap-3">
                     <span className="text-[11px] text-stone-400">
-                      Modifications are saved when clicking below.
+                      Changes are applied when clicking Save.
                     </span>
                     <button
                       type="button"
@@ -1716,12 +1585,12 @@ function TutorProfileContent() {
 
             {/* TAB 2: DEGREES & SANAD DOCUMENTS */}
             {activeTab === 'degrees' && (
-              <div id="profile-sanads" className="bg-white p-6 sm:p-7 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-5 animate-in fade-in">
+              <div id="profile-sanads" className="bg-white p-5 sm:p-7 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-5 animate-in fade-in">
                 <div className="border-b border-stone-100 pb-3 flex items-center justify-between">
                   <div>
                     <h2 className="text-sm font-black text-stone-900 flex items-center gap-2">
                       <GraduationCap className="w-4 h-4 text-[#b85d34]" />
-                      <span>Sanad &amp; Educational Degrees Verification</span>
+                      <span>Sanad &amp; Degrees Verification</span>
                     </h2>
                     <p className="text-xs text-stone-500 mt-0.5">
                       Upload your official Sanad and academic certificates for administration team review.
@@ -1733,7 +1602,7 @@ function TutorProfileContent() {
                 </div>
 
                 {/* Privacy Guarantee Banner */}
-                <div className="p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl flex items-start gap-3 text-xs text-stone-700">
+                <div className="p-3.5 sm:p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl flex items-start gap-3 text-xs text-stone-700">
                   <ShieldCheck className="w-4 h-4 text-emerald-700 shrink-0 mt-0.5" />
                   <div className="leading-relaxed">
                     <span className="font-bold text-[#0c2217]">Confidentiality Guarantee: </span>
@@ -1791,8 +1660,8 @@ function TutorProfileContent() {
                             }`}
                           >
                             <div className="flex items-center gap-3 overflow-hidden min-w-0">
-                              <div className="w-10 h-10 rounded-xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center shrink-0">
-                                <GraduationCap className="w-5 h-5" />
+                              <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-[#f0ece1] text-[#0c2217] flex items-center justify-center shrink-0">
+                                <GraduationCap className="w-4 h-4 sm:w-5 sm:h-5" />
                               </div>
                               <div className="truncate min-w-0">
                                 <p className="font-bold text-xs text-stone-900 truncate">{doc.title || 'Sanad / Degree Document'}</p>
@@ -1856,7 +1725,7 @@ function TutorProfileContent() {
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <div>
                       <label className="text-xs font-bold text-stone-700 block mb-1">
-                        Degree / Qualification Title * <span className="text-[10px] text-stone-400 font-normal">(Shown on profile)</span>
+                        Degree Title * <span className="text-[10px] text-stone-400 font-normal">(Publicly visible)</span>
                       </label>
                       <input
                         type="text"
@@ -1880,14 +1749,14 @@ function TutorProfileContent() {
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between gap-3 pt-1">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
                     <p className="text-[10.5px] text-stone-400">
                       Adding a document stages it in memory. It is submitted to the server when you click "Save Profile Changes".
                     </p>
                     <button
                       type="submit"
                       disabled={!newSanadFileUrl}
-                      className="px-4 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer disabled:opacity-40 flex items-center gap-1.5 shrink-0"
+                      className="w-full sm:w-auto px-4 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer disabled:opacity-40 flex items-center justify-center gap-1.5 shrink-0"
                     >
                       <PlusCircle className="w-3.5 h-3.5 text-[#d4a359]" />
                       <span>+ Stage Document</span>
@@ -1917,11 +1786,11 @@ function TutorProfileContent() {
             {activeTab === 'payments' && (
               <div id="profile-payment-methods" className="space-y-5 animate-in fade-in">
                 {/* Informative Header Banner */}
-                <div className="p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-3xl flex items-start gap-3 text-xs text-stone-700">
+                <div className="p-3.5 sm:p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-3xl flex items-start gap-3 text-xs text-stone-700">
                   <CreditCard className="w-4 h-4 text-[#0c2217] shrink-0 mt-0.5" />
                   <div className="leading-relaxed">
                     <span className="font-bold text-[#0c2217]">Tuition Receiving Accounts: </span>
-                    You can configure your personal bank accounts / mobile wallets (Meezan, EasyPaisa, JazzCash, Raast) or choose to use IlmiDunya administration accounts. Any additions, edits, or receiving preference changes will be saved when you click <strong>"Save Profile Changes"</strong>.
+                    Configure personal accounts (Meezan, EasyPaisa, JazzCash, Raast) or select administration accounts. All additions or edits save when clicking <strong>"Save Profile Changes"</strong>.
                   </div>
                 </div>
 
@@ -1938,7 +1807,7 @@ function TutorProfileContent() {
                 />
 
                 {/* Primary Save Action for Tab 3 */}
-                <div className="bg-white p-5 rounded-3xl border border-[#e6dfd5] shadow-xs flex items-center justify-between gap-3">
+                <div className="bg-white p-4 sm:p-5 rounded-3xl border border-[#e6dfd5] shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <div>
                     <span className="text-xs font-bold text-stone-800 block">
                       Save Tuition Payment Settings
@@ -1951,7 +1820,7 @@ function TutorProfileContent() {
                     type="button"
                     onClick={handleUnifiedSave}
                     disabled={savingProfile}
-                    className="px-6 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
+                    className="w-full sm:w-auto px-6 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                   >
                     <Save className="w-3.5 h-3.5 text-[#d4a359]" />
                     <span>{savingProfile ? 'Saving All Changes...' : 'Save Profile Changes'}</span>
@@ -1962,7 +1831,7 @@ function TutorProfileContent() {
 
             {/* TAB 4: VIDEO INTRODUCTION */}
             {activeTab === 'video' && (
-              <div id="profile-video-intro" className="bg-white p-6 sm:p-7 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-5 animate-in fade-in">
+              <div id="profile-video-intro" className="bg-white p-5 sm:p-7 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-5 animate-in fade-in">
                 <div className="border-b border-stone-100 pb-3 flex items-center justify-between flex-wrap gap-2">
                   <div>
                     <div className="flex items-center gap-2">
@@ -2006,7 +1875,7 @@ function TutorProfileContent() {
                 )}
 
                 {/* Mode Toggle: Video Link vs Upload File */}
-                <div className="flex items-center gap-2 border-b border-stone-100 pb-3">
+                <div className="flex items-center gap-2 border-b border-stone-100 pb-3 flex-wrap">
                   <button
                     type="button"
                     onClick={() => setVideoTab('link')}
@@ -2016,7 +1885,7 @@ function TutorProfileContent() {
                         : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                     }`}
                   >
-                    Paste Video Link (YouTube / Loom / Vimeo)
+                    Paste Video Link (YouTube / Loom)
                   </button>
                   <button
                     type="button"
@@ -2027,7 +1896,7 @@ function TutorProfileContent() {
                         : 'bg-stone-100 text-stone-600 hover:bg-stone-200'
                     }`}
                   >
-                    Upload Video File (MP4 / WebM)
+                    Upload Video File (MP4)
                   </button>
                 </div>
 
@@ -2128,10 +1997,10 @@ function TutorProfileContent() {
 
             {/* TAB 5: ACCOUNT & SECURITY */}
             {activeTab === 'security' && (
-              <div id="profile-security" className="space-y-6 animate-in fade-in">
+              <div id="profile-security" className="space-y-5 sm:space-y-6 animate-in fade-in">
                 
                 {/* 1. Change Password */}
-                <div className="bg-white p-6 sm:p-7 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-5">
+                <div className="bg-white p-5 sm:p-7 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-5">
                   <div className="border-b border-stone-100 pb-3">
                     <h2 className="text-sm font-black text-stone-900 flex items-center gap-2">
                       <Lock className="w-4 h-4 text-[#b85d34]" />
@@ -2235,17 +2104,17 @@ function TutorProfileContent() {
                       <button
                         type="submit"
                         disabled={changingPassword}
-                        className="px-6 py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
+                        className="w-full sm:w-auto px-6 py-2.5 bg-stone-900 hover:bg-stone-800 text-white font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                       >
                         <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-                        <span>{changingPassword ? 'Updating Password...' : 'Update Password'}</span>
+                        <span>{changingPassword ? 'Updating...' : 'Update Password'}</span>
                       </button>
                     </div>
                   </form>
                 </div>
 
                 {/* 2. Change Email Address (with OTP Verification) */}
-                <div id="change-email-section" className="bg-white p-6 sm:p-7 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-4 scroll-mt-28">
+                <div id="change-email-section" className="bg-white p-5 sm:p-7 rounded-3xl border border-[#e6dfd5] shadow-xs space-y-4 scroll-mt-28">
                   <div className="border-b border-stone-100 pb-3 flex flex-wrap items-center justify-between gap-2">
                     <div>
                       <h2 className="text-sm font-black text-stone-900 flex items-center gap-2">
@@ -2323,7 +2192,7 @@ function TutorProfileContent() {
                         <button
                           type="submit"
                           disabled={emailChangeLoading}
-                          className="px-6 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
+                          className="w-full sm:w-auto px-6 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
                         >
                           <Mail className="w-3.5 h-3.5 text-white" />
                           <span>{emailChangeLoading ? 'Sending OTP...' : 'Send Verification OTP'}</span>
@@ -2386,7 +2255,7 @@ function TutorProfileContent() {
                 <SafetyReportsSection userRole="tutor" />
 
                 {/* 4. Danger Zone / Delete Account */}
-                <div className="bg-white p-6 sm:p-7 rounded-3xl border border-rose-200 shadow-xs space-y-3.5">
+                <div className="bg-white p-5 sm:p-7 rounded-3xl border border-rose-200 shadow-xs space-y-3.5">
                   <div className="border-b border-rose-100 pb-3 flex items-center justify-between">
                     <div>
                       <h2 className="text-sm font-black text-rose-950 flex items-center gap-2">
@@ -2407,7 +2276,7 @@ function TutorProfileContent() {
                     <button
                       type="button"
                       onClick={() => setShowDeleteModal(true)}
-                      className="px-5 py-2.5 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-bold text-xs rounded-2xl shadow-sm transition-all flex items-center gap-2 cursor-pointer"
+                      className="w-full sm:w-auto px-5 py-2.5 bg-rose-600 hover:bg-rose-700 active:bg-rose-800 text-white font-bold text-xs rounded-2xl shadow-sm transition-all flex items-center justify-center gap-2 cursor-pointer"
                     >
                       <Trash2 className="w-4 h-4" />
                       <span>Delete My Account</span>
@@ -2419,38 +2288,170 @@ function TutorProfileContent() {
             )}
 
           </div>
+
+          {/* Left Column: Profile Overview Sidebar (Order 2 on mobile so it sits cleanly below tabs!) */}
+          <div className="lg:col-span-4 space-y-5 order-2 lg:order-1">
+            <div className="bg-white p-5 sm:p-6 rounded-3xl border border-[#e6dfd5] shadow-xs text-center space-y-4">
+              <div id="profile-avatar" className="relative inline-block mx-auto">
+                <img
+                  src={avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(name || 'Tutor')}&background=0c2217&color=faf8f5&size=200`}
+                  alt={name}
+                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-full object-cover border-4 border-[#eef5f0] shadow-md mx-auto"
+                />
+
+                {isConnected ? (
+                  <span
+                    className="absolute top-1 right-1 flex h-4 w-4 sm:h-5 sm:w-5 z-10"
+                    title="Active / Online Now"
+                  >
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-4 w-4 sm:h-5 sm:w-5 bg-emerald-500 border-2 border-white shadow-sm"></span>
+                  </span>
+                ) : (
+                  <span
+                    className="absolute top-1 right-1 inline-flex rounded-full h-4 w-4 sm:h-5 sm:w-5 bg-stone-400 border-2 border-white shadow-sm z-10"
+                    title="Offline"
+                  />
+                )}
+                
+                <label className="absolute bottom-0 right-0 p-2 sm:p-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white rounded-full cursor-pointer shadow-md transition-transform hover:scale-105 z-10">
+                  <Camera className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleAvatarChange}
+                    className="hidden"
+                  />
+                </label>
+              </div>
+
+              <div>
+                <h3 className="font-bold text-sm text-stone-900">{name || 'Tutor Name'}</h3>
+                <p className="text-xs text-stone-500">{email || 'tutor@example.com'}</p>
+                <div className="mt-2 flex flex-wrap items-center justify-center gap-1.5">
+                  <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-[#f0ece1] text-[#0c2217]">
+                    Tutor
+                  </span>
+                  {tutorProfile?.verificationStatus === 'approved' ? (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#b85d34] text-white flex items-center gap-1 shadow-xs">
+                      <ShieldCheck className="w-3 h-3" />
+                      <span>Verified</span>
+                    </span>
+                  ) : tutorProfile?.verificationStatus === 'under_review' || tutorProfile?.verificationStatus === 'pending' ? (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">
+                      <Clock className="w-3 h-3 text-amber-600 animate-pulse" />
+                      <span>Pending Review</span>
+                    </span>
+                  ) : (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-stone-100 text-stone-700 border border-stone-200 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3 text-stone-500" />
+                      <span>Incomplete</span>
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              <div className="pt-3 border-t border-stone-100 text-left space-y-2.5 text-xs text-stone-600">
+                <div className="flex items-center justify-between">
+                  <span className="text-stone-400">Gender &amp; Age:</span>
+                  <span className="font-bold capitalize">{gender || 'Not set'}{age ? `, ${age} yrs` : ''}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-stone-400">Location:</span>
+                  <span className="font-bold text-right truncate max-w-[160px]">{localArea ? `${localArea}, ${city}` : (city || 'Not set')}</span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-stone-400">Subjects Selected:</span>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('personal')}
+                    className="font-bold text-[#b85d34] hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>{selectedSubjects.length} Classes</span>
+                    <span className="text-[10px]">&rarr;</span>
+                  </button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-stone-400">Degrees / Sanads:</span>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('degrees')}
+                    className="font-bold text-[#0c2217] hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>{uploadedSanads.length} Uploaded</span>
+                    <span className="text-[10px]">&rarr;</span>
+                  </button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-stone-400">Payment Accounts:</span>
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('payments')}
+                    className="font-bold text-[#0c2217] hover:underline flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>{stagedPaymentMethods.length} Methods ({stagedPreferredChoice === 'admin' ? 'Admin' : 'Own'})</span>
+                    <span className="text-[10px]">&rarr;</span>
+                  </button>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-stone-400">Video Intro:</span>
+                  <span className="font-bold text-right">
+                    {videoIntroInput ? (
+                      <span className="text-emerald-700 font-bold flex items-center gap-1">
+                        <Check className="w-3 h-3" /> Active
+                      </span>
+                    ) : (
+                      <span className="text-stone-400 font-medium">None</span>
+                    )}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Links / Help */}
+            <div className="p-4 bg-[#f0ece1]/50 border border-[#e6dfd5] rounded-3xl space-y-2 text-xs text-stone-600">
+              <div className="flex items-center gap-2 text-[#0c2217] font-bold">
+                <Info className="w-4 h-4 text-[#d4a359]" />
+                <span>Need assistance?</span>
+              </div>
+              <p className="text-[11px] leading-relaxed text-stone-500">
+                Degrees &amp; Sanads must be authentic government or Wafaq-ul-Madaris issued certificates. Administration reviews submissions within 24-48 hours.
+              </p>
+            </div>
+          </div>
+
         </div>
 
       </div>
 
-      {/* Floating Bottom Action Bar for Unsaved Changes */}
+      {/* Floating Bottom Action Bar for Unsaved Changes (Responsive for Mobile & Desktop) */}
       {hasUnsavedChanges && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0c2217]/95 backdrop-blur-md border-t border-[#d4a359]/30 py-3.5 px-4 sm:px-8 shadow-2xl transition-all animate-in slide-in-from-bottom duration-200">
-          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div className="flex items-center gap-2.5 text-white text-xs">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#d4a359] animate-ping" />
-              <span className="font-bold text-[#faf8f5]">You have unsaved changes in your profile.</span>
-              <span className="text-stone-300 hidden md:inline">
-                Click "Save Profile Changes" to commit degrees, payment methods, and profile info all at once.
-              </span>
+        <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0c2217]/95 backdrop-blur-md border-t border-[#d4a359]/30 p-3 sm:py-3.5 sm:px-8 shadow-2xl transition-all animate-in slide-in-from-bottom duration-200">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-3">
+            <div className="flex items-center gap-2 text-white text-xs w-full sm:w-auto justify-between sm:justify-start">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#d4a359] animate-ping shrink-0" />
+                <span className="font-bold text-[#faf8f5]">Unsaved changes in profile</span>
+              </div>
+              <span className="text-[10px] text-[#d4a359] sm:hidden font-mono font-bold">Not saved</span>
             </div>
-            <div className="flex items-center gap-2.5 w-full sm:w-auto justify-end">
+            <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
               <button
                 type="button"
                 onClick={handleDiscardChanges}
                 disabled={savingProfile}
-                className="px-4 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 font-bold text-xs rounded-xl border border-stone-600 transition-colors cursor-pointer"
+                className="w-full sm:w-auto px-3.5 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 font-bold text-xs rounded-xl border border-stone-600 transition-colors cursor-pointer text-center"
               >
-                Discard Changes
+                Discard
               </button>
               <button
                 type="button"
                 onClick={handleUnifiedSave}
                 disabled={savingProfile}
-                className="px-6 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-lg shadow-[#b85d34]/40 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                className="w-full sm:w-auto px-5 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-lg shadow-[#b85d34]/40 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 text-center"
               >
                 <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
-                <span>{savingProfile ? 'Saving All Changes...' : 'Save Profile Changes'}</span>
+                <span>{savingProfile ? 'Saving...' : 'Save Changes'}</span>
               </button>
             </div>
           </div>

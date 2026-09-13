@@ -37,3 +37,4 @@ const detectContactSharing = (text) => {
 module.exports = {
   detectContactSharing
 };
+

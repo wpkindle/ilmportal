@@ -35,6 +35,7 @@ import {
   AlertTriangle,
   RotateCcw,
   Save,
+  Loader2,
   HelpCircle,
   Info,
   ChevronRight
@@ -141,6 +142,7 @@ function TutorProfileContent() {
 
   // Status & Feedback
   const [savingProfile, setSavingProfile] = useState(false);
+  const [justSavedProfile, setJustSavedProfile] = useState(false);
   const [changingPassword, setChangingPassword] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileError, setProfileError] = useState('');
@@ -651,8 +653,10 @@ function TutorProfileContent() {
         videoIntro: cleanVideo
       });
 
-      setProfileSuccess('All profile settings, degrees, and payment accounts saved successfully!');
-      setTimeout(() => setProfileSuccess(''), 5000);
+      setProfileSuccess('Profile updated successfully! All your changes have been saved.');
+      setJustSavedProfile(true);
+      setTimeout(() => setJustSavedProfile(false), 4000);
+      setTimeout(() => setProfileSuccess(''), 6000);
     } catch (err) {
       setProfileError(err.message || 'Failed to update profile settings.');
     } finally {
@@ -775,6 +779,29 @@ function TutorProfileContent() {
 
   return (
     <div className="py-6 sm:py-8 bg-[#faf8f5] min-h-screen text-stone-900 pb-28">
+      {/* Viewport Floating Toast Confirmation for Profile Save */}
+      {profileSuccess && (
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 max-w-md w-[92%] sm:w-auto px-5 py-3.5 bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#0c2217] border-2 border-[#d4a359] text-white rounded-2xl shadow-2xl flex items-center justify-between gap-3.5 animate-in fade-in slide-in-from-top-4 duration-200 ring-4 ring-[#d4a359]/20">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-[#d4a359]/20 text-[#d4a359] flex items-center justify-center shrink-0 border border-[#d4a359]/40">
+              <CheckCircle2 className="w-5 h-5 text-[#d4a359]" />
+            </div>
+            <div>
+              <p className="font-serif font-bold text-xs sm:text-sm text-white">Profile Updated Successfully!</p>
+              <p className="text-[11px] text-[#faf8f5]/80 font-medium">{profileSuccess}</p>
+            </div>
+          </div>
+          <button
+            type="button"
+            onClick={() => setProfileSuccess('')}
+            className="p-1 text-stone-400 hover:text-white rounded-lg hover:bg-white/10 transition-colors shrink-0 cursor-pointer ml-2"
+            title="Dismiss"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
       <div className="max-w-7xl mx-auto px-3.5 sm:px-6 lg:px-8 space-y-5 sm:space-y-6">
         
         {/* Top Header & Breadcrumb (Save button removed as requested) */}
@@ -1573,10 +1600,28 @@ function TutorProfileContent() {
                       type="button"
                       onClick={handleUnifiedSave}
                       disabled={savingProfile}
-                      className="px-6 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
+                      className={`px-6 py-2.5 font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2 ${
+                        justSavedProfile
+                          ? 'bg-emerald-700 text-white ring-2 ring-emerald-400'
+                          : 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
+                      }`}
                     >
-                      <Save className="w-3.5 h-3.5 text-[#d4a359]" />
-                      <span>{savingProfile ? 'Saving All Changes...' : 'Save Profile Changes'}</span>
+                      {savingProfile ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                          <span>Saving Changes...</span>
+                        </>
+                      ) : justSavedProfile ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-300" />
+                          <span>Profile Updated!</span>
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-3.5 h-3.5 text-[#d4a359]" />
+                          <span>Save Profile Changes</span>
+                        </>
+                      )}
                     </button>
                   </div>
                 </div>
@@ -1773,10 +1818,28 @@ function TutorProfileContent() {
                     type="button"
                     onClick={handleUnifiedSave}
                     disabled={savingProfile}
-                    className="px-6 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
+                    className={`px-6 py-2.5 font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2 ${
+                      justSavedProfile
+                        ? 'bg-emerald-700 text-white ring-2 ring-emerald-400'
+                        : 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
+                    }`}
                   >
-                    <Save className="w-3.5 h-3.5 text-[#d4a359]" />
-                    <span>{savingProfile ? 'Saving All Changes...' : 'Save Profile Changes'}</span>
+                    {savingProfile ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                        <span>Saving Changes...</span>
+                      </>
+                    ) : justSavedProfile ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-300" />
+                        <span>Profile Updated!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-3.5 h-3.5 text-[#d4a359]" />
+                        <span>Save Profile Changes</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -1820,10 +1883,28 @@ function TutorProfileContent() {
                     type="button"
                     onClick={handleUnifiedSave}
                     disabled={savingProfile}
-                    className="w-full sm:w-auto px-6 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2"
+                    className={`w-full sm:w-auto px-6 py-2.5 font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 ${
+                      justSavedProfile
+                        ? 'bg-emerald-700 text-white ring-2 ring-emerald-400'
+                        : 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
+                    }`}
                   >
-                    <Save className="w-3.5 h-3.5 text-[#d4a359]" />
-                    <span>{savingProfile ? 'Saving All Changes...' : 'Save Profile Changes'}</span>
+                    {savingProfile ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                        <span>Saving Changes...</span>
+                      </>
+                    ) : justSavedProfile ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-300" />
+                        <span>Profile Updated!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-3.5 h-3.5 text-[#d4a359]" />
+                        <span>Save Profile Changes</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -1986,10 +2067,28 @@ function TutorProfileContent() {
                     type="button"
                     onClick={handleUnifiedSave}
                     disabled={savingProfile}
-                    className="px-6 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2"
+                    className={`px-6 py-2.5 font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2 ${
+                      justSavedProfile
+                        ? 'bg-emerald-700 text-white ring-2 ring-emerald-400'
+                        : 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
+                    }`}
                   >
-                    <Save className="w-3.5 h-3.5 text-[#d4a359]" />
-                    <span>{savingProfile ? 'Saving All Changes...' : 'Save Profile Changes'}</span>
+                    {savingProfile ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                        <span>Saving Changes...</span>
+                      </>
+                    ) : justSavedProfile ? (
+                      <>
+                        <Check className="w-3.5 h-3.5 text-emerald-300" />
+                        <span>Profile Updated!</span>
+                      </>
+                    ) : (
+                      <>
+                        <Save className="w-3.5 h-3.5 text-[#d4a359]" />
+                        <span>Save Profile Changes</span>
+                      </>
+                    )}
                   </button>
                 </div>
               </div>
@@ -2424,36 +2523,66 @@ function TutorProfileContent() {
 
       </div>
 
-      {/* Floating Bottom Action Bar for Unsaved Changes (Responsive for Mobile & Desktop) */}
-      {hasUnsavedChanges && (
+      {/* Floating Bottom Action Bar for Unsaved Changes & Save Confirmation (Responsive for Mobile & Desktop) */}
+      {(hasUnsavedChanges || justSavedProfile) && (
         <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0c2217]/95 backdrop-blur-md border-t border-[#d4a359]/30 p-3 sm:py-3.5 sm:px-8 shadow-2xl transition-all animate-in slide-in-from-bottom duration-200">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-3">
-            <div className="flex items-center gap-2 text-white text-xs w-full sm:w-auto justify-between sm:justify-start">
-              <div className="flex items-center gap-2">
-                <span className="w-2.5 h-2.5 rounded-full bg-[#d4a359] animate-ping shrink-0" />
-                <span className="font-bold text-[#faf8f5]">Unsaved changes in profile</span>
+            {justSavedProfile ? (
+              <div className="flex items-center justify-between w-full py-0.5">
+                <div className="flex items-center gap-2.5 text-emerald-300 text-xs sm:text-sm font-bold">
+                  <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-400/40">
+                    <Check className="w-3.5 h-3.5" />
+                  </div>
+                  <span>Profile updated successfully! All changes are saved.</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setJustSavedProfile(false)}
+                  className="text-stone-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                  title="Close"
+                >
+                  <X className="w-4 h-4" />
+                </button>
               </div>
-              <span className="text-[10px] text-[#d4a359] sm:hidden font-mono font-bold">Not saved</span>
-            </div>
-            <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={handleDiscardChanges}
-                disabled={savingProfile}
-                className="w-full sm:w-auto px-3.5 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 font-bold text-xs rounded-xl border border-stone-600 transition-colors cursor-pointer text-center"
-              >
-                Discard
-              </button>
-              <button
-                type="button"
-                onClick={handleUnifiedSave}
-                disabled={savingProfile}
-                className="w-full sm:w-auto px-5 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-lg shadow-[#b85d34]/40 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 text-center"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
-                <span>{savingProfile ? 'Saving...' : 'Save Changes'}</span>
-              </button>
-            </div>
+            ) : (
+              <>
+                <div className="flex items-center gap-2 text-white text-xs w-full sm:w-auto justify-between sm:justify-start">
+                  <div className="flex items-center gap-2">
+                    <span className="w-2.5 h-2.5 rounded-full bg-[#d4a359] animate-ping shrink-0" />
+                    <span className="font-bold text-[#faf8f5]">Unsaved changes in profile</span>
+                  </div>
+                  <span className="text-[10px] text-[#d4a359] sm:hidden font-mono font-bold">Not saved</span>
+                </div>
+                <div className="grid grid-cols-2 sm:flex items-center gap-2 w-full sm:w-auto">
+                  <button
+                    type="button"
+                    onClick={handleDiscardChanges}
+                    disabled={savingProfile}
+                    className="w-full sm:w-auto px-3.5 py-2 bg-stone-800 hover:bg-stone-700 text-stone-200 font-bold text-xs rounded-xl border border-stone-600 transition-colors cursor-pointer text-center"
+                  >
+                    Discard
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleUnifiedSave}
+                    disabled={savingProfile}
+                    className="w-full sm:w-auto px-5 py-2 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs rounded-xl shadow-lg shadow-[#b85d34]/40 transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 text-center"
+                  >
+                    {savingProfile ? (
+                      <>
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>Saving Changes...</span>
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="w-3.5 h-3.5 text-[#d4a359]" />
+                        <span>Save Changes</span>
+                      </>
+                    )}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}

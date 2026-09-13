@@ -84,8 +84,23 @@ export const POPULAR_PAKISTANI_BANKS = [
   'Sadapay'
 ];
 
-export default function TutorPaymentMethodsManager({ onMethodsUpdated, initialMethods = [] }) {
-  const [methods, setMethods] = useState(initialMethods);
+export default function TutorPaymentMethodsManager({
+  onMethodsUpdated,
+  initialMethods = [],
+  methods: controlledMethods,
+  onChange: onControlledChange,
+  preferredChoice: controlledPreferredChoice,
+  onPreferenceChange: onControlledPreferenceChange,
+  isControlled = false
+}) {
+  const [internalMethods, setInternalMethods] = useState(initialMethods);
+  const methods = isControlled && controlledMethods !== undefined ? controlledMethods : internalMethods;
+  const setMethods = isControlled && onControlledChange ? onControlledChange : setInternalMethods;
+
+  const [internalPreferredChoice, setInternalPreferredChoice] = useState('own');
+  const preferredChoice = isControlled && controlledPreferredChoice !== undefined ? controlledPreferredChoice : internalPreferredChoice;
+  const setPreferredChoice = isControlled && onControlledPreferenceChange ? onControlledPreferenceChange : setInternalPreferredChoice;
+
   const [loading, setLoading] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingMethod, setEditingMethod] = useState(null);
@@ -93,7 +108,6 @@ export default function TutorPaymentMethodsManager({ onMethodsUpdated, initialMe
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [copiedId, setCopiedId] = useState(null);
-  const [preferredChoice, setPreferredChoice] = useState('own');
   const [updatingChoice, setUpdatingChoice] = useState(false);
   const [showAdminAccounts, setShowAdminAccounts] = useState(false);
 
@@ -106,13 +120,14 @@ export default function TutorPaymentMethodsManager({ onMethodsUpdated, initialMe
   const [isDefault, setIsDefault] = useState(false);
 
   const fetchMethods = async () => {
+    if (isControlled && controlledMethods !== undefined) return;
     try {
       setLoading(true);
       const res = await api.getPaymentMethods();
       if (res.success && Array.isArray(res.paymentMethods)) {
-        setMethods(res.paymentMethods);
+        setInternalMethods(res.paymentMethods);
         if (res.preferredAccountChoice) {
-          setPreferredChoice(res.preferredAccountChoice);
+          setInternalPreferredChoice(res.preferredAccountChoice);
         }
         if (onMethodsUpdated) {
           onMethodsUpdated(res.paymentMethods);
@@ -127,6 +142,10 @@ export default function TutorPaymentMethodsManager({ onMethodsUpdated, initialMe
 
   const handlePreferenceChange = async (choice) => {
     if (choice === preferredChoice) return;
+    if (isControlled) {
+      if (onControlledPreferenceChange) onControlledPreferenceChange(choice);
+      return;
+    }
     try {
       setUpdatingChoice(true);
       const res = await api.setPreferredAccountChoice(choice);
@@ -143,8 +162,10 @@ export default function TutorPaymentMethodsManager({ onMethodsUpdated, initialMe
   };
 
   useEffect(() => {
-    fetchMethods();
-  }, []);
+    if (!isControlled) {
+      fetchMethods();
+    }
+  }, [isControlled]);
 
   const openAddModal = () => {
     setEditingMethod(null);
@@ -209,6 +230,31 @@ export default function TutorPaymentMethodsManager({ onMethodsUpdated, initialMe
       isDefault
     };
 
+    if (isControlled) {
+      let nextMethods;
+      if (editingMethod && editingMethod._id) {
+        nextMethods = methods.map(m => m._id === editingMethod._id ? { ...m, ...payload, _id: editingMethod._id, isStaged: true } : m);
+      } else {
+        const newMethod = {
+          ...payload,
+          _id: 'temp_' + Date.now(),
+          isStaged: true
+        };
+        nextMethods = [...methods, newMethod];
+      }
+      if (payload.isDefault || nextMethods.length === 1) {
+        const targetId = editingMethod?._id || nextMethods[nextMethods.length - 1]._id;
+        nextMethods = nextMethods.map(m => ({
+          ...m,
+          isDefault: m._id === targetId
+        }));
+      }
+      setMethods(nextMethods);
+      setIsModalOpen(false);
+      setSubmitting(false);
+      return;
+    }
+
     try {
       let res;
       if (editingMethod && editingMethod._id) {
@@ -234,6 +280,11 @@ export default function TutorPaymentMethodsManager({ onMethodsUpdated, initialMe
 
   const handleDelete = async (methodId) => {
     if (!confirm('Are you sure you want to delete this payment method?')) return;
+    if (isControlled) {
+      const nextMethods = methods.filter(m => m._id !== methodId);
+      setMethods(nextMethods);
+      return;
+    }
     try {
       setLoading(true);
       const res = await api.deletePaymentMethod(methodId);
@@ -250,6 +301,14 @@ export default function TutorPaymentMethodsManager({ onMethodsUpdated, initialMe
   };
 
   const handleSetDefault = async (methodId) => {
+    if (isControlled) {
+      const nextMethods = methods.map(m => ({
+        ...m,
+        isDefault: m._id === methodId
+      }));
+      setMethods(nextMethods);
+      return;
+    }
     try {
       const res = await api.setDefaultPaymentMethod(methodId);
       if (res.success) {
@@ -439,6 +498,11 @@ export default function TutorPaymentMethodsManager({ onMethodsUpdated, initialMe
                       <span className="px-2 py-0.5 text-[10px] font-black rounded-lg bg-[#0c2217] text-[#faf8f5] flex items-center gap-1">
                         <Star className="w-2.5 h-2.5 text-[#d4a359] fill-[#d4a359]" />
                         <span>Primary</span>
+                      </span>
+                    )}
+                    {method.isStaged && (
+                      <span className="px-2 py-0.5 text-[9px] font-bold rounded-lg bg-blue-50 text-blue-700 border border-blue-200">
+                        Unsaved
                       </span>
                     )}
                   </div>

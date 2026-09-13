@@ -246,62 +246,93 @@ function TutorProfileContent() {
     '#personal': 'personal'
   };
 
-  const navigateToSection = (targetUrlOrHash) => {
+  // Direct tab switcher that updates activeTab, centers tab button, and updates URL
+  const switchTab = (tabId, fieldId = null) => {
+    if (!tabId) return;
+
+    // 1. Immediately switch the active tab
+    setActiveTab(tabId);
+
+    // 2. Center tab button in mobile tab bar
+    if (typeof window !== 'undefined') {
+      const tabBtn = document.getElementById(`tab-btn-${tabId}`);
+      if (tabBtn && tabBarRef.current) {
+        tabBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+      }
+
+      // Sync URL query without reload
+      const url = fieldId
+        ? `/tutor/profile?tab=${tabId}#${fieldId}`
+        : `/tutor/profile?tab=${tabId}`;
+      try {
+        window.history.replaceState(null, '', url);
+      } catch {}
+    }
+
+    // 3. Smooth scroll down to target section or tab workspace
+    setTimeout(() => {
+      const targetId = fieldId || (
+        tabId === 'degrees' ? 'profile-sanads' :
+        tabId === 'payments' ? 'profile-payment-methods' :
+        tabId === 'video' ? 'profile-video-intro' :
+        tabId === 'security' ? 'profile-security' :
+        'profile-tab-workspace'
+      );
+      const el = document.getElementById(targetId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        el.classList.add('ring-4', 'ring-[#d4a359]', 'ring-offset-4', 'transition-all', 'duration-500');
+        setTimeout(() => el.classList.remove('ring-4', 'ring-[#d4a359]', 'ring-offset-4'), 2500);
+
+        const focusable = el.querySelector('input:not([type=hidden]):not([disabled]), textarea, select, button');
+        if (focusable && typeof focusable.focus === 'function') {
+          try { focusable.focus({ preventScroll: true }); } catch {}
+        }
+      }
+    }, 80);
+  };
+
+  const navigateToSection = (targetUrlOrHash, item) => {
+    if (item?.tab) {
+      switchTab(item.tab, item.targetFieldId);
+      return;
+    }
     if (!targetUrlOrHash) return;
 
-    // Extract anchor ID
+    // Check if URL has ?tab=
+    if (targetUrlOrHash.includes('tab=')) {
+      const match = targetUrlOrHash.match(/tab=([^&#]+)/);
+      if (match && match[1]) {
+        const hashMatch = targetUrlOrHash.includes('#') ? targetUrlOrHash.split('#')[1] : null;
+        switchTab(match[1], hashMatch);
+        return;
+      }
+    }
+
     const hashPart = targetUrlOrHash.includes('#')
       ? targetUrlOrHash.split('#')[1]
       : targetUrlOrHash.replace(/^#/, '');
 
-    if (!hashPart) return;
-
     const targetTab = HASH_TO_TAB_MAP[hashPart] || HASH_TO_TAB_MAP['#' + hashPart] || 'personal';
-
-    // 1. Switch active tab so target element is mounted in DOM
-    setActiveTab(targetTab);
-
-    // 2. Safely sync URL hash without causing harsh page jump
-    if (typeof window !== 'undefined') {
-      try {
-        window.history.pushState(null, '', `#${hashPart}`);
-      } catch {
-        window.location.hash = hashPart;
-      }
-    }
-
-    // 3. Scroll to target element with retry to ensure DOM has rendered
-    const executeScroll = (retryCount = 0) => {
-      const el = document.getElementById(hashPart);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-
-        // Highlight ring animation to guide user's attention
-        el.classList.add('ring-4', 'ring-[#d4a359]', 'ring-offset-4', 'transition-all', 'duration-500');
-        setTimeout(() => {
-          el.classList.remove('ring-4', 'ring-[#d4a359]', 'ring-offset-4');
-        }, 2500);
-
-        // Auto-focus first meaningful interactive element inside the section
-        const focusable = el.querySelector('input:not([type=hidden]):not([disabled]), textarea, select, button');
-        if (focusable && typeof focusable.focus === 'function') {
-          try {
-            focusable.focus({ preventScroll: true });
-          } catch {}
-        }
-      } else if (retryCount < 8) {
-        setTimeout(() => executeScroll(retryCount + 1), 60);
-      }
-    };
-
-    setTimeout(() => executeScroll(0), 100);
+    switchTab(targetTab, hashPart);
   };
+
+  // Sync activeTab with URL searchParams (?tab=...) on load or param change
+  const tabQueryParam = searchParams.get('tab');
+  useEffect(() => {
+    if (tabQueryParam && ['personal', 'degrees', 'payments', 'video', 'security'].includes(tabQueryParam)) {
+      setActiveTab(tabQueryParam);
+    }
+  }, [tabQueryParam]);
 
   // Sync active tab with URL hash on mount, hashchange, or custom navigation
   useEffect(() => {
     const handleHashSync = () => {
-      if (typeof window !== 'undefined' && window.location.hash) {
-        navigateToSection(window.location.hash);
+      if (typeof window !== 'undefined') {
+        const hash = window.location.hash;
+        if (hash) {
+          navigateToSection(hash);
+        }
       }
     };
 
@@ -1073,13 +1104,20 @@ function TutorProfileContent() {
         <AccountStatusBanner user={user} tutorProfile={tutorProfile} role="tutor" />
 
         {/* Dynamic Profile Completion Meter Widget */}
-        <ProfileCompletionMeter user={user} tutorProfile={tutorProfile} showGreeting={false} onNavigate={navigateToSection} />
+        <ProfileCompletionMeter
+          user={user}
+          tutorProfile={tutorProfile}
+          showGreeting={false}
+          activeTab={activeTab}
+          onTabSelect={switchTab}
+          onNavigate={navigateToSection}
+        />
 
         {/* Main Layout: Tabs on Top for Mobile, 2-Column on Desktop */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-5 sm:gap-6 items-start">
           
           {/* Main Tab Workspace (Order 1 on mobile so it appears immediately!) */}
-          <div className="lg:col-span-8 space-y-5 order-1 lg:order-2">
+          <div id="profile-tab-workspace" className="lg:col-span-8 space-y-5 order-1 lg:order-2 scroll-mt-28">
             
             {/* Fully Mobile-Responsive Segmented Navigation Bar */}
             <div className="relative">
@@ -1103,14 +1141,10 @@ function TutorProfileContent() {
                   return (
                     <button
                       key={tab.id}
+                      id={`tab-btn-${tab.id}`}
                       type="button"
                       ref={isActive ? activeTabBtnRef : null}
-                      onClick={() => {
-                        setActiveTab(tab.id);
-                        if (typeof window !== 'undefined') {
-                          window.history.replaceState(null, '', `#${tab.id}`);
-                        }
-                      }}
+                      onClick={() => switchTab(tab.id)}
                       className={`shrink-0 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 select-none ${
                         isActive
                           ? 'bg-[#0c2217] text-[#faf8f5] shadow-sm'

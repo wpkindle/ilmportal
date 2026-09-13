@@ -38,7 +38,9 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         label: 'Full Name',
         weight: 10,
         done: !!user.name?.trim(),
-        link: '/tutor/profile#profile-name',
+        tab: 'personal',
+        targetFieldId: 'profile-name',
+        link: '/tutor/profile?tab=personal#profile-name',
         actionLabel: 'Set Name'
       },
       {
@@ -54,7 +56,9 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         label: 'Profile Picture',
         weight: 10,
         done: !!user.avatar?.trim(),
-        link: '/tutor/profile#profile-avatar',
+        tab: 'personal',
+        targetFieldId: 'profile-avatar',
+        link: '/tutor/profile?tab=personal#profile-avatar',
         actionLabel: 'Upload Photo'
       },
       {
@@ -62,7 +66,9 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         label: 'Tutor Age',
         weight: 5,
         done: !!user.age,
-        link: '/tutor/profile#profile-age',
+        tab: 'personal',
+        targetFieldId: 'profile-age',
+        link: '/tutor/profile?tab=personal#profile-age',
         actionLabel: 'Set Age'
       },
       {
@@ -70,7 +76,9 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         label: 'Gender',
         weight: 5,
         done: !!(user.gender?.trim() || tutorProfile?.gender?.trim()),
-        link: '/tutor/profile#profile-gender',
+        tab: 'personal',
+        targetFieldId: 'profile-gender',
+        link: '/tutor/profile?tab=personal#profile-gender',
         actionLabel: 'Set Gender'
       },
       {
@@ -78,7 +86,9 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         label: 'City Location',
         weight: 10,
         done: !!(user.city?.trim() || tutorProfile?.city?.trim()),
-        link: '/tutor/profile#profile-city',
+        tab: 'personal',
+        targetFieldId: 'profile-city',
+        link: '/tutor/profile?tab=personal#profile-city',
         actionLabel: 'Select City'
       },
       {
@@ -86,7 +96,9 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         label: 'Subjects & Classes',
         weight: 10,
         done: Array.isArray(tutorProfile?.subjects) && tutorProfile.subjects.length > 0,
-        link: '/tutor/profile#profile-subjects',
+        tab: 'personal',
+        targetFieldId: 'profile-subjects',
+        link: '/tutor/profile?tab=personal#profile-subjects',
         actionLabel: 'Select Subjects'
       },
       {
@@ -94,7 +106,9 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         label: 'Teaching Bio & Headline',
         weight: 15,
         done: !!tutorProfile?.bio?.trim() && tutorProfile.bio.length > 20 && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmPortal') && !tutorProfile.bio.includes('Assalam-o-Alaikum! I am an experienced tutor on IlmiDunya'),
-        link: '/tutor/profile#profile-bio',
+        tab: 'personal',
+        targetFieldId: 'profile-bio',
+        link: '/tutor/profile?tab=personal#profile-bio',
         actionLabel: 'Write Bio'
       },
       {
@@ -102,7 +116,9 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         label: 'Educational Qualifications',
         weight: 10,
         done: !!tutorProfile?.qualifications?.trim() && tutorProfile.qualifications !== 'Tutor Qualifications',
-        link: '/tutor/profile#profile-qualifications',
+        tab: 'personal',
+        targetFieldId: 'profile-qualifications',
+        link: '/tutor/profile?tab=personal#profile-qualifications',
         actionLabel: 'Add Degrees'
       },
       {
@@ -114,7 +130,9 @@ export const calculateClientCompletion = (user, tutorProfile) => {
             : 'Sanad / Degree Document',
         weight: 5,
         done: hasApprovedSanad,
-        link: '/tutor/profile#profile-sanads',
+        tab: 'degrees',
+        targetFieldId: 'profile-sanads',
+        link: '/tutor/profile?tab=degrees#profile-sanads',
         actionLabel: hasApprovedSanad
           ? 'Approved'
           : hasPendingSanad
@@ -126,7 +144,9 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         label: 'Payment Method (Required)',
         weight: 10,
         done: Array.isArray(tutorProfile?.paymentMethods) && tutorProfile.paymentMethods.length > 0,
-        link: '/tutor/profile#profile-payment-methods',
+        tab: 'payments',
+        targetFieldId: 'profile-payment-methods',
+        link: '/tutor/profile?tab=payments#profile-payment-methods',
         actionLabel: 'Add Payment Method'
       }
     ];
@@ -197,52 +217,57 @@ export default function ProfileCompletionMeter({
   className = '',
   alwaysShow = false,
   showGreeting = true,
-  onNavigate
+  onNavigate,
+  onTabSelect
 }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const { percentage, items } = calculateClientCompletion(user, tutorProfile);
 
   const handleItemClick = (e, item) => {
-    if (!item?.link) return;
+    if (!item) return;
 
-    // External link or non-hash link (e.g. /verify-email): let browser / Next.js navigate
-    if (!item.link.includes('#')) {
+    // External link (e.g. /verify-email)
+    if (item.key === 'email' || item.link?.startsWith('/verify-email')) {
+      return; // Allow standard navigation
+    }
+
+    e.preventDefault();
+
+    // 1. Direct onTabSelect callback to immediately switch active tab
+    if (onTabSelect && item.tab) {
+      onTabSelect(item.tab, item.targetFieldId);
       return;
     }
 
+    // 2. Direct onNavigate callback
     if (onNavigate) {
-      e.preventDefault();
-      onNavigate(item.link, item);
+      onNavigate(item.link || item.tab, item);
       return;
     }
 
-    // Direct fallback if rendered without onNavigate prop
+    // 3. Direct DOM Tab Button click: physically trigger the tab button
     if (typeof window !== 'undefined') {
-      const [path, hash] = item.link.split('#');
-      if (!path || window.location.pathname === path || window.location.pathname.startsWith(path)) {
-        e.preventDefault();
-        const targetHash = `#${hash}`;
-        try {
-          window.history.pushState(null, '', targetHash);
-        } catch {
-          window.location.hash = hash;
-        }
-        window.dispatchEvent(new CustomEvent('tutor-profile-navigate', { detail: { hash: targetHash } }));
-        window.dispatchEvent(new CustomEvent('profile-navigate', { detail: { hash: targetHash } }));
-
-        // Also attempt direct scroll for single-page profiles
-        const el = document.getElementById(hash);
-        if (el) {
-          el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          el.classList.add('ring-4', 'ring-[#d4a359]', 'ring-offset-2', 'transition-all', 'duration-500');
-          setTimeout(() => {
-            el.classList.remove('ring-4', 'ring-[#d4a359]', 'ring-offset-2');
-          }, 2000);
-          const input = el.querySelector('input:not([type=hidden]), textarea, select');
-          if (input) {
-            try { input.focus({ preventScroll: true }); } catch {}
+      if (item.tab) {
+        const tabBtn = document.getElementById(`tab-btn-${item.tab}`);
+        if (tabBtn) {
+          tabBtn.click();
+          if (item.targetFieldId) {
+            setTimeout(() => {
+              const el = document.getElementById(item.targetFieldId);
+              if (el) {
+                el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                el.classList.add('ring-4', 'ring-[#d4a359]', 'ring-offset-4', 'transition-all', 'duration-500');
+                setTimeout(() => el.classList.remove('ring-4', 'ring-[#d4a359]', 'ring-offset-4'), 2500);
+              }
+            }, 100);
           }
+          return;
         }
+      }
+
+      // 4. Fallback navigation
+      if (item.link) {
+        window.location.href = item.link;
       }
     }
   };

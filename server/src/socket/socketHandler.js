@@ -4,6 +4,7 @@ const Deal = require('../models/Deal');
 const ChatRequest = require('../models/ChatRequest');
 const TutorProfile = require('../models/TutorProfile');
 const SupportSession = require('../models/SupportSession');
+const { detectContactSharing } = require('../utils/contactModeration');
 
 const initSocket = (io, app) => {
   const onlineUsers = new Map(); // userId -> Set of socketIds
@@ -358,6 +359,19 @@ const initSocket = (io, app) => {
             code: 'TUTOR_TO_TUTOR_FORBIDDEN'
           });
           return;
+        }
+
+        // AI Contact Detection Guard: Prevent sharing of phone numbers, emails, or off-platform handles
+        const isStudentTutor = (senderUser?.role === 'student' && recipientUser?.role === 'tutor') || (senderUser?.role === 'tutor' && recipientUser?.role === 'student');
+        if (isStudentTutor && text) {
+          const detected = detectContactSharing(text);
+          if (detected) {
+            socket.emit('chat-error', {
+              message: 'External contact sharing is strictly prohibited. Keep all communication inside the platform to prevent an account ban.',
+              code: 'CONTACT_SHARING_PROHIBITED'
+            });
+            return;
+          }
         }
 
         // 72-hour tutor platform fee clearance enforcement

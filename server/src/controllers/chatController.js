@@ -12,6 +12,7 @@ const {
   sendChatRequestStatusEmail,
   getClientBaseUrl
 } = require('../utils/emailService');
+const { detectContactSharing } = require('../utils/contactModeration');
 
 // Helper to calculate student profile completion strength (6 core required fields matching frontend weights)
 const calculateStudentProfileStrength = (user) => {
@@ -332,6 +333,19 @@ exports.sendMessage = async (req, res) => {
         success: false,
         message: 'Tutors cannot message other tutors. Messaging is reserved for student-tutor learning communication.'
       });
+    }
+
+    // AI Contact Detection Guard: Prevent sharing of phone numbers, emails, or off-platform handles
+    const isStudentTutor = (req.user.role === 'student' && recipientUser.role === 'tutor') || (req.user.role === 'tutor' && recipientUser.role === 'student');
+    if (isStudentTutor && text) {
+      const detected = detectContactSharing(text);
+      if (detected) {
+        return res.status(400).json({
+          success: false,
+          code: 'CONTACT_SHARING_PROHIBITED',
+          message: 'External contact sharing is strictly prohibited. Keep all communication inside the platform to prevent an account ban.'
+        });
+      }
     }
 
     // Safeguard: Check if tutor's platform fee clearance has expired (>72 hours)

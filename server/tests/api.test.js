@@ -720,5 +720,51 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
     // Clean up admin user
     await User.deleteOne({ email: 'testadmin@pakistanlms.pk' });
   });
+
+  test('AI contact detection blocks sharing phone numbers and WhatsApp in student-tutor messages', async () => {
+    const User = require('../src/models/User');
+    const student = await User.findOne({ email: 'teststudent@pakistanlms.pk' });
+    const tutor = await User.findOne({ email: 'testtutor@pakistanlms.pk' });
+    expect(student).toBeDefined();
+    expect(tutor).toBeDefined();
+
+    // 1. Student attempts to send phone number in chat
+    const phoneRes = await request(app)
+      .post('/api/chat/send')
+      .set('Authorization', `Bearer ${studentToken}`)
+      .send({
+        recipientId: tutor._id.toString(),
+        text: 'Hello, please call me on 03001234567 for details.'
+      });
+
+    expect(phoneRes.statusCode).toEqual(400);
+    expect(phoneRes.body.success).toBe(false);
+    expect(phoneRes.body.code).toBe('CONTACT_SHARING_PROHIBITED');
+
+    // 2. Student attempts to send WhatsApp solicitation
+    const waRes = await request(app)
+      .post('/api/chat/send')
+      .set('Authorization', `Bearer ${studentToken}`)
+      .send({
+        recipientId: tutor._id.toString(),
+        text: 'Contact me on whatsapp to discuss timings.'
+      });
+
+    expect(waRes.statusCode).toEqual(400);
+    expect(waRes.body.success).toBe(false);
+    expect(waRes.body.code).toBe('CONTACT_SHARING_PROHIBITED');
+
+    // 3. Normal educational message succeeds
+    const safeRes = await request(app)
+      .post('/api/chat/send')
+      .set('Authorization', `Bearer ${studentToken}`)
+      .send({
+        recipientId: tutor._id.toString(),
+        text: 'Assalam o Alaikum, what times are available for Tajweed class?'
+      });
+
+    expect(safeRes.statusCode).toEqual(201);
+    expect(safeRes.body.success).toBe(true);
+  });
 });
 

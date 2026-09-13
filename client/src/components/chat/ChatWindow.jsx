@@ -74,9 +74,44 @@ const formatFileSize = (bytes) => {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 };
 
+// AI Contact Sharing Detection: identifies phone numbers, email addresses, WhatsApp, and off-platform contact sharing keywords
+const detectContactSharing = (text) => {
+  if (!text || typeof text !== 'string') return null;
+  const clean = text.toLowerCase();
+
+  // Pakistani phone formats: 03xx-xxxxxxx, +923xxxxxxxxx, 03xxxxxxxxx, or spaced/hyphenated numbers
+  const phonePattern = /(?:\+?92\s*3\d{2}[-\s]?\d{7}|03\d{2}[-\s]?\d{7}|\b03\d{9}\b|\b\d{4}[-\s]?\d{7}\b)/;
+  if (phonePattern.test(clean)) {
+    return 'Phone number or contact digit sequence detected';
+  }
+
+  // General contiguous digit sequences (10-12 digits)
+  const genericDigits = /\b\d{10,12}\b/;
+  if (genericDigits.test(clean)) {
+    return 'Phone number pattern detected';
+  }
+
+  // Email address
+  const emailPattern = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/;
+  if (emailPattern.test(clean)) {
+    return 'Email address detected';
+  }
+
+  // Social / messaging solicitation keywords
+  const keywordPattern = /\b(whats\s*app|whatapp|watsapp|call\s*me\s*at|call\s*me\s*on|contact\s*me\s*at|contact\s*me\s*on|my\s*num(?:ber)?|reach\s*me\s*at|telegram|skype|imo\b)/i;
+  if (keywordPattern.test(clean)) {
+    return 'External contact solicitation keyword detected';
+  }
+
+  return null;
+};
+
 const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversationDeleted, onDealUpdated }) => {
   const { user, isTutor, isStudent } = useAuth();
   const isTutorToTutor = (isTutor || user?.role === 'tutor') && partner?.role === 'tutor';
+  const isStudentTutorChat = !isTutorToTutor && Boolean(
+    isStudent || isTutor || user?.role === 'student' || user?.role === 'tutor' || partner?.role === 'student' || partner?.role === 'tutor'
+  );
   const { socket, onlineUsers, onlineStatusMap, refreshUserOnlineStatus } = useSocket();
   const { soundEnabled, toggleSound, permissionStatus, requestPermission } = useNotifications();
 
@@ -96,6 +131,32 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
   const [menuOpen, setMenuOpen] = useState(false);
   const [toastNotice, setToastNotice] = useState(null);
   const menuRef = useRef(null);
+
+  // Safety Notice Popup on message box & AI Contact Detection State
+  const [showContactNotice, setShowContactNotice] = useState(false);
+  const [contactWarningReason, setContactWarningReason] = useState(null);
+
+  useEffect(() => {
+    if (!conversationId || !isStudentTutorChat) return;
+    try {
+      const seen = sessionStorage.getItem(`safety_notice_${conversationId}`);
+      if (!seen) {
+        setShowContactNotice(true);
+      }
+    } catch (e) {
+      setShowContactNotice(true);
+    }
+  }, [conversationId, isStudentTutorChat]);
+
+  const handleDismissContactNotice = useCallback(() => {
+    setShowContactNotice(false);
+    setContactWarningReason(null);
+    if (conversationId) {
+      try {
+        sessionStorage.setItem(`safety_notice_${conversationId}`, 'true');
+      } catch (e) {}
+    }
+  }, [conversationId]);
 
   // File upload state
   const [selectedFile, setSelectedFile] = useState(null);
@@ -427,6 +488,22 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
       }
     };
 
+    const handleChatError = (err) => {
+      if (err?.code === 'CONTACT_SHARING_PROHIBITED') {
+        setShowContactNotice(true);
+        setContactWarningReason('External contact sharing detected');
+        setToastNotice({
+          type: 'error',
+          message: err.message || 'External contact sharing is strictly prohibited.'
+        });
+      } else {
+        setToastNotice({
+          type: 'error',
+          message: err?.message || 'Chat error occurred.'
+        });
+      }
+    };
+
     socket.on('new-message', handleReceiveMessage);
     socket.on('messages-seen', handleMessagesSeen);
     socket.on('messages-delivered', handleMessagesDelivered);
@@ -435,6 +512,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
     socket.on('conversation-cleared', handleConversationCleared);
     socket.on('conversation-deleted', handleConversationDeleted);
     socket.on('payment-request-updated', handlePaymentRequestUpdated);
+    socket.on('chat-error', handleChatError);
 
     return () => {
       socket.off('new-message', handleReceiveMessage);
@@ -445,6 +523,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
       socket.off('conversation-cleared', handleConversationCleared);
       socket.off('conversation-deleted', handleConversationDeleted);
       socket.off('payment-request-updated', handlePaymentRequestUpdated);
+      socket.off('chat-error', handleChatError);
     };
   }, [socket, conversationId, user]);
 
@@ -617,6 +696,21 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!user || !partner?._id) return;
+
+    // AI Contact Detection Guard: Prevent sharing of phone numbers, emails, or off-platform handles
+    if (isStudentTutorChat && (inputText.trim() || selectedFile)) {
+      const textToCheck = inputText.trim() || (selectedFile ? selectedFile.name : '');
+      const detected = detectContactSharing(textToCheck);
+      if (detected) {
+        setContactWarningReason(detected);
+        setShowContactNotice(true);
+        setToastNotice({
+          type: 'error',
+          message: 'Contact sharing detected! Please keep all communication inside the platform to avoid an account ban.'
+        });
+        return;
+      }
+    }
 
     // Handle file upload if a file is selected
     if (selectedFile) {
@@ -1839,7 +1933,110 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
       </div>
 
       {/* Bottom Message Input Area */}
-      <div className="p-2 sm:p-3 bg-white border-t border-slate-200/80 shrink-0">
+      <div className="p-2 sm:p-3 bg-white border-t border-slate-200/80 shrink-0 relative">
+        {/* Contact Safety Notice Popup */}
+        {showContactNotice && isStudentTutorChat && (
+          <div className="absolute bottom-full left-2 right-2 sm:left-4 sm:right-4 mb-2 z-30 animate-in fade-in slide-in-from-bottom-2 duration-200">
+            <div
+              className={`relative p-3.5 sm:p-4 rounded-2xl text-white shadow-2xl transition-all ${
+                contactWarningReason
+                  ? 'bg-gradient-to-br from-[#2a0b0b] via-[#3d1414] to-[#1a0707] border-2 border-rose-500 ring-4 ring-rose-500/20'
+                  : 'bg-gradient-to-br from-[#0c2217] via-[#143d2b] to-[#07150e] border-2 border-[#d4a359] ring-4 ring-[#d4a359]/20'
+              }`}
+            >
+              {/* Downward Callout Arrow pointing to message box */}
+              <div
+                className={`absolute -bottom-2 left-8 sm:left-12 w-4 h-4 rotate-45 transform border-r-2 border-b-2 ${
+                  contactWarningReason
+                    ? 'bg-[#2a0b0b] border-rose-500'
+                    : 'bg-[#0c2217] border-[#d4a359]'
+                }`}
+              />
+
+              {/* Header */}
+              <div className="flex items-start justify-between gap-2.5">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div
+                    className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${
+                      contactWarningReason
+                        ? 'bg-rose-500/20 text-rose-400 border-rose-400/40 animate-pulse'
+                        : 'bg-[#d4a359]/20 text-[#d4a359] border-[#d4a359]/40'
+                    }`}
+                  >
+                    {contactWarningReason ? (
+                      <AlertTriangle className="w-4 h-4 sm:w-5 sm:h-5 text-rose-400" />
+                    ) : (
+                      <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-[#d4a359]" />
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    <h4 className="font-serif font-bold text-xs sm:text-sm text-white tracking-wide">
+                      Quick reminder: Please keep all contact on the platform!
+                    </h4>
+                    {contactWarningReason && (
+                      <p className="text-[10.5px] text-rose-300 font-semibold mt-0.5">
+                        ⚠️ AI Alert: {contactWarningReason}. Remove external contact details to send.
+                      </p>
+                    )}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleDismissContactNotice}
+                  className="p-1 rounded-lg text-stone-400 hover:text-white hover:bg-white/10 transition-colors cursor-pointer shrink-0"
+                  title="Dismiss Reminder"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Bullets with ~ */}
+              <div className="mt-2.5 mb-3 space-y-1.5 text-[11px] sm:text-xs text-stone-200 pl-1">
+                <div className="flex items-start gap-2">
+                  <span className="text-[#d4a359] font-bold text-sm leading-none mt-0.5 shrink-0">~</span>
+                  <span className="leading-snug">
+                    Sharing or requesting external contact info is <strong className="text-white font-semibold underline decoration-[#d4a359]/60">strictly prohibited</strong>.
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-[#d4a359] font-bold text-sm leading-none mt-0.5 shrink-0">~</span>
+                  <span className="leading-snug">
+                    Our <strong className="text-amber-400 font-semibold">AI system automatically detects</strong> contact sharing.
+                  </span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-[#d4a359] font-bold text-sm leading-none mt-0.5 shrink-0">~</span>
+                  <span className="leading-snug">
+                    Violations will lead to a <strong className="text-rose-400 font-bold">permanent account ban</strong>.
+                  </span>
+                </div>
+              </div>
+
+              {/* Action Footer */}
+              <div className="flex items-center justify-between gap-3 pt-2 border-t border-white/10">
+                <button
+                  type="button"
+                  onClick={handleDismissContactNotice}
+                  className="px-3.5 py-1.5 bg-gradient-to-r from-[#d4a359] to-[#b85d34] hover:from-[#c2934c] hover:to-[#9e4e2a] active:scale-95 text-white font-bold text-[11px] sm:text-xs rounded-xl shadow-md transition-all flex items-center gap-1.5 cursor-pointer"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5" />
+                  <span>I Understand</span>
+                </button>
+
+                <Link
+                  href="/safety"
+                  target="_blank"
+                  className="text-[10.5px] sm:text-xs text-[#d4a359] hover:text-white underline font-semibold flex items-center gap-1 transition-colors"
+                >
+                  <span>Safety Rules</span>
+                  <ExternalLink className="w-3 h-3" />
+                </Link>
+              </div>
+            </div>
+          </div>
+        )}
+
         {isTutorFeeOverdue ? (
           <div className="p-4 bg-rose-50 border border-rose-200 rounded-2xl text-center space-y-2.5 shadow-xs animate-in fade-in">
             <div className="flex items-center justify-center gap-2 text-rose-900 font-black text-xs">
@@ -2000,6 +2197,25 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             )}
 
             <form onSubmit={handleSendMessage} className="flex items-center gap-1 sm:gap-1.5 w-full">
+              {/* Safety Policy Reminder Button */}
+              {isStudentTutorChat && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowContactNotice((prev) => !prev);
+                    if (contactWarningReason) setContactWarningReason(null);
+                  }}
+                  className={`p-2 sm:p-2.5 rounded-xl sm:rounded-2xl transition-all cursor-pointer shrink-0 flex items-center gap-1 border ${
+                    showContactNotice
+                      ? 'bg-[#0c2217] text-[#d4a359] border-[#d4a359]/60 shadow-xs'
+                      : 'text-stone-400 hover:text-[#0c2217] hover:bg-[#f0ece1] border-transparent'
+                  }`}
+                  title="Contact Policy & Safety Notice"
+                >
+                  <ShieldCheck className="w-4 h-4 sm:w-5 sm:h-5 text-[#d4a359]" />
+                </button>
+              )}
+
               {/* File Attachment Input (hidden strictly png, jpg, jpeg, pdf) */}
               <input
                 type="file"
@@ -2036,9 +2252,25 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                 type="text"
                 placeholder={selectedFile ? 'Add a caption / note (optional)...' : 'Type a message...'}
                 value={inputText}
-                onChange={(e) => setInputText(e.target.value)}
+                onChange={(e) => {
+                  const val = e.target.value;
+                  setInputText(val);
+                  if (isStudentTutorChat) {
+                    const detected = detectContactSharing(val);
+                    if (detected) {
+                      setContactWarningReason(detected);
+                      setShowContactNotice(true);
+                    } else if (contactWarningReason) {
+                      setContactWarningReason(null);
+                    }
+                  }
+                }}
                 disabled={uploadingFile}
-                className="flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#faf8f5] border border-stone-200 rounded-xl sm:rounded-2xl text-sm sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 focus:bg-white transition-all font-medium min-h-[40px] sm:min-h-[44px]"
+                className={`flex-1 min-w-0 px-3 sm:px-4 py-2 sm:py-2.5 bg-[#faf8f5] border rounded-xl sm:rounded-2xl text-sm sm:text-sm text-stone-900 outline-none transition-all font-medium min-h-[40px] sm:min-h-[44px] ${
+                  contactWarningReason
+                    ? 'border-rose-400 ring-2 ring-rose-300/40 bg-rose-50/20'
+                    : 'border-stone-200 focus:border-[#0c2217] focus:ring-1 focus:ring-[#0c2217]/20 focus:bg-white'
+                }`}
               />
 
               {/* Send Button */}

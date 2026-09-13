@@ -76,6 +76,7 @@ function TutorProfileContent() {
   const [activeTab, setActiveTab] = useState('personal');
   const tabBarRef = useRef(null);
   const activeTabBtnRef = useRef(null);
+  const saveFeedbackTimeoutRef = useRef(null);
 
   // Basic Account Details
   const [name, setName] = useState('');
@@ -536,8 +537,6 @@ function TutorProfileContent() {
   // UNIFIED SINGLE SAVE HANDLER
   const handleUnifiedSave = async (e) => {
     if (e) e.preventDefault();
-    setSavingProfile(true);
-    setProfileSuccess('');
     setProfileError('');
 
     if (!name.trim()) {
@@ -553,6 +552,19 @@ function TutorProfileContent() {
       setSavingProfile(false);
       return;
     }
+
+    // Instantly display "Profile Updated" without waiting for network latency
+    setProfileSuccess('Profile Updated');
+    setJustSavedProfile(true);
+    setSavingProfile(true);
+
+    if (saveFeedbackTimeoutRef.current) {
+      clearTimeout(saveFeedbackTimeoutRef.current);
+    }
+    saveFeedbackTimeoutRef.current = setTimeout(() => {
+      setProfileSuccess('');
+      setJustSavedProfile(false);
+    }, 3500);
 
     try {
       const cleanVideo = (videoIntroInput || videoIntro || '').trim();
@@ -653,11 +665,14 @@ function TutorProfileContent() {
         videoIntro: cleanVideo
       });
 
-      setProfileSuccess('Profile updated successfully! All your changes have been saved.');
+      setProfileSuccess('Profile Updated');
       setJustSavedProfile(true);
-      setTimeout(() => setJustSavedProfile(false), 4000);
-      setTimeout(() => setProfileSuccess(''), 6000);
     } catch (err) {
+      if (saveFeedbackTimeoutRef.current) {
+        clearTimeout(saveFeedbackTimeoutRef.current);
+      }
+      setProfileSuccess('');
+      setJustSavedProfile(false);
       setProfileError(err.message || 'Failed to update profile settings.');
     } finally {
       setSavingProfile(false);
@@ -781,15 +796,14 @@ function TutorProfileContent() {
     <div className="py-6 sm:py-8 bg-[#faf8f5] min-h-screen text-stone-900 pb-28">
       {/* Viewport Floating Toast Confirmation for Profile Save */}
       {profileSuccess && (
-        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 max-w-md w-[92%] sm:w-auto px-5 py-3.5 bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#0c2217] border-2 border-[#d4a359] text-white rounded-2xl shadow-2xl flex items-center justify-between gap-3.5 animate-in fade-in slide-in-from-top-4 duration-200 ring-4 ring-[#d4a359]/20">
+        <div className="fixed top-5 left-1/2 -translate-x-1/2 z-50 max-w-md w-[92%] sm:w-auto px-5 py-3.5 bg-gradient-to-r from-[#0c2217] via-[#143d2b] to-[#0c2217] border-2 border-[#d4a359] text-white rounded-2xl shadow-2xl flex items-center justify-between gap-3.5 animate-in fade-in slide-in-from-top-4 duration-150 ring-4 ring-[#d4a359]/20">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-[#d4a359]/20 text-[#d4a359] flex items-center justify-center shrink-0 border border-[#d4a359]/40">
-              <CheckCircle2 className="w-5 h-5 text-[#d4a359]" />
+            <div className="w-7 h-7 rounded-xl bg-[#d4a359]/20 text-[#d4a359] flex items-center justify-center shrink-0 border border-[#d4a359]/40">
+              <CheckCircle2 className="w-4 h-4 text-[#d4a359]" />
             </div>
-            <div>
-              <p className="font-serif font-bold text-xs sm:text-sm text-white">Profile Updated Successfully!</p>
-              <p className="text-[11px] text-[#faf8f5]/80 font-medium">{profileSuccess}</p>
-            </div>
+            <span className="font-serif font-bold text-sm sm:text-base text-white tracking-wide">
+              {profileSuccess}
+            </span>
           </div>
           <button
             type="button"
@@ -1614,7 +1628,7 @@ function TutorProfileContent() {
                       ) : justSavedProfile ? (
                         <>
                           <Check className="w-3.5 h-3.5 text-emerald-300" />
-                          <span>Profile Updated!</span>
+                          <span>Profile Updated</span>
                         </>
                       ) : (
                         <>
@@ -1832,7 +1846,7 @@ function TutorProfileContent() {
                     ) : justSavedProfile ? (
                       <>
                         <Check className="w-3.5 h-3.5 text-emerald-300" />
-                        <span>Profile Updated!</span>
+                        <span>Profile Updated</span>
                       </>
                     ) : (
                       <>
@@ -1897,7 +1911,7 @@ function TutorProfileContent() {
                     ) : justSavedProfile ? (
                       <>
                         <Check className="w-3.5 h-3.5 text-emerald-300" />
-                        <span>Profile Updated!</span>
+                        <span>Profile Updated</span>
                       </>
                     ) : (
                       <>
@@ -2081,7 +2095,7 @@ function TutorProfileContent() {
                     ) : justSavedProfile ? (
                       <>
                         <Check className="w-3.5 h-3.5 text-emerald-300" />
-                        <span>Profile Updated!</span>
+                        <span>Profile Updated</span>
                       </>
                     ) : (
                       <>
@@ -2533,7 +2547,7 @@ function TutorProfileContent() {
                   <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-400/40">
                     <Check className="w-3.5 h-3.5" />
                   </div>
-                  <span>Profile updated successfully! All changes are saved.</span>
+                  <span>Profile Updated</span>
                 </div>
                 <button
                   type="button"

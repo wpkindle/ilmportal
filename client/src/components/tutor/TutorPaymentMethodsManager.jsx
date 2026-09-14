@@ -95,7 +95,8 @@ export default function TutorPaymentMethodsManager({
   onPreferenceChange: onControlledPreferenceChange,
   isControlled = false,
   previewUrl = null,
-  tutorId = null
+  tutorId = null,
+  onPreviewClick = null
 }) {
   const [internalMethods, setInternalMethods] = useState(initialMethods);
   const methods = isControlled && controlledMethods !== undefined ? controlledMethods : internalMethods;
@@ -365,6 +366,7 @@ export default function TutorPaymentMethodsManager({
               href={effectivePreviewUrl}
               target="_blank"
               rel="noopener noreferrer"
+              onClick={onPreviewClick}
               className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-[#faf8f5] hover:bg-[#f0ece1] text-[#0c2217] text-xs font-bold rounded-2xl border border-[#d4a359]/50 shadow-2xs transition-all cursor-pointer group"
               title="Preview how your public profile appears to prospective students"
             >

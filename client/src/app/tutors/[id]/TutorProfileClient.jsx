@@ -45,6 +45,8 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
   const { user, isAuthenticated, isTutor, tutorProfile } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [currentTutor, setCurrentTutor] = useState(initialTutor);
+  const [draftTutor, setDraftTutor] = useState(null);
+  const [previewViewMode, setPreviewViewMode] = useState('draft'); // 'draft' | 'live'
   const [isLoadingProfile, setIsLoadingProfile] = useState(!initialTutor);
   const [fetchError, setFetchError] = useState(false);
 
@@ -66,7 +68,21 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
     )
   );
 
-  const tutor = currentTutor || initialTutor || (isOwnProfile && tutorProfile ? { ...tutorProfile, user } : null);
+  const isCurrentTutorUser = isTutor || user?.role === 'tutor';
+  const isDraftAvailable = Boolean(
+    draftTutor && (
+      isOwnProfile ||
+      isCurrentTutorUser ||
+      (currentUserId && draftTutor?.user?._id && currentUserId.toString() === draftTutor.user._id.toString()) ||
+      (currentUserId && draftTutor?.user?.id && currentUserId.toString() === draftTutor.user.id.toString())
+    )
+  );
+
+  // Use draft if available and draft mode active, otherwise fallback to database profile
+  const tutor = (isDraftAvailable && previewViewMode === 'draft')
+    ? draftTutor
+    : (currentTutor || initialTutor || (isOwnProfile && tutorProfile ? { ...tutorProfile, user } : null));
+
   const [sanadModalOpen, setSanadModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [femaleGateModalOpen, setFemaleGateModalOpen] = useState(false);
@@ -99,6 +115,47 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
 
   React.useEffect(() => {
     setMounted(true);
+  }, []);
+
+  // Load draft preview from localStorage/sessionStorage and subscribe to cross-tab storage updates
+  useEffect(() => {
+    const loadDraft = () => {
+      try {
+        const raw = localStorage.getItem('tutor_draft_preview') || sessionStorage.getItem('tutor_draft_preview');
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed && typeof parsed === 'object') {
+            setDraftTutor(parsed);
+            if (typeof window !== 'undefined') {
+              const urlParams = new URLSearchParams(window.location.search);
+              if (urlParams.get('preview') === 'live') {
+                setPreviewViewMode('live');
+              } else {
+                setPreviewViewMode('draft');
+              }
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error loading draft preview from storage:', e);
+      }
+    };
+
+    loadDraft();
+
+    const handleStorage = (e) => {
+      if (e.key === 'tutor_draft_preview' && e.newValue) {
+        try {
+          const updated = JSON.parse(e.newValue);
+          if (updated && typeof updated === 'object') {
+            setDraftTutor(updated);
+          }
+        } catch (err) {}
+      }
+    };
+
+    window.addEventListener('storage', handleStorage);
+    return () => window.removeEventListener('storage', handleStorage);
   }, []);
 
   // Sync if initialTutor prop changes
@@ -320,26 +377,63 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
 
   return (
     <div className="bg-[#faf8f5] min-h-screen">
-      {/* Live Preview Mode Sticky Top Banner for Profile Owner */}
-      {isOwnProfile && (
-        <div className="bg-[#0c2217] text-[#faf8f5] border-b border-[#d4a359]/40 py-2.5 sm:py-3 px-4 sm:px-6 sticky top-0 z-30 shadow-md">
-          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
-            <div className="flex items-center gap-2.5">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#d4a359]/20 text-[#d4a359] border border-[#d4a359]/40 text-[10.5px] font-bold uppercase tracking-wider shrink-0">
-                <Eye className="w-3.5 h-3.5 text-[#d4a359]" />
-                Live Preview Mode
+      {/* Live / Draft Preview Mode Sticky Top Banner for Profile Owner */}
+      {(isOwnProfile || (isDraftAvailable && isTutorVisitor)) && (
+        <div className="bg-gradient-to-r from-[#0c2217] via-[#143826] to-[#0c2217] text-[#faf8f5] border-b border-[#d4a359]/40 py-2.5 sm:py-3 px-4 sm:px-6 sticky top-0 z-30 shadow-md">
+          <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-bold uppercase tracking-wider shrink-0 ${
+                isDraftAvailable && previewViewMode === 'draft'
+                  ? 'bg-amber-500/20 text-amber-300 border border-amber-400/50'
+                  : 'bg-[#d4a359]/20 text-[#d4a359] border border-[#d4a359]/40'
+              }`}>
+                <Eye className="w-3.5 h-3.5" />
+                {isDraftAvailable && previewViewMode === 'draft' ? 'Draft Preview Mode' : 'Live Published Profile'}
               </span>
               <span className="text-stone-300 font-medium">
-                You are viewing your public tutor profile exactly as prospective students see it on IlmiDunya.
+                {isDraftAvailable && previewViewMode === 'draft'
+                  ? 'Viewing unsaved draft changes from profile settings (Bio, Rates, Subjects, etc.).'
+                  : 'Viewing your currently published profile as live students see it on IlmiDunya.'}
               </span>
             </div>
-            <Link
-              href="/tutor/profile"
-              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#d4a359] hover:bg-[#b85d34] text-[#0c2217] hover:text-white font-bold rounded-xl transition-all shadow-xs shrink-0 self-end sm:self-auto cursor-pointer"
-            >
-              <span>Back to Edit Settings</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
+
+            <div className="flex items-center gap-2.5 self-end md:self-auto shrink-0">
+              {/* Draft vs Live View Toggle Switcher */}
+              {isDraftAvailable && (
+                <div className="inline-flex rounded-xl bg-black/40 p-1 border border-white/10 text-[11px] font-bold">
+                  <button
+                    type="button"
+                    onClick={() => setPreviewViewMode('draft')}
+                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                      previewViewMode === 'draft'
+                        ? 'bg-amber-500 text-stone-950 shadow-xs'
+                        : 'text-stone-300 hover:text-white'
+                    }`}
+                  >
+                    Draft (Unsaved)
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewViewMode('live')}
+                    className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                      previewViewMode === 'live'
+                        ? 'bg-[#d4a359] text-stone-950 shadow-xs'
+                        : 'text-stone-300 hover:text-white'
+                    }`}
+                  >
+                    Live Published
+                  </button>
+                </div>
+              )}
+
+              <Link
+                href="/tutor/profile"
+                className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#d4a359] hover:bg-[#b85d34] text-[#0c2217] hover:text-white font-bold rounded-xl transition-all shadow-xs shrink-0 cursor-pointer"
+              >
+                <span>Back to Edit Settings</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
           </div>
         </div>
       )}

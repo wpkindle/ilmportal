@@ -343,13 +343,13 @@ export default function TutorPaymentMethodsManager({
             </div>
             <h2 className="text-sm font-black text-slate-900 font-serif flex items-center gap-2">
               <span>Tuition Fee Payment Methods</span>
-              <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-rose-50 text-rose-700 border border-rose-200">
-                Required
+              <span className="px-2 py-0.5 text-[10px] font-bold rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200">
+                Optional
               </span>
             </h2>
           </div>
           <p className="text-xs text-slate-500 mt-1 max-w-xl">
-            Add Pakistani receiving accounts (Bank, Raast ID, EasyPaisa, JazzCash, UPaisa). Students will see these verified methods and transfer your tuition fees directly to you.
+            Add Pakistani receiving accounts (Bank, Raast ID, EasyPaisa, JazzCash, UPaisa) at your convenience. Adding receiving accounts is optional and does not affect your profile health or verification score. When added, students transfer tuition fees directly to your accounts.
           </p>
         </div>
 

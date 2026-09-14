@@ -23,7 +23,9 @@ import {
   Search,
   AlertTriangle,
   GraduationCap,
-  Flag
+  Flag,
+  Eye,
+  Loader2
 } from 'lucide-react';
 import RatingStars from '../../../components/common/RatingStars';
 import { SanadModal } from '../../../components/common/SanadBadge';
@@ -43,7 +45,28 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
   const { user, isAuthenticated, isTutor, tutorProfile } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [currentTutor, setCurrentTutor] = useState(initialTutor);
-  const tutor = currentTutor || initialTutor || {};
+  const [isLoadingProfile, setIsLoadingProfile] = useState(!initialTutor);
+  const [fetchError, setFetchError] = useState(false);
+
+  const currentUserId = user?._id || user?.id;
+  const currentUsername = user?.username ? user.username.toLowerCase() : '';
+  const currentTutorProfileId = tutorProfile?._id || tutorProfile?.id;
+  const paramIdLower = (id || '').toString().toLowerCase();
+
+  const isOwnProfile = Boolean(
+    currentUserId && (
+      (currentTutor?.user?._id && currentUserId.toString() === currentTutor.user._id.toString()) ||
+      (currentTutor?.user?.id && currentUserId.toString() === currentTutor.user.id.toString()) ||
+      (initialTutor?.user?._id && currentUserId.toString() === initialTutor.user._id.toString()) ||
+      (initialTutor?.user?.id && currentUserId.toString() === initialTutor.user.id.toString()) ||
+      (currentTutorProfileId && currentTutorProfileId.toString() === (currentTutor?._id || initialTutor?._id || '').toString()) ||
+      (currentUsername && paramIdLower && currentUsername === paramIdLower) ||
+      (currentUserId && paramIdLower && currentUserId.toString().toLowerCase() === paramIdLower) ||
+      (currentTutorProfileId && paramIdLower && currentTutorProfileId.toString().toLowerCase() === paramIdLower)
+    )
+  );
+
+  const tutor = currentTutor || initialTutor || (isOwnProfile && tutorProfile ? { ...tutorProfile, user } : null);
   const [sanadModalOpen, setSanadModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
   const [femaleGateModalOpen, setFemaleGateModalOpen] = useState(false);
@@ -82,20 +105,30 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
   useEffect(() => {
     if (initialTutor) {
       setCurrentTutor(initialTutor);
+      setIsLoadingProfile(false);
     }
   }, [initialTutor]);
 
-  // Client-side fetch fresh tutor profile on mount to avoid stale ISR cache
+  // Client-side fetch fresh tutor profile on mount to avoid stale ISR cache or load owner preview
   useEffect(() => {
     const idToFetch = id || tutorUserIdStr || tutor?._id || tutorUser?._id || tutorUser?.id;
     if (idToFetch) {
+      setIsLoadingProfile(true);
       api.getTutorById(idToFetch).then((res) => {
         if (res?.success && res.tutor) {
           setCurrentTutor(res.tutor);
+          setFetchError(false);
+        } else {
+          if (!initialTutor && !tutorProfile) setFetchError(true);
         }
       }).catch((err) => {
         console.error('Error fetching client-side tutor profile:', err);
+        if (!initialTutor && !tutorProfile) setFetchError(true);
+      }).finally(() => {
+        setIsLoadingProfile(false);
       });
+    } else {
+      setIsLoadingProfile(false);
     }
   }, [id, tutorUserIdStr, tutor?._id, tutorUser?._id]);
 
@@ -171,8 +204,7 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
     }
   })());
 
-  const tutorTargetId = tutorUser._id || tutorUser.id || tutor._id;
-  const isOwnProfile = Boolean((user?._id || user?.id) && (user?._id || user?.id) === tutorTargetId);
+  const tutorTargetId = tutorUser._id || tutorUser.id || tutor?._id;
 
   const effectiveVideoIntro = (
     tutor?.videoIntro ||
@@ -263,9 +295,56 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
   const hasSecondary = hasSanad || hasVideo;
   const hasBothSecondary = hasSanad && hasVideo;
 
+  if (isLoadingProfile && !tutor) {
+    return (
+      <div className="py-24 text-center space-y-4 min-h-[50vh] flex flex-col items-center justify-center bg-[#faf8f5]">
+        <Loader2 className="w-8 h-8 animate-spin text-[#d4a359]" />
+        <p className="text-sm font-semibold text-stone-600">Loading tutor profile...</p>
+      </div>
+    );
+  }
+
+  if (!tutor) {
+    return (
+      <div className="py-20 text-center space-y-4 min-h-[50vh] flex flex-col items-center justify-center bg-[#faf8f5]">
+        <h2 className="text-xl font-bold text-slate-800">Tutor profile not found</h2>
+        <p className="text-xs text-stone-500 max-w-md mx-auto">
+          This tutor profile does not exist or may be under review.
+        </p>
+        <Link href="/tutors" className="px-5 py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] rounded-xl text-xs font-bold inline-block shadow-sm">
+          Browse Other Tutors
+        </Link>
+      </div>
+    );
+  }
+
   return (
-    <div className="py-8 bg-[#faf8f5] min-h-screen">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+    <div className="bg-[#faf8f5] min-h-screen">
+      {/* Live Preview Mode Sticky Top Banner for Profile Owner */}
+      {isOwnProfile && (
+        <div className="bg-[#0c2217] text-[#faf8f5] border-b border-[#d4a359]/40 py-2.5 sm:py-3 px-4 sm:px-6 sticky top-0 z-30 shadow-md">
+          <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs">
+            <div className="flex items-center gap-2.5">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-[#d4a359]/20 text-[#d4a359] border border-[#d4a359]/40 text-[10.5px] font-bold uppercase tracking-wider shrink-0">
+                <Eye className="w-3.5 h-3.5 text-[#d4a359]" />
+                Live Preview Mode
+              </span>
+              <span className="text-stone-300 font-medium">
+                You are viewing your public tutor profile exactly as prospective students see it on IlmiDunya.
+              </span>
+            </div>
+            <Link
+              href="/tutor/profile"
+              className="inline-flex items-center gap-1.5 px-3.5 py-1.5 bg-[#d4a359] hover:bg-[#b85d34] text-[#0c2217] hover:text-white font-bold rounded-xl transition-all shadow-xs shrink-0 self-end sm:self-auto cursor-pointer"
+            >
+              <span>Back to Edit Settings</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+      )}
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8 py-8">
         
         {/* Top Profile Card */}
         <div className="bg-white rounded-3xl p-5 sm:p-7 md:p-8 border border-[#e6ded1] shadow-xs space-y-6">
@@ -412,10 +491,10 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
             </div>
 
             {/* Quick Action Buttons */}
-            {(canMessage || hasSecondary) && (
+            {(canMessage || isOwnProfile || hasSecondary) && (
               <div
                 className={`w-full shrink-0 pt-4 xl:pt-0 border-t xl:border-t-0 border-slate-100 flex ${
-                  canMessage
+                  canMessage || isOwnProfile
                     ? 'xl:w-[320px] 2xl:w-[340px] flex-col sm:flex-row sm:items-center sm:justify-between xl:flex-col xl:items-stretch gap-2.5 sm:gap-3'
                     : 'xl:w-auto flex-col sm:flex-row items-stretch sm:items-center sm:justify-end gap-2.5 sm:gap-3'
                 }`}
@@ -424,7 +503,7 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
                 {hasSecondary && (
                   <div
                     className={`${
-                      canMessage
+                      canMessage || isOwnProfile
                         ? `grid ${hasBothSecondary ? 'grid-cols-2 sm:flex' : 'grid-cols-1 sm:flex'} sm:items-center xl:grid ${
                             hasBothSecondary ? 'xl:grid-cols-2' : 'xl:grid-cols-1'
                           } gap-2 w-full sm:w-auto xl:w-full order-2 sm:order-1 xl:order-2`
@@ -434,7 +513,7 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
                     {hasSanad && (
                       <div
                         className={`${
-                          canMessage ? 'w-full sm:w-auto xl:w-full' : 'w-full sm:w-auto'
+                          canMessage || isOwnProfile ? 'w-full sm:w-auto xl:w-full' : 'w-full sm:w-auto'
                         } py-2.5 px-3 rounded-2xl text-xs font-bold bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/50 shadow-2xs flex items-center justify-center gap-1.5 whitespace-nowrap select-none`}
                         title="Qualifications authenticated by IlmiDunya Administration"
                       >
@@ -448,7 +527,7 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
                       <a
                         href="#tutor-video-intro"
                         className={`${
-                          canMessage ? 'w-full sm:w-auto xl:w-full' : 'w-full sm:w-auto'
+                          canMessage || isOwnProfile ? 'w-full sm:w-auto xl:w-full' : 'w-full sm:w-auto'
                         } py-2.5 px-3 rounded-2xl text-xs font-bold bg-[#faf8f5] hover:bg-[#f0ece1] text-[#0c2217] border border-[#e6ded1] hover:border-[#b85d34]/40 transition-all shadow-2xs flex items-center justify-center gap-1.5 cursor-pointer whitespace-nowrap`}
                         title="Watch tutor video introduction"
                       >
@@ -459,8 +538,8 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
                   </div>
                 )}
 
-                {/* Primary CTA: Message & Discuss Schedule */}
-                {canMessage && (
+                {/* Primary CTA: Message & Discuss Schedule OR Edit Profile */}
+                {canMessage ? (
                   <button
                     type="button"
                     onClick={handleStartChat}
@@ -469,7 +548,15 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
                     <MessageSquare className="w-4 h-4 shrink-0" />
                     <span>Message &amp; Discuss Schedule</span>
                   </button>
-                )}
+                ) : isOwnProfile ? (
+                  <Link
+                    href="/tutor/profile"
+                    className="w-full sm:w-auto xl:w-full order-1 sm:order-2 xl:order-1 px-5 py-3 bg-[#0c2217] hover:bg-[#143d2b] active:scale-[0.99] text-[#faf8f5] font-bold text-xs sm:text-sm rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
+                  >
+                    <span>Edit Profile Settings</span>
+                    <ArrowRight className="w-4 h-4 text-[#d4a359]" />
+                  </Link>
+                ) : null}
               </div>
             )}
 

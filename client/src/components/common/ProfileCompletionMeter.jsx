@@ -128,7 +128,7 @@ export const calculateClientCompletion = (user, tutorProfile) => {
           : hasPendingSanad
             ? 'Sanad / Degree (Pending Admin Review)'
             : 'Sanad / Degree Document',
-        weight: 5,
+        weight: 15,
         done: hasApprovedSanad,
         tab: 'degrees',
         targetFieldId: 'profile-sanads',
@@ -141,17 +141,20 @@ export const calculateClientCompletion = (user, tutorProfile) => {
       },
       {
         key: 'paymentMethods',
-        label: 'Payment Method (Required)',
-        weight: 10,
+        label: 'Payment Method (Optional)',
+        weight: 0,
+        optional: true,
         done: Array.isArray(tutorProfile?.paymentMethods) && tutorProfile.paymentMethods.length > 0,
         tab: 'payments',
         targetFieldId: 'profile-payment-methods',
         link: '/tutor/profile?tab=payments#profile-payment-methods',
-        actionLabel: 'Add Payment Method'
+        actionLabel: Array.isArray(tutorProfile?.paymentMethods) && tutorProfile.paymentMethods.length > 0
+          ? 'Manage Methods'
+          : 'Add Method (Optional)'
       }
     ];
 
-    const percentage = Math.min(100, Math.max(0, checks.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0)));
+    const percentage = Math.min(100, Math.max(0, checks.filter(c => !c.optional).reduce((sum, item) => sum + (item.done ? item.weight : 0), 0)));
     return { percentage, items: checks };
   } else {
     // Student
@@ -285,9 +288,9 @@ export default function ProfileCompletionMeter({
       (doc) => doc.status === 'verified' || doc.status === 'approved'
     );
 
-  const completedCount = items.filter((i) => i.done).length;
-  const totalCount = items.length;
-  const remainingItems = items.filter((i) => !i.done);
+  const completedCount = items.filter((i) => i.done && !i.optional).length;
+  const totalCount = items.filter((i) => !i.optional).length;
+  const remainingItems = items.filter((i) => !i.done && !i.optional);
 
   const getBarColor = (pct) => {
     if (pct >= 85) return 'from-[#d4a359] via-[#b85d34] to-[#d4a359]';
@@ -531,16 +534,20 @@ export default function ProfileCompletionMeter({
                   className={`p-2.5 rounded-xl border text-xs flex items-center justify-between gap-2 transition-all ${
                     item.done
                       ? 'bg-emerald-50/70 border-emerald-200 text-emerald-900'
+                      : item.optional
+                      ? 'bg-stone-50/80 border-stone-200 text-stone-700'
                       : 'bg-[#faf8f5] border-[#ebe3d3] text-stone-800'
                   }`}
                 >
                   <div className="flex items-center gap-2 min-w-0">
                     {item.done ? (
                       <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    ) : item.optional ? (
+                      <Circle className="w-3.5 h-3.5 text-stone-400 shrink-0" />
                     ) : (
                       <Circle className="w-3.5 h-3.5 text-amber-500 shrink-0" />
                     )}
-                    <span className={`truncate ${item.done ? 'font-medium text-stone-600' : 'font-bold text-[#0c2217]'}`}>
+                    <span className={`truncate ${item.done ? 'font-medium text-stone-600' : item.optional ? 'font-medium text-stone-600' : 'font-bold text-[#0c2217]'}`}>
                       {item.label}
                     </span>
                   </div>
@@ -548,7 +555,7 @@ export default function ProfileCompletionMeter({
                   <div className="flex items-center gap-1.5 shrink-0">
                     {item.done ? (
                       <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100/80 border border-emerald-300 px-2 py-0.5 rounded-full">
-                        Done
+                        {item.optional ? 'Provided (Optional)' : 'Done'}
                       </span>
                     ) : item.key === 'email' || item.link?.startsWith('/verify-email') ? (
                       <Link
@@ -562,7 +569,11 @@ export default function ProfileCompletionMeter({
                       <button
                         type="button"
                         onClick={(e) => handleItemClick(e, item)}
-                        className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[10px] font-bold shadow-xs transition-all cursor-pointer"
+                        className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-bold shadow-xs transition-all cursor-pointer ${
+                          item.optional
+                            ? 'bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-300'
+                            : 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
+                        }`}
                       >
                         <span>{item.actionLabel}</span>
                         <ArrowRight className="w-2.5 h-2.5" />
@@ -711,16 +722,20 @@ export default function ProfileCompletionMeter({
               className={`p-3 rounded-2xl border text-xs flex items-center justify-between gap-2 transition-all ${
                 item.done
                   ? 'bg-[#faf8f5] border-[#e6dfd5] text-stone-900'
+                  : item.optional
+                  ? 'bg-stone-50 border-stone-200 text-stone-700'
                   : 'bg-white border-amber-200/90 shadow-2xs text-slate-800'
               }`}
             >
               <div className="flex items-center gap-2 min-w-0">
                 {item.done ? (
                   <CheckCircle2 className="w-4 h-4 text-[#d4a359] shrink-0" />
+                ) : item.optional ? (
+                  <Circle className="w-4 h-4 text-stone-400 shrink-0" />
                 ) : (
                   <Circle className="w-4 h-4 text-amber-500 shrink-0" />
                 )}
-                <span className={`truncate ${item.done ? 'font-medium text-[#0c2217]' : 'font-bold text-slate-800'}`}>
+                <span className={`truncate ${item.done ? 'font-medium text-[#0c2217]' : item.optional ? 'font-medium text-stone-600' : 'font-bold text-slate-800'}`}>
                   {item.label}
                 </span>
               </div>
@@ -728,7 +743,7 @@ export default function ProfileCompletionMeter({
               <div className="flex items-center gap-1.5 shrink-0">
                 {item.done ? (
                   <span className="text-[10px] font-bold text-[#0c2217] bg-[#f0ece1] border border-[#d4a359]/30 px-2 py-0.5 rounded-full">
-                    Done (+{item.weight}%)
+                    {item.optional ? 'Provided (Optional)' : `Done (+${item.weight}%)`}
                   </span>
                 ) : item.key === 'email' || item.link?.startsWith('/verify-email') ? (
                   <Link
@@ -742,7 +757,11 @@ export default function ProfileCompletionMeter({
                   <button
                     type="button"
                     onClick={(e) => handleItemClick(e, item)}
-                    className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-[11px] font-bold shadow-2xs transition-all hover:scale-102 cursor-pointer"
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-xl text-[11px] font-bold shadow-2xs transition-all hover:scale-102 cursor-pointer ${
+                      item.optional
+                        ? 'bg-stone-100 hover:bg-stone-200 text-stone-700 border border-stone-300'
+                        : 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
+                    }`}
                   >
                     <span>{item.actionLabel}</span>
                     <ArrowRight className="w-3 h-3" />

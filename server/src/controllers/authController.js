@@ -36,20 +36,21 @@ const calculateProfileCompletion = (user, tutorProfile) => {
       {
         key: 'sanad',
         label: 'Sanad / Degree Approved',
-        weight: 5,
+        weight: 15,
         done: Array.isArray(tutorProfile?.sanadDocuments) &&
               tutorProfile.sanadDocuments.length > 0 &&
               tutorProfile.sanadDocuments.some(doc => doc.status === 'verified' || doc.status === 'approved')
       },
       {
         key: 'paymentMethods',
-        label: 'Payment Method (Required)',
-        weight: 10,
+        label: 'Payment Method (Optional)',
+        weight: 0,
+        optional: true,
         done: Array.isArray(tutorProfile?.paymentMethods) && tutorProfile.paymentMethods.length > 0
       }
     ];
 
-    const percentage = Math.min(100, Math.max(0, checks.reduce((sum, item) => sum + (item.done ? item.weight : 0), 0)));
+    const percentage = Math.min(100, Math.max(0, checks.filter(c => !c.optional).reduce((sum, item) => sum + (item.done ? item.weight : 0), 0)));
     return { percentage, items: checks };
   } else {
     // Student

@@ -38,7 +38,8 @@ import {
   Loader2,
   HelpCircle,
   Info,
-  ChevronRight
+  ChevronRight,
+  ExternalLink
 } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { useSocket } from '../../../context/SocketContext';
@@ -1011,13 +1012,27 @@ function TutorProfileContent() {
             </p>
           </div>
 
-          <Link
-            href="/tutor/dashboard"
-            className="self-start sm:self-center px-4 py-2 bg-white hover:bg-stone-50 border border-[#e6dfd5] rounded-2xl text-xs font-semibold text-stone-700 flex items-center gap-1.5 shadow-2xs transition-colors"
-          >
-            <Layers className="w-3.5 h-3.5 text-[#143d2b]" />
-            <span>Dashboard</span>
-          </Link>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Link
+              href={`/tutors/${user?.username || user?._id || ''}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-4 py-2 bg-[#f0ece1] hover:bg-[#e6dfd5] border border-[#d4a359]/50 rounded-2xl text-xs font-bold text-[#0c2217] flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer group"
+              title="Preview how your profile appears to prospective students"
+            >
+              <Eye className="w-3.5 h-3.5 text-[#b85d34] group-hover:scale-110 transition-transform" />
+              <span>Live Public Preview</span>
+              <ExternalLink className="w-3 h-3 text-stone-400" />
+            </Link>
+
+            <Link
+              href="/tutor/dashboard"
+              className="px-4 py-2 bg-white hover:bg-stone-50 border border-[#e6dfd5] rounded-2xl text-xs font-semibold text-stone-700 flex items-center gap-1.5 shadow-2xs transition-colors"
+            >
+              <Layers className="w-3.5 h-3.5 text-[#143d2b]" />
+              <span>Dashboard</span>
+            </Link>
+          </div>
         </div>
 
         {/* 1-Click Email Verification Success Banner */}
@@ -1131,51 +1146,65 @@ function TutorProfileContent() {
           <div id="profile-tab-workspace" className="lg:col-span-8 space-y-5 order-1 lg:order-2 scroll-mt-28">
             
             {/* Fully Mobile-Responsive Segmented Navigation Bar */}
-            <div className="relative">
-              <div
-                ref={tabBarRef}
-                className="bg-white p-1 sm:p-1.5 rounded-2xl sm:rounded-3xl border border-[#e6dfd5] shadow-xs flex items-center gap-1 sm:gap-1.5 overflow-x-auto scrollbar-none overscroll-x-contain [-webkit-overflow-scrolling:touch]"
-              >
-                {PROFILE_TABS.map((tab) => {
-                  const Icon = tab.icon;
-                  const isActive = activeTab === tab.id;
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
+              <div className="relative flex-1 min-w-0">
+                <div
+                  ref={tabBarRef}
+                  className="bg-white p-1 sm:p-1.5 rounded-2xl sm:rounded-3xl border border-[#e6dfd5] shadow-xs flex items-center gap-1 sm:gap-1.5 overflow-x-auto scrollbar-none overscroll-x-contain [-webkit-overflow-scrolling:touch]"
+                >
+                  {PROFILE_TABS.map((tab) => {
+                    const Icon = tab.icon;
+                    const isActive = activeTab === tab.id;
 
-                  let badge = null;
-                  if (tab.id === 'degrees' && uploadedSanads.length > 0) {
-                    badge = uploadedSanads.length;
-                  } else if (tab.id === 'payments' && stagedPaymentMethods.length > 0) {
-                    badge = stagedPaymentMethods.length;
-                  } else if (tab.id === 'video' && videoIntroInput) {
-                    badge = '✓';
-                  }
+                    let badge = null;
+                    if (tab.id === 'degrees' && uploadedSanads.length > 0) {
+                      badge = uploadedSanads.length;
+                    } else if (tab.id === 'payments' && stagedPaymentMethods.length > 0) {
+                      badge = stagedPaymentMethods.length;
+                    } else if (tab.id === 'video' && videoIntroInput) {
+                      badge = '✓';
+                    }
 
-                  return (
-                    <button
-                      key={tab.id}
-                      id={`tab-btn-${tab.id}`}
-                      type="button"
-                      ref={isActive ? activeTabBtnRef : null}
-                      onClick={() => switchTab(tab.id)}
-                      className={`shrink-0 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 select-none ${
-                        isActive
-                          ? 'bg-[#0c2217] text-[#faf8f5] shadow-sm'
-                          : 'text-stone-600 hover:text-[#0c2217] hover:bg-[#faf8f5]'
-                      }`}
-                    >
-                      <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${isActive ? 'text-[#d4a359]' : 'text-stone-400'}`} />
-                      <span className="hidden sm:inline whitespace-nowrap">{tab.fullLabel}</span>
-                      <span className="sm:hidden whitespace-nowrap">{tab.shortLabel}</span>
-                      {badge !== null && (
-                        <span className={`text-[9.5px] sm:text-[10px] px-1.5 py-0.2 rounded-full font-mono shrink-0 ${
-                          isActive ? 'bg-[#143d2b] text-[#d4a359]' : 'bg-stone-100 text-stone-600'
-                        }`}>
-                          {badge}
-                        </span>
-                      )}
-                    </button>
-                  );
-                })}
+                    return (
+                      <button
+                        key={tab.id}
+                        id={`tab-btn-${tab.id}`}
+                        type="button"
+                        ref={isActive ? activeTabBtnRef : null}
+                        onClick={() => switchTab(tab.id)}
+                        className={`shrink-0 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 select-none ${
+                          isActive
+                            ? 'bg-[#0c2217] text-[#faf8f5] shadow-sm'
+                            : 'text-stone-600 hover:text-[#0c2217] hover:bg-[#faf8f5]'
+                        }`}
+                      >
+                        <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${isActive ? 'text-[#d4a359]' : 'text-stone-400'}`} />
+                        <span className="hidden sm:inline whitespace-nowrap">{tab.fullLabel}</span>
+                        <span className="sm:hidden whitespace-nowrap">{tab.shortLabel}</span>
+                        {badge !== null && (
+                          <span className={`text-[9.5px] sm:text-[10px] px-1.5 py-0.2 rounded-full font-mono shrink-0 ${
+                            isActive ? 'bg-[#143d2b] text-[#d4a359]' : 'bg-stone-100 text-stone-600'
+                          }`}>
+                            {badge}
+                          </span>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
+
+              <Link
+                href={`/tutors/${user?.username || user?._id || ''}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="shrink-0 px-3.5 py-2.5 bg-white hover:bg-stone-50 border border-[#e6dfd5] rounded-2xl sm:rounded-3xl text-xs font-bold text-[#0c2217] flex items-center justify-center gap-1.5 shadow-2xs transition-colors group cursor-pointer"
+                title="Preview how your profile appears to prospective students"
+              >
+                <Eye className="w-3.5 h-3.5 text-[#b85d34] group-hover:scale-110 transition-transform" />
+                <span className="whitespace-nowrap">Live Preview</span>
+                <ExternalLink className="w-3 h-3 text-stone-400" />
+              </Link>
             </div>
 
             {/* TAB 1: PERSONAL & TEACHING INFO */}
@@ -2043,8 +2072,8 @@ function TutorProfileContent() {
                 <div className="p-3.5 sm:p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-3xl flex items-start gap-3 text-xs text-stone-700">
                   <CreditCard className="w-4 h-4 text-[#0c2217] shrink-0 mt-0.5" />
                   <div className="leading-relaxed">
-                    <span className="font-bold text-[#0c2217]">Tuition Receiving Accounts: </span>
-                    Configure personal accounts (Meezan, EasyPaisa, JazzCash, Raast) or select administration accounts. All additions or edits save when clicking <strong>"Save Profile Changes"</strong>.
+                    <span className="font-bold text-[#0c2217]">Tuition Receiving Accounts (Optional): </span>
+                    Adding receiving accounts (Bank, EasyPaisa, JazzCash, Raast) is optional and does not affect your profile health or verification. You can configure personal accounts or use official administration accounts. All additions or edits save when clicking <strong>"Save Profile Changes"</strong>.
                   </div>
                 </div>
 
@@ -2696,6 +2725,21 @@ function TutorProfileContent() {
                   </span>
                 </div>
               </div>
+
+              {/* Live Preview Button in Sidebar */}
+              <div className="pt-2">
+                <Link
+                  href={`/tutors/${user?.username || user?._id || ''}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-2.5 px-3.5 bg-[#f0ece1] hover:bg-[#e6dfd5] text-[#0c2217] border border-[#d4a359]/40 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-2xs group cursor-pointer"
+                  title="Preview how your profile appears to prospective students"
+                >
+                  <Eye className="w-4 h-4 text-[#b85d34] group-hover:scale-110 transition-transform" />
+                  <span>Preview Public Profile</span>
+                  <ExternalLink className="w-3.5 h-3.5 text-stone-400" />
+                </Link>
+              </div>
             </div>
 
             {/* Quick Links / Help */}
@@ -2726,14 +2770,26 @@ function TutorProfileContent() {
                   </div>
                   <span>Profile Updated</span>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setJustSavedProfile(false)}
-                  className="text-stone-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
-                  title="Close"
-                >
-                  <X className="w-4 h-4" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <Link
+                    href={`/tutors/${user?.username || user?._id || ''}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-emerald-300" />
+                    <span>View Public Profile</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </Link>
+                  <button
+                    type="button"
+                    onClick={() => setJustSavedProfile(false)}
+                    className="text-stone-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
+                    title="Close"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
               </div>
             ) : (
               <>

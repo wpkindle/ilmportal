@@ -1812,37 +1812,50 @@ function TutorProfileContent() {
                   </div>
 
                   {/* Primary Save Action for Tab 1 */}
-                  <div className="pt-3 border-t border-stone-100 flex items-center justify-between gap-3">
+                  <div className="pt-3 border-t border-stone-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                     <span className="text-[11px] text-stone-400">
                       Changes are applied when clicking Save.
                     </span>
-                    <button
-                      type="button"
-                      onClick={handleUnifiedSave}
-                      disabled={savingProfile}
-                      className={`px-6 py-2.5 font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2 ${
-                        justSavedProfile
-                          ? 'bg-emerald-700 text-white ring-2 ring-emerald-400'
-                          : 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
-                      }`}
-                    >
-                      {savingProfile ? (
-                        <>
-                          <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
-                          <span>Saving Changes...</span>
-                        </>
-                      ) : justSavedProfile ? (
-                        <>
-                          <Check className="w-3.5 h-3.5 text-emerald-300" />
-                          <span>Profile Updated</span>
-                        </>
-                      ) : (
-                        <>
-                          <Save className="w-3.5 h-3.5 text-[#d4a359]" />
-                          <span>Save Profile Changes</span>
-                        </>
-                      )}
-                    </button>
+                    <div className="flex items-center gap-2 w-full sm:w-auto">
+                      <Link
+                        href={`/tutors/${user?.username || user?._id || ''}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="px-3.5 py-2.5 bg-[#f0ece1] hover:bg-[#e6dfd5] text-[#0c2217] text-xs font-bold rounded-2xl border border-[#d4a359]/40 transition-colors flex items-center justify-center gap-1.5 shadow-2xs group cursor-pointer"
+                        title="Preview how your profile appears to students"
+                      >
+                        <Eye className="w-3.5 h-3.5 text-[#b85d34] group-hover:scale-110 transition-transform" />
+                        <span>Preview Profile</span>
+                        <ExternalLink className="w-3 h-3 text-stone-400" />
+                      </Link>
+                      <button
+                        type="button"
+                        onClick={handleUnifiedSave}
+                        disabled={savingProfile}
+                        className={`flex-1 sm:flex-initial px-6 py-2.5 font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 ${
+                          justSavedProfile
+                            ? 'bg-emerald-700 text-white ring-2 ring-emerald-400'
+                            : 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
+                        }`}
+                      >
+                        {savingProfile ? (
+                          <>
+                            <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                            <span>Saving Changes...</span>
+                          </>
+                        ) : justSavedProfile ? (
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-300" />
+                            <span>Profile Updated</span>
+                          </>
+                        ) : (
+                          <>
+                            <Save className="w-3.5 h-3.5 text-[#d4a359]" />
+                            <span>Save Profile Changes</span>
+                          </>
+                        )}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -2030,37 +2043,50 @@ function TutorProfileContent() {
                 </form>
 
                 {/* Primary Save Action for Tab 2 */}
-                <div className="pt-4 border-t border-stone-100 flex items-center justify-between gap-3">
+                <div className="pt-4 border-t border-stone-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                   <span className="text-[11px] text-stone-400">
                     Degrees are submitted for approval upon clicking Save.
                   </span>
-                  <button
-                    type="button"
-                    onClick={handleUnifiedSave}
-                    disabled={savingProfile}
-                    className={`px-6 py-2.5 font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center gap-2 ${
-                      justSavedProfile
-                        ? 'bg-emerald-700 text-white ring-2 ring-emerald-400'
-                        : 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
-                    }`}
-                  >
-                    {savingProfile ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
-                        <span>Saving Changes...</span>
-                      </>
-                    ) : justSavedProfile ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-300" />
-                        <span>Profile Updated</span>
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-3.5 h-3.5 text-[#d4a359]" />
-                        <span>Save Profile Changes</span>
-                      </>
-                    )}
-                  </button>
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <Link
+                      href={`/tutors/${user?.username || user?._id || ''}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3.5 py-2.5 bg-[#f0ece1] hover:bg-[#e6dfd5] text-[#0c2217] text-xs font-bold rounded-2xl border border-[#d4a359]/40 transition-colors flex items-center justify-center gap-1.5 shadow-2xs group cursor-pointer"
+                      title="Preview how your profile appears to students"
+                    >
+                      <Eye className="w-3.5 h-3.5 text-[#b85d34] group-hover:scale-110 transition-transform" />
+                      <span>Preview Profile</span>
+                      <ExternalLink className="w-3 h-3 text-stone-400" />
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={handleUnifiedSave}
+                      disabled={savingProfile}
+                      className={`flex-1 sm:flex-initial px-6 py-2.5 font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 ${
+                        justSavedProfile
+                          ? 'bg-emerald-700 text-white ring-2 ring-emerald-400'
+                          : 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
+                      }`}
+                    >
+                      {savingProfile ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                          <span>Saving Changes...</span>
+                        </>
+                      ) : justSavedProfile ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-300" />
+                          <span>Profile Updated</span>
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-3.5 h-3.5 text-[#d4a359]" />
+                          <span>Save Profile Changes</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}
@@ -2069,16 +2095,31 @@ function TutorProfileContent() {
             {activeTab === 'payments' && (
               <div id="profile-payment-methods" className="scroll-mt-28 space-y-5 animate-in fade-in">
                 {/* Informative Header Banner */}
-                <div className="p-3.5 sm:p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-3xl flex items-start gap-3 text-xs text-stone-700">
-                  <CreditCard className="w-4 h-4 text-[#0c2217] shrink-0 mt-0.5" />
-                  <div className="leading-relaxed">
-                    <span className="font-bold text-[#0c2217]">Tuition Receiving Accounts (Optional): </span>
-                    Adding receiving accounts (Bank, EasyPaisa, JazzCash, Raast) is optional and does not affect your profile health or verification. You can configure personal accounts or use official administration accounts. All additions or edits save when clicking <strong>"Save Profile Changes"</strong>.
+                <div className="p-3.5 sm:p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-stone-700">
+                  <div className="flex items-start gap-3">
+                    <CreditCard className="w-4 h-4 text-[#0c2217] shrink-0 mt-0.5" />
+                    <div className="leading-relaxed">
+                      <span className="font-bold text-[#0c2217]">Tuition Receiving Accounts (Optional): </span>
+                      Adding receiving accounts (Bank, EasyPaisa, JazzCash, Raast) is optional and does not affect your profile health or verification. You can configure personal accounts or use official administration accounts. All additions or edits save when clicking <strong>"Save Profile Changes"</strong>.
+                    </div>
                   </div>
+                  <Link
+                    href={`/tutors/${user?.username || user?._id || ''}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="shrink-0 px-3.5 py-2 bg-white hover:bg-stone-50 border border-[#e6dfd5] text-[#0c2217] rounded-2xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs transition-colors group cursor-pointer"
+                    title="Preview how your profile appears to students"
+                  >
+                    <Eye className="w-3.5 h-3.5 text-[#b85d34] group-hover:scale-110 transition-transform" />
+                    <span className="whitespace-nowrap">Preview as Student</span>
+                    <ExternalLink className="w-3 h-3 text-stone-400" />
+                  </Link>
                 </div>
 
                 <TutorPaymentMethodsManager
                   isControlled={true}
+                  previewUrl={`/tutors/${user?.username || user?._id || ''}`}
+                  tutorId={user?._id}
                   methods={stagedPaymentMethods}
                   onChange={(updatedMethods) => {
                     setStagedPaymentMethods(updatedMethods);
@@ -2099,33 +2140,46 @@ function TutorProfileContent() {
                       Commit all receiving accounts and your default account choice.
                     </span>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleUnifiedSave}
-                    disabled={savingProfile}
-                    className={`w-full sm:w-auto px-6 py-2.5 font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 ${
-                      justSavedProfile
-                        ? 'bg-emerald-700 text-white ring-2 ring-emerald-400'
-                        : 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
-                    }`}
-                  >
-                    {savingProfile ? (
-                      <>
-                        <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
-                        <span>Saving Changes...</span>
-                      </>
-                    ) : justSavedProfile ? (
-                      <>
-                        <Check className="w-3.5 h-3.5 text-emerald-300" />
-                        <span>Profile Updated</span>
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-3.5 h-3.5 text-[#d4a359]" />
-                        <span>Save Profile Changes</span>
-                      </>
-                    )}
-                  </button>
+                  <div className="flex items-center gap-2 w-full sm:w-auto">
+                    <Link
+                      href={`/tutors/${user?.username || user?._id || ''}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-3.5 py-2.5 bg-[#f0ece1] hover:bg-[#e6dfd5] text-[#0c2217] text-xs font-bold rounded-2xl border border-[#d4a359]/40 transition-colors flex items-center justify-center gap-1.5 shadow-2xs group cursor-pointer"
+                      title="Preview how your profile appears to students"
+                    >
+                      <Eye className="w-3.5 h-3.5 text-[#b85d34] group-hover:scale-110 transition-transform" />
+                      <span>Preview Profile</span>
+                      <ExternalLink className="w-3 h-3 text-stone-400" />
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={handleUnifiedSave}
+                      disabled={savingProfile}
+                      className={`flex-1 sm:flex-initial px-6 py-2.5 font-bold text-xs rounded-2xl shadow-sm transition-all cursor-pointer disabled:opacity-50 flex items-center justify-center gap-2 ${
+                        justSavedProfile
+                          ? 'bg-emerald-700 text-white ring-2 ring-emerald-400'
+                          : 'bg-[#b85d34] hover:bg-[#9e4e2a] text-white'
+                      }`}
+                    >
+                      {savingProfile ? (
+                        <>
+                          <Loader2 className="w-3.5 h-3.5 animate-spin text-white" />
+                          <span>Saving Changes...</span>
+                        </>
+                      ) : justSavedProfile ? (
+                        <>
+                          <Check className="w-3.5 h-3.5 text-emerald-300" />
+                          <span>Profile Updated</span>
+                        </>
+                      ) : (
+                        <>
+                          <Save className="w-3.5 h-3.5 text-[#d4a359]" />
+                          <span>Save Profile Changes</span>
+                        </>
+                      )}
+                    </button>
+                  </div>
                 </div>
               </div>
             )}

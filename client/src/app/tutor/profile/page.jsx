@@ -1167,22 +1167,6 @@ function TutorProfileContent() {
           </div>
         )}
 
-        {/* Global Feedback Messages */}
-        {profileSuccess && (
-          <div className="p-3.5 sm:p-4 bg-[#f0ece1] border border-[#d4a359]/50 text-[#0c2217] text-xs font-bold rounded-2xl flex items-center justify-between gap-2 shadow-xs animate-in fade-in">
-            <div className="flex items-center gap-2.5">
-              <CheckCircle2 className="w-4 h-4 text-[#b85d34] shrink-0" />
-              <span>{profileSuccess}</span>
-            </div>
-            <button
-              type="button"
-              onClick={() => setProfileSuccess('')}
-              className="text-stone-400 hover:text-stone-600 p-1"
-            >
-              <X className="w-4 h-4" />
-            </button>
-          </div>
-        )}
 
         {profileError && (
           <div className="p-3.5 sm:p-4 bg-rose-50 border border-rose-300 text-rose-800 text-xs font-bold rounded-2xl flex items-center justify-between gap-2 shadow-xs animate-in fade-in">
@@ -2887,50 +2871,18 @@ function TutorProfileContent() {
 
       </div>
 
-      {/* Floating Bottom Action Bar for Unsaved Changes & Save Confirmation (Responsive for Mobile & Desktop) */}
-      {(hasUnsavedChanges || justSavedProfile) && (
+      {/* Floating Bottom Action Bar for Unsaved Changes (Responsive for Mobile & Desktop) */}
+      {hasUnsavedChanges && (
         <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0c2217]/95 backdrop-blur-md border-t border-[#d4a359]/30 p-3 sm:py-3.5 sm:px-8 shadow-2xl transition-all animate-in slide-in-from-bottom duration-200">
           <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-3">
-            {justSavedProfile ? (
-              <div className="flex items-center justify-between w-full py-0.5">
-                <div className="flex items-center gap-2.5 text-emerald-300 text-xs sm:text-sm font-bold">
-                  <div className="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 border border-emerald-400/40">
-                    <Check className="w-3.5 h-3.5" />
-                  </div>
-                  <span>Profile Updated</span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <Link
-                    href={`/tutors/${user?.username || user?._id || ''}?preview=live`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={handlePreparePreview}
-                    className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 text-emerald-200 border border-emerald-400/40 rounded-xl text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer"
-                  >
-                    <Eye className="w-3.5 h-3.5 text-emerald-300" />
-                    <span>View Public Profile</span>
-                    <ExternalLink className="w-3 h-3" />
-                  </Link>
-                  <button
-                    type="button"
-                    onClick={() => setJustSavedProfile(false)}
-                    className="text-stone-400 hover:text-white p-1 rounded-lg hover:bg-white/10 transition-colors cursor-pointer"
-                    title="Close"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
-                </div>
+            <div className="flex items-center gap-2 text-white text-xs w-full sm:w-auto justify-between sm:justify-start">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-[#d4a359] animate-ping shrink-0" />
+                <span className="font-bold text-[#faf8f5]">Unsaved changes in profile</span>
               </div>
-            ) : (
-              <>
-                <div className="flex items-center gap-2 text-white text-xs w-full sm:w-auto justify-between sm:justify-start">
-                  <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#d4a359] animate-ping shrink-0" />
-                    <span className="font-bold text-[#faf8f5]">Unsaved changes in profile</span>
-                  </div>
-                  <span className="text-[10px] text-[#d4a359] sm:hidden font-mono font-bold">Not saved</span>
-                </div>
-                <div className="grid grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto">
+              <span className="text-[10px] text-[#d4a359] sm:hidden font-mono font-bold">Not saved</span>
+            </div>
+            <div className="grid grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto">
                   <Link
                     href="/tutor/preview"
                     target="_blank"
@@ -2970,8 +2922,6 @@ function TutorProfileContent() {
                     )}
                   </button>
                 </div>
-              </>
-            )}
           </div>
         </div>
       )}

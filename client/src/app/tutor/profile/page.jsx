@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useMemo, useRef, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import {
   User,
   Mail,
@@ -68,10 +68,28 @@ const PROFILE_TABS = [
 ];
 
 function TutorProfileContent() {
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const isVerifiedNotice = searchParams.get('verified') === 'true';
   const { user, tutorProfile, updateUserProfile, updateTutorProfileState, loading: authLoading } = useAuth();
   const { isConnected } = useSocket();
+
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        router.replace(`/login?role=tutor&redirect=${encodeURIComponent(pathname || '/tutor/profile')}`);
+      } else if (user.role !== 'tutor') {
+        if (user.role === 'student') {
+          router.replace('/student/dashboard');
+        } else if (user.role === 'admin') {
+          router.replace('/admin');
+        } else {
+          router.replace('/login');
+        }
+      }
+    }
+  }, [user, authLoading, router, pathname]);
 
   // Active Tab State & Scroll Ref for smooth mobile tab centering
   const initialTab = searchParams.get('tab');
@@ -963,8 +981,12 @@ function TutorProfileContent() {
     return Boolean(d.tutorFeeDueDate && new Date(d.tutorFeeDueDate) < new Date() && !d.tutorFeePaid);
   });
 
-  if (authLoading) {
-    return <LoadingSpinner />;
+  if (authLoading || !user || user.role !== 'tutor') {
+    return (
+      <div className="min-h-screen bg-[#faf8f5] flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
   }
 
   return (

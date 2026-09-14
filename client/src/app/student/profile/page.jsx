@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter, usePathname } from 'next/navigation';
 import {
   User,
   Mail,
@@ -41,10 +41,28 @@ import ReportReviewModal from '../../../components/common/ReportReviewModal';
 const pakistaniCities = allPakistaniCities;
 
 function StudentProfileContent() {
+  const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const isVerifiedNotice = searchParams.get('verified') === 'true';
   const { user, updateUserProfile, loading: authLoading } = useAuth();
   const { isConnected } = useSocket();
+
+  useEffect(() => {
+    if (!authLoading) {
+      if (!user) {
+        router.replace(`/login?role=student&redirect=${encodeURIComponent(pathname || '/student/profile')}`);
+      } else if (user.role !== 'student') {
+        if (user.role === 'tutor') {
+          router.replace('/tutor/dashboard');
+        } else if (user.role === 'admin') {
+          router.replace('/admin');
+        } else {
+          router.replace('/login');
+        }
+      }
+    }
+  }, [user, authLoading, router, pathname]);
 
   // Profile Form State
   const [name, setName] = useState('');
@@ -216,8 +234,12 @@ function StudentProfileContent() {
     }
   };
 
-  if (authLoading) {
-    return <LoadingSpinner />;
+  if (authLoading || !user || user.role !== 'student') {
+    return (
+      <div className="min-h-screen bg-[#faf8f5] flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
   }
 
   return (

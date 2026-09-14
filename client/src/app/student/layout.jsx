@@ -1,16 +1,43 @@
 'use client';
 
-import React from 'react';
-import { usePathname } from 'next/navigation';
+import React, { useEffect } from 'react';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import ProfileCompletionMeter from '../../components/common/ProfileCompletionMeter';
+import LoadingSpinner from '../../components/common/LoadingSpinner';
 
 export default function StudentLayout({ children }) {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
 
   const isProfilePage = pathname === '/student/profile';
   const isChatPage = pathname?.startsWith('/student/messages');
+
+  useEffect(() => {
+    if (!loading) {
+      if (!user) {
+        router.replace(`/login?role=student&redirect=${encodeURIComponent(pathname)}`);
+      } else if (user.role !== 'student') {
+        if (user.role === 'tutor') {
+          router.replace('/tutor/dashboard');
+        } else if (user.role === 'admin') {
+          router.replace('/admin');
+        } else {
+          router.replace('/login');
+        }
+      }
+    }
+  }, [user, loading, pathname, router]);
+
+  // While checking auth or redirecting, show LoadingSpinner - NEVER render protected children!
+  if (loading || !user || user.role !== 'student') {
+    return (
+      <div className="min-h-screen bg-[#faf8f5] flex items-center justify-center">
+        <LoadingSpinner size="lg" />
+      </div>
+    );
+  }
 
   return (
     <div className={`${isChatPage ? 'flex-1 flex flex-col' : 'min-h-screen flex flex-col'} bg-[#faf8f5] text-stone-900 font-sans selection:bg-[#d4a359]/30`}>

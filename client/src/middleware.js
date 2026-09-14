@@ -15,6 +15,41 @@ export function middleware(request) {
     return NextResponse.redirect(url, 308);
   }
 
+  const { pathname, search } = request.nextUrl;
+  const authCookie = request.cookies.get('ilm_auth')?.value;
+  const roleCookie = request.cookies.get('ilm_role')?.value;
+  const fullPath = `${pathname}${search}`;
+
+  // 1. Protect Tutor portal routes: /tutor and /tutor/*
+  // NOTE: /tutors (public directory) and /tutors/[id] (public student-facing profile) must remain public!
+  if (pathname === '/tutor' || pathname.startsWith('/tutor/')) {
+    if (!authCookie) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('role', 'tutor');
+      loginUrl.searchParams.set('redirect', fullPath);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // 2. Protect Student portal routes: /student and /student/*
+  if (pathname === '/student' || pathname.startsWith('/student/')) {
+    if (!authCookie) {
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('role', 'student');
+      loginUrl.searchParams.set('redirect', fullPath);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
+  // 3. Protect Admin portal routes: /admin and /admin/* (except /admin/login)
+  if ((pathname === '/admin' || pathname.startsWith('/admin/')) && pathname !== '/admin/login') {
+    if (!authCookie || roleCookie !== 'admin') {
+      const loginUrl = new URL('/admin/login', request.url);
+      loginUrl.searchParams.set('redirect', fullPath);
+      return NextResponse.redirect(loginUrl);
+    }
+  }
+
   return NextResponse.next();
 }
 

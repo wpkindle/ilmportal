@@ -22,7 +22,7 @@ import LoadingSpinner from '../../components/common/LoadingSpinner';
 import BrandLogo from '../../components/common/BrandLogo';
 
 function LoginContent() {
-  const { login } = useAuth();
+  const { user, login, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -41,6 +41,14 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+
+  // Auto-redirect if already logged in
+  useEffect(() => {
+    if (!authLoading && user) {
+      const target = redirect && redirect !== '/' ? redirect : (user.role === 'tutor' ? '/tutor/dashboard' : user.role === 'admin' ? '/admin' : '/student/dashboard');
+      router.replace(target);
+    }
+  }, [user, authLoading, redirect, router]);
 
   // Sign In Form States
   const [signInEmail, setSignInEmail] = useState('');
@@ -79,12 +87,13 @@ function LoginContent() {
 
     try {
       const data = await login(signInEmail.trim(), signInPassword);
+      const target = redirect && redirect !== '/' ? redirect : null;
       if (data?.user?.role === 'admin') {
-        router.push('/admin');
+        router.push(target || '/admin');
       } else if (data?.user?.role === 'tutor') {
-        router.push('/tutor/dashboard');
+        router.push(target || '/tutor/dashboard');
       } else {
-        router.push(redirect === '/' ? '/student/dashboard' : redirect);
+        router.push(target || '/student/dashboard');
       }
     } catch (err) {
       console.error('Login error:', err);

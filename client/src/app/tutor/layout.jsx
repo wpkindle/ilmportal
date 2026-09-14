@@ -12,6 +12,7 @@ export default function TutorLayout({ children }) {
   const router = useRouter();
 
   const isProfilePage = pathname === '/tutor/profile';
+  const isPreviewPage = pathname === '/tutor/preview';
   const isChatPage = pathname?.startsWith('/tutor/messages');
 
   useEffect(() => {
@@ -43,7 +44,7 @@ export default function TutorLayout({ children }) {
     <div className={`${isChatPage ? 'flex-1 flex flex-col' : 'min-h-screen flex flex-col'} bg-[#faf8f5] text-stone-900 font-sans selection:bg-[#d4a359]/30`}>
 
       {/* Profile Completion Meter & Greeting Tab */}
-      {!isProfilePage && !isChatPage && user && (
+      {!isProfilePage && !isChatPage && !isPreviewPage && user && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6 w-full">
           <ProfileCompletionMeter user={user} tutorProfile={tutorProfile} />
         </div>

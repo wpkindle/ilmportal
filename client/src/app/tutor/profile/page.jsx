@@ -56,7 +56,6 @@ import { parseDegreesAndCertificates } from '../../../utils/tutorHelpers';
 import VideoIntroPlayer from '../../../components/common/VideoIntroPlayer';
 import TutorPaymentMethodsManager from '../../../components/tutor/TutorPaymentMethodsManager';
 import TutorPaymentModal from '../../../components/tutor/TutorPaymentModal';
-import TutorQuickPreviewModal from '../../../components/tutor/TutorQuickPreviewModal';
 
 const pakistaniCities = allPakistaniCities;
 
@@ -186,8 +185,8 @@ function TutorProfileContent() {
   // Baseline snapshot for tracking unsaved modifications
   const [savedSnapshot, setSavedSnapshot] = useState(null);
 
-  // Quick in-page draft preview modal state
-  const [quickPreviewOpen, setQuickPreviewOpen] = useState(false);
+  // Cross-tab real-time sync BroadcastChannel reference
+  const draftChannelRef = useRef(null);
 
   const fetchDeals = async () => {
     try {
@@ -604,25 +603,57 @@ function TutorProfileContent() {
     };
   };
 
-  // Synchronize draft profile to storage before navigating to preview
+  // Synchronize draft profile to storage and BroadcastChannel for real-time preview
   const handlePreparePreview = () => {
     if (typeof window !== 'undefined') {
       try {
         const draft = getDraftProfileData();
         localStorage.setItem('tutor_draft_preview', JSON.stringify(draft));
         sessionStorage.setItem('tutor_draft_preview', JSON.stringify(draft));
+        if (draftChannelRef.current) {
+          draftChannelRef.current.postMessage({ type: 'DRAFT_UPDATE', data: draft });
+        }
       } catch (err) {
         console.error('Failed to sync draft preview to storage:', err);
       }
     }
   };
 
+  // Initialize cross-tab BroadcastChannel for instantaneous live draft updates
+  useEffect(() => {
+    if (typeof window !== 'undefined' && window.BroadcastChannel) {
+      try {
+        const bc = new BroadcastChannel('ilm_tutor_draft_channel');
+        draftChannelRef.current = bc;
+        bc.onmessage = (event) => {
+          if (event.data?.type === 'REQUEST_LATEST_DRAFT') {
+            bc.postMessage({ type: 'DRAFT_UPDATE', data: getDraftProfileData() });
+          } else if (event.data?.type === 'SAVE_PROFILE_REQUEST') {
+            handleUnifiedSave();
+          }
+        };
+      } catch (err) {
+        console.error('Error initializing tutor draft BroadcastChannel:', err);
+      }
+    }
+    return () => {
+      if (draftChannelRef.current) {
+        draftChannelRef.current.close();
+      }
+    };
+  }, [
+    name, city, localArea, gender, tutoringType, age, avatar,
+    bio, qualifications, experienceYears, hourlyRate, teachingModes,
+    selectedSubjects, uploadedSanads, stagedPaymentMethods, stagedPreferredChoice,
+    videoIntroInput, videoIntro, hasUnsavedChanges
+  ]);
+
   // Continuous auto-sync so external or side-by-side preview tabs update in real time
   useEffect(() => {
     if (typeof window !== 'undefined' && user) {
       const timer = setTimeout(() => {
         handlePreparePreview();
-      }, 250);
+      }, 100);
       return () => clearTimeout(timer);
     }
   }, [
@@ -930,6 +961,9 @@ function TutorProfileContent() {
 
       setProfileSuccess('Profile Updated');
       setJustSavedProfile(true);
+      if (draftChannelRef.current) {
+        draftChannelRef.current.postMessage({ type: 'DRAFT_SAVED', timestamp: Date.now() });
+      }
     } catch (err) {
       if (saveFeedbackTimeoutRef.current) {
         clearTimeout(saveFeedbackTimeoutRef.current);
@@ -1884,12 +1918,12 @@ function TutorProfileContent() {
                     </span>
                     <div className="flex items-center gap-2 w-full sm:w-auto">
                       <Link
-                        href={`/tutors/${user?.username || user?._id || ''}?preview=draft`}
+                        href="/tutor/preview"
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={handlePreparePreview}
                         className="px-3.5 py-2.5 bg-[#f0ece1] hover:bg-[#e6dfd5] text-[#0c2217] text-xs font-bold rounded-2xl border border-[#d4a359]/40 transition-colors flex items-center justify-center gap-1.5 shadow-2xs group cursor-pointer"
-                        title="Preview how your profile appears to students"
+                        title="Preview how your profile appears to students in a new browser tab"
                       >
                         <Eye className="w-3.5 h-3.5 text-[#b85d34] group-hover:scale-110 transition-transform" />
                         <span>Preview Draft</span>
@@ -2897,18 +2931,18 @@ function TutorProfileContent() {
                   <span className="text-[10px] text-[#d4a359] sm:hidden font-mono font-bold">Not saved</span>
                 </div>
                 <div className="grid grid-cols-3 sm:flex items-center gap-2 w-full sm:w-auto">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      handlePreparePreview();
-                      setQuickPreviewOpen(true);
-                    }}
+                  <Link
+                    href="/tutor/preview"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={handlePreparePreview}
                     className="w-full sm:w-auto px-3.5 py-2 bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 font-bold text-xs rounded-xl border border-amber-400/40 transition-colors cursor-pointer text-center flex items-center justify-center gap-1.5"
-                    title="Quick preview draft profile"
+                    title="Preview draft profile in a new browser tab"
                   >
                     <Eye className="w-3.5 h-3.5 text-amber-300" />
                     <span>Preview Draft</span>
-                  </button>
+                    <ExternalLink className="w-3 h-3 text-amber-300/70" />
+                  </Link>
                   <button
                     type="button"
                     onClick={handleDiscardChanges}
@@ -2974,18 +3008,6 @@ function TutorProfileContent() {
             setSelectedDealForPay(null);
             fetchDeals();
           }}
-        />
-      )}
-
-      {/* Tutor In-Page Quick Draft Preview Modal */}
-      {quickPreviewOpen && (
-        <TutorQuickPreviewModal
-          isOpen={quickPreviewOpen}
-          onClose={() => setQuickPreviewOpen(false)}
-          draftTutor={getDraftProfileData()}
-          onSaveProfile={handleUnifiedSave}
-          isSaving={savingProfile}
-          fullPreviewUrl={`/tutors/${user?.username || user?._id || ''}?preview=draft`}
         />
       )}
 

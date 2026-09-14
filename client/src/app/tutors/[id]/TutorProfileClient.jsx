@@ -41,14 +41,14 @@ import { useSocket } from '../../../context/SocketContext';
 import { api } from '../../../services/api';
 import { getTutorAvatar, parseDegreesAndCertificates } from '../../../utils/tutorHelpers';
 
-export default function TutorProfileClient({ tutor: initialTutor, reviews = [], id }) {
+export default function TutorProfileClient({ tutor: initialTutor, reviews = [], id, isDraftPreview = false }) {
   const router = useRouter();
   const { user, isAuthenticated, isTutor, tutorProfile } = useAuth();
   const [mounted, setMounted] = useState(false);
   const [currentTutor, setCurrentTutor] = useState(initialTutor);
   const [draftTutor, setDraftTutor] = useState(null);
   const [previewViewMode, setPreviewViewMode] = useState('draft'); // 'draft' | 'live'
-  const [isLoadingProfile, setIsLoadingProfile] = useState(!initialTutor);
+  const [isLoadingProfile, setIsLoadingProfile] = useState(!initialTutor && !isDraftPreview);
   const [fetchError, setFetchError] = useState(false);
 
   const currentUserId = user?._id || user?.id;
@@ -57,7 +57,8 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
   const paramIdLower = (id || '').toString().toLowerCase();
 
   const isOwnProfile = Boolean(
-    currentUserId && (
+    isDraftPreview ||
+    (currentUserId && (
       (currentTutor?.user?._id && currentUserId.toString() === currentTutor.user._id.toString()) ||
       (currentTutor?.user?.id && currentUserId.toString() === currentTutor.user.id.toString()) ||
       (initialTutor?.user?._id && currentUserId.toString() === initialTutor.user._id.toString()) ||
@@ -66,23 +67,30 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
       (currentUsername && paramIdLower && currentUsername === paramIdLower) ||
       (currentUserId && paramIdLower && currentUserId.toString().toLowerCase() === paramIdLower) ||
       (currentTutorProfileId && paramIdLower && currentTutorProfileId.toString().toLowerCase() === paramIdLower)
-    )
+    ))
   );
 
   const isCurrentTutorUser = isTutor || user?.role === 'tutor';
   const isDraftAvailable = Boolean(
-    draftTutor && (
+    isDraftPreview ||
+    (draftTutor && (
       isOwnProfile ||
       isCurrentTutorUser ||
       (currentUserId && draftTutor?.user?._id && currentUserId.toString() === draftTutor.user._id.toString()) ||
-      (currentUserId && draftTutor?.user?.id && currentUserId.toString() === draftTutor.user.id.toString())
-    )
+      (currentUserId && draftTutor?.user?.id && currentUserId.toString() === draftTutor.user.id.toString()) ||
+      (typeof window !== 'undefined' && (
+        new URLSearchParams(window.location.search).get('preview') === 'draft' ||
+        window.location.pathname === '/tutor/preview'
+      ))
+    ))
   );
 
+  const effectiveDraft = draftTutor || (isDraftPreview ? (initialTutor || (tutorProfile ? { ...tutorProfile, user } : null)) : null);
+
   // Use draft if available and draft mode active, otherwise fallback to database profile
-  const tutor = (isDraftAvailable && previewViewMode === 'draft')
-    ? draftTutor
-    : (currentTutor || initialTutor || (isOwnProfile && tutorProfile ? { ...tutorProfile, user } : null));
+  const tutor = ((isDraftAvailable || isDraftPreview) && previewViewMode === 'draft')
+    ? (effectiveDraft || currentTutor || initialTutor)
+    : (currentTutor || initialTutor || (isOwnProfile && tutorProfile ? { ...tutorProfile, user } : null) || effectiveDraft);
 
   const [sanadModalOpen, setSanadModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -157,7 +165,28 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
     };
 
     window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+
+    // Native BroadcastChannel for instantaneous, zero-latency reactive updates across tabs
+    let bc = null;
+    if (typeof window !== 'undefined' && window.BroadcastChannel) {
+      try {
+        bc = new BroadcastChannel('ilm_tutor_draft_channel');
+        bc.onmessage = (event) => {
+          if (event.data?.type === 'DRAFT_UPDATE' && event.data.data) {
+            setDraftTutor(event.data.data);
+          }
+        };
+        // Request latest uncommitted draft edits immediately
+        bc.postMessage({ type: 'REQUEST_LATEST_DRAFT' });
+      } catch (err) {
+        console.error('BroadcastChannel initialization error:', err);
+      }
+    }
+
+    return () => {
+      window.removeEventListener('storage', handleStorage);
+      if (bc) bc.close();
+    };
   }, []);
 
   // Sync if initialTutor prop changes
@@ -170,8 +199,12 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
 
   // Client-side fetch fresh tutor profile on mount to avoid stale ISR cache or load owner preview
   useEffect(() => {
+    if (isDraftPreview) {
+      setIsLoadingProfile(false);
+      return;
+    }
     const idToFetch = id || tutorUserIdStr || tutor?._id || tutorUser?._id || tutorUser?.id;
-    if (idToFetch) {
+    if (idToFetch && idToFetch !== 'preview' && idToFetch !== 'draft-preview') {
       setIsLoadingProfile(true);
       api.getTutorById(idToFetch).then((res) => {
         if (res?.success && res.tutor) {
@@ -189,7 +222,7 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
     } else {
       setIsLoadingProfile(false);
     }
-  }, [id, tutorUserIdStr, tutor?._id, tutorUser?._id]);
+  }, [id, tutorUserIdStr, tutor?._id, tutorUser?._id, isDraftPreview]);
 
   // Sync initial reviews prop if changed
   useEffect(() => {
@@ -380,21 +413,27 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
   return (
     <div className="bg-[#faf8f5] min-h-screen">
       {/* Live / Draft Preview Mode Sticky Top Banner for Profile Owner */}
-      {(isOwnProfile || (isDraftAvailable && isTutorVisitor)) && (
+      {(isDraftPreview || isOwnProfile || (isDraftAvailable && isTutorVisitor)) && (
         <div className="bg-gradient-to-r from-[#0c2217] via-[#143826] to-[#0c2217] text-[#faf8f5] border-b border-[#d4a359]/40 py-2.5 sm:py-3 px-4 sm:px-6 sticky top-0 z-30 shadow-md">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">
               <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10.5px] font-bold uppercase tracking-wider shrink-0 ${
-                isDraftAvailable && previewViewMode === 'draft'
+                (isDraftPreview || isDraftAvailable) && previewViewMode === 'draft'
                   ? 'bg-amber-500/20 text-amber-300 border border-amber-400/50'
                   : 'bg-[#d4a359]/20 text-[#d4a359] border border-[#d4a359]/40'
               }`}>
                 <Eye className="w-3.5 h-3.5" />
-                {isDraftAvailable && previewViewMode === 'draft' ? 'Draft Preview Mode' : 'Live Published Profile'}
+                {(isDraftPreview || isDraftAvailable) && previewViewMode === 'draft' ? 'Draft Preview Mode' : 'Live Published Profile'}
               </span>
+              {(isDraftPreview || isDraftAvailable) && previewViewMode === 'draft' && (
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] font-bold">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping shrink-0" />
+                  <span>Real-time Live Sync</span>
+                </span>
+              )}
               <span className="text-stone-300 font-medium">
-                {isDraftAvailable && previewViewMode === 'draft'
-                  ? 'Viewing unsaved draft changes from profile settings (Bio, Rates, Subjects, etc.).'
+                {(isDraftPreview || isDraftAvailable) && previewViewMode === 'draft'
+                  ? 'Viewing unsaved draft changes from profile editor (Bio, Rates, Subjects, Age, etc.). Edits update here in real time.'
                   : 'Viewing your currently published profile as live students see it on IlmiDunya.'}
               </span>
             </div>

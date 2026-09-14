@@ -50,12 +50,12 @@ const socialChannels = [
   {
     id: 'instagram',
     name: 'Instagram',
-    handle: '@ilmidunya_com',
-    url: 'https://www.instagram.com/ilmidunya_com',
+    handle: '@ilmidunyapakistan',
+    url: 'https://www.instagram.com/ilmidunyapakistan',
     badge: 'Daily Study Reels',
     badgeColor: 'bg-pink-50 text-pink-700 border-pink-200',
     description: 'Visual Tajweed tips, Quranic verses, quick study routines, and student success highlights.',
-    cta: 'Follow @ilmidunya_com',
+    cta: 'Follow @ilmidunyapakistan',
     buttonColor: 'bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-95 text-white shadow-pink-500/20',
     icon: (
       <svg className="w-5 h-5 text-pink-600 shrink-0" fill="currentColor" viewBox="0 0 24 24">

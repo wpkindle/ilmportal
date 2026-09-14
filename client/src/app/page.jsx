@@ -111,7 +111,7 @@ const homeStructuredData = {
       ],
       sameAs: [
         'https://www.facebook.com/ilmidunyapakistan',
-        'https://www.instagram.com/ilmidunya_com',
+        'https://www.instagram.com/ilmidunyapakistan',
         'https://www.youtube.com/@ilmidunyapakistan',
         'https://whatsapp.com/channel/0029VbDT9HCI7Be90yESwo3y'
       ]

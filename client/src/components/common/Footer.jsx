@@ -150,7 +150,7 @@ const Footer = () => {
                 </svg>
               </a>
               <a
-                href="https://www.instagram.com/ilmidunya_com"
+                href="https://www.instagram.com/ilmidunyapakistan"
                 target="_blank"
                 rel="noopener noreferrer"
                 title="Instagram"

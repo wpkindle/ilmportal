@@ -70,27 +70,35 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
     ))
   );
 
-  const isCurrentTutorUser = isTutor || user?.role === 'tutor';
-  const isDraftAvailable = Boolean(
-    isDraftPreview ||
-    (draftTutor && (
-      isOwnProfile ||
-      isCurrentTutorUser ||
-      (currentUserId && draftTutor?.user?._id && currentUserId.toString() === draftTutor.user._id.toString()) ||
-      (currentUserId && draftTutor?.user?.id && currentUserId.toString() === draftTutor.user.id.toString()) ||
-      (typeof window !== 'undefined' && (
-        new URLSearchParams(window.location.search).get('preview') === 'draft' ||
-        window.location.pathname === '/tutor/preview'
-      ))
-    ))
+  // Draft preview mode is only active on the dedicated /tutor/preview page OR when the profile owner visits with ?preview=draft
+  const isDraftQuery = typeof window !== 'undefined' &&
+    new URLSearchParams(window.location.search).get('preview') === 'draft';
+
+  const isDraftActive = Boolean(
+    isDraftPreview || (isOwnProfile && isDraftQuery)
   );
 
-  const effectiveDraft = draftTutor || (isDraftPreview ? (initialTutor || (tutorProfile ? { ...tutorProfile, user } : null)) : null);
+  const isDraftAvailable = Boolean(
+    isDraftActive &&
+    (
+      isDraftPreview ||
+      (draftTutor && (
+        isOwnProfile ||
+        (currentUserId && draftTutor?.user?._id && currentUserId.toString() === draftTutor.user._id.toString()) ||
+        (currentUserId && draftTutor?.user?.id && currentUserId.toString() === draftTutor.user.id.toString()) ||
+        (currentTutorProfileId && draftTutor?._id && currentTutorProfileId.toString() === draftTutor._id.toString())
+      ))
+    )
+  );
 
-  // Use draft if available and draft mode active, otherwise fallback to database profile
-  const tutor = ((isDraftAvailable || isDraftPreview) && previewViewMode === 'draft')
-    ? (effectiveDraft || currentTutor || initialTutor)
-    : (currentTutor || initialTutor || (isOwnProfile && tutorProfile ? { ...tutorProfile, user } : null) || effectiveDraft);
+  const effectiveDraft = isDraftActive
+    ? (draftTutor || (isDraftPreview ? (initialTutor || (tutorProfile ? { ...tutorProfile, user } : null)) : null))
+    : null;
+
+  // Use draft if draft mode is actively enabled for this profile, otherwise always fallback to database profile
+  const tutor = (isDraftActive && previewViewMode === 'draft' && effectiveDraft)
+    ? effectiveDraft
+    : (currentTutor || initialTutor || (isDraftPreview && tutorProfile ? { ...tutorProfile, user } : null));
 
   const [sanadModalOpen, setSanadModalOpen] = useState(false);
   const [authModalOpen, setAuthModalOpen] = useState(false);
@@ -129,6 +137,16 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
 
   // Load draft preview from localStorage/sessionStorage and subscribe to cross-tab storage updates
   useEffect(() => {
+    // Only load and listen to drafts if this is the dedicated draft preview route (/tutor/preview)
+    // or if viewing own profile with explicit ?preview=draft
+    const isExplicitDraftQuery = typeof window !== 'undefined' &&
+      new URLSearchParams(window.location.search).get('preview') === 'draft';
+    const isPreviewRoute = isDraftPreview || (typeof window !== 'undefined' && window.location.pathname === '/tutor/preview');
+
+    if (!isPreviewRoute && (!isOwnProfile || !isExplicitDraftQuery)) {
+      return;
+    }
+
     const loadDraft = () => {
       try {
         const raw = localStorage.getItem('tutor_draft_preview') || sessionStorage.getItem('tutor_draft_preview');
@@ -187,7 +205,7 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
       window.removeEventListener('storage', handleStorage);
       if (bc) bc.close();
     };
-  }, []);
+  }, [isDraftPreview, isOwnProfile]);
 
   // Sync if initialTutor prop changes
   useEffect(() => {
@@ -203,7 +221,7 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
       setIsLoadingProfile(false);
       return;
     }
-    const idToFetch = id || tutorUserIdStr || tutor?._id || tutorUser?._id || tutorUser?.id;
+    const idToFetch = id;
     if (idToFetch && idToFetch !== 'preview' && idToFetch !== 'draft-preview') {
       setIsLoadingProfile(true);
       api.getTutorById(idToFetch).then((res) => {
@@ -222,7 +240,7 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
     } else {
       setIsLoadingProfile(false);
     }
-  }, [id, tutorUserIdStr, tutor?._id, tutorUser?._id, isDraftPreview]);
+  }, [id, isDraftPreview]);
 
   // Sync initial reviews prop if changed
   useEffect(() => {
@@ -233,8 +251,8 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
 
   // Client-side fetch fresh reviews on mount to avoid stale ISR cache
   useEffect(() => {
-    const idToFetch = id || tutorUserIdStr || tutor?._id || tutorUser?._id || tutorUser?.id;
-    if (idToFetch) {
+    const idToFetch = id;
+    if (idToFetch && idToFetch !== 'preview' && idToFetch !== 'draft-preview') {
       api.getTutorReviews(idToFetch).then((res) => {
         if (res?.success && Array.isArray(res.reviews)) {
           setReviewsList(res.reviews);
@@ -243,7 +261,7 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
         console.error('Error fetching client-side tutor reviews:', err);
       });
     }
-  }, [id, tutorUserIdStr, tutor?._id, tutorUser?._id]);
+  }, [id]);
 
   const verifiedSanadDocs = React.useMemo(() => {
     return (Array.isArray(tutor?.sanadDocuments) ? tutor.sanadDocuments : []).filter(
@@ -413,7 +431,7 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
   return (
     <div className="bg-[#faf8f5] min-h-screen">
       {/* Live / Draft Preview Mode Sticky Top Banner for Profile Owner */}
-      {(isDraftPreview || isOwnProfile || (isDraftAvailable && isTutorVisitor)) && (
+      {(!isDraftPreview && isOwnProfile && isDraftActive) && (
         <div className="bg-gradient-to-r from-[#0c2217] via-[#143826] to-[#0c2217] text-[#faf8f5] border-b border-[#d4a359]/40 py-2.5 sm:py-3 px-4 sm:px-6 sticky top-0 z-30 shadow-md">
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-xs">
             <div className="flex flex-wrap items-center gap-2 sm:gap-3">

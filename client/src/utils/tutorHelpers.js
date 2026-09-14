@@ -100,48 +100,41 @@ export function parseRawQualifications(qualificationsStr) {
  * preventing arbitrary unverified strings (like skills/marketing tags) from cluttering credentials.
  */
 export function parseDegreesAndCertificates(qualificationsStr, sanadDocuments = [], isVerified = false) {
-  // 1. Filter for verified / approved Sanad documents
+  const parsedQuals = parseRawQualifications(qualificationsStr);
   const verifiedDocs = (Array.isArray(sanadDocuments) ? sanadDocuments : []).filter(
     doc => doc?.status === 'verified' || doc?.status === 'approved'
   );
 
-  const parsedQuals = parseRawQualifications(qualificationsStr);
+  const list = [];
 
-  // 2. If the tutor has verified Sanad document(s), ONLY display the Sanad(s) that are verified!
-  if (verifiedDocs.length > 0) {
-    const list = [];
-    verifiedDocs.forEach((doc, idx) => {
-      let title = doc?.title?.trim();
-      // If doc title is generic placeholder like "Sanad / Degree Document",
-      // use the matching qualification title from qualificationsStr if available
-      const isGeneric = !title ||
-        title.toLowerCase() === 'sanad / degree document' ||
-        title.toLowerCase() === 'document' ||
-        title.toLowerCase() === 'sanad' ||
-        title.toLowerCase() === 'degree document';
+  // 1. Include all comma-separated qualifications/degrees declared by the tutor
+  parsedQuals.forEach(q => {
+    if (q && !list.some(item => item.toLowerCase() === q.toLowerCase())) {
+      list.push(q);
+    }
+  });
 
-      if (isGeneric && parsedQuals[idx]) {
-        title = parsedQuals[idx];
-      } else if (!title) {
-        title = parsedQuals[idx] || parsedQuals[0] || 'Verified Sanad';
-      }
+  // 2. Also include any approved/verified Sanad documents that have specific non-generic titles
+  verifiedDocs.forEach(doc => {
+    const title = doc?.title?.trim();
+    const isGeneric = !title ||
+      title.toLowerCase() === 'sanad / degree document' ||
+      title.toLowerCase() === 'document' ||
+      title.toLowerCase() === 'sanad' ||
+      title.toLowerCase() === 'degree document';
 
-      if (title && !list.some(item => item.toLowerCase() === title.toLowerCase())) {
-        list.push(title);
-      }
-    });
+    if (!isGeneric && title && !list.some(item => item.toLowerCase() === title.toLowerCase())) {
+      list.push(title);
+    }
+  });
 
-    return list.length > 0 ? list : ['Verified Sanad'];
+  if (list.length > 0) {
+    return list;
   }
 
-  // 3. If tutor profile is marked isSanadVerified: true but documents array is empty
-  if (isVerified) {
-    if (parsedQuals.length > 0) {
-      return [parsedQuals[0]]; // Only display the 1 verified primary qualification
-    }
+  if (isVerified || verifiedDocs.length > 0) {
     return ['Verified Sanad'];
   }
 
-  // 4. If no verified sanads, fall back to parsed qualifications (unverified)
-  return parsedQuals.length > 0 ? parsedQuals : ['Verified Faculty'];
+  return ['Verified Faculty'];
 }

@@ -115,7 +115,8 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         key: 'qualifications',
         label: 'Educational Qualifications',
         weight: 10,
-        done: !!tutorProfile?.qualifications?.trim() && tutorProfile.qualifications !== 'Tutor Qualifications',
+        done: (!!tutorProfile?.qualifications?.trim() && tutorProfile.qualifications !== 'Tutor Qualifications') ||
+          (Array.isArray(tutorProfile?.sanadDocuments) && tutorProfile.sanadDocuments.length > 0),
         tab: 'degrees',
         targetFieldId: 'profile-qualifications',
         link: '/tutor/profile?tab=degrees#profile-qualifications',

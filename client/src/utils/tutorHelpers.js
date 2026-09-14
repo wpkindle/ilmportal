@@ -101,9 +101,7 @@ export function parseRawQualifications(qualificationsStr) {
  */
 export function parseDegreesAndCertificates(qualificationsStr, sanadDocuments = [], isVerified = false) {
   const parsedQuals = parseRawQualifications(qualificationsStr);
-  const verifiedDocs = (Array.isArray(sanadDocuments) ? sanadDocuments : []).filter(
-    doc => doc?.status === 'verified' || doc?.status === 'approved'
-  );
+  const allDocs = Array.isArray(sanadDocuments) ? sanadDocuments : [];
 
   const list = [];
 
@@ -114,8 +112,8 @@ export function parseDegreesAndCertificates(qualificationsStr, sanadDocuments = 
     }
   });
 
-  // 2. Also include any approved/verified Sanad documents that have specific non-generic titles
-  verifiedDocs.forEach(doc => {
+  // 2. Also include any attached Sanad / degree documents that have specific non-generic titles
+  allDocs.forEach(doc => {
     const title = doc?.title?.trim();
     const isGeneric = !title ||
       title.toLowerCase() === 'sanad / degree document' ||
@@ -132,7 +130,7 @@ export function parseDegreesAndCertificates(qualificationsStr, sanadDocuments = 
     return list;
   }
 
-  if (isVerified || verifiedDocs.length > 0) {
+  if (isVerified || allDocs.length > 0) {
     return ['Verified Sanad'];
   }
 

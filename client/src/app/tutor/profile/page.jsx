@@ -436,7 +436,10 @@ function TutorProfileContent() {
       }
       if (tutorProfile.tutoringType) setTutoringType(tutorProfile.tutoringType);
       setBio(tutorProfile.bio || '');
-      setQualifications(tutorProfile.qualifications || '');
+      const sanads = Array.isArray(tutorProfile.sanadDocuments) ? tutorProfile.sanadDocuments : [];
+      setUploadedSanads(sanads);
+      const docTitles = sanads.map(d => d.title?.trim()).filter(Boolean).join(', ');
+      setQualifications(docTitles || tutorProfile.qualifications || '');
       if (tutorProfile.experienceYears !== undefined && tutorProfile.experienceYears !== null) {
         setExperienceYears(tutorProfile.experienceYears);
       }
@@ -451,9 +454,6 @@ function TutorProfileContent() {
         ? tutorProfile.subjects.map(s => (typeof s === 'object' && s?._id ? s._id : s))
         : [];
       setSelectedSubjects(subjects);
-
-      const sanads = Array.isArray(tutorProfile.sanadDocuments) ? tutorProfile.sanadDocuments : [];
-      setUploadedSanads(sanads);
 
       const methods = Array.isArray(tutorProfile.paymentMethods) ? tutorProfile.paymentMethods : [];
       setStagedPaymentMethods(methods);
@@ -577,7 +577,11 @@ function TutorProfileContent() {
         avatar: avatar || user?.avatar,
       },
       bio: bio.trim(),
-      qualifications: qualifications.trim(),
+      qualifications: (
+        uploadedSanads.map(d => d.title?.trim()).filter(Boolean).join(', ') ||
+        qualifications ||
+        ''
+      ).trim(),
       experienceYears: Number(experienceYears) || 0,
       hourlyRate: Number(hourlyRate) || 0,
       teachingModes: teachingModes.length > 0 ? teachingModes : ['online'],
@@ -755,18 +759,26 @@ function TutorProfileContent() {
       uploadedAt: new Date().toISOString()
     };
 
-    setUploadedSanads(prev => [...prev, newDoc]);
+    const nextDocs = [...uploadedSanads, newDoc];
+    setUploadedSanads(nextDocs);
+    const nextQuals = nextDocs.map(d => d.title?.trim()).filter(Boolean).join(', ');
+    if (nextQuals) {
+      setQualifications(nextQuals);
+    }
     setNewSanadTitle('');
     setNewSanadFileUrl('');
     setSanadError('');
-    setSanadSuccess('Degree added to your staged list! Click "Save Profile Changes" below to submit for admin approval.');
+    setSanadSuccess('Degree added! Click "Save Profile Changes" below to submit for admin approval.');
     setTimeout(() => setSanadSuccess(''), 5000);
   };
 
   const handleDeleteSanadDocStaged = (docIndex) => {
     if (!window.confirm('Are you sure you want to remove this document from your profile?')) return;
-    setUploadedSanads(prev => prev.filter((_, idx) => idx !== docIndex));
-    setSanadSuccess('Document removed from staged list. Click "Save Profile Changes" to commit.');
+    const nextDocs = uploadedSanads.filter((_, idx) => idx !== docIndex);
+    setUploadedSanads(nextDocs);
+    const nextQuals = nextDocs.map(d => d.title?.trim()).filter(Boolean).join(', ');
+    setQualifications(nextQuals);
+    setSanadSuccess('Document removed from list. Click "Save Profile Changes" to commit.');
     setTimeout(() => setSanadSuccess(''), 4000);
   };
 
@@ -880,6 +892,12 @@ function TutorProfileContent() {
         return rest;
       });
 
+      const effectiveQuals = (
+        cleanSanads.map(d => d.title?.trim()).filter(Boolean).join(', ') ||
+        qualifications ||
+        ''
+      ).trim();
+
       // 1. Update basic user details
       await updateUserProfile({
         name: name.trim(),
@@ -892,7 +910,7 @@ function TutorProfileContent() {
         age: age ? Number(age) : undefined,
         avatar,
         bio: bio.trim(),
-        qualifications: qualifications.trim(),
+        qualifications: effectiveQuals,
         experienceYears: Number(experienceYears),
         hourlyRate: Number(hourlyRate),
         teachingModes,
@@ -909,7 +927,7 @@ function TutorProfileContent() {
         tutoringType,
         subjects: selectedSubjects,
         bio: bio.trim(),
-        qualifications: qualifications.trim(),
+        qualifications: effectiveQuals,
         experienceYears: Number(experienceYears),
         hourlyRate: Number(hourlyRate),
         teachingModes,
@@ -1953,52 +1971,15 @@ function TutorProfileContent() {
                   </div>
                 )}
 
-                {/* Academic Qualifications & Degrees Text */}
-                <div id="profile-qualifications" className="scroll-mt-28 space-y-2.5 p-4 sm:p-5 bg-[#faf8f5]/60 border border-[#e6ded1] rounded-2xl">
-                  <div className="flex items-center justify-between flex-wrap gap-1">
-                    <label className="text-xs font-bold text-stone-800 flex items-center gap-1.5">
-                      <GraduationCap className="w-3.5 h-3.5 text-[#b85d34]" />
-                      <span>Academic Qualifications &amp; Sanad Degrees *</span>
-                    </label>
-                    <span className="text-[10px] text-stone-500 font-normal">Comma-separated degrees</span>
-                  </div>
-                  <textarea
-                    rows={2}
-                    placeholder="e.g. Shahadat-ul-Alimiyyah (Dars-e-Nizami), Sanad Tajweed & Qirat Sabaa, MA Islamic Studies, M.Sc. Economics"
-                    value={qualifications}
-                    onChange={(e) => setQualifications(e.target.value)}
-                    className="w-full px-4 py-2.5 bg-white border border-stone-200 rounded-2xl text-xs text-stone-900 outline-none focus:border-[#0c2217] font-medium leading-relaxed shadow-2xs"
-                  />
-                  {qualifications && qualifications.trim() && (
-                    <div className="p-3 bg-white border border-[#e6ded1] rounded-2xl space-y-1 shadow-2xs">
-                      <span className="text-[10px] font-bold text-stone-500 block">Recognized Credentials:</span>
-                      <div className="flex flex-wrap gap-1.5">
-                        {parseDegreesAndCertificates(qualifications).map((deg, dIdx) => (
-                          <span
-                            key={dIdx}
-                            className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#faf8f5] border border-[#e6ded1] rounded-xl text-xs font-bold text-stone-900 shadow-2xs"
-                          >
-                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                            <span>{deg}</span>
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                  <p className="text-[10.5px] text-stone-500">
-                    Declared qualifications are publicly displayed on your tutor card and profile, and cross-verified against your attached documents below.
-                  </p>
-                </div>
-
                 {/* Uploaded Documents Grid */}
-                <div className="space-y-3">
+                <div id="profile-qualifications" className="scroll-mt-28 space-y-3">
                   <div className="flex items-center justify-between">
                     <h4 className="text-xs font-bold text-stone-800">
                       Degrees &amp; Sanads Attached ({uploadedSanads.length})
                     </h4>
                     {uploadedSanads.some(d => d.isStaged) && (
                       <span className="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">
-                        ★ Staged changes present
+                        ★ Unsaved changes present
                       </span>
                     )}
                   </div>
@@ -2007,7 +1988,7 @@ function TutorProfileContent() {
                     <div className="p-6 border-2 border-dashed border-stone-200 rounded-2xl text-center text-xs text-stone-400 space-y-1">
                       <FileText className="w-6 h-6 mx-auto text-stone-300" />
                       <p className="font-bold text-stone-600">No degree documents attached yet</p>
-                      <p className="text-[11px]">Upload your Sanad or Shahadat-ul-Alimiyyah below and click "Save Profile Changes".</p>
+                      <p className="text-[11px]">Upload your Sanad, Shahadat-ul-Alimiyyah, or university degree below and click &quot;Save Changes&quot;.</p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -2081,11 +2062,11 @@ function TutorProfileContent() {
                   )}
                 </div>
 
-                {/* Upload New Sanad Document Form (Stages locally) */}
+                {/* Upload New Sanad Document Form (Adds locally) */}
                 <form onSubmit={handleAddSanadStaged} className="pt-4 border-t border-stone-100 space-y-3">
                   <h4 className="text-xs font-bold text-stone-800 flex items-center gap-1.5">
                     <PlusCircle className="w-4 h-4 text-[#b85d34]" />
-                    <span>Stage Additional Sanad / Degree Document</span>
+                    <span>Add Additional Sanad / Degree Document</span>
                   </h4>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -2117,7 +2098,7 @@ function TutorProfileContent() {
 
                   <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1">
                     <p className="text-[10.5px] text-stone-400">
-                      Adding a document stages it in memory. It is submitted to the server when you click "Save Profile Changes".
+                      Adding a document adds it to your profile list. It is submitted to the server when you click &quot;Save Profile Changes&quot;.
                     </p>
                     <button
                       type="submit"
@@ -2125,7 +2106,7 @@ function TutorProfileContent() {
                       className="w-full sm:w-auto px-4 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl shadow-xs transition-all cursor-pointer disabled:opacity-40 flex items-center justify-center gap-1.5 shrink-0"
                     >
                       <PlusCircle className="w-3.5 h-3.5 text-[#d4a359]" />
-                      <span>+ Stage Document</span>
+                      <span>Add Document</span>
                     </button>
                   </div>
                 </form>

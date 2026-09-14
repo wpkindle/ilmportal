@@ -116,9 +116,9 @@ export const calculateClientCompletion = (user, tutorProfile) => {
         label: 'Educational Qualifications',
         weight: 10,
         done: !!tutorProfile?.qualifications?.trim() && tutorProfile.qualifications !== 'Tutor Qualifications',
-        tab: 'personal',
+        tab: 'degrees',
         targetFieldId: 'profile-qualifications',
-        link: '/tutor/profile?tab=personal#profile-qualifications',
+        link: '/tutor/profile?tab=degrees#profile-qualifications',
         actionLabel: 'Add Degrees'
       },
       {

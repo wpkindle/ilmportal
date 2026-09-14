@@ -218,6 +218,8 @@ function TutorProfileContent() {
     '#sanad': 'degrees',
     'upload-sanad': 'degrees',
     '#upload-sanad': 'degrees',
+    'profile-qualifications': 'degrees',
+    '#profile-qualifications': 'degrees',
 
     // Tab 3: Tuition Payment Accounts
     'profile-payment-methods': 'payments',
@@ -266,8 +268,6 @@ function TutorProfileContent() {
     '#profile-area': 'personal',
     'profile-subjects': 'personal',
     '#profile-subjects': 'personal',
-    'profile-qualifications': 'personal',
-    '#profile-qualifications': 'personal',
     'profile-bio': 'personal',
     '#profile-bio': 'personal',
     'personal': 'personal',
@@ -1846,40 +1846,6 @@ function TutorProfileContent() {
                     </div>
                   </div>
 
-                  {/* Academic Qualifications & Degrees Text */}
-                  <div id="profile-qualifications" className="scroll-mt-28 space-y-2">
-                    <div className="flex items-center justify-between flex-wrap gap-1">
-                      <label className="text-xs font-bold text-stone-700 block">
-                        Academic Qualifications &amp; Sanad Degrees *
-                      </label>
-                      <span className="text-[10px] text-stone-500">Comma-separated degrees</span>
-                    </div>
-                    <textarea
-                      rows={2}
-                      required
-                      placeholder="e.g. Shahadat-ul-Alimiyyah (Dars-e-Nizami), Sanad Tajweed & Qirat Sabaa, MA Islamic Studies"
-                      value={qualifications}
-                      onChange={(e) => setQualifications(e.target.value)}
-                      className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 outline-none focus:border-[#0c2217] font-medium leading-relaxed"
-                    />
-                    {qualifications && qualifications.trim() && (
-                      <div className="p-3 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl space-y-1">
-                        <span className="text-[10px] font-bold text-stone-500 block">Recognized Credentials:</span>
-                        <div className="flex flex-wrap gap-1.5">
-                          {parseDegreesAndCertificates(qualifications).map((deg, dIdx) => (
-                            <span
-                              key={dIdx}
-                              className="inline-flex items-center gap-1.5 px-3 py-1 bg-white border border-[#e6ded1] rounded-xl text-xs font-bold text-stone-900 shadow-2xs"
-                            >
-                              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-                              <span>{deg}</span>
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
                   {/* Teaching Bio / Headline */}
                   <div id="profile-bio" className="scroll-mt-28">
                     <label className="text-xs font-bold text-stone-700 block mb-1">
@@ -1986,6 +1952,43 @@ function TutorProfileContent() {
                     <span>{sanadError}</span>
                   </div>
                 )}
+
+                {/* Academic Qualifications & Degrees Text */}
+                <div id="profile-qualifications" className="scroll-mt-28 space-y-2.5 p-4 sm:p-5 bg-[#faf8f5]/60 border border-[#e6ded1] rounded-2xl">
+                  <div className="flex items-center justify-between flex-wrap gap-1">
+                    <label className="text-xs font-bold text-stone-800 flex items-center gap-1.5">
+                      <GraduationCap className="w-3.5 h-3.5 text-[#b85d34]" />
+                      <span>Academic Qualifications &amp; Sanad Degrees *</span>
+                    </label>
+                    <span className="text-[10px] text-stone-500 font-normal">Comma-separated degrees</span>
+                  </div>
+                  <textarea
+                    rows={2}
+                    placeholder="e.g. Shahadat-ul-Alimiyyah (Dars-e-Nizami), Sanad Tajweed & Qirat Sabaa, MA Islamic Studies, M.Sc. Economics"
+                    value={qualifications}
+                    onChange={(e) => setQualifications(e.target.value)}
+                    className="w-full px-4 py-2.5 bg-white border border-stone-200 rounded-2xl text-xs text-stone-900 outline-none focus:border-[#0c2217] font-medium leading-relaxed shadow-2xs"
+                  />
+                  {qualifications && qualifications.trim() && (
+                    <div className="p-3 bg-white border border-[#e6ded1] rounded-2xl space-y-1 shadow-2xs">
+                      <span className="text-[10px] font-bold text-stone-500 block">Recognized Credentials:</span>
+                      <div className="flex flex-wrap gap-1.5">
+                        {parseDegreesAndCertificates(qualifications).map((deg, dIdx) => (
+                          <span
+                            key={dIdx}
+                            className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#faf8f5] border border-[#e6ded1] rounded-xl text-xs font-bold text-stone-900 shadow-2xs"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>{deg}</span>
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  <p className="text-[10.5px] text-stone-500">
+                    Declared qualifications are publicly displayed on your tutor card and profile, and cross-verified against your attached documents below.
+                  </p>
+                </div>
 
                 {/* Uploaded Documents Grid */}
                 <div className="space-y-3">

@@ -600,15 +600,6 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
                       <span className="text-stone-600">Area: <strong className="text-slate-900">{tutorArea}</strong></span>
                     </>
                   )}
-                  {tutorAge && (
-                    <>
-                      <span className="text-stone-300">&bull;</span>
-                      <span className="inline-flex items-center gap-1 text-slate-700">
-                        <User className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
-                        <span>Age: <strong className="text-slate-900">{tutorAge} Yrs</strong></span>
-                      </span>
-                    </>
-                  )}
                   <span className="text-stone-300">&bull;</span>
                   <span className="inline-flex items-center gap-1 font-semibold text-[#0c2217]">
                     <span className="capitalize">{teachingModeLabel}</span>
@@ -637,16 +628,6 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
                       </span>
                       <span className="text-xs text-slate-400 font-medium">No reviews yet</span>
                     </div>
-                  )}
-
-                  {formattedJoiningDate && (
-                    <>
-                      <span className="text-stone-300">&bull;</span>
-                      <span className="inline-flex items-center gap-1 text-xs text-stone-600 font-medium">
-                        <Calendar className="w-3.5 h-3.5 text-[#b85d34]" />
-                        <span>Joined: <strong className="text-slate-800">{formattedJoiningDate}</strong></span>
-                      </span>
-                    </>
                   )}
                 </div>
               </div>
@@ -732,47 +713,8 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
             </p>
           </div>
 
-          {/* Key Qualifications, Verified Credentials & Metrics */}
-          <div className="pt-4 border-t border-slate-100 space-y-3">
-            {/* Verified Credentials Box - Displays ALL degrees, certificates, and religious Sanads without truncation */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] shadow-2xs space-y-2.5">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <span className="text-[10px] sm:text-[11px] uppercase font-black text-slate-500 tracking-wider flex items-center gap-1.5">
-                  <Award className="w-4 h-4 text-[#b85d34]" />
-                  <span>Verified Credentials &amp; Degrees ({allDegrees.length})</span>
-                </span>
-                {user?.role === 'admin' && verifiedSanadCount > 0 ? (
-                  <button
-                    type="button"
-                    onClick={() => setSanadModalOpen(true)}
-                    className="inline-flex items-center gap-1.5 px-3 py-1 bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/50 rounded-xl text-xs font-bold transition-all shadow-2xs cursor-pointer"
-                  >
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#d4a359]" />
-                    <span>Admin: Review Documents ({verifiedSanadCount})</span>
-                  </button>
-                ) : verifiedSanadCount > 0 ? (
-                  <span className="inline-flex items-center gap-1.5 px-3 py-1 bg-white text-[#0c2217] border border-[#d4a359]/50 rounded-xl text-xs font-bold shadow-2xs select-none">
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Verified by Administration</span>
-                  </span>
-                ) : null}
-              </div>
-
-              {/* All degrees rendered cleanly as wrap-friendly badges with green verification checkmark */}
-              <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                {allDegrees.map((degree, idx) => (
-                  <div
-                    key={idx}
-                    className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl bg-white border border-[#e6ded1] shadow-2xs text-xs font-bold text-slate-900 group hover:border-[#b85d34]/40 transition-all"
-                  >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
-                    <span className="break-words leading-snug">{degree}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Teaching Experience, Tutor Age, Tuition Fee, Platform Member */}
+          {/* Key Metrics: Teaching Experience, Tutor Age, Tuition Fee, Platform Member */}
+          <div className="pt-4 border-t border-slate-100">
             <div className={`grid grid-cols-1 sm:grid-cols-2 ${tutorAge ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-3 sm:gap-4`}>
               <div className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-1">
                 <span className="text-[10px] uppercase font-bold text-slate-400">Teaching Experience</span>
@@ -854,74 +796,76 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
           </div>
         )}
 
-        {/* Verified Degrees, Sanads & Certifications Section */}
-        <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e6ded1] shadow-2xs space-y-5">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <div>
-              <div className="flex items-center gap-2.5">
-                <div className="p-2 rounded-xl bg-[#f0ece1] text-[#0c2217]">
-                  <GraduationCap className="w-5 h-5 text-[#b85d34]" />
+        {/* Verified Degrees & Certificates Section */}
+        {allDegrees.length > 0 && (
+          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e6ded1] shadow-2xs space-y-5">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2.5">
+                  <div className="p-2 rounded-xl bg-[#f0ece1] text-[#0c2217]">
+                    <GraduationCap className="w-5 h-5 text-[#b85d34]" />
+                  </div>
+                  <h2 className="text-base sm:text-lg font-black text-slate-900 font-serif">
+                    Verified Degrees &amp; Certificates
+                  </h2>
                 </div>
-                <h2 className="text-base sm:text-lg font-black text-slate-900 font-serif">
-                  Verified Degrees &amp; Religious Sanads
-                </h2>
+                <p className="text-xs text-slate-500 mt-1">
+                  All educational degrees and certificates authenticated by IlmiDunya verification committee.
+                </p>
               </div>
-              <p className="text-xs text-slate-500 mt-1">
-                All educational degrees, certificates, and religious Sanads authenticated by IlmiDunya verification committee.
-              </p>
+
+              {user?.role === 'admin' && verifiedSanadCount > 0 && (
+                <button
+                  type="button"
+                  onClick={() => setSanadModalOpen(true)}
+                  className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#0c2217] hover:bg-[#163826] text-[#f5d996] text-xs font-bold shadow-sm transition-all cursor-pointer"
+                >
+                  <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
+                  <span>Admin: Inspect Documents ({verifiedSanadCount})</span>
+                </button>
+              )}
             </div>
 
-            {user?.role === 'admin' && verifiedSanadCount > 0 && (
-              <button
-                type="button"
-                onClick={() => setSanadModalOpen(true)}
-                className="inline-flex items-center gap-2 px-4 py-2 rounded-2xl bg-[#0c2217] hover:bg-[#163826] text-[#f5d996] text-xs font-bold shadow-sm transition-all cursor-pointer"
-              >
-                <ShieldCheck className="w-4 h-4 text-[#d4a359]" />
-                <span>Admin: Inspect Documents ({verifiedSanadCount})</span>
-              </button>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              {allDegrees.map((degree, idx) => (
+                <div
+                  key={idx}
+                  className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] flex items-start gap-3.5 hover:border-[#b85d34]/40 transition-colors shadow-2xs"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-white border border-[#e6ded1] flex items-center justify-center text-[#0c2217] shrink-0 mt-0.5 shadow-2xs">
+                    <Award className="w-5 h-5 text-[#b85d34]" />
+                  </div>
+                  <div className="min-w-0 flex-1 space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h4 className="font-bold text-xs sm:text-sm text-slate-900 leading-snug break-words">
+                        {degree}
+                      </h4>
+                      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                        Verified
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-slate-500">
+                      Official credential authenticated and on record with platform administration.
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {verifiedSanadDocs.length > 0 && (
+              <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
+                <span className="flex items-center gap-1.5 font-medium">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{verifiedSanadDocs.length} credential qualification(s) verified by IlmiDunya administration.</span>
+                </span>
+                <span className="text-slate-400 text-[11px] italic">
+                  Official documents verified &amp; archived securely
+                </span>
+              </div>
             )}
           </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            {allDegrees.map((degree, idx) => (
-              <div
-                key={idx}
-                className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] flex items-start gap-3.5 hover:border-[#b85d34]/40 transition-colors shadow-2xs"
-              >
-                <div className="w-10 h-10 rounded-xl bg-white border border-[#e6ded1] flex items-center justify-center text-[#0c2217] shrink-0 mt-0.5 shadow-2xs">
-                  <Award className="w-5 h-5 text-[#b85d34]" />
-                </div>
-                <div className="min-w-0 flex-1 space-y-1">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <h4 className="font-bold text-xs sm:text-sm text-slate-900 leading-snug break-words">
-                      {degree}
-                    </h4>
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[10px] font-black uppercase bg-emerald-50 text-emerald-800 border border-emerald-200 shrink-0">
-                      <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                      Verified
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-slate-500">
-                    Official credential authenticated and on record with platform administration.
-                  </p>
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {verifiedSanadDocs.length > 0 && (
-            <div className="pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between gap-3 text-xs text-slate-600">
-              <span className="flex items-center gap-1.5 font-medium">
-                <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-                <span>{verifiedSanadDocs.length} credential qualification(s) verified by IlmiDunya administration.</span>
-              </span>
-              <span className="text-slate-400 text-[11px] italic">
-                Official documents verified &amp; archived securely
-              </span>
-            </div>
-          )}
-        </div>
+        )}
 
         {/* Subjects & Disciplines Taught */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-[#e6ded1] shadow-2xs space-y-4">

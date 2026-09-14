@@ -100,34 +100,50 @@ export function parseRawQualifications(qualificationsStr) {
  * preventing arbitrary unverified strings (like skills/marketing tags) from cluttering credentials.
  */
 export function parseDegreesAndCertificates(qualificationsStr, sanadDocuments = [], isVerified = false) {
-  const parsedQuals = parseRawQualifications(qualificationsStr);
   const allDocs = Array.isArray(sanadDocuments) ? sanadDocuments : [];
 
-  const list = [];
+  const docTitles = [];
+  const seenKeys = new Set();
 
-  // 1. Include all comma-separated qualifications/degrees declared by the tutor
-  parsedQuals.forEach(q => {
-    if (q && !list.some(item => item.toLowerCase() === q.toLowerCase())) {
-      list.push(q);
-    }
-  });
-
-  // 2. Also include any attached Sanad / degree documents that have specific non-generic titles
   allDocs.forEach(doc => {
     const title = doc?.title?.trim();
     const isGeneric = !title ||
       title.toLowerCase() === 'sanad / degree document' ||
       title.toLowerCase() === 'document' ||
       title.toLowerCase() === 'sanad' ||
-      title.toLowerCase() === 'degree document';
+      title.toLowerCase() === 'degree document' ||
+      title.toLowerCase() === 'educational degree';
 
-    if (!isGeneric && title && !list.some(item => item.toLowerCase() === title.toLowerCase())) {
-      list.push(title);
+    if (!isGeneric && title) {
+      const key = title.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (key && !seenKeys.has(key)) {
+        seenKeys.add(key);
+        docTitles.push(title);
+      }
     }
   });
 
-  if (list.length > 0) {
-    return list;
+  // 1. If specific degree documents are attached, use their titles as the official credentials
+  if (docTitles.length > 0) {
+    return docTitles;
+  }
+
+  // 2. Otherwise fall back to parsed qualifications string if no specific degree documents are attached
+  const parsedQuals = parseRawQualifications(qualificationsStr);
+  const qualList = [];
+  parsedQuals.forEach(q => {
+    const clean = q?.trim();
+    if (clean) {
+      const key = clean.toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (key && !seenKeys.has(key)) {
+        seenKeys.add(key);
+        qualList.push(clean);
+      }
+    }
+  });
+
+  if (qualList.length > 0) {
+    return qualList;
   }
 
   if (isVerified || allDocs.length > 0) {

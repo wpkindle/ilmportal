@@ -34,6 +34,31 @@ const evaluatePaymentOverdue = async (deal) => {
 
 exports.evaluatePaymentOverdue = evaluatePaymentOverdue;
 
+/**
+ * Helper: ensure payment request has receiving accounts populated,
+ * defaulting to platform administration accounts if tutor has not configured any.
+ */
+const ensureAdminPaymentMethodsFallback = (pr) => {
+  if (!pr) return pr;
+  const prObj = pr.toObject ? pr.toObject() : { ...pr };
+  if (!Array.isArray(prObj.paymentMethods) || prObj.paymentMethods.length === 0) {
+    prObj.paymentMethods = ADMIN_PAYMENT_ACCOUNTS.map(pm => ({
+      method: pm.method,
+      bankName: pm.bankName || '',
+      accountTitle: pm.accountTitle || '',
+      accountNumber: pm.accountNumber || '',
+      instructions: pm.instructions || '',
+      qrImage: pm.qrImage || '',
+      isAdminAccount: true,
+      isDefault: Boolean(pm.isDefault)
+    }));
+    prObj.accountChoice = 'admin';
+  }
+  return prObj;
+};
+
+exports.ensureAdminPaymentMethodsFallback = ensureAdminPaymentMethodsFallback;
+
 // @desc    Tutor sends tuition fee payment request to student (3-day threshold)
 // @route   POST /api/payment-requests
 exports.createPaymentRequest = async (req, res) => {
@@ -66,7 +91,13 @@ exports.createPaymentRequest = async (req, res) => {
       return res.status(403).json({ success: false, message: 'Only the tutor can request tuition fees for this deal' });
     }
 
-    const isUsingAdminAccounts = accountChoice === 'admin';
+    // Fetch tutor's configured receiving methods
+    const tutorProfile = await TutorProfile.findOne({ user: req.user.id });
+    const tutorPaymentMethods = tutorProfile?.paymentMethods || [];
+    const hasPersonalMethods = Array.isArray(tutorPaymentMethods) && tutorPaymentMethods.length > 0;
+
+    // Default to administration accounts if tutor explicitly selected admin accounts OR has not added any personal accounts
+    const isUsingAdminAccounts = accountChoice === 'admin' || !hasPersonalMethods;
     let assignedPaymentMethods = [];
 
     if (isUsingAdminAccounts) {
@@ -82,18 +113,7 @@ exports.createPaymentRequest = async (req, res) => {
         isDefault: Boolean(pm.isDefault)
       }));
     } else {
-      // Verify tutor has at least 1 payment method configured
-      const tutorProfile = await TutorProfile.findOne({ user: req.user.id });
-      const paymentMethods = tutorProfile?.paymentMethods || [];
-
-      if (!paymentMethods || paymentMethods.length === 0) {
-        return res.status(400).json({
-          success: false,
-          message: 'You have chosen to use your personal accounts, but have not configured any receiving payment methods. Please add your account in profile settings or select IlmiDunya Administration Accounts.'
-        });
-      }
-
-      assignedPaymentMethods = paymentMethods.map(pm => ({
+      assignedPaymentMethods = tutorPaymentMethods.map(pm => ({
         method: pm.method,
         bankName: pm.bankName || '',
         accountTitle: pm.accountTitle || '',
@@ -243,9 +263,11 @@ exports.getPaymentRequestsByDeal = async (req, res) => {
       .populate('tutor', 'name email avatar')
       .populate('student', 'name email avatar');
 
+    const formattedRequests = paymentRequests.map(pr => ensureAdminPaymentMethodsFallback(pr));
+
     res.status(200).json({
       success: true,
-      paymentRequests,
+      paymentRequests: formattedRequests,
       dealRestricted: Boolean(deal.accessRestricted || deal.hasOverduePayment)
     });
   } catch (error) {
@@ -294,7 +316,7 @@ exports.getPaymentRequestById = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      paymentRequest
+      paymentRequest: ensureAdminPaymentMethodsFallback(paymentRequest)
     });
   } catch (error) {
     res.status(500).json({

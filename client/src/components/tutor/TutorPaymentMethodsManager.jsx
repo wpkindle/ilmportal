@@ -102,7 +102,7 @@ export default function TutorPaymentMethodsManager({
   const methods = isControlled && controlledMethods !== undefined ? controlledMethods : internalMethods;
   const setMethods = isControlled && onControlledChange ? onControlledChange : setInternalMethods;
 
-  const [internalPreferredChoice, setInternalPreferredChoice] = useState('own');
+  const [internalPreferredChoice, setInternalPreferredChoice] = useState(initialMethods.length === 0 ? 'admin' : 'own');
   const preferredChoice = isControlled && controlledPreferredChoice !== undefined ? controlledPreferredChoice : internalPreferredChoice;
   const setPreferredChoice = isControlled && onControlledPreferenceChange ? onControlledPreferenceChange : setInternalPreferredChoice;
 
@@ -135,6 +135,8 @@ export default function TutorPaymentMethodsManager({
         setInternalMethods(res.paymentMethods);
         if (res.preferredAccountChoice) {
           setInternalPreferredChoice(res.preferredAccountChoice);
+        } else if (res.paymentMethods.length === 0) {
+          setInternalPreferredChoice('admin');
         }
         if (onMethodsUpdated) {
           onMethodsUpdated(res.paymentMethods);
@@ -389,28 +391,41 @@ export default function TutorPaymentMethodsManager({
               type="button"
               disabled={updatingChoice}
               onClick={() => handlePreferenceChange('own')}
-              className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer text-center ${
+              className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer text-center flex items-center justify-center gap-1.5 ${
                 preferredChoice === 'own'
                   ? 'bg-[#0c2217] text-white shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              My Personal Accounts
+              <span>My Personal Accounts</span>
+              {methods.length === 0 && <span className="text-[9px] opacity-70">(0 added)</span>}
             </button>
             <button
               type="button"
               disabled={updatingChoice}
               onClick={() => handlePreferenceChange('admin')}
-              className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer text-center ${
+              className={`px-3 py-2 sm:py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer text-center flex items-center justify-center gap-1.5 ${
                 preferredChoice === 'admin'
                   ? 'bg-[#0c2217] text-white shadow-2xs'
                   : 'text-slate-600 hover:text-slate-900'
               }`}
             >
-              Administration Accounts
+              <span>Administration Accounts</span>
+              {methods.length === 0 && (
+                <span className={`px-1.5 py-0.2 rounded text-[9px] font-bold ${preferredChoice === 'admin' ? 'bg-[#d4a359] text-[#0c2217]' : 'bg-emerald-100 text-emerald-800'}`}>Default</span>
+              )}
             </button>
           </div>
         </div>
+
+        {methods.length === 0 && (
+          <div className="p-3 bg-[#f8f6f0] border border-[#d4a359]/30 rounded-xl flex items-center gap-2.5 text-xs text-[#0c2217]">
+            <ShieldCheck className="w-4 h-4 text-[#b85d34] shrink-0" />
+            <span className="text-[11.5px] text-slate-700">
+              <strong>Official Administration Accounts active by default:</strong> Students can always transfer fees to IlmiDunya verified accounts without delay until you add your own personal accounts below.
+            </span>
+          </div>
+        )}
 
         {/* Administration Accounts Quick Drawer */}
         <div className="pt-2 border-t border-slate-200/60">

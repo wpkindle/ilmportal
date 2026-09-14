@@ -22,6 +22,7 @@ import {
   Trash2
 } from 'lucide-react';
 import { api } from '../../services/api';
+import { ADMIN_PAYMENT_ACCOUNTS } from '../../data/adminPaymentAccounts';
 
 export default function StudentPaymentRequestModal({
   paymentRequest,
@@ -48,7 +49,8 @@ export default function StudentPaymentRequestModal({
   const [isEditingProof, setIsEditingProof] = useState(false);
   const fileInputRef = useRef(null);
 
-  const methods = paymentRequest?.paymentMethods || [];
+  const hasCustomMethods = Array.isArray(paymentRequest?.paymentMethods) && paymentRequest.paymentMethods.length > 0;
+  const methods = hasCustomMethods ? paymentRequest.paymentMethods : ADMIN_PAYMENT_ACCOUNTS;
 
   useEffect(() => {
     if (methods.length > 0 && !selectedMethod) {
@@ -174,7 +176,7 @@ export default function StudentPaymentRequestModal({
   };
 
   const currentMethod = methods[activeTab] || methods[0];
-  const isAdminMode = paymentRequest?.accountChoice === 'admin' || Boolean(currentMethod?.isAdminAccount);
+  const isAdminMode = paymentRequest?.accountChoice === 'admin' || !hasCustomMethods || Boolean(currentMethod?.isAdminAccount);
 
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-950/75 backdrop-blur-xs p-3 sm:p-4 flex min-h-full items-center justify-center animate-in fade-in duration-200">
@@ -286,7 +288,9 @@ export default function StudentPaymentRequestModal({
                     </span>
                   </div>
                   <p className="text-[11px] text-slate-600 leading-snug">
-                    Your tutor selected IlmiDunya&apos;s main administration accounts (same official accounts used in the Support Platform). Transfer to any account below and upload your receipt.
+                    {!hasCustomMethods
+                      ? "Your tutor has not configured personal payment accounts yet. IlmiDunya Official Administration Accounts are automatically provided for your tuition payment. Transfer to any account below and upload your receipt."
+                      : "Your tutor selected IlmiDunya's main administration accounts (same official accounts used in the Support Platform). Transfer to any account below and upload your receipt."}
                   </p>
                 </div>
               </div>

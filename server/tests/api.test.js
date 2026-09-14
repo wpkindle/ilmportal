@@ -670,6 +670,60 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
     expect(clearRes.body.paymentRequest.status).toBe('cleared');
   });
 
+  test('Tutor without payment methods automatically defaults to official administration accounts for student payment', async () => {
+    const TutorProfile = require('../src/models/TutorProfile');
+    const Deal = require('../src/models/Deal');
+
+    // Clear tutor's personal payment methods to simulate a tutor who hasn't added any
+    await TutorProfile.findByIdAndUpdate(
+      tutorProfileId,
+      { paymentMethods: [], preferredAccountChoice: 'own' }
+    );
+
+    // 1. GET /api/tutors/payment-methods returns preferredAccountChoice: 'admin' when methods are empty
+    const getMethodsRes = await request(app)
+      .get('/api/tutors/payment-methods')
+      .set('Authorization', `Bearer ${tutorToken}`);
+
+    expect(getMethodsRes.statusCode).toEqual(200);
+    expect(getMethodsRes.body.paymentMethods.length).toBe(0);
+    expect(getMethodsRes.body.preferredAccountChoice).toBe('admin');
+
+    // 2. Tutor creates payment request with accountChoice: 'own' (or missing).
+    // Should NOT throw 400. Must automatically default to admin accounts.
+    const deal = await Deal.findById(dealId);
+    expect(deal).toBeDefined();
+
+    const prRes = await request(app)
+      .post('/api/payment-requests')
+      .set('Authorization', `Bearer ${tutorToken}`)
+      .send({
+        dealId: deal._id.toString(),
+        amount: 6500,
+        title: 'Monthly Quran Tuition Fee',
+        description: 'Default admin escrow account test',
+        accountChoice: 'own' // Tutor selected 'own' but has no personal methods
+      });
+
+    expect(prRes.statusCode).toEqual(201);
+    expect(prRes.body.success).toBe(true);
+    const createdPR = prRes.body.paymentRequest;
+    expect(createdPR.accountChoice).toBe('admin');
+    expect(createdPR.paymentMethods.length).toBe(5);
+    expect(createdPR.paymentMethods[0].isAdminAccount).toBe(true);
+    expect(createdPR.paymentMethods[0].accountTitle).toBe('Abdul Khaliq');
+
+    // 3. Student fetches the payment request and receives administration accounts
+    const studentGetRes = await request(app)
+      .get(`/api/payment-requests/${createdPR._id}`)
+      .set('Authorization', `Bearer ${studentToken}`);
+
+    expect(studentGetRes.statusCode).toEqual(200);
+    expect(studentGetRes.body.paymentRequest.paymentMethods.length).toBe(5);
+    expect(studentGetRes.body.paymentRequest.paymentMethods.some(m => m.method === 'bank' && m.accountNumber === '96010105435308')).toBe(true);
+    expect(studentGetRes.body.paymentRequest.paymentMethods.some(m => m.method === 'easypaisa' && m.accountNumber === '03171759093')).toBe(true);
+  });
+
   test('Public tutor endpoints omit fileUrl from sanadDocuments for non-admins to ensure document privacy', async () => {
     const TutorProfile = require('../src/models/TutorProfile');
     const User = require('../src/models/User');

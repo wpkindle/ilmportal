@@ -769,7 +769,7 @@ exports.getMyPaymentMethods = async (req, res) => {
   try {
     const profile = await TutorProfile.findOne({ user: req.user.id });
     const paymentMethods = profile?.paymentMethods || [];
-    const preferredAccountChoice = profile?.preferredAccountChoice || 'own';
+    const preferredAccountChoice = paymentMethods.length === 0 ? 'admin' : (profile?.preferredAccountChoice || 'own');
     res.status(200).json({
       success: true,
       paymentMethods,

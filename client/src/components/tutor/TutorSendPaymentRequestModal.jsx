@@ -57,10 +57,12 @@ export default function TutorSendPaymentRequestModal({
         setTutorPaymentMethods(methodsList);
         if (deal?.latestPaymentRequest?.accountChoice) {
           setAccountChoice(deal.latestPaymentRequest.accountChoice);
-        } else if (res.preferredAccountChoice) {
-          setAccountChoice(res.preferredAccountChoice);
         } else if (methodsList.length === 0) {
           setAccountChoice('admin');
+        } else if (res.preferredAccountChoice) {
+          setAccountChoice(res.preferredAccountChoice);
+        } else {
+          setAccountChoice('own');
         }
       }
     } catch (err) {
@@ -82,9 +84,10 @@ export default function TutorSendPaymentRequestModal({
       return;
     }
 
-    if (accountChoice === 'own' && tutorPaymentMethods.length === 0) {
-      setError('You have not configured any receiving payment methods. Please add your personal account or select Administration Accounts.');
-      return;
+    let effectiveChoice = accountChoice;
+    if (effectiveChoice === 'own' && tutorPaymentMethods.length === 0) {
+      effectiveChoice = 'admin';
+      setAccountChoice('admin');
     }
 
     try {
@@ -94,7 +97,7 @@ export default function TutorSendPaymentRequestModal({
         amount: numAmount,
         title: title.trim(),
         description: description.trim(),
-        accountChoice
+        accountChoice: effectiveChoice
       });
 
       if (res.success) {
@@ -233,7 +236,7 @@ export default function TutorSendPaymentRequestModal({
                       ? 'Checking configured accounts...'
                       : tutorPaymentMethods.length > 0
                       ? `${tutorPaymentMethods.length} personal method${tutorPaymentMethods.length > 1 ? 's' : ''} active`
-                      : 'No personal accounts added yet'}
+                      : 'No personal accounts added yet (Official Admin accounts active by default)'}
                   </p>
                 </button>
 
@@ -251,6 +254,9 @@ export default function TutorSendPaymentRequestModal({
                     <div className="flex items-center gap-1.5 min-w-0">
                       <ShieldCheck className={`w-3.5 h-3.5 shrink-0 ${accountChoice === 'admin' ? 'text-[#b85d34]' : 'text-slate-500'}`} />
                       <span className="font-bold text-xs text-slate-900 truncate">Administration Accounts</span>
+                      {tutorPaymentMethods.length === 0 && (
+                        <span className="px-1.5 py-0.5 bg-emerald-100 text-emerald-800 text-[9px] font-bold rounded">Default</span>
+                      )}
                     </div>
                     {accountChoice === 'admin' && (
                       <CheckCircle2 className="w-4 h-4 text-[#0c2217] shrink-0 fill-[#0c2217]/10" />
@@ -425,7 +431,7 @@ export default function TutorSendPaymentRequestModal({
             ) : (
               <button
                 type="submit"
-                disabled={submitting || (accountChoice === 'own' && tutorPaymentMethods.length === 0)}
+                disabled={submitting}
                 className="inline-flex items-center gap-1.5 px-4 sm:px-5 py-2 sm:py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-white text-xs font-bold rounded-2xl shadow-xs transition-all cursor-pointer disabled:opacity-50"
               >
                 <Send className="w-3.5 h-3.5 text-[#d4a359]" />

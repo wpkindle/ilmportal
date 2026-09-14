@@ -298,32 +298,19 @@ function TutorProfileContent() {
       } catch {}
     }
 
-    // 3. Smooth scroll down to target section or tab workspace
-    setTimeout(() => {
-      const targetId = fieldId || (
-        tabId === 'degrees' ? 'profile-sanads' :
-        tabId === 'payments' ? 'profile-payment-methods' :
-        tabId === 'video' ? 'profile-video-intro' :
-        tabId === 'security' ? 'profile-security' :
-        'profile-tab-workspace'
-      );
-      const el = document.getElementById(targetId);
-      if (el) {
-        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        el.classList.add('ring-4', 'ring-[#d4a359]', 'ring-offset-4', 'transition-all', 'duration-500');
-        setTimeout(() => el.classList.remove('ring-4', 'ring-[#d4a359]', 'ring-offset-4'), 2500);
-
-        const focusable = el.querySelector('input:not([type=hidden]):not([disabled]), textarea, select, button');
-        if (focusable && typeof focusable.focus === 'function') {
-          try { focusable.focus({ preventScroll: true }); } catch {}
+    // 3. Smooth scroll to specific target field only when explicitly navigated from checklist (no container border highlight)
+    if (fieldId) {
+      setTimeout(() => {
+        const el = document.getElementById(fieldId);
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          const focusable = el.querySelector('input:not([type=hidden]):not([disabled]), textarea, select, button');
+          if (focusable && typeof focusable.focus === 'function') {
+            try { focusable.focus({ preventScroll: true }); } catch {}
+          }
         }
-      } else {
-        const workspace = document.getElementById('profile-tab-workspace');
-        if (workspace) {
-          workspace.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      }
-    }, 100);
+      }, 100);
+    }
   };
 
   const navigateToSection = (targetUrlOrHash, item) => {
@@ -1118,42 +1105,6 @@ function TutorProfileContent() {
           </div>
 
           <div className="flex items-center gap-2 flex-wrap">
-            {/* Instant In-Page Quick Preview Modal Button */}
-            <button
-              type="button"
-              onClick={() => {
-                handlePreparePreview();
-                setQuickPreviewOpen(true);
-              }}
-              className="px-3.5 py-2 bg-amber-50 hover:bg-amber-100 border border-amber-300 rounded-2xl text-xs font-bold text-amber-950 flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer group"
-              title="Instant in-page preview showing your current unsaved edits"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-amber-600 group-hover:scale-110 transition-transform" />
-              <span>Quick Preview</span>
-              {hasUnsavedChanges && (
-                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span>
-              )}
-            </button>
-
-            {/* Full Page Preview in New Tab */}
-            <Link
-              href={`/tutors/${user?.username || user?._id || ''}?preview=draft`}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={handlePreparePreview}
-              className="px-4 py-2 bg-[#f0ece1] hover:bg-[#e6dfd5] border border-[#d4a359]/50 rounded-2xl text-xs font-bold text-[#0c2217] flex items-center gap-1.5 shadow-2xs transition-all cursor-pointer group"
-              title="Open student profile preview in new tab"
-            >
-              <Eye className="w-3.5 h-3.5 text-[#b85d34] group-hover:scale-110 transition-transform" />
-              <span>{hasUnsavedChanges ? 'Preview Draft' : 'Live Preview'}</span>
-              {hasUnsavedChanges && (
-                <span className="px-1.5 py-0.2 rounded-md bg-amber-200 text-amber-900 text-[10px] font-extrabold">
-                  Draft
-                </span>
-              )}
-              <ExternalLink className="w-3 h-3 text-stone-400" />
-            </Link>
-
             <Link
               href="/tutor/dashboard"
               className="px-4 py-2 bg-white hover:bg-stone-50 border border-[#e6dfd5] rounded-2xl text-xs font-semibold text-stone-700 flex items-center gap-1.5 shadow-2xs transition-colors"
@@ -1275,66 +1226,51 @@ function TutorProfileContent() {
           <div id="profile-tab-workspace" className="lg:col-span-8 space-y-5 order-1 lg:order-2 scroll-mt-28">
             
             {/* Fully Mobile-Responsive Segmented Navigation Bar */}
-            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-2">
-              <div className="relative flex-1 min-w-0">
-                <div
-                  ref={tabBarRef}
-                  className="bg-white p-1 sm:p-1.5 rounded-2xl sm:rounded-3xl border border-[#e6dfd5] shadow-xs flex items-center gap-1 sm:gap-1.5 overflow-x-auto scrollbar-none overscroll-x-contain [-webkit-overflow-scrolling:touch]"
-                >
-                  {PROFILE_TABS.map((tab) => {
-                    const Icon = tab.icon;
-                    const isActive = activeTab === tab.id;
-
-                    let badge = null;
-                    if (tab.id === 'degrees' && uploadedSanads.length > 0) {
-                      badge = uploadedSanads.length;
-                    } else if (tab.id === 'payments' && stagedPaymentMethods.length > 0) {
-                      badge = stagedPaymentMethods.length;
-                    } else if (tab.id === 'video' && videoIntroInput) {
-                      badge = '✓';
-                    }
-
-                    return (
-                      <button
-                        key={tab.id}
-                        id={`tab-btn-${tab.id}`}
-                        type="button"
-                        ref={isActive ? activeTabBtnRef : null}
-                        onClick={() => switchTab(tab.id)}
-                        className={`shrink-0 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 select-none ${
-                          isActive
-                            ? 'bg-[#0c2217] text-[#faf8f5] shadow-sm'
-                            : 'text-stone-600 hover:text-[#0c2217] hover:bg-[#faf8f5]'
-                        }`}
-                      >
-                        <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${isActive ? 'text-[#d4a359]' : 'text-stone-400'}`} />
-                        <span className="hidden sm:inline whitespace-nowrap">{tab.fullLabel}</span>
-                        <span className="sm:hidden whitespace-nowrap">{tab.shortLabel}</span>
-                        {badge !== null && (
-                          <span className={`text-[9.5px] sm:text-[10px] px-1.5 py-0.2 rounded-full font-mono shrink-0 ${
-                            isActive ? 'bg-[#143d2b] text-[#d4a359]' : 'bg-stone-100 text-stone-600'
-                          }`}>
-                            {badge}
-                          </span>
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              </div>
-
-              <Link
-                href={`/tutors/${user?.username || user?._id || ''}?preview=draft`}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={handlePreparePreview}
-                className="shrink-0 px-3.5 py-2.5 bg-white hover:bg-stone-50 border border-[#e6dfd5] rounded-2xl sm:rounded-3xl text-xs font-bold text-[#0c2217] flex items-center justify-center gap-1.5 shadow-2xs transition-colors group cursor-pointer"
-                title="Preview how your profile appears to prospective students"
+            <div className="relative w-full min-w-0">
+              <div
+                ref={tabBarRef}
+                className="bg-white p-1 sm:p-1.5 rounded-2xl sm:rounded-3xl border border-[#e6dfd5] shadow-xs flex items-center gap-1 sm:gap-1.5 overflow-x-auto scrollbar-none overscroll-x-contain [-webkit-overflow-scrolling:touch]"
               >
-                <Eye className="w-3.5 h-3.5 text-[#b85d34] group-hover:scale-110 transition-transform" />
-                <span className="whitespace-nowrap">{hasUnsavedChanges ? 'Preview Draft' : 'Live Preview'}</span>
-                <ExternalLink className="w-3 h-3 text-stone-400" />
-              </Link>
+                {PROFILE_TABS.map((tab) => {
+                  const Icon = tab.icon;
+                  const isActive = activeTab === tab.id;
+
+                  let badge = null;
+                  if (tab.id === 'degrees' && uploadedSanads.length > 0) {
+                    badge = uploadedSanads.length;
+                  } else if (tab.id === 'payments' && stagedPaymentMethods.length > 0) {
+                    badge = stagedPaymentMethods.length;
+                  } else if (tab.id === 'video' && videoIntroInput) {
+                    badge = '✓';
+                  }
+
+                  return (
+                    <button
+                      key={tab.id}
+                      id={`tab-btn-${tab.id}`}
+                      type="button"
+                      ref={isActive ? activeTabBtnRef : null}
+                      onClick={() => switchTab(tab.id)}
+                      className={`shrink-0 px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl text-xs font-bold transition-all cursor-pointer flex items-center justify-center gap-1.5 sm:gap-2 select-none focus:outline-none focus:ring-0 ${
+                        isActive
+                          ? 'bg-[#0c2217] text-[#faf8f5] shadow-sm'
+                          : 'text-stone-600 hover:text-[#0c2217] hover:bg-[#faf8f5]'
+                      }`}
+                    >
+                      <Icon className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${isActive ? 'text-[#d4a359]' : 'text-stone-400'}`} />
+                      <span className="hidden sm:inline whitespace-nowrap">{tab.fullLabel}</span>
+                      <span className="sm:hidden whitespace-nowrap">{tab.shortLabel}</span>
+                      {badge !== null && (
+                        <span className={`text-[9.5px] sm:text-[10px] px-1.5 py-0.2 rounded-full font-mono shrink-0 ${
+                          isActive ? 'bg-[#143d2b] text-[#d4a359]' : 'bg-stone-100 text-stone-600'
+                        }`}>
+                          {badge}
+                        </span>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
 
             {/* TAB 1: PERSONAL & TEACHING INFO */}
@@ -1956,7 +1892,7 @@ function TutorProfileContent() {
                         title="Preview how your profile appears to students"
                       >
                         <Eye className="w-3.5 h-3.5 text-[#b85d34] group-hover:scale-110 transition-transform" />
-                        <span>{hasUnsavedChanges ? 'Preview Draft' : 'Preview Profile'}</span>
+                        <span>Preview Draft</span>
                         <ExternalLink className="w-3 h-3 text-stone-400" />
                       </Link>
                       <button
@@ -2179,18 +2115,6 @@ function TutorProfileContent() {
                     Degrees are submitted for approval upon clicking Save.
                   </span>
                   <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <Link
-                      href={`/tutors/${user?.username || user?._id || ''}?preview=draft`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={handlePreparePreview}
-                      className="px-3.5 py-2.5 bg-[#f0ece1] hover:bg-[#e6dfd5] text-[#0c2217] text-xs font-bold rounded-2xl border border-[#d4a359]/40 transition-colors flex items-center justify-center gap-1.5 shadow-2xs group cursor-pointer"
-                      title="Preview how your profile appears to students"
-                    >
-                      <Eye className="w-3.5 h-3.5 text-[#b85d34] group-hover:scale-110 transition-transform" />
-                      <span>{hasUnsavedChanges ? 'Preview Draft' : 'Preview Profile'}</span>
-                      <ExternalLink className="w-3 h-3 text-stone-400" />
-                    </Link>
                     <button
                       type="button"
                       onClick={handleUnifiedSave}
@@ -2227,33 +2151,17 @@ function TutorProfileContent() {
             {activeTab === 'payments' && (
               <div id="profile-payment-methods" className="scroll-mt-28 space-y-5 animate-in fade-in">
                 {/* Informative Header Banner */}
-                <div className="p-3.5 sm:p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-3xl flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs text-stone-700">
-                  <div className="flex items-start gap-3">
-                    <CreditCard className="w-4 h-4 text-[#0c2217] shrink-0 mt-0.5" />
-                    <div className="leading-relaxed">
-                      <span className="font-bold text-[#0c2217]">Tuition Receiving Accounts (Optional): </span>
-                      Adding receiving accounts (Bank, EasyPaisa, JazzCash, Raast) is optional and does not affect your profile health or verification. You can configure personal accounts or use official administration accounts. All additions or edits save when clicking <strong>"Save Profile Changes"</strong>.
-                    </div>
+                <div className="p-3.5 sm:p-4 bg-[#faf8f5] border border-[#e6ded1] rounded-3xl flex items-start gap-3 text-xs text-stone-700">
+                  <CreditCard className="w-4 h-4 text-[#0c2217] shrink-0 mt-0.5" />
+                  <div className="leading-relaxed">
+                    <span className="font-bold text-[#0c2217]">Tuition Receiving Accounts (Optional): </span>
+                    Adding receiving accounts (Bank, EasyPaisa, JazzCash, Raast) is optional and does not affect your profile health or verification. You can configure personal accounts or use official administration accounts. All additions or edits save when clicking <strong>"Save Profile Changes"</strong>.
                   </div>
-                  <Link
-                    href={`/tutors/${user?.username || user?._id || ''}?preview=draft`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={handlePreparePreview}
-                    className="shrink-0 px-3.5 py-2 bg-white hover:bg-stone-50 border border-[#e6dfd5] text-[#0c2217] rounded-2xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-2xs transition-colors group cursor-pointer"
-                    title="Preview how your profile appears to students"
-                  >
-                    <Eye className="w-3.5 h-3.5 text-[#b85d34] group-hover:scale-110 transition-transform" />
-                    <span className="whitespace-nowrap">Preview as Student</span>
-                    <ExternalLink className="w-3 h-3 text-stone-400" />
-                  </Link>
                 </div>
 
                 <TutorPaymentMethodsManager
                   isControlled={true}
-                  previewUrl={`/tutors/${user?.username || user?._id || ''}?preview=draft`}
                   tutorId={user?._id}
-                  onPreviewClick={handlePreparePreview}
                   methods={stagedPaymentMethods}
                   onChange={(updatedMethods) => {
                     setStagedPaymentMethods(updatedMethods);
@@ -2275,18 +2183,6 @@ function TutorProfileContent() {
                     </span>
                   </div>
                   <div className="flex items-center gap-2 w-full sm:w-auto">
-                    <Link
-                      href={`/tutors/${user?.username || user?._id || ''}?preview=draft`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={handlePreparePreview}
-                      className="px-3.5 py-2.5 bg-[#f0ece1] hover:bg-[#e6dfd5] text-[#0c2217] text-xs font-bold rounded-2xl border border-[#d4a359]/40 transition-colors flex items-center justify-center gap-1.5 shadow-2xs group cursor-pointer"
-                      title="Preview how your profile appears to students"
-                    >
-                      <Eye className="w-3.5 h-3.5 text-[#b85d34] group-hover:scale-110 transition-transform" />
-                      <span>{hasUnsavedChanges ? 'Preview Draft' : 'Preview Profile'}</span>
-                      <ExternalLink className="w-3 h-3 text-stone-400" />
-                    </Link>
                     <button
                       type="button"
                       onClick={handleUnifiedSave}
@@ -2857,6 +2753,31 @@ function TutorProfileContent() {
                     </span>
                   )}
                 </div>
+
+                {/* Preview Profile Button under profile image */}
+                <div className="pt-2">
+                  {tutorProfile?.verificationStatus === 'approved' && tutorProfile?.isActive !== false ? (
+                    <Link
+                      href={`/tutors/${user?.username || user?._id || ''}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-2 px-3 rounded-2xl bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] text-xs font-bold flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer group"
+                      title="View your live active public profile"
+                    >
+                      <Eye className="w-3.5 h-3.5 text-[#d4a359] group-hover:scale-110 transition-transform" />
+                      <span>Preview Profile</span>
+                      <ExternalLink className="w-3 h-3 text-stone-400" />
+                    </Link>
+                  ) : (
+                    <div
+                      className="w-full py-2 px-3 rounded-2xl bg-stone-100 text-stone-500 text-[11px] font-medium flex items-center justify-center gap-1.5 border border-stone-200 select-none cursor-default"
+                      title="Live public profile will be visible once approved by administration"
+                    >
+                      <Eye className="w-3.5 h-3.5 text-stone-400" />
+                      <span>Preview Profile (When Approved)</span>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div className="pt-3 border-t border-stone-100 text-left space-y-2.5 text-xs text-stone-600">
@@ -2913,22 +2834,6 @@ function TutorProfileContent() {
                     )}
                   </span>
                 </div>
-              </div>
-
-              {/* Live / Draft Preview Button in Sidebar */}
-              <div className="pt-2">
-                <Link
-                  href={`/tutors/${user?.username || user?._id || ''}?preview=draft`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={handlePreparePreview}
-                  className="w-full py-2.5 px-3.5 bg-[#f0ece1] hover:bg-[#e6dfd5] text-[#0c2217] border border-[#d4a359]/40 rounded-2xl text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-2xs group cursor-pointer"
-                  title="Preview how your profile appears to prospective students"
-                >
-                  <Eye className="w-4 h-4 text-[#b85d34] group-hover:scale-110 transition-transform" />
-                  <span>{hasUnsavedChanges ? 'Preview Draft Profile' : 'Preview Public Profile'}</span>
-                  <ExternalLink className="w-3.5 h-3.5 text-stone-400" />
-                </Link>
               </div>
             </div>
 

@@ -662,7 +662,9 @@ exports.updateProfile = async (req, res) => {
     }
     if (avatar !== undefined) user.avatar = avatar;
     if (gender) user.gender = gender;
-    if (age !== undefined) user.age = Number(age);
+    if (age !== undefined) {
+      user.age = (age !== '' && age !== null && !isNaN(Number(age))) ? Number(age) : undefined;
+    }
     if (req.body.tuitionMode !== undefined || req.body.preferredMode !== undefined || (user.role === 'student' && teachingMode !== undefined)) {
       const modeVal = req.body.tuitionMode || req.body.preferredMode || teachingMode;
       const normalizedMode = modeVal === 'physical' ? 'in_person' : (['online', 'in_person', 'both'].includes(modeVal) ? modeVal : 'both');

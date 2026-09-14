@@ -361,21 +361,6 @@ export default function TutorPaymentMethodsManager({
         </div>
 
         <div className="flex flex-wrap items-center gap-2 shrink-0">
-          {effectivePreviewUrl && (
-            <Link
-              href={effectivePreviewUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={onPreviewClick}
-              className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 bg-[#faf8f5] hover:bg-[#f0ece1] text-[#0c2217] text-xs font-bold rounded-2xl border border-[#d4a359]/50 shadow-2xs transition-all cursor-pointer group"
-              title="Preview how your public profile appears to prospective students"
-            >
-              <Eye className="w-4 h-4 text-[#b85d34] group-hover:scale-110 transition-transform" />
-              <span>Preview Profile as Student</span>
-              <ExternalLink className="w-3 h-3 text-slate-400" />
-            </Link>
-          )}
-
           <button
             type="button"
             onClick={openAddModal}

@@ -310,6 +310,14 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                     <span>{data.experienceYears || 1} yrs exp</span>
                   )}
                 </span>
+                {(data.user?.age || data.age) && (
+                  <>
+                    <span className="text-slate-300">·</span>
+                    <span className="text-[10px] font-semibold text-slate-600 shrink-0">
+                      {data.user?.age || data.age} yrs old
+                    </span>
+                  </>
+                )}
               </div>
             </div>
           </div>

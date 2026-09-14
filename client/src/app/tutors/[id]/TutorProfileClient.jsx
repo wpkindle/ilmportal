@@ -25,7 +25,8 @@ import {
   GraduationCap,
   Flag,
   Eye,
-  Loader2
+  Loader2,
+  User
 } from 'lucide-react';
 import RatingStars from '../../../components/common/RatingStars';
 import { SanadModal } from '../../../components/common/SanadBadge';
@@ -97,6 +98,7 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
   const tutorName = tutorUser.name || 'Verified Tutor';
   const tutorArea = tutor?.localArea || tutorUser.area || tutor?.area || '';
   const tutorCity = tutorUser.city || tutor?.city || 'Pakistan';
+  const tutorAge = tutorUser.age || tutor?.age || (isOwnProfile && user?.age ? user.age : null);
   const tutorAvatar = getTutorAvatar(tutor || tutorUser, tutorName);
 
   const tutorUserId = tutorUser._id || tutorUser.id || tutor?.user?._id || tutor?.user?.id || (typeof tutor?.user === 'string' ? tutor.user : null);
@@ -541,6 +543,15 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
                       <span className="text-stone-600">Area: <strong className="text-slate-900">{tutorArea}</strong></span>
                     </>
                   )}
+                  {tutorAge && (
+                    <>
+                      <span className="text-stone-300">&bull;</span>
+                      <span className="inline-flex items-center gap-1 text-slate-700">
+                        <User className="w-3.5 h-3.5 text-[#d4a359] shrink-0" />
+                        <span>Age: <strong className="text-slate-900">{tutorAge} Yrs</strong></span>
+                      </span>
+                    </>
+                  )}
                   <span className="text-stone-300">&bull;</span>
                   <span className="inline-flex items-center gap-1 font-semibold text-[#0c2217]">
                     <span className="capitalize">{teachingModeLabel}</span>
@@ -704,8 +715,8 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
               </div>
             </div>
 
-            {/* Teaching Experience, Tuition Fee, Platform Member */}
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+            {/* Teaching Experience, Tutor Age, Tuition Fee, Platform Member */}
+            <div className={`grid grid-cols-1 sm:grid-cols-2 ${tutorAge ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-3 sm:gap-4`}>
               <div className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-1">
                 <span className="text-[10px] uppercase font-bold text-slate-400">Teaching Experience</span>
                 <p className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
@@ -722,6 +733,16 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
                   )}
                 </p>
               </div>
+
+              {tutorAge && (
+                <div className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-1">
+                  <span className="text-[10px] uppercase font-bold text-slate-400">Tutor Age</span>
+                  <p className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
+                    <User className="w-4 h-4 text-[#d4a359] shrink-0" />
+                    <span>{tutorAge} Years Old</span>
+                  </p>
+                </div>
+              )}
 
               <div className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-1">
                 <span className="text-[10px] uppercase font-bold text-slate-400">Tuition Fee</span>

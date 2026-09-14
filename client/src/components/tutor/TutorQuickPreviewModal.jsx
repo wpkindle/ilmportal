@@ -17,7 +17,8 @@ import {
   CheckCircle2,
   Clock,
   Briefcase,
-  GraduationCap
+  GraduationCap,
+  User
 } from 'lucide-react';
 import { getTutorAvatar, parseDegreesAndCertificates } from '../../utils/tutorHelpers';
 import VideoIntroPlayer from '../common/VideoIntroPlayer';
@@ -40,6 +41,7 @@ export default function TutorQuickPreviewModal({
   const location = area ? `${area}, ${city}` : city;
   const hourlyRate = draftTutor.hourlyRate || 0;
   const experienceYears = draftTutor.experienceYears || 0;
+  const age = user.age || draftTutor.age || '';
   const qualifications = draftTutor.qualifications || '';
   const bio = draftTutor.bio || 'No bio provided yet.';
   const subjects = Array.isArray(draftTutor.subjects) ? draftTutor.subjects : [];
@@ -185,6 +187,12 @@ export default function TutorQuickPreviewModal({
                   {experienceYears} Years Teaching Experience
                 </span>
               )}
+              {age && (
+                <span className="px-2.5 py-1 rounded-xl bg-amber-50 text-amber-900 border border-amber-200 font-semibold flex items-center gap-1.5">
+                  <User className="w-3.5 h-3.5 text-amber-600" />
+                  {age} Years Old
+                </span>
+              )}
             </div>
           </div>
 
@@ -303,3 +311,4 @@ export default function TutorQuickPreviewModal({
     </div>
   );
 }
+

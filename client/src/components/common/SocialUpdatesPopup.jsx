@@ -24,6 +24,7 @@ const socialChannels = [
     badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200',
     description: 'Instant tutor announcements, class schedules, and parent educational alerts directly on WhatsApp.',
     cta: 'Join Channel',
+    mobileCta: 'Join',
     buttonColor: 'bg-[#25D366] hover:bg-[#20ba59] text-white shadow-emerald-500/20',
     icon: (
       <svg className="w-5 h-5 text-emerald-600 shrink-0" fill="currentColor" viewBox="0 0 24 24">
@@ -36,10 +37,11 @@ const socialChannels = [
     name: 'Facebook Page',
     handle: '@ilmidunyapakistan',
     url: 'https://www.facebook.com/ilmidunyapakistan',
-    badge: 'Community & Reviews',
+    badge: 'Community',
     badgeColor: 'bg-blue-50 text-blue-700 border-blue-200',
     description: 'Educational articles, featured teacher bios, board exam guidance, and community discussion.',
     cta: 'Follow Page',
+    mobileCta: 'Follow',
     buttonColor: 'bg-[#1877F2] hover:bg-[#166fe5] text-white shadow-blue-500/20',
     icon: (
       <svg className="w-5 h-5 text-blue-600 shrink-0" fill="currentColor" viewBox="0 0 24 24">
@@ -56,6 +58,7 @@ const socialChannels = [
     badgeColor: 'bg-pink-50 text-pink-700 border-pink-200',
     description: 'Visual Tajweed tips, Quranic verses, quick study routines, and student success highlights.',
     cta: 'Follow @ilmidunyapakistan',
+    mobileCta: 'Follow',
     buttonColor: 'bg-gradient-to-r from-[#833ab4] via-[#fd1d1d] to-[#fcb045] hover:opacity-95 text-white shadow-pink-500/20',
     icon: (
       <svg className="w-5 h-5 text-pink-600 shrink-0" fill="currentColor" viewBox="0 0 24 24">
@@ -68,10 +71,11 @@ const socialChannels = [
     name: 'YouTube Channel',
     handle: '@ilmidunyapakistan',
     url: 'https://www.youtube.com/@ilmidunyapakistan',
-    badge: 'Lectures & Demos',
+    badge: 'Lectures',
     badgeColor: 'bg-red-50 text-red-700 border-red-200',
     description: 'Video lessons, demo tutoring sessions, Tajweed pronunciation drills, and platform guides.',
     cta: 'Subscribe',
+    mobileCta: 'Subscribe',
     buttonColor: 'bg-[#FF0000] hover:bg-[#d90000] text-white shadow-red-500/20',
     icon: (
       <svg className="w-5 h-5 text-red-600 shrink-0" fill="currentColor" viewBox="0 0 24 24">
@@ -150,50 +154,90 @@ export default function SocialUpdatesPopup() {
       role="dialog"
       aria-modal="true"
       aria-labelledby="social-popup-title"
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 md:p-6 bg-black/45 backdrop-blur-sm animate-in fade-in duration-300"
+      className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-4 md:p-6 bg-black/50 backdrop-blur-xs animate-in fade-in duration-300"
     >
       <div
-        className="relative w-full max-w-2xl max-h-[92dvh] flex flex-col rounded-3xl bg-white border-2 border-[#d4a359]/70 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+        className="relative w-full max-w-xl lg:max-w-2xl max-h-[92dvh] sm:max-h-[88dvh] flex flex-col rounded-2xl sm:rounded-3xl bg-white border border-[#d4a359]/70 shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Gold & Emerald Illuminated Accent Bar */}
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#d4a359] via-[#10b981] to-[#b85d34] z-20" />
+        <div className="absolute top-0 left-0 right-0 h-1 sm:h-1.5 bg-gradient-to-r from-[#d4a359] via-[#10b981] to-[#b85d34] z-20" />
 
         {/* Modal Header */}
-        <div className="relative p-5 sm:p-6 bg-gradient-to-br from-[#faf8f5] via-[#f7f3eb] to-[#f0ece1] border-b border-[#ebe3d3] shrink-0">
+        <div className="relative p-3.5 sm:p-5 md:p-6 bg-gradient-to-br from-[#faf8f5] via-[#f7f3eb] to-[#f0ece1] border-b border-[#ebe3d3] shrink-0">
           <button
             type="button"
             onClick={handleClose}
             aria-label="Close social updates popup"
-            className="absolute top-4 right-4 p-2 rounded-full text-slate-500 hover:text-slate-900 hover:bg-slate-200/60 active:scale-95 transition-all cursor-pointer z-10"
+            className="absolute top-3 right-3 sm:top-4 sm:right-4 w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-white/80 hover:bg-slate-200/80 text-slate-500 hover:text-slate-900 border border-slate-200/60 flex items-center justify-center active:scale-95 transition-all cursor-pointer z-10"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
 
-          <div className="flex items-start gap-3.5 pr-8">
-            <div className="p-3 rounded-2xl bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/40 shadow-md shrink-0">
-              <Bell className="w-5 h-5" />
+          <div className="flex items-start gap-2.5 sm:gap-3.5 pr-7 sm:pr-8">
+            <div className="p-2 sm:p-2.5 rounded-xl sm:rounded-2xl bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/40 shadow-md shrink-0 mt-0.5">
+              <Bell className="w-4 h-4 sm:w-5 sm:h-5" />
             </div>
-            <div className="space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase tracking-wider bg-[#d4a359]/20 text-[#8f6424] border border-[#d4a359]/40">
+            <div className="space-y-0.5 sm:space-y-1 min-w-0">
+              <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] sm:text-[10px] font-extrabold uppercase tracking-wider bg-[#d4a359]/20 text-[#8f6424] border border-[#d4a359]/40">
                 <Sparkles className="w-3 h-3 text-[#d4a359]" />
-                <span>Stay Connected &amp; Informed</span>
+                <span>Stay Connected &bull; IlmiDunya</span>
               </div>
-              <h2 id="social-popup-title" className="font-serif font-black text-lg sm:text-xl text-[#0c2217] leading-snug">
-                Follow IlmiDunya for Official Announcements &amp; Updates
+              <h2 id="social-popup-title" className="font-serif font-black text-sm sm:text-lg md:text-xl text-[#0c2217] leading-tight">
+                Follow IlmiDunya for Official Announcements
               </h2>
-              <p className="text-xs text-slate-600 leading-relaxed max-w-xl">
-                Stay updated with verified Quran Qaris, female Alimahs, new academic classes (Grades 1-8, Civics, Political Science &amp; Constitution), and learning tips across our social channels.
+              <p className="text-[11px] sm:text-xs text-slate-600 leading-snug sm:leading-relaxed max-w-xl line-clamp-2 sm:line-clamp-none">
+                Stay updated with verified Quran Qaris, female Alimahs, new academic classes, and student learning tips across Pakistan.
               </p>
             </div>
           </div>
         </div>
 
         {/* Modal Scrollable Body */}
-        <div className="p-4 sm:p-6 overflow-y-auto space-y-4 bg-slate-50/50">
+        <div className="p-3 sm:p-5 md:p-6 overflow-y-auto space-y-2.5 sm:space-y-4 bg-slate-50/50 overscroll-contain">
           
-          {/* Social Channels 2x2 Responsive Grid */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-3.5">
+          {/* Mobile-Specific Horizontal List (< sm) */}
+          <div className="flex sm:hidden flex-col gap-2">
+            {socialChannels.map((channel) => (
+              <div
+                key={`mobile-${channel.id}`}
+                className="flex items-center justify-between gap-2.5 p-2.5 bg-white border border-[#ebe3d3] rounded-2xl hover:border-[#d4a359]/60 shadow-2xs transition-all"
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="p-2 rounded-xl bg-slate-50 border border-slate-100 shrink-0">
+                    {channel.icon}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5 flex-wrap">
+                      <h3 className="text-xs font-black text-slate-900 truncate">
+                        {channel.name}
+                      </h3>
+                      <span className={`text-[8.5px] font-bold px-1.5 py-0.2 rounded border shrink-0 ${channel.badgeColor}`}>
+                        {channel.badge}
+                      </span>
+                    </div>
+                    <p className="text-[10.5px] font-semibold text-slate-500 truncate font-mono">
+                      {channel.handle}
+                    </p>
+                  </div>
+                </div>
+
+                <a
+                  href={channel.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handleClose}
+                  className={`shrink-0 py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition-all active:scale-95 shadow-xs ${channel.buttonColor}`}
+                >
+                  <span>{channel.mobileCta || 'Follow'}</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
+            ))}
+          </div>
+
+          {/* Desktop/Tablet 2x2 Grid (>= sm) */}
+          <div className="hidden sm:grid sm:grid-cols-2 gap-3 sm:gap-3.5">
             {socialChannels.map((channel) => (
               <div
                 key={channel.id}
@@ -209,7 +253,7 @@ export default function SocialUpdatesPopup() {
                         <h3 className="text-xs font-black text-slate-900 leading-tight">
                           {channel.name}
                         </h3>
-                        <p className="text-[10px] font-medium text-slate-500">
+                        <p className="text-[10px] font-medium text-slate-500 font-mono">
                           {channel.handle}
                         </p>
                       </div>
@@ -241,32 +285,32 @@ export default function SocialUpdatesPopup() {
           </div>
 
           {/* Dedicated Support Platform Dialogue Trigger Card */}
-          <div className="relative rounded-2xl bg-gradient-to-br from-[#0c2217] via-[#102d20] to-[#07150e] border-2 border-[#d4a359]/70 p-4 sm:p-5 text-white shadow-xl overflow-hidden">
+          <div className="relative rounded-2xl bg-gradient-to-br from-[#0c2217] via-[#102d20] to-[#07150e] border border-[#d4a359]/70 p-3 sm:p-5 text-white shadow-xl overflow-hidden">
             {/* Background Ambient Glow */}
             <div className="absolute top-0 right-0 w-44 h-44 bg-[#d4a359]/15 rounded-full blur-2xl pointer-events-none" />
 
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
-              <div className="space-y-1.5 max-w-md">
-                <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-extrabold bg-[#d4a359]/20 text-[#f5d996] border border-[#d4a359]/40">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2.5 sm:gap-4 relative z-10">
+              <div className="space-y-0.5 sm:space-y-1 max-w-md">
+                <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[9px] sm:text-[9.5px] font-extrabold bg-[#d4a359]/20 text-[#f5d996] border border-[#d4a359]/40">
                   <Heart className="w-3 h-3 text-rose-400 fill-rose-400" />
                   <span>Sadaqah Jariyah &bull; Platform Continuity</span>
                 </div>
-                <h4 className="font-serif font-black text-sm sm:text-base text-[#faf8f5]">
+                <h4 className="font-serif font-black text-xs sm:text-base text-[#faf8f5]">
                   Support IlmiDunya Platform
                 </h4>
-                <p className="text-[11px] text-[#c4d9ce] leading-relaxed">
-                  Help us maintain free listings, manual tutor document verification, and subsidize education for deserving students across Pakistan.
+                <p className="text-[10px] sm:text-[11px] text-[#c4d9ce] leading-relaxed">
+                  Help maintain free listings, manual tutor document verification, and subsidize education for deserving students across Pakistan.
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={handleOpenSupport}
-                className="shrink-0 w-full sm:w-auto px-4 py-2.5 rounded-xl bg-gradient-to-r from-[#d4a359] to-[#c29048] hover:from-[#c29048] hover:to-[#b07d37] text-[#0c2217] font-black text-xs shadow-md active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer border border-[#f5d996]/50"
+                className="shrink-0 w-full sm:w-auto px-3 py-2 sm:px-4 sm:py-2.5 rounded-xl bg-gradient-to-r from-[#d4a359] to-[#c29048] hover:from-[#c29048] hover:to-[#b07d37] text-[#0c2217] font-black text-xs shadow-md active:scale-95 transition-all flex items-center justify-center gap-1.5 cursor-pointer border border-[#f5d996]/50"
               >
-                <QrCode className="w-4 h-4 text-[#0c2217]" />
-                <span>Support Platform Dialogue</span>
-                <ArrowRight className="w-3.5 h-3.5 text-[#0c2217]" />
+                <QrCode className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#0c2217]" />
+                <span>Support Platform</span>
+                <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[#0c2217]" />
               </button>
             </div>
           </div>
@@ -274,16 +318,16 @@ export default function SocialUpdatesPopup() {
         </div>
 
         {/* Modal Footer Controls */}
-        <div className="p-3.5 sm:p-4 bg-[#faf8f5] border-t border-[#ebe3d3] flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-1.5 text-[11px] text-slate-500 font-medium">
+        <div className="p-2.5 sm:p-3.5 bg-[#faf8f5] border-t border-[#ebe3d3] flex items-center justify-between shrink-0">
+          <div className="flex items-center gap-1.5 text-[10px] sm:text-[11px] text-slate-500 font-medium">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Official IlmiDunya Verification &amp; Security</span>
+            <span>Official IlmiDunya Verification</span>
           </div>
 
           <button
             type="button"
             onClick={handleClose}
-            className="px-4 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-colors cursor-pointer"
+            className="px-3 py-1 sm:px-4 sm:py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-slate-900 hover:bg-slate-200/60 transition-colors cursor-pointer"
           >
             Maybe Later
           </button>
@@ -293,4 +337,3 @@ export default function SocialUpdatesPopup() {
     </div>
   );
 }
-

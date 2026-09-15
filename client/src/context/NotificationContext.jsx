@@ -82,7 +82,39 @@ export const NotificationProvider = ({ children }) => {
   useEffect(() => {
     if (!socket) return;
 
-    const handleNotification = (alertData) => {
+    // Tab title flasher reference
+    let titleFlashInterval = null;
+    const originalTitle = typeof document !== 'undefined' ? document.title : 'IlmiDunya';
+
+    const stopTitleFlash = () => {
+      if (titleFlashInterval) {
+        clearInterval(titleFlashInterval);
+        titleFlashInterval = null;
+      }
+      if (typeof document !== 'undefined') {
+        document.title = originalTitle;
+      }
+    };
+
+    const startTitleFlash = (alertTitle) => {
+      if (typeof document === 'undefined') return;
+      let toggle = true;
+      stopTitleFlash();
+      titleFlashInterval = setInterval(() => {
+        document.title = toggle ? `🔔 ${alertTitle}` : originalTitle;
+        toggle = !toggle;
+      }, 1200);
+      // Stop flashing when user returns to tab
+      const onVisible = () => {
+        if (document.visibilityState === 'visible') {
+          stopTitleFlash();
+          document.removeEventListener('visibilitychange', onVisible);
+        }
+      };
+      document.addEventListener('visibilitychange', onVisible);
+    };
+
+    const handleNotification = async (alertData) => {
       if (!alertData) return;
 
       // 1. In-memory deduplication (5-second window by messageId or hash)
@@ -123,12 +155,38 @@ export const NotificationProvider = ({ children }) => {
       setToastAlert(alertData);
       fetchNotifications();
 
-      // Play audio chime for in-app alert notice
+      // 3. Play audio chime
+      const isAdmin = user?.role === 'admin';
       const isMessageAlert = alertData.type === 'new_message';
-      if (isMessageAlert) {
-        soundEngine.playMessageSound();
-      } else {
-        soundEngine.playNotificationSound();
+      const tabVisible = typeof document !== 'undefined' && document.visibilityState === 'visible';
+
+      if (tabVisible) {
+        if (isAdmin) {
+          soundEngine.playAdminAlertSound();
+        } else if (isMessageAlert) {
+          soundEngine.playMessageSound();
+        } else {
+          soundEngine.playNotificationSound();
+        }
+      }
+
+      // 4. OS browser notification — fires even when tab is in background
+      const isBackground = typeof document !== 'undefined' && document.visibilityState === 'hidden';
+      if (isBackground || isAdmin) {
+        const { showNativeNotification } = await import('../utils/notificationManager');
+        showNativeNotification({
+          title: alertData.title || (isAdmin ? '🔔 IlmiDunya Admin Alert' : 'IlmiDunya Notification'),
+          body: alertData.message || 'You have a new notification.',
+          icon: '/icon.png',
+          url: alertData.link || '/',
+          tag: alertKey,
+          soundType: isAdmin ? 'admin' : (isMessageAlert ? 'message' : 'alert')
+        });
+      }
+
+      // 5. Flash tab title when tab is in background
+      if (isBackground) {
+        startTitleFlash(alertData.title || 'New Notification');
       }
 
       if (toastTimeoutRef.current) {
@@ -143,6 +201,7 @@ export const NotificationProvider = ({ children }) => {
 
     return () => {
       socket.off('notification-alert', handleNotification);
+      stopTitleFlash();
       if (toastTimeoutRef.current) {
         clearTimeout(toastTimeoutRef.current);
       }

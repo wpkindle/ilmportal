@@ -149,6 +149,45 @@ class SoundEngine {
       console.warn('Notification chime error:', err);
     }
   }
+  /**
+   * Urgent admin alert chime — louder descending tone (G5→E5→C5) for admin-specific events.
+   * Used when: new tutor signup, new report, new support request, etc.
+   */
+  playAdminAlertSound() {
+    if (!this.soundEnabled) return;
+    const nowMs = Date.now();
+    if (this.lastNotificationSoundTime && nowMs - this.lastNotificationSoundTime < 600) return;
+    this.lastNotificationSoundTime = nowMs;
+
+    try {
+      const ctx = this.getAudioContext();
+      if (!ctx) return;
+
+      const now = ctx.currentTime;
+
+      // Three descending bell tones: G5 → E5 → C5 with resonant triangle wave
+      const notes = [783.99, 659.25, 523.25];
+      notes.forEach((freq, idx) => {
+        const t = now + idx * 0.14;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(freq, t);
+
+        gain.gain.setValueAtTime(0, t);
+        gain.gain.linearRampToValueAtTime(0.38, t + 0.018); // louder than regular chimes
+        gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.45);
+
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(t);
+        osc.stop(t + 0.5);
+      });
+    } catch (err) {
+      console.warn('Admin alert chime error:', err);
+    }
+  }
 }
 
 export const soundEngine = new SoundEngine();

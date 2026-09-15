@@ -29,8 +29,8 @@ export function getNotificationPermission() {
 }
 
 /**
- * In-App audio and haptic alert runner.
- * Note: Default browser OS notifications are disabled in favor of our custom styled in-app notification notice (InAppNotificationToast).
+ * Show an OS-level browser notification banner (visible even when on another tab).
+ * Also plays audio and vibrates if tab is in focus.
  */
 export async function showNativeNotification({
   title,
@@ -38,15 +38,17 @@ export async function showNativeNotification({
   icon = '/icon.svg',
   url = '/',
   tag = 'ilmidunya-notification',
-  soundType = 'message' // 'message' | 'alert' | 'none'
+  soundType = 'message' // 'message' | 'alert' | 'admin' | 'none'
 }) {
   if (typeof window === 'undefined') return null;
 
-  // 1. Play audible sound chime (just like WhatsApp / Messenger)
-  if (soundType === 'message') {
-    soundEngine.playMessageSound();
-  } else if (soundType === 'alert') {
-    soundEngine.playNotificationSound();
+  // 1. Play audible sound chime when tab is focused
+  if (document.visibilityState === 'visible') {
+    if (soundType === 'message') {
+      soundEngine.playMessageSound();
+    } else if (soundType === 'alert' || soundType === 'admin') {
+      soundEngine.playNotificationSound();
+    }
   }
 
   // 2. Trigger mobile hardware vibration if supported (Haptic feedback)
@@ -56,6 +58,33 @@ export async function showNativeNotification({
     } catch (e) {}
   }
 
-  // Default browser notifications are suppressed so users exclusively see our own custom in-app notification notice
-  return null;
+  // 3. Fire native OS browser notification (works even when tab is in background)
+  if (!('Notification' in window)) return null;
+  if (Notification.permission !== 'granted') return null;
+
+  try {
+    const notif = new Notification(title, {
+      body,
+      icon,
+      tag,
+      requireInteraction: false,
+      silent: false
+    });
+
+    notif.onclick = () => {
+      window.focus();
+      if (url && url !== '#') {
+        window.dispatchEvent(new CustomEvent('ilmportal:navigate', { detail: { url } }));
+      }
+      notif.close();
+    };
+
+    // Auto-close after 8 seconds
+    setTimeout(() => notif.close(), 8000);
+
+    return notif;
+  } catch (err) {
+    console.warn('OS notification error:', err);
+    return null;
+  }
 }

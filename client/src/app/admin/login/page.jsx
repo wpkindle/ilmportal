@@ -1,16 +1,17 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, Lock, Mail, ArrowRight, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
-import ReCaptcha from '../../../components/common/ReCaptcha';
+import { useRecaptchaV3 } from '../../../components/common/ReCaptcha';
 
 export default function AdminLoginPage() {
   const { user, login } = useAuth();
   const router = useRouter();
+  const { executeRecaptcha } = useRecaptchaV3();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -18,8 +19,6 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [captchaToken, setCaptchaToken] = useState('');
-  const recaptchaRef = useRef(null);
 
   // If already logged in as admin, redirect to /admin
   useEffect(() => {
@@ -29,14 +28,11 @@ export default function AdminLoginPage() {
   }, [user, router]);
 
   const performLogin = async (loginEmail, loginPass) => {
-    if (!captchaToken) {
-      setError('Please complete the security check ("I am not a robot") below.');
-      return;
-    }
-
     setLoading(true);
     setError('');
     setSuccess('');
+
+    const captchaToken = await executeRecaptcha('admin_login');
 
     try {
       // First attempt via AuthContext
@@ -47,8 +43,6 @@ export default function AdminLoginPage() {
           window.location.href = '/admin';
         }, 300);
       } else {
-        recaptchaRef.current?.reset();
-        setCaptchaToken('');
         setError('Access Denied: This account does not possess administrative privileges.');
         setLoading(false);
       }
@@ -64,13 +58,9 @@ export default function AdminLoginPage() {
           }, 300);
           return;
         } else {
-          recaptchaRef.current?.reset();
-          setCaptchaToken('');
           setError(directRes.message || 'Invalid administrator credentials');
         }
       } catch (directErr) {
-        recaptchaRef.current?.reset();
-        setCaptchaToken('');
         const errorMsg = directErr.data?.message || directErr.message || err.data?.message || err.message;
         if (errorMsg && errorMsg.includes('fetch failed')) {
           setError('Server connection initializing. Please try again in 2 seconds.');
@@ -179,13 +169,6 @@ export default function AdminLoginPage() {
                 </button>
               </div>
             </div>
-
-            {/* Security Verification */}
-            <ReCaptcha
-              ref={recaptchaRef}
-              onChange={setCaptchaToken}
-              theme="dark"
-            />
 
             <button
               type="submit"

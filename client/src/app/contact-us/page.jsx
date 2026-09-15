@@ -1,9 +1,9 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '../../services/api';
-import ReCaptcha from '../../components/common/ReCaptcha';
+import { useRecaptchaV3 } from '../../components/common/ReCaptcha';
 import {
   Mail,
   Send,
@@ -22,6 +22,7 @@ import {
 export default function ContactUsPage() {
   const [page, setPage] = useState(null);
   const [loading, setLoading] = useState(true);
+  const { executeRecaptcha } = useRecaptchaV3();
 
   // Form State
   const [name, setName] = useState('');
@@ -32,8 +33,6 @@ export default function ContactUsPage() {
   const [formSuccess, setFormSuccess] = useState('');
   const [formError, setFormError] = useState('');
   const [copiedEmail, setCopiedEmail] = useState(false);
-  const [captchaToken, setCaptchaToken] = useState('');
-  const recaptchaRef = useRef(null);
 
   useEffect(() => {
     const fetchPage = async () => {
@@ -61,16 +60,12 @@ export default function ContactUsPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!captchaToken) {
-      setFormError('Please complete the security check ("I am not a robot") below.');
-      return;
-    }
-
     setSubmitting(true);
     setFormSuccess('');
     setFormError('');
 
     try {
+      const captchaToken = await executeRecaptcha('contact');
       const res = await api.submitContactMessage({
         name,
         email,
@@ -85,16 +80,10 @@ export default function ContactUsPage() {
         setEmail('');
         setSubject('');
         setMessage('');
-        recaptchaRef.current?.reset();
-        setCaptchaToken('');
       } else {
-        recaptchaRef.current?.reset();
-        setCaptchaToken('');
         setFormError(res.message || 'Error sending message. Please try again.');
       }
     } catch (err) {
-      recaptchaRef.current?.reset();
-      setCaptchaToken('');
       setFormError(err.message || 'Error sending message. Please try again or email us directly at info@ilmidunya.com.');
     } finally {
       setSubmitting(false);
@@ -371,11 +360,6 @@ export default function ContactUsPage() {
                   />
                 </div>
 
-                {/* Security Verification */}
-                <ReCaptcha
-                  ref={recaptchaRef}
-                  onChange={setCaptchaToken}
-                />
 
                 <button
                   type="submit"

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -28,7 +28,7 @@ import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { allPakistaniCities } from '../../data/pakistanAreas';
 import { getTutorAvatar } from '../../utils/tutorHelpers';
-import ReCaptcha from './ReCaptcha';
+import { useRecaptchaV3 } from './ReCaptcha';
 
 const pakistaniCities = allPakistaniCities;
 
@@ -57,11 +57,7 @@ export default function StudentAuthModal({
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
 
-  // Captcha States
-  const [loginCaptchaToken, setLoginCaptchaToken] = useState('');
-  const loginCaptchaRef = useRef(null);
-  const [registerCaptchaToken, setRegisterCaptchaToken] = useState('');
-  const registerCaptchaRef = useRef(null);
+  const { executeRecaptcha } = useRecaptchaV3();
 
   // Login Form
   const [loginForm, setLoginForm] = useState({
@@ -120,22 +116,17 @@ export default function StudentAuthModal({
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    if (!loginCaptchaToken) {
-      setError('Please complete the security check ("I am not a robot") below.');
-      return;
-    }
 
     setLoading(true);
     setError('');
     setInfoMessage('');
     try {
+      const loginCaptchaToken = await executeRecaptcha('login');
       const res = await login(loginForm.email.trim(), loginForm.password, loginCaptchaToken);
       if (res && res.user) {
         await handleDispatchInvitation(res.user);
       }
     } catch (err) {
-      loginCaptchaRef.current?.reset();
-      setLoginCaptchaToken('');
       if (err.isUnverified || err.message?.toLowerCase().includes('verify')) {
         setOtpEmail(loginForm.email.trim());
         setMode('verify_otp');
@@ -156,16 +147,12 @@ export default function StudentAuthModal({
       return;
     }
 
-    if (!registerCaptchaToken) {
-      setError('Please complete the security check ("I am not a robot") below.');
-      return;
-    }
-
     setLoading(true);
     setError('');
     setInfoMessage('');
 
     try {
+      const registerCaptchaToken = await executeRecaptcha('register');
       const res = await api.register({
         name: registerForm.name.trim(),
         email: registerForm.email.trim().toLowerCase(),
@@ -180,8 +167,6 @@ export default function StudentAuthModal({
         setInfoMessage('Verification code sent to your email.');
       }
     } catch (err) {
-      registerCaptchaRef.current?.reset();
-      setRegisterCaptchaToken('');
       setError(err.message || 'Registration failed. Please verify your details.');
     } finally {
       setLoading(false);
@@ -439,11 +424,6 @@ export default function StudentAuthModal({
                 </div>
               </div>
 
-              {/* Security Check */}
-              <ReCaptcha
-                ref={loginCaptchaRef}
-                onChange={setLoginCaptchaToken}
-              />
 
               <button
                 type="submit"
@@ -545,11 +525,6 @@ export default function StudentAuthModal({
                 {' '}Protected under PECA 2016.
               </p>
 
-              {/* Security Check */}
-              <ReCaptcha
-                ref={registerCaptchaRef}
-                onChange={setRegisterCaptchaToken}
-              />
 
               <button
                 type="submit"

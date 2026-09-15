@@ -20,7 +20,7 @@ import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import BrandLogo from '../../components/common/BrandLogo';
-import ReCaptcha from '../../components/common/ReCaptcha';
+import { useRecaptchaV3 } from '../../components/common/ReCaptcha';
 
 function LoginContent() {
   const { user, login, loading: authLoading } = useAuth();
@@ -51,20 +51,18 @@ function LoginContent() {
     }
   }, [user, authLoading, redirect, router]);
 
+  const { executeRecaptcha } = useRecaptchaV3();
+
   // Sign In Form States
   const [signInEmail, setSignInEmail] = useState('');
   const [signInPassword, setSignInPassword] = useState('');
   const [showSignInPassword, setShowSignInPassword] = useState(false);
-  const [signInCaptchaToken, setSignInCaptchaToken] = useState('');
-  const signInCaptchaRef = useRef(null);
 
   // Sign Up Form States
   const [signUpName, setSignUpName] = useState('');
   const [signUpEmail, setSignUpEmail] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
   const [showSignUpPassword, setShowSignUpPassword] = useState(false);
-  const [signUpCaptchaToken, setSignUpCaptchaToken] = useState('');
-  const signUpCaptchaRef = useRef(null);
 
   // Keep state in sync with URL params if they change
   useEffect(() => {
@@ -87,16 +85,12 @@ function LoginContent() {
   const handleSignIn = async (e) => {
     e.preventDefault();
 
-    if (!signInCaptchaToken) {
-      setError('Please complete the security check ("I am not a robot") below.');
-      return;
-    }
-
     setLoading(true);
     setError('');
     setSuccessMessage('');
 
     try {
+      const signInCaptchaToken = await executeRecaptcha('login');
       const data = await login(signInEmail.trim(), signInPassword, signInCaptchaToken);
       const target = redirect && redirect !== '/' ? redirect : null;
       if (data?.user?.role === 'admin') {
@@ -108,8 +102,6 @@ function LoginContent() {
       }
     } catch (err) {
       console.error('Login error:', err);
-      signInCaptchaRef.current?.reset();
-      setSignInCaptchaToken('');
       if (err.isUnverified || err.message?.toLowerCase().includes('verify')) {
         router.push(
           `/verify-email?email=${encodeURIComponent(signInEmail.trim())}&role=${isTutorMode ? 'tutor' : 'student'}`
@@ -139,16 +131,13 @@ function LoginContent() {
       setError('Password must be at least 6 characters long');
       return;
     }
-    if (!signUpCaptchaToken) {
-      setError('Please complete the security check ("I am not a robot") below.');
-      return;
-    }
 
     setLoading(true);
     setError('');
     setSuccessMessage('');
 
     try {
+      const signUpCaptchaToken = await executeRecaptcha('register');
       const payload = {
         name: signUpName.trim(),
         email: signUpEmail.trim().toLowerCase(),
@@ -185,8 +174,6 @@ function LoginContent() {
       }
     } catch (err) {
       console.error('Registration error:', err);
-      signUpCaptchaRef.current?.reset();
-      setSignUpCaptchaToken('');
       setError(err.message || 'Registration failed. Please check your details and try again.');
     } finally {
       setLoading(false);
@@ -403,11 +390,6 @@ function LoginContent() {
                 </div>
               </div>
 
-              {/* Security Verification */}
-              <ReCaptcha
-                ref={signInCaptchaRef}
-                onChange={setSignInCaptchaToken}
-              />
 
               <button
                 type="submit"
@@ -507,11 +489,6 @@ function LoginContent() {
                 Your personal details are confidential and securely encrypted. We never sell, rent, or share your data with any third party.
               </div>
 
-              {/* Security Verification */}
-              <ReCaptcha
-                ref={signUpCaptchaRef}
-                onChange={setSignUpCaptchaToken}
-              />
 
               {/* Submit Sign Up Button */}
               <button

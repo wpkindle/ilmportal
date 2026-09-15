@@ -28,5 +28,5 @@ services:
       - key: MONGODB_URI
         sync: false
       - key: RECAPTCHA_SECRET_KEY
-        value: 6LduWLwtAAAAAHvnIDMjYeTlkqmWGuDYKsFTLXMo
+        value: 6LeB9rwtAAAAAIwngdI_jyWfo4-jUOo4gO67ES7i
 

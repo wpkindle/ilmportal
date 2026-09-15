@@ -1,30 +1,42 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import Link from 'next/link';
 import { Mail, ArrowRight, CheckCircle2, ArrowLeft, ShieldCheck, RefreshCw } from 'lucide-react';
 import { api } from '../../services/api';
+import ReCaptcha from '../../components/common/ReCaptcha';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
+  const recaptchaRef = useRef(null);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!email.trim()) return;
 
+    if (!captchaToken) {
+      setError('Please complete the security check ("I am not a robot") below.');
+      return;
+    }
+
     setLoading(true);
     setError('');
     try {
-      const res = await api.forgotPassword({ email: email.trim() });
+      const res = await api.forgotPassword({ email: email.trim(), captchaToken });
       if (res.success) {
         setSent(true);
       } else {
+        recaptchaRef.current?.reset();
+        setCaptchaToken('');
         setError(res.message || 'Unable to process request.');
       }
     } catch (err) {
+      recaptchaRef.current?.reset();
+      setCaptchaToken('');
       setError(err.message || 'No account found with this email address or server error.');
     } finally {
       setLoading(false);
@@ -72,6 +84,12 @@ export default function ForgotPasswordPage() {
                 />
               </div>
             </div>
+
+            {/* Security Verification */}
+            <ReCaptcha
+              ref={recaptchaRef}
+              onChange={setCaptchaToken}
+            />
 
             <button
               type="submit"

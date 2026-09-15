@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -28,6 +28,7 @@ import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { allPakistaniCities } from '../../data/pakistanAreas';
 import { getTutorAvatar } from '../../utils/tutorHelpers';
+import ReCaptcha from './ReCaptcha';
 
 const pakistaniCities = allPakistaniCities;
 
@@ -55,6 +56,12 @@ export default function StudentAuthModal({
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
+
+  // Captcha States
+  const [loginCaptchaToken, setLoginCaptchaToken] = useState('');
+  const loginCaptchaRef = useRef(null);
+  const [registerCaptchaToken, setRegisterCaptchaToken] = useState('');
+  const registerCaptchaRef = useRef(null);
 
   // Login Form
   const [loginForm, setLoginForm] = useState({
@@ -113,8 +120,8 @@ export default function StudentAuthModal({
 
   const handleLoginSubmit = async (e) => {
     e.preventDefault();
-    if (!captchaVerified) {
-      setError('Please enter the security verification code.');
+    if (!loginCaptchaToken) {
+      setError('Please complete the security check ("I am not a robot") below.');
       return;
     }
 
@@ -122,11 +129,13 @@ export default function StudentAuthModal({
     setError('');
     setInfoMessage('');
     try {
-      const res = await login(loginForm.email.trim(), loginForm.password);
+      const res = await login(loginForm.email.trim(), loginForm.password, loginCaptchaToken);
       if (res && res.user) {
         await handleDispatchInvitation(res.user);
       }
     } catch (err) {
+      loginCaptchaRef.current?.reset();
+      setLoginCaptchaToken('');
       if (err.isUnverified || err.message?.toLowerCase().includes('verify')) {
         setOtpEmail(loginForm.email.trim());
         setMode('verify_otp');
@@ -141,8 +150,14 @@ export default function StudentAuthModal({
 
   const handleRegisterSubmit = async (e) => {
     e.preventDefault();
-    if (!captchaVerified) {
-      setError('Please enter the security verification code.');
+
+    if (!registerForm.name.trim()) {
+      setError('Full name is required');
+      return;
+    }
+
+    if (!registerCaptchaToken) {
+      setError('Please complete the security check ("I am not a robot") below.');
       return;
     }
 
@@ -150,18 +165,13 @@ export default function StudentAuthModal({
     setError('');
     setInfoMessage('');
 
-    if (!registerForm.name.trim()) {
-      setError('Full name is required');
-      setLoading(false);
-      return;
-    }
-
     try {
       const res = await api.register({
         name: registerForm.name.trim(),
         email: registerForm.email.trim().toLowerCase(),
         password: registerForm.password,
-        role: 'student'
+        role: 'student',
+        captchaToken: registerCaptchaToken
       });
 
       if (res.success) {
@@ -170,6 +180,8 @@ export default function StudentAuthModal({
         setInfoMessage('Verification code sent to your email.');
       }
     } catch (err) {
+      registerCaptchaRef.current?.reset();
+      setRegisterCaptchaToken('');
       setError(err.message || 'Registration failed. Please verify your details.');
     } finally {
       setLoading(false);
@@ -427,6 +439,12 @@ export default function StudentAuthModal({
                 </div>
               </div>
 
+              {/* Security Check */}
+              <ReCaptcha
+                ref={loginCaptchaRef}
+                onChange={setLoginCaptchaToken}
+              />
+
               <button
                 type="submit"
                 disabled={loading}
@@ -526,6 +544,12 @@ export default function StudentAuthModal({
                 <Link href="/privacy-policy" target="_blank" className="text-[#0c2217] underline font-bold">Privacy Policy</Link>.
                 {' '}Protected under PECA 2016.
               </p>
+
+              {/* Security Check */}
+              <ReCaptcha
+                ref={registerCaptchaRef}
+                onChange={setRegisterCaptchaToken}
+              />
 
               <button
                 type="submit"

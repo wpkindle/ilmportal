@@ -1,8 +1,9 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { api } from '../../services/api';
+import ReCaptcha from '../../components/common/ReCaptcha';
 import {
   Mail,
   Send,
@@ -31,6 +32,8 @@ export default function ContactUsPage() {
   const [formSuccess, setFormSuccess] = useState('');
   const [formError, setFormError] = useState('');
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState('');
+  const recaptchaRef = useRef(null);
 
   useEffect(() => {
     const fetchPage = async () => {
@@ -57,6 +60,12 @@ export default function ContactUsPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+
+    if (!captchaToken) {
+      setFormError('Please complete the security check ("I am not a robot") below.');
+      return;
+    }
+
     setSubmitting(true);
     setFormSuccess('');
     setFormError('');
@@ -67,7 +76,8 @@ export default function ContactUsPage() {
         email,
         phone: '',
         subject: subject || 'General Inquiry',
-        message
+        message,
+        captchaToken
       });
       if (res.success) {
         setFormSuccess(res.message || 'Thank you! Your message has been sent successfully. We will respond to your email promptly.');
@@ -75,8 +85,16 @@ export default function ContactUsPage() {
         setEmail('');
         setSubject('');
         setMessage('');
+        recaptchaRef.current?.reset();
+        setCaptchaToken('');
+      } else {
+        recaptchaRef.current?.reset();
+        setCaptchaToken('');
+        setFormError(res.message || 'Error sending message. Please try again.');
       }
     } catch (err) {
+      recaptchaRef.current?.reset();
+      setCaptchaToken('');
       setFormError(err.message || 'Error sending message. Please try again or email us directly at info@ilmidunya.com.');
     } finally {
       setSubmitting(false);
@@ -352,6 +370,12 @@ export default function ContactUsPage() {
                     }
                   />
                 </div>
+
+                {/* Security Verification */}
+                <ReCaptcha
+                  ref={recaptchaRef}
+                  onChange={setCaptchaToken}
+                />
 
                 <button
                   type="submit"

@@ -18,15 +18,16 @@ const {
   deleteMyAccount
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
+const { requireRecaptcha } = require('../middleware/recaptchaMiddleware');
 
-router.post('/register', register);
-router.post('/early-tutor', registerEarlyTutor);
-router.post('/early-tutor-register', registerEarlyTutor);
+router.post('/register', requireRecaptcha, register);
+router.post('/early-tutor', requireRecaptcha, registerEarlyTutor);
+router.post('/early-tutor-register', requireRecaptcha, registerEarlyTutor);
 router.post('/verify-otp', verifyOtp);
 router.post('/verify-token', verifyToken);
 router.get('/verify-token', verifyToken);
 router.post('/resend-otp', resendOtp);
-router.post('/login', login);
+router.post('/login', requireRecaptcha, login);
 router.get('/test-email', testEmail);
 router.get('/me', protect, getMe);
 router.put('/update-profile', protect, updateProfile);
@@ -35,7 +36,7 @@ router.post('/request-email-change', protect, requestEmailChange);
 router.post('/verify-email-change', protect, verifyEmailChange);
 router.delete('/delete-account', protect, deleteMyAccount);
 router.post('/delete-account', protect, deleteMyAccount);
-router.post('/forgot-password', forgotPassword);
+router.post('/forgot-password', requireRecaptcha, forgotPassword);
 router.post('/reset-password', resetPassword);
 
 module.exports = router;

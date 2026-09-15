@@ -20,6 +20,7 @@ import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import BrandLogo from '../../components/common/BrandLogo';
+import ReCaptcha from '../../components/common/ReCaptcha';
 
 function LoginContent() {
   const { user, login, loading: authLoading } = useAuth();
@@ -54,12 +55,16 @@ function LoginContent() {
   const [signInEmail, setSignInEmail] = useState('');
   const [signInPassword, setSignInPassword] = useState('');
   const [showSignInPassword, setShowSignInPassword] = useState(false);
+  const [signInCaptchaToken, setSignInCaptchaToken] = useState('');
+  const signInCaptchaRef = useRef(null);
 
   // Sign Up Form States
   const [signUpName, setSignUpName] = useState('');
   const [signUpEmail, setSignUpEmail] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
   const [showSignUpPassword, setShowSignUpPassword] = useState(false);
+  const [signUpCaptchaToken, setSignUpCaptchaToken] = useState('');
+  const signUpCaptchaRef = useRef(null);
 
   // Keep state in sync with URL params if they change
   useEffect(() => {
@@ -81,12 +86,18 @@ function LoginContent() {
   // Handle Sign In
   const handleSignIn = async (e) => {
     e.preventDefault();
+
+    if (!signInCaptchaToken) {
+      setError('Please complete the security check ("I am not a robot") below.');
+      return;
+    }
+
     setLoading(true);
     setError('');
     setSuccessMessage('');
 
     try {
-      const data = await login(signInEmail.trim(), signInPassword);
+      const data = await login(signInEmail.trim(), signInPassword, signInCaptchaToken);
       const target = redirect && redirect !== '/' ? redirect : null;
       if (data?.user?.role === 'admin') {
         router.push(target || '/admin');
@@ -97,6 +108,8 @@ function LoginContent() {
       }
     } catch (err) {
       console.error('Login error:', err);
+      signInCaptchaRef.current?.reset();
+      setSignInCaptchaToken('');
       if (err.isUnverified || err.message?.toLowerCase().includes('verify')) {
         router.push(
           `/verify-email?email=${encodeURIComponent(signInEmail.trim())}&role=${isTutorMode ? 'tutor' : 'student'}`
@@ -112,33 +125,36 @@ function LoginContent() {
   // Handle Sign Up
   const handleSignUp = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    setError('');
-    setSuccessMessage('');
 
     // Validations
     if (!signUpName.trim()) {
       setError('Please enter your full name');
-      setLoading(false);
       return;
     }
     if (!signUpEmail.trim()) {
       setError('Please enter your email address');
-      setLoading(false);
       return;
     }
     if (!signUpPassword || signUpPassword.length < 6) {
       setError('Password must be at least 6 characters long');
-      setLoading(false);
       return;
     }
+    if (!signUpCaptchaToken) {
+      setError('Please complete the security check ("I am not a robot") below.');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
+    setSuccessMessage('');
 
     try {
       const payload = {
         name: signUpName.trim(),
         email: signUpEmail.trim().toLowerCase(),
         password: signUpPassword,
-        role: isTutorMode ? 'tutor' : 'student'
+        role: isTutorMode ? 'tutor' : 'student',
+        captchaToken: signUpCaptchaToken
       };
 
       const res = await api.register(payload);
@@ -169,6 +185,8 @@ function LoginContent() {
       }
     } catch (err) {
       console.error('Registration error:', err);
+      signUpCaptchaRef.current?.reset();
+      setSignUpCaptchaToken('');
       setError(err.message || 'Registration failed. Please check your details and try again.');
     } finally {
       setLoading(false);
@@ -385,6 +403,12 @@ function LoginContent() {
                 </div>
               </div>
 
+              {/* Security Verification */}
+              <ReCaptcha
+                ref={signInCaptchaRef}
+                onChange={setSignInCaptchaToken}
+              />
+
               <button
                 type="submit"
                 disabled={loading}
@@ -482,6 +506,12 @@ function LoginContent() {
                 </p>
                 Your personal details are confidential and securely encrypted. We never sell, rent, or share your data with any third party.
               </div>
+
+              {/* Security Verification */}
+              <ReCaptcha
+                ref={signUpCaptchaRef}
+                onChange={setSignUpCaptchaToken}
+              />
 
               {/* Submit Sign Up Button */}
               <button

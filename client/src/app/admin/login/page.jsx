@@ -1,11 +1,12 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, Lock, Mail, ArrowRight, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
+import ReCaptcha from '../../../components/common/ReCaptcha';
 
 export default function AdminLoginPage() {
   const { user, login } = useAuth();
@@ -17,6 +18,8 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [captchaToken, setCaptchaToken] = useState('');
+  const recaptchaRef = useRef(null);
 
   // If already logged in as admin, redirect to /admin
   useEffect(() => {
@@ -26,26 +29,33 @@ export default function AdminLoginPage() {
   }, [user, router]);
 
   const performLogin = async (loginEmail, loginPass) => {
+    if (!captchaToken) {
+      setError('Please complete the security check ("I am not a robot") below.');
+      return;
+    }
+
     setLoading(true);
     setError('');
     setSuccess('');
 
     try {
       // First attempt via AuthContext
-      const data = await login(loginEmail.trim(), loginPass);
+      const data = await login(loginEmail.trim(), loginPass, captchaToken);
       if (data && data.user && data.user.role === 'admin') {
         setSuccess('Authentication successful! Loading Control Center...');
         setTimeout(() => {
           window.location.href = '/admin';
         }, 300);
       } else {
+        recaptchaRef.current?.reset();
+        setCaptchaToken('');
         setError('Access Denied: This account does not possess administrative privileges.');
         setLoading(false);
       }
     } catch (err) {
       // Direct API fallback attempt
       try {
-        const directRes = await api.login({ email: loginEmail.trim(), password: loginPass });
+        const directRes = await api.login({ email: loginEmail.trim(), password: loginPass, captchaToken });
         if (directRes.success && directRes.user?.role === 'admin') {
           localStorage.setItem('ilm_token', directRes.token);
           setSuccess('Authentication successful! Loading Control Center...');
@@ -54,9 +64,13 @@ export default function AdminLoginPage() {
           }, 300);
           return;
         } else {
+          recaptchaRef.current?.reset();
+          setCaptchaToken('');
           setError(directRes.message || 'Invalid administrator credentials');
         }
       } catch (directErr) {
+        recaptchaRef.current?.reset();
+        setCaptchaToken('');
         const errorMsg = directErr.data?.message || directErr.message || err.data?.message || err.message;
         if (errorMsg && errorMsg.includes('fetch failed')) {
           setError('Server connection initializing. Please try again in 2 seconds.');
@@ -165,6 +179,13 @@ export default function AdminLoginPage() {
                 </button>
               </div>
             </div>
+
+            {/* Security Verification */}
+            <ReCaptcha
+              ref={recaptchaRef}
+              onChange={setCaptchaToken}
+              theme="dark"
+            />
 
             <button
               type="submit"

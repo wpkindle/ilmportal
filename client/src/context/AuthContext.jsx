@@ -121,8 +121,8 @@ export const AuthProvider = ({ children }) => {
     fetchCurrentUser();
   }, [token]);
 
-  const login = async (email, password) => {
-    const data = await api.login({ email, password });
+  const login = async (email, password, captchaToken) => {
+    const data = await api.login({ email, password, captchaToken });
     if (data.success && data.token) {
       localStorage.setItem('ilm_token', data.token);
       localStorage.setItem('ilm_user', JSON.stringify(data.user));

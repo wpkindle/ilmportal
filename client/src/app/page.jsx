@@ -183,26 +183,42 @@ const homeStructuredData = {
 
 export const revalidate = 60; // SSR with ISR caching every 60s
 
+// 5-second timeout: if Render backend is sleeping, return empty data immediately
+// instead of hanging the Vercel build worker for 60s
+const SSR_FETCH_TIMEOUT_MS = 5000;
+
 async function getFeaturedTutors() {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), SSR_FETCH_TIMEOUT_MS);
   try {
-    const res = await api.getPublicTutors({ limit: 6, sortBy: 'rating' });
+    const res = await api.getPublicTutors({ limit: 6, sortBy: 'rating' }, { signal: controller.signal });
     if (res && res.success && Array.isArray(res.tutors)) {
       return res.tutors;
     }
   } catch (err) {
-    console.error('SSR fetch error for featured tutors:', err);
+    if (err?.name !== 'AbortError') {
+      console.error('SSR fetch error for featured tutors:', err.message);
+    }
+  } finally {
+    clearTimeout(timer);
   }
   return [];
 }
 
 async function getLatestArticles() {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), SSR_FETCH_TIMEOUT_MS);
   try {
-    const res = await api.getArticles({ limit: 3 });
+    const res = await api.getArticles({ limit: 3 }, { signal: controller.signal });
     if (res && res.success) {
       return res.articles || [];
     }
   } catch (err) {
-    console.error('SSR fetch error for latest articles:', err);
+    if (err?.name !== 'AbortError') {
+      console.error('SSR fetch error for latest articles:', err.message);
+    }
+  } finally {
+    clearTimeout(timer);
   }
   return [];
 }

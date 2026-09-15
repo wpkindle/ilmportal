@@ -293,9 +293,9 @@ export const api = {
 
 
   // Tutors
-  getPublicTutors: (params = {}) => {
+  getPublicTutors: (params = {}, { signal } = {}) => {
     const query = new URLSearchParams(params).toString();
-    return fetch(`${API_BASE}/tutors?${query}`).then(handleResponse);
+    return fetch(`${API_BASE}/tutors?${query}`, { signal }).then(handleResponse);
   },
   getTutors: (params = {}) => {
     const query = new URLSearchParams(params).toString();
@@ -989,10 +989,11 @@ export const api = {
   }).then(handleResponse),
 
   // Articles & Editorial
-  getArticles: (params = {}) => {
+  getArticles: (params = {}, { signal } = {}) => {
     const query = new URLSearchParams(params).toString();
     return fetch(`${API_BASE}/articles${query ? `?${query}` : ''}`, {
-      headers: getHeaders()
+      headers: getHeaders(),
+      signal
     }).then(handleResponse);
   },
 

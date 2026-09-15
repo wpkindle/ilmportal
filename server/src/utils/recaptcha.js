@@ -49,11 +49,24 @@ const verifyRecaptcha = async (token, remoteIp) => {
     const data = await response.json();
 
     if (!data.success) {
-      console.warn('[reCAPTCHA v3] Rejected by Google:', data['error-codes'] || data);
+      const codes = data['error-codes'] || [];
+      console.warn('[reCAPTCHA v3] Google rejected token:', codes);
+
+      // Fail open for invalid-keys / misconfiguration errors so users are never
+      // blocked by a misconfigured key. Only hard-block on known bot signals.
+      const hardBlockCodes = ['invalid-input-response', 'timeout-or-duplicate'];
+      const isHardBlock = codes.some(c => hardBlockCodes.includes(c));
+
+      if (!isHardBlock) {
+        // Config error (bad secret key, hostname mismatch, etc) — let request through
+        console.warn('[reCAPTCHA v3] Failing open due to config/key error:', codes);
+        return { success: true, bypassed: true };
+      }
+
       return {
         success: false,
         message: 'Security verification failed. Please refresh the page and try again.',
-        errors: data['error-codes']
+        errors: codes
       };
     }
 

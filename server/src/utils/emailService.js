@@ -687,6 +687,148 @@ const sendTutorStatusEmail = async (to, name, status, reason = '') => {
       html,
       text: `Assalam-o-Alaikum ${name}! Mubarak! Your tutor profile and Sanad credentials have been approved on IlmiDunya Pakistan. Access your tutor dashboard at: ${dashboardUrl}`
     });
+  } else if (status === 'paused') {
+    const subject = `⏸️ Important: Your Tutor Profile has been Temporarily Paused by Administration`;
+    const dashboardUrl = `${clientUrl}/tutor/dashboard`;
+    const profileUrl = `${clientUrl}/tutor/profile`;
+
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tutor Profile Paused - IlmiDunya</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #faf8f5; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #faf8f5; padding: 30px 10px;">
+          <tr>
+            <td align="center">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 580px; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(12, 34, 23, 0.07); border: 1px solid #e6ded1;">
+                <tr>
+                  <td align="center" style="padding: 32px 30px 24px 30px; background-color: #0c2217; border-bottom: 3px solid #d4a359; color: #ffffff;">
+                    <a href="${clientUrl}" target="_blank" style="text-decoration: none;">
+                      <img src="${logoUrl}" alt="IlmiDunya Pakistan" width="160" style="display: block; margin: 0 auto; border: 0;" />
+                    </a>
+                    <div style="margin-top: 14px;">
+                      <span style="display: inline-block; padding: 4px 14px; background-color: rgba(212, 163, 89, 0.2); color: #f5d6cf; border: 1px solid rgba(212, 163, 89, 0.5); border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px;">
+                        Profile Notice from Administration
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 32px 30px 24px 30px;">
+                    <h2 style="margin: 0 0 14px 0; font-size: 18px; font-weight: 900; color: #0c2217;">
+                      Assalam-o-Alaikum, ${name},
+                    </h2>
+                    <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.6; color: #44403c;">
+                      This is an administrative notification to inform you that your live tutor teaching profile has been <strong>temporarily paused</strong> by the IlmiDunya administration.
+                    </p>
+                    <div style="margin: 18px 0; padding: 18px 20px; background-color: #fffbeb; border-left: 4px solid #f59e0b; border-radius: 10px;">
+                      <p style="margin: 0 0 6px 0; font-size: 12px; font-weight: 800; color: #92400e; text-transform: uppercase;">
+                        Reason for Pausing Profile:
+                      </p>
+                      <p style="margin: 0; font-size: 14px; font-weight: 600; color: #78350f; line-height: 1.6;">
+                        "${reason || 'Administrative review required. Please review your dashboard for instructions.'}"
+                      </p>
+                    </div>
+                    <p style="margin: 0 0 16px 0; font-size: 13px; line-height: 1.6; color: #57534e;">
+                      While paused, your profile is temporarily hidden from the public tutors directory. Any existing students and active deals can still reach you in your student messages.
+                    </p>
+                    <div style="text-align: center; margin: 26px 0 16px 0;">
+                      <a href="${dashboardUrl}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: #0c2217; color: #ffffff !important; font-size: 14px; font-weight: 800; text-decoration: none; border-radius: 12px; border: 1px solid #d4a359;">
+                        View Notice on Tutor Dashboard →
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 20px 24px; background-color: #f5f0e6; border-top: 1px solid #e6ded1; text-align: center;">
+                    <p style="margin: 0; font-size: 11px; color: #78716c;">
+                      Need assistance? Contact our Instructor Desk at info@ilmidunya.com
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+
+    return sendEmail({
+      to,
+      subject,
+      html,
+      text: `Assalam-o-Alaikum ${name}. Your IlmiDunya tutor profile has been temporarily paused by administration. Reason: ${reason}. View your dashboard at: ${dashboardUrl}`
+    });
+  } else if (status === 'resumed') {
+    const subject = `▶️ Your Tutor Profile has been Resumed & is Live on IlmiDunya`;
+    const dashboardUrl = `${clientUrl}/tutor/dashboard`;
+
+    const html = `
+      <!DOCTYPE html>
+      <html lang="en">
+      <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Tutor Profile Resumed - IlmiDunya</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #faf8f5; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
+        <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #faf8f5; padding: 30px 10px;">
+          <tr>
+            <td align="center">
+              <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 580px; background-color: #ffffff; border-radius: 20px; overflow: hidden; border: 1px solid #e6ded1;">
+                <tr>
+                  <td align="center" style="padding: 32px 30px 24px 30px; background-color: #0c2217; border-bottom: 3px solid #10b981; color: #ffffff;">
+                    <a href="${clientUrl}" target="_blank" style="text-decoration: none;">
+                      <img src="${logoUrl}" alt="IlmiDunya Pakistan" width="160" style="display: block; margin: 0 auto; border: 0;" />
+                    </a>
+                    <div style="margin-top: 14px;">
+                      <span style="display: inline-block; padding: 4px 14px; background-color: rgba(16, 185, 129, 0.2); color: #d1fae5; border: 1px solid rgba(16, 185, 129, 0.5); border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;">
+                        Profile Resumed &amp; Live
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 32px 30px 24px 30px;">
+                    <h2 style="margin: 0 0 14px 0; font-size: 18px; font-weight: 900; color: #0c2217;">
+                      Assalam-o-Alaikum, ${name},
+                    </h2>
+                    <p style="margin: 0 0 16px 0; font-size: 14px; line-height: 1.6; color: #44403c;">
+                      Good news! The pause on your tutor teaching profile has been lifted by administration. Your profile is now active, live, and publicly visible to prospective students nationwide.
+                    </p>
+                    <div style="text-align: center; margin: 26px 0 16px 0;">
+                      <a href="${dashboardUrl}" target="_blank" style="display: inline-block; padding: 14px 32px; background-color: #0c2217; color: #ffffff !important; font-size: 14px; font-weight: 800; text-decoration: none; border-radius: 12px; border: 1px solid #10b981;">
+                        Open Tutor Dashboard →
+                      </a>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td style="padding: 20px 24px; background-color: #f5f0e6; border-top: 1px solid #e6ded1; text-align: center;">
+                    <p style="margin: 0; font-size: 11px; color: #78716c;">
+                      IlmiDunya Pakistan &bull; Quality Quranic &amp; Academic Tutoring
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+      </html>
+    `;
+
+    return sendEmail({
+      to,
+      subject,
+      html,
+      text: `Assalam-o-Alaikum ${name}. Your IlmiDunya tutor profile pause has been lifted and is live again! Open your dashboard at: ${dashboardUrl}`
+    });
   } else {
     // Rejection or Revision Request
     const subject = `⚠️ Update on Your IlmiDunya Tutor Application`;

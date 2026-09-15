@@ -129,7 +129,7 @@ export default function TutorDashboardPage() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6 sm:space-y-8">
         
         {/* Account Status / Warning Notice / Audit Banner */}
-        <AccountStatusBanner user={user} role="tutor" />
+        <AccountStatusBanner user={user} tutorProfile={tutorProfile} role="tutor" />
 
         {/* Overdue Platform Fee Warning Notice */}
         {overdueDeals.length > 0 && (

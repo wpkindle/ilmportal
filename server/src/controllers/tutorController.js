@@ -29,6 +29,7 @@ exports.getPublicTutors = async (req, res) => {
 
     const query = {
       verificationStatus: 'approved',
+      isPaused: { $ne: true },
       subjects: { $exists: true, $not: { $size: 0 } },
       sanadDocuments: {
         $elemMatch: {
@@ -319,6 +320,14 @@ exports.getTutorById = async (req, res) => {
       return res.status(403).json({
         success: false,
         message: 'This tutor profile is incomplete (must be 100% complete) or under review and not yet publicly visible.'
+      });
+    }
+
+    // Block public access to paused profiles (admin and owner can still view)
+    if (tutor.isPaused && !isAdmin && !isOwner) {
+      return res.status(403).json({
+        success: false,
+        message: 'This tutor profile is temporarily unavailable.'
       });
     }
 

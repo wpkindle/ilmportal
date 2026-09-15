@@ -6,6 +6,8 @@ const {
   approveTutor,
   rejectTutor,
   contactTutor,
+  pauseTutorProfile,
+  resumeTutorProfile,
   reviewTutorDocument,
   getAllUsers,
   issueUserWarning,
@@ -47,6 +49,8 @@ router.get('/tutors/queue', getTutorApprovalQueue);
 router.put('/tutors/:id/approve', approveTutor);
 router.put('/tutors/:id/reject', rejectTutor);
 router.put('/tutors/:id/contact', contactTutor);
+router.put('/tutors/:id/pause', pauseTutorProfile);
+router.put('/tutors/:id/resume', resumeTutorProfile);
 router.put('/tutors/:id/documents/:docId/review', reviewTutorDocument);
 
 // User Management & Moderation

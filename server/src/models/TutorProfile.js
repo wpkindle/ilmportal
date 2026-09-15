@@ -83,6 +83,22 @@ const tutorProfileSchema = new mongoose.Schema({
     type: String,
     default: ''
   },
+  isPaused: {
+    type: Boolean,
+    default: false
+  },
+  pauseReason: {
+    type: String,
+    default: '',
+    trim: true
+  },
+  pausedAt: {
+    type: Date
+  },
+  pausedBy: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  },
   ratingAverage: {
     type: Number,
     default: 0,

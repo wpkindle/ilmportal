@@ -17,6 +17,37 @@ export default function AccountStatusBanner({ user, tutorProfile, role = 'studen
   const underReviewReason = user.underReviewReason || 'Profile credentials & safety review in progress';
   const isTutor = role === 'tutor' || user.role === 'tutor';
 
+  // 0. PAUSED STATE (tutor profile temporarily hidden by admin)
+  if (isTutor && tutorProfile?.isPaused) {
+    return (
+      <div className="bg-orange-50 border-2 border-orange-300 rounded-3xl p-5 shadow-xs space-y-3">
+        <div className="flex items-start gap-3.5">
+          <div className="w-10 h-10 rounded-2xl bg-orange-500 text-white flex items-center justify-center shrink-0 shadow-md shadow-orange-500/20">
+            <Clock className="w-5 h-5" />
+          </div>
+          <div className="space-y-1 flex-1">
+            <div className="flex items-center gap-2 flex-wrap">
+              <h3 className="text-sm sm:text-base font-black text-orange-950">
+                Your Tutor Profile Is Temporarily Paused
+              </h3>
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase bg-orange-200 text-orange-900 border border-orange-300">
+                Paused
+              </span>
+            </div>
+            <p className="text-xs text-orange-800 leading-relaxed">
+              Your tutor profile is currently hidden from the public listing. You will be notified once it is resumed by the administration team.
+            </p>
+            {tutorProfile.pauseReason && (
+              <p className="text-xs font-semibold text-orange-950 bg-white/70 p-2.5 rounded-xl border border-orange-200 mt-1">
+                Admin Reason: {tutorProfile.pauseReason}
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // 1. SUSPENDED STATE
   if (status === 'suspended' || status === 'deactivated' || user.isActive === false) {
     return (

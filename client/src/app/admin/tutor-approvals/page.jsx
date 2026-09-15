@@ -17,7 +17,9 @@ import {
   Clock,
   AlertCircle,
   ShieldCheck,
-  Video
+  Video,
+  PauseCircle,
+  PlayCircle
 } from 'lucide-react';
 import VideoIntroPlayer from '../../../components/common/VideoIntroPlayer';
 
@@ -32,6 +34,7 @@ export default function TutorApprovalPage() {
     approved: 0,
     contact_needed: 0,
     rejected: 0,
+    paused: 0,
     all: 0
   });
 
@@ -47,6 +50,10 @@ export default function TutorApprovalPage() {
   const [contactId, setContactId] = useState(null);
   const [contactNotes, setContactNotes] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
+
+  // Pause Modal
+  const [pauseId, setPauseId] = useState(null);
+  const [pauseReason, setPauseReason] = useState('');
 
   // Single Document Rejection State
   const [docRejectData, setDocRejectData] = useState({
@@ -208,6 +215,37 @@ export default function TutorApprovalPage() {
     }
   };
 
+  const handlePauseSubmit = async (e) => {
+    e.preventDefault();
+    if (!pauseId || !pauseReason.trim()) return;
+    setActionLoading(true);
+    try {
+      const res = await api.pauseTutor(pauseId, pauseReason);
+      if (res.success) {
+        setPauseId(null);
+        setPauseReason('');
+        fetchQueue();
+      }
+    } catch (err) {
+      alert(err.message || 'Error pausing tutor profile');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleResume = async (id) => {
+    if (!window.confirm('Resume this tutor profile? It will become publicly visible again.')) return;
+    setActionLoading(true);
+    try {
+      const res = await api.resumeTutor(id);
+      if (res.success) fetchQueue();
+    } catch (err) {
+      alert(err.message || 'Error resuming tutor profile');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   return (
     <div className="py-8 bg-slate-50 min-h-screen">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -232,6 +270,7 @@ export default function TutorApprovalPage() {
                   { id: 'approved', label: 'Approved & Live', count: counts.approved, badgeBg: 'bg-emerald-600 text-white' },
                   { id: 'contact_needed', label: 'Needs Contact', count: counts.contact_needed, badgeBg: 'bg-purple-600 text-white' },
                   { id: 'rejected', label: 'Rejected', count: counts.rejected, badgeBg: 'bg-rose-600 text-white' },
+                  { id: 'paused', label: 'Paused', count: counts.paused, badgeBg: 'bg-orange-500 text-white' },
                   { id: 'all', label: 'All Tutors', count: counts.all, badgeBg: 'bg-slate-600 text-white' }
                 ].map((tab) => (
                   <button
@@ -622,6 +661,28 @@ export default function TutorApprovalPage() {
                               <span>Reject Application</span>
                             </button>
                           )}
+
+                          {tutor.verificationStatus === 'approved' && !tutor.isPaused && (
+                            <button
+                              onClick={() => { setPauseId(tutor._id); setPauseReason(''); }}
+                              disabled={actionLoading}
+                              className="px-3.5 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-colors"
+                            >
+                              <PauseCircle className="w-4 h-4" />
+                              <span>Pause Profile</span>
+                            </button>
+                          )}
+
+                          {tutor.isPaused && (
+                            <button
+                              onClick={() => handleResume(tutor._id)}
+                              disabled={actionLoading}
+                              className="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-colors"
+                            >
+                              <PlayCircle className="w-4 h-4" />
+                              <span>Resume Profile</span>
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -794,6 +855,84 @@ export default function TutorApprovalPage() {
                   className="px-4 py-2 bg-amber-600 text-white font-bold text-xs rounded-xl"
                 >
                   Send Notice
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Pause Profile Modal */}
+      {pauseId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-200">
+            <div>
+              <div className="flex items-center gap-2 text-orange-600 mb-1">
+                <PauseCircle className="w-5 h-5" />
+                <h3 className="font-bold text-base text-slate-900">Pause Tutor Profile</h3>
+              </div>
+              <p className="text-xs text-slate-500">
+                The tutor will be hidden from public listings. Their account remains active and they will be notified with your reason.
+              </p>
+            </div>
+
+            <form onSubmit={handlePauseSubmit} className="space-y-3">
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1.5">
+                  Quick Reason (click to select):
+                </label>
+                <div className="flex flex-wrap gap-1.5 mb-2">
+                  {[
+                    'Profile content under review',
+                    'Complaint filed — pending investigation',
+                    'Credentials require re-verification',
+                    'Scheduled maintenance pause',
+                    'Inappropriate profile content'
+                  ].map((preset) => (
+                    <button
+                      key={preset}
+                      type="button"
+                      onClick={() => setPauseReason(preset)}
+                      className={`text-[11px] px-2.5 py-1 rounded-lg border transition-colors cursor-pointer ${
+                        pauseReason === preset
+                          ? 'bg-orange-100 text-orange-800 border-orange-300 font-bold'
+                          : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100 font-medium'
+                      }`}
+                    >
+                      {preset}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div>
+                <label className="text-xs font-bold text-slate-700 block mb-1">
+                  Reason to Display on Tutor Dashboard:
+                </label>
+                <textarea
+                  rows="3"
+                  required
+                  placeholder="Explain why this profile is being paused..."
+                  value={pauseReason}
+                  onChange={(e) => setPauseReason(e.target.value)}
+                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-orange-400 focus:bg-white"
+                />
+              </div>
+
+              <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+                <button
+                  type="button"
+                  onClick={() => { setPauseId(null); setPauseReason(''); }}
+                  className="px-4 py-2 border rounded-xl text-xs font-bold text-slate-700 hover:bg-slate-50 cursor-pointer"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={actionLoading || !pauseReason.trim()}
+                  className="px-4 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer disabled:opacity-50"
+                >
+                  Confirm Pause
                 </button>
               </div>
             </form>

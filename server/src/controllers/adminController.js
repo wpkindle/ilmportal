@@ -142,6 +142,8 @@ exports.getTutorApprovalQueue = async (req, res) => {
       filter = { verificationStatus: 'contact_needed' };
     } else if (status === 'rejected') {
       filter = { verificationStatus: 'rejected' };
+    } else if (status === 'paused') {
+      filter = { isPaused: true };
     } else if (status !== 'all') {
       filter = { verificationStatus: status };
     }
@@ -170,6 +172,7 @@ exports.getTutorApprovalQueue = async (req, res) => {
       }),
       incomplete: await TutorProfile.countDocuments({ verificationStatus: 'incomplete' }),
       approved: await TutorProfile.countDocuments({ verificationStatus: 'approved' }),
+      paused: await TutorProfile.countDocuments({ isPaused: true }),
       contact_needed: await TutorProfile.countDocuments({ verificationStatus: 'contact_needed' }),
       rejected: await TutorProfile.countDocuments({ verificationStatus: 'rejected' }),
       all: await TutorProfile.countDocuments({})
@@ -328,6 +331,101 @@ exports.rejectTutor = async (req, res) => {
       success: false,
       message: error.message || 'Error rejecting tutor'
     });
+  }
+};
+
+// @desc    Pause a live tutor profile with reason (profile stays approved but hidden from listings)
+// @route   PUT /api/admin/tutors/:id/pause
+exports.pauseTutorProfile = async (req, res) => {
+  try {
+    const { reason } = req.body;
+    if (!reason || !reason.trim()) {
+      return res.status(400).json({ success: false, message: 'A pause reason is required.' });
+    }
+
+    const tutor = await TutorProfile.findById(req.params.id).populate('user');
+    if (!tutor) {
+      return res.status(404).json({ success: false, message: 'Tutor profile not found' });
+    }
+
+    tutor.isPaused = true;
+    tutor.pauseReason = reason.trim();
+    tutor.pausedAt = new Date();
+    tutor.pausedBy = req.user.id;
+    await tutor.save();
+
+    await Notification.create({
+      recipient: tutor.user._id,
+      sender: req.user.id,
+      title: 'Your Tutor Profile Has Been Paused',
+      message: `Your tutor profile has been temporarily paused by administration. Reason: ${tutor.pauseReason}`,
+      type: 'verification_status',
+      link: '/tutor/dashboard'
+    });
+
+    await sendTutorStatusEmail(tutor.user.email, tutor.user.name, 'paused', tutor.pauseReason);
+    await logAction(req.user.id, 'PAUSE_TUTOR', 'tutor_profile', tutor._id, { reason: tutor.pauseReason }, req);
+
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`user_${tutor.user._id}`).emit('notification-alert', {
+        title: 'Your Tutor Profile Has Been Paused',
+        message: `Your tutor profile has been temporarily paused. Reason: ${tutor.pauseReason}`,
+        type: 'verification_status',
+        link: '/tutor/dashboard'
+      });
+      io.to(`user_${tutor.user._id}`).emit('tutor-profile-updated', tutor);
+      io.emit('admin-tutor-queue-updated', { tutorId: tutor._id, status: 'paused' });
+    }
+
+    res.status(200).json({ success: true, message: 'Tutor profile has been paused.', tutor });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message || 'Error pausing tutor profile' });
+  }
+};
+
+// @desc    Resume a paused tutor profile (makes it visible in listings again)
+// @route   PUT /api/admin/tutors/:id/resume
+exports.resumeTutorProfile = async (req, res) => {
+  try {
+    const tutor = await TutorProfile.findById(req.params.id).populate('user');
+    if (!tutor) {
+      return res.status(404).json({ success: false, message: 'Tutor profile not found' });
+    }
+
+    tutor.isPaused = false;
+    tutor.pauseReason = '';
+    tutor.pausedAt = undefined;
+    tutor.pausedBy = undefined;
+    await tutor.save();
+
+    await Notification.create({
+      recipient: tutor.user._id,
+      sender: req.user.id,
+      title: 'Your Tutor Profile Is Live Again',
+      message: 'Your tutor profile has been resumed by administration and is now publicly visible.',
+      type: 'verification_status',
+      link: '/tutor/dashboard'
+    });
+
+    await sendTutorStatusEmail(tutor.user.email, tutor.user.name, 'resumed', '');
+    await logAction(req.user.id, 'RESUME_TUTOR', 'tutor_profile', tutor._id, {}, req);
+
+    const io = req.app.get('io');
+    if (io) {
+      io.to(`user_${tutor.user._id}`).emit('notification-alert', {
+        title: 'Your Tutor Profile Is Live Again',
+        message: 'Your tutor profile has been resumed and is now publicly visible.',
+        type: 'verification_status',
+        link: '/tutor/dashboard'
+      });
+      io.to(`user_${tutor.user._id}`).emit('tutor-profile-updated', tutor);
+      io.emit('admin-tutor-queue-updated', { tutorId: tutor._id, status: 'resumed' });
+    }
+
+    res.status(200).json({ success: true, message: 'Tutor profile has been resumed.', tutor });
+  } catch (error) {
+    res.status(500).json({ success: false, message: error.message || 'Error resuming tutor profile' });
   }
 };
 

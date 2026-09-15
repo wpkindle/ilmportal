@@ -632,6 +632,17 @@ export const api = {
     body: JSON.stringify({ notes })
   }).then(handleResponse),
 
+  pauseTutor: (id, reason) => fetch(`${API_BASE}/admin/tutors/${id}/pause`, {
+    method: 'PUT',
+    headers: getHeaders(),
+    body: JSON.stringify({ reason })
+  }).then(handleResponse),
+
+  resumeTutor: (id) => fetch(`${API_BASE}/admin/tutors/${id}/resume`, {
+    method: 'PUT',
+    headers: getHeaders()
+  }).then(handleResponse),
+
   reviewTutorDocument: (tutorId, docId, body) => fetch(`${API_BASE}/admin/tutors/${tutorId}/documents/${docId}/review`, {
     method: 'PUT',
     headers: getHeaders(),

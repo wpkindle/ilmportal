@@ -7,9 +7,7 @@ import {
   Sparkles,
   Heart,
   QrCode,
-  ExternalLink,
   ShieldCheck,
-  CheckCircle2,
   Bell,
   ArrowRight
 } from 'lucide-react';
@@ -195,92 +193,24 @@ export default function SocialUpdatesPopup() {
 
         {/* Modal Scrollable Body */}
         <div className="p-3 sm:p-5 md:p-6 overflow-y-auto space-y-2.5 sm:space-y-4 bg-slate-50/50 overscroll-contain">
-          
-          {/* Mobile-Specific Horizontal List (< sm) */}
-          <div className="flex sm:hidden flex-col gap-2">
-            {socialChannels.map((channel) => (
-              <div
-                key={`mobile-${channel.id}`}
-                className="flex items-center justify-between gap-2.5 p-2.5 bg-white border border-[#ebe3d3] rounded-2xl hover:border-[#d4a359]/60 shadow-2xs transition-all"
-              >
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="p-2 rounded-xl bg-slate-50 border border-slate-100 shrink-0">
-                    {channel.icon}
-                  </div>
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1.5 flex-wrap">
-                      <h3 className="text-xs font-black text-slate-900 truncate">
-                        {channel.name}
-                      </h3>
-                      <span className={`text-[8.5px] font-bold px-1.5 py-0.2 rounded border shrink-0 ${channel.badgeColor}`}>
-                        {channel.badge}
-                      </span>
-                    </div>
-                    <p className="text-[10.5px] font-semibold text-slate-500 truncate font-mono">
-                      {channel.handle}
-                    </p>
-                  </div>
-                </div>
 
-                <a
-                  href={channel.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={handleClose}
-                  className={`shrink-0 py-1.5 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1 transition-all active:scale-95 shadow-xs ${channel.buttonColor}`}
-                >
-                  <span>{channel.mobileCta || 'Follow'}</span>
-                  <ExternalLink className="w-3 h-3" />
-                </a>
-              </div>
-            ))}
-          </div>
-
-          {/* Desktop/Tablet 2x2 Grid (>= sm) */}
-          <div className="hidden sm:grid sm:grid-cols-2 gap-3 sm:gap-3.5">
+          {/* Social Icon Buttons Row */}
+          <div className="flex items-center justify-center gap-3 sm:gap-4 py-3 sm:py-4">
             {socialChannels.map((channel) => (
-              <div
+              <a
                 key={channel.id}
-                className="flex flex-col justify-between p-4 rounded-2xl bg-white border border-[#ebe3d3] hover:border-[#d4a359]/60 hover:shadow-md transition-all group"
+                href={channel.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={handleClose}
+                aria-label={channel.name}
+                title={channel.name}
+                className={`w-14 h-14 sm:w-16 sm:h-16 rounded-2xl flex items-center justify-center transition-all active:scale-90 hover:scale-110 shadow-md ${channel.buttonColor}`}
               >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between gap-2">
-                    <div className="flex items-center gap-2.5">
-                      <div className="p-2 rounded-xl bg-slate-50 border border-slate-100 group-hover:scale-105 transition-transform">
-                        {channel.icon}
-                      </div>
-                      <div>
-                        <h3 className="text-xs font-black text-slate-900 leading-tight">
-                          {channel.name}
-                        </h3>
-                        <p className="text-[10px] font-medium text-slate-500 font-mono">
-                          {channel.handle}
-                        </p>
-                      </div>
-                    </div>
-                    <span className={`text-[9px] font-bold px-2 py-0.5 rounded-md border shrink-0 ${channel.badgeColor}`}>
-                      {channel.badge}
-                    </span>
-                  </div>
-
-                  <p className="text-[11px] text-slate-600 leading-relaxed line-clamp-2">
-                    {channel.description}
-                  </p>
-                </div>
-
-                <div className="pt-3 mt-1 border-t border-slate-100">
-                  <a
-                    href={channel.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    onClick={handleClose}
-                    className={`w-full py-2 px-3 rounded-xl font-bold text-xs flex items-center justify-center gap-1.5 transition-all active:scale-98 shadow-xs ${channel.buttonColor}`}
-                  >
-                    <span>{channel.cta}</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              </div>
+                <span className="[&_svg]:w-7 [&_svg]:h-7 [&_svg]:text-white">
+                  {channel.icon}
+                </span>
+              </a>
             ))}
           </div>
 

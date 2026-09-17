@@ -713,7 +713,7 @@ exports.uploadVideoIntro = async (req, res) => {
           const { cloudinary } = require('../config/cloudinary');
           if (req.file.path) {
             const result = await cloudinary.uploader.upload(req.file.path, {
-              folder: 'ilmportal/tutor-videos',
+              folder: 'ilmidunya/tutor-videos',
               resource_type: 'video',
               chunk_size: 6000000
             });
@@ -727,7 +727,7 @@ exports.uploadVideoIntro = async (req, res) => {
           } else if (req.file.buffer) {
             videoUrl = await new Promise((resolve, reject) => {
               const stream = cloudinary.uploader.upload_stream(
-                { folder: 'ilmportal/tutor-videos', resource_type: 'video' },
+                { folder: 'ilmidunya/tutor-videos', resource_type: 'video' },
                 (error, result) => {
                   if (error) return reject(error);
                   resolve(result.secure_url);

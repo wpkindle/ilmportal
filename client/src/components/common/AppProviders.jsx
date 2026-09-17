@@ -10,7 +10,7 @@ import { NotificationProvider } from '../../context/NotificationContext';
 // Dynamically load heavy floating widgets with ssr: false so they don't block critical page hydration
 const SupportPlatformWidget = dynamic(() => import('./SupportPlatformWidget'), { ssr: false });
 const InAppNotificationToast = dynamic(() => import('./InAppNotificationToast'), { ssr: false });
-const AiChatbotWidget = dynamic(() => import('./AiChatbotWidget'), { ssr: false });
+const LiveSupportWidget = dynamic(() => import('./LiveSupportWidget'), { ssr: false });
 const SocialUpdatesPopup = dynamic(() => import('./SocialUpdatesPopup'), { ssr: false });
 
 export default function AppProviders({ children }) {
@@ -46,17 +46,19 @@ export default function AppProviders({ children }) {
     };
 
     const handleServiceWorkerMessage = (event) => {
-      if (event.data && event.data.type === 'ILMPORTAL_NOTIFICATION_NAVIGATE' && event.data.url) {
+      if (event.data && (event.data.type === 'ILMIDUNYA_NOTIFICATION_NAVIGATE' || event.data.type === 'ILMPORTAL_NOTIFICATION_NAVIGATE') && event.data.url) {
         handleSmoothNavigation(event.data.url);
       }
     };
 
+    window.addEventListener('ilmidunya:navigate', handleCustomNavigate);
     window.addEventListener('ilmportal:navigate', handleCustomNavigate);
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.addEventListener('message', handleServiceWorkerMessage);
     }
 
     return () => {
+      window.removeEventListener('ilmidunya:navigate', handleCustomNavigate);
       window.removeEventListener('ilmportal:navigate', handleCustomNavigate);
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.removeEventListener('message', handleServiceWorkerMessage);
@@ -70,7 +72,7 @@ export default function AppProviders({ children }) {
           <InAppNotificationToast />
           <SupportPlatformWidget />
           <SocialUpdatesPopup />
-          <AiChatbotWidget />
+          <LiveSupportWidget />
           {children}
         </NotificationProvider>
       </SocketProvider>

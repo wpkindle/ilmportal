@@ -409,7 +409,7 @@ exports.uploadSupportFile = async (req, res) => {
     if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
       const { cloudinary } = require('../config/cloudinary');
       const isImage = req.file.mimetype.startsWith('image/');
-      const folder = isImage ? 'ilmportal/support/images' : 'ilmportal/support/files';
+      const folder = isImage ? 'ilmidunya/support/images' : 'ilmidunya/support/files';
 
       fileUrl = await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(

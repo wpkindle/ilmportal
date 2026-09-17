@@ -4,14 +4,14 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { Mail, ArrowRight, CheckCircle2, ArrowLeft, RefreshCw } from 'lucide-react';
 import { api } from '../../services/api';
-import { useRecaptchaV3 } from '../../components/common/ReCaptcha';
+import Turnstile from '../../components/common/Turnstile';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
-  const { executeRecaptcha } = useRecaptchaV3();
+  const [turnstileToken, setTurnstileToken] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -20,8 +20,11 @@ export default function ForgotPasswordPage() {
     setLoading(true);
     setError('');
     try {
-      const captchaToken = await executeRecaptcha('forgot_password');
-      const res = await api.forgotPassword({ email: email.trim(), captchaToken });
+      const res = await api.forgotPassword({
+        email: email.trim(),
+        turnstileToken,
+        captchaToken: turnstileToken
+      });
       if (res.success) {
         setSent(true);
       } else {
@@ -75,6 +78,8 @@ export default function ForgotPasswordPage() {
                 />
               </div>
             </div>
+
+            <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="forgot_password" size="compact" />
 
             <button
               type="submit"

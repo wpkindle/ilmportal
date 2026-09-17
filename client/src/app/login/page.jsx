@@ -20,7 +20,7 @@ import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import BrandLogo from '../../components/common/BrandLogo';
-import { useRecaptchaV3 } from '../../components/common/ReCaptcha';
+import Turnstile from '../../components/common/Turnstile';
 
 function LoginContent() {
   const { user, login, loading: authLoading } = useAuth();
@@ -42,6 +42,7 @@ function LoginContent() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
 
   // Auto-redirect if already logged in
   useEffect(() => {
@@ -50,8 +51,6 @@ function LoginContent() {
       router.replace(target);
     }
   }, [user, authLoading, redirect, router]);
-
-  const { executeRecaptcha } = useRecaptchaV3();
 
   // Sign In Form States
   const [signInEmail, setSignInEmail] = useState('');
@@ -91,8 +90,7 @@ function LoginContent() {
     setSuccessMessage('');
 
     try {
-      const signInCaptchaToken = await executeRecaptcha('login');
-      const data = await login(signInEmail.trim(), signInPassword, signInCaptchaToken);
+      const data = await login(signInEmail.trim(), signInPassword, turnstileToken);
       const target = redirect && redirect !== '/' ? redirect : null;
       if (data?.user?.role === 'admin') {
         router.push(target || '/admin');
@@ -138,13 +136,13 @@ function LoginContent() {
     setSuccessMessage('');
 
     try {
-      const signUpCaptchaToken = await executeRecaptcha('register');
       const payload = {
         name: signUpName.trim(),
         email: signUpEmail.trim().toLowerCase(),
         password: signUpPassword,
         role: isTutorMode ? 'tutor' : 'student',
-        captchaToken: signUpCaptchaToken,
+        turnstileToken,
+        captchaToken: turnstileToken,
         hp_website: signUpHoneypot
       };
 
@@ -392,6 +390,7 @@ function LoginContent() {
                 </div>
               </div>
 
+              <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="login" />
 
               <button
                 type="submit"
@@ -503,6 +502,7 @@ function LoginContent() {
                 Your personal details are confidential and securely encrypted. We never sell, rent, or share your data with any third party.
               </div>
 
+              <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="register" />
 
               {/* Submit Sign Up Button */}
               <button

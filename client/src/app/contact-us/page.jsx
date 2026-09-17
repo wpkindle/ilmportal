@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { api } from '../../services/api';
-import { useRecaptchaV3 } from '../../components/common/ReCaptcha';
+import Turnstile from '../../components/common/Turnstile';
 import {
   Mail,
   Send,
@@ -22,7 +22,7 @@ import {
 export default function ContactUsPage() {
   const [page, setPage] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { executeRecaptcha } = useRecaptchaV3();
+  const [turnstileToken, setTurnstileToken] = useState('');
 
   // Form State
   const [name, setName] = useState('');
@@ -66,14 +66,14 @@ export default function ContactUsPage() {
     setFormError('');
 
     try {
-      const captchaToken = await executeRecaptcha('contact');
       const res = await api.submitContactMessage({
         name,
         email,
         phone: '',
         subject: subject || 'General Inquiry',
         message,
-        captchaToken,
+        turnstileToken,
+        captchaToken: turnstileToken,
         hp_website: honeypot
       });
       if (res.success) {
@@ -373,6 +373,7 @@ export default function ContactUsPage() {
                   />
                 </div>
 
+                <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="contact" />
 
                 <button
                   type="submit"

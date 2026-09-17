@@ -1,39 +1,38 @@
-const { verifyRecaptcha } = require('../src/utils/recaptcha');
-const { requireRecaptcha } = require('../src/middleware/recaptchaMiddleware');
+const { verifyTurnstile } = require('../src/utils/turnstile');
+const { requireTurnstile } = require('../src/middleware/turnstileMiddleware');
 
-describe('reCAPTCHA Verification & Middleware Tests', () => {
+describe('Cloudflare Turnstile Verification & Middleware Tests', () => {
   const originalEnv = process.env.NODE_ENV;
 
   afterEach(() => {
     process.env.NODE_ENV = originalEnv;
   });
 
-  test('verifyRecaptcha rejects empty or missing token', async () => {
-    // Force non-test to test raw validation
+  test('verifyTurnstile rejects empty or missing token', async () => {
     process.env.NODE_ENV = 'production';
-    const result1 = await verifyRecaptcha('');
+    const result1 = await verifyTurnstile('');
     expect(result1.success).toBe(false);
-    expect(result1.message).toMatch(/reCAPTCHA/i);
+    expect(result1.message).toMatch(/Turnstile/i);
 
-    const result2 = await verifyRecaptcha(null);
+    const result2 = await verifyTurnstile(null);
     expect(result2.success).toBe(false);
   });
 
-  test('verifyRecaptcha accepts bypass token', async () => {
+  test('verifyTurnstile accepts bypass token', async () => {
     process.env.NODE_ENV = 'production';
-    const result = await verifyRecaptcha('bypass-recaptcha-token');
+    const result = await verifyTurnstile('bypass-turnstile-token');
     expect(result.success).toBe(true);
     expect(result.bypassed).toBe(true);
   });
 
-  test('verifyRecaptcha accepts test-token when in test environment', async () => {
+  test('verifyTurnstile accepts test-token in test environment', async () => {
     process.env.NODE_ENV = 'test';
-    const result = await verifyRecaptcha('test-token');
+    const result = await verifyTurnstile('test-token');
     expect(result.success).toBe(true);
     expect(result.bypassed).toBe(true);
   });
 
-  test('requireRecaptcha middleware blocks request if token is missing in production', async () => {
+  test('requireTurnstile middleware blocks request if token is missing in production', async () => {
     process.env.NODE_ENV = 'production';
     const req = {
       body: {},
@@ -46,19 +45,18 @@ describe('reCAPTCHA Verification & Middleware Tests', () => {
     };
     const next = jest.fn();
 
-    await requireRecaptcha(req, res, next);
-
+    await requireTurnstile(req, res, next);
     expect(res.status).toHaveBeenCalledWith(400);
     expect(res.json).toHaveBeenCalledWith(
       expect.objectContaining({
         success: false,
-        message: expect.stringMatching(/reCAPTCHA/i)
+        message: expect.stringMatching(/Turnstile/i)
       })
     );
     expect(next).not.toHaveBeenCalled();
   });
 
-  test('requireRecaptcha middleware allows pass-through in test env when token is absent', async () => {
+  test('requireTurnstile middleware allows pass-through in test env when token is absent', async () => {
     process.env.NODE_ENV = 'test';
     const req = {
       body: {},
@@ -71,15 +69,14 @@ describe('reCAPTCHA Verification & Middleware Tests', () => {
     };
     const next = jest.fn();
 
-    await requireRecaptcha(req, res, next);
-
+    await requireTurnstile(req, res, next);
     expect(next).toHaveBeenCalled();
   });
 
-  test('requireRecaptcha middleware allows request with valid bypass token', async () => {
+  test('requireTurnstile middleware allows request with valid bypass token', async () => {
     process.env.NODE_ENV = 'production';
     const req = {
-      body: { captchaToken: 'bypass-recaptcha-token' },
+      body: { turnstileToken: 'bypass-turnstile-token' },
       headers: {},
       ip: '127.0.0.1'
     };
@@ -89,10 +86,9 @@ describe('reCAPTCHA Verification & Middleware Tests', () => {
     };
     const next = jest.fn();
 
-    await requireRecaptcha(req, res, next);
-
+    await requireTurnstile(req, res, next);
+    expect(req.turnstileVerified).toBe(true);
     expect(next).toHaveBeenCalled();
-    expect(req.recaptchaVerified).toBe(true);
   });
 });
 

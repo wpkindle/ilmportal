@@ -11,7 +11,7 @@ export default function NotificationPermissionPrompt() {
   useEffect(() => {
     // Only prompt if permission is 'default' (not granted, not denied)
     if (typeof window !== 'undefined' && permissionStatus === 'default') {
-      const isDismissed = sessionStorage.getItem('ilmportal_notif_prompt_dismissed');
+      const isDismissed = sessionStorage.getItem('ilmidunya_notif_prompt_dismissed') || sessionStorage.getItem('ilmportal_notif_prompt_dismissed');
       if (!isDismissed) {
         // Slight delay on landing so it feels gentle and non-intrusive
         const timer = setTimeout(() => setDismissed(false), 2000);
@@ -28,7 +28,7 @@ export default function NotificationPermissionPrompt() {
   };
 
   const handleDismiss = () => {
-    sessionStorage.setItem('ilmportal_notif_prompt_dismissed', 'true');
+    sessionStorage.setItem('ilmidunya_notif_prompt_dismissed', 'true');
     setDismissed(true);
   };
 

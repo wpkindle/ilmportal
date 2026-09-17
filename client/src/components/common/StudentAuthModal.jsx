@@ -28,7 +28,7 @@ import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
 import { allPakistaniCities } from '../../data/pakistanAreas';
 import { getTutorAvatar } from '../../utils/tutorHelpers';
-import { useRecaptchaV3 } from './ReCaptcha';
+import Turnstile from './Turnstile';
 
 const pakistaniCities = allPakistaniCities;
 
@@ -56,8 +56,7 @@ export default function StudentAuthModal({
   const [showLoginPassword, setShowLoginPassword] = useState(false);
   const [showRegisterPassword, setShowRegisterPassword] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
-
-  const { executeRecaptcha } = useRecaptchaV3();
+  const [turnstileToken, setTurnstileToken] = useState('');
 
   // Login Form
   const [loginForm, setLoginForm] = useState({
@@ -122,8 +121,7 @@ export default function StudentAuthModal({
     setError('');
     setInfoMessage('');
     try {
-      const loginCaptchaToken = await executeRecaptcha('login');
-      const res = await login(loginForm.email.trim(), loginForm.password, loginCaptchaToken);
+      const res = await login(loginForm.email.trim(), loginForm.password, turnstileToken);
       if (res && res.user) {
         await handleDispatchInvitation(res.user);
       }
@@ -153,13 +151,13 @@ export default function StudentAuthModal({
     setInfoMessage('');
 
     try {
-      const registerCaptchaToken = await executeRecaptcha('register');
       const res = await api.register({
         name: registerForm.name.trim(),
         email: registerForm.email.trim().toLowerCase(),
         password: registerForm.password,
         role: 'student',
-        captchaToken: registerCaptchaToken,
+        turnstileToken,
+        captchaToken: turnstileToken,
         hp_website: registerForm.hp_website
       });
 
@@ -426,6 +424,7 @@ export default function StudentAuthModal({
                 </div>
               </div>
 
+              <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="login" size="compact" />
 
               <button
                 type="submit"
@@ -538,6 +537,7 @@ export default function StudentAuthModal({
                 {' '}Protected under PECA 2016.
               </p>
 
+              <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="register" size="compact" />
 
               <button
                 type="submit"

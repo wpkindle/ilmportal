@@ -12,7 +12,7 @@ class SoundEngine {
     this.lastNotificationSoundTime = 0;
 
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('ilmportal_sound_enabled');
+      const stored = localStorage.getItem('ilmidunya_sound_enabled') || localStorage.getItem('ilmportal_sound_enabled');
       this.soundEnabled = stored !== null ? stored === 'true' : true;
 
       // Unlock AudioContext on first user interaction to satisfy browser autoplay policies
@@ -49,7 +49,7 @@ class SoundEngine {
   setSoundEnabled(enabled) {
     this.soundEnabled = !!enabled;
     if (typeof window !== 'undefined') {
-      localStorage.setItem('ilmportal_sound_enabled', this.soundEnabled ? 'true' : 'false');
+      localStorage.setItem('ilmidunya_sound_enabled', this.soundEnabled ? 'true' : 'false');
     }
   }
 

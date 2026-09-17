@@ -119,11 +119,13 @@ export default function SocialUpdatesPopup() {
     // Also support manual trigger via window event for testing or direct navigation
     const handleManualOpen = () => setIsOpen(true);
     window.addEventListener('open-social-updates', handleManualOpen);
+    window.addEventListener('ilmidunya:open-social-updates', handleManualOpen);
     window.addEventListener('ilmportal:open-social-updates', handleManualOpen);
 
     return () => {
       clearTimeout(timer);
       window.removeEventListener('open-social-updates', handleManualOpen);
+      window.removeEventListener('ilmidunya:open-social-updates', handleManualOpen);
       window.removeEventListener('ilmportal:open-social-updates', handleManualOpen);
     };
   }, [pathname]);

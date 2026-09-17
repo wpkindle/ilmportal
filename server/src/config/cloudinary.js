@@ -16,7 +16,7 @@ const cloudinaryStorage = new CloudinaryStorage({
     // Determine resource type
     let resourceType = 'auto';
     const isImage = file.mimetype.startsWith('image/');
-    const folder = isImage ? 'ilmportal/chat/images' : 'ilmportal/chat/files';
+    const folder = isImage ? 'ilmidunya/chat/images' : 'ilmidunya/chat/files';
 
     return {
       folder,

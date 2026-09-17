@@ -74,6 +74,7 @@ export async function showNativeNotification({
     notif.onclick = () => {
       window.focus();
       if (url && url !== '#') {
+        window.dispatchEvent(new CustomEvent('ilmidunya:navigate', { detail: { url } }));
         window.dispatchEvent(new CustomEvent('ilmportal:navigate', { detail: { url } }));
       }
       notif.close();

@@ -1004,7 +1004,7 @@ exports.uploadChatFile = async (req, res) => {
     if (process.env.CLOUDINARY_CLOUD_NAME && process.env.CLOUDINARY_API_KEY && process.env.CLOUDINARY_API_SECRET) {
       const { cloudinary } = require('../config/cloudinary');
       const isImage = req.file.mimetype.startsWith('image/');
-      const folder = isImage ? 'ilmportal/chat/images' : 'ilmportal/chat/files';
+      const folder = isImage ? 'ilmidunya/chat/images' : 'ilmidunya/chat/files';
 
       fileUrl = await new Promise((resolve, reject) => {
         const stream = cloudinary.uploader.upload_stream(

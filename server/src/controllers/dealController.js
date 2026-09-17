@@ -492,7 +492,7 @@ exports.submitPaymentProof = async (req, res) => {
         const { cloudinary } = require('../config/cloudinary');
         proofImageUrl = await new Promise((resolve, reject) => {
           const stream = cloudinary.uploader.upload_stream(
-            { folder: 'ilmportal/payment-proofs', resource_type: 'image' },
+            { folder: 'ilmidunya/payment-proofs', resource_type: 'image' },
             (error, result) => {
               if (error) return reject(error);
               resolve(result.secure_url);

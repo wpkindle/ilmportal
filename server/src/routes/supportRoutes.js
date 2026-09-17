@@ -5,7 +5,7 @@ const supportController = require('../controllers/supportController');
 const { protect, optionalAuth } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 const rateLimit = require('express-rate-limit');
-const { requireRecaptcha } = require('../middleware/recaptchaMiddleware');
+const { requireTurnstile } = require('../middleware/turnstileMiddleware');
 const { spamFilter, contactLimiter } = require('../middleware/spamFilter');
 
 // Rate limit: 60 messages per 15 minutes per IP
@@ -39,7 +39,7 @@ const supportUpload = multer({
 // ==========================================
 router.get('/admin-status', supportController.getAdminOnlineStatus);
 router.post('/message', supportLimiter, optionalAuth, supportController.sendMessage);
-router.post('/offline-message', contactLimiter, spamFilter, requireRecaptcha, optionalAuth, supportController.leaveOfflineMessage);
+router.post('/offline-message', contactLimiter, spamFilter, requireTurnstile, optionalAuth, supportController.leaveOfflineMessage);
 router.post('/upload', optionalAuth, supportUpload.single('file'), supportController.uploadSupportFile);
 router.get('/session/:sessionId', supportController.getSessionHistory);
 router.delete('/session/:sessionId', optionalAuth, supportController.deleteUserSession);

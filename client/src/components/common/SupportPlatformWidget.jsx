@@ -75,9 +75,11 @@ export default function SupportPlatformWidget() {
   useEffect(() => {
     const handleOpen = () => setIsOpen(true);
     window.addEventListener('open-support-platform', handleOpen);
+    window.addEventListener('ilmidunya:open-support', handleOpen);
     window.addEventListener('ilmportal:open-support', handleOpen);
     return () => {
       window.removeEventListener('open-support-platform', handleOpen);
+      window.removeEventListener('ilmidunya:open-support', handleOpen);
       window.removeEventListener('ilmportal:open-support', handleOpen);
     };
   }, []);

@@ -26,7 +26,7 @@ import {
 import { api } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
 import { useAuth } from '../../context/AuthContext';
-import { useRecaptchaV3 } from './ReCaptcha';
+import Turnstile from './Turnstile';
 
 const getFileUrl = (path) => {
   if (!path) return '';
@@ -82,7 +82,7 @@ export default function LiveSupportWidget() {
   const pathname = usePathname();
   const { user } = useAuth();
   const { socket, isAdminOnline: socketAdminOnline } = useSocket();
-  const { executeRecaptcha } = useRecaptchaV3();
+  const [turnstileToken, setTurnstileToken] = useState('');
 
   const [isOpen, setIsOpen] = useState(false);
   const [sessionId, setSessionId] = useState('');
@@ -684,13 +684,6 @@ export default function LiveSupportWidget() {
     }
 
     try {
-      let captchaToken = '';
-      try {
-        captchaToken = await executeRecaptcha('support_offline');
-      } catch (captchaErr) {
-        console.warn('reCAPTCHA error in offline support inquiry:', captchaErr);
-      }
-
       const res = await api.sendOfflineSupportMessage({
         sessionId,
         email: offlineEmail.trim(),
@@ -700,7 +693,8 @@ export default function LiveSupportWidget() {
         fileName: uploadedAttachment?.fileName,
         fileType: uploadedAttachment?.fileType,
         fileSize: uploadedAttachment?.fileSize,
-        captchaToken,
+        turnstileToken,
+        captchaToken: turnstileToken,
         hp_website: offlineHpWebsite
       });
 
@@ -1195,6 +1189,8 @@ export default function LiveSupportWidget() {
                       <Paperclip className="w-4 h-4 text-[#059669] shrink-0" />
                       <span className="truncate">{selectedFile ? `Attached: ${selectedFile.name}` : 'Attach File (PNG, JPG, PDF)'}</span>
                     </label>
+
+                    <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="support_offline" size="compact" />
 
                     <button
                       type="submit"

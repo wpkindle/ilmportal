@@ -484,7 +484,7 @@ const uploadArticleImage = async (req, res) => {
         imageUrl = await new Promise((resolve, reject) => {
           const stream = cloudinary.uploader.upload_stream(
             {
-              folder: 'ilmportal/articles',
+              folder: 'ilmidunya/articles',
               resource_type: 'image',
               transformation: [{ quality: 'auto', fetch_format: 'auto' }]
             },

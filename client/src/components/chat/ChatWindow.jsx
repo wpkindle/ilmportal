@@ -1415,7 +1415,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                 <button
                   type="button"
                   onClick={() => {
-                    window.dispatchEvent(new CustomEvent('ilmportal:open-support'));
+                    window.dispatchEvent(new CustomEvent('ilmidunya:open-support'));
                     setMenuOpen(false);
                   }}
                   className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 text-[#0c2217] hover:bg-[#f0ece1] font-bold cursor-pointer"

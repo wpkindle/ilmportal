@@ -6,12 +6,11 @@ import { useRouter } from 'next/navigation';
 import { ShieldCheck, Lock, Mail, ArrowRight, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 import { api } from '../../../services/api';
-import { useRecaptchaV3 } from '../../../components/common/ReCaptcha';
+import Turnstile from '../../../components/common/Turnstile';
 
 export default function AdminLoginPage() {
   const { user, login } = useAuth();
   const router = useRouter();
-  const { executeRecaptcha } = useRecaptchaV3();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -19,6 +18,7 @@ export default function AdminLoginPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [turnstileToken, setTurnstileToken] = useState('');
 
   // If already logged in as admin, redirect to /admin
   useEffect(() => {
@@ -32,11 +32,9 @@ export default function AdminLoginPage() {
     setError('');
     setSuccess('');
 
-    const captchaToken = await executeRecaptcha('admin_login');
-
     try {
       // First attempt via AuthContext
-      const data = await login(loginEmail.trim(), loginPass, captchaToken);
+      const data = await login(loginEmail.trim(), loginPass, turnstileToken);
       if (data && data.user && data.user.role === 'admin') {
         setSuccess('Authentication successful! Loading Control Center...');
         setTimeout(() => {
@@ -49,7 +47,7 @@ export default function AdminLoginPage() {
     } catch (err) {
       // Direct API fallback attempt
       try {
-        const directRes = await api.login({ email: loginEmail.trim(), password: loginPass, captchaToken });
+        const directRes = await api.login({ email: loginEmail.trim(), password: loginPass, turnstileToken, captchaToken: turnstileToken });
         if (directRes.success && directRes.user?.role === 'admin') {
           localStorage.setItem('ilm_token', directRes.token);
           setSuccess('Authentication successful! Loading Control Center...');
@@ -169,6 +167,8 @@ export default function AdminLoginPage() {
                 </button>
               </div>
             </div>
+
+            <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="admin_login" theme="dark" size="compact" />
 
             <button
               type="submit"

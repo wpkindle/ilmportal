@@ -77,17 +77,12 @@ exports.register = async (req, res) => {
       name,
       username,
       email,
-      phone,
-      number,
       password,
       role,
-      guardianPhone,
       city,
       gender,
       age
     } = req.body;
-
-    const userPhone = (phone || number || '').trim();
 
     if (!name || !name.trim()) {
       return res.status(400).json({ success: false, message: 'Full name is required' });
@@ -130,13 +125,13 @@ exports.register = async (req, res) => {
     const newUserData = {
       name: name.trim(),
       email: emailClean,
-      phone: userPhone,
+      phone: '',
       password,
       role: userRole,
       city: (city || '').trim(),
       gender: (gender || '').trim(),
       age: age ? Number(age) : undefined,
-      guardianPhone: (guardianPhone || '').trim(),
+      guardianPhone: '',
       isVerified: false,
       verificationOtp: otp,
       verificationOtpExpires: otpExpires,
@@ -209,8 +204,7 @@ exports.register = async (req, res) => {
         gender: user.gender,
         age: user.age,
         isVerified: false,
-        city: user.city,
-        phone: user.phone
+        city: user.city
       }
     });
   } catch (error) {
@@ -307,8 +301,7 @@ exports.verifyOtp = async (req, res) => {
         gender: user.gender,
         age: user.age,
         isVerified: true,
-        city: user.city,
-        phone: user.phone
+        city: user.city
       },
       tutorProfile,
       completion
@@ -394,8 +387,7 @@ exports.verifyToken = async (req, res) => {
         gender: user.gender,
         age: user.age,
         isVerified: true,
-        city: user.city,
-        phone: user.phone
+        city: user.city
       },
       tutorProfile,
       completion
@@ -554,7 +546,6 @@ exports.login = async (req, res) => {
         age: user.age,
         isVerified: user.isVerified,
         city: user.city,
-        phone: user.phone,
         tuitionMode: user.tuitionMode || user.preferredMode || 'both',
         preferredMode: user.preferredMode || user.tuitionMode || 'both'
       },
@@ -606,8 +597,6 @@ exports.updateProfile = async (req, res) => {
     const {
       name,
       email,
-      phone,
-      guardianPhone,
       city,
       area,
       localArea,
@@ -654,8 +643,6 @@ exports.updateProfile = async (req, res) => {
     // Ignore unverified direct email payload in general profile update
 
     if (name) user.name = name.trim();
-    if (phone !== undefined) user.phone = phone.trim();
-    if (guardianPhone !== undefined) user.guardianPhone = guardianPhone.trim();
     if (city) user.city = city.trim();
     if (area !== undefined || localArea !== undefined) {
       user.area = (localArea !== undefined ? localArea : area).trim();
@@ -975,7 +962,7 @@ exports.deleteMyAccount = async (req, res) => {
 // @access  Public
 exports.registerEarlyTutor = async (req, res) => {
   try {
-    const { name, email, phone, number, city, whatWillYouTeach, qualifications, teachingMode, gender, password } = req.body;
+    const { name, email, city, whatWillYouTeach, qualifications, teachingMode, gender, password } = req.body;
 
     if (!name || !name.trim()) {
       return res.status(400).json({ success: false, message: 'Please provide your full name.' });
@@ -985,7 +972,6 @@ exports.registerEarlyTutor = async (req, res) => {
     }
 
     const emailClean = email.toLowerCase().trim();
-    const userPhone = (phone || number || '').trim();
     const userCity = (city || '').trim();
     const teachSubject = (whatWillYouTeach || qualifications || '').trim();
     const userGender = (gender || 'male').trim();
@@ -997,7 +983,6 @@ exports.registerEarlyTutor = async (req, res) => {
     if (user) {
       // Update existing user profile
       user.name = name.trim();
-      if (userPhone) user.phone = userPhone;
       if (userCity) user.city = userCity;
       if (userGender) user.gender = userGender;
       user.role = 'tutor';
@@ -1026,7 +1011,7 @@ exports.registerEarlyTutor = async (req, res) => {
       user = await User.create({
         name: name.trim(),
         email: emailClean,
-        phone: userPhone,
+        phone: '',
         password: autoPassword,
         role: 'tutor',
         city: userCity,
@@ -1065,7 +1050,6 @@ exports.registerEarlyTutor = async (req, res) => {
       tutor: {
         name: user.name,
         email: user.email,
-        phone: user.phone,
         city: user.city,
         whatWillYouTeach: teachSubject
       }

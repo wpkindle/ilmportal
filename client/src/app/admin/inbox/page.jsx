@@ -870,17 +870,6 @@ export default function AdminMailboxPage() {
                     {/* Matched LMS User Actions */}
                     {selectedThread.userRef && (
                       <div className="flex items-center gap-2">
-                        {selectedThread.userRef.phone && (
-                          <a
-                            href={`https://wa.me/${selectedThread.userRef.phone.replace(/[^0-9]/g, '')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="px-3 py-1.5 rounded-xl bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 text-[11px] font-bold flex items-center gap-1.5"
-                          >
-                            <MessageCircle className="w-3.5 h-3.5" />
-                            <span>WhatsApp</span>
-                          </a>
-                        )}
                         <Link
                           href={selectedThread.userRole === 'tutor' ? `/tutors` : `/admin/users`}
                           target="_blank"

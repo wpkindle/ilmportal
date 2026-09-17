@@ -21,7 +21,6 @@ import {
   Ban,
   Trash2,
   Mail,
-  Phone,
   Search,
   RefreshCw,
   X,
@@ -116,9 +115,8 @@ export default function AdminDashboardPage() {
         const q = search.trim().toLowerCase();
         const matchName = u.name?.toLowerCase().includes(q);
         const matchEmail = u.email?.toLowerCase().includes(q);
-        const matchPhone = u.phone?.toLowerCase().includes(q);
         const matchCity = u.city?.toLowerCase().includes(q);
-        if (!matchName && !matchEmail && !matchPhone && !matchCity) return false;
+        if (!matchName && !matchEmail && !matchCity) return false;
       }
 
       return true;
@@ -605,7 +603,7 @@ export default function AdminDashboardPage() {
                   type="text"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Filter by student/tutor name, email, city, or phone number in real time..."
+                  placeholder="Filter by student/tutor name, email, or city in real time..."
                   className="w-full pl-10 pr-4 py-2 text-xs rounded-xl border border-slate-200 focus:outline-none focus:ring-2 focus:ring-purple-500 bg-slate-50/50"
                 />
               </div>
@@ -670,12 +668,6 @@ export default function AdminDashboardPage() {
                               <Mail className="w-3.5 h-3.5 text-slate-400" />
                               <span>{u.email}</span>
                             </span>
-                            {u.phone && (
-                              <span className="flex items-center gap-1 font-mono">
-                                <Phone className="w-3.5 h-3.5 text-slate-400" />
-                                <span>{u.phone}</span>
-                              </span>
-                            )}
                             <span className="flex items-center gap-1">
                               <MapPin className="w-3.5 h-3.5 text-slate-400" />
                               <span>{u.city || 'Pakistan'}</span>

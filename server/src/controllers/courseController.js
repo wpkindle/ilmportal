@@ -65,7 +65,7 @@ exports.getAllCourses = async (req, res) => {
     }
 
     const courses = await Course.find(query)
-      .populate('instructor', 'name email avatar city phone isVerified')
+      .populate('instructor', 'name email avatar city isVerified')
       .populate('tutorProfile', 'isSanadVerified qualifications hourlyRate teachingMode averageRating')
       .sort(sort);
 
@@ -89,7 +89,7 @@ exports.getCourseBySlug = async (req, res) => {
   try {
     const { slug } = req.params;
     const course = await Course.findOne({ slug, isActive: true })
-      .populate('instructor', 'name email avatar city phone isVerified')
+      .populate('instructor', 'name email avatar city isVerified')
       .populate('tutorProfile', 'isSanadVerified qualifications hourlyRate teachingMode averageRating ratingCount bio');
 
     if (!course) {

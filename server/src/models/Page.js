@@ -25,8 +25,8 @@ const pageSchema = new mongoose.Schema({
   },
   contactDetails: {
     email: { type: String, default: 'info@ilmidunya.com' },
-    phone: { type: String, default: '+92 300 1234567' },
-    whatsapp: { type: String, default: '+92 300 1234567' },
+    phone: { type: String, default: '' },
+    whatsapp: { type: String, default: '' },
     address: { type: String, default: 'Lahore, Punjab, Pakistan' },
     workingHours: { type: String, default: 'Monday – Saturday: 9:00 AM – 9:00 PM PKT' }
   },

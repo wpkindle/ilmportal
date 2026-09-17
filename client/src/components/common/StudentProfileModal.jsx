@@ -531,7 +531,7 @@ export default function StudentProfileModal({
                       Contact Privacy &amp; Child Safety Protection
                     </span>
                     <p className="text-amber-800/90 text-[11px] leading-relaxed">
-                      Personal contact details (email address, mobile/WhatsApp number) are private and kept strictly confidential by IlmiDunya for student safety. Please conduct all conversations, tuition agreements, and classes inside IlmiDunya.
+                      Personal contact details are private and kept strictly confidential by IlmiDunya for student safety. Please conduct all conversations, tuition agreements, and classes inside IlmiDunya.
                     </p>
                   </div>
                 </div>

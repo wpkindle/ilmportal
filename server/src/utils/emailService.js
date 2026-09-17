@@ -1631,12 +1631,6 @@ const sendEarlyTutorNoticeEmail = async ({ to, name }) => {
             <p style="color: #475569; font-size: 14px; line-height: 1.6;">
               Our academic faculty coordinator is reviewing educator submissions to organize curriculum categories, assign verified badges, and prepare direct student connections.
             </p>
-
-            <div style="text-align: center; margin: 26px 0 10px 0;">
-              <a href="https://wa.me/923171759093" style="background-color: #25D366; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; font-size: 13px; display: inline-block;">
-                💬 Connect on WhatsApp: +92 317 1759093
-              </a>
-            </div>
           </td>
         </tr>
         <tr>

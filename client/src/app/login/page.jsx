@@ -368,7 +368,7 @@ function LoginContent() {
             <form onSubmit={handleSignIn} autoComplete="off" className="space-y-4">
               <div>
                 <label className="text-xs font-bold text-stone-800 block mb-1">
-                  {isTutorMode ? 'Tutor Email or Mobile' : 'Student Email or Mobile'}
+                  {isTutorMode ? 'Tutor Email Address' : 'Student Email Address'}
                 </label>
                 <div className="relative">
                   <Mail className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />

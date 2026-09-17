@@ -117,8 +117,8 @@ exports.respondToDealOffer = async (req, res) => {
   try {
     const { action } = req.body; // 'accept' or 'decline'
     const deal = await Deal.findById(req.params.id)
-      .populate('tutor', 'name email phone avatar')
-      .populate('student', 'name email phone avatar');
+      .populate('tutor', 'name email avatar')
+      .populate('student', 'name email avatar');
 
     if (!deal) {
       return res.status(404).json({
@@ -299,8 +299,8 @@ exports.getMyDeals = async (req, res) => {
 
     const { evaluatePaymentOverdue } = require('./paymentRequestController');
     const deals = await Deal.find(filter)
-      .populate('student', req.user.role === 'tutor' ? 'name avatar city' : 'name email phone avatar city')
-      .populate('tutor', 'name email phone avatar city')
+      .populate('student', req.user.role === 'tutor' ? 'name avatar city' : 'name email avatar city')
+      .populate('tutor', 'name email avatar city')
       .populate('latestPaymentRequest')
       .sort({ createdAt: -1 });
 
@@ -426,8 +426,8 @@ exports.getMyDeals = async (req, res) => {
 exports.getDealById = async (req, res) => {
   try {
     const deal = await Deal.findById(req.params.id)
-      .populate('student', 'name email phone avatar city')
-      .populate('tutor', 'name email phone avatar city')
+      .populate('student', 'name email avatar city')
+      .populate('tutor', 'name email avatar city')
       .populate('latestPaymentRequest');
 
     if (!deal) {
@@ -599,8 +599,8 @@ exports.respondToTrialContinuation = async (req, res) => {
   try {
     const { decision, reason } = req.body; // 'continue' or 'decline'
     const deal = await Deal.findById(req.params.id)
-      .populate('tutor', 'name email phone avatar')
-      .populate('student', 'name email phone avatar');
+      .populate('tutor', 'name email avatar')
+      .populate('student', 'name email avatar');
 
     if (!deal) {
       return res.status(404).json({
@@ -768,8 +768,8 @@ exports.respondToTrialContinuation = async (req, res) => {
 exports.adminClearTutorFee = async (req, res) => {
   try {
     const deal = await Deal.findById(req.params.id)
-      .populate('tutor', 'name email phone')
-      .populate('student', 'name email phone');
+      .populate('tutor', 'name email')
+      .populate('student', 'name email');
 
     if (!deal) {
       return res.status(404).json({

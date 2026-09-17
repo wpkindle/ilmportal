@@ -150,7 +150,7 @@ exports.getTutorApprovalQueue = async (req, res) => {
 
     const tutors = await TutorProfile.find(filter)
       .select('-cnicFrontImage -cnicBackImage -experienceCertificates.fileUrl -sanadDocuments.fileUrl')
-      .populate('user', 'name email avatar phone city area role age gender isVerified createdAt')
+      .populate('user', 'name email avatar city area role age gender isVerified createdAt')
       .populate('subjects', 'name type')
       .populate('cities', 'name province')
       .sort({ createdAt: -1 });
@@ -599,7 +599,7 @@ exports.getAllUsers = async (req, res) => {
 
     if (search && search !== 'undefined' && search !== 'null' && search.trim()) {
       const searchRegex = new RegExp(search.trim(), 'i');
-      const searchConditions = [{ name: searchRegex }, { email: searchRegex }, { phone: searchRegex }];
+      const searchConditions = [{ name: searchRegex }, { email: searchRegex }];
       if (query.$or) {
         query.$and = (query.$and || []).concat([{ $or: query.$or }, { $or: searchConditions }]);
         delete query.$or;
@@ -934,8 +934,8 @@ exports.getAllDeals = async (req, res) => {
     if (paymentStatus && paymentStatus !== 'all') query.paymentStatus = paymentStatus;
 
     const deals = await Deal.find(query)
-      .populate('student', 'name email phone avatar city')
-      .populate('tutor', 'name email phone avatar city')
+      .populate('student', 'name email avatar city')
+      .populate('tutor', 'name email avatar city')
       .populate('paymentVerifiedBy', 'name')
       .sort({ createdAt: -1 });
 
@@ -1367,8 +1367,8 @@ exports.getSessionLogs = async (req, res) => {
   try {
     const sessions = await Session.find()
       .populate('deal', 'subject price mode status')
-      .populate('tutor', 'name email avatar phone city')
-      .populate('student', 'name email avatar phone city')
+      .populate('tutor', 'name email avatar city')
+      .populate('student', 'name email avatar city')
       .sort({ scheduledStartTime: -1 });
 
     res.status(200).json({

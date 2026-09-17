@@ -86,8 +86,8 @@ exports.getMySessions = async (req, res) => {
 
     const sessions = await Session.find(filter)
       .populate('deal', 'subject price mode status')
-      .populate('tutor', 'name avatar email phone city')
-      .populate('student', 'name avatar email phone city')
+      .populate('tutor', 'name avatar email city')
+      .populate('student', 'name avatar email city')
       .sort({ scheduledStartTime: 1 });
 
     res.status(200).json({
@@ -110,8 +110,8 @@ exports.getSessionByRoomId = async (req, res) => {
     const roomId = req.params.roomId;
     let session = await Session.findOne({ roomId })
       .populate('deal')
-      .populate('tutor', 'name avatar email phone')
-      .populate('student', 'name avatar email phone');
+      .populate('tutor', 'name avatar email')
+      .populate('student', 'name avatar email');
 
     // Block video classroom for existing sessions linked to an in-person deal
     if (session && session.deal) {

@@ -7,7 +7,6 @@ import {
   User,
   Mail,
   Lock,
-  Phone,
   ArrowRight,
   ArrowLeft,
   CheckCircle2,
@@ -86,7 +85,6 @@ export default function TutorMultiStepRegister() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [phone, setPhone] = useState('');
   const [turnstileToken, setTurnstileToken] = useState('');
   const turnstileRef = useRef(null);
 
@@ -173,7 +171,6 @@ export default function TutorMultiStepRegister() {
       setIsEmailVerified(true);
       setName(user.name || '');
       setEmail(user.email || '');
-      if (user.phone) setPhone(user.phone);
       if (user.city) setCity(user.city);
       if (user.area) setLocalArea(user.area);
       if (user.gender) setGender(user.gender);
@@ -220,10 +217,6 @@ export default function TutorMultiStepRegister() {
       setError('Password must be at least 6 characters long.');
       return;
     }
-    if (!phone.trim()) {
-      setError('Please enter your active WhatsApp or mobile phone number.');
-      return;
-    }
     if (!turnstileToken) {
       setError('Please complete the Cloudflare security verification check below.');
       return;
@@ -236,7 +229,6 @@ export default function TutorMultiStepRegister() {
         name: name.trim(),
         email: email.trim().toLowerCase(),
         password,
-        phone: phone.trim(),
         role: 'tutor',
         city: city || 'Lahore',
         turnstileToken,
@@ -811,48 +803,28 @@ export default function TutorMultiStepRegister() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {/* Password */}
-                    <div>
-                      <label className="text-xs font-serif font-bold text-[#e6dfd5] block mb-1">
-                        Create Password (min. 6 characters) *
-                      </label>
-                      <div className="relative">
-                        <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type={showPassword ? 'text' : 'password'}
-                          required
-                          value={password}
-                          onChange={(e) => setPassword(e.target.value)}
-                          placeholder="••••••••••••"
-                          className="w-full pl-10 pr-10 py-2.5 bg-[#06120c] border border-[#1b4d36] rounded-2xl text-xs sm:text-sm text-[#faf8f5] placeholder:text-stone-500 outline-none focus:border-[#d4a359] focus:ring-1 focus:ring-[#d4a359] font-mono"
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowPassword(!showPassword)}
-                          className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-200 cursor-pointer p-1"
-                        >
-                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* WhatsApp / Mobile Phone */}
-                    <div>
-                      <label className="text-xs font-serif font-bold text-[#e6dfd5] block mb-1">
-                        Active Mobile / WhatsApp Number *
-                      </label>
-                      <div className="relative">
-                        <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                        <input
-                          type="tel"
-                          required
-                          value={phone}
-                          onChange={(e) => setPhone(e.target.value)}
-                          placeholder="03001234567"
-                          className="w-full pl-10 pr-4 py-2.5 bg-[#06120c] border border-[#1b4d36] rounded-2xl text-xs sm:text-sm text-[#faf8f5] placeholder:text-stone-500 outline-none focus:border-[#d4a359] focus:ring-1 focus:ring-[#d4a359]"
-                        />
-                      </div>
+                  {/* Password */}
+                  <div>
+                    <label className="text-xs font-serif font-bold text-[#e6dfd5] block mb-1">
+                      Create Password (min. 6 characters) *
+                    </label>
+                    <div className="relative">
+                      <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+                      <input
+                        type={showPassword ? 'text' : 'password'}
+                        required
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••••••"
+                        className="w-full pl-10 pr-10 py-2.5 bg-[#06120c] border border-[#1b4d36] rounded-2xl text-xs sm:text-sm text-[#faf8f5] placeholder:text-stone-500 outline-none focus:border-[#d4a359] focus:ring-1 focus:ring-[#d4a359] font-mono"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-stone-400 hover:text-stone-200 cursor-pointer p-1"
+                      >
+                        {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
                     </div>
                   </div>
 
@@ -1670,12 +1642,12 @@ export default function TutorMultiStepRegister() {
                   </div>
 
                   <div>
-                    <label className="text-[11px] text-stone-400 block mb-1">Account / Mobile Number *</label>
+                    <label className="text-[11px] text-stone-400 block mb-1">Account Number / IBAN *</label>
                     <input
                       type="text"
                       value={accountNumber}
                       onChange={(e) => setAccountNumber(e.target.value)}
-                      placeholder="03001234567 or IBAN"
+                      placeholder="Account number or IBAN"
                       className="w-full px-3 py-2 bg-[#0c2217] border border-[#1b4d36] rounded-xl text-xs text-[#faf8f5] outline-none focus:border-[#d4a359] font-mono"
                     />
                   </div>

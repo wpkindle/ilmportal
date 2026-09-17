@@ -67,7 +67,10 @@ const PAYMENT_PROVIDERS = [
   { id: 'Other Bank', name: 'Other Pakistani Commercial / Islamic Bank', type: 'bank' }
 ];
 
-export default function TutorMultiStepRegister() {
+export default function TutorMultiStepRegister({
+  embedded = false,
+  onSwitchToSignIn
+} = {}) {
   const router = useRouter();
   const { user, token, verifyOtp: authVerifyOtp, updateTutorProfileState, updateUserProfile } = useAuth();
 
@@ -647,14 +650,8 @@ export default function TutorMultiStepRegister() {
     { num: 5, title: 'Launch', subtitle: 'Payments & Submit' }
   ];
 
-  return (
-    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 bg-[#06120c] flex flex-col justify-center relative overflow-hidden">
-      
-      {/* Background Decorative Lighting */}
-      <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#d4a359]/10 rounded-full blur-3xl pointer-events-none" />
-      <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-[#143d2b]/40 rounded-full blur-3xl pointer-events-none" />
-
-      <div className="max-w-3xl w-full mx-auto space-y-6 relative z-10">
+  const content = (
+    <div className="max-w-3xl w-full mx-auto space-y-6 relative z-10">
         
         {/* Top Branding & Heading */}
         <div className="text-center space-y-2">
@@ -861,9 +858,19 @@ export default function TutorMultiStepRegister() {
 
                   <p className="text-center text-xs text-stone-400 pt-2">
                     Already registered as a tutor?{' '}
-                    <Link href="/login?role=tutor" className="text-[#d4a359] font-bold hover:underline">
-                      Sign in here
-                    </Link>
+                    {onSwitchToSignIn ? (
+                      <button
+                        type="button"
+                        onClick={onSwitchToSignIn}
+                        className="text-[#d4a359] font-bold hover:underline cursor-pointer"
+                      >
+                        Sign in here
+                      </button>
+                    ) : (
+                      <Link href="/login?role=tutor" className="text-[#d4a359] font-bold hover:underline">
+                        Sign in here
+                      </Link>
+                    )}
                   </p>
                 </form>
               ) : isEmailVerified ? (
@@ -1747,6 +1754,18 @@ export default function TutorMultiStepRegister() {
 
         </div>
       </div>
+  );
+
+  if (embedded) {
+    return content;
+  }
+
+  return (
+    <div className="min-h-screen py-10 px-4 sm:px-6 lg:px-8 bg-[#06120c] flex flex-col justify-center relative overflow-hidden">
+      {/* Background Decorative Lighting */}
+      <div className="absolute -top-40 -right-40 w-96 h-96 bg-[#d4a359]/10 rounded-full blur-3xl pointer-events-none" />
+      <div className="absolute -bottom-40 -left-40 w-96 h-96 bg-[#143d2b]/40 rounded-full blur-3xl pointer-events-none" />
+      {content}
     </div>
   );
 }

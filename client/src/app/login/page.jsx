@@ -21,6 +21,7 @@ import { api } from '../../services/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import BrandLogo from '../../components/common/BrandLogo';
 import Turnstile from '../../components/common/Turnstile';
+import TutorMultiStepRegister from '../../components/auth/TutorMultiStepRegister';
 
 function LoginContent() {
   const { user, login, loading: authLoading } = useAuth();
@@ -65,30 +66,45 @@ function LoginContent() {
   const [showSignUpPassword, setShowSignUpPassword] = useState(false);
   const [signUpHoneypot, setSignUpHoneypot] = useState('');
 
+  // Helper handlers for role and mode toggling with smooth URL state sync
+  const handleRoleChange = (newRole) => {
+    setRole(newRole);
+    setError('');
+    setSuccessMessage('');
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      params.set('role', newRole);
+      window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+    }
+  };
+
+  const handleModeChange = (newMode) => {
+    setMode(newMode);
+    setError('');
+    setSuccessMessage('');
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      params.set('mode', newMode);
+      window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+    }
+  };
+
   // Keep state in sync with URL params if they change
   useEffect(() => {
-    if (roleParam === 'tutor' && initialModeParam === 'signup') {
-      router.replace('/register/tutor');
-      return;
-    }
     if (roleParam === 'tutor') {
       setRole('tutor');
     } else if (roleParam === 'student') {
       setRole('student');
     }
-  }, [roleParam, initialModeParam, router]);
+  }, [roleParam]);
 
   useEffect(() => {
     if (initialModeParam === 'signup') {
-      if (roleParam === 'tutor') {
-        router.replace('/register/tutor');
-        return;
-      }
       setMode('signup');
     } else if (initialModeParam === 'signin') {
       setMode('signin');
     }
-  }, [initialModeParam, roleParam, router]);
+  }, [initialModeParam]);
 
   // Handle Sign In
   const handleSignIn = async (e) => {
@@ -203,8 +219,85 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen py-8 sm:py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative z-10">
-      <div className="max-w-4xl w-full bg-white rounded-3xl border border-[#e6dfd5] shadow-[0_16px_50px_rgba(12,34,23,0.08)] overflow-hidden grid grid-cols-1 md:grid-cols-12">
+    <div className="min-h-screen py-8 sm:py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center relative z-10">
+      
+      {/* Top Header Controls (Branding + Role & Mode Toggles) */}
+      <div className="max-w-4xl w-full mx-auto mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <Link href="/" className="inline-flex items-center gap-3 group">
+          <BrandLogo variant="light" size="md" />
+        </Link>
+
+        <div className="flex flex-wrap items-center justify-center gap-2.5">
+          {/* Role Pill Switcher */}
+          <div className="flex bg-[#f5efe6] p-1.5 rounded-2xl border border-[#e6dfd5] shadow-2xs">
+            <button
+              type="button"
+              onClick={() => handleRoleChange('student')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                !isTutorMode
+                  ? 'bg-[#0c2217] text-[#d4a359] shadow-sm'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <GraduationCap className="w-3.5 h-3.5" />
+              <span>Student Portal</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleRoleChange('tutor')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                isTutorMode
+                  ? 'bg-[#b85d34] text-white shadow-sm'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <ShieldCheck className="w-3.5 h-3.5" />
+              <span>Faculty &amp; Tutor</span>
+            </button>
+          </div>
+
+          {/* Mode Pill Switcher */}
+          <div className="flex bg-[#f5efe6] p-1.5 rounded-2xl border border-[#e6dfd5] shadow-2xs">
+            <button
+              type="button"
+              onClick={() => handleModeChange('signin')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                mode === 'signin'
+                  ? 'bg-[#0c2217] text-white shadow-sm'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <Lock className="w-3.5 h-3.5" />
+              <span>Sign In</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => handleModeChange('signup')}
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                mode === 'signup'
+                  ? isTutorMode
+                    ? 'bg-[#b85d34] text-white shadow-sm'
+                    : 'bg-[#0c2217] text-white shadow-sm'
+                  : 'text-stone-600 hover:text-stone-900'
+              }`}
+            >
+              <Sparkles className="w-3.5 h-3.5" />
+              <span>Sign Up</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      {isTutorMode && mode === 'signup' ? (
+        <div className="w-full max-w-3xl mx-auto animate-in fade-in duration-300">
+          <TutorMultiStepRegister
+            embedded={true}
+            onSwitchToSignIn={() => handleModeChange('signin')}
+          />
+        </div>
+      ) : (
+        <div className="max-w-4xl w-full bg-white rounded-3xl border border-[#e6dfd5] shadow-[0_16px_50px_rgba(12,34,23,0.08)] overflow-hidden grid grid-cols-1 md:grid-cols-12 animate-in fade-in duration-300">
         
         {/* Left Column: Sign In Title, Logo & Brand Details */}
         <div className="md:col-span-5 bg-[#faf8f5] p-6 sm:p-8 lg:p-10 border-b md:border-b-0 md:border-r border-[#e6dfd5] flex flex-col justify-between space-y-6">
@@ -307,11 +400,7 @@ function LoginContent() {
           <div className="flex bg-[#f5efe6] p-1.5 rounded-2xl border border-[#e6dfd5]">
             <button
               type="button"
-              onClick={() => {
-                setMode('signin');
-                setError('');
-                setSuccessMessage('');
-              }}
+              onClick={() => handleModeChange('signin')}
               className={`flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
                 mode === 'signin'
                   ? 'bg-[#0c2217] text-white shadow-md'
@@ -324,15 +413,7 @@ function LoginContent() {
 
             <button
               type="button"
-              onClick={() => {
-                if (isTutorMode) {
-                  router.push('/register/tutor');
-                  return;
-                }
-                setMode('signup');
-                setError('');
-                setSuccessMessage('');
-              }}
+              onClick={() => handleModeChange('signup')}
               className={`flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-bold transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer ${
                 mode === 'signup'
                   ? isTutorMode
@@ -446,31 +527,8 @@ function LoginContent() {
           )}
 
           {/* ══════════════════════════════════════════════════════════
-              CHOICE 2: SIGN UP FORM
+              CHOICE 2: STUDENT SIGN UP FORM
              ══════════════════════════════════════════════════════════ */}
-          {mode === 'signup' && isTutorMode && (
-            <div className="space-y-5 p-6 sm:p-8 bg-[#faf8f5] border border-[#e6dfd5] rounded-3xl text-center">
-              <div className="w-14 h-14 rounded-2xl bg-[#f5ebe6] border border-[#b85d34]/30 flex items-center justify-center mx-auto text-[#b85d34] shadow-xs">
-                <ShieldCheck className="w-7 h-7" />
-              </div>
-              <div className="space-y-2">
-                <h3 className="font-serif font-black text-xl text-[#0c2217]">
-                  Faculty Multi-Step Onboarding
-                </h3>
-                <p className="text-xs sm:text-sm text-stone-600 max-w-md mx-auto leading-relaxed">
-                  To ensure quality and verified credentials, all tutors register through our comprehensive 5-step registration wizard with mandatory email verification, disciplines setup, and sanad documentation.
-                </p>
-              </div>
-              <Link
-                href="/register/tutor"
-                className="inline-flex items-center justify-center gap-2 w-full py-3.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#854020] text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md transition-all border border-[#d4a359]/40 cursor-pointer"
-              >
-                <span>Launch 5-Step Registration Wizard</span>
-                <ArrowRight className="w-4 h-4 text-[#d4a359]" />
-              </Link>
-            </div>
-          )}
-
           {mode === 'signup' && !isTutorMode && (
             <form onSubmit={handleSignUp} autoComplete="off" className="space-y-4">
               {/* Anti-spam honeypot (hidden from real users, filled by bots) */}
@@ -586,6 +644,7 @@ function LoginContent() {
         </div>
 
       </div>
+      )}
     </div>
   );
 }

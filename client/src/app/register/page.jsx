@@ -12,7 +12,7 @@ function RegisterRedirect() {
 
   useEffect(() => {
     if (role === 'tutor') {
-      router.replace('/register/tutor');
+      router.replace('/login?role=tutor&mode=signup');
       return;
     }
     let target = '/login?mode=signup';

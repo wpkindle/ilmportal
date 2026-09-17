@@ -1778,3 +1778,4 @@ export default function TutorMultiStepRegister() {
     </div>
   );
 }
+

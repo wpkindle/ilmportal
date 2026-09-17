@@ -111,8 +111,8 @@ export default function StudentPaymentRequestModal({
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      setError('Proof image exceeds the 10MB limit. Please select a smaller screenshot.');
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Proof image exceeds the 2MB limit. Please select a file under 2MB.');
       return;
     }
 

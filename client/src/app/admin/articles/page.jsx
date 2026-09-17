@@ -179,8 +179,8 @@ export default function AdminArticlesPage() {
       setImageUploadError('Please select a valid image file (JPG, PNG, WEBP, GIF).');
       return;
     }
-    if (file.size > 10 * 1024 * 1024) {
-      setImageUploadError('Image size exceeds 10MB limit. Please choose a smaller image.');
+    if (file.size > 2 * 1024 * 1024) {
+      setImageUploadError('Image size exceeds 2MB limit. Please choose an image under 2MB.');
       return;
     }
 

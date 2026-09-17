@@ -26,6 +26,7 @@ import {
 import { api } from '../../services/api';
 import { useSocket } from '../../context/SocketContext';
 import { useAuth } from '../../context/AuthContext';
+import { useRecaptchaV3 } from './ReCaptcha';
 
 const getFileUrl = (path) => {
   if (!path) return '';
@@ -81,6 +82,7 @@ export default function LiveSupportWidget() {
   const pathname = usePathname();
   const { user } = useAuth();
   const { socket, isAdminOnline: socketAdminOnline } = useSocket();
+  const { executeRecaptcha } = useRecaptchaV3();
 
   const [isOpen, setIsOpen] = useState(false);
   const [sessionId, setSessionId] = useState('');
@@ -164,6 +166,7 @@ export default function LiveSupportWidget() {
   const [offlineEmail, setOfflineEmail] = useState('');
   const [offlineName, setOfflineName] = useState('');
   const [offlineMessage, setOfflineMessage] = useState('');
+  const [offlineHpWebsite, setOfflineHpWebsite] = useState('');
   const [offlineSending, setOfflineSending] = useState(false);
   const [offlineSubmitted, setOfflineSubmitted] = useState(false);
 
@@ -514,8 +517,8 @@ export default function LiveSupportWidget() {
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      alert('File size exceeds the 10MB limit. Please choose a smaller file.');
+    if (file.size > 2 * 1024 * 1024) {
+      alert('File size exceeds the 2MB limit. Please choose a file under 2MB.');
       e.target.value = '';
       return;
     }
@@ -681,6 +684,13 @@ export default function LiveSupportWidget() {
     }
 
     try {
+      let captchaToken = '';
+      try {
+        captchaToken = await executeRecaptcha('support_offline');
+      } catch (captchaErr) {
+        console.warn('reCAPTCHA error in offline support inquiry:', captchaErr);
+      }
+
       const res = await api.sendOfflineSupportMessage({
         sessionId,
         email: offlineEmail.trim(),
@@ -689,7 +699,9 @@ export default function LiveSupportWidget() {
         fileUrl: uploadedAttachment?.fileUrl,
         fileName: uploadedAttachment?.fileName,
         fileType: uploadedAttachment?.fileType,
-        fileSize: uploadedAttachment?.fileSize
+        fileSize: uploadedAttachment?.fileSize,
+        captchaToken,
+        hp_website: offlineHpWebsite
       });
 
       if (res?.success) {
@@ -1089,6 +1101,17 @@ export default function LiveSupportWidget() {
                 </div>
               ) : (
                 <form onSubmit={handleSendOfflineMessage} className="space-y-3">
+                  {/* Honeypot anti-spam field */}
+                  <input
+                    type="text"
+                    name="hp_website"
+                    value={offlineHpWebsite}
+                    onChange={(e) => setOfflineHpWebsite(e.target.value)}
+                    style={{ display: 'none', position: 'absolute', left: '-9999px' }}
+                    tabIndex="-1"
+                    autoComplete="off"
+                    aria-hidden="true"
+                  />
                   <div>
                     <label className="block text-[11px] font-bold text-[#0c2217] mb-1">
                       Your Email Address <span className="text-rose-500">*</span>

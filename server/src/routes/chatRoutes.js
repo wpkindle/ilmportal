@@ -21,7 +21,7 @@ const multer = require('multer');
 // Use memory storage so files are available regardless of filesystem (works on Render/ephemeral)
 const upload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB max
   fileFilter: (req, file, cb) => {
     const allowed = [
       'image/jpeg', 'image/jpg', 'image/png',

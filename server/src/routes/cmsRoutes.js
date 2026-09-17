@@ -10,13 +10,14 @@ const {
   diagnoseEmail
 } = require('../controllers/cmsController');
 const { requireRecaptcha } = require('../middleware/recaptchaMiddleware');
+const { spamFilter, contactLimiter } = require('../middleware/spamFilter');
 
 router.get('/categories', getCategories);
 router.get('/locations', getLocations);
 router.get('/config', getSystemConfig);
 router.get('/pages', getAllPages);
 router.get('/pages/:slug', getPage);
-router.post('/contact', requireRecaptcha, submitContactMessage);
+router.post('/contact', contactLimiter, spamFilter, requireRecaptcha, submitContactMessage);
 router.get('/diagnose-email', diagnoseEmail);
 
 module.exports = router;

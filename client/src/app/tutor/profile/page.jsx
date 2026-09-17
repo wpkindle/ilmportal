@@ -710,8 +710,8 @@ function TutorProfileContent() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 8 * 1024 * 1024) {
-      setProfileError('Image file must be under 8MB');
+    if (file.size > 2 * 1024 * 1024) {
+      setProfileError('Image file must be under 2MB');
       return;
     }
 
@@ -735,8 +735,8 @@ function TutorProfileContent() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 10 * 1024 * 1024) {
-      setSanadError('File size must be under 10MB');
+    if (file.size > 2 * 1024 * 1024) {
+      setSanadError('File size must be under 2MB');
       return;
     }
 

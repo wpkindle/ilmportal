@@ -70,7 +70,8 @@ export default function StudentAuthModal({
     name: '',
     email: '',
     password: '',
-    role: 'student'
+    role: 'student',
+    hp_website: ''
   });
 
   // OTP Verification State
@@ -158,7 +159,8 @@ export default function StudentAuthModal({
         email: registerForm.email.trim().toLowerCase(),
         password: registerForm.password,
         role: 'student',
-        captchaToken: registerCaptchaToken
+        captchaToken: registerCaptchaToken,
+        hp_website: registerForm.hp_website
       });
 
       if (res.success) {
@@ -450,7 +452,18 @@ export default function StudentAuthModal({
           {/* 2. REGISTRATION FORM (STRAIGHTFORWARD 5-FIELD LAYOUT) */}
           {mode === 'register' && (
             <form onSubmit={handleRegisterSubmit} autoComplete="off" className="space-y-2">
-              
+              {/* Anti-spam honeypot (hidden from real users, filled by bots) */}
+              <input
+                type="text"
+                name="hp_website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                value={registerForm.hp_website || ''}
+                onChange={(e) => setRegisterForm({ ...registerForm, hp_website: e.target.value })}
+                style={{ display: 'none', position: 'absolute', opacity: 0, pointerEvents: 'none' }}
+              />
+
               {/* Row 1: Full Name */}
               <div>
                 <label className="text-[11px] font-bold text-slate-700 block mb-0.5">

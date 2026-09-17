@@ -14,10 +14,10 @@ const { protect } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 const multer = require('multer');
 
-// Memory storage for article featured image uploads (max 10MB)
+// Memory storage for article featured image uploads (strict 2MB max)
 const articleUpload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 2 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     if (file.mimetype.startsWith('image/')) {
       cb(null, true);

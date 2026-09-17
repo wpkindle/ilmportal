@@ -68,3 +68,4 @@ export async function compressAvatarFile(file, maxDimension = 350, quality = 0.8
     reader.readAsDataURL(file);
   });
 }
+

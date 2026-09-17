@@ -33,6 +33,7 @@ export default function ContactUsPage() {
   const [formSuccess, setFormSuccess] = useState('');
   const [formError, setFormError] = useState('');
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const [honeypot, setHoneypot] = useState('');
 
   useEffect(() => {
     const fetchPage = async () => {
@@ -72,7 +73,8 @@ export default function ContactUsPage() {
         phone: '',
         subject: subject || 'General Inquiry',
         message,
-        captchaToken
+        captchaToken,
+        hp_website: honeypot
       });
       if (res.success) {
         setFormSuccess(res.message || 'Thank you! Your message has been sent successfully. We will respond to your email promptly.');
@@ -273,6 +275,17 @@ export default function ContactUsPage() {
               )}
 
               <form onSubmit={handleSubmit} className="space-y-5">
+                {/* Honeypot anti-spam field */}
+                <input
+                  type="text"
+                  name="hp_website"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  style={{ display: 'none', position: 'absolute', left: '-9999px' }}
+                  tabIndex="-1"
+                  autoComplete="off"
+                  aria-hidden="true"
+                />
                 
                 {/* Full Name */}
                 <div className="space-y-1.5">

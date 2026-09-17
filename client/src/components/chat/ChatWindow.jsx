@@ -598,8 +598,8 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
       return;
     }
 
-    if (file.size > 10 * 1024 * 1024) {
-      alert('File size exceeds the 10MB limit. Please choose a smaller file.');
+    if (file.size > 2 * 1024 * 1024) {
+      alert('File size exceeds the 2MB limit. Please choose a file under 2MB.');
       e.target.value = '';
       return;
     }

@@ -19,10 +19,11 @@ const {
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 const { requireRecaptcha } = require('../middleware/recaptchaMiddleware');
+const { spamFilter, registrationLimiter } = require('../middleware/spamFilter');
 
-router.post('/register', requireRecaptcha, register);
-router.post('/early-tutor', requireRecaptcha, registerEarlyTutor);
-router.post('/early-tutor-register', requireRecaptcha, registerEarlyTutor);
+router.post('/register', registrationLimiter, spamFilter, requireRecaptcha, register);
+router.post('/early-tutor', registrationLimiter, spamFilter, requireRecaptcha, registerEarlyTutor);
+router.post('/early-tutor-register', registrationLimiter, spamFilter, requireRecaptcha, registerEarlyTutor);
 router.post('/verify-otp', verifyOtp);
 router.post('/verify-token', verifyToken);
 router.get('/verify-token', verifyToken);

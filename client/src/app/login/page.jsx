@@ -63,6 +63,7 @@ function LoginContent() {
   const [signUpEmail, setSignUpEmail] = useState('');
   const [signUpPassword, setSignUpPassword] = useState('');
   const [showSignUpPassword, setShowSignUpPassword] = useState(false);
+  const [signUpHoneypot, setSignUpHoneypot] = useState('');
 
   // Keep state in sync with URL params if they change
   useEffect(() => {
@@ -143,7 +144,8 @@ function LoginContent() {
         email: signUpEmail.trim().toLowerCase(),
         password: signUpPassword,
         role: isTutorMode ? 'tutor' : 'student',
-        captchaToken: signUpCaptchaToken
+        captchaToken: signUpCaptchaToken,
+        hp_website: signUpHoneypot
       };
 
       const res = await api.register(payload);
@@ -417,6 +419,18 @@ function LoginContent() {
              ══════════════════════════════════════════════════════════ */}
           {mode === 'signup' && (
             <form onSubmit={handleSignUp} autoComplete="off" className="space-y-4">
+              {/* Anti-spam honeypot (hidden from real users, filled by bots) */}
+              <input
+                type="text"
+                name="hp_website"
+                tabIndex={-1}
+                autoComplete="off"
+                aria-hidden="true"
+                value={signUpHoneypot}
+                onChange={(e) => setSignUpHoneypot(e.target.value)}
+                style={{ display: 'none', position: 'absolute', opacity: 0, pointerEvents: 'none' }}
+              />
+
               {/* Full Name */}
               <div>
                 <label className="text-xs font-bold text-stone-800 block mb-1">

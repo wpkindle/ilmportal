@@ -28,7 +28,7 @@ const verifyRecaptcha = async (token, remoteIp) => {
   if (!token || typeof token !== 'string' || !token.trim()) {
     return {
       success: false,
-      message: 'Security verification missing. Please try again.'
+      message: 'reCAPTCHA verification missing. Please try again.'
     };
   }
 

@@ -28,10 +28,10 @@ const cloudinaryStorage = new CloudinaryStorage({
   }
 });
 
-// Multer upload using Cloudinary storage
+// Multer upload using Cloudinary storage (Strict 2MB max upload limit)
 const uploadToCloud = multer({
   storage: cloudinaryStorage,
-  limits: { fileSize: 10 * 1024 * 1024 }, // 10MB
+  limits: { fileSize: 2 * 1024 * 1024 }, // 2MB
   fileFilter: (req, file, cb) => {
     const allowed = [
       'image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif',

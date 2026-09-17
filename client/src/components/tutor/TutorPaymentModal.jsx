@@ -103,8 +103,8 @@ export default function TutorPaymentModal({ deal, isOpen, onClose, onSuccess }) 
       setError('Please upload an image file (JPG, PNG, WEBP).');
       return;
     }
-    if (file.size > 8 * 1024 * 1024) {
-      setError('Screenshot must be under 8MB.');
+    if (file.size > 2 * 1024 * 1024) {
+      setError('Screenshot must be under 2MB.');
       return;
     }
     setProofImage(file);

@@ -5,6 +5,8 @@ const supportController = require('../controllers/supportController');
 const { protect, optionalAuth } = require('../middleware/authMiddleware');
 const { authorize } = require('../middleware/roleMiddleware');
 const rateLimit = require('express-rate-limit');
+const { requireRecaptcha } = require('../middleware/recaptchaMiddleware');
+const { spamFilter, contactLimiter } = require('../middleware/spamFilter');
 
 // Rate limit: 60 messages per 15 minutes per IP
 const supportLimiter = rateLimit({
@@ -18,16 +20,16 @@ const supportLimiter = rateLimit({
   legacyHeaders: false
 });
 
-// Multer configured strictly for PNG, JPG, JPEG, and PDF (Max 10MB)
+// Multer configured strictly for PNG, JPG, JPEG, and PDF (Strict 2MB max)
 const supportUpload = multer({
   storage: multer.memoryStorage(),
-  limits: { fileSize: 10 * 1024 * 1024 },
+  limits: { fileSize: 2 * 1024 * 1024 },
   fileFilter: (req, file, cb) => {
     const allowed = ['image/png', 'image/jpeg', 'image/jpg', 'application/pdf'];
     if (allowed.includes(file.mimetype)) {
       cb(null, true);
     } else {
-      cb(new Error('Only PNG, JPG, JPEG, and PDF files are allowed.'), false);
+      cb(new Error('Only PNG, JPG, JPEG, and PDF files are allowed. Max 2MB.'), false);
     }
   }
 });
@@ -37,7 +39,7 @@ const supportUpload = multer({
 // ==========================================
 router.get('/admin-status', supportController.getAdminOnlineStatus);
 router.post('/message', supportLimiter, optionalAuth, supportController.sendMessage);
-router.post('/offline-message', supportLimiter, optionalAuth, supportController.leaveOfflineMessage);
+router.post('/offline-message', contactLimiter, spamFilter, requireRecaptcha, optionalAuth, supportController.leaveOfflineMessage);
 router.post('/upload', optionalAuth, supportUpload.single('file'), supportController.uploadSupportFile);
 router.get('/session/:sessionId', supportController.getSessionHistory);
 router.delete('/session/:sessionId', optionalAuth, supportController.deleteUserSession);

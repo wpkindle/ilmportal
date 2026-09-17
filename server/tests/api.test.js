@@ -15,21 +15,21 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
     await connectDB();
     const User = require('../src/models/User');
     const TutorProfile = require('../src/models/TutorProfile');
-    const existing = await User.find({ email: { $in: ['teststudent@pakistanlms.pk', 'testtutor@pakistanlms.pk'] } });
+    const existing = await User.find({ email: { $in: ['teststudent@pakistanlms.pk', 'testtutor@pakistanlms.pk', 'testadmin@pakistanlms.pk'] } });
     if (existing.length > 0) {
       await TutorProfile.deleteMany({ user: { $in: existing.map(u => u._id) } });
     }
-    await User.deleteMany({ email: { $in: ['teststudent@pakistanlms.pk', 'testtutor@pakistanlms.pk'] } });
+    await User.deleteMany({ email: { $in: ['teststudent@pakistanlms.pk', 'testtutor@pakistanlms.pk', 'testadmin@pakistanlms.pk'] } });
   });
 
   afterAll(async () => {
     const User = require('../src/models/User');
     const TutorProfile = require('../src/models/TutorProfile');
-    const existing = await User.find({ email: { $in: ['teststudent@pakistanlms.pk', 'testtutor@pakistanlms.pk'] } });
+    const existing = await User.find({ email: { $in: ['teststudent@pakistanlms.pk', 'testtutor@pakistanlms.pk', 'testadmin@pakistanlms.pk'] } });
     if (existing.length > 0) {
       await TutorProfile.deleteMany({ user: { $in: existing.map(u => u._id) } });
     }
-    await User.deleteMany({ email: { $in: ['teststudent@pakistanlms.pk', 'testtutor@pakistanlms.pk'] } });
+    await User.deleteMany({ email: { $in: ['teststudent@pakistanlms.pk', 'testtutor@pakistanlms.pk', 'testadmin@pakistanlms.pk'] } });
     await disconnectDB();
     server.close();
   });
@@ -141,11 +141,11 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
 
   test('POST /api/auth/login logs in admin account', async () => {
     const User = require('../src/models/User');
-    let admin = await User.findOne({ email: 'admin@pakistanlms.pk' });
+    let admin = await User.findOne({ email: 'testadmin@pakistanlms.pk' });
     if (!admin) {
       admin = await User.create({
         name: 'Admin Test',
-        email: 'admin@pakistanlms.pk',
+        email: 'testadmin@pakistanlms.pk',
         password: 'Admin@12345',
         role: 'admin',
         isVerified: true
@@ -155,7 +155,7 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
     const res = await request(app)
       .post('/api/auth/login')
       .send({
-        email: 'admin@pakistanlms.pk',
+        email: 'testadmin@pakistanlms.pk',
         password: 'Admin@12345'
       });
 

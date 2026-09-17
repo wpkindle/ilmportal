@@ -3,8 +3,7 @@
  * Verifies Turnstile tokens against Cloudflare's siteverify API.
  */
 
-// Default to Cloudflare's official test secret key (always passes) if not configured in environment
-const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET_KEY || '1x0000000000000000000000000000000AA';
+const TURNSTILE_SECRET = process.env.TURNSTILE_SECRET_KEY || '0x4AAAAAAE52TT00KyyNVcrLj_f7Ygt3r4U';
 
 /**
  * Verifies a Cloudflare Turnstile token.

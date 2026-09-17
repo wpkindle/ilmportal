@@ -2,8 +2,7 @@
 
 import React, { useEffect, useRef, useState, useImperativeHandle, forwardRef } from 'react';
 
-// Cloudflare official test sitekey (always passes) used as fallback if not set in environment
-const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '1x00000000000000000000AA';
+const TURNSTILE_SITE_KEY = process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY || '0x4AAAAAAE52TXQOcvyAUM7Q';
 const SCRIPT_ID = 'cf-turnstile-script';
 
 /**

@@ -40,6 +40,7 @@ export default function VideoClassroomPage() {
         const data = err.data || {};
         setSessionData({
           error: data.message || err.message || 'Unable to join classroom.',
+          isInPerson: Boolean(data.isInPerson),
           isRestricted: Boolean(data.isRestricted),
           hasOverduePayment: Boolean(data.hasOverduePayment),
           isDenied: Boolean(!data.isRestricted && (err.status === 403 || err.message?.includes('deal')))
@@ -53,6 +54,29 @@ export default function VideoClassroomPage() {
   }, [roomId]);
 
   if (loading) return <LoadingSpinner />;
+
+  // Block classroom if deal is for in-person physical tutoring
+  if (sessionData?.isInPerson && user?.role !== 'admin') {
+    return (
+      <div className="h-screen w-screen bg-slate-950 flex flex-col items-center justify-center p-6 text-white text-center fixed inset-0 z-50">
+        <div className="max-w-md bg-slate-900 border border-[#d4a359]/40 rounded-3xl p-6 sm:p-8 space-y-4 shadow-2xl">
+          <div className="w-16 h-16 rounded-2xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400">
+            <span className="text-2xl font-black">🏠</span>
+          </div>
+          <h2 className="text-xl font-black text-white">In-Person Tutoring Deal</h2>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            {sessionData.error || 'Live video classroom is only available for online classes. This is an in-person physical tutoring deal.'}
+          </p>
+          <button
+            onClick={() => window.location.href = user?.role === 'tutor' ? '/tutor/messages' : '/student/messages'}
+            className="w-full py-3 bg-[#b85d34] hover:bg-[#9e4e2a] text-white text-xs font-bold rounded-xl transition-all cursor-pointer shadow-md"
+          >
+            Return to Messages
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   // Block classroom if access is denied / deal not accepted
   if (sessionData?.isDenied && user?.role !== 'admin') {

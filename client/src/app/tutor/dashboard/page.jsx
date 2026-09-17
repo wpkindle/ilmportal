@@ -19,7 +19,8 @@ import {
   X,
   Loader2,
   Star,
-  Flag
+  Flag,
+  Home
 } from 'lucide-react';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
@@ -330,7 +331,7 @@ export default function TutorDashboardPage() {
 
                     <div className="flex items-center gap-2 flex-wrap">
                       {/* Join Live Classroom */}
-                      {deal.status !== 'completed' && deal.mode !== 'in_person' && deal.mode !== 'physical' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && (() => {
+                      {deal.status !== 'completed' && deal.mode !== 'in_person' && deal.mode !== 'physical' && deal.mode !== 'in-person' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && (() => {
                         const isOverdue = Boolean(deal.tutorFeeDueDate && new Date(deal.tutorFeeDueDate) < new Date() && !deal.tutorFeePaid);
                         if (isOverdue) {
                           return (
@@ -355,6 +356,13 @@ export default function TutorDashboardPage() {
                           </Link>
                         );
                       })()}
+
+                      {deal.status !== 'completed' && (deal.mode === 'in_person' || deal.mode === 'physical' || deal.mode === 'in-person') && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && (
+                        <span className="px-3.5 py-2 rounded-xl bg-[#ede6db] text-[#0c2217] text-xs font-bold flex items-center gap-1.5 border border-[#d4a359]/30 shadow-xs">
+                          <Home className="w-4 h-4 text-[#b85d34]" />
+                          <span>In-Person Deal</span>
+                        </span>
+                      )}
 
                       {deal.status !== 'completed' && (
                         <Link

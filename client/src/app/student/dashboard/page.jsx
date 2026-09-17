@@ -15,7 +15,8 @@ import {
   GraduationCap,
   Award,
   Star,
-  Flag
+  Flag,
+  Home
 } from 'lucide-react';
 import { api } from '../../../services/api';
 import { useAuth } from '../../../context/AuthContext';
@@ -189,7 +190,7 @@ export default function StudentDashboardPage() {
                     </div>
 
                     <div className="flex items-center gap-2 flex-wrap">
-                      {deal.status !== 'completed' && deal.mode !== 'in_person' && deal.mode !== 'physical' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && !deal.accessRestricted && (
+                      {deal.status !== 'completed' && deal.mode !== 'in_person' && deal.mode !== 'physical' && deal.mode !== 'in-person' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && !deal.accessRestricted && (
                         <Link
                           href={`/classroom/${[user?.id || user?._id, deal.tutor?._id].sort().join('_')}`}
                           className="px-4 py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-sm border border-[#d4a359]/30 transition-all"
@@ -197,6 +198,13 @@ export default function StudentDashboardPage() {
                           <Video className="w-3.5 h-3.5 text-[#d4a359]" />
                           <span>Join Live Class</span>
                         </Link>
+                      )}
+
+                      {deal.status !== 'completed' && (deal.mode === 'in_person' || deal.mode === 'physical' || deal.mode === 'in-person') && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && (
+                        <div className="px-3.5 py-2.5 bg-[#ede6db] text-[#0c2217] font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-2xs border border-[#d4a359]/30">
+                          <Home className="w-3.5 h-3.5 text-[#b85d34]" />
+                          <span>In-Person Deal</span>
+                        </div>
                       )}
 
                       {deal.status !== 'completed' && (
@@ -315,13 +323,20 @@ export default function StudentDashboardPage() {
                     <span>{new Date(sess.scheduledStartTime).toLocaleString()}</span>
                   </div>
 
-                  <Link
-                    href={`/classroom/${sess.roomId}`}
-                    className="w-full py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-2 border border-[#d4a359]/30 transition-all"
-                  >
-                    <Video className="w-4 h-4 text-[#d4a359]" />
-                    <span>Join In-Platform Live Class</span>
-                  </Link>
+                  {sess.deal?.mode !== 'in_person' && sess.deal?.mode !== 'physical' && sess.deal?.mode !== 'in-person' && sess.mode !== 'in_person' && sess.mode !== 'physical' && sess.mode !== 'in-person' ? (
+                    <Link
+                      href={`/classroom/${sess.roomId}`}
+                      className="w-full py-2.5 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-2 border border-[#d4a359]/30 transition-all"
+                    >
+                      <Video className="w-4 h-4 text-[#d4a359]" />
+                      <span>Join In-Platform Live Class</span>
+                    </Link>
+                  ) : (
+                    <div className="w-full py-2.5 bg-[#ede6db] text-[#0c2217] font-bold text-xs rounded-xl shadow-xs flex items-center justify-center gap-2 border border-[#d4a359]/30">
+                      <Home className="w-4 h-4 text-[#b85d34]" />
+                      <span>In-Person Scheduled Session</span>
+                    </div>
+                  )}
                 </div>
               ))}
             </div>

@@ -33,7 +33,8 @@ import {
   File,
   CreditCard,
   Star,
-  Upload
+  Upload,
+  Home
 } from 'lucide-react';
 import { api } from '../../services/api';
 import { useAuth } from '../../context/AuthContext';
@@ -206,6 +207,18 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
             m.deal.status !== 'restricted')
       )
     )
+  );
+
+  // In-person deal check: when a deal is in-person / physical, video classroom button must be hidden!
+  const currentDealMode =
+    partnerDeal?.mode ||
+    messages.slice().reverse().find((m) => m.deal?.mode || m.dealOfferData?.mode)?.deal?.mode ||
+    messages.slice().reverse().find((m) => m.deal?.mode || m.dealOfferData?.mode)?.dealOfferData?.mode;
+
+  const isInPersonDeal = Boolean(
+    currentDealMode === 'in_person' ||
+    currentDealMode === 'physical' ||
+    currentDealMode === 'in-person'
   );
 
   // Student Profile & Female Tutor Gate State
@@ -1030,8 +1043,8 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
 
         {/* Right Side: Primary Actions + Sound + 3-Dots Dropdown */}
         <div className="flex items-center gap-1 sm:gap-1.5 shrink min-w-0 justify-end py-0.5">
-          {/* Live In-Platform Video Classroom Button */}
-          {!isTutorToTutor && isDealAccepted && partnerDeal?.status !== 'completed' && (
+          {/* Live In-Platform Video Classroom Button (Online Deals Only) */}
+          {!isTutorToTutor && isDealAccepted && !isInPersonDeal && partnerDeal?.status !== 'completed' && (
             <Link
               href={`/classroom/${conversationId}`}
               className="p-1.5 sm:px-2.5 sm:py-1.5 md:px-3 md:py-2 bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] text-[#faf8f5] font-bold text-xs rounded-xl shadow-md border border-[#d4a359]/40 flex items-center gap-1.5 transition-all cursor-pointer shrink-0"
@@ -1040,6 +1053,17 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
               <Video className="w-4 h-4 sm:w-3.5 sm:h-3.5 text-[#d4a359] shrink-0" />
               <span className="hidden md:inline">Join Class</span>
             </Link>
+          )}
+
+          {/* In-Person Physical Deal Badge (Shown instead of video button) */}
+          {!isTutorToTutor && isDealAccepted && isInPersonDeal && partnerDeal?.status !== 'completed' && (
+            <div
+              className="px-2 sm:px-2.5 py-1.5 bg-[#ede6db] text-[#0c2217] font-bold text-xs rounded-xl border border-[#d4a359]/30 flex items-center gap-1.5 shrink-0 select-none shadow-2xs"
+              title="In-Person Tutoring Deal Active (Physical Classes)"
+            >
+              <Home className="w-3.5 h-3.5 text-[#b85d34] shrink-0" />
+              <span className="hidden md:inline">In-Person Deal</span>
+            </div>
           )}
 
           {/* Tutor Action: Dynamic Tuition Fee Request / Status Button */}
@@ -1327,7 +1351,7 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                   </button>
                 )}
 
-                {!isTutorToTutor && isDealAccepted && partnerDeal?.status !== 'completed' && (
+                {!isTutorToTutor && isDealAccepted && !isInPersonDeal && partnerDeal?.status !== 'completed' && (
                   <Link
                     href={`/classroom/${conversationId}`}
                     onClick={() => setMenuOpen(false)}
@@ -1336,6 +1360,13 @@ const ChatWindow = ({ conversationId, partner, initialDeal, onBack, onConversati
                     <Video className="w-4 h-4 text-[#d4a359]" />
                     <span>Join Live Video Class</span>
                   </Link>
+                )}
+
+                {!isTutorToTutor && isDealAccepted && isInPersonDeal && partnerDeal?.status !== 'completed' && (
+                  <div className="w-full px-3.5 py-2 text-left flex items-center gap-2.5 text-stone-600 text-xs font-semibold select-none bg-stone-50/60">
+                    <Home className="w-4 h-4 text-[#b85d34]" />
+                    <span>In-Person Physical Tutoring</span>
+                  </div>
                 )}
 
                 {(isTutor || user?.role === 'tutor') && (!partnerDeal || !['active_trial', 'continuation_agreed', 'active_paid', 'pending_offer'].includes(partnerDeal.status)) && (

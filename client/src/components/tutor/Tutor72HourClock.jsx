@@ -12,7 +12,7 @@ export default function Tutor72HourClock({ deal, onPayClick, className = '' }) {
     formatted: '72h 00m 00s'
   });
 
-  const isInPerson = deal?.mode === 'in_person' || deal?.mode === 'physical';
+  const isInPerson = deal?.mode === 'in_person' || deal?.mode === 'physical' || deal?.mode === 'in-person';
   const hasFeeDueDate = Boolean(deal?.tutorFeeDueDate);
 
   useEffect(() => {
@@ -40,34 +40,40 @@ export default function Tutor72HourClock({ deal, onPayClick, className = '' }) {
           minutes: 0,
           seconds: 0,
           isOverdue: true,
-          formatted: '00h 00m 00s (Expired)'
+          formatted: '00h 00m 00s'
         });
         return;
       }
 
-      const totalSeconds = Math.floor(diff / 1000);
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
+      const totalHours = Math.floor(diff / (1000 * 60 * 60));
+      const minutes = Math.floor((diff / (1000 * 60)) % 60);
+      const seconds = Math.floor((diff / 1000) % 60);
 
-      const pad = (n) => String(n).padStart(2, '0');
+      const formatted = `${totalHours}h ${String(minutes).padStart(2, '0')}m ${String(seconds).padStart(2, '0')}s`;
+
       setTimeLeft({
-        hours,
+        hours: totalHours,
         minutes,
         seconds,
         isOverdue: false,
-        formatted: `${hours}h ${pad(minutes)}m ${pad(seconds)}s`
+        formatted
       });
     };
 
     updateTimer();
-    const timer = setInterval(updateTimer, 1000);
-    return () => clearInterval(timer);
+    const interval = setInterval(updateTimer, 1000);
+    return () => clearInterval(interval);
   }, [deal, isInPerson, hasFeeDueDate]);
 
+  // If no deal, return null
   if (!deal) return null;
 
-  // For online classes, if tutor has not approved student payment yet (no tutorFeeDueDate) and fee is not paid, don't show platform fee button/clock yet
+  // Don't show clock on completed or cancelled deals
+  if (deal.status === 'completed' || deal.status === 'cancelled') {
+    return null;
+  }
+
+  // If not in-person, not overdue, and tutor fee is not due yet, don't show
   if (!isInPerson && !hasFeeDueDate && !deal.tutorFeePaid && deal.paymentStatus !== 'verified') {
     return null;
   }
@@ -82,7 +88,11 @@ export default function Tutor72HourClock({ deal, onPayClick, className = '' }) {
           </div>
           <div>
             <span className="font-bold">Platform Fee Cleared &amp; Verified</span>
-            <p className="text-[11px] text-[#0c2217]/80">Full unrestricted access active for chat and video classroom.</p>
+            <p className="text-[11px] text-[#0c2217]/80">
+              {isInPerson
+                ? 'Full unrestricted access active for chat and physical tutoring.'
+                : 'Full unrestricted access active for chat and video classroom.'}
+            </p>
           </div>
         </div>
         <span className="px-2.5 py-1 bg-[#0c2217] text-[#faf8f5] border border-[#d4a359]/40 font-bold text-[10px] rounded-full uppercase tracking-wider">
@@ -143,7 +153,7 @@ export default function Tutor72HourClock({ deal, onPayClick, className = '' }) {
               </span>
             </div>
             <p className="text-[11px] text-rose-700 mt-0.5 leading-relaxed">
-              The 72-hour window has passed without payment verification. <strong>Chat and video classroom are paused</strong> until the platform fee ({feeDisplay}) is cleared with admin.
+              The 72-hour window has passed without payment verification. <strong>{isInPerson ? 'Chat messaging is paused' : 'Chat and video classroom are paused'}</strong> until the platform fee ({feeDisplay}) is cleared with admin.
             </p>
           </div>
         </div>
@@ -178,11 +188,13 @@ export default function Tutor72HourClock({ deal, onPayClick, className = '' }) {
               ⏳ {timeLeft.formatted}
             </span>
             <span className="px-2 py-0.5 bg-[#f0ece1] text-[#0c2217] border border-[#d4a359]/40 font-bold text-[9px] rounded-full uppercase tracking-wider">
-              Full Access Active (Chat &amp; Video)
+              {isInPerson ? 'Full Access Active (Chat)' : 'Full Access Active (Chat &amp; Video)'}
             </span>
           </div>
           <p className="text-[11px] text-slate-600 mt-1 leading-relaxed">
-            You have full access to chat and join live video classes during this 72-hour window. Please clear the platform fee ({feeDisplay}) before the timer expires.
+            {isInPerson
+              ? `You have full access to chat during this 72-hour window. Please clear the platform fee (${feeDisplay}) before the timer expires.`
+              : `You have full access to chat and join live video classes during this 72-hour window. Please clear the platform fee (${feeDisplay}) before the timer expires.`}
           </p>
         </div>
       </div>

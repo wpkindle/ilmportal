@@ -7,7 +7,7 @@ import TrialBanner from '../../../components/common/TrialBanner';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 import LeaveReviewModal from '../../../components/common/LeaveReviewModal';
 import StudentPaymentRequestModal from '../../../components/tutor/StudentPaymentRequestModal';
-import { BookOpen, Star, MessageSquare, CreditCard, X, CheckCircle2, Video, Sparkles, Clock, AlertTriangle } from 'lucide-react';
+import { BookOpen, Star, MessageSquare, CreditCard, X, CheckCircle2, Video, Sparkles, Clock, AlertTriangle, Home } from 'lucide-react';
 import { useAuth } from '../../../context/AuthContext';
 
 export default function MyDealsPage() {
@@ -109,7 +109,7 @@ export default function MyDealsPage() {
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap">
-                    {deal.status !== 'completed' && deal.mode !== 'in_person' && deal.mode !== 'physical' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && !deal.accessRestricted && (
+                    {deal.status !== 'completed' && deal.mode !== 'in_person' && deal.mode !== 'physical' && deal.mode !== 'in-person' && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && !deal.accessRestricted && (
                       <Link
                         href={`/classroom/${[user?.id || user?._id, deal.tutor?._id].sort().join('_')}`}
                         className="px-3.5 py-2 bg-[#0c2217] hover:bg-[#143d2b] text-[#faf8f5] font-bold text-xs rounded-xl flex items-center gap-1.5 shadow-xs border border-[#d4a359]/30 transition-all"
@@ -117,6 +117,13 @@ export default function MyDealsPage() {
                         <Video className="w-3.5 h-3.5 text-[#d4a359]" />
                         <span>Join Live Class</span>
                       </Link>
+                    )}
+
+                    {deal.status !== 'completed' && (deal.mode === 'in_person' || deal.mode === 'physical' || deal.mode === 'in-person') && ['active_trial', 'continuation_agreed', 'active_paid'].includes(deal.status) && (
+                      <span className="px-3 py-2 bg-[#ede6db] text-[#0c2217] font-bold text-xs rounded-xl border border-[#d4a359]/30 flex items-center gap-1.5 shadow-xs">
+                        <Home className="w-3.5 h-3.5 text-[#b85d34]" />
+                        <span>In-Person Deal</span>
+                      </span>
                     )}
 
                     {deal.isReviewed || deal.isStudentReviewed ? (

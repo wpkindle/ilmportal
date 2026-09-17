@@ -113,6 +113,19 @@ exports.getSessionByRoomId = async (req, res) => {
       .populate('tutor', 'name avatar email phone')
       .populate('student', 'name avatar email phone');
 
+    // Block video classroom for existing sessions linked to an in-person deal
+    if (session && session.deal) {
+      const isDealInPerson = session.deal.mode === 'in_person' || session.deal.mode === 'physical' || session.deal.mode === 'in-person';
+      if (isDealInPerson && req.user?.role !== 'admin') {
+        return res.status(403).json({
+          success: false,
+          isDenied: true,
+          isInPerson: true,
+          message: 'Live video classroom is only available for online classes. This session is for in-person physical tutoring.'
+        });
+      }
+    }
+
     if (!session && roomId && roomId.includes('_')) {
       const parts = roomId.split('_');
       if (parts.length === 2 && mongoose.Types.ObjectId.isValid(parts[0]) && mongoose.Types.ObjectId.isValid(parts[1])) {
@@ -136,6 +149,17 @@ exports.getSessionByRoomId = async (req, res) => {
             { tutor: student?._id, student: tutor?._id }
           ]
         }).sort({ createdAt: -1 });
+
+        // Block video classroom for in-person deals
+        const isInPersonDeal = deal && (deal.mode === 'in_person' || deal.mode === 'physical' || deal.mode === 'in-person');
+        if (isInPersonDeal && req.user?.role !== 'admin') {
+          return res.status(403).json({
+            success: false,
+            isDenied: true,
+            isInPerson: true,
+            message: 'Live video classroom is only available for online classes. This deal is for in-person physical tutoring.'
+          });
+        }
 
         // 72-hour grace period check for platform fee clearance (starts when deal starts!)
         if (deal) {

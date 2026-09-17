@@ -88,6 +88,8 @@ const TrialBanner = ({ deal, onPayClick }) => {
     );
   }
 
+  const isInPerson = deal.mode === 'in_person' || deal.mode === 'physical' || deal.mode === 'in-person';
+
   // 3. Restricted or Expired (after 72h overdue)
   if (deal.accessRestricted || deal.status === 'restricted' || deal.status === 'trial_expired' || isExpired) {
     const feeText = deal.platformFee !== null && deal.platformFee !== undefined
@@ -100,12 +102,14 @@ const TrialBanner = ({ deal, onPayClick }) => {
           <AlertCircle className="w-5 h-5 text-rose-600 shrink-0" />
           <div>
             <p className="font-bold text-rose-900">
-              {isTutor ? '72-Hour Platform Fee Clearance Expired' : 'Classroom Access Paused'}
+              {isTutor ? '72-Hour Platform Fee Clearance Expired' : (isInPerson ? 'Tuition Access Paused' : 'Classroom Access Paused')}
             </p>
             <p className="text-[11px] text-rose-700">
               {isTutor
                 ? `The 72-hour grace period expired without payment clearance. Please submit the platform fee (${feeText}) to reactivate live classes.`
-                : 'Live classes are paused pending tutor platform clearance with administration. Official Support: info@ilmidunya.com.'}
+                : (isInPerson
+                  ? 'In-person tuition sessions are paused pending tutor platform clearance with administration. Official Support: info@ilmidunya.com.'
+                  : 'Live classes are paused pending tutor platform clearance with administration. Official Support: info@ilmidunya.com.')}
             </p>
           </div>
         </div>
@@ -156,16 +160,18 @@ const TrialBanner = ({ deal, onPayClick }) => {
           <div>
             <div className="flex items-center gap-2">
               <p className="font-bold text-amber-900">
-                {isTutor ? 'Student Agreed to Continue - Platform Fee Due' : 'Course Continuation Confirmed'}
+                {isTutor ? 'Student Agreed to Continue - Platform Fee Due' : (isInPerson ? 'In-Person Tutoring Confirmed' : 'Course Continuation Confirmed')}
               </p>
               <span className="px-2 py-0.5 bg-[#f5f0e6] text-[#b85d34] border border-[#d4a359]/30 font-bold text-[9px] rounded-full uppercase tracking-wider">
-                Video Classroom Active
+                {isInPerson ? 'In-Person Tutoring Active' : 'Video Classroom Active'}
               </span>
             </div>
             <p className="text-[11px] text-amber-800 mt-0.5">
               {isTutor
                 ? `Student agreed to continue! Classes are active with a 72-hour grace window. Please submit the platform fee (${feeText}) within 72 hours.`
-                : `You agreed to continue regular learning for ${deal.subject}. Live video classroom is active.`}
+                : (isInPerson
+                  ? `You agreed to continue regular in-person tutoring for ${deal.subject}. Physical classes are active.`
+                  : `You agreed to continue regular learning for ${deal.subject}. Live video classroom is active.`)}
             </p>
           </div>
         </div>

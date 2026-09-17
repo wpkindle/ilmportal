@@ -146,8 +146,8 @@ const Turnstile = forwardRef(function Turnstile(
   }, [action, theme, size]);
 
   return (
-    <div className={`my-2 flex justify-center ${className}`}>
-      <div ref={containerRef} />
+    <div className={`my-3 flex justify-center items-center overflow-hidden min-h-[65px] ${className}`}>
+      <div ref={containerRef} className="inline-block rounded-xl overflow-hidden shadow-xs" />
     </div>
   );
 });

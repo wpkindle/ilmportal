@@ -156,8 +156,9 @@ exports.getTutorApprovalQueue = async (req, res) => {
       .sort({ createdAt: -1 });
 
     const { calculateProfileCompletion } = require('./authController');
-    const tutorsWithCompletion = tutors.map((t) => {
-      const completion = t.user ? calculateProfileCompletion(t.user, t) : { percentage: 0, items: [] };
+    const validTutors = tutors.filter((t) => t.user);
+    const tutorsWithCompletion = validTutors.map((t) => {
+      const completion = calculateProfileCompletion(t.user, t);
       return {
         ...t.toObject(),
         completion

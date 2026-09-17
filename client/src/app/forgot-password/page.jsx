@@ -79,7 +79,7 @@ export default function ForgotPasswordPage() {
               </div>
             </div>
 
-            <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="forgot_password" size="compact" />
+            <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="forgot_password" size="normal" />
 
             <button
               type="submit"

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { ShieldCheck, Lock, Mail, ArrowRight, AlertCircle, CheckCircle2, Eye, EyeOff } from 'lucide-react';
@@ -19,6 +19,7 @@ export default function AdminLoginPage() {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef(null);
 
   // If already logged in as admin, redirect to /admin
   useEffect(() => {
@@ -28,12 +29,16 @@ export default function AdminLoginPage() {
   }, [user, router]);
 
   const performLogin = async (loginEmail, loginPass) => {
+    if (!turnstileToken) {
+      setError('Please complete the security verification check before proceeding.');
+      return;
+    }
+
     setLoading(true);
     setError('');
     setSuccess('');
 
     try {
-      // First attempt via AuthContext
       const data = await login(loginEmail.trim(), loginPass, turnstileToken);
       if (data && data.user && data.user.role === 'admin') {
         setSuccess('Authentication successful! Loading Control Center...');
@@ -42,29 +47,20 @@ export default function AdminLoginPage() {
         }, 300);
       } else {
         setError('Access Denied: This account does not possess administrative privileges.');
+        setTurnstileToken('');
+        turnstileRef.current?.reset();
         setLoading(false);
       }
     } catch (err) {
-      // Direct API fallback attempt
-      try {
-        const directRes = await api.login({ email: loginEmail.trim(), password: loginPass, turnstileToken, captchaToken: turnstileToken });
-        if (directRes.success && directRes.user?.role === 'admin') {
-          localStorage.setItem('ilm_token', directRes.token);
-          setSuccess('Authentication successful! Loading Control Center...');
-          setTimeout(() => {
-            window.location.href = '/admin';
-          }, 300);
-          return;
-        } else {
-          setError(directRes.message || 'Invalid administrator credentials');
-        }
-      } catch (directErr) {
-        const errorMsg = directErr.data?.message || directErr.message || err.data?.message || err.message;
-        if (errorMsg && errorMsg.includes('fetch failed')) {
-          setError('Server connection initializing. Please try again in 2 seconds.');
-        } else {
-          setError(errorMsg || 'Invalid administrator email or password.');
-        }
+      // Clear token and reset Turnstile widget immediately for next attempt
+      setTurnstileToken('');
+      turnstileRef.current?.reset();
+
+      const errorMsg = err.data?.message || err.message;
+      if (errorMsg && errorMsg.includes('fetch failed')) {
+        setError('Server connection initializing. Please try again in 2 seconds.');
+      } else {
+        setError(errorMsg || 'Invalid administrator email or password.');
       }
       setLoading(false);
     }
@@ -168,7 +164,14 @@ export default function AdminLoginPage() {
               </div>
             </div>
 
-            <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="admin_login" theme="dark" size="compact" />
+            <Turnstile
+              ref={turnstileRef}
+              onVerify={(token) => setTurnstileToken(token)}
+              onExpire={() => setTurnstileToken('')}
+              action="admin_login"
+              theme="dark"
+              size="normal"
+            />
 
             <button
               type="submit"

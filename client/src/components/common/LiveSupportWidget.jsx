@@ -1190,7 +1190,7 @@ export default function LiveSupportWidget() {
                       <span className="truncate">{selectedFile ? `Attached: ${selectedFile.name}` : 'Attach File (PNG, JPG, PDF)'}</span>
                     </label>
 
-                    <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="support_offline" size="compact" />
+                    <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="support_offline" size="normal" />
 
                     <button
                       type="submit"

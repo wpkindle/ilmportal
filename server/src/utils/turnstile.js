@@ -35,9 +35,9 @@ const verifyTurnstile = async (token, remoteIp) => {
     const formData = new URLSearchParams();
     formData.append('secret', TURNSTILE_SECRET);
     formData.append('response', token.trim());
-    if (remoteIp) {
-      formData.append('remoteip', remoteIp);
-    }
+    // Cloudflare remoteip is optional and known to cause false rejections
+    // when backend is behind reverse proxies, CDNs, or cellular CGNAT networks.
+    // Omit remoteip for reliable verification.
 
     const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
       method: 'POST',
@@ -58,9 +58,14 @@ const verifyTurnstile = async (token, remoteIp) => {
         return { success: true, bypassed: true };
       }
 
+      let errorMsg = 'Security verification failed. Please refresh the page and try again.';
+      if (codes.includes('timeout-or-duplicate')) {
+        errorMsg = 'Security verification expired. Please complete the security check and try again.';
+      }
+
       return {
         success: false,
-        message: 'Security verification failed. Please refresh the page and try again.',
+        message: errorMsg,
         errors: codes
       };
     }

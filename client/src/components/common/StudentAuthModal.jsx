@@ -424,7 +424,7 @@ export default function StudentAuthModal({
                 </div>
               </div>
 
-              <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="login" size="compact" />
+              <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="login" size="normal" />
 
               <button
                 type="submit"
@@ -537,7 +537,7 @@ export default function StudentAuthModal({
                 {' '}Protected under PECA 2016.
               </p>
 
-              <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="register" size="compact" />
+              <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="register" size="normal" />
 
               <button
                 type="submit"

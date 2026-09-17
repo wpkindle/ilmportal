@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, Suspense } from 'react';
+import React, { useState, useEffect, useRef, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import {
@@ -43,6 +43,7 @@ function LoginContent() {
   const [error, setError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [turnstileToken, setTurnstileToken] = useState('');
+  const turnstileRef = useRef(null);
 
   // Auto-redirect if already logged in
   useEffect(() => {
@@ -85,6 +86,11 @@ function LoginContent() {
   const handleSignIn = async (e) => {
     e.preventDefault();
 
+    if (!turnstileToken) {
+      setError('Please complete the security check before signing in.');
+      return;
+    }
+
     setLoading(true);
     setError('');
     setSuccessMessage('');
@@ -101,6 +107,8 @@ function LoginContent() {
       }
     } catch (err) {
       console.error('Login error:', err);
+      setTurnstileToken('');
+      turnstileRef.current?.reset();
       if (err.isUnverified || err.message?.toLowerCase().includes('verify')) {
         router.push(
           `/verify-email?email=${encodeURIComponent(signInEmail.trim())}&role=${isTutorMode ? 'tutor' : 'student'}`
@@ -128,6 +136,10 @@ function LoginContent() {
     }
     if (!signUpPassword || signUpPassword.length < 6) {
       setError('Password must be at least 6 characters long');
+      return;
+    }
+    if (!turnstileToken) {
+      setError('Please complete the security check before registering.');
       return;
     }
 
@@ -174,6 +186,8 @@ function LoginContent() {
       }
     } catch (err) {
       console.error('Registration error:', err);
+      setTurnstileToken('');
+      turnstileRef.current?.reset();
       setError(err.message || 'Registration failed. Please check your details and try again.');
     } finally {
       setLoading(false);
@@ -390,7 +404,13 @@ function LoginContent() {
                 </div>
               </div>
 
-              <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="login" />
+              <Turnstile
+                ref={turnstileRef}
+                onVerify={(token) => setTurnstileToken(token)}
+                onExpire={() => setTurnstileToken('')}
+                action="login"
+                size="normal"
+              />
 
               <button
                 type="submit"
@@ -502,7 +522,13 @@ function LoginContent() {
                 Your personal details are confidential and securely encrypted. We never sell, rent, or share your data with any third party.
               </div>
 
-              <Turnstile onVerify={(token) => setTurnstileToken(token)} onExpire={() => setTurnstileToken('')} action="register" />
+              <Turnstile
+                ref={turnstileRef}
+                onVerify={(token) => setTurnstileToken(token)}
+                onExpire={() => setTurnstileToken('')}
+                action="register"
+                size="normal"
+              />
 
               {/* Submit Sign Up Button */}
               <button

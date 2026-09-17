@@ -14,11 +14,21 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
   beforeAll(async () => {
     await connectDB();
     const User = require('../src/models/User');
+    const TutorProfile = require('../src/models/TutorProfile');
+    const existing = await User.find({ email: { $in: ['teststudent@pakistanlms.pk', 'testtutor@pakistanlms.pk'] } });
+    if (existing.length > 0) {
+      await TutorProfile.deleteMany({ user: { $in: existing.map(u => u._id) } });
+    }
     await User.deleteMany({ email: { $in: ['teststudent@pakistanlms.pk', 'testtutor@pakistanlms.pk'] } });
   });
 
   afterAll(async () => {
     const User = require('../src/models/User');
+    const TutorProfile = require('../src/models/TutorProfile');
+    const existing = await User.find({ email: { $in: ['teststudent@pakistanlms.pk', 'testtutor@pakistanlms.pk'] } });
+    if (existing.length > 0) {
+      await TutorProfile.deleteMany({ user: { $in: existing.map(u => u._id) } });
+    }
     await User.deleteMany({ email: { $in: ['teststudent@pakistanlms.pk', 'testtutor@pakistanlms.pk'] } });
     await disconnectDB();
     server.close();

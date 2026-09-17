@@ -11,10 +11,12 @@ function RegisterRedirect() {
   const redirect = searchParams.get('redirect');
 
   useEffect(() => {
-    let target = '/login?mode=signup';
     if (role === 'tutor') {
-      target += '&role=tutor';
-    } else if (role === 'student') {
+      router.replace('/register/tutor');
+      return;
+    }
+    let target = '/login?mode=signup';
+    if (role === 'student') {
       target += '&role=student';
     }
     if (redirect) {

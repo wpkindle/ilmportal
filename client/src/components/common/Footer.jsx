@@ -90,7 +90,7 @@ const Footer = () => {
                 <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
-                href="/login?role=tutor&mode=signup"
+                href="/register/tutor"
                 className="px-5 py-3.5 bg-white/10 hover:bg-white/20 text-white font-bold text-xs sm:text-sm rounded-xl border-2 border-[#d4a359]/60 transition-all flex items-center gap-2 cursor-pointer shadow-md backdrop-blur-xs"
               >
                 <ShieldCheck className="w-4 h-4 text-[#d4a359]" />

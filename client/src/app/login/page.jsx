@@ -67,20 +67,28 @@ function LoginContent() {
 
   // Keep state in sync with URL params if they change
   useEffect(() => {
+    if (roleParam === 'tutor' && initialModeParam === 'signup') {
+      router.replace('/register/tutor');
+      return;
+    }
     if (roleParam === 'tutor') {
       setRole('tutor');
     } else if (roleParam === 'student') {
       setRole('student');
     }
-  }, [roleParam]);
+  }, [roleParam, initialModeParam, router]);
 
   useEffect(() => {
     if (initialModeParam === 'signup') {
+      if (roleParam === 'tutor') {
+        router.replace('/register/tutor');
+        return;
+      }
       setMode('signup');
     } else if (initialModeParam === 'signin') {
       setMode('signin');
     }
-  }, [initialModeParam]);
+  }, [initialModeParam, roleParam, router]);
 
   // Handle Sign In
   const handleSignIn = async (e) => {
@@ -317,6 +325,10 @@ function LoginContent() {
             <button
               type="button"
               onClick={() => {
+                if (isTutorMode) {
+                  router.push('/register/tutor');
+                  return;
+                }
                 setMode('signup');
                 setError('');
                 setSuccessMessage('');
@@ -436,7 +448,30 @@ function LoginContent() {
           {/* ══════════════════════════════════════════════════════════
               CHOICE 2: SIGN UP FORM
              ══════════════════════════════════════════════════════════ */}
-          {mode === 'signup' && (
+          {mode === 'signup' && isTutorMode && (
+            <div className="space-y-5 p-6 sm:p-8 bg-[#faf8f5] border border-[#e6dfd5] rounded-3xl text-center">
+              <div className="w-14 h-14 rounded-2xl bg-[#f5ebe6] border border-[#b85d34]/30 flex items-center justify-center mx-auto text-[#b85d34] shadow-xs">
+                <ShieldCheck className="w-7 h-7" />
+              </div>
+              <div className="space-y-2">
+                <h3 className="font-serif font-black text-xl text-[#0c2217]">
+                  Faculty Multi-Step Onboarding
+                </h3>
+                <p className="text-xs sm:text-sm text-stone-600 max-w-md mx-auto leading-relaxed">
+                  To ensure quality and verified credentials, all tutors register through our comprehensive 5-step registration wizard with mandatory email verification, disciplines setup, and sanad documentation.
+                </p>
+              </div>
+              <Link
+                href="/register/tutor"
+                className="inline-flex items-center justify-center gap-2 w-full py-3.5 bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#854020] text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md transition-all border border-[#d4a359]/40 cursor-pointer"
+              >
+                <span>Launch 5-Step Registration Wizard</span>
+                <ArrowRight className="w-4 h-4 text-[#d4a359]" />
+              </Link>
+            </div>
+          )}
+
+          {mode === 'signup' && !isTutorMode && (
             <form onSubmit={handleSignUp} autoComplete="off" className="space-y-4">
               {/* Anti-spam honeypot (hidden from real users, filled by bots) */}
               <input
@@ -534,19 +569,13 @@ function LoginContent() {
               <button
                 type="submit"
                 disabled={loading}
-                className={`w-full py-3 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer border ${
-                  isTutorMode
-                    ? 'bg-[#b85d34] hover:bg-[#9e4e2a] active:bg-[#854020] border-[#d4a359]/40'
-                    : 'bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] border-[#d4a359]/30'
-                }`}
+                className="w-full py-3 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer border bg-[#0c2217] hover:bg-[#143d2b] active:bg-[#07150e] border-[#d4a359]/30"
               >
                 {loading ? (
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <>
-                    <span>
-                      {isTutorMode ? 'Create Tutor Account & Join Faculty' : 'Create Student Account'}
-                    </span>
+                    <span>Create Student Account</span>
                     <ArrowRight className="w-4 h-4 text-[#d4a359]" />
                   </>
                 )}

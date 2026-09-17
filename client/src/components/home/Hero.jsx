@@ -412,7 +412,7 @@ export default function Hero() {
                     <ArrowRight className="w-3 h-3 sm:w-3.5 sm:h-3.5 shrink-0 hidden xs:inline" />
                   </Link>
                   <Link
-                    href="/login?role=tutor&mode=signup"
+                    href="/register/tutor"
                     className="w-full py-2.5 sm:py-3 px-3 sm:px-4 rounded-xl bg-white/15 hover:bg-white/25 text-white font-bold text-xs sm:text-sm shadow-lg transition-all flex items-center justify-center gap-1.5 sm:gap-2 cursor-pointer border border-white/25 active:scale-98 text-center"
                   >
                     <ShieldCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#d4a359] shrink-0" />

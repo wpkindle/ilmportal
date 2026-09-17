@@ -1032,7 +1032,7 @@ export default function TutorMultiStepRegister({
                       }`}
                     >
                       <User className="w-4 h-4" />
-                      <span>Male / Qari</span>
+                      <span>Male</span>
                     </button>
                     <button
                       type="button"
@@ -1044,7 +1044,7 @@ export default function TutorMultiStepRegister({
                       }`}
                     >
                       <User className="w-4 h-4" />
-                      <span>Female / Alimah</span>
+                      <span>Female</span>
                     </button>
                   </div>
                 </div>
@@ -1058,6 +1058,7 @@ export default function TutorMultiStepRegister({
                     min={18}
                     max={80}
                     required
+                    placeholder="Enter Your Age"
                     value={age}
                     onChange={(e) => setAge(e.target.value)}
                     className="w-full px-4 py-2.5 bg-[#06120c] border border-[#1b4d36] rounded-2xl text-xs sm:text-sm text-[#faf8f5] outline-none focus:border-[#d4a359] font-mono"

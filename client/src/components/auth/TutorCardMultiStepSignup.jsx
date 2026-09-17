@@ -523,7 +523,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
           <span className="font-mono text-[11px] text-[#b85d34]">{currentStep * 20}%</span>
         </div>
 
-        {/* Step Circles */}
+        {/* Step Buttons */}
         <div className="grid grid-cols-5 gap-1.5 pt-1">
           {STEPS.map((s) => {
             const isCurrent = currentStep === s.num;
@@ -536,17 +536,27 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
                 type="button"
                 disabled={!isClickable}
                 onClick={() => isClickable && setCurrentStep(s.num)}
-                className={`py-1.5 px-1 rounded-xl text-center transition-all flex flex-col items-center justify-center gap-0.5 ${
+                className={`h-9 px-1.5 rounded-xl transition-all flex items-center justify-center gap-1.5 border text-center ${
                   isCurrent
-                    ? 'bg-[#b85d34] text-white shadow-xs font-bold'
+                    ? 'bg-[#b85d34] border-[#b85d34] text-white shadow-xs font-bold'
                     : isDone
-                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200 cursor-pointer font-semibold'
-                    : 'bg-stone-100 text-stone-400 cursor-not-allowed text-[10px]'
+                    ? 'bg-emerald-50 text-emerald-700 border-emerald-200 cursor-pointer font-semibold'
+                    : 'bg-stone-100 text-stone-400 border-transparent cursor-not-allowed font-medium'
                 }`}
               >
-                <span className="text-[11px] flex items-center gap-1 leading-none">
-                  {isDone ? <Check className="w-3 h-3 stroke-[3]" /> : s.num}
-                  <span className="hidden sm:inline text-[10px]">{s.label}</span>
+                <span
+                  className={`w-4 h-4 rounded-full flex items-center justify-center text-[10px] font-bold shrink-0 leading-none ${
+                    isCurrent
+                      ? 'bg-white/25 text-white'
+                      : isDone
+                      ? 'bg-emerald-200/80 text-emerald-900'
+                      : 'bg-stone-200 text-stone-500'
+                  }`}
+                >
+                  {isDone ? <Check className="w-2.5 h-2.5 stroke-[3]" /> : s.num}
+                </span>
+                <span className="text-[11px] font-semibold leading-none hidden sm:inline truncate">
+                  {s.label}
                 </span>
               </button>
             );
@@ -788,24 +798,24 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
                 <button
                   type="button"
                   onClick={() => setGender('male')}
-                  className={`py-2 px-2 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                  className={`py-2 px-2 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
                     gender === 'male'
                       ? 'bg-[#0c2217] border-[#0c2217] text-[#d4a359]'
                       : 'bg-[#faf8f5] border-[#e6dfd5] text-stone-600 hover:border-stone-400'
                   }`}
                 >
-                  Male / Qari
+                  Male
                 </button>
                 <button
                   type="button"
                   onClick={() => setGender('female')}
-                  className={`py-2 px-2 rounded-xl border text-xs font-bold transition-all cursor-pointer ${
+                  className={`py-2 px-2 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center justify-center ${
                     gender === 'female'
                       ? 'bg-[#0c2217] border-[#0c2217] text-[#d4a359]'
                       : 'bg-[#faf8f5] border-[#e6dfd5] text-stone-600 hover:border-stone-400'
                   }`}
                 >
-                  Female / Alimah
+                  Female
                 </button>
               </div>
             </div>
@@ -817,7 +827,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
                 min={18}
                 max={85}
                 required
-                placeholder="e.g. 26"
+                placeholder="Enter Your Age"
                 value={age}
                 onChange={(e) => setAge(e.target.value)}
                 className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"

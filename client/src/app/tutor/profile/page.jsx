@@ -1365,7 +1365,7 @@ function TutorProfileContent() {
                     <input
                       type="text"
                       required
-                      placeholder="e.g. Qari Muhammad Ahmad"
+                      placeholder="Enter Your Full Name"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white font-medium"

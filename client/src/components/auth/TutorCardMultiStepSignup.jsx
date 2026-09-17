@@ -585,7 +585,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Qari Muhammad Usman"
+                    placeholder="Enter Your Full Name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     className="w-full pl-10 pr-4 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"

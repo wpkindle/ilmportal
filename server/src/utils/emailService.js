@@ -356,17 +356,14 @@ const sendEmailDetailed = async ({ to, subject, html, text, replyTo }) => {
 const sendVerificationOtpEmail = async (to, name, otp, token, role = 'student', req = null) => {
   const isTutor = role === 'tutor';
   const clientUrl = getClientBaseUrl(req);
-  const tokenParam = token || otp;
-  const verifyLink = `${clientUrl}/verify-email?token=${encodeURIComponent(tokenParam)}&email=${encodeURIComponent(to)}&role=${isTutor ? 'tutor' : 'student'}`;
   const logoUrl = `${clientUrl}/logo-dark.png`;
 
   console.log(`\n======================================================`);
-  console.log(`📧 [PREPARING 1-CLICK VERIFICATION EMAIL]`);
+  console.log(`📧 [PREPARING OTP VERIFICATION EMAIL]`);
   console.log(`📬 To: ${to}`);
   console.log(`👤 Name: ${name}`);
   console.log(`🎭 Role: ${role}`);
-  console.log(`🔑 Token: ${token || otp}`);
-  console.log(`🔗 Verification Link: ${verifyLink}`);
+  console.log(`🔑 OTP Code: ${otp}`);
   console.log(`======================================================\n`);
 
   const subject = isTutor
@@ -374,14 +371,9 @@ const sendVerificationOtpEmail = async (to, name, otp, token, role = 'student', 
     : `🔐 Verify Your Account - IlmiDunya Pakistan`;
 
   const badgeText = isTutor ? 'Faculty Verification & Onboarding' : 'Account Email Verification';
-  const greetingTitle = isTutor ? 'Verify Your Faculty Account' : 'Verify Your Student Account';
   const welcomeText = isTutor
-    ? `Thank you for applying to teach with <strong>IlmiDunya Pakistan</strong>. To activate your faculty teaching workspace, start receiving direct inquiries, and complete your onboarding, please verify your email address below:`
-    : `Thank you for joining <strong>IlmiDunya Pakistan</strong>. To activate your account and connect with verified tutors, please verify your email address below:`;
-  const buttonText = isTutor ? 'Verify Faculty Account →' : 'Verify Account & Continue →';
-  const buttonSubtext = isTutor
-    ? `⚡ Clicking the button will immediately verify your email and open your faculty onboarding dashboard.`
-    : `⚡ Clicking the button will immediately verify your email and take you directly to your student workspace.`;
+    ? `Thank you for applying to teach with <strong>IlmiDunya Pakistan</strong>. To activate your faculty teaching workspace, start receiving direct inquiries, and complete your onboarding, please use the 6-digit verification code below:`
+    : `Thank you for joining <strong>IlmiDunya Pakistan</strong>. To activate your account and connect with verified tutors, please use the 6-digit verification code below:`;
 
   const html = `
     <!DOCTYPE html>
@@ -409,10 +401,8 @@ const sendVerificationOtpEmail = async (to, name, otp, token, role = 'student', 
           .mobile-body { padding: 24px 18px 20px 18px !important; }
           .mobile-title { font-size: 19px !important; line-height: 25px !important; }
           .mobile-text { font-size: 13.5px !important; line-height: 1.6 !important; }
-          .mobile-btn-container { width: 100% !important; margin: 24px 0 20px 0 !important; }
-          .mobile-btn { display: block !important; width: 100% !important; max-width: 100% !important; box-sizing: border-box !important; text-align: center !important; padding: 15px 14px !important; font-size: 14px !important; }
-          .mobile-otp-box { padding: 14px 12px !important; margin: 20px 0 !important; }
-          .mobile-otp-code { font-size: 26px !important; letter-spacing: 5px !important; }
+          .mobile-otp-box { padding: 18px 14px !important; margin: 20px 0 !important; }
+          .mobile-otp-code { font-size: 28px !important; letter-spacing: 6px !important; }
           .mobile-footer { padding: 20px 16px !important; }
         }
       </style>
@@ -458,44 +448,23 @@ const sendVerificationOtpEmail = async (to, name, otp, token, role = 'student', 
                     ${welcomeText}
                   </p>
 
-                  <!-- Direct 1-Click Action Button (Fluid & Responsive) -->
-                  <div class="mobile-btn-container" style="text-align: center; margin: 30px 0 24px 0;">
-                    <a href="${verifyLink}" target="_blank" class="mobile-btn" style="display: inline-block; width: auto; min-width: 260px; max-width: 100%; padding: 16px 38px; background-color: #0c2217; color: #ffffff !important; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; font-size: 14px; font-weight: 800; text-decoration: none; border-radius: 14px; border: 1px solid #d4a359; box-shadow: 0 4px 16px rgba(12, 34, 23, 0.28); text-transform: uppercase; letter-spacing: 0.5px; box-sizing: border-box;">
-                      ${buttonText}
-                    </a>
-                  </div>
-
-                  <p style="margin: 0 0 22px 0; font-size: 12.5px; line-height: 1.55; color: #78716c; text-align: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                    ${buttonSubtext}
-                  </p>
-
                   <!-- 6-Digit OTP Box -->
-                  <div class="mobile-otp-box" style="background-color: #faf8f5; border: 1px dashed #d4a359; border-radius: 14px; padding: 18px 20px; text-align: center; margin: 24px 0;">
-                    <span style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #b85d34; margin-bottom: 6px;">
+                  <div class="mobile-otp-box" style="background-color: #faf8f5; border: 2px dashed #d4a359; border-radius: 16px; padding: 24px 20px; text-align: center; margin: 26px 0;">
+                    <span style="display: block; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: #b85d34; margin-bottom: 8px;">
                       Verification Security Code (OTP)
                     </span>
-                    <span class="mobile-otp-code" style="display: block; font-family: 'Courier New', Courier, monospace; font-size: 30px; font-weight: 900; letter-spacing: 7px; color: #0c2217;">
+                    <span class="mobile-otp-code" style="display: block; font-family: 'Courier New', Courier, monospace; font-size: 34px; font-weight: 900; letter-spacing: 8px; color: #0c2217;">
                       ${otp}
                     </span>
-                    <span style="display: block; font-size: 11px; color: #78716c; margin-top: 6px;">
-                      Valid for 24 hours. Enter this on the verification screen if prompted.
+                    <span style="display: block; font-size: 12px; color: #78716c; margin-top: 8px;">
+                      Valid for 24 hours. Enter this code on the registration page to proceed.
                     </span>
-                  </div>
-
-                  <!-- Direct Link Fallback Box -->
-                  <div style="background-color: #faf8f5; border: 1px solid #e6ded1; padding: 14px 16px; border-radius: 12px; margin-top: 22px; word-break: break-all; word-wrap: break-word; overflow-wrap: break-word; font-size: 11.5px; color: #78716c; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                    <span style="font-weight: 700; color: #0c2217; display: block; margin-bottom: 6px;">
-                      Alternative Link (copy &amp; paste into your browser):
-                    </span>
-                    <a href="${verifyLink}" target="_blank" style="color: #b85d34; text-decoration: underline; font-weight: 600; word-break: break-all;">
-                      ${verifyLink}
-                    </a>
                   </div>
 
                   <!-- Security Advisory Notice -->
                   <div style="background-color: #fdfbf7; border-left: 3px solid #d4a359; padding: 12px 14px; border-radius: 8px; margin-top: 22px;">
                     <p style="margin: 0; font-size: 11.5px; line-height: 1.5; color: #78716c; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;">
-                      <strong style="color: #0c2217;">Security Advisory:</strong> If you did not register on IlmiDunya Pakistan, please disregard this email. Your information remains completely safe.
+                      <strong style="color: #0c2217;">Security Advisory:</strong> If you did not register on IlmiDunya Pakistan, please disregard this email. Never share your verification code with anyone.
                     </p>
                   </div>
                 </td>
@@ -526,7 +495,7 @@ const sendVerificationOtpEmail = async (to, name, otp, token, role = 'student', 
     to,
     subject,
     html,
-    text: `Assalam-o-Alaikum ${name}, please click this link to verify your IlmiDunya account: ${verifyLink} (OTP: ${otp})`
+    text: `Assalam-o-Alaikum ${name},\n\nYour IlmiDunya verification security code (OTP) is: ${otp}\n\nPlease enter this 6-digit code on the verification screen to complete your registration. This code is valid for 24 hours.\n\nIlmiDunya Pakistan`
   });
 
   return result.success;

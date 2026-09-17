@@ -181,7 +181,7 @@ const homeStructuredData = {
   ]
 };
 
-export const revalidate = 60; // SSR with ISR caching every 60s
+export const revalidate = 300; // SSR with ISR edge caching every 5 minutes (loads in <50ms from CDN)
 
 // 5-second timeout: if Render backend is sleeping, return empty data immediately
 // instead of hanging the Vercel build worker for 60s

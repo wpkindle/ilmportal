@@ -56,6 +56,7 @@ import { parseDegreesAndCertificates } from '../../../utils/tutorHelpers';
 import VideoIntroPlayer from '../../../components/common/VideoIntroPlayer';
 import TutorPaymentMethodsManager from '../../../components/tutor/TutorPaymentMethodsManager';
 import TutorPaymentModal from '../../../components/tutor/TutorPaymentModal';
+import { compressAvatarFile } from '../../../utils/imageCompressor';
 
 const pakistaniCities = allPakistaniCities;
 
@@ -704,22 +705,29 @@ function TutorProfileContent() {
     return true;
   });
 
-  // Handle Avatar Change
-  const handleAvatarChange = (e) => {
+  // Handle Avatar Change (with automatic client-side compression to ~20KB)
+  const handleAvatarChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    if (file.size > 5 * 1024 * 1024) {
-      setProfileError('Image size must be under 5MB');
+    if (file.size > 8 * 1024 * 1024) {
+      setProfileError('Image file must be under 8MB');
       return;
     }
 
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setAvatar(reader.result);
-      setProfileSuccess('Photo selected! Click "Save Profile Changes" below to apply.');
-    };
-    reader.readAsDataURL(file);
+    try {
+      const compressedDataUrl = await compressAvatarFile(file, 350, 0.82);
+      setAvatar(compressedDataUrl);
+      setProfileSuccess('Photo optimized and selected! Click "Save Profile Changes" below to apply.');
+    } catch (err) {
+      console.warn('Avatar compression error, falling back to standard read:', err);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setAvatar(reader.result);
+        setProfileSuccess('Photo selected! Click "Save Profile Changes" below to apply.');
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   // STAGED Sanad / Degree Document Handlers (NO immediate server calls)

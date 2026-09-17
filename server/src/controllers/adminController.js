@@ -149,6 +149,7 @@ exports.getTutorApprovalQueue = async (req, res) => {
     }
 
     const tutors = await TutorProfile.find(filter)
+      .select('-cnicFrontImage -cnicBackImage -experienceCertificates.fileUrl -sanadDocuments.fileUrl')
       .populate('user', 'name email avatar phone city area role age gender isVerified createdAt')
       .populate('subjects', 'name type')
       .populate('cities', 'name province')

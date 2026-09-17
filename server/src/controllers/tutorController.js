@@ -202,10 +202,12 @@ exports.getPublicTutors = async (req, res) => {
     const skip = (pageNumber - 1) * limitNumber;
 
     let tutorProfiles = await TutorProfile.find(query)
+      .select('-cnicFrontImage -cnicBackImage -experienceCertificates.fileUrl -sanadDocuments.fileUrl')
       .populate('user', 'name email avatar phone city area age gender role isVerified isActive createdAt')
       .populate('subjects', 'name slug type icon description')
       .populate('cities', 'name province isMajorCity')
-      .sort(sortOptions);
+      .sort(sortOptions)
+      .lean();
 
     // Strictly enforce 100% completed profile health for public directory visibility
     tutorProfiles = tutorProfiles.filter(tp => {
@@ -279,6 +281,7 @@ exports.getTutorById = async (req, res) => {
 
     if (isValidObjectId) {
       tutor = await TutorProfile.findById(req.params.id)
+        .select('-cnicFrontImage -cnicBackImage')
         .populate('user', 'name email avatar phone city area age gender role isVerified isActive createdAt')
         .populate('subjects', 'name slug type icon description')
         .populate('cities', 'name province isMajorCity');
@@ -286,6 +289,7 @@ exports.getTutorById = async (req, res) => {
       // If ID was user ID instead of tutor profile ID
       if (!tutor) {
         tutor = await TutorProfile.findOne({ user: req.params.id })
+          .select('-cnicFrontImage -cnicBackImage')
           .populate('user', 'name email avatar phone city area age gender role isVerified isActive createdAt')
           .populate('subjects', 'name slug type icon description')
           .populate('cities', 'name province isMajorCity');
@@ -296,6 +300,7 @@ exports.getTutorById = async (req, res) => {
       const userDoc = await User.findOne({ username: req.params.id.toLowerCase() });
       if (userDoc) {
         tutor = await TutorProfile.findOne({ user: userDoc._id })
+          .select('-cnicFrontImage -cnicBackImage')
           .populate('user', 'name email avatar phone city area age gender role isVerified isActive createdAt')
           .populate('subjects', 'name slug type icon description')
           .populate('cities', 'name province isMajorCity');

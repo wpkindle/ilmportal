@@ -21,7 +21,7 @@ import { api } from '../../services/api';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import BrandLogo from '../../components/common/BrandLogo';
 import Turnstile from '../../components/common/Turnstile';
-import TutorMultiStepRegister from '../../components/auth/TutorMultiStepRegister';
+import TutorCardMultiStepSignup from '../../components/auth/TutorCardMultiStepSignup';
 
 function LoginContent() {
   const { user, login, loading: authLoading } = useAuth();
@@ -219,85 +219,8 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen py-8 sm:py-12 px-4 sm:px-6 lg:px-8 flex flex-col items-center justify-center relative z-10">
-      
-      {/* Top Header Controls (Branding + Role & Mode Toggles) */}
-      <div className="max-w-4xl w-full mx-auto mb-6 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <Link href="/" className="inline-flex items-center gap-3 group">
-          <BrandLogo variant="light" size="md" />
-        </Link>
-
-        <div className="flex flex-wrap items-center justify-center gap-2.5">
-          {/* Role Pill Switcher */}
-          <div className="flex bg-[#f5efe6] p-1.5 rounded-2xl border border-[#e6dfd5] shadow-2xs">
-            <button
-              type="button"
-              onClick={() => handleRoleChange('student')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                !isTutorMode
-                  ? 'bg-[#0c2217] text-[#d4a359] shadow-sm'
-                  : 'text-stone-600 hover:text-stone-900'
-              }`}
-            >
-              <GraduationCap className="w-3.5 h-3.5" />
-              <span>Student Portal</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleRoleChange('tutor')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                isTutorMode
-                  ? 'bg-[#b85d34] text-white shadow-sm'
-                  : 'text-stone-600 hover:text-stone-900'
-              }`}
-            >
-              <ShieldCheck className="w-3.5 h-3.5" />
-              <span>Faculty &amp; Tutor</span>
-            </button>
-          </div>
-
-          {/* Mode Pill Switcher */}
-          <div className="flex bg-[#f5efe6] p-1.5 rounded-2xl border border-[#e6dfd5] shadow-2xs">
-            <button
-              type="button"
-              onClick={() => handleModeChange('signin')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                mode === 'signin'
-                  ? 'bg-[#0c2217] text-white shadow-sm'
-                  : 'text-stone-600 hover:text-stone-900'
-              }`}
-            >
-              <Lock className="w-3.5 h-3.5" />
-              <span>Sign In</span>
-            </button>
-            <button
-              type="button"
-              onClick={() => handleModeChange('signup')}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
-                mode === 'signup'
-                  ? isTutorMode
-                    ? 'bg-[#b85d34] text-white shadow-sm'
-                    : 'bg-[#0c2217] text-white shadow-sm'
-                  : 'text-stone-600 hover:text-stone-900'
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Sign Up</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      {/* Main Content Area */}
-      {isTutorMode && mode === 'signup' ? (
-        <div className="w-full max-w-3xl mx-auto animate-in fade-in duration-300">
-          <TutorMultiStepRegister
-            embedded={true}
-            onSwitchToSignIn={() => handleModeChange('signin')}
-          />
-        </div>
-      ) : (
-        <div className="max-w-4xl w-full bg-white rounded-3xl border border-[#e6dfd5] shadow-[0_16px_50px_rgba(12,34,23,0.08)] overflow-hidden grid grid-cols-1 md:grid-cols-12 animate-in fade-in duration-300">
+    <div className="min-h-screen py-8 sm:py-12 px-4 sm:px-6 lg:px-8 flex items-center justify-center relative z-10">
+      <div className="max-w-4xl w-full bg-white rounded-3xl border border-[#e6dfd5] shadow-[0_16px_50px_rgba(12,34,23,0.08)] overflow-hidden grid grid-cols-1 md:grid-cols-12">
         
         {/* Left Column: Sign In Title, Logo & Brand Details */}
         <div className="md:col-span-5 bg-[#faf8f5] p-6 sm:p-8 lg:p-10 border-b md:border-b-0 md:border-r border-[#e6dfd5] flex flex-col justify-between space-y-6">
@@ -306,27 +229,32 @@ function LoginContent() {
               <BrandLogo variant="light" size="md" />
             </Link>
 
-            {/* Role Header Indicator */}
-            <div>
-              <div
-                className={`inline-flex items-center gap-2 px-3.5 py-1 rounded-full text-xs font-bold shadow-2xs border ${
-                  isTutorMode
-                    ? 'bg-[#f5ebe6] border-[#b85d34]/30 text-[#b85d34]'
-                    : 'bg-[#f5f0e6] border-[#d4a359]/40 text-[#0c2217]'
+            {/* Role Header Switcher inside container */}
+            <div className="flex bg-[#efe8de] p-1 rounded-2xl border border-[#e6dfd5] w-fit">
+              <button
+                type="button"
+                onClick={() => handleRoleChange('student')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  !isTutorMode
+                    ? 'bg-[#0c2217] text-[#d4a359] shadow-sm'
+                    : 'text-stone-600 hover:text-stone-900'
                 }`}
               >
-                {isTutorMode ? (
-                  <>
-                    <ShieldCheck className="w-3.5 h-3.5 text-[#b85d34]" />
-                    <span>Faculty &amp; Tutor Portal</span>
-                  </>
-                ) : (
-                  <>
-                    <GraduationCap className="w-3.5 h-3.5 text-[#d4a359]" />
-                    <span>Student &amp; Family Portal</span>
-                  </>
-                )}
-              </div>
+                <GraduationCap className="w-3.5 h-3.5" />
+                <span>Student</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => handleRoleChange('tutor')}
+                className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  isTutorMode
+                    ? 'bg-[#b85d34] text-white shadow-sm'
+                    : 'text-stone-600 hover:text-stone-900'
+                }`}
+              >
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Tutor / Faculty</span>
+              </button>
             </div>
 
             <div className="space-y-2">
@@ -527,7 +455,16 @@ function LoginContent() {
           )}
 
           {/* ══════════════════════════════════════════════════════════
-              CHOICE 2: STUDENT SIGN UP FORM
+              CHOICE 2: TUTOR MULTI-STEP SIGN UP FORM
+             ══════════════════════════════════════════════════════════ */}
+          {mode === 'signup' && isTutorMode && (
+            <TutorCardMultiStepSignup
+              onSwitchToSignIn={() => handleModeChange('signin')}
+            />
+          )}
+
+          {/* ══════════════════════════════════════════════════════════
+              CHOICE 3: STUDENT SIGN UP FORM
              ══════════════════════════════════════════════════════════ */}
           {mode === 'signup' && !isTutorMode && (
             <form onSubmit={handleSignUp} autoComplete="off" className="space-y-4">
@@ -644,7 +581,6 @@ function LoginContent() {
         </div>
 
       </div>
-      )}
     </div>
   );
 }

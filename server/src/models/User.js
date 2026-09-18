@@ -152,4 +152,10 @@ userSchema.methods.comparePassword = async function(enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
 
+userSchema.index({ role: 1, createdAt: -1 });
+userSchema.index({ status: 1 });
+userSchema.index({ city: 1 });
+userSchema.index({ isVerified: 1 });
+userSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model('User', userSchema);

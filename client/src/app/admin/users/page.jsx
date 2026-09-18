@@ -50,12 +50,17 @@ export default function AdminUsersModerationPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [actionFeedback, setActionFeedback] = useState({ message: '', type: '' });
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (showSpinner = true) => {
     try {
-      setLoading(true);
+      if (showSpinner) setLoading(true);
       const res = await api.getAdminUsers({});
-      if (res.success) {
-        setAllUsers(res.users || []);
+      if (res.success && Array.isArray(res.users)) {
+        setAllUsers(res.users);
+        try {
+          sessionStorage.setItem('admin_users_cache', JSON.stringify(res.users));
+        } catch (e) {
+          // ignore quota error
+        }
       }
     } catch (err) {
       console.error('Error fetching users:', err);
@@ -65,7 +70,22 @@ export default function AdminUsersModerationPage() {
   };
 
   useEffect(() => {
-    fetchUsers();
+    // SWR pattern: render cached data immediately (0ms), then refresh in background
+    try {
+      const cached = typeof window !== 'undefined' ? sessionStorage.getItem('admin_users_cache') : null;
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          setAllUsers(parsed);
+          setLoading(false);
+          fetchUsers(false);
+          return;
+        }
+      }
+    } catch (e) {
+      // ignore
+    }
+    fetchUsers(true);
   }, []);
 
   // Stable summary counts computed across ALL users (never drops when clicking tabs!)
@@ -242,7 +262,7 @@ export default function AdminUsersModerationPage() {
               </div>
 
               <button
-                onClick={fetchUsers}
+                onClick={() => fetchUsers(true)}
                 disabled={loading}
                 className="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 flex items-center gap-1.5 shadow-2xs self-start sm:self-center transition-all cursor-pointer"
               >

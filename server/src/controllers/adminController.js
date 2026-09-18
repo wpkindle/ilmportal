@@ -31,68 +31,124 @@ const logAction = async (adminId, action, entityType, entityId, details, req) =>
   }
 };
 
+// In-Memory High Performance Cache for Admin Read Operations
+const adminCache = new Map();
+const ADMIN_CACHE_DEFAULT_TTL = 20 * 1000; // 20 seconds
+
+const getCached = (key) => {
+  const item = adminCache.get(key);
+  if (!item) return null;
+  if (Date.now() > item.expiry) {
+    adminCache.delete(key);
+    return null;
+  }
+  return item.data;
+};
+
+const setCached = (key, data, ttlMs = ADMIN_CACHE_DEFAULT_TTL) => {
+  adminCache.set(key, { data, expiry: Date.now() + ttlMs });
+};
+
+const invalidateAdminCache = (prefix) => {
+  if (!prefix) {
+    adminCache.clear();
+    return;
+  }
+  for (const key of adminCache.keys()) {
+    if (key.startsWith(prefix)) {
+      adminCache.delete(key);
+    }
+  }
+};
+
 // @desc    Get Admin Dashboard Stats & Analytics
 // @route   GET /api/admin/stats
 exports.getDashboardStats = async (req, res) => {
   try {
-    const totalStudents = await User.countDocuments({ role: 'student' });
-    const totalTutors = await User.countDocuments({ role: 'tutor' });
-    const approvedTutors = await TutorProfile.countDocuments({ verificationStatus: 'approved' });
-    const pendingTutorApprovals = await TutorProfile.countDocuments({
-      $or: [
-        { verificationStatus: { $in: ['under_review', 'pending'] } },
-        { 'sanadDocuments.status': 'pending' }
-      ]
-    });
-    const incompleteTutors = await TutorProfile.countDocuments({ verificationStatus: 'incomplete' });
-    
-    const totalDeals = await Deal.countDocuments();
-    const activeTrialDeals = await Deal.countDocuments({ status: 'active_trial' });
-    const activePaidDeals = await Deal.countDocuments({ status: 'active_paid' });
-    const expiredDeals = await Deal.countDocuments({ status: 'trial_expired' });
-    const completedSessions = await Session.countDocuments({ status: 'completed' });
+    const cacheKey = 'admin_stats';
+    const cached = getCached(cacheKey);
+    if (cached) {
+      return res.status(200).json(cached);
+    }
 
-    // Incident & Safety Reports
-    const pendingReportsCount = await Report.countDocuments({ status: 'pending' });
-    const totalReportsCount = await Report.countDocuments();
-    const recentReports = await Report.find()
-      .sort({ createdAt: -1 })
-      .limit(6)
-      .populate('reporter', 'name email role avatar')
-      .populate('reportedUser', 'name email role avatar');
-
-    // Aggregate revenue from verified payments
-    const verifiedDeals = await Deal.find({ paymentStatus: 'verified' });
-    const totalRevenue = verifiedDeals.reduce((sum, d) => sum + (d.price || 0), 0);
-
-    // City distribution
-    const locationStats = await User.aggregate([
-      { $group: { _id: '$city', count: { $sum: 1 } } },
-      { $sort: { count: -1 } },
-      { $limit: 8 }
+    const [
+      totalStudents,
+      totalTutors,
+      approvedTutors,
+      pendingTutorApprovals,
+      incompleteTutors,
+      totalDeals,
+      activeTrialDeals,
+      activePaidDeals,
+      expiredDeals,
+      completedSessions,
+      pendingReportsCount,
+      totalReportsCount,
+      recentReports,
+      revenueResult,
+      locationStats,
+      totalCategories,
+      totalLocations,
+      unreadInquiriesCount,
+      totalInquiriesCount,
+      offlineSupportCount,
+      humanSupportCount,
+      recentInquiries
+    ] = await Promise.all([
+      User.countDocuments({ role: 'student' }),
+      User.countDocuments({ role: 'tutor' }),
+      TutorProfile.countDocuments({ verificationStatus: 'approved' }),
+      TutorProfile.countDocuments({
+        $or: [
+          { verificationStatus: { $in: ['under_review', 'pending'] } },
+          { 'sanadDocuments.status': 'pending' }
+        ]
+      }),
+      TutorProfile.countDocuments({ verificationStatus: 'incomplete' }),
+      Deal.countDocuments(),
+      Deal.countDocuments({ status: 'active_trial' }),
+      Deal.countDocuments({ status: 'active_paid' }),
+      Deal.countDocuments({ status: 'trial_expired' }),
+      Session.countDocuments({ status: 'completed' }),
+      Report.countDocuments({ status: 'pending' }),
+      Report.countDocuments(),
+      Report.find()
+        .sort({ createdAt: -1 })
+        .limit(6)
+        .populate('reporter', 'name email role avatar')
+        .populate('reportedUser', 'name email role avatar')
+        .lean(),
+      Deal.aggregate([
+        { $match: { paymentStatus: 'verified' } },
+        { $group: { _id: null, total: { $sum: '$price' } } }
+      ]),
+      User.aggregate([
+        { $group: { _id: '$city', count: { $sum: 1 } } },
+        { $sort: { count: -1 } },
+        { $limit: 8 }
+      ]),
+      Category.countDocuments(),
+      Location.countDocuments(),
+      EmailThread.countDocuments({ status: 'unread' }),
+      EmailThread.countDocuments({ status: { $ne: 'archived' } }),
+      SupportSession.countDocuments({ status: 'offline_message' }),
+      SupportSession.countDocuments({ status: 'human_requested' }),
+      EmailThread.find({ status: { $ne: 'archived' } })
+        .sort({ lastMessageAt: -1 })
+        .limit(5)
+        .lean()
     ]);
 
-    // Categories count
-    const totalCategories = await Category.countDocuments();
-    const totalLocations = await Location.countDocuments();
+    const totalRevenue = (revenueResult && revenueResult[0] && revenueResult[0].total) || 0;
 
-    // Inquiries & Live Support stats
-    const unreadInquiriesCount = await EmailThread.countDocuments({ status: 'unread' });
-    const totalInquiriesCount = await EmailThread.countDocuments({ status: { $ne: 'archived' } });
-    const offlineSupportCount = await SupportSession.countDocuments({ status: 'offline_message' });
-    const humanSupportCount = await SupportSession.countDocuments({ status: 'human_requested' });
-    const recentInquiries = await EmailThread.find({ status: { $ne: 'archived' } })
-      .sort({ lastMessageAt: -1 })
-      .limit(5)
-      .lean();
-
-    res.status(200).json({
+    const responseData = {
       success: true,
       stats: {
         totalStudents,
         totalTutors,
         approvedTutors,
         pendingTutorApprovals,
+        incompleteTutors,
         totalDeals,
         activeTrialDeals,
         activePaidDeals,
@@ -111,7 +167,11 @@ exports.getDashboardStats = async (req, res) => {
         humanSupportCount,
         recentInquiries
       }
-    });
+    };
+
+    setCached(cacheKey, responseData, 20000);
+
+    res.status(200).json(responseData);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -125,6 +185,12 @@ exports.getDashboardStats = async (req, res) => {
 exports.getTutorApprovalQueue = async (req, res) => {
   try {
     const { status = 'under_review' } = req.query;
+    const cacheKey = `tutor_queue_${status}`;
+    const cached = getCached(cacheKey);
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     let filter = {};
 
     if (status === 'under_review') {
@@ -148,44 +214,65 @@ exports.getTutorApprovalQueue = async (req, res) => {
       filter = { verificationStatus: status };
     }
 
-    const tutors = await TutorProfile.find(filter)
-      .select('-cnicFrontImage -cnicBackImage -experienceCertificates.fileUrl -sanadDocuments.fileUrl')
-      .populate('user', 'name email avatar city area role age gender isVerified createdAt')
-      .populate('subjects', 'name type')
-      .populate('cities', 'name province')
-      .sort({ createdAt: -1 });
+    const [
+      tutors,
+      under_review,
+      incomplete,
+      approved,
+      paused,
+      contact_needed,
+      rejected,
+      all
+    ] = await Promise.all([
+      TutorProfile.find(filter)
+        .select('-cnicFrontImage -cnicBackImage -experienceCertificates.fileUrl -sanadDocuments.fileUrl')
+        .populate('user', 'name email avatar city area role age gender isVerified createdAt')
+        .populate('subjects', 'name type')
+        .populate('cities', 'name province')
+        .sort({ createdAt: -1 })
+        .lean(),
+      TutorProfile.countDocuments({
+        $or: [
+          { verificationStatus: { $in: ['under_review', 'pending'] } },
+          { 'sanadDocuments.status': 'pending' }
+        ]
+      }),
+      TutorProfile.countDocuments({ verificationStatus: 'incomplete' }),
+      TutorProfile.countDocuments({ verificationStatus: 'approved' }),
+      TutorProfile.countDocuments({ isPaused: true }),
+      TutorProfile.countDocuments({ verificationStatus: 'contact_needed' }),
+      TutorProfile.countDocuments({ verificationStatus: 'rejected' }),
+      TutorProfile.countDocuments({})
+    ]);
 
     const { calculateProfileCompletion } = require('./authController');
     const validTutors = tutors.filter((t) => t.user);
     const tutorsWithCompletion = validTutors.map((t) => {
       const completion = calculateProfileCompletion(t.user, t);
       return {
-        ...t.toObject(),
+        ...t,
         completion
       };
     });
 
-    const counts = {
-      under_review: await TutorProfile.countDocuments({
-        $or: [
-          { verificationStatus: { $in: ['under_review', 'pending'] } },
-          { 'sanadDocuments.status': 'pending' }
-        ]
-      }),
-      incomplete: await TutorProfile.countDocuments({ verificationStatus: 'incomplete' }),
-      approved: await TutorProfile.countDocuments({ verificationStatus: 'approved' }),
-      paused: await TutorProfile.countDocuments({ isPaused: true }),
-      contact_needed: await TutorProfile.countDocuments({ verificationStatus: 'contact_needed' }),
-      rejected: await TutorProfile.countDocuments({ verificationStatus: 'rejected' }),
-      all: await TutorProfile.countDocuments({})
-    };
-
-    res.status(200).json({
+    const responseData = {
       success: true,
       count: tutorsWithCompletion.length,
-      counts,
+      counts: {
+        under_review,
+        incomplete,
+        approved,
+        paused,
+        contact_needed,
+        rejected,
+        all
+      },
       tutors: tutorsWithCompletion
-    });
+    };
+
+    setCached(cacheKey, responseData, 20000);
+
+    res.status(200).json(responseData);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -256,6 +343,10 @@ exports.approveTutor = async (req, res) => {
       io.emit('admin-tutor-queue-updated', { tutorId: tutor._id, status: 'approved' });
     }
 
+    invalidateAdminCache('tutor_queue');
+    invalidateAdminCache('admin_users');
+    invalidateAdminCache('admin_stats');
+
     res.status(200).json({
       success: true,
       message: `Tutor ${tutor.user.name} and all educational documents have been approved & verified!`,
@@ -323,6 +414,10 @@ exports.rejectTutor = async (req, res) => {
       io.emit('admin-tutor-queue-updated', { tutorId: tutor._id, status: 'rejected' });
     }
 
+    invalidateAdminCache('tutor_queue');
+    invalidateAdminCache('admin_users');
+    invalidateAdminCache('admin_stats');
+
     res.status(200).json({
       success: true,
       message: `Tutor application marked as rejected.`,
@@ -380,6 +475,10 @@ exports.pauseTutorProfile = async (req, res) => {
       io.emit('admin-tutor-queue-updated', { tutorId: tutor._id, status: 'paused' });
     }
 
+    invalidateAdminCache('tutor_queue');
+    invalidateAdminCache('admin_users');
+    invalidateAdminCache('admin_stats');
+
     res.status(200).json({ success: true, message: 'Tutor profile has been paused.', tutor });
   } catch (error) {
     res.status(500).json({ success: false, message: error.message || 'Error pausing tutor profile' });
@@ -424,6 +523,10 @@ exports.resumeTutorProfile = async (req, res) => {
       io.to(`user_${tutor.user._id}`).emit('tutor-profile-updated', tutor);
       io.emit('admin-tutor-queue-updated', { tutorId: tutor._id, status: 'resumed' });
     }
+
+    invalidateAdminCache('tutor_queue');
+    invalidateAdminCache('admin_users');
+    invalidateAdminCache('admin_stats');
 
     res.status(200).json({ success: true, message: 'Tutor profile has been resumed.', tutor });
   } catch (error) {
@@ -502,6 +605,10 @@ exports.reviewTutorDocument = async (req, res) => {
       io.emit('admin-tutor-queue-updated', { tutorId: tutor._id, docId: doc._id, status });
     }
 
+    invalidateAdminCache('tutor_queue');
+    invalidateAdminCache('admin_users');
+    invalidateAdminCache('admin_stats');
+
     res.status(200).json({
       success: true,
       message: `Document status updated to ${status}.`,
@@ -546,6 +653,9 @@ exports.contactTutor = async (req, res) => {
     await sendTutorStatusEmail(tutor.user.email, tutor.user.name, 'contact_needed', tutor.contactNotes);
     await logAction(req.user.id, 'CONTACT_TUTOR', 'tutor_profile', tutor._id, { notes: tutor.contactNotes }, req);
 
+    invalidateAdminCache('tutor_queue');
+    invalidateAdminCache('admin_users');
+
     res.status(200).json({
       success: true,
       message: `Clarification notice sent to ${tutor.user.name}`,
@@ -559,12 +669,16 @@ exports.contactTutor = async (req, res) => {
   }
 };
 
-// @desc    Get All Users with search & filters
-// @route   GET /api/admin/users
 // @desc    Get All Users with search, role, and status filters
 // @route   GET /api/admin/users
 exports.getAllUsers = async (req, res) => {
   try {
+    const cacheKey = 'admin_users_' + JSON.stringify(req.query || {});
+    const cached = getCached(cacheKey);
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     const { role, search, city, status, isVerified } = req.query;
     const query = {};
 
@@ -610,33 +724,82 @@ exports.getAllUsers = async (req, res) => {
       }
     }
 
-    const users = await User.find(query).sort({ createdAt: -1 });
+    // Exclude password hash and use lean() for optimal query performance
+    const users = await User.find(query).select('-password').sort({ createdAt: -1 }).lean();
 
-    // Enhance each user with tutor profile info & active deals count
-    const enrichedUsers = await Promise.all(
-      users.map(async (u) => {
-        const uObj = u.toObject();
-        if (u.role === 'tutor') {
-          const profile = await TutorProfile.findOne({ user: u._id })
+    if (users.length === 0) {
+      const responseData = { success: true, count: 0, users: [] };
+      setCached(cacheKey, responseData, 20000);
+      return res.status(200).json(responseData);
+    }
+
+    const userIds = users.map((u) => u._id);
+    const tutorUserIds = users.filter((u) => u.role === 'tutor').map((u) => u._id);
+
+    // Run batch queries in parallel: lightweight tutor profiles, deal counts, and report counts
+    const [tutorProfiles, studentDealCounts, tutorDealCounts, reportCounts] = await Promise.all([
+      tutorUserIds.length > 0
+        ? TutorProfile.find({ user: { $in: tutorUserIds } })
+            .select('user verificationStatus isPaused hourlyRate bio gender city localArea subjects ratingAverage ratingCount')
             .populate('subjects', 'name slug')
-            .populate('cities', 'name');
-          uObj.tutorProfile = profile;
-        }
-        const dealCount = await Deal.countDocuments({
-          $or: [{ student: u._id }, { tutor: u._id }]
-        });
-        const reportsCount = await Report.countDocuments({ reportedUser: u._id });
-        uObj.dealCount = dealCount;
-        uObj.reportsCount = reportsCount;
-        return uObj;
-      })
-    );
+            .populate('cities', 'name')
+            .lean()
+        : Promise.resolve([]),
+      Deal.aggregate([
+        { $match: { student: { $in: userIds } } },
+        { $group: { _id: '$student', count: { $sum: 1 } } }
+      ]),
+      Deal.aggregate([
+        { $match: { tutor: { $in: userIds } } },
+        { $group: { _id: '$tutor', count: { $sum: 1 } } }
+      ]),
+      Report.aggregate([
+        { $match: { reportedUser: { $in: userIds } } },
+        { $group: { _id: '$reportedUser', count: { $sum: 1 } } }
+      ])
+    ]);
 
-    res.status(200).json({
+    const tutorProfileMap = new Map();
+    tutorProfiles.forEach((tp) => {
+      if (tp.user) {
+        tutorProfileMap.set(tp.user.toString(), tp);
+      }
+    });
+
+    const dealCountMap = new Map();
+    studentDealCounts.forEach((d) => {
+      const uid = d._id.toString();
+      dealCountMap.set(uid, (dealCountMap.get(uid) || 0) + d.count);
+    });
+    tutorDealCounts.forEach((d) => {
+      const uid = d._id.toString();
+      dealCountMap.set(uid, (dealCountMap.get(uid) || 0) + d.count);
+    });
+
+    const reportCountMap = new Map();
+    reportCounts.forEach((r) => {
+      reportCountMap.set(r._id.toString(), r.count);
+    });
+
+    const enrichedUsers = users.map((u) => {
+      const uidStr = u._id.toString();
+      return {
+        ...u,
+        tutorProfile: tutorProfileMap.get(uidStr) || null,
+        dealCount: dealCountMap.get(uidStr) || 0,
+        reportsCount: reportCountMap.get(uidStr) || 0
+      };
+    });
+
+    const responseData = {
       success: true,
       count: enrichedUsers.length,
       users: enrichedUsers
-    });
+    };
+
+    setCached(cacheKey, responseData, 20000);
+
+    res.status(200).json(responseData);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -713,6 +876,9 @@ exports.issueUserWarning = async (req, res) => {
       { userName: user.name, role: user.role, reason, warningCount: user.warningCount },
       req
     );
+
+    invalidateAdminCache('admin_users');
+    invalidateAdminCache('admin_stats');
 
     res.status(200).json({
       success: true,
@@ -827,6 +993,10 @@ exports.updateUserStatus = async (req, res) => {
       req
     );
 
+    invalidateAdminCache('admin_users');
+    invalidateAdminCache('admin_stats');
+    invalidateAdminCache('tutor_queue');
+
     res.status(200).json({
       success: true,
       message: `User ${user.name} status updated from ${prevStatus} to ${status}`,
@@ -883,6 +1053,10 @@ exports.deleteUserAccount = async (req, res) => {
       req
     );
 
+    invalidateAdminCache('admin_users');
+    invalidateAdminCache('admin_stats');
+    invalidateAdminCache('tutor_queue');
+
     res.status(200).json({
       success: true,
       message: `Account for ${userName} (${userEmail}) has been permanently deleted.`
@@ -910,6 +1084,10 @@ exports.toggleUserStatus = async (req, res) => {
 
     await logAction(req.user.id, user.isActive ? 'ACTIVATE_USER' : 'DEACTIVATE_USER', 'user', user._id, { userName: user.name }, req);
 
+    invalidateAdminCache('admin_users');
+    invalidateAdminCache('admin_stats');
+    invalidateAdminCache('tutor_queue');
+
     res.status(200).json({
       success: true,
       message: `User ${user.name} is now ${user.isActive ? 'active' : 'deactivated'}`,
@@ -927,6 +1105,12 @@ exports.toggleUserStatus = async (req, res) => {
 // @route   GET /api/admin/deals
 exports.getAllDeals = async (req, res) => {
   try {
+    const cacheKey = 'admin_deals_' + JSON.stringify(req.query || {});
+    const cached = getCached(cacheKey);
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     const { status, paymentStatus } = req.query;
     const query = {};
 
@@ -937,13 +1121,18 @@ exports.getAllDeals = async (req, res) => {
       .populate('student', 'name email avatar city')
       .populate('tutor', 'name email avatar city')
       .populate('paymentVerifiedBy', 'name')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
-    res.status(200).json({
+    const responseData = {
       success: true,
       count: deals.length,
       deals
-    });
+    };
+
+    setCached(cacheKey, responseData, 20000);
+
+    res.status(200).json(responseData);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -1010,6 +1199,9 @@ exports.verifyDealPayment = async (req, res) => {
 
       await logAction(req.user.id, 'VERIFY_PAYMENT', 'deal', deal._id, { amount: deal.price, student: deal.student.name, tutor: deal.tutor.name }, req);
 
+      invalidateAdminCache('admin_deals');
+      invalidateAdminCache('admin_stats');
+
       return res.status(200).json({
         success: true,
         message: 'Payment marked as verified successfully. Deal status set to Active Paid.',
@@ -1040,6 +1232,9 @@ exports.verifyDealPayment = async (req, res) => {
       });
 
       await logAction(req.user.id, 'REJECT_PAYMENT', 'deal', deal._id, { dealId: deal._id }, req);
+
+      invalidateAdminCache('admin_deals');
+      invalidateAdminCache('admin_stats');
 
       return res.status(200).json({
         success: true,
@@ -1086,6 +1281,8 @@ exports.restrictDealAccess = async (req, res) => {
 
     await logAction(req.user.id, 'RESTRICT_DEAL', 'deal', deal._id, { restrictionType: deal.restrictionType }, req);
 
+    invalidateAdminCache('admin_deals');
+
     res.status(200).json({
       success: true,
       message: `Deal restriction updated to: ${deal.restrictionType}`,
@@ -1103,33 +1300,56 @@ exports.restrictDealAccess = async (req, res) => {
 // @route   GET /api/admin/chats
 exports.getAllConversations = async (req, res) => {
   try {
-    const messages = await Message.find()
+    const cacheKey = 'admin_chats';
+    const cached = getCached(cacheKey);
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
+    const conversationSummary = await Message.aggregate([
+      { $sort: { createdAt: -1 } },
+      {
+        $group: {
+          _id: '$conversationId',
+          messageCount: { $sum: 1 },
+          lastMessageId: { $first: '$_id' }
+        }
+      }
+    ]);
+
+    if (!conversationSummary || conversationSummary.length === 0) {
+      const responseData = { success: true, conversations: [] };
+      setCached(cacheKey, responseData, 20000);
+      return res.status(200).json(responseData);
+    }
+
+    const lastMsgIds = conversationSummary.map((c) => c.lastMessageId);
+    const countMap = new Map(conversationSummary.map((c) => [c._id, c.messageCount]));
+
+    const lastMessages = await Message.find({ _id: { $in: lastMsgIds } })
       .populate('sender', 'name email avatar role city')
       .populate('recipient', 'name email avatar role city')
       .populate('deal')
-      .sort({ createdAt: -1 });
+      .lean();
 
-    const conversationMap = new Map();
+    const conversations = lastMessages
+      .filter((msg) => msg.sender && msg.recipient)
+      .map((msg) => ({
+        conversationId: msg.conversationId,
+        user1: msg.sender,
+        user2: msg.recipient,
+        lastMessage: msg,
+        messageCount: countMap.get(msg.conversationId) || 1,
+        deal: msg.deal
+      }));
 
-    for (const msg of messages) {
-      if (!msg.sender || !msg.recipient) continue;
-      if (!conversationMap.has(msg.conversationId)) {
-        const totalMsgs = await Message.countDocuments({ conversationId: msg.conversationId });
-        conversationMap.set(msg.conversationId, {
-          conversationId: msg.conversationId,
-          user1: msg.sender,
-          user2: msg.recipient,
-          lastMessage: msg,
-          messageCount: totalMsgs,
-          deal: msg.deal
-        });
-      }
-    }
-
-    res.status(200).json({
+    const responseData = {
       success: true,
-      conversations: Array.from(conversationMap.values())
-    });
+      conversations
+    };
+
+    setCached(cacheKey, responseData, 20000);
+    res.status(200).json(responseData);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -1199,6 +1419,8 @@ exports.deleteAdminConversation = async (req, res) => {
       }
     }
 
+    invalidateAdminCache('admin_chats');
+
     res.status(200).json({
       success: true,
       message: 'Chat conversation permanently deleted by admin',
@@ -1217,6 +1439,12 @@ exports.deleteAdminConversation = async (req, res) => {
 // @route   GET /api/admin/reviews
 exports.getAllReviews = async (req, res) => {
   try {
+    const cacheKey = 'admin_reviews_' + JSON.stringify(req.query || {});
+    const cached = getCached(cacheKey);
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     const { status } = req.query;
     let query = {};
     if (status && status !== 'all') {
@@ -1234,13 +1462,18 @@ exports.getAllReviews = async (req, res) => {
       .populate('targetUser', 'name email avatar city role')
       .populate('reportedBy', 'name email role')
       .populate('deal', 'subject price mode')
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
-    res.status(200).json({
+    const responseData = {
       success: true,
       count: reviews.length,
       reviews
-    });
+    };
+
+    setCached(cacheKey, responseData, 20000);
+
+    res.status(200).json(responseData);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -1304,6 +1537,8 @@ exports.overrideReview = async (req, res) => {
       status: review.status
     }, req);
 
+    invalidateAdminCache('admin_reviews');
+
     res.status(200).json({
       success: true,
       message: 'Review rating/comment successfully moderated & updated!',
@@ -1349,6 +1584,8 @@ exports.deleteReview = async (req, res) => {
 
     await logAction(req.user.id, 'DELETE_REVIEW', 'review', req.params.id, { tutorId }, req);
 
+    invalidateAdminCache('admin_reviews');
+
     res.status(200).json({
       success: true,
       message: 'Review removed successfully'
@@ -1365,17 +1602,28 @@ exports.deleteReview = async (req, res) => {
 // @route   GET /api/admin/sessions
 exports.getSessionLogs = async (req, res) => {
   try {
+    const cacheKey = 'admin_sessions';
+    const cached = getCached(cacheKey);
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     const sessions = await Session.find()
       .populate('deal', 'subject price mode status')
       .populate('tutor', 'name email avatar city')
       .populate('student', 'name email avatar city')
-      .sort({ scheduledStartTime: -1 });
+      .sort({ scheduledStartTime: -1 })
+      .lean();
 
-    res.status(200).json({
+    const responseData = {
       success: true,
       count: sessions.length,
       sessions
-    });
+    };
+
+    setCached(cacheKey, responseData, 20000);
+
+    res.status(200).json(responseData);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -1388,16 +1636,27 @@ exports.getSessionLogs = async (req, res) => {
 // @route   GET /api/admin/audit-logs
 exports.getAuditLogs = async (req, res) => {
   try {
+    const cacheKey = 'admin_audit_logs';
+    const cached = getCached(cacheKey);
+    if (cached) {
+      return res.status(200).json(cached);
+    }
+
     const logs = await AuditLog.find()
       .populate('admin', 'name email role')
       .sort({ createdAt: -1 })
-      .limit(100);
+      .limit(100)
+      .lean();
 
-    res.status(200).json({
+    const responseData = {
       success: true,
       count: logs.length,
       logs
-    });
+    };
+
+    setCached(cacheKey, responseData, 20000);
+
+    res.status(200).json(responseData);
   } catch (error) {
     res.status(500).json({
       success: false,
@@ -1423,6 +1682,8 @@ exports.createCategory = async (req, res) => {
     });
 
     await logAction(req.user.id, 'CREATE_CATEGORY', 'category', category._id, { name }, req);
+
+    invalidateAdminCache('admin_stats');
 
     res.status(201).json({
       success: true,
@@ -1461,6 +1722,8 @@ exports.updateCategory = async (req, res) => {
     await category.save();
     await logAction(req.user.id, 'UPDATE_CATEGORY', 'category', category._id, { name: category.name }, req);
 
+    invalidateAdminCache('admin_stats');
+
     res.status(200).json({
       success: true,
       message: 'Category updated successfully',
@@ -1484,6 +1747,8 @@ exports.deleteCategory = async (req, res) => {
     }
 
     await logAction(req.user.id, 'DELETE_CATEGORY', 'category', req.params.id, { name: category.name }, req);
+
+    invalidateAdminCache('admin_stats');
 
     res.status(200).json({
       success: true,
@@ -1509,6 +1774,8 @@ exports.createLocation = async (req, res) => {
     });
 
     await logAction(req.user.id, 'CREATE_LOCATION', 'location', location._id, { name, province }, req);
+
+    invalidateAdminCache('admin_stats');
 
     res.status(201).json({
       success: true,
@@ -1542,6 +1809,8 @@ exports.updateLocation = async (req, res) => {
     await location.save();
     await logAction(req.user.id, 'UPDATE_LOCATION', 'location', location._id, { name: location.name }, req);
 
+    invalidateAdminCache('admin_stats');
+
     res.status(200).json({
       success: true,
       message: 'Location updated successfully',
@@ -1565,6 +1834,8 @@ exports.deleteLocation = async (req, res) => {
     }
 
     await logAction(req.user.id, 'DELETE_LOCATION', 'location', req.params.id, { name: location.name }, req);
+
+    invalidateAdminCache('admin_stats');
 
     res.status(200).json({
       success: true,

@@ -145,13 +145,16 @@ export default function TutorApprovalPage() {
     }
   };
 
-  const fetchQueue = async () => {
-    setLoading(true);
+  const fetchQueue = async (showSpinner = true) => {
+    if (showSpinner) setLoading(true);
     try {
       const res = await api.getTutorQueue(statusFilter);
       if (res.success) {
         setTutors(res.tutors);
         if (res.counts) setCounts(res.counts);
+        try {
+          sessionStorage.setItem(`admin_tutor_queue_${statusFilter}`, JSON.stringify({ tutors: res.tutors, counts: res.counts }));
+        } catch (e) {}
       }
     } catch (e) {
       console.error(e);
@@ -161,7 +164,20 @@ export default function TutorApprovalPage() {
   };
 
   useEffect(() => {
-    fetchQueue();
+    try {
+      const cached = typeof window !== 'undefined' ? sessionStorage.getItem(`admin_tutor_queue_${statusFilter}`) : null;
+      if (cached) {
+        const parsed = JSON.parse(cached);
+        if (parsed && Array.isArray(parsed.tutors)) {
+          setTutors(parsed.tutors);
+          if (parsed.counts) setCounts(parsed.counts);
+          setLoading(false);
+          fetchQueue(false);
+          return;
+        }
+      }
+    } catch (e) {}
+    fetchQueue(true);
   }, [statusFilter]);
 
   const handleApprove = async (id) => {

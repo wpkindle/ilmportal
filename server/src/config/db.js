@@ -27,7 +27,14 @@ const connectDB = async () => {
     // 2. Connect via direct 3-shard Atlas replicaSet (bypasses SRV/DNS issues)
     try {
       console.log('Connecting to persistent MongoDB Atlas cluster (direct shard URI)...');
-      await mongoose.connect(DEFAULT_MONGODB_URI, { serverSelectionTimeoutMS: 12000 });
+      const mongooseOptions = {
+        serverSelectionTimeoutMS: 12000,
+        maxPoolSize: 50,
+        minPoolSize: 10,
+        socketTimeoutMS: 45000,
+        family: 4
+      };
+      await mongoose.connect(DEFAULT_MONGODB_URI, mongooseOptions);
       console.log('✅ MongoDB connected successfully to persistent Atlas database (ilmportal)');
       return;
     } catch (atlasErr) {

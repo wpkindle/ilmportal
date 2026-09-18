@@ -62,4 +62,8 @@ const sessionSchema = new mongoose.Schema({
   timestamps: true
 });
 
+sessionSchema.index({ tutor: 1, scheduledStartTime: -1 });
+sessionSchema.index({ student: 1, scheduledStartTime: -1 });
+sessionSchema.index({ status: 1 });
+
 module.exports = mongoose.model('Session', sessionSchema);

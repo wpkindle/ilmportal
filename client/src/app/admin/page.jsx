@@ -59,10 +59,16 @@ export default function AdminDashboardPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [actionFeedback, setActionFeedback] = useState({ message: '', type: '' });
 
-  const fetchStats = async () => {
+  const fetchStats = async (showSpinner = true) => {
     try {
+      if (showSpinner) setLoading(true);
       const res = await api.getAdminStats();
-      if (res.success) setStats(res.stats);
+      if (res.success && res.stats) {
+        setStats(res.stats);
+        try {
+          sessionStorage.setItem('admin_stats_cache', JSON.stringify(res.stats));
+        } catch (e) {}
+      }
     } catch (err) {
       console.error('Error fetching admin stats:', err);
     } finally {
@@ -70,12 +76,15 @@ export default function AdminDashboardPage() {
     }
   };
 
-  const fetchUsers = async () => {
+  const fetchUsers = async (showSpinner = true) => {
     try {
-      setUsersLoading(true);
+      if (showSpinner) setUsersLoading(true);
       const res = await api.getAdminUsers({});
-      if (res.success) {
-        setAllUsers(res.users || []);
+      if (res.success && Array.isArray(res.users)) {
+        setAllUsers(res.users);
+        try {
+          sessionStorage.setItem('admin_users_cache', JSON.stringify(res.users));
+        } catch (e) {}
       }
     } catch (err) {
       console.error('Error fetching users:', err);
@@ -85,8 +94,36 @@ export default function AdminDashboardPage() {
   };
 
   useEffect(() => {
-    fetchStats();
-    fetchUsers();
+    // SWR pattern: restore cached stats and users immediately for 0ms load time
+    let hadCachedStats = false;
+    let hadCachedUsers = false;
+    try {
+      const cachedStats = typeof window !== 'undefined' ? sessionStorage.getItem('admin_stats_cache') : null;
+      if (cachedStats) {
+        const parsedStats = JSON.parse(cachedStats);
+        if (parsedStats && typeof parsedStats === 'object') {
+          setStats(parsedStats);
+          setLoading(false);
+          hadCachedStats = true;
+        }
+      }
+    } catch (e) {}
+
+    try {
+      const cachedUsers = typeof window !== 'undefined' ? sessionStorage.getItem('admin_users_cache') : null;
+      if (cachedUsers) {
+        const parsedUsers = JSON.parse(cachedUsers);
+        if (Array.isArray(parsedUsers) && parsedUsers.length > 0) {
+          setAllUsers(parsedUsers);
+          setUsersLoading(false);
+          hadCachedUsers = true;
+        }
+      }
+    } catch (e) {}
+
+    // Fetch fresh data in background without blocking UI
+    fetchStats(!hadCachedStats);
+    fetchUsers(!hadCachedUsers);
   }, []);
 
   // Stable summary counts for tabs

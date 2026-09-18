@@ -181,4 +181,9 @@ tutorProfileSchema.virtual('totalReviews').get(function () {
   return this.ratingCount !== undefined ? this.ratingCount : 0;
 });
 
+tutorProfileSchema.index({ verificationStatus: 1, createdAt: -1 });
+tutorProfileSchema.index({ isPaused: 1 });
+tutorProfileSchema.index({ city: 1 });
+tutorProfileSchema.index({ createdAt: -1 });
+
 module.exports = mongoose.model('TutorProfile', tutorProfileSchema);

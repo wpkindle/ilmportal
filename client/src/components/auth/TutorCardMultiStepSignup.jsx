@@ -490,17 +490,13 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
       setError('Please select at least one teaching subject or discipline.');
       return;
     }
-    if (!hourlyRate || Number(hourlyRate) < 100) {
-      setError('Please enter a valid hourly rate (minimum 100 PKR).');
-      return;
-    }
 
     setLoading(true);
     try {
       await api.updateMyTutorProfile({
         subjects: selectedDisciplines,
-        hourlyRate: Number(hourlyRate),
-        monthlyRate: Number(monthlyRate) || 0,
+        hourlyRate: Number(hourlyRate) || 1500,
+        monthlyRate: Number(monthlyRate) || 15000,
         bio: bio.trim()
       });
       if (typeof window !== 'undefined') {
@@ -671,7 +667,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
             <span className="text-stone-800">
               {currentStep === 1 && 'Credentials & Verification'}
               {currentStep === 2 && 'Personal Profile & Location'}
-              {currentStep === 3 && 'Subjects & Rates'}
+              {currentStep === 3 && 'Teaching Subjects'}
               {currentStep === 4 && 'Education & Sanad'}
               {currentStep === 5 && 'Payouts & Availability'}
             </span>
@@ -1078,7 +1074,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
               disabled={loading}
               className="flex-1 py-2.5 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-xs sm:text-sm rounded-xl shadow transition-all flex items-center justify-center gap-1.5 cursor-pointer"
             >
-              <span>Next: Subjects &amp; Rates</span>
+              <span>Next: Teaching Subjects</span>
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
@@ -1128,33 +1124,6 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
                   </div>
                 );
               })}
-            </div>
-          </div>
-
-          {/* Rates */}
-          <div className="grid grid-cols-2 gap-2.5">
-            <div>
-              <label className="text-xs font-bold text-stone-800 block mb-1">Hourly Rate (PKR) *</label>
-              <input
-                type="number"
-                min={100}
-                required
-                placeholder="1500"
-                value={hourlyRate}
-                onChange={(e) => setHourlyRate(e.target.value)}
-                className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-stone-800 block mb-1">Monthly Approx (PKR)</label>
-              <input
-                type="number"
-                min={1000}
-                placeholder="15000"
-                value={monthlyRate}
-                onChange={(e) => setMonthlyRate(e.target.value)}
-                className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
-              />
             </div>
           </div>
 

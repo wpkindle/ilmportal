@@ -141,7 +141,12 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
   // -------------------------------------------------------------
   const [degrees, setDegrees] = useState(() => {
     if (Array.isArray(initialDraft.degrees) && initialDraft.degrees.length > 0) {
-      return initialDraft.degrees;
+      return initialDraft.degrees.map((d) => ({
+        ...d,
+        fileUrl: d.fileUrl || '',
+        fileName: d.fileUrl ? (d.fileName || 'Attached Document Scan') : '',
+        fileType: d.fileUrl ? (d.fileType || '') : ''
+      }));
     }
     if (initialDraft.degreeTitle || initialDraft.sanadFile) {
       return [{
@@ -150,7 +155,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         completionYear: initialDraft.completionYear || '',
         institute: initialDraft.institute || '',
         fileUrl: initialDraft.sanadFile || '',
-        fileName: initialDraft.sanadFileName || '',
+        fileName: initialDraft.sanadFile ? (initialDraft.sanadFileName || 'Attached Document Scan') : '',
         fileType: initialDraft.sanadFile?.startsWith('data:application/pdf') ? 'application/pdf' : 'image/jpeg'
       }];
     }
@@ -201,22 +206,37 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
     setDegrees((prev) => prev.map((d) => (d.id === degId ? { ...d, [field]: value } : d)));
   };
 
-  const handleDegreeFileUpload = (degId, file) => {
+  const handleDegreeFileUpload = async (degId, file) => {
     if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Document file size must be under 5MB.');
+    if (file.size > 10 * 1024 * 1024) {
+      setError('Document file size must be under 10MB.');
       return;
     }
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result;
+    setError('');
+
+    try {
+      let dataUrl = '';
+      const isImage = file.type?.startsWith('image/') || /\.(jpg|jpeg|png|webp)$/i.test(file.name);
+      if (isImage) {
+        // Compress document scan to clean high-resolution ~150KB image
+        dataUrl = await compressAvatarFile(file, 1200, 0.82);
+      } else {
+        // PDF or document
+        dataUrl = await new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+      }
+
       const fileType = file.type || (file.name.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
       setDegrees((prev) =>
         prev.map((d) =>
           d.id === degId
             ? {
                 ...d,
-                fileUrl: result,
+                fileUrl: dataUrl,
                 fileName: file.name,
                 fileType
               }
@@ -224,8 +244,10 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         )
       );
       setError('');
-    };
-    reader.readAsDataURL(file);
+    } catch (err) {
+      console.error('File upload processing error:', err);
+      setError('Could not process the attached file. Please select a valid document scan.');
+    }
   };
 
   const removeDegreeFile = (degId) => {
@@ -270,10 +292,15 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         hourlyRate,
         monthlyRate,
         bio,
-        degrees: degrees.map((d) => ({
-          ...d,
-          fileUrl: d.fileUrl && d.fileUrl.length < 1000000 ? d.fileUrl : ''
-        })),
+        degrees: degrees.map((d) => {
+          const canSaveUrl = d.fileUrl && d.fileUrl.length < 2500000;
+          return {
+            ...d,
+            fileUrl: canSaveUrl ? d.fileUrl : '',
+            fileName: canSaveUrl ? d.fileName : '',
+            fileType: canSaveUrl ? d.fileType : ''
+          };
+        }),
         experienceYears,
         payoutChoice,
         payoutProvider,
@@ -1411,31 +1438,43 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
                     Upload Degree / Certificate Document <span className="text-red-500">*</span>
                   </label>
                   <div className="p-3 rounded-xl bg-[#faf8f5] border border-dashed border-[#e6dfd5] text-center hover:border-stone-400 transition-colors">
-                    {deg.fileName || deg.fileUrl ? (
+                    {deg.fileUrl ? (
                       <div className="flex items-center justify-between gap-2 text-xs text-stone-700 bg-white p-2 rounded-lg border border-[#e6dfd5]">
-                        <div className="flex items-center gap-2 min-w-0">
-                          {deg.fileType === 'application/pdf' || deg.fileName?.endsWith('.pdf') ? (
-                            <FileText className="w-4 h-4 text-rose-600 shrink-0" />
+                        <div className="flex items-center gap-2.5 min-w-0">
+                          {deg.fileType === 'application/pdf' || deg.fileName?.endsWith('.pdf') || deg.fileUrl?.startsWith('data:application/pdf') ? (
+                            <div className="w-8 h-8 rounded-md bg-rose-50 border border-rose-200 flex items-center justify-center shrink-0">
+                              <FileText className="w-5 h-5 text-rose-600" />
+                            </div>
                           ) : (
-                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                            <img
+                              src={deg.fileUrl}
+                              alt="Scan Preview"
+                              className="w-8 h-8 object-cover rounded-md border border-stone-200 shrink-0"
+                            />
                           )}
-                          <span className="truncate font-medium text-stone-800">
-                            {deg.fileName || 'Attached Document'}
-                          </span>
+                          <div className="min-w-0 text-left">
+                            <span className="truncate font-bold text-stone-800 text-xs block">
+                              {deg.fileName || 'Attached Document Scan'}
+                            </span>
+                            <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1">
+                              <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                              Scan Attached &amp; Verified
+                            </span>
+                          </div>
                         </div>
                         <button
                           type="button"
                           onClick={() => removeDegreeFile(deg.id)}
-                          className="text-red-600 hover:text-red-800 font-bold text-xs shrink-0 cursor-pointer"
+                          className="text-red-600 hover:text-red-800 font-bold text-xs shrink-0 cursor-pointer px-2 py-1 hover:bg-red-50 rounded-lg transition-colors"
                         >
                           Remove
                         </button>
                       </div>
                     ) : (
-                      <label className="cursor-pointer text-xs text-stone-500 hover:text-[#b85d34] flex flex-col items-center gap-1.5 py-1">
+                      <label className="cursor-pointer text-xs text-stone-500 hover:text-[#b85d34] flex flex-col items-center gap-1.5 py-1.5">
                         <Upload className="w-5 h-5 text-[#b85d34]" />
                         <span className="font-semibold text-stone-700">Click to upload Sanad or Degree copy</span>
-                        <span className="text-[10px] text-stone-400">Image (JPG, PNG) or PDF up to 5MB</span>
+                        <span className="text-[10px] text-stone-400">Image (JPG, PNG) or PDF up to 10MB</span>
                         <input
                           type="file"
                           accept="image/*,application/pdf"

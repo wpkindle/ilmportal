@@ -1682,7 +1682,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
                   </span>
                 </div>
                 <p className="text-[11px] text-stone-600 leading-relaxed">
-                  Students pay fees to official IlmiDunya verified accounts. Fees are disbursed directly to you with zero commission.
+                  Students pay fees to official IlmiDunya verified accounts. Fees are disbursed directly to you.
                 </p>
               </div>
 
@@ -1852,7 +1852,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
 
           <div className="p-2.5 rounded-xl bg-[#faf8f5] border border-[#e6dfd5] text-[11px] text-stone-600 flex items-center gap-2">
             <ShieldCheck className="w-4 h-4 text-[#b85d34] shrink-0" />
-            <span>Guaranteed monthly tuition payout protection with zero commission on live lessons.</span>
+            <span>Guaranteed monthly tuition payout protection on live lessons.</span>
           </div>
 
           {/* Nav Buttons */}

@@ -9,6 +9,7 @@
     "seed": "npm run seed --prefix server",
     "test": "npm run test --prefix server",
     "sitemap": "node scripts/generate-sitemap.js",
+    "icons": "node scripts/generate-favicons.js",
     "install:all": "npm install && npm install --prefix server && npm install --prefix client",
     "build": "npm run build --prefix client"
   },

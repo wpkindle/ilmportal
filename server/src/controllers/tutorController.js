@@ -464,12 +464,30 @@ exports.updateMyTutorProfile = async (req, res) => {
       ? Number(experienceYears)
       : undefined;
 
-    // Normalize payment methods if sent as payoutMethod single object
-    let resolvedPaymentMethods = Array.isArray(paymentMethods) ? paymentMethods : undefined;
-    if ((!resolvedPaymentMethods || resolvedPaymentMethods.length === 0) && payoutMethod && (payoutMethod.accountTitle || payoutMethod.accountNumber)) {
+    // Normalize payment methods if sent as paymentMethods array or payoutMethod single object
+    let resolvedPaymentMethods = undefined;
+    if (Array.isArray(paymentMethods)) {
+      resolvedPaymentMethods = paymentMethods.map((pm, idx) => {
+        const rawBank = (pm.bankName || pm.provider || pm.method || 'Bank').trim();
+        const lower = rawBank.toLowerCase();
+        const method = ['easypaisa', 'jazzcash', 'upaisa', 'raast'].includes(lower) ? lower : 'bank';
+        return {
+          _id: pm._id,
+          method,
+          bankName: rawBank,
+          accountTitle: (pm.accountTitle || '').trim(),
+          accountNumber: (pm.accountNumber || '').trim(),
+          instructions: (pm.instructions || '').trim(),
+          isDefault: Boolean(pm.isDefault || idx === 0)
+        };
+      }).filter(pm => pm.accountTitle && pm.accountNumber);
+    } else if (payoutMethod && (payoutMethod.accountTitle || payoutMethod.accountNumber)) {
+      const rawBank = (payoutMethod.bankName || payoutMethod.provider || 'Bank').trim();
+      const lower = rawBank.toLowerCase();
+      const method = ['easypaisa', 'jazzcash', 'upaisa', 'raast'].includes(lower) ? lower : 'bank';
       resolvedPaymentMethods = [{
-        method: ['easypaisa', 'jazzcash', 'upaisa'].includes((payoutMethod.provider || '').toLowerCase()) ? payoutMethod.provider.toLowerCase() : 'bank',
-        bankName: payoutMethod.provider || 'JazzCash',
+        method,
+        bankName: rawBank,
         accountTitle: (payoutMethod.accountTitle || '').trim(),
         accountNumber: (payoutMethod.accountNumber || '').trim(),
         isDefault: true
@@ -511,6 +529,7 @@ exports.updateMyTutorProfile = async (req, res) => {
         videoIntro: typeof videoIntro === 'string' ? videoIntro.trim() : '',
         subjects: resolvedSubjects !== undefined ? resolvedSubjects : [],
         teachingModes: resolvedModes || ['online'],
+        paymentMethods: resolvedPaymentMethods || [],
         verificationStatus: isProfileComplete ? 'under_review' : 'incomplete',
         preferredAccountChoice: ['own', 'admin'].includes(preferredAccountChoice) ? preferredAccountChoice : 'admin'
       });
@@ -532,15 +551,7 @@ exports.updateMyTutorProfile = async (req, res) => {
         profile.teachingModes = resolvedModes;
       }
       if (Array.isArray(resolvedPaymentMethods)) {
-        profile.paymentMethods = resolvedPaymentMethods.filter(pm => pm && pm.method && pm.accountTitle && pm.accountNumber).map((pm, idx) => ({
-          _id: pm._id,
-          method: pm.method,
-          bankName: (pm.bankName || '').trim(),
-          accountTitle: (pm.accountTitle || '').trim(),
-          accountNumber: (pm.accountNumber || '').trim(),
-          instructions: (pm.instructions || '').trim(),
-          isDefault: Boolean(pm.isDefault || idx === 0)
-        }));
+        profile.paymentMethods = resolvedPaymentMethods;
       }
       if (['own', 'admin'].includes(preferredAccountChoice)) {
         profile.preferredAccountChoice = preferredAccountChoice;

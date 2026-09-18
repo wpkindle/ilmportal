@@ -132,7 +132,8 @@ const tutorProfileSchema = new mongoose.Schema({
   paymentMethods: [{
     method: {
       type: String,
-      enum: ['bank', 'raast', 'easypaisa', 'jazzcash', 'upaisa'],
+      enum: ['bank', 'raast', 'easypaisa', 'jazzcash', 'upaisa', 'other'],
+      default: 'bank',
       required: true
     },
     bankName: {

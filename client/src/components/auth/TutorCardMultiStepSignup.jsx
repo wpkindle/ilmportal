@@ -33,18 +33,6 @@ import CustomSelect from '../common/CustomSelect';
 import { allPakistaniCities, pakistaniCityAreas } from '../../data/pakistanAreas';
 import { compressAvatarFile } from '../../utils/imageCompressor';
 
-// Popular Pakistani payment providers
-const PAYMENT_PROVIDERS = [
-  { id: 'JazzCash', name: 'JazzCash Mobile Account' },
-  { id: 'EasyPaisa', name: 'EasyPaisa Mobile Account' },
-  { id: 'Meezan Bank', name: 'Meezan Bank (Islamic Banking)' },
-  { id: 'HBL', name: 'Habib Bank Limited (HBL)' },
-  { id: 'UBL', name: 'United Bank Limited (UBL)' },
-  { id: 'Bank Alfalah', name: 'Bank Alfalah Islamic' },
-  { id: 'Allied Bank', name: 'Allied Bank (ABL)' },
-  { id: 'Faysal Bank', name: 'Faysal Islamic Bank' },
-  { id: 'Other Bank', name: 'Other Commercial / Islamic Bank' }
-];
 
 const STEPS = [
   { num: 1, label: 'Account' },
@@ -292,10 +280,72 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
   // STEP 5: Payouts & Availability
   // -------------------------------------------------------------
   const [payoutChoice, setPayoutChoice] = useState(() => initialDraft.payoutChoice || 'admin'); // 'admin' (IlmiDunya Admin Accounts) | 'own' (Personal Accounts)
-  const [payoutProvider, setPayoutProvider] = useState(() => initialDraft.payoutProvider || 'JazzCash');
-  const [payoutTitle, setPayoutTitle] = useState(() => initialDraft.payoutTitle || '');
-  const [payoutAccount, setPayoutAccount] = useState(() => initialDraft.payoutAccount || '');
+  const [payoutAccounts, setPayoutAccounts] = useState(() => {
+    if (Array.isArray(initialDraft.payoutAccounts) && initialDraft.payoutAccounts.length > 0) {
+      return initialDraft.payoutAccounts;
+    }
+    if (initialDraft.payoutProvider || initialDraft.payoutTitle || initialDraft.payoutAccount) {
+      return [
+        {
+          id: 'acc_1',
+          bankName: initialDraft.payoutProvider || '',
+          accountTitle: initialDraft.payoutTitle || '',
+          accountNumber: initialDraft.payoutAccount || '',
+          isDefault: true
+        }
+      ];
+    }
+    return [
+      {
+        id: 'acc_1',
+        bankName: '',
+        accountTitle: '',
+        accountNumber: '',
+        isDefault: true
+      }
+    ];
+  });
   const [selectedDays, setSelectedDays] = useState(() => initialDraft.selectedDays || ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
+
+  const addPayoutAccount = () => {
+    setPayoutAccounts((prev) => [
+      ...prev,
+      {
+        id: 'acc_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+        bankName: '',
+        accountTitle: '',
+        accountNumber: '',
+        isDefault: prev.length === 0
+      }
+    ]);
+  };
+
+  const removePayoutAccount = (accId) => {
+    setPayoutAccounts((prev) => {
+      if (prev.length <= 1) return prev;
+      const filtered = prev.filter((a) => a.id !== accId);
+      const hasDefault = filtered.some((a) => a.isDefault);
+      if (!hasDefault && filtered.length > 0) {
+        filtered[0] = { ...filtered[0], isDefault: true };
+      }
+      return filtered;
+    });
+  };
+
+  const updatePayoutAccount = (accId, field, value) => {
+    setPayoutAccounts((prev) =>
+      prev.map((a) => (a.id === accId ? { ...a, [field]: value } : a))
+    );
+  };
+
+  const setDefaultPayoutAccount = (accId) => {
+    setPayoutAccounts((prev) =>
+      prev.map((a) => ({
+        ...a,
+        isDefault: a.id === accId
+      }))
+    );
+  };
 
   // Auto-save form draft & step state to localStorage on every change
   useEffect(() => {
@@ -326,9 +376,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         }),
         experienceYears,
         payoutChoice,
-        payoutProvider,
-        payoutTitle,
-        payoutAccount,
+        payoutAccounts,
         selectedDays
       };
       localStorage.setItem('ilm_tutor_signup_draft', JSON.stringify(dataToSave));
@@ -357,9 +405,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
     degrees,
     experienceYears,
     payoutChoice,
-    payoutProvider,
-    payoutTitle,
-    payoutAccount,
+    payoutAccounts,
     selectedDays,
     currentStep,
     highestStep
@@ -420,9 +466,37 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         }
         if (tp.experienceYears && !experienceYears) setExperienceYears(String(tp.experienceYears));
         if (tp.preferredAccountChoice && !initialDraft.payoutChoice) setPayoutChoice(tp.preferredAccountChoice);
-        if (tp.payoutMethod?.provider && !payoutProvider) setPayoutProvider(tp.payoutMethod.provider);
-        if (tp.payoutMethod?.accountTitle && !payoutTitle) setPayoutTitle(tp.payoutMethod.accountTitle);
-        if (tp.payoutMethod?.accountNumber && !payoutAccount) setPayoutAccount(tp.payoutMethod.accountNumber);
+        if (Array.isArray(tp.paymentMethods) && tp.paymentMethods.length > 0) {
+          setPayoutAccounts((prev) => {
+            const isBlank = prev.length === 1 && !prev[0].bankName && !prev[0].accountTitle && !prev[0].accountNumber;
+            if (isBlank) {
+              return tp.paymentMethods.map((pm, idx) => ({
+                id: pm._id || 'acc_' + idx,
+                bankName: pm.bankName || (pm.method ? pm.method.toUpperCase() : ''),
+                accountTitle: pm.accountTitle || '',
+                accountNumber: pm.accountNumber || '',
+                isDefault: pm.isDefault !== undefined ? pm.isDefault : idx === 0
+              }));
+            }
+            return prev;
+          });
+        } else if (tp.payoutMethod?.accountTitle || tp.payoutMethod?.accountNumber) {
+          setPayoutAccounts((prev) => {
+            const isBlank = prev.length === 1 && !prev[0].bankName && !prev[0].accountTitle && !prev[0].accountNumber;
+            if (isBlank) {
+              return [
+                {
+                  id: 'acc_1',
+                  bankName: tp.payoutMethod.provider || '',
+                  accountTitle: tp.payoutMethod.accountTitle || '',
+                  accountNumber: tp.payoutMethod.accountNumber || '',
+                  isDefault: true
+                }
+              ];
+            }
+            return prev;
+          });
+        }
         if (tp.availabilityDays?.length && (!selectedDays || selectedDays.length === 0)) setSelectedDays(tp.availabilityDays);
       }
     }
@@ -774,13 +848,24 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
     setError('');
 
     if (payoutChoice === 'own') {
-      if (!payoutTitle.trim()) {
-        setError('Please enter your account title as registered with the bank/service.');
+      if (!payoutAccounts || payoutAccounts.length === 0) {
+        setError('Please add at least one personal payment account.');
         return;
       }
-      if (!payoutAccount.trim()) {
-        setError('Please enter your account number or IBAN.');
-        return;
+      for (let i = 0; i < payoutAccounts.length; i++) {
+        const acc = payoutAccounts[i];
+        if (!acc.bankName || !acc.bankName.trim()) {
+          setError(`Please enter the bank / wallet name for Account #${i + 1}.`);
+          return;
+        }
+        if (!acc.accountTitle || !acc.accountTitle.trim()) {
+          setError(`Please enter the account title for Account #${i + 1} (${acc.bankName.trim()}).`);
+          return;
+        }
+        if (!acc.accountNumber || !acc.accountNumber.trim()) {
+          setError(`Please enter the account number / IBAN for Account #${i + 1} (${acc.bankName.trim()}).`);
+          return;
+        }
       }
     }
 
@@ -798,6 +883,18 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
       fileUrl: d.fileUrl,
       fileType: d.fileType || (d.fileUrl?.startsWith('data:application/pdf') ? 'application/pdf' : 'image/jpeg')
     }));
+
+    const cleanPaymentMethods = payoutChoice === 'own'
+      ? payoutAccounts
+          .filter((a) => a.bankName?.trim() && a.accountTitle?.trim() && a.accountNumber?.trim())
+          .map((a, idx) => ({
+            bankName: a.bankName.trim(),
+            accountTitle: a.accountTitle.trim(),
+            accountNumber: a.accountNumber.trim(),
+            isDefault: a.isDefault !== undefined ? a.isDefault : idx === 0
+          }))
+      : [];
+    const primaryAcc = cleanPaymentMethods.find((a) => a.isDefault) || cleanPaymentMethods[0];
 
     setLoading(true);
     try {
@@ -819,12 +916,13 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         sanadDocuments: sanadDocumentsPayload,
         sanadUrl: sanadDocumentsPayload[0]?.fileUrl || undefined,
         preferredAccountChoice: payoutChoice,
-        ...(payoutChoice === 'own' && payoutTitle.trim() && payoutAccount.trim()
+        ...(payoutChoice === 'own' && cleanPaymentMethods.length > 0
           ? {
+              paymentMethods: cleanPaymentMethods,
               payoutMethod: {
-                provider: payoutProvider,
-                accountTitle: payoutTitle.trim(),
-                accountNumber: payoutAccount.trim()
+                provider: primaryAcc.bankName,
+                accountTitle: primaryAcc.accountTitle,
+                accountNumber: primaryAcc.accountNumber
               }
             }
           : {}),
@@ -1727,7 +1825,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
                       <CreditCard className="w-4 h-4" />
                     </div>
                     <span className="text-xs font-bold text-stone-900">
-                      My Personal Account
+                      My Personal Accounts
                     </span>
                   </div>
                   {payoutChoice === 'own' && (
@@ -1737,7 +1835,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
                   )}
                 </div>
                 <p className="text-[11px] text-stone-600 leading-relaxed">
-                  Students transfer fees directly to your personal Pakistani bank account, JazzCash, or EasyPaisa.
+                  Students transfer fees directly to your personal Pakistani bank account(s), JazzCash, or EasyPaisa.
                 </p>
               </div>
 
@@ -1761,54 +1859,121 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
             </div>
           </div>
 
-          {/* Conditional Personal Account Form */}
+          {/* Conditional Personal Accounts Form */}
           {payoutChoice === 'own' ? (
-            <div className="bg-white border border-[#e6dfd5] rounded-2xl p-3.5 space-y-3 shadow-2xs animate-in fade-in duration-200">
-              <h4 className="text-xs font-bold text-stone-800 flex items-center gap-1.5">
-                <CreditCard className="w-3.5 h-3.5 text-[#b85d34]" />
-                <span>Enter Your Personal Account Details</span>
-              </h4>
-
-              <div>
-                <label className="text-xs font-bold text-stone-800 block mb-1">
-                  Tuition Fee Receiving Provider <span className="text-red-500">*</span>
-                </label>
-                <CustomSelect
-                  options={PAYMENT_PROVIDERS.map((p) => ({ value: p.id, label: p.name }))}
-                  value={payoutProvider}
-                  onChange={(p) => setPayoutProvider(p)}
-                  className="text-xs"
-                />
+            <div className="space-y-3 animate-in fade-in duration-200">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h4 className="text-xs font-bold text-stone-900 flex items-center gap-1.5">
+                    <CreditCard className="w-3.5 h-3.5 text-[#b85d34]" />
+                    <span>Your Personal Fee Receiving Accounts</span>
+                  </h4>
+                  <p className="text-[11px] text-stone-500 mt-0.5">
+                    Enter your bank or mobile wallet details. You can add multiple accounts.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={addPayoutAccount}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-white border border-[#b85d34] text-[#b85d34] hover:bg-[#b85d34] hover:text-white rounded-lg text-xs font-bold transition-all shadow-2xs cursor-pointer"
+                >
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>Add Account</span>
+                </button>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-                <div>
-                  <label className="text-xs font-bold text-stone-800 block mb-1">
-                    Account Title <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Name as registered on account"
-                    value={payoutTitle}
-                    onChange={(e) => setPayoutTitle(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
-                  />
+              {payoutAccounts.map((acc, idx) => (
+                <div
+                  key={acc.id || idx}
+                  className="bg-white border border-[#e6dfd5] rounded-2xl p-3.5 space-y-3 shadow-2xs relative"
+                >
+                  <div className="flex items-center justify-between pb-2 border-b border-stone-100">
+                    <div className="flex items-center gap-2">
+                      <span className="w-5 h-5 rounded-full bg-stone-100 text-stone-700 text-[11px] font-bold flex items-center justify-center">
+                        {idx + 1}
+                      </span>
+                      <span className="text-xs font-bold text-stone-800">
+                        {acc.bankName ? acc.bankName : `Account #${idx + 1}`}
+                      </span>
+                      {acc.isDefault ? (
+                        <span className="text-[10px] font-bold px-2 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
+                          Primary
+                        </span>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={() => setDefaultPayoutAccount(acc.id)}
+                          className="text-[10.5px] text-stone-500 hover:text-stone-900 underline font-medium cursor-pointer"
+                        >
+                          Set as Primary
+                        </button>
+                      )}
+                    </div>
+                    {payoutAccounts.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => removePayoutAccount(acc.id)}
+                        className="p-1 text-stone-400 hover:text-red-500 transition-colors cursor-pointer"
+                        title="Remove this account"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-stone-800 block mb-1">
+                      Bank or Wallet Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      placeholder="e.g. Meezan Bank, JazzCash, EasyPaisa, HBL, Bank Alfalah"
+                      value={acc.bankName}
+                      onChange={(e) => updatePayoutAccount(acc.id, 'bankName', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium placeholder:text-stone-400"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                      <label className="text-xs font-bold text-stone-800 block mb-1">
+                        Account Title <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Name as registered on account"
+                        value={acc.accountTitle}
+                        onChange={(e) => updatePayoutAccount(acc.id, 'accountTitle', e.target.value)}
+                        className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium placeholder:text-stone-400"
+                      />
+                    </div>
+                    <div>
+                      <label className="text-xs font-bold text-stone-800 block mb-1">
+                        Account Number / IBAN <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        placeholder="Account number or IBAN"
+                        value={acc.accountNumber}
+                        onChange={(e) => updatePayoutAccount(acc.id, 'accountNumber', e.target.value)}
+                        className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium placeholder:text-stone-400"
+                      />
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <label className="text-xs font-bold text-stone-800 block mb-1">
-                    Account Number / IBAN <span className="text-red-500">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    placeholder="Account number or IBAN"
-                    value={payoutAccount}
-                    onChange={(e) => setPayoutAccount(e.target.value)}
-                    className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
-                  />
-                </div>
-              </div>
+              ))}
+
+              <button
+                type="button"
+                onClick={addPayoutAccount}
+                className="w-full py-2 border-2 border-dashed border-[#e6dfd5] hover:border-[#b85d34] rounded-xl text-xs font-bold text-stone-600 hover:text-[#b85d34] flex items-center justify-center gap-1.5 transition-all cursor-pointer bg-white/50 hover:bg-white"
+              >
+                <Plus className="w-3.5 h-3.5" />
+                <span>+ Add Another Personal Account</span>
+              </button>
             </div>
           ) : (
             <div className="p-3 rounded-2xl bg-[#faf8f5] border border-[#e6dfd5] text-xs text-stone-700 flex items-start gap-2.5">

@@ -60,6 +60,8 @@ const tutorProfileSchema = new mongoose.Schema({
     title: { type: String, default: 'Sanad / Degree Document' },
     fileUrl: { type: String, required: true },
     fileType: { type: String, default: 'image/jpeg' },
+    completionYear: { type: Number },
+    institute: { type: String, default: '', trim: true },
     status: {
       type: String,
       enum: ['pending', 'verified', 'approved', 'rejected'],

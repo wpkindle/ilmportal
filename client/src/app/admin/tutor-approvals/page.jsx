@@ -544,6 +544,17 @@ export default function TutorApprovalPage() {
                                         {doc.title || `Document #${docIdx + 1}`}
                                       </h5>
 
+                                      {(doc.completionYear || doc.institute) && (
+                                        <div className="text-[10px] text-slate-600 flex flex-wrap items-center gap-x-2 gap-y-0.5">
+                                          {doc.completionYear && (
+                                            <span><strong>Year:</strong> {doc.completionYear}</span>
+                                          )}
+                                          {doc.institute && (
+                                            <span><strong>Institute:</strong> {doc.institute}</span>
+                                          )}
+                                        </div>
+                                      )}
+
                                       <div>
                                         {isDocVerified ? (
                                           <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-50 border border-emerald-300 px-2 py-0.5 rounded-md">

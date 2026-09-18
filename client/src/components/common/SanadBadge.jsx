@@ -126,26 +126,38 @@ export const SanadModal = ({
             return (
               <div key={doc._id || idx} className="border border-stone-200 rounded-2xl overflow-hidden bg-[#faf8f5]">
                 <div className="p-3 bg-white border-b border-stone-200 flex flex-wrap items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <FileText className="w-4 h-4 text-[#0c2217] shrink-0" />
-                    <span className="font-semibold text-sm text-stone-800 truncate">
-                      {doc.title || `Document #${idx + 1}`}
-                    </span>
-                    {isDocVerified ? (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-md shrink-0">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600" />
-                        Verified
+                  <div className="flex flex-col min-w-0">
+                    <div className="flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-[#0c2217] shrink-0" />
+                      <span className="font-semibold text-sm text-stone-800 truncate">
+                        {doc.title || `Document #${idx + 1}`}
                       </span>
-                    ) : isDocRejected ? (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-800 bg-rose-100 border border-rose-300 px-2 py-0.5 rounded-md shrink-0">
-                        <AlertCircle className="w-3 h-3 text-rose-600" />
-                        Rejected
-                      </span>
-                    ) : (
-                      <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-md shrink-0">
-                        <Clock className="w-3 h-3 text-amber-600 animate-pulse" />
-                        Pending Approval
-                      </span>
+                      {isDocVerified ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-300 px-2 py-0.5 rounded-md shrink-0">
+                          <CheckCircle2 className="w-3 h-3 text-emerald-600" />
+                          Verified
+                        </span>
+                      ) : isDocRejected ? (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-rose-800 bg-rose-100 border border-rose-300 px-2 py-0.5 rounded-md shrink-0">
+                          <AlertCircle className="w-3 h-3 text-rose-600" />
+                          Rejected
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1 text-[10px] font-bold text-amber-900 bg-amber-100 border border-amber-300 px-2 py-0.5 rounded-md shrink-0">
+                          <Clock className="w-3 h-3 text-amber-600 animate-pulse" />
+                          Pending Approval
+                        </span>
+                      )}
+                    </div>
+                    {(doc.completionYear || doc.institute) && (
+                      <div className="text-[11px] text-stone-500 pl-6 flex flex-wrap items-center gap-x-3 gap-y-0.5 mt-0.5">
+                        {doc.completionYear && (
+                          <span>Year: <strong>{doc.completionYear}</strong></span>
+                        )}
+                        {doc.institute && (
+                          <span>Institute: <strong>{doc.institute}</strong></span>
+                        )}
+                      </div>
                     )}
                   </div>
                   <div className="flex items-center gap-2">

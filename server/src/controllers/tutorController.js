@@ -568,6 +568,8 @@ exports.updateMyTutorProfile = async (req, res) => {
           title: doc.title || 'Sanad / Educational Degree',
           fileUrl: doc.fileUrl,
           fileType: doc.fileType || (doc.fileUrl && doc.fileUrl.startsWith('data:application/pdf') ? 'application/pdf' : 'image/jpeg'),
+          completionYear: doc.completionYear ? Number(doc.completionYear) : (existing?.completionYear || undefined),
+          institute: doc.institute !== undefined ? String(doc.institute).trim() : (existing?.institute || ''),
           status: isNew ? 'pending' : (existing?.status || 'pending'),
           uploadedAt: existing?.uploadedAt || doc.uploadedAt || new Date(),
           reviewedAt: existing?.reviewedAt,

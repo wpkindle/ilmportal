@@ -20,7 +20,10 @@ import {
   Sparkles,
   CreditCard,
   Check,
-  Clock
+  Clock,
+  Plus,
+  FileText,
+  Upload
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../services/api';
@@ -28,19 +31,6 @@ import Turnstile from '../common/Turnstile';
 import CustomSelect from '../common/CustomSelect';
 import { allPakistaniCities, pakistaniCityAreas } from '../../data/pakistanAreas';
 import { compressAvatarFile } from '../../utils/imageCompressor';
-
-// Popular qualification presets
-const QUALIFICATION_PRESETS = [
-  'Shahadat-ul-Alimiyyah (Dars-e-Nizami)',
-  'Hafiz-ul-Quran & Tajweed Specialist',
-  'Qari-e-Quran (Wifaq-ul-Madaris)',
-  'M.Phil / MS Islamic Studies',
-  'M.Sc Mathematics / Physics',
-  'M.Sc Chemistry / Biology',
-  'M.A English / Urdu Literature',
-  'B.S Computer Science / IT',
-  'O / A-Level Cambridge Specialist'
-];
 
 // Popular Pakistani payment providers
 const PAYMENT_PROVIDERS = [
@@ -147,13 +137,111 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
   const [bio, setBio] = useState(() => initialDraft.bio || '');
 
   // -------------------------------------------------------------
-  // STEP 4: Qualifications & Sanad
+  // STEP 4: Qualifications & Sanad (Multiple Degrees)
   // -------------------------------------------------------------
-  const [degreeTitle, setDegreeTitle] = useState(() => initialDraft.degreeTitle || '');
-  const [institute, setInstitute] = useState(() => initialDraft.institute || '');
+  const [degrees, setDegrees] = useState(() => {
+    if (Array.isArray(initialDraft.degrees) && initialDraft.degrees.length > 0) {
+      return initialDraft.degrees;
+    }
+    if (initialDraft.degreeTitle || initialDraft.sanadFile) {
+      return [{
+        id: 'deg_1',
+        title: initialDraft.degreeTitle || '',
+        completionYear: initialDraft.completionYear || '',
+        institute: initialDraft.institute || '',
+        fileUrl: initialDraft.sanadFile || '',
+        fileName: initialDraft.sanadFileName || '',
+        fileType: initialDraft.sanadFile?.startsWith('data:application/pdf') ? 'application/pdf' : 'image/jpeg'
+      }];
+    }
+    return [{
+      id: 'deg_1',
+      title: '',
+      completionYear: '',
+      institute: '',
+      fileUrl: '',
+      fileName: '',
+      fileType: ''
+    }];
+  });
   const [experienceYears, setExperienceYears] = useState(() => initialDraft.experienceYears || '3');
-  const [sanadFile, setSanadFile] = useState(() => initialDraft.sanadFile || '');
-  const [sanadFileName, setSanadFileName] = useState(() => initialDraft.sanadFileName || '');
+
+  const completionYearOptions = useMemo(() => {
+    const currentYear = new Date().getFullYear();
+    const years = [];
+    for (let y = currentYear; y >= 1970; y--) {
+      years.push(String(y));
+    }
+    return years;
+  }, []);
+
+  const addDegree = () => {
+    setDegrees((prev) => [
+      ...prev,
+      {
+        id: 'deg_' + Date.now() + '_' + Math.random().toString(36).substring(2, 6),
+        title: '',
+        completionYear: '',
+        institute: '',
+        fileUrl: '',
+        fileName: '',
+        fileType: ''
+      }
+    ]);
+  };
+
+  const removeDegree = (degId) => {
+    setDegrees((prev) => {
+      if (prev.length <= 1) return prev;
+      return prev.filter((d) => d.id !== degId);
+    });
+  };
+
+  const updateDegree = (degId, field, value) => {
+    setDegrees((prev) => prev.map((d) => (d.id === degId ? { ...d, [field]: value } : d)));
+  };
+
+  const handleDegreeFileUpload = (degId, file) => {
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Document file size must be under 5MB.');
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result;
+      const fileType = file.type || (file.name.endsWith('.pdf') ? 'application/pdf' : 'image/jpeg');
+      setDegrees((prev) =>
+        prev.map((d) =>
+          d.id === degId
+            ? {
+                ...d,
+                fileUrl: result,
+                fileName: file.name,
+                fileType
+              }
+            : d
+        )
+      );
+      setError('');
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeDegreeFile = (degId) => {
+    setDegrees((prev) =>
+      prev.map((d) =>
+        d.id === degId
+          ? {
+              ...d,
+              fileUrl: '',
+              fileName: '',
+              fileType: ''
+            }
+          : d
+      )
+    );
+  };
 
   // -------------------------------------------------------------
   // STEP 5: Payouts & Availability
@@ -181,11 +269,11 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         hourlyRate,
         monthlyRate,
         bio,
-        degreeTitle,
-        institute,
+        degrees: degrees.map((d) => ({
+          ...d,
+          fileUrl: d.fileUrl && d.fileUrl.length < 1000000 ? d.fileUrl : ''
+        })),
         experienceYears,
-        sanadFileName,
-        sanadFile: (sanadFile && sanadFile.length < 1500000) ? sanadFile : '',
         payoutProvider,
         payoutTitle,
         payoutAccount,
@@ -214,11 +302,8 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
     hourlyRate,
     monthlyRate,
     bio,
-    degreeTitle,
-    institute,
+    degrees,
     experienceYears,
-    sanadFile,
-    sanadFileName,
     payoutProvider,
     payoutTitle,
     payoutAccount,
@@ -256,9 +341,26 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         if (tp.hourlyRate && !hourlyRate) setHourlyRate(String(tp.hourlyRate));
         if (tp.monthlyRate && !monthlyRate) setMonthlyRate(String(tp.monthlyRate));
         if (tp.bio && !bio) setBio(tp.bio);
-        if (tp.qualifications && !degreeTitle) setDegreeTitle(tp.qualifications);
-        else if (tp.qualification && !degreeTitle) setDegreeTitle(tp.qualification);
-        if (tp.institute && !institute) setInstitute(tp.institute);
+        if (Array.isArray(tp.sanadDocuments) && tp.sanadDocuments.length > 0) {
+          setDegrees((prev) => {
+            const isBlank = prev.length === 1 && !prev[0].title && !prev[0].fileUrl;
+            if (isBlank) {
+              return tp.sanadDocuments.map((doc, idx) => ({
+                id: doc._id || 'deg_' + idx,
+                title: doc.title || '',
+                completionYear: doc.completionYear ? String(doc.completionYear) : '',
+                institute: doc.institute || '',
+                fileUrl: doc.fileUrl || '',
+                fileName: doc.title || 'Attached Document',
+                fileType: doc.fileType || ''
+              }));
+            }
+            return prev;
+          });
+        } else if ((tp.qualifications || tp.qualification) && (!degrees[0]?.title)) {
+          updateDegree(degrees[0]?.id || 'deg_1', 'title', tp.qualifications || tp.qualification);
+          if (tp.institute) updateDegree(degrees[0]?.id || 'deg_1', 'institute', tp.institute);
+        }
         if (tp.experienceYears && !experienceYears) setExperienceYears(String(tp.experienceYears));
         if (tp.payoutMethod?.provider && !payoutProvider) setPayoutProvider(tp.payoutMethod.provider);
         if (tp.payoutMethod?.accountTitle && !payoutTitle) setPayoutTitle(tp.payoutMethod.accountTitle);
@@ -521,38 +623,62 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
   // -------------------------------------------------------------
   // STEP 4 HANDLERS
   // -------------------------------------------------------------
-  const handleSanadUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) {
-      setError('Document file size must be under 5MB.');
-      return;
-    }
-    setSanadFileName(file.name);
-    const reader = new FileReader();
-    reader.onload = () => {
-      setSanadFile(reader.result);
-    };
-    reader.readAsDataURL(file);
-  };
-
   const handleStep4Submit = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (!degreeTitle.trim()) {
-      setError('Please select or specify your highest qualification or Sanad.');
+    if (!degrees || degrees.length === 0) {
+      setError('Please add at least one qualification or degree.');
       return;
     }
+
+    const currentYear = new Date().getFullYear();
+    for (let i = 0; i < degrees.length; i++) {
+      const deg = degrees[i];
+      const indexNum = i + 1;
+      if (!deg.title || !deg.title.trim()) {
+        setError(`Please enter the degree / certificate name for Degree #${indexNum}.`);
+        return;
+      }
+      if (!deg.completionYear || !String(deg.completionYear).trim()) {
+        setError(`Please select the completion year for "${deg.title.trim()}".`);
+        return;
+      }
+      const yearNum = Number(deg.completionYear);
+      if (isNaN(yearNum) || yearNum < 1960 || yearNum > currentYear) {
+        setError(`Please select a valid completion year (between 1960 and ${currentYear}) for "${deg.title.trim()}".`);
+        return;
+      }
+      if (!deg.fileUrl) {
+        setError(`Please upload the degree / certificate document scan for "${deg.title.trim()}".`);
+        return;
+      }
+    }
+
+    if (!experienceYears || isNaN(Number(experienceYears)) || Number(experienceYears) < 0) {
+      setError('Please enter your total teaching experience in years.');
+      return;
+    }
+
+    const qualificationsString = degrees.map((d) => d.title.trim()).filter(Boolean).join(', ');
+    const primaryInstitute = degrees.find((d) => d.institute?.trim())?.institute?.trim() || '';
+    const sanadDocumentsPayload = degrees.map((d) => ({
+      title: d.title.trim(),
+      completionYear: Number(d.completionYear) || undefined,
+      institute: (d.institute || '').trim(),
+      fileUrl: d.fileUrl,
+      fileType: d.fileType || (d.fileUrl?.startsWith('data:application/pdf') ? 'application/pdf' : 'image/jpeg')
+    }));
 
     setLoading(true);
     try {
       await api.updateMyTutorProfile({
-        qualification: degreeTitle.trim(),
-        qualifications: degreeTitle.trim(),
-        institute: institute.trim(),
+        qualification: qualificationsString,
+        qualifications: qualificationsString,
+        institute: primaryInstitute,
         experienceYears: Number(experienceYears) || 1,
-        sanadUrl: sanadFile || undefined
+        sanadDocuments: sanadDocumentsPayload,
+        sanadUrl: sanadDocumentsPayload[0]?.fileUrl || undefined
       });
       if (typeof window !== 'undefined') {
         localStorage.setItem('ilm_tutor_signup_step', '5');
@@ -599,6 +725,16 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
       return;
     }
 
+    const qualificationsString = degrees.map((d) => d.title.trim()).filter(Boolean).join(', ');
+    const primaryInstitute = degrees.find((d) => d.institute?.trim())?.institute?.trim() || '';
+    const sanadDocumentsPayload = degrees.map((d) => ({
+      title: d.title.trim(),
+      completionYear: Number(d.completionYear) || undefined,
+      institute: (d.institute || '').trim(),
+      fileUrl: d.fileUrl,
+      fileType: d.fileType || (d.fileUrl?.startsWith('data:application/pdf') ? 'application/pdf' : 'image/jpeg')
+    }));
+
     setLoading(true);
     try {
       const finalPayload = {
@@ -611,11 +747,12 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         hourlyRate: Number(hourlyRate) || 1500,
         monthlyRate: Number(monthlyRate) || 15000,
         bio: bio.trim(),
-        qualification: degreeTitle.trim(),
-        qualifications: degreeTitle.trim(),
-        institute: institute.trim(),
+        qualification: qualificationsString,
+        qualifications: qualificationsString,
+        institute: primaryInstitute,
         experienceYears: Number(experienceYears) || 1,
-        sanadUrl: sanadFile || undefined,
+        sanadDocuments: sanadDocumentsPayload,
+        sanadUrl: sanadDocumentsPayload[0]?.fileUrl || undefined,
         payoutMethod: {
           provider: payoutProvider,
           accountTitle: payoutTitle.trim(),
@@ -1162,94 +1299,170 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
       )}
 
       {/* ══════════════════════════════════════════════════════════
-          STEP 4: QUALIFICATIONS & SANAD
+          STEP 4: QUALIFICATIONS & SANAD (DEGREES UPLOAD)
          ══════════════════════════════════════════════════════════ */}
       {currentStep === 4 && (
-        <form onSubmit={handleStep4Submit} className="space-y-3.5">
-          {/* Quick Presets */}
-          <div>
-            <label className="text-xs font-bold text-stone-800 block mb-1">
-              Select Highest Degree or Preset *
-            </label>
-            <div className="flex flex-wrap gap-1.5 mb-2">
-              {QUALIFICATION_PRESETS.slice(0, 6).map((preset) => (
-                <button
-                  key={preset}
-                  type="button"
-                  onClick={() => setDegreeTitle(preset)}
-                  className={`text-[10px] px-2.5 py-1 rounded-lg border font-semibold transition-all cursor-pointer ${
-                    degreeTitle === preset
-                      ? 'bg-[#0c2217] border-[#0c2217] text-[#d4a359]'
-                      : 'bg-[#faf8f5] border-[#e6dfd5] text-stone-600 hover:border-stone-400'
-                  }`}
-                >
-                  {preset}
-                </button>
-              ))}
+        <form onSubmit={handleStep4Submit} className="space-y-4">
+          <div className="bg-[#fcfbf9] border border-[#e6dfd5] rounded-2xl p-3.5 space-y-1">
+            <div className="flex items-center gap-2 text-stone-900 font-bold text-xs sm:text-sm">
+              <GraduationCap className="w-4 h-4 text-[#b85d34]" />
+              <span>Degrees &amp; Sanad Certificates</span>
             </div>
+            <p className="text-[11px] text-stone-600">
+              Please upload your degrees or certificates (Image or PDF). For each credential, provide the degree title and completion year.
+            </p>
+          </div>
+
+          {/* Dynamic Degree Cards */}
+          <div className="space-y-3.5">
+            {degrees.map((deg, idx) => (
+              <div
+                key={deg.id || idx}
+                className="bg-white border border-[#e6dfd5] rounded-2xl p-3.5 space-y-3 shadow-2xs relative"
+              >
+                {/* Header with item badge and delete button */}
+                <div className="flex items-center justify-between pb-2 border-b border-stone-100">
+                  <div className="flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-[#0c2217] text-[#d4a359] text-[10px] font-bold flex items-center justify-center">
+                      {idx + 1}
+                    </span>
+                    <span className="text-xs font-bold text-stone-800">
+                      Degree / Certificate #{idx + 1}
+                    </span>
+                  </div>
+                  {degrees.length > 1 && (
+                    <button
+                      type="button"
+                      onClick={() => removeDegree(deg.id)}
+                      className="text-stone-400 hover:text-red-600 text-xs font-bold flex items-center gap-1 cursor-pointer transition-colors"
+                      title="Remove this degree"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                      <span className="text-[11px]">Remove</span>
+                    </button>
+                  )}
+                </div>
+
+                {/* Degree Name / Title */}
+                <div>
+                  <label className="text-xs font-bold text-stone-800 block mb-1">
+                    Degree / Certificate Name <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Shahadat-ul-Alimiyyah, BS Computer Science, Hafiz-ul-Quran"
+                    value={deg.title}
+                    onChange={(e) => updateDegree(deg.id, 'title', e.target.value)}
+                    className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
+                  />
+                </div>
+
+                {/* Completion Year & Institute */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                  <div>
+                    <label className="text-xs font-bold text-stone-800 block mb-1">
+                      Year of Completion <span className="text-red-500">*</span>
+                    </label>
+                    <select
+                      required
+                      value={deg.completionYear || ''}
+                      onChange={(e) => updateDegree(deg.id, 'completionYear', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium cursor-pointer"
+                    >
+                      <option value="">Select Year</option>
+                      {completionYearOptions.map((y) => (
+                        <option key={y} value={y}>
+                          {y}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-bold text-stone-800 block mb-1">
+                      Institute / University / Board
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g. Wifaq-ul-Madaris / Punjab Univ"
+                      value={deg.institute || ''}
+                      onChange={(e) => updateDegree(deg.id, 'institute', e.target.value)}
+                      className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
+                    />
+                  </div>
+                </div>
+
+                {/* Degree Document File Upload */}
+                <div>
+                  <label className="text-xs font-bold text-stone-800 block mb-1">
+                    Upload Degree / Certificate Document <span className="text-red-500">*</span>
+                  </label>
+                  <div className="p-3 rounded-xl bg-[#faf8f5] border border-dashed border-[#e6dfd5] text-center hover:border-stone-400 transition-colors">
+                    {deg.fileName || deg.fileUrl ? (
+                      <div className="flex items-center justify-between gap-2 text-xs text-stone-700 bg-white p-2 rounded-lg border border-[#e6dfd5]">
+                        <div className="flex items-center gap-2 min-w-0">
+                          {deg.fileType === 'application/pdf' || deg.fileName?.endsWith('.pdf') ? (
+                            <FileText className="w-4 h-4 text-rose-600 shrink-0" />
+                          ) : (
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                          )}
+                          <span className="truncate font-medium text-stone-800">
+                            {deg.fileName || 'Attached Document'}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => removeDegreeFile(deg.id)}
+                          className="text-red-600 hover:text-red-800 font-bold text-xs shrink-0 cursor-pointer"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <label className="cursor-pointer text-xs text-stone-500 hover:text-[#b85d34] flex flex-col items-center gap-1.5 py-1">
+                        <Upload className="w-5 h-5 text-[#b85d34]" />
+                        <span className="font-semibold text-stone-700">Click to upload Sanad or Degree copy</span>
+                        <span className="text-[10px] text-stone-400">Image (JPG, PNG) or PDF up to 5MB</span>
+                        <input
+                          type="file"
+                          accept="image/*,application/pdf"
+                          onChange={(e) => handleDegreeFileUpload(deg.id, e.target.files?.[0])}
+                          className="hidden"
+                        />
+                      </label>
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Add Another Degree Button */}
+          <button
+            type="button"
+            onClick={addDegree}
+            className="w-full py-2.5 px-3 bg-[#faf8f5] hover:bg-stone-100 text-stone-800 font-bold text-xs rounded-xl border border-dashed border-[#d4a359] hover:border-[#b85d34] flex items-center justify-center gap-2 cursor-pointer transition-all"
+          >
+            <Plus className="w-4 h-4 text-[#b85d34]" />
+            <span>+ Add Another Degree / Certificate</span>
+          </button>
+
+          {/* Overall Teaching Experience */}
+          <div className="pt-1">
+            <label className="text-xs font-bold text-stone-800 block mb-1">
+              Total Teaching Experience (Years) <span className="text-red-500">*</span>
+            </label>
             <input
-              type="text"
+              type="number"
+              min={0}
+              max={50}
               required
-              placeholder="e.g. Shahadat-ul-Alimiyyah or M.Sc Physics"
-              value={degreeTitle}
-              onChange={(e) => setDegreeTitle(e.target.value)}
+              placeholder="e.g. 3"
+              value={experienceYears}
+              onChange={(e) => setExperienceYears(e.target.value)}
               className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
             />
-          </div>
-
-          <div className="grid grid-cols-2 gap-2.5">
-            <div>
-              <label className="text-xs font-bold text-stone-800 block mb-1">Institute / University</label>
-              <input
-                type="text"
-                placeholder="e.g. Wifaq-ul-Madaris / Punjab Univ"
-                value={institute}
-                onChange={(e) => setInstitute(e.target.value)}
-                className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
-              />
-            </div>
-            <div>
-              <label className="text-xs font-bold text-stone-800 block mb-1">Experience (Years)</label>
-              <input
-                type="number"
-                min={0}
-                max={50}
-                placeholder="3"
-                value={experienceYears}
-                onChange={(e) => setExperienceYears(e.target.value)}
-                className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
-              />
-            </div>
-          </div>
-
-          {/* Sanad / Degree Document Upload */}
-          <div>
-            <label className="text-xs font-bold text-stone-800 block mb-1">
-              Sanad / Certificate Document (Optional)
-            </label>
-            <div className="p-3 rounded-xl bg-[#faf8f5] border border-dashed border-[#e6dfd5] text-center">
-              {sanadFileName ? (
-                <div className="flex items-center justify-between text-xs text-stone-700">
-                  <span className="truncate max-w-[200px]">{sanadFileName}</span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSanadFile('');
-                      setSanadFileName('');
-                    }}
-                    className="text-red-600 hover:text-red-800 font-bold"
-                  >
-                    Remove
-                  </button>
-                </div>
-              ) : (
-                <label className="cursor-pointer text-xs text-stone-500 hover:text-[#b85d34] flex flex-col items-center gap-1">
-                  <GraduationCap className="w-5 h-5 text-[#b85d34]" />
-                  <span>Click to attach Sanad or Degree copy (Image or PDF)</span>
-                  <input type="file" accept="image/*,application/pdf" onChange={handleSanadUpload} className="hidden" />
-                </label>
-              )}
-            </div>
           </div>
 
           {/* Nav Buttons */}

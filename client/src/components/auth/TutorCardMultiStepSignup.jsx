@@ -246,6 +246,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
   // -------------------------------------------------------------
   // STEP 5: Payouts & Availability
   // -------------------------------------------------------------
+  const [payoutChoice, setPayoutChoice] = useState(() => initialDraft.payoutChoice || 'admin'); // 'admin' (IlmiDunya Admin Accounts) | 'own' (Personal Accounts)
   const [payoutProvider, setPayoutProvider] = useState(() => initialDraft.payoutProvider || 'JazzCash');
   const [payoutTitle, setPayoutTitle] = useState(() => initialDraft.payoutTitle || '');
   const [payoutAccount, setPayoutAccount] = useState(() => initialDraft.payoutAccount || '');
@@ -274,6 +275,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
           fileUrl: d.fileUrl && d.fileUrl.length < 1000000 ? d.fileUrl : ''
         })),
         experienceYears,
+        payoutChoice,
         payoutProvider,
         payoutTitle,
         payoutAccount,
@@ -304,6 +306,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
     bio,
     degrees,
     experienceYears,
+    payoutChoice,
     payoutProvider,
     payoutTitle,
     payoutAccount,
@@ -362,6 +365,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
           if (tp.institute) updateDegree(degrees[0]?.id || 'deg_1', 'institute', tp.institute);
         }
         if (tp.experienceYears && !experienceYears) setExperienceYears(String(tp.experienceYears));
+        if (tp.preferredAccountChoice && !initialDraft.payoutChoice) setPayoutChoice(tp.preferredAccountChoice);
         if (tp.payoutMethod?.provider && !payoutProvider) setPayoutProvider(tp.payoutMethod.provider);
         if (tp.payoutMethod?.accountTitle && !payoutTitle) setPayoutTitle(tp.payoutMethod.accountTitle);
         if (tp.payoutMethod?.accountNumber && !payoutAccount) setPayoutAccount(tp.payoutMethod.accountNumber);
@@ -712,14 +716,17 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
     e.preventDefault();
     setError('');
 
-    if (!payoutTitle.trim()) {
-      setError('Please enter your account title as registered with the bank/service.');
-      return;
+    if (payoutChoice === 'own') {
+      if (!payoutTitle.trim()) {
+        setError('Please enter your account title as registered with the bank/service.');
+        return;
+      }
+      if (!payoutAccount.trim()) {
+        setError('Please enter your account number or IBAN.');
+        return;
+      }
     }
-    if (!payoutAccount.trim()) {
-      setError('Please enter your account number or IBAN.');
-      return;
-    }
+
     if (selectedDays.length === 0) {
       setError('Please select at least one day you are available to teach.');
       return;
@@ -753,11 +760,16 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         experienceYears: Number(experienceYears) || 1,
         sanadDocuments: sanadDocumentsPayload,
         sanadUrl: sanadDocumentsPayload[0]?.fileUrl || undefined,
-        payoutMethod: {
-          provider: payoutProvider,
-          accountTitle: payoutTitle.trim(),
-          accountNumber: payoutAccount.trim()
-        },
+        preferredAccountChoice: payoutChoice,
+        ...(payoutChoice === 'own' && payoutTitle.trim() && payoutAccount.trim()
+          ? {
+              payoutMethod: {
+                provider: payoutProvider,
+                accountTitle: payoutTitle.trim(),
+                accountNumber: payoutAccount.trim()
+              }
+            }
+          : {}),
         availabilityDays: selectedDays,
         verificationStatus: 'under_review',
         isProfileComplete: true
@@ -1491,43 +1503,190 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
           STEP 5: PAYOUT DETAILS & LAUNCH
          ══════════════════════════════════════════════════════════ */}
       {currentStep === 5 && (
-        <form onSubmit={handleFinalSubmit} className="space-y-3.5">
-          <div>
-            <label className="text-xs font-bold text-stone-800 block mb-1">
-              Tuition Fee Receiving Provider *
-            </label>
-            <CustomSelect
-              options={PAYMENT_PROVIDERS.map((p) => ({ value: p.id, label: p.name }))}
-              value={payoutProvider}
-              onChange={(p) => setPayoutProvider(p)}
-              className="text-xs"
-            />
+        <form onSubmit={handleFinalSubmit} className="space-y-4">
+          <div className="bg-[#fcfbf9] border border-[#e6dfd5] rounded-2xl p-3.5 space-y-1">
+            <div className="flex items-center gap-2 text-stone-900 font-bold text-xs sm:text-sm">
+              <CreditCard className="w-4 h-4 text-[#b85d34]" />
+              <span>Tuition Fee Receiving Preference</span>
+            </div>
+            <p className="text-[11px] text-stone-600">
+              Choose how you want to receive tuition fee payments from students.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
-            <div>
-              <label className="text-xs font-bold text-stone-800 block mb-1">Account Title *</label>
-              <input
-                type="text"
-                required
-                placeholder="Name as registered on account"
-                value={payoutTitle}
-                onChange={(e) => setPayoutTitle(e.target.value)}
-                className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
-              />
+          {/* Receiving Mode Choice Cards */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Option 1: IlmiDunya Administration Account (Default) */}
+            <div
+              onClick={() => setPayoutChoice('admin')}
+              className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between gap-2.5 ${
+                payoutChoice === 'admin'
+                  ? 'border-[#0c2217] bg-[#f8f6f0] ring-2 ring-[#0c2217]/10 shadow-xs'
+                  : 'border-[#e6dfd5] bg-white hover:border-stone-400'
+              }`}
+            >
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`p-1.5 rounded-lg ${
+                        payoutChoice === 'admin'
+                          ? 'bg-[#0c2217] text-[#d4a359]'
+                          : 'bg-stone-100 text-stone-600'
+                      }`}
+                    >
+                      <ShieldCheck className="w-4 h-4" />
+                    </div>
+                    <span className="text-xs font-bold text-stone-900">
+                      IlmiDunya Administration
+                    </span>
+                  </div>
+                  <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">
+                    Default
+                  </span>
+                </div>
+                <p className="text-[11px] text-stone-600 leading-relaxed">
+                  Students pay fees to official IlmiDunya verified accounts. Fees are disbursed directly to you with zero commission.
+                </p>
+              </div>
+
+              <div className="pt-1 flex items-center justify-between text-[10.5px]">
+                <span className="text-stone-500">No bank info required now</span>
+                <span
+                  className={`font-bold flex items-center gap-1 ${
+                    payoutChoice === 'admin' ? 'text-[#0c2217]' : 'text-stone-400'
+                  }`}
+                >
+                  {payoutChoice === 'admin' ? (
+                    <>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Selected</span>
+                    </>
+                  ) : (
+                    <span>Select this</span>
+                  )}
+                </span>
+              </div>
             </div>
-            <div>
-              <label className="text-xs font-bold text-stone-800 block mb-1">Account Number / IBAN *</label>
-              <input
-                type="text"
-                required
-                placeholder="Account number or IBAN"
-                value={payoutAccount}
-                onChange={(e) => setPayoutAccount(e.target.value)}
-                className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
-              />
+
+            {/* Option 2: Personal Accounts */}
+            <div
+              onClick={() => setPayoutChoice('own')}
+              className={`p-3.5 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between gap-2.5 ${
+                payoutChoice === 'own'
+                  ? 'border-[#0c2217] bg-[#f8f6f0] ring-2 ring-[#0c2217]/10 shadow-xs'
+                  : 'border-[#e6dfd5] bg-white hover:border-stone-400'
+              }`}
+            >
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <div
+                      className={`p-1.5 rounded-lg ${
+                        payoutChoice === 'own'
+                          ? 'bg-[#0c2217] text-[#d4a359]'
+                          : 'bg-stone-100 text-stone-600'
+                      }`}
+                    >
+                      <CreditCard className="w-4 h-4" />
+                    </div>
+                    <span className="text-xs font-bold text-stone-900">
+                      My Personal Account
+                    </span>
+                  </div>
+                  {payoutChoice === 'own' && (
+                    <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-full bg-[#0c2217] text-[#d4a359]">
+                      Active
+                    </span>
+                  )}
+                </div>
+                <p className="text-[11px] text-stone-600 leading-relaxed">
+                  Students transfer fees directly to your personal Pakistani bank account, JazzCash, or EasyPaisa.
+                </p>
+              </div>
+
+              <div className="pt-1 flex items-center justify-between text-[10.5px]">
+                <span className="text-stone-500">Direct student-to-tutor</span>
+                <span
+                  className={`font-bold flex items-center gap-1 ${
+                    payoutChoice === 'own' ? 'text-[#0c2217]' : 'text-stone-400'
+                  }`}
+                >
+                  {payoutChoice === 'own' ? (
+                    <>
+                      <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>Selected</span>
+                    </>
+                  ) : (
+                    <span>Select this</span>
+                  )}
+                </span>
+              </div>
             </div>
           </div>
+
+          {/* Conditional Personal Account Form */}
+          {payoutChoice === 'own' ? (
+            <div className="bg-white border border-[#e6dfd5] rounded-2xl p-3.5 space-y-3 shadow-2xs animate-in fade-in duration-200">
+              <h4 className="text-xs font-bold text-stone-800 flex items-center gap-1.5">
+                <CreditCard className="w-3.5 h-3.5 text-[#b85d34]" />
+                <span>Enter Your Personal Account Details</span>
+              </h4>
+
+              <div>
+                <label className="text-xs font-bold text-stone-800 block mb-1">
+                  Tuition Fee Receiving Provider <span className="text-red-500">*</span>
+                </label>
+                <CustomSelect
+                  options={PAYMENT_PROVIDERS.map((p) => ({ value: p.id, label: p.name }))}
+                  value={payoutProvider}
+                  onChange={(p) => setPayoutProvider(p)}
+                  className="text-xs"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                <div>
+                  <label className="text-xs font-bold text-stone-800 block mb-1">
+                    Account Title <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Name as registered on account"
+                    value={payoutTitle}
+                    onChange={(e) => setPayoutTitle(e.target.value)}
+                    className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
+                  />
+                </div>
+                <div>
+                  <label className="text-xs font-bold text-stone-800 block mb-1">
+                    Account Number / IBAN <span className="text-red-500">*</span>
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="Account number or IBAN"
+                    value={payoutAccount}
+                    onChange={(e) => setPayoutAccount(e.target.value)}
+                    className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
+                  />
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className="p-3 rounded-2xl bg-[#faf8f5] border border-[#e6dfd5] text-xs text-stone-700 flex items-start gap-2.5">
+              <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
+              <div className="space-y-0.5">
+                <p className="font-bold text-stone-900">
+                  Official Administration Accounts active by default
+                </p>
+                <p className="text-[11px] text-stone-600 leading-relaxed">
+                  Students will be provided IlmiDunya official payment options for fee settlements. You can switch to or add personal accounts anytime in your profile settings after completing registration.
+                </p>
+              </div>
+            </div>
+          )}
 
           {/* Availability Days */}
           <div>

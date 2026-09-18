@@ -504,7 +504,7 @@ exports.updateMyTutorProfile = async (req, res) => {
           ? teachingModes
           : (teachingMode ? (teachingMode === 'both' ? ['online', 'in_person'] : [teachingMode === 'physical' ? 'in_person' : teachingMode]) : ['online']),
         verificationStatus: isProfileComplete ? 'under_review' : 'incomplete',
-        preferredAccountChoice: ['own', 'admin'].includes(preferredAccountChoice) ? preferredAccountChoice : 'own'
+        preferredAccountChoice: ['own', 'admin'].includes(preferredAccountChoice) ? preferredAccountChoice : 'admin'
       });
     } else {
       if (bio !== undefined) profile.bio = bio;

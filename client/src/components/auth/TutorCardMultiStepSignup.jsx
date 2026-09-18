@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import {
   User,
   Mail,
@@ -114,6 +115,12 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [isSubmitted, setIsSubmitted] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('ilm_tutor_signup_completed') === 'true';
+    }
+    return false;
+  });
 
   // Initial draft loaded once on mount
   const initialDraft = useMemo(() => loadTutorSignupDraft(), []);
@@ -833,21 +840,36 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         updateTutorProfileState?.(res.user.tutorProfile || {});
       }
 
-      // CLEAR ALL SIGNUP STORAGE FLAGS!
+      // CLEAR ALL SIGNUP STORAGE FLAGS & SYNC AUTH COOKIES!
       try {
         localStorage.removeItem('ilm_tutor_signup_in_progress');
         localStorage.removeItem('ilm_tutor_signup_step');
         localStorage.removeItem('ilm_tutor_signup_highest_step');
         localStorage.removeItem('ilm_tutor_signup_draft');
         localStorage.setItem('ilm_tutor_signup_completed', 'true');
+        if (typeof document !== 'undefined') {
+          const maxAge = 30 * 24 * 60 * 60;
+          document.cookie = `ilm_auth=1; path=/; max-age=${maxAge}; SameSite=Lax`;
+          document.cookie = `ilm_role=tutor; path=/; max-age=${maxAge}; SameSite=Lax`;
+          const currentToken = localStorage.getItem('ilm_token');
+          if (currentToken) {
+            document.cookie = `ilm_token=${encodeURIComponent(currentToken)}; path=/; max-age=${maxAge}; SameSite=Lax`;
+          }
+        }
       } catch (storageErr) {
         console.warn('Storage cleanup notice:', storageErr);
       }
 
-      setSuccess('Application submitted successfully! Loading your tutor dashboard...');
+      setIsSubmitted(true);
+      setSuccess('Application submitted successfully! Redirecting to your tutor dashboard...');
       setTimeout(() => {
-        router.push('/tutor/dashboard');
-      }, 700);
+        try {
+          router.push('/tutor/dashboard');
+        } catch (_) {}
+        if (typeof window !== 'undefined') {
+          window.location.href = '/tutor/dashboard';
+        }
+      }, 1000);
     } catch (err) {
       console.error('Final registration error:', err);
       setError(err.message || 'Could not complete registration. Please try again.');
@@ -932,12 +954,63 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
       )}
 
       {success && (
-        <div className="p-3 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-2xl text-xs font-semibold flex items-center gap-2 animate-in fade-in">
-          <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
-          <span>{success}</span>
+        <div className="p-3.5 bg-emerald-50 border border-emerald-200 text-emerald-900 rounded-2xl text-xs font-semibold flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 animate-in fade-in shadow-xs">
+          <div className="flex items-center gap-2 min-w-0">
+            <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+            <span className="leading-snug">{success}</span>
+          </div>
+          <Link
+            href="/tutor/dashboard"
+            onClick={() => {
+              if (typeof window !== 'undefined') {
+                window.location.href = '/tutor/dashboard';
+              }
+            }}
+            className="inline-flex items-center justify-center gap-1.5 px-3.5 py-1.5 bg-[#0c2217] hover:bg-[#143d2b] text-white rounded-xl font-bold text-xs shrink-0 shadow-sm transition-all cursor-pointer"
+          >
+            <span>Go to Dashboard</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
         </div>
       )}
 
+      {isSubmitted ? (
+        <div className="bg-white border border-[#e6dfd5] rounded-3xl p-6 sm:p-8 text-center space-y-4 shadow-sm animate-in fade-in zoom-in-95 my-2">
+          <div className="w-16 h-16 bg-emerald-100 border-2 border-emerald-500 rounded-full flex items-center justify-center mx-auto shadow-inner">
+            <CheckCircle2 className="w-10 h-10 text-emerald-600" />
+          </div>
+
+          <div className="space-y-1.5">
+            <h3 className="font-serif text-lg sm:text-xl font-bold text-stone-900">
+              Application Submitted Successfully!
+            </h3>
+            <p className="text-xs text-stone-600 max-w-md mx-auto leading-relaxed">
+              Your tutor profile and educational credentials have been submitted for admin verification.
+              You can now access your tutor dashboard to view your profile status, manage your schedule, and set up courses.
+            </p>
+          </div>
+
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              href="/tutor/dashboard"
+              onClick={() => {
+                if (typeof window !== 'undefined') {
+                  window.location.href = '/tutor/dashboard';
+                }
+              }}
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto px-6 py-3 bg-[#b85d34] hover:bg-[#9e4e2a] text-white font-bold text-sm rounded-xl shadow-md transition-all cursor-pointer"
+            >
+              <span>Open Tutor Dashboard</span>
+              <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+
+          <p className="text-[11px] text-stone-400">
+            If you are not redirected automatically in a moment, click the button above.
+          </p>
+        </div>
+      ) : (
+        <>
       {/* ══════════════════════════════════════════════════════════
           STEP 1: CREDENTIALS & INLINE OTP
          ══════════════════════════════════════════════════════════ */}
@@ -1808,6 +1881,8 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
             </button>
           </div>
         </form>
+      )}
+        </>
       )}
     </div>
   );

@@ -46,13 +46,40 @@ function LoginContent() {
   const [turnstileToken, setTurnstileToken] = useState('');
   const turnstileRef = useRef(null);
 
-  // Auto-redirect if already logged in
+  // Auto-redirect if already logged in (Bypassed if tutor signup is in progress)
   useEffect(() => {
     if (!authLoading && user) {
-      const target = redirect && redirect !== '/' ? redirect : (user.role === 'tutor' ? '/tutor/dashboard' : user.role === 'admin' ? '/admin' : '/student/dashboard');
+      if (user.role === 'tutor') {
+        const signupInProgress = typeof window !== 'undefined' && localStorage.getItem('ilm_tutor_signup_in_progress') === 'true';
+        const isCompleted = typeof window !== 'undefined' && localStorage.getItem('ilm_tutor_signup_completed') === 'true';
+        const isVerifiedOrUnderReview = user.tutorProfile?.verificationStatus && ['under_review', 'approved', 'pending'].includes(user.tutorProfile.verificationStatus);
+
+        // If tutor is currently in the signup wizard or profile is incomplete, DO NOT redirect away! Stay on the signup wizard
+        if (signupInProgress || (!isCompleted && !isVerifiedOrUnderReview && (mode === 'signup' || initialModeParam === 'signup'))) {
+          if (role !== 'tutor') setRole('tutor');
+          if (mode !== 'signup') setMode('signup');
+          return;
+        }
+      }
+
+      const target = (redirect && redirect !== '/' && redirect !== '/tutor/profile')
+        ? redirect
+        : (user.role === 'tutor' ? '/tutor/dashboard' : user.role === 'admin' ? '/admin' : '/student/dashboard');
       router.replace(target);
     }
-  }, [user, authLoading, redirect, router]);
+  }, [user, authLoading, redirect, router, mode, role, initialModeParam]);
+
+  // Clean lingering redirect param when in tutor signup mode so reload never jumps to protected URLs like /tutor/profile
+  useEffect(() => {
+    if (typeof window !== 'undefined' && isTutorMode && mode === 'signup') {
+      const params = new URLSearchParams(window.location.search);
+      if (params.has('redirect')) {
+        params.delete('redirect');
+        const newSearch = params.toString() ? `?${params.toString()}` : '';
+        window.history.replaceState(null, '', `${window.location.pathname}${newSearch}`);
+      }
+    }
+  }, [isTutorMode, mode]);
 
   // Sign In Form States
   const [signInEmail, setSignInEmail] = useState('');
@@ -125,6 +152,10 @@ function LoginContent() {
       if (data?.user?.role === 'admin') {
         router.push(target || '/admin');
       } else if (data?.user?.role === 'tutor') {
+        if (typeof window !== 'undefined') {
+          localStorage.removeItem('ilm_tutor_signup_in_progress');
+          localStorage.removeItem('ilm_tutor_signup_step');
+        }
         router.push(target || '/tutor/dashboard');
       } else {
         router.push(target || '/student/dashboard');

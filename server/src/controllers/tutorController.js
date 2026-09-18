@@ -432,6 +432,7 @@ exports.updateMyTutorProfile = async (req, res) => {
     const {
       bio,
       qualifications,
+      qualification,
       experienceYears,
       hourlyRate,
       subjects,
@@ -444,15 +445,45 @@ exports.updateMyTutorProfile = async (req, res) => {
       tutoringType,
       gender,
       sanadDocuments,
+      sanadUrl,
       verificationStatus,
       videoIntro,
       paymentMethods,
-      preferredAccountChoice
+      payoutMethod,
+      preferredAccountChoice,
+      availabilityDays,
+      age,
+      avatar,
+      isProfileComplete
     } = req.body;
+
+    const effectiveQualifications = qualifications !== undefined ? qualifications : qualification;
 
     const normalizedExp = (experienceYears !== undefined && experienceYears !== null && experienceYears !== '')
       ? Number(experienceYears)
       : undefined;
+
+    // Normalize payment methods if sent as payoutMethod single object
+    let resolvedPaymentMethods = Array.isArray(paymentMethods) ? paymentMethods : undefined;
+    if ((!resolvedPaymentMethods || resolvedPaymentMethods.length === 0) && payoutMethod && (payoutMethod.accountTitle || payoutMethod.accountNumber)) {
+      resolvedPaymentMethods = [{
+        method: ['easypaisa', 'jazzcash', 'upaisa'].includes((payoutMethod.provider || '').toLowerCase()) ? payoutMethod.provider.toLowerCase() : 'bank',
+        bankName: payoutMethod.provider || 'JazzCash',
+        accountTitle: (payoutMethod.accountTitle || '').trim(),
+        accountNumber: (payoutMethod.accountNumber || '').trim(),
+        isDefault: true
+      }];
+    }
+
+    // Normalize sanad documents if sent as single sanadUrl
+    let resolvedSanadDocs = Array.isArray(sanadDocuments) ? sanadDocuments : undefined;
+    if ((!resolvedSanadDocs || resolvedSanadDocs.length === 0) && sanadUrl) {
+      resolvedSanadDocs = [{
+        title: (effectiveQualifications || 'Sanad / Educational Degree').trim(),
+        fileUrl: sanadUrl,
+        fileType: sanadUrl.startsWith('data:application/pdf') ? 'application/pdf' : 'image/jpeg'
+      }];
+    }
 
     let profile = await TutorProfile.findOne({ user: req.user.id });
 
@@ -460,7 +491,7 @@ exports.updateMyTutorProfile = async (req, res) => {
       profile = new TutorProfile({
         user: req.user.id,
         bio: bio || '',
-        qualifications: qualifications || '',
+        qualifications: effectiveQualifications || '',
         experienceYears: normalizedExp !== undefined ? normalizedExp : 1,
         hourlyRate: hourlyRate !== undefined ? Number(hourlyRate) : 1500,
         city: city || '',
@@ -472,12 +503,12 @@ exports.updateMyTutorProfile = async (req, res) => {
         teachingModes: Array.isArray(teachingModes) && teachingModes.length > 0
           ? teachingModes
           : (teachingMode ? (teachingMode === 'both' ? ['online', 'in_person'] : [teachingMode === 'physical' ? 'in_person' : teachingMode]) : ['online']),
-        verificationStatus: 'under_review',
+        verificationStatus: isProfileComplete ? 'under_review' : 'incomplete',
         preferredAccountChoice: ['own', 'admin'].includes(preferredAccountChoice) ? preferredAccountChoice : 'own'
       });
     } else {
       if (bio !== undefined) profile.bio = bio;
-      if (qualifications !== undefined) profile.qualifications = qualifications;
+      if (effectiveQualifications !== undefined) profile.qualifications = effectiveQualifications;
       if (normalizedExp !== undefined) profile.experienceYears = normalizedExp;
       if (hourlyRate !== undefined) profile.hourlyRate = Number(hourlyRate);
       if (gender !== undefined) profile.gender = gender;
@@ -494,8 +525,8 @@ exports.updateMyTutorProfile = async (req, res) => {
       } else if (teachingMode !== undefined) {
         profile.teachingModes = teachingMode === 'both' ? ['online', 'in_person'] : [teachingMode === 'physical' ? 'in_person' : teachingMode];
       }
-      if (Array.isArray(paymentMethods)) {
-        profile.paymentMethods = paymentMethods.filter(pm => pm && pm.method && pm.accountTitle && pm.accountNumber).map((pm, idx) => ({
+      if (Array.isArray(resolvedPaymentMethods)) {
+        profile.paymentMethods = resolvedPaymentMethods.filter(pm => pm && pm.method && pm.accountTitle && pm.accountNumber).map((pm, idx) => ({
           _id: pm._id,
           method: pm.method,
           bankName: (pm.bankName || '').trim(),
@@ -508,16 +539,24 @@ exports.updateMyTutorProfile = async (req, res) => {
       if (['own', 'admin'].includes(preferredAccountChoice)) {
         profile.preferredAccountChoice = preferredAccountChoice;
       }
+      if (Array.isArray(availabilityDays) && availabilityDays.length > 0) {
+        profile.availabilitySlots = availabilityDays.map(day => ({
+          dayOfWeek: day,
+          startTime: '09:00',
+          endTime: '21:00',
+          isBooked: false
+        }));
+      }
     }
 
     let hasNewlyUploadedDoc = false;
     let newlyUploadedDocTitle = '';
 
     // Handle Sanad Documents Array & Status Tracking
-    if (Array.isArray(sanadDocuments)) {
+    if (Array.isArray(resolvedSanadDocs)) {
       const existingDocMap = new Map((profile.sanadDocuments || []).map(d => [d.fileUrl, d]));
 
-      const normalizedDocs = sanadDocuments.map(doc => {
+      const normalizedDocs = resolvedSanadDocs.map(doc => {
         const existing = existingDocMap.get(doc.fileUrl) || (doc._id ? (profile.sanadDocuments.id ? profile.sanadDocuments.id(doc._id) : null) : null);
         const isNew = !existing;
         if (isNew) {
@@ -540,7 +579,7 @@ exports.updateMyTutorProfile = async (req, res) => {
       profile.sanadDocuments = normalizedDocs;
     }
 
-    // Also sync gender, city and area to the user record first so completion checks are accurate
+    // Also sync gender, city, area, age and avatar to the user record first so completion checks are accurate
     const userDoc = await User.findById(req.user.id);
     if (userDoc) {
       let userUpdated = false;
@@ -557,6 +596,14 @@ exports.updateMyTutorProfile = async (req, res) => {
         userDoc.area = targetArea;
         userUpdated = true;
       }
+      if (age !== undefined && age !== '' && !isNaN(Number(age))) {
+        userDoc.age = Number(age);
+        userUpdated = true;
+      }
+      if (avatar && typeof avatar === 'string' && avatar.startsWith('data:')) {
+        userDoc.avatar = avatar;
+        userUpdated = true;
+      }
       if (userUpdated) await userDoc.save();
     }
 
@@ -570,6 +617,8 @@ exports.updateMyTutorProfile = async (req, res) => {
       if (profile.verificationStatus === 'approved') {
         profile.verificationStatus = hasPendingSanad ? 'under_review' : 'incomplete';
       } else if (hasPendingSanad && profile.verificationStatus === 'incomplete') {
+        profile.verificationStatus = 'under_review';
+      } else if (isProfileComplete && profile.verificationStatus === 'incomplete') {
         profile.verificationStatus = 'under_review';
       }
     } else {

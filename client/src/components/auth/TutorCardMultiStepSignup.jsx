@@ -63,28 +63,66 @@ const STEPS = [
   { num: 5, label: 'Payout' }
 ];
 
+const loadTutorSignupDraft = () => {
+  if (typeof window === 'undefined') return {};
+  try {
+    const raw = localStorage.getItem('ilm_tutor_signup_draft');
+    return raw ? JSON.parse(raw) : {};
+  } catch (e) {
+    return {};
+  }
+};
+
 export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
   const router = useRouter();
   const { user, token, verifyOtp: authVerifyOtp, updateTutorProfileState } = useAuth();
 
-  // Wizard state
-  const [currentStep, setCurrentStep] = useState(1);
-  const [highestStep, setHighestStep] = useState(1);
+  // Wizard state: restore from localStorage if user reloaded
+  const [currentStep, setCurrentStep] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedStep = localStorage.getItem('ilm_tutor_signup_step');
+      if (savedStep && !isNaN(Number(savedStep))) {
+        const stepNum = Number(savedStep);
+        if (stepNum >= 1 && stepNum <= 5) return stepNum;
+      }
+    }
+    return 1;
+  });
+
+  const [highestStep, setHighestStep] = useState(() => {
+    if (typeof window !== 'undefined') {
+      const savedHighest = localStorage.getItem('ilm_tutor_signup_highest_step');
+      if (savedHighest && !isNaN(Number(savedHighest))) {
+        const hNum = Number(savedHighest);
+        if (hNum >= 1 && hNum <= 5) return hNum;
+      }
+      const savedStep = localStorage.getItem('ilm_tutor_signup_step');
+      if (savedStep && !isNaN(Number(savedStep))) {
+        const sNum = Number(savedStep);
+        if (sNum >= 1 && sNum <= 5) return sNum;
+      }
+    }
+    return 1;
+  });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
+  // Initial draft loaded once on mount
+  const initialDraft = useMemo(() => loadTutorSignupDraft(), []);
+
   // -------------------------------------------------------------
   // STEP 1: Account Credentials & Email OTP Gate
   // -------------------------------------------------------------
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
+  const [name, setName] = useState(() => initialDraft.name || '');
+  const [email, setEmail] = useState(() => initialDraft.email || '');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [turnstileToken, setTurnstileToken] = useState('');
   const turnstileRef = useRef(null);
 
-  const [step1Mode, setStep1Mode] = useState('credentials'); // 'credentials' | 'otp'
+  const [step1Mode, setStep1Mode] = useState(() => initialDraft.step1Mode || 'credentials'); // 'credentials' | 'otp'
   const [otpCode, setOtpCode] = useState('');
   const [otpTimer, setOtpTimer] = useState(60);
   const [canResendOtp, setCanResendOtp] = useState(false);
@@ -93,37 +131,101 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
   // -------------------------------------------------------------
   // STEP 2: Personal Details, Photo & Location
   // -------------------------------------------------------------
-  const [avatar, setAvatar] = useState('');
-  const [gender, setGender] = useState('male');
-  const [age, setAge] = useState('');
-  const [city, setCity] = useState('');
-  const [area, setArea] = useState('');
-  const [teachingMode, setTeachingMode] = useState('both'); // 'online' | 'physical' | 'both'
+  const [avatar, setAvatar] = useState(() => initialDraft.avatar || '');
+  const [gender, setGender] = useState(() => initialDraft.gender || 'male');
+  const [age, setAge] = useState(() => initialDraft.age || '');
+  const [city, setCity] = useState(() => initialDraft.city || '');
+  const [area, setArea] = useState(() => initialDraft.area || '');
+  const [teachingMode, setTeachingMode] = useState(() => initialDraft.teachingMode || 'both'); // 'online' | 'physical' | 'both'
 
   // -------------------------------------------------------------
   // STEP 3: Teaching Categories, Subjects & Rates
   // -------------------------------------------------------------
-  const [selectedDisciplines, setSelectedDisciplines] = useState([]);
-  const [hourlyRate, setHourlyRate] = useState('1500');
-  const [monthlyRate, setMonthlyRate] = useState('15000');
-  const [bio, setBio] = useState('');
+  const [selectedDisciplines, setSelectedDisciplines] = useState(() => initialDraft.selectedDisciplines || []);
+  const [hourlyRate, setHourlyRate] = useState(() => initialDraft.hourlyRate || '1500');
+  const [monthlyRate, setMonthlyRate] = useState(() => initialDraft.monthlyRate || '15000');
+  const [bio, setBio] = useState(() => initialDraft.bio || '');
 
   // -------------------------------------------------------------
   // STEP 4: Qualifications & Sanad
   // -------------------------------------------------------------
-  const [degreeTitle, setDegreeTitle] = useState('');
-  const [institute, setInstitute] = useState('');
-  const [experienceYears, setExperienceYears] = useState('3');
-  const [sanadFile, setSanadFile] = useState('');
-  const [sanadFileName, setSanadFileName] = useState('');
+  const [degreeTitle, setDegreeTitle] = useState(() => initialDraft.degreeTitle || '');
+  const [institute, setInstitute] = useState(() => initialDraft.institute || '');
+  const [experienceYears, setExperienceYears] = useState(() => initialDraft.experienceYears || '3');
+  const [sanadFile, setSanadFile] = useState(() => initialDraft.sanadFile || '');
+  const [sanadFileName, setSanadFileName] = useState(() => initialDraft.sanadFileName || '');
 
   // -------------------------------------------------------------
   // STEP 5: Payouts & Availability
   // -------------------------------------------------------------
-  const [payoutProvider, setPayoutProvider] = useState('JazzCash');
-  const [payoutTitle, setPayoutTitle] = useState('');
-  const [payoutAccount, setPayoutAccount] = useState('');
-  const [selectedDays, setSelectedDays] = useState(['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
+  const [payoutProvider, setPayoutProvider] = useState(() => initialDraft.payoutProvider || 'JazzCash');
+  const [payoutTitle, setPayoutTitle] = useState(() => initialDraft.payoutTitle || '');
+  const [payoutAccount, setPayoutAccount] = useState(() => initialDraft.payoutAccount || '');
+  const [selectedDays, setSelectedDays] = useState(() => initialDraft.selectedDays || ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday']);
+
+  // Auto-save form draft & step state to localStorage on every change
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    try {
+      const dataToSave = {
+        name,
+        email,
+        step1Mode,
+        avatar,
+        gender,
+        age,
+        city,
+        area,
+        teachingMode,
+        selectedDisciplines,
+        hourlyRate,
+        monthlyRate,
+        bio,
+        degreeTitle,
+        institute,
+        experienceYears,
+        sanadFileName,
+        sanadFile: (sanadFile && sanadFile.length < 1500000) ? sanadFile : '',
+        payoutProvider,
+        payoutTitle,
+        payoutAccount,
+        selectedDays
+      };
+      localStorage.setItem('ilm_tutor_signup_draft', JSON.stringify(dataToSave));
+      localStorage.setItem('ilm_tutor_signup_step', String(currentStep));
+      localStorage.setItem('ilm_tutor_signup_highest_step', String(highestStep));
+      if (localStorage.getItem('ilm_tutor_signup_completed') !== 'true') {
+        localStorage.setItem('ilm_tutor_signup_in_progress', 'true');
+      }
+    } catch (e) {
+      console.warn('Could not cache signup draft to localStorage:', e);
+    }
+  }, [
+    name,
+    email,
+    step1Mode,
+    avatar,
+    gender,
+    age,
+    city,
+    area,
+    teachingMode,
+    selectedDisciplines,
+    hourlyRate,
+    monthlyRate,
+    bio,
+    degreeTitle,
+    institute,
+    experienceYears,
+    sanadFile,
+    sanadFileName,
+    payoutProvider,
+    payoutTitle,
+    payoutAccount,
+    selectedDays,
+    currentStep,
+    highestStep
+  ]);
 
   // Pre-fill from existing user session if available
   useEffect(() => {
@@ -132,26 +234,36 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
       if (user.email && !email) setEmail(user.email);
       if (user.isVerified) {
         setIsEmailVerified(true);
-        if (currentStep === 1) setCurrentStep(2);
+        // Only bump step if currently on step 1 and no saved higher step in localStorage
+        const savedStep = typeof window !== 'undefined' ? Number(localStorage.getItem('ilm_tutor_signup_step')) : 0;
+        if (currentStep === 1) {
+          if (savedStep && savedStep > 1) {
+            setCurrentStep(savedStep);
+          } else {
+            setCurrentStep(2);
+            setHighestStep((prev) => Math.max(prev, 2));
+          }
+        }
       }
       if (user.tutorProfile) {
         const tp = user.tutorProfile;
-        if (tp.gender) setGender(tp.gender);
-        if (tp.age) setAge(String(tp.age));
-        if (tp.city) setCity(tp.city);
-        if (tp.area) setArea(tp.area);
-        if (tp.teachingModes?.[0]) setTeachingMode(tp.teachingModes[0]);
-        if (tp.subjects?.length) setSelectedDisciplines(tp.subjects);
-        if (tp.hourlyRate) setHourlyRate(String(tp.hourlyRate));
-        if (tp.monthlyRate) setMonthlyRate(String(tp.monthlyRate));
-        if (tp.bio) setBio(tp.bio);
-        if (tp.qualification) setDegreeTitle(tp.qualification);
-        if (tp.institute) setInstitute(tp.institute);
-        if (tp.experienceYears) setExperienceYears(String(tp.experienceYears));
-        if (tp.payoutMethod?.provider) setPayoutProvider(tp.payoutMethod.provider);
-        if (tp.payoutMethod?.accountTitle) setPayoutTitle(tp.payoutMethod.accountTitle);
-        if (tp.payoutMethod?.accountNumber) setPayoutAccount(tp.payoutMethod.accountNumber);
-        if (tp.availabilityDays?.length) setSelectedDays(tp.availabilityDays);
+        if (tp.gender && !gender) setGender(tp.gender);
+        if (tp.age && !age) setAge(String(tp.age));
+        if (tp.city && !city) setCity(tp.city);
+        if (tp.area && !area) setArea(tp.area);
+        if (tp.teachingModes?.[0] && !teachingMode) setTeachingMode(tp.teachingModes[0]);
+        if (tp.subjects?.length && (!selectedDisciplines || selectedDisciplines.length === 0)) setSelectedDisciplines(tp.subjects);
+        if (tp.hourlyRate && !hourlyRate) setHourlyRate(String(tp.hourlyRate));
+        if (tp.monthlyRate && !monthlyRate) setMonthlyRate(String(tp.monthlyRate));
+        if (tp.bio && !bio) setBio(tp.bio);
+        if (tp.qualifications && !degreeTitle) setDegreeTitle(tp.qualifications);
+        else if (tp.qualification && !degreeTitle) setDegreeTitle(tp.qualification);
+        if (tp.institute && !institute) setInstitute(tp.institute);
+        if (tp.experienceYears && !experienceYears) setExperienceYears(String(tp.experienceYears));
+        if (tp.payoutMethod?.provider && !payoutProvider) setPayoutProvider(tp.payoutMethod.provider);
+        if (tp.payoutMethod?.accountTitle && !payoutTitle) setPayoutTitle(tp.payoutMethod.accountTitle);
+        if (tp.payoutMethod?.accountNumber && !payoutAccount) setPayoutAccount(tp.payoutMethod.accountNumber);
+        if (tp.availabilityDays?.length && (!selectedDays || selectedDays.length === 0)) setSelectedDays(tp.availabilityDays);
       }
     }
   }, [user]);
@@ -263,6 +375,11 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         }
         setIsEmailVerified(true);
         setSuccess('Email verified successfully! Proceeding to Step 2...');
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('ilm_tutor_signup_in_progress', 'true');
+          localStorage.setItem('ilm_tutor_signup_step', '2');
+          localStorage.setItem('ilm_tutor_signup_highest_step', '2');
+        }
         setTimeout(() => {
           setCurrentStep(2);
           setHighestStep((prev) => Math.max(prev, 2));
@@ -337,11 +454,18 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         teachingModes: [teachingMode],
         avatar: avatar || undefined
       });
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ilm_tutor_signup_step', '3');
+        localStorage.setItem('ilm_tutor_signup_highest_step', String(Math.max(highestStep, 3)));
+      }
       setCurrentStep(3);
       setHighestStep((prev) => Math.max(prev, 3));
     } catch (err) {
       console.warn('Autosave step 2 notice:', err);
-      // Even if background save had issue, proceed locally
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ilm_tutor_signup_step', '3');
+        localStorage.setItem('ilm_tutor_signup_highest_step', String(Math.max(highestStep, 3)));
+      }
       setCurrentStep(3);
       setHighestStep((prev) => Math.max(prev, 3));
     } finally {
@@ -379,10 +503,18 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         monthlyRate: Number(monthlyRate) || 0,
         bio: bio.trim()
       });
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ilm_tutor_signup_step', '4');
+        localStorage.setItem('ilm_tutor_signup_highest_step', String(Math.max(highestStep, 4)));
+      }
       setCurrentStep(4);
       setHighestStep((prev) => Math.max(prev, 4));
     } catch (err) {
       console.warn('Autosave step 3 notice:', err);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ilm_tutor_signup_step', '4');
+        localStorage.setItem('ilm_tutor_signup_highest_step', String(Math.max(highestStep, 4)));
+      }
       setCurrentStep(4);
       setHighestStep((prev) => Math.max(prev, 4));
     } finally {
@@ -421,14 +553,23 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
     try {
       await api.updateMyTutorProfile({
         qualification: degreeTitle.trim(),
+        qualifications: degreeTitle.trim(),
         institute: institute.trim(),
         experienceYears: Number(experienceYears) || 1,
         sanadUrl: sanadFile || undefined
       });
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ilm_tutor_signup_step', '5');
+        localStorage.setItem('ilm_tutor_signup_highest_step', String(Math.max(highestStep, 5)));
+      }
       setCurrentStep(5);
       setHighestStep((prev) => Math.max(prev, 5));
     } catch (err) {
       console.warn('Autosave step 4 notice:', err);
+      if (typeof window !== 'undefined') {
+        localStorage.setItem('ilm_tutor_signup_step', '5');
+        localStorage.setItem('ilm_tutor_signup_highest_step', String(Math.max(highestStep, 5)));
+      }
       setCurrentStep(5);
       setHighestStep((prev) => Math.max(prev, 5));
     } finally {
@@ -475,6 +616,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         monthlyRate: Number(monthlyRate) || 15000,
         bio: bio.trim(),
         qualification: degreeTitle.trim(),
+        qualifications: degreeTitle.trim(),
         institute: institute.trim(),
         experienceYears: Number(experienceYears) || 1,
         sanadUrl: sanadFile || undefined,
@@ -484,12 +626,26 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
           accountNumber: payoutAccount.trim()
         },
         availabilityDays: selectedDays,
+        verificationStatus: 'under_review',
         isProfileComplete: true
       };
 
       const res = await api.updateMyTutorProfile(finalPayload);
-      if (res.user) {
+      if (res.profile) {
+        updateTutorProfileState?.(res.profile);
+      } else if (res.user) {
         updateTutorProfileState?.(res.user.tutorProfile || {});
+      }
+
+      // CLEAR ALL SIGNUP STORAGE FLAGS!
+      try {
+        localStorage.removeItem('ilm_tutor_signup_in_progress');
+        localStorage.removeItem('ilm_tutor_signup_step');
+        localStorage.removeItem('ilm_tutor_signup_highest_step');
+        localStorage.removeItem('ilm_tutor_signup_draft');
+        localStorage.setItem('ilm_tutor_signup_completed', 'true');
+      } catch (storageErr) {
+        console.warn('Storage cleanup notice:', storageErr);
       }
 
       setSuccess('Application submitted successfully! Loading your tutor dashboard...');
@@ -535,7 +691,14 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
                 key={s.num}
                 type="button"
                 disabled={!isClickable}
-                onClick={() => isClickable && setCurrentStep(s.num)}
+                onClick={() => {
+                  if (isClickable) {
+                    setCurrentStep(s.num);
+                    if (typeof window !== 'undefined') {
+                      localStorage.setItem('ilm_tutor_signup_step', String(s.num));
+                    }
+                  }
+                }}
                 className={`h-9 px-1.5 rounded-xl transition-all flex items-center justify-center gap-1.5 border text-center ${
                   isCurrent
                     ? 'bg-[#b85d34] border-[#b85d34] text-white shadow-xs font-bold'

@@ -27,9 +27,20 @@ export default function TutorLayout({ children }) {
         } else {
           router.replace('/login');
         }
+      } else if (user.role === 'tutor') {
+        // If tutor has not completed the multi-step signup wizard, redirect to finish signup form
+        if (typeof window !== 'undefined') {
+          const signupInProgress = localStorage.getItem('ilm_tutor_signup_in_progress') === 'true';
+          const isCompleted = localStorage.getItem('ilm_tutor_signup_completed') === 'true';
+          const isVerifiedOrUnderReview = tutorProfile?.verificationStatus && ['under_review', 'approved', 'pending'].includes(tutorProfile.verificationStatus);
+
+          if (signupInProgress || (!isCompleted && !isVerifiedOrUnderReview && !tutorProfile?.qualifications && (!tutorProfile?.subjects || tutorProfile.subjects.length === 0))) {
+            router.replace('/login?role=tutor&mode=signup');
+          }
+        }
       }
     }
-  }, [user, loading, pathname, router]);
+  }, [user, tutorProfile, loading, pathname, router]);
 
   // While checking auth or redirecting, show LoadingSpinner - NEVER render protected children!
   if (loading || !user || user.role !== 'tutor') {

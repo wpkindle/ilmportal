@@ -26,6 +26,17 @@ function VerifyEmailContent() {
   const [message, setMessage] = useState('');
   const [error, setError] = useState('');
 
+  const getTutorRedirectTarget = (targetUser) => {
+    if (typeof window !== 'undefined') {
+      const isCompleted = localStorage.getItem('ilm_tutor_signup_completed') === 'true';
+      const isVerifiedOrUnderReview = targetUser?.tutorProfile?.verificationStatus && ['under_review', 'approved', 'pending'].includes(targetUser.tutorProfile.verificationStatus);
+      if (isCompleted || isVerifiedOrUnderReview) {
+        return '/tutor/dashboard?verified=true';
+      }
+    }
+    return '/login?role=tutor&mode=signup';
+  };
+
   // 1-Click Verification Link Effect
   useEffect(() => {
     if (tokenParam) {
@@ -38,7 +49,7 @@ function VerifyEmailContent() {
           if (res.success && isMounted) {
             const userRole = res.user?.role || roleParam;
             if (userRole === 'tutor') {
-              router.push('/tutor/profile?verified=true');
+              router.push(getTutorRedirectTarget(res.user));
             } else {
               router.push('/student/profile?verified=true');
             }
@@ -81,7 +92,7 @@ function VerifyEmailContent() {
         const userRole = res.user?.role || roleParam;
         setTimeout(() => {
           if (userRole === 'tutor') {
-            router.push('/tutor/profile?verified=true');
+            router.push(getTutorRedirectTarget(res.user));
           } else {
             router.push('/student/profile?verified=true');
           }
@@ -111,7 +122,7 @@ function VerifyEmailContent() {
                 const userRole = res.user?.role || roleParam;
                 setTimeout(() => {
                   if (userRole === 'tutor') {
-                    router.push('/tutor/profile?verified=true');
+                    router.push(getTutorRedirectTarget(res.user));
                   } else {
                     router.push('/student/profile?verified=true');
                   }

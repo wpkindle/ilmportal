@@ -63,6 +63,22 @@ const loadTutorSignupDraft = () => {
   }
 };
 
+const sanitizeDisciplines = (list) => {
+  if (!list) return [];
+  const arr = Array.isArray(list) ? list : [list];
+  const cleaned = [];
+  for (const item of arr) {
+    if (typeof item === 'string') {
+      const s = item.replace(/[\[\]'"]/g, '').trim();
+      if (s) cleaned.push(s);
+    } else if (item && typeof item === 'object') {
+      const val = item.title || item.name || item._id || item.id;
+      if (val) cleaned.push(String(val));
+    }
+  }
+  return Array.from(new Set(cleaned));
+};
+
 export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
   const router = useRouter();
   const { user, token, verifyOtp: authVerifyOtp, updateTutorProfileState } = useAuth();
@@ -131,7 +147,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
   // -------------------------------------------------------------
   // STEP 3: Teaching Categories, Subjects & Rates
   // -------------------------------------------------------------
-  const [selectedDisciplines, setSelectedDisciplines] = useState(() => initialDraft.selectedDisciplines || []);
+  const [selectedDisciplines, setSelectedDisciplines] = useState(() => sanitizeDisciplines(initialDraft.selectedDisciplines));
   const [hourlyRate, setHourlyRate] = useState(() => initialDraft.hourlyRate || '1500');
   const [monthlyRate, setMonthlyRate] = useState(() => initialDraft.monthlyRate || '15000');
   const [bio, setBio] = useState(() => initialDraft.bio || '');
@@ -366,8 +382,12 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         if (tp.age && !age) setAge(String(tp.age));
         if (tp.city && !city) setCity(tp.city);
         if (tp.area && !area) setArea(tp.area);
-        if (tp.teachingModes?.[0] && !teachingMode) setTeachingMode(tp.teachingModes[0]);
-        if (tp.subjects?.length && (!selectedDisciplines || selectedDisciplines.length === 0)) setSelectedDisciplines(tp.subjects);
+        if (tp.teachingModes?.length && !teachingMode) {
+          setTeachingMode(tp.teachingModes.length > 1 ? 'both' : (tp.teachingModes[0] === 'in_person' ? 'physical' : tp.teachingModes[0]));
+        }
+        if (tp.subjects?.length && (!selectedDisciplines || selectedDisciplines.length === 0)) {
+          setSelectedDisciplines(sanitizeDisciplines(tp.subjects));
+        }
         if (tp.hourlyRate && !hourlyRate) setHourlyRate(String(tp.hourlyRate));
         if (tp.monthlyRate && !monthlyRate) setMonthlyRate(String(tp.monthlyRate));
         if (tp.bio && !bio) setBio(tp.bio);
@@ -584,7 +604,8 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         age: Number(age),
         city,
         area: area || '',
-        teachingModes: [teachingMode],
+        teachingModes: teachingMode === 'both' ? ['online', 'in_person'] : [teachingMode === 'physical' ? 'in_person' : teachingMode],
+        teachingMode,
         avatar: avatar || undefined
       });
       if (typeof window !== 'undefined') {
@@ -610,16 +631,18 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
   // STEP 3 HANDLERS
   // -------------------------------------------------------------
   const toggleDiscipline = (item) => {
-    setSelectedDisciplines((prev) =>
-      prev.includes(item) ? prev.filter((d) => d !== item) : [...prev, item]
-    );
+    setSelectedDisciplines((prev) => {
+      const cleaned = sanitizeDisciplines(prev);
+      return cleaned.includes(item) ? cleaned.filter((d) => d !== item) : [...cleaned, item];
+    });
   };
 
   const handleStep3Submit = async (e) => {
     e.preventDefault();
     setError('');
 
-    if (selectedDisciplines.length === 0) {
+    const cleanDisciplines = sanitizeDisciplines(selectedDisciplines);
+    if (cleanDisciplines.length === 0) {
       setError('Please select at least one teaching subject or discipline.');
       return;
     }
@@ -627,7 +650,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
     setLoading(true);
     try {
       await api.updateMyTutorProfile({
-        subjects: selectedDisciplines,
+        subjects: cleanDisciplines,
         hourlyRate: Number(hourlyRate) || 1500,
         monthlyRate: Number(monthlyRate) || 15000,
         bio: bio.trim()
@@ -776,8 +799,9 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         age: Number(age) || 25,
         city,
         area: area || '',
-        teachingModes: [teachingMode],
-        subjects: selectedDisciplines,
+        teachingModes: teachingMode === 'both' ? ['online', 'in_person'] : [teachingMode === 'physical' ? 'in_person' : teachingMode],
+        teachingMode,
+        subjects: sanitizeDisciplines(selectedDisciplines),
         hourlyRate: Number(hourlyRate) || 1500,
         monthlyRate: Number(monthlyRate) || 15000,
         bio: bio.trim(),
@@ -1275,7 +1299,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
                 { id: 'Mathematics (All Grades)', title: 'Mathematics', desc: 'Grade 1 to 12 & Calculus' },
                 { id: 'O / A-Level Cambridge', title: 'O / A-Levels', desc: 'IGCSE & Cambridge board' }
               ].map((disc) => {
-                const checked = selectedDisciplines.includes(disc.id);
+                const checked = selectedDisciplines.some((s) => s === disc.id || s === disc.title);
                 return (
                   <div
                     key={disc.id}

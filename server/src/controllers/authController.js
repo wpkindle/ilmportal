@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const TutorProfile = require('../models/TutorProfile');
 const Notification = require('../models/Notification');
+const { normalizeTeachingModes, resolveSubjectCategoryIds } = require('../utils/tutorHelpers');
 const {
   sendVerificationOtpEmail,
   sendEmailChangeOtpEmail,
@@ -681,11 +682,11 @@ exports.updateProfile = async (req, res) => {
       if (req.body.videoIntro !== undefined) {
         tutorProfile.videoIntro = typeof req.body.videoIntro === 'string' ? req.body.videoIntro.trim() : '';
       }
-      if (req.body.subjects !== undefined) tutorProfile.subjects = req.body.subjects;
-      if (Array.isArray(req.body.teachingModes) && req.body.teachingModes.length > 0) {
-        tutorProfile.teachingModes = req.body.teachingModes;
-      } else if (teachingMode !== undefined) {
-        tutorProfile.teachingModes = teachingMode === 'both' ? ['online', 'in_person'] : [teachingMode === 'physical' ? 'in_person' : teachingMode];
+      if (req.body.subjects !== undefined) {
+        tutorProfile.subjects = await resolveSubjectCategoryIds(req.body.subjects);
+      }
+      if (req.body.teachingModes !== undefined || teachingMode !== undefined) {
+        tutorProfile.teachingModes = normalizeTeachingModes(req.body.teachingModes, teachingMode);
       }
 
       await tutorProfile.save();

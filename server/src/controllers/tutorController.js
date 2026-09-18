@@ -5,6 +5,7 @@ const Category = require('../models/Category');
 const Location = require('../models/Location');
 const Review = require('../models/Review');
 const { calculateProfileCompletion } = require('./authController');
+const { normalizeTeachingModes, resolveSubjectCategoryIds } = require('../utils/tutorHelpers');
 
 // @desc    Get all public verified tutors with filters & pagination
 // @route   GET /api/tutors
@@ -485,6 +486,15 @@ exports.updateMyTutorProfile = async (req, res) => {
       }];
     }
 
+    const resolvedModes = (teachingModes !== undefined || teachingMode !== undefined)
+      ? normalizeTeachingModes(teachingModes, teachingMode)
+      : undefined;
+
+    let resolvedSubjects = undefined;
+    if (subjects !== undefined) {
+      resolvedSubjects = await resolveSubjectCategoryIds(subjects);
+    }
+
     let profile = await TutorProfile.findOne({ user: req.user.id });
 
     if (!profile) {
@@ -499,10 +509,8 @@ exports.updateMyTutorProfile = async (req, res) => {
         tutoringType: tutoringType || 'both',
         gender: gender || 'male',
         videoIntro: typeof videoIntro === 'string' ? videoIntro.trim() : '',
-        subjects: Array.isArray(subjects) ? subjects : [],
-        teachingModes: Array.isArray(teachingModes) && teachingModes.length > 0
-          ? teachingModes
-          : (teachingMode ? (teachingMode === 'both' ? ['online', 'in_person'] : [teachingMode === 'physical' ? 'in_person' : teachingMode]) : ['online']),
+        subjects: resolvedSubjects !== undefined ? resolvedSubjects : [],
+        teachingModes: resolvedModes || ['online'],
         verificationStatus: isProfileComplete ? 'under_review' : 'incomplete',
         preferredAccountChoice: ['own', 'admin'].includes(preferredAccountChoice) ? preferredAccountChoice : 'admin'
       });
@@ -514,16 +522,14 @@ exports.updateMyTutorProfile = async (req, res) => {
       if (gender !== undefined) profile.gender = gender;
       if (tutoringType !== undefined) profile.tutoringType = tutoringType;
       if (videoIntro !== undefined) profile.videoIntro = typeof videoIntro === 'string' ? videoIntro.trim() : '';
-      if (subjects !== undefined) profile.subjects = subjects;
+      if (resolvedSubjects !== undefined) profile.subjects = resolvedSubjects;
       if (cities !== undefined) profile.cities = cities;
       if (city !== undefined) profile.city = city.trim();
       if (localArea !== undefined || area !== undefined) {
         profile.localArea = (localArea !== undefined ? localArea : area).trim();
       }
-      if (Array.isArray(teachingModes) && teachingModes.length > 0) {
-        profile.teachingModes = teachingModes;
-      } else if (teachingMode !== undefined) {
-        profile.teachingModes = teachingMode === 'both' ? ['online', 'in_person'] : [teachingMode === 'physical' ? 'in_person' : teachingMode];
+      if (resolvedModes !== undefined) {
+        profile.teachingModes = resolvedModes;
       }
       if (Array.isArray(resolvedPaymentMethods)) {
         profile.paymentMethods = resolvedPaymentMethods.filter(pm => pm && pm.method && pm.accountTitle && pm.accountNumber).map((pm, idx) => ({

@@ -22,6 +22,7 @@ import {
   PlayCircle
 } from 'lucide-react';
 import VideoIntroPlayer from '../../../components/common/VideoIntroPlayer';
+import { getDocumentUrl, isPdfDocument } from '../../../utils/tutorHelpers';
 
 
 export default function TutorApprovalPage() {
@@ -511,32 +512,55 @@ export default function TutorApprovalPage() {
                                 >
                                   <div className="flex items-start gap-3">
                                     {/* Thumbnail Preview */}
-                                    <div
-                                      onClick={() => {
-                                        setActiveSanads([doc]);
-                                        setActiveTutorName(tutor.user?.name || 'Tutor');
-                                        setActiveTutorId(tutor._id);
-                                        setSanadModalOpen(true);
-                                      }}
-                                      className="w-16 h-16 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden shrink-0 cursor-pointer flex items-center justify-center group relative hover:opacity-90 transition-opacity"
-                                      title="Click to zoom in"
-                                    >
-                                      {doc.fileUrl && (doc.fileUrl.endsWith('.pdf') || doc.fileType === 'application/pdf') ? (
-                                        <div className="flex flex-col items-center justify-center p-1 text-center">
-                                          <FileText className="w-6 h-6 text-rose-500" />
-                                          <span className="text-[9px] font-bold text-slate-600 uppercase">PDF</span>
+                                    {(() => {
+                                      const isPdf = isPdfDocument(doc.fileUrl, doc.fileType);
+                                      const resolvedUrl = getDocumentUrl(doc.fileUrl);
+
+                                      return (
+                                        <div
+                                          onClick={() => {
+                                            setActiveSanads([doc]);
+                                            setActiveTutorName(tutor.user?.name || 'Tutor');
+                                            setActiveTutorId(tutor._id);
+                                            setSanadModalOpen(true);
+                                          }}
+                                          className="w-16 h-16 rounded-lg bg-slate-100 border border-slate-200 overflow-hidden shrink-0 cursor-pointer flex items-center justify-center group relative hover:opacity-90 transition-opacity"
+                                          title="Click to zoom in"
+                                        >
+                                          {isPdf ? (
+                                            <div className="flex flex-col items-center justify-center p-1 text-center">
+                                              <FileText className="w-6 h-6 text-rose-500" />
+                                              <span className="text-[9px] font-bold text-slate-600 uppercase">PDF</span>
+                                            </div>
+                                          ) : resolvedUrl ? (
+                                            <>
+                                              <img
+                                                src={resolvedUrl}
+                                                alt={doc.title || 'Sanad'}
+                                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                                                onError={(e) => {
+                                                  e.currentTarget.style.display = 'none';
+                                                  const fallback = e.currentTarget.parentElement?.querySelector('.img-fallback');
+                                                  if (fallback) fallback.style.display = 'flex';
+                                                }}
+                                              />
+                                              <div className="img-fallback hidden w-full h-full flex-col items-center justify-center p-1 text-center bg-stone-50">
+                                                <FileText className="w-5 h-5 text-stone-400" />
+                                                <span className="text-[8px] font-bold text-stone-500 uppercase">Scan</span>
+                                              </div>
+                                            </>
+                                          ) : (
+                                            <div className="flex flex-col items-center justify-center p-1 text-center bg-stone-50 text-stone-400">
+                                              <FileText className="w-5 h-5 text-stone-400" />
+                                              <span className="text-[8px] font-bold uppercase">No Scan</span>
+                                            </div>
+                                          )}
+                                          <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
+                                            <Eye className="w-4 h-4 text-white" />
+                                          </div>
                                         </div>
-                                      ) : (
-                                        <img
-                                          src={doc.fileUrl}
-                                          alt={doc.title || 'Sanad'}
-                                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                                        />
-                                      )}
-                                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                                        <Eye className="w-4 h-4 text-white" />
-                                      </div>
-                                    </div>
+                                      );
+                                    })()}
 
                                     {/* Info & Status */}
                                     <div className="min-w-0 flex-1 space-y-1">
@@ -581,15 +605,23 @@ export default function TutorApprovalPage() {
                                       )}
 
                                       <div className="pt-0.5">
-                                        <a
-                                          href={doc.fileUrl}
-                                          target="_blank"
-                                          rel="noopener noreferrer"
-                                          className="text-[11px] font-semibold text-[#b85d34] hover:underline inline-flex items-center gap-1"
-                                        >
-                                          <span>Full View</span>
-                                          <ExternalLink className="w-3 h-3" />
-                                        </a>
+                                        {(() => {
+                                          const resolvedUrl = getDocumentUrl(doc.fileUrl);
+                                          if (!resolvedUrl) {
+                                            return <span className="text-[10px] text-slate-400 italic">No document file attached</span>;
+                                          }
+                                          return (
+                                            <a
+                                              href={resolvedUrl}
+                                              target="_blank"
+                                              rel="noopener noreferrer"
+                                              className="text-[11px] font-semibold text-[#b85d34] hover:underline inline-flex items-center gap-1"
+                                            >
+                                              <span>Full View</span>
+                                              <ExternalLink className="w-3 h-3" />
+                                            </a>
+                                          );
+                                        })()}
                                       </div>
                                     </div>
                                   </div>

@@ -225,7 +225,7 @@ exports.getTutorApprovalQueue = async (req, res) => {
       all
     ] = await Promise.all([
       TutorProfile.find(filter)
-        .select('-cnicFrontImage -cnicBackImage -experienceCertificates.fileUrl -sanadDocuments.fileUrl')
+        .select('-cnicFrontImage -cnicBackImage')
         .populate('user', 'name email avatar city area role age gender isVerified createdAt')
         .populate('subjects', 'name type')
         .populate('cities', 'name province')

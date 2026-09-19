@@ -152,3 +152,52 @@ export function parseDegreesAndCertificates(qualificationsStr, sanadDocuments = 
 
   return ['Verified Faculty'];
 }
+
+/**
+ * Resolves a document/sanad fileUrl into an absolute, viewable URL.
+ * Handles base64 data URLs, remote URLs, and relative upload paths.
+ */
+export function getDocumentUrl(fileUrl) {
+  if (!fileUrl || typeof fileUrl !== 'string') return '';
+  const trimmed = fileUrl.trim();
+  if (!trimmed) return '';
+
+  if (
+    trimmed.startsWith('data:') ||
+    trimmed.startsWith('blob:') ||
+    trimmed.startsWith('http://') ||
+    trimmed.startsWith('https://')
+  ) {
+    return trimmed;
+  }
+
+  const backendBase =
+    process.env.NEXT_PUBLIC_BACKEND_URL ||
+    (typeof window !== 'undefined' &&
+    (window.location.hostname === 'ilmidunya.com' ||
+      window.location.hostname.endsWith('.ilmidunya.com') ||
+      window.location.hostname.includes('vercel.app'))
+      ? 'https://ilmportal-backend.onrender.com'
+      : '');
+
+  if (!backendBase) return trimmed;
+  const cleanBase = backendBase.replace(/\/+$/, '');
+  const cleanPath = trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
+  return `${cleanBase}${cleanPath}`;
+}
+
+/**
+ * Checks whether a document is a PDF file based on its URL or MIME type.
+ */
+export function isPdfDocument(fileUrl, fileType) {
+  if (fileType === 'application/pdf') return true;
+  if (!fileUrl || typeof fileUrl !== 'string') return false;
+  const lower = fileUrl.toLowerCase();
+  return (
+    lower.startsWith('data:application/pdf') ||
+    lower.includes('application/pdf') ||
+    lower.endsWith('.pdf') ||
+    lower.includes('.pdf?')
+  );
+}
+

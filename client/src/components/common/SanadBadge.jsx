@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { ShieldCheck, GraduationCap, FileText, ExternalLink, X, CheckCircle2, Clock, AlertCircle } from 'lucide-react';
+import { getDocumentUrl, isPdfDocument } from '../../utils/tutorHelpers';
 
 const SanadBadge = ({ documents = [], documentsCount = 0, isVerified = true, onClick }) => {
   const count = (Array.isArray(documents) ? documents.length : 0) || documentsCount || 0;
@@ -199,9 +200,9 @@ export const SanadModal = ({
                         <span>{isDocRejected ? 'Rejected (Update)' : 'Reject Doc'}</span>
                       </button>
                     )}
-                    {allowScanView && doc.fileUrl && (
+                    {allowScanView && getDocumentUrl(doc.fileUrl) && (
                       <a
-                        href={doc.fileUrl}
+                        href={getDocumentUrl(doc.fileUrl)}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="text-xs font-bold text-[#b85d34] hover:text-[#9e4e2a] inline-flex items-center gap-1 ml-1"
@@ -222,12 +223,12 @@ export const SanadModal = ({
                 {/* Document Scans: ONLY visible to Administrators and owner tutor in settings. Never exposed to public. */}
                 {allowScanView ? (
                   <div className="p-2 flex justify-center bg-slate-900/5">
-                    {doc.fileUrl && (doc.fileUrl.endsWith('.pdf') || doc.fileType === 'application/pdf' || doc.fileUrl.startsWith('data:application/pdf')) ? (
+                    {isPdfDocument(doc.fileUrl, doc.fileType) ? (
                       <div className="p-8 text-center text-slate-600">
                         <FileText className="w-12 h-12 mx-auto text-red-500 mb-2" />
                         <p className="text-sm font-medium">PDF Sanad / Degree Document</p>
                         <a
-                          href={doc.fileUrl}
+                          href={getDocumentUrl(doc.fileUrl)}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="mt-2 inline-block px-3 py-1.5 bg-slate-800 text-white text-xs rounded-lg hover:bg-slate-700"
@@ -235,12 +236,28 @@ export const SanadModal = ({
                           Open PDF in New Tab
                         </a>
                       </div>
+                    ) : getDocumentUrl(doc.fileUrl) ? (
+                      <>
+                        <img
+                          src={getDocumentUrl(doc.fileUrl)}
+                          alt={doc.title || 'Sanad / Degree Document'}
+                          className="max-h-96 w-auto object-contain rounded shadow-sm"
+                          onError={(e) => {
+                            e.currentTarget.style.display = 'none';
+                            const fallback = e.currentTarget.parentElement?.querySelector('.img-modal-fallback');
+                            if (fallback) fallback.style.display = 'flex';
+                          }}
+                        />
+                        <div className="img-modal-fallback hidden p-8 flex-col items-center justify-center text-center text-slate-400">
+                          <FileText className="w-10 h-10 mx-auto text-slate-300 mb-2" />
+                          <p className="text-xs">Document scan could not be loaded</p>
+                        </div>
+                      </>
                     ) : (
-                      <img
-                        src={doc.fileUrl}
-                        alt={doc.title || 'Sanad / Degree Document'}
-                        className="max-h-96 w-auto object-contain rounded shadow-sm"
-                      />
+                      <div className="p-8 text-center text-slate-400">
+                        <FileText className="w-10 h-10 mx-auto text-slate-300 mb-2" />
+                        <p className="text-xs">Document scan not available</p>
+                      </div>
                     )}
                   </div>
                 ) : (

@@ -151,7 +151,7 @@ exports.register = async (req, res) => {
         user: user._id,
         bio: (req.body.bio || '').trim(),
         qualifications: (req.body.qualifications || req.body.whatWillYouTeach || '').trim(),
-        experienceYears: req.body.experienceYears ? Number(req.body.experienceYears) : 1,
+        experienceYears: (req.body.experienceYears !== undefined && req.body.experienceYears !== null && req.body.experienceYears !== '') ? (Number(req.body.experienceYears) || 0) : 0,
         hourlyRate: req.body.hourlyRate ? Number(req.body.hourlyRate) : 1500,
         gender: (gender || '').trim(),
         verificationStatus: 'incomplete'
@@ -675,7 +675,7 @@ exports.updateProfile = async (req, res) => {
       }
       if (bio !== undefined) tutorProfile.bio = bio;
       if (qualifications !== undefined) tutorProfile.qualifications = qualifications;
-      if (experienceYears !== undefined) tutorProfile.experienceYears = Number(experienceYears);
+      if (experienceYears !== undefined) tutorProfile.experienceYears = Number(experienceYears) || 0;
       if (hourlyRate !== undefined) tutorProfile.hourlyRate = Number(hourlyRate);
       if (gender) tutorProfile.gender = gender;
       if (req.body.tutoringType !== undefined) tutorProfile.tutoringType = req.body.tutoringType;
@@ -1000,7 +1000,7 @@ exports.registerEarlyTutor = async (req, res) => {
           user: user._id,
           bio: `Experienced ${userGender === 'female' ? 'female Alimah / educator' : 'Qari / tutor'} specializing in ${teachSubject || 'Quran & Academics'}. Available for ${userTeachingMode} sessions.`,
           qualifications: teachSubject,
-          experienceYears: 1,
+          experienceYears: 0,
           hourlyRate: 1500,
           gender: userGender,
           verificationStatus: 'incomplete'
@@ -1024,7 +1024,7 @@ exports.registerEarlyTutor = async (req, res) => {
         user: user._id,
         bio: `Experienced ${userGender === 'female' ? 'female Alimah / educator' : 'Qari / tutor'} specializing in ${teachSubject || 'Quran & Academics'}. Available for ${userTeachingMode} sessions.`,
         qualifications: teachSubject,
-        experienceYears: 1,
+        experienceYears: 0,
         hourlyRate: 1500,
         gender: userGender,
         verificationStatus: 'incomplete'

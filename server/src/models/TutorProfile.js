@@ -17,7 +17,7 @@ const tutorProfileSchema = new mongoose.Schema({
   },
   experienceYears: {
     type: Number,
-    default: 1
+    default: 0
   },
   hourlyRate: {
     type: Number,

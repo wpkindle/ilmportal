@@ -121,7 +121,7 @@ export default function TutorMultiStepRegister({
   const [subjectFilterTab, setSubjectFilterTab] = useState('all'); // 'all' | 'quran' | 'academic'
   const [subjectSearch, setSubjectSearch] = useState('');
   const [qualifications, setQualifications] = useState('Shahadat-ul-Alimiyyah (Dars-e-Nizami)');
-  const [experienceYears, setExperienceYears] = useState(3);
+  const [experienceYears, setExperienceYears] = useState('');
   const [hourlyRate, setHourlyRate] = useState(1500);
   const [bio, setBio] = useState(
     'Assalam-o-Alaikum! I am an experienced Quran and academic tutor with over 3 years of teaching experience. I focus on correct Tajweed, patient conceptual learning, and personalized attention for every student.'
@@ -468,7 +468,7 @@ export default function TutorMultiStepRegister({
           tutoringType,
           subjects: selectedSubjects,
           qualifications: qualifications.trim(),
-          experienceYears: Number(experienceYears) || 1,
+          experienceYears: Number(experienceYears) || 0,
           hourlyRate: Number(hourlyRate) || 1500,
           bio: bio.trim()
         });
@@ -599,7 +599,7 @@ export default function TutorMultiStepRegister({
           tutoringType,
           subjects: selectedSubjects,
           qualifications: qualifications.trim(),
-          experienceYears: Number(experienceYears) || 1,
+          experienceYears: Number(experienceYears) || 0,
           hourlyRate: Number(hourlyRate) || 1500,
           bio: bio.trim(),
           sanadDocuments: uploadedSanads,
@@ -1347,17 +1347,20 @@ export default function TutorMultiStepRegister({
                 <div>
                   <label className="text-xs font-serif font-bold text-[#e6dfd5] block mb-1 flex items-center gap-1.5">
                     <Award className="w-3.5 h-3.5 text-[#d4a359]" />
-                    <span>Teaching Experience (Years) *</span>
+                    <span>Teaching Experience (Years)</span>
                   </label>
                   <input
                     type="number"
                     min={0}
                     max={40}
-                    required
+                    placeholder="Leave it if fresh"
                     value={experienceYears}
                     onChange={(e) => setExperienceYears(e.target.value)}
                     className="w-full px-4 py-2.5 bg-[#06120c] border border-[#1b4d36] rounded-2xl text-xs sm:text-sm text-[#faf8f5] outline-none focus:border-[#d4a359] font-mono"
                   />
+                  <p className="text-[11px] text-[#a8b8aa] mt-1">
+                    Leave blank if fresh tutor. It will appear on your profile as <strong>Fresh</strong>.
+                  </p>
                 </div>
 
                 <div>

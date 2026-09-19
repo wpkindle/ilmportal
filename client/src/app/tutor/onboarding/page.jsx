@@ -36,7 +36,7 @@ export default function TutorOnboardingPage() {
   const [gender, setGender] = useState('male');
   const [tutoringType, setTutoringType] = useState('both'); // 'quran' | 'academic' | 'both'
   const [qualifications, setQualifications] = useState('Dars-e-Nizami / Master Degree');
-  const [experienceYears, setExperienceYears] = useState(1);
+  const [experienceYears, setExperienceYears] = useState(0);
   const [hourlyRate, setHourlyRate] = useState(1500);
   const [city, setCity] = useState('Lahore');
   const [localArea, setLocalArea] = useState('');
@@ -120,7 +120,7 @@ export default function TutorOnboardingPage() {
         gender,
         tutoringType,
         qualifications: qualifications.trim(),
-        experienceYears: Number(experienceYears),
+        experienceYears: Number(experienceYears) || 0,
         hourlyRate: Number(hourlyRate),
         city: city.trim(),
         localArea: localArea.trim(),
@@ -375,7 +375,7 @@ export default function TutorOnboardingPage() {
 
                 <div>
                   <div className="flex items-center justify-between mb-1">
-                    <label className="text-xs font-serif font-bold text-[#0c2217] block">Experience (Years) *</label>
+                    <label className="text-xs font-serif font-bold text-[#0c2217] block">Experience (Years)</label>
                     <button
                       type="button"
                       onClick={() => setExperienceYears(0)}
@@ -386,21 +386,21 @@ export default function TutorOnboardingPage() {
                       }`}
                     >
                       <Sparkles className="w-2.5 h-2.5 text-[#d4a359]" />
-                      <span>{Number(experienceYears) === 0 ? 'Fresh Selected' : 'Choose Fresh (0 yrs)'}</span>
+                      <span>{Number(experienceYears) === 0 ? 'Fresh' : 'Set as Fresh (0 yrs)'}</span>
                     </button>
                   </div>
                   <input
                     type="number"
                     min="0"
                     max="50"
-                    required
-                    value={experienceYears}
+                    placeholder="Leave it if fresh"
+                    value={experienceYears === 0 || experienceYears === '0' ? '' : experienceYears}
                     onChange={(e) => setExperienceYears(e.target.value)}
                     className="w-full px-4 py-2.5 bg-[#faf8f5] border border-[#e6dfd5] rounded-2xl text-xs text-[#0c2217] font-bold outline-none focus:border-[#0c2217] focus:bg-white"
                   />
-                  {Number(experienceYears) === 0 && (
+                  {(experienceYears === 0 || experienceYears === '0' || experienceYears === '') && (
                     <p className="text-[10px] text-[#b85d34] font-semibold mt-1">
-                      Registered as Fresh / Beginner Tutor (&lt; 1 Year experience).
+                      Appears on your profile as <strong>Fresh</strong>.
                     </p>
                   )}
                 </div>

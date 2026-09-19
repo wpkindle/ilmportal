@@ -128,7 +128,7 @@ function TutorProfileContent() {
   // Teaching / Academic Profile
   const [bio, setBio] = useState('');
   const [qualifications, setQualifications] = useState('');
-  const [experienceYears, setExperienceYears] = useState(2);
+  const [experienceYears, setExperienceYears] = useState(0);
   const [hourlyRate, setHourlyRate] = useState(1500);
   const [teachingModes, setTeachingModes] = useState(['online']);
   
@@ -478,7 +478,7 @@ function TutorProfileContent() {
         avatar: user?.avatar || '',
         bio: tutorProfile.bio || '',
         qualifications: tutorProfile.qualifications || '',
-        experienceYears: tutorProfile.experienceYears ?? 2,
+        experienceYears: tutorProfile.experienceYears ?? 0,
         hourlyRate: tutorProfile.hourlyRate || 1500,
         teachingModes: modes,
         selectedSubjects: subjects,
@@ -1834,7 +1834,7 @@ function TutorProfileContent() {
                     <div>
                       <div className="flex items-center justify-between mb-1">
                         <label className="text-xs font-bold text-stone-700 block">
-                          Teaching Experience (Years) *
+                          Teaching Experience (Years)
                         </label>
                         <button
                           type="button"
@@ -1846,18 +1846,23 @@ function TutorProfileContent() {
                           }`}
                         >
                           <Sparkles className="w-2.5 h-2.5 text-[#d4a359]" />
-                          <span>{Number(experienceYears) === 0 ? 'Fresh (0 yrs)' : 'Set as Fresh'}</span>
+                          <span>{Number(experienceYears) === 0 ? 'Fresh' : 'Set as Fresh'}</span>
                         </button>
                       </div>
                       <input
                         type="number"
                         min="0"
                         max="45"
-                        required
-                        value={experienceYears}
+                        placeholder="Leave it if fresh"
+                        value={experienceYears === 0 || experienceYears === '0' ? '' : experienceYears}
                         onChange={(e) => setExperienceYears(e.target.value)}
                         className="w-full px-4 py-2.5 bg-stone-50 border border-stone-200 rounded-2xl text-xs text-stone-900 outline-none focus:border-[#0c2217] font-bold transition-all"
                       />
+                      {(experienceYears === 0 || experienceYears === '0' || experienceYears === '') && (
+                        <p className="text-[10.5px] text-[#b85d34] font-medium mt-1">
+                          Displays on your profile and cards as <strong>Fresh</strong>.
+                        </p>
+                      )}
                     </div>
 
                     <div className="p-3 bg-[#faf8f5] border border-[#e6ded1] rounded-2xl flex flex-col justify-center">

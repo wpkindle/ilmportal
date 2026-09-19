@@ -461,7 +461,7 @@ exports.updateMyTutorProfile = async (req, res) => {
     const effectiveQualifications = qualifications !== undefined ? qualifications : qualification;
 
     const normalizedExp = (experienceYears !== undefined && experienceYears !== null && experienceYears !== '')
-      ? Number(experienceYears)
+      ? (Number(experienceYears) || 0)
       : undefined;
 
     // Normalize payment methods if sent as paymentMethods array or payoutMethod single object
@@ -520,7 +520,7 @@ exports.updateMyTutorProfile = async (req, res) => {
         user: req.user.id,
         bio: bio || '',
         qualifications: effectiveQualifications || '',
-        experienceYears: normalizedExp !== undefined ? normalizedExp : 1,
+        experienceYears: normalizedExp !== undefined ? normalizedExp : 0,
         hourlyRate: hourlyRate !== undefined ? Number(hourlyRate) : 1500,
         city: city || '',
         localArea: (localArea !== undefined ? localArea : area || '').trim(),

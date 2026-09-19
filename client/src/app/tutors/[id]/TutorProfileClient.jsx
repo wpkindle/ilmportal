@@ -719,15 +719,15 @@ export default function TutorProfileClient({ tutor: initialTutor, reviews = [], 
               <div className="p-4 rounded-2xl bg-[#faf8f5] border border-[#e6ded1] space-y-1">
                 <span className="text-[10px] uppercase font-bold text-slate-400">Teaching Experience</span>
                 <p className="font-bold text-xs text-slate-900 flex items-center gap-1.5">
-                  {(tutor.experienceYears === 0 || tutor.experienceYears === '0' || tutor.experienceYears === 'fresh') ? (
+                  {(tutor.experienceYears === 0 || tutor.experienceYears === '0' || tutor.experienceYears === 'fresh' || !tutor.experienceYears) ? (
                     <>
                       <Sparkles className="w-4 h-4 text-[#d4a359] shrink-0" />
-                      <span className="text-[#0c2217]">Fresh Tutor (&lt; 1 Yr)</span>
+                      <span className="text-[#0c2217]">Fresh</span>
                     </>
                   ) : (
                     <>
                       <CheckCircle2 className="w-4 h-4 text-[#0c2217] shrink-0" />
-                      <span>{tutor.experienceYears || 1} {Number(tutor.experienceYears) === 1 ? 'Year' : 'Years'} Exp</span>
+                      <span>{tutor.experienceYears} {Number(tutor.experienceYears) === 1 ? 'Year' : 'Years'} Exp</span>
                     </>
                   )}
                 </p>

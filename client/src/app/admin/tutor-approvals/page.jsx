@@ -412,7 +412,7 @@ export default function TutorApprovalPage() {
                               {tutor.user?.email} &bull; {tutor.localArea || tutor.user?.area ? `${tutor.localArea || tutor.user?.area}, ` : ''}{tutor.user?.city || tutor.city || 'No City'}
                             </p>
                             <p className="text-xs font-semibold text-emerald-800 mt-1">
-                              Declared Qualification: {tutor.qualifications || 'Not specified'} ({tutor.experienceYears || 0} Yrs Exp)
+                              Declared Qualification: {tutor.qualifications || 'Not specified'} ({tutor.experienceYears ? `${tutor.experienceYears} Yrs Exp` : 'Fresh'})
                             </p>
                           </div>
                         </div>

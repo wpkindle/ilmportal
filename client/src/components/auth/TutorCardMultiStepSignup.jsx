@@ -182,7 +182,12 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
       fileType: ''
     }];
   });
-  const [experienceYears, setExperienceYears] = useState(() => initialDraft.experienceYears || '3');
+  const [experienceYears, setExperienceYears] = useState(() => {
+    if (initialDraft.experienceYears !== undefined && initialDraft.experienceYears !== null && initialDraft.experienceYears !== '' && initialDraft.experienceYears !== '3') {
+      return String(initialDraft.experienceYears);
+    }
+    return '';
+  });
 
   const completionYearOptions = useMemo(() => {
     const currentYear = new Date().getFullYear();
@@ -792,9 +797,15 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
       }
     }
 
-    if (!experienceYears || isNaN(Number(experienceYears)) || Number(experienceYears) < 0) {
-      setError('Please enter your total teaching experience in years.');
-      return;
+    const trimmedExp = String(experienceYears ?? '').trim();
+    let expNum = 0;
+    if (trimmedExp !== '') {
+      const parsed = Number(trimmedExp);
+      if (isNaN(parsed) || parsed < 0) {
+        setError('Please enter a valid number of years for teaching experience, or leave it blank if fresh.');
+        return;
+      }
+      expNum = parsed;
     }
 
     const qualificationsString = degrees.map((d) => d.title.trim()).filter(Boolean).join(', ');
@@ -813,7 +824,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         qualification: qualificationsString,
         qualifications: qualificationsString,
         institute: primaryInstitute,
-        experienceYears: Number(experienceYears) || 1,
+        experienceYears: expNum,
         sanadDocuments: sanadDocumentsPayload,
         sanadUrl: sanadDocumentsPayload[0]?.fileUrl || undefined
       });
@@ -914,7 +925,7 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
         qualification: qualificationsString,
         qualifications: qualificationsString,
         institute: primaryInstitute,
-        experienceYears: Number(experienceYears) || 1,
+        experienceYears: String(experienceYears ?? '').trim() !== '' ? (Number(experienceYears) || 0) : 0,
         sanadDocuments: sanadDocumentsPayload,
         sanadUrl: sanadDocumentsPayload[0]?.fileUrl || undefined,
         preferredAccountChoice: payoutChoice,
@@ -1710,18 +1721,20 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
           {/* Overall Teaching Experience */}
           <div className="pt-1">
             <label className="text-xs font-bold text-stone-800 block mb-1">
-              Total Teaching Experience (Years) <span className="text-red-500">*</span>
+              Total Teaching Experience (Years)
             </label>
             <input
               type="number"
               min={0}
               max={50}
-              required
-              placeholder="e.g. 3"
+              placeholder="Leave it if fresh"
               value={experienceYears}
               onChange={(e) => setExperienceYears(e.target.value)}
               className="w-full px-3 py-2 bg-[#faf8f5] border border-[#e6dfd5] rounded-xl text-xs sm:text-sm text-stone-900 outline-none focus:border-[#0c2217] focus:bg-white transition-all font-medium"
             />
+            <p className="text-[11px] text-stone-500 mt-1">
+              Leave blank if fresh graduate / beginner tutor. It will appear on your profile as <strong>Fresh</strong>.
+            </p>
           </div>
 
           {/* Nav Buttons */}

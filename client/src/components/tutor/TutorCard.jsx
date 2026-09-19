@@ -301,13 +301,13 @@ const TutorCard = ({ tutor, tutorProfile }) => {
                 )}
                 <span className="text-slate-300">·</span>
                 <span className="inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#faf8f5] border border-[#e6ded1] text-slate-700 shrink-0">
-                  {(data.experienceYears === 0 || data.experienceYears === '0' || data.experienceYears === 'fresh') ? (
+                  {(data.experienceYears === 0 || data.experienceYears === '0' || data.experienceYears === 'fresh' || !data.experienceYears) ? (
                     <>
                       <Sparkles className="w-3 h-3 text-[#d4a359]" />
-                      <span className="text-[#0c2217]">Fresh Tutor</span>
+                      <span className="text-[#0c2217]">Fresh</span>
                     </>
                   ) : (
-                    <span>{data.experienceYears || 1} yrs exp</span>
+                    <span>{data.experienceYears} yrs exp</span>
                   )}
                 </span>
                 {(data.user?.age || data.age) && (

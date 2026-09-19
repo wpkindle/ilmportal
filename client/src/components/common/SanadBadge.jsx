@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
-import { ShieldCheck, GraduationCap, FileText, ExternalLink, X, CheckCircle2, Clock, AlertCircle, Download, Loader2 } from 'lucide-react';
+import { ShieldCheck, GraduationCap, FileText, ExternalLink, X, CheckCircle2, Clock, AlertCircle, Download, Loader2, Trash2 } from 'lucide-react';
 import { getDocumentUrl, isPdfDocument, dataUrlToBlob, openDocumentInNewTab, downloadDocument } from '../../utils/tutorHelpers';
+
 
 
 const SanadBadge = ({ documents = [], documentsCount = 0, isVerified = true, onClick }) => {
@@ -189,7 +190,8 @@ export const SanadModal = ({
   isAdmin = false,
   canViewScans = false,
   onVerifyDoc = null,
-  onRejectDoc = null
+  onRejectDoc = null,
+  onDeleteDoc = null
 }) => {
   const [mounted, setMounted] = useState(false);
   const allowScanView = Boolean(isAdmin || canViewScans);
@@ -339,6 +341,22 @@ export const SanadModal = ({
                         <span>{isDocRejected ? 'Rejected (Update)' : 'Reject Doc'}</span>
                       </button>
                     )}
+                    {isAdmin && onDeleteDoc && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (window.confirm(`Are you sure you want to permanently delete "${doc.title || 'this document'}"? This cannot be undone.`)) {
+                            onDeleteDoc(doc._id || idx);
+                          }
+                        }}
+                        className="px-2.5 py-1 text-[11px] font-bold rounded-lg shadow-xs transition-colors cursor-pointer flex items-center gap-1 bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200"
+                        title="Delete this document permanently"
+                      >
+                        <Trash2 className="w-3 h-3" />
+                        <span>Delete</span>
+                      </button>
+                    )}
+
                     {allowScanView && doc.fileUrl && (
                       <button
                         type="button"

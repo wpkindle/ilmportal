@@ -623,6 +623,89 @@ exports.reviewTutorDocument = async (req, res) => {
   }
 };
 
+// @desc    Delete individual tutor sanad / certificate document
+// @route   DELETE /api/admin/tutors/:id/documents/:docId
+exports.deleteTutorDocument = async (req, res) => {
+  try {
+    const tutor = await TutorProfile.findById(req.params.id).populate('user');
+
+    if (!tutor) {
+      return res.status(404).json({
+        success: false,
+        message: 'Tutor profile not found'
+      });
+    }
+
+    const docIndex = (tutor.sanadDocuments || []).findIndex(
+      (d) => d._id?.toString() === req.params.docId
+    );
+
+    if (docIndex === -1) {
+      return res.status(404).json({
+        success: false,
+        message: 'Sanad document not found'
+      });
+    }
+
+    const removedDoc = tutor.sanadDocuments[docIndex];
+    tutor.sanadDocuments.splice(docIndex, 1);
+
+    // If tutor.sanadUrl was pointing to this document, update or clear it
+    if (tutor.sanadUrl === removedDoc.fileUrl) {
+      tutor.sanadUrl = tutor.sanadDocuments.length > 0 ? tutor.sanadDocuments[0].fileUrl : undefined;
+    }
+
+    // Update isSanadVerified flag if no verified documents remain
+    const hasVerifiedDoc = tutor.sanadDocuments.some(
+      (d) => d.status === 'verified' || d.status === 'approved'
+    );
+    tutor.isSanadVerified = hasVerifiedDoc;
+
+    await tutor.save();
+
+    // Create Notification for the tutor
+    if (tutor.user && tutor.user._id) {
+      await Notification.create({
+        recipient: tutor.user._id,
+        sender: req.user.id,
+        title: 'Degree / Sanad Document Removed',
+        message: `Your document "${removedDoc.title || 'Sanad / Certificate'}" was removed by IlmiDunya administration.`,
+        type: 'verification_status',
+        link: '/tutor/profile#profile-sanads'
+      });
+
+      const io = req.app.get('io');
+      if (io) {
+        io.to(`user_${tutor.user._id}`).emit('notification-alert', {
+          title: 'Degree / Sanad Document Removed',
+          message: `Your document "${removedDoc.title || 'Sanad / Certificate'}" was removed by IlmiDunya administration.`,
+          type: 'verification_status',
+          link: '/tutor/profile#profile-sanads'
+        });
+        io.to(`user_${tutor.user._id}`).emit('tutor-profile-updated', tutor);
+        io.emit('admin-tutor-queue-updated', { tutorId: tutor._id, docId: req.params.docId, action: 'deleted' });
+      }
+    }
+
+    invalidateAdminCache('tutor_queue');
+    invalidateAdminCache('admin_users');
+    invalidateAdminCache('admin_stats');
+
+    res.status(200).json({
+      success: true,
+      message: `Document "${removedDoc.title || 'Sanad'}" has been permanently deleted.`,
+      sanadDocuments: tutor.sanadDocuments,
+      tutor
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error deleting document'
+    });
+  }
+};
+
+
 // @desc    Contact Tutor Applicant
 // @route   PUT /api/admin/tutors/:id/contact
 exports.contactTutor = async (req, res) => {

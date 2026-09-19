@@ -9,6 +9,7 @@ const {
   pauseTutorProfile,
   resumeTutorProfile,
   reviewTutorDocument,
+  deleteTutorDocument,
   getAllUsers,
   issueUserWarning,
   updateUserStatus,
@@ -52,6 +53,8 @@ router.put('/tutors/:id/contact', contactTutor);
 router.put('/tutors/:id/pause', pauseTutorProfile);
 router.put('/tutors/:id/resume', resumeTutorProfile);
 router.put('/tutors/:id/documents/:docId/review', reviewTutorDocument);
+router.delete('/tutors/:id/documents/:docId', deleteTutorDocument);
+
 
 // User Management & Moderation
 router.get('/users', getAllUsers);

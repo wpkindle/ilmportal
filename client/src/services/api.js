@@ -649,6 +649,12 @@ export const api = {
     body: JSON.stringify(body)
   }).then(handleResponse),
 
+  deleteTutorDocument: (tutorId, docId) => fetch(`${API_BASE}/admin/tutors/${tutorId}/documents/${docId}`, {
+    method: 'DELETE',
+    headers: getHeaders()
+  }).then(handleResponse),
+
+
   getAdminDeals: (params = {}) => {
     const query = new URLSearchParams(params).toString();
     return fetch(`${API_BASE}/admin/deals?${query}`, {

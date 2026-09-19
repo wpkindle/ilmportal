@@ -19,7 +19,8 @@ import {
   ShieldCheck,
   Video,
   PauseCircle,
-  PlayCircle
+  PlayCircle,
+  Trash2
 } from 'lucide-react';
 import VideoIntroPlayer from '../../../components/common/VideoIntroPlayer';
 import { getDocumentUrl, isPdfDocument, openDocumentInNewTab } from '../../../utils/tutorHelpers';
@@ -146,6 +147,45 @@ export default function TutorApprovalPage() {
       setActionLoading(false);
     }
   };
+
+  const handleDeleteDoc = async (tutorId, docId, docTitle = 'this document') => {
+    if (!tutorId || !docId) return;
+    if (!window.confirm(`Are you sure you want to permanently delete "${docTitle}"? This cannot be undone.`)) {
+      return;
+    }
+    setActionLoading(true);
+    try {
+      const res = await api.deleteTutorDocument(tutorId, docId);
+      if (res.success) {
+        setTutors((prev) =>
+          prev.map((t) => {
+            if (t._id !== tutorId) return t;
+            const updatedDocs = (t.sanadDocuments || []).filter(
+              (d) => (d._id || d) !== docId
+            );
+            return {
+              ...t,
+              sanadDocuments: updatedDocs,
+              isSanadVerified: res.tutor?.isSanadVerified ?? updatedDocs.some(d => d.status === 'verified' || d.status === 'approved')
+            };
+          })
+        );
+        setActiveSanads((prev) => {
+          const nextDocs = prev.filter((d) => (d._id || d) !== docId);
+          if (nextDocs.length === 0) {
+            setSanadModalOpen(false);
+          }
+          return nextDocs;
+        });
+        fetchQueue(false);
+      }
+    } catch (err) {
+      alert(err.message || 'Error deleting document');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
 
   const fetchQueue = async (showSpinner = true) => {
     if (showSpinner) setLoading(true);
@@ -666,6 +706,23 @@ export default function TutorApprovalPage() {
                                       <XCircle className="w-3.5 h-3.5" />
                                       <span>{isDocRejected ? 'Rejected ✕' : 'Reject Doc'}</span>
                                     </button>
+
+                                    <button
+                                      type="button"
+                                      disabled={actionLoading}
+                                      onClick={() =>
+                                        handleDeleteDoc(
+                                          tutor._id,
+                                          doc._id,
+                                          doc.title || `Document #${docIdx + 1}`
+                                        )
+                                      }
+                                      className="px-2.5 py-1.5 text-xs font-bold rounded-xl flex items-center gap-1 shadow-2xs transition-all cursor-pointer bg-stone-100 hover:bg-rose-50 text-stone-600 hover:text-rose-700 border border-stone-200 hover:border-rose-200"
+                                      title="Delete this Sanad document permanently"
+                                    >
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                      <span>Delete</span>
+                                    </button>
                                   </div>
                                 </div>
                               );
@@ -773,6 +830,10 @@ export default function TutorApprovalPage() {
             docId,
             docTitle: docItem?.title || 'Sanad / Degree Document'
           });
+        }}
+        onDeleteDoc={(docId) => {
+          const docItem = activeSanads.find((d) => (d._id || d) === docId);
+          handleDeleteDoc(activeTutorId, docId, docItem?.title || 'Sanad / Degree Document');
         }}
       />
 

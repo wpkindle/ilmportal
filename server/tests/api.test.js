@@ -781,6 +781,18 @@ describe('IlmiDunya Pakistan LMS API Tests', () => {
     expect(adminRes.statusCode).toEqual(200);
     expect(adminRes.body.tutor.sanadDocuments[0].fileUrl).toBe('https://storage.ilmidunya.com/sanads/secret-degree-12345.pdf');
 
+    // 3. Admin DELETE /api/admin/tutors/:id/documents/:docId
+    const docToDelete = adminRes.body.tutor.sanadDocuments[0];
+    const deleteRes = await request(app)
+      .delete(`/api/admin/tutors/${profile._id}/documents/${docToDelete._id}`)
+      .set('Authorization', `Bearer ${adminToken}`);
+    expect(deleteRes.statusCode).toEqual(200);
+    expect(deleteRes.body.success).toBe(true);
+    expect(deleteRes.body.sanadDocuments.length).toBe(0);
+
+    const refreshedProfile = await TutorProfile.findById(profile._id);
+    expect(refreshedProfile.sanadDocuments.length).toBe(0);
+
     // Clean up admin user
     await User.deleteOne({ email: 'testadmin@pakistanlms.pk' });
   });

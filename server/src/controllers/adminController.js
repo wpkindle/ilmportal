@@ -12,7 +12,7 @@ const SystemConfig = require('../models/SystemConfig');
 const Report = require('../models/Report');
 const EmailThread = require('../models/EmailThread');
 const SupportSession = require('../models/SupportSession');
-const { sendTutorStatusEmail, sendAccountWarningEmail, sendAccountStatusEmail } = require('../utils/emailService');
+const { sendTutorStatusEmail, sendSanadApprovalEmail, sendAccountWarningEmail, sendAccountStatusEmail } = require('../utils/emailService');
 
 // Helper to log admin actions
 const logAction = async (adminId, action, entityType, entityId, details, req) => {
@@ -304,17 +304,13 @@ exports.approveTutor = async (req, res) => {
       });
     }
 
-    const { calculateProfileCompletion } = require('./authController');
-    const completion = calculateProfileCompletion(tutor.user, tutor);
-    if (completion.percentage < 100) {
-      return res.status(400).json({
-        success: false,
-        message: `Cannot approve tutor: Profile is only ${completion.percentage}% complete. Tutor must achieve 100% profile health before public approval.`
-      });
-    }
-
     tutor.verificationStatus = 'approved';
     tutor.rejectionReason = '';
+
+    if (tutor.user) {
+      const userId = tutor.user._id || tutor.user;
+      await User.findByIdAndUpdate(userId, { isVerified: true });
+    }
 
     await tutor.save();
 
@@ -558,28 +554,29 @@ exports.reviewTutorDocument = async (req, res) => {
       });
     }
 
-    doc.status = status;
-    doc.reviewedAt = new Date();
-    doc.reviewedBy = req.user.id;
-    if (status === 'rejected') {
-      doc.rejectionReason = reason || 'Document does not meet authenticity criteria.';
-    } else {
+    if (status === 'verified') {
+      doc.status = 'verified';
+      doc.reviewedAt = new Date();
+      doc.reviewedBy = req.user.id;
       doc.rejectionReason = '';
-    }
 
-    // If all documents are verified, transition tutor verificationStatus to approved if under review and 100% complete
-    const allVerified = tutor.sanadDocuments.length > 0 && tutor.sanadDocuments.every((d) => d.status === 'verified' || d.status === 'approved');
-    if (allVerified && tutor.verificationStatus !== 'approved') {
-      const { calculateProfileCompletion } = require('./authController');
-      const completion = calculateProfileCompletion(tutor.user, tutor);
-      if (completion.percentage === 100) {
-        tutor.verificationStatus = 'approved';
+      // Immediately mark tutor verificationStatus as approved so tutor side displays Verified
+      tutor.verificationStatus = 'approved';
+      tutor.rejectionReason = '';
+      if (tutor.user) {
+        const userId = tutor.user._id || tutor.user;
+        await User.findByIdAndUpdate(userId, { isVerified: true });
       }
+    } else {
+      doc.status = 'rejected';
+      doc.reviewedAt = new Date();
+      doc.reviewedBy = req.user.id;
+      doc.rejectionReason = reason || 'Document does not meet authenticity criteria.';
     }
 
     await tutor.save();
 
-    // Create Notification
+    // Create In-App Notification
     await Notification.create({
       recipient: tutor.user._id,
       sender: req.user.id,
@@ -590,6 +587,13 @@ exports.reviewTutorDocument = async (req, res) => {
       type: 'verification_status',
       link: '/tutor/profile#profile-sanads'
     });
+
+    // Send Email Notification to Tutor
+    if (status === 'verified' && tutor.user?.email) {
+      await sendSanadApprovalEmail(tutor.user.email, tutor.user.name, doc.title || 'Sanad / Degree Document');
+    } else if (status === 'rejected' && tutor.user?.email) {
+      await sendTutorStatusEmail(tutor.user.email, tutor.user.name, 'rejected', doc.rejectionReason);
+    }
 
     const io = req.app.get('io');
     if (io) {
@@ -701,6 +705,61 @@ exports.deleteTutorDocument = async (req, res) => {
     res.status(500).json({
       success: false,
       message: error.message || 'Error deleting document'
+    });
+  }
+};
+
+// @desc    Delete tutor application and profile permanently
+// @route   DELETE /api/admin/tutors/:id
+exports.deleteTutorProfile = async (req, res) => {
+  try {
+    const tutor = await TutorProfile.findById(req.params.id).populate('user');
+    if (!tutor) {
+      return res.status(404).json({ success: false, message: 'Tutor profile not found' });
+    }
+
+    const userId = tutor.user?._id || tutor.user;
+    const tutorName = tutor.user?.name || 'Tutor';
+    const tutorEmail = tutor.user?.email || '';
+
+    // Delete tutor profile
+    await TutorProfile.findByIdAndDelete(req.params.id);
+
+    // If associated user exists and is a tutor, delete the user account too
+    if (userId) {
+      await User.findByIdAndDelete(userId);
+      await Deal.updateMany(
+        { $or: [{ student: userId }, { tutor: userId }] },
+        { status: 'cancelled' }
+      );
+    }
+
+    await logAction(
+      req.user.id,
+      'DELETE_TUTOR_APPLICATION',
+      'tutor_profile',
+      tutor._id,
+      { tutorName, tutorEmail },
+      req
+    );
+
+    const io = req.app.get('io');
+    if (io) {
+      io.emit('admin-tutor-queue-updated', { tutorId: tutor._id, status: 'deleted' });
+    }
+
+    invalidateAdminCache('tutor_queue');
+    invalidateAdminCache('admin_users');
+    invalidateAdminCache('admin_stats');
+
+    res.status(200).json({
+      success: true,
+      message: `Tutor application for ${tutorName} has been permanently deleted.`
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message || 'Error deleting tutor application'
     });
   }
 };

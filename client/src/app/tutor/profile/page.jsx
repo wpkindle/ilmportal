@@ -2034,7 +2034,7 @@ function TutorProfileContent() {
                                   ) : isDocVerified ? (
                                     <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-emerald-800 bg-emerald-100 border border-emerald-200 px-1.5 py-0.2 rounded-md">
                                       <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
-                                      Verified &amp; Approved
+                                      Sanad/Certificate Verified
                                     </span>
                                   ) : isDocRejected ? (
                                     <span className="inline-flex items-center gap-1 text-[9.5px] font-bold text-rose-800 bg-rose-100 border border-rose-200 px-1.5 py-0.2 rounded-md">
@@ -2755,10 +2755,10 @@ function TutorProfileContent() {
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase bg-[#f0ece1] text-[#0c2217]">
                     Tutor
                   </span>
-                  {tutorProfile?.verificationStatus === 'approved' ? (
-                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#b85d34] text-white flex items-center gap-1 shadow-xs">
-                      <ShieldCheck className="w-3 h-3" />
-                      <span>Verified</span>
+                  {tutorProfile?.verificationStatus === 'approved' || (Array.isArray(tutorProfile?.sanadDocuments) && tutorProfile.sanadDocuments.some(d => d.status === 'verified' || d.status === 'approved')) ? (
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-[#0c2217] text-[#d4a359] border border-[#d4a359]/40 flex items-center gap-1 shadow-xs">
+                      <ShieldCheck className="w-3 h-3 text-[#d4a359]" />
+                      <span>Sanad/Certificate Verified</span>
                     </span>
                   ) : tutorProfile?.verificationStatus === 'under_review' || tutorProfile?.verificationStatus === 'pending' ? (
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-900 border border-amber-300 flex items-center gap-1">

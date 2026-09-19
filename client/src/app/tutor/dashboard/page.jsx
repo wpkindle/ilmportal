@@ -114,7 +114,11 @@ export default function TutorDashboardPage() {
 
   if (loading) return <LoadingSpinner />;
 
-  const isPending = tutorProfile?.verificationStatus === 'pending' || tutorProfile?.verificationStatus === 'under_review';
+  const hasVerifiedSanads = Boolean(
+    tutorProfile?.verificationStatus === 'approved' ||
+    (Array.isArray(tutorProfile?.sanadDocuments) && tutorProfile.sanadDocuments.some(d => d.status === 'verified' || d.status === 'approved'))
+  );
+  const isPending = !hasVerifiedSanads && (tutorProfile?.verificationStatus === 'pending' || tutorProfile?.verificationStatus === 'under_review');
   const isContactNeeded = tutorProfile?.verificationStatus === 'contact_needed';
 
   const activeTrialDeals = deals.filter(d => d.status === 'active_trial');
@@ -185,7 +189,27 @@ export default function TutorDashboardPage() {
         )}
 
         {/* Verification Status Banner */}
-        {isPending && (
+        {hasVerifiedSanads ? (
+          <div className="p-4 sm:p-5 bg-emerald-50/90 border border-emerald-200 rounded-3xl flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 text-emerald-950 shadow-xs">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-emerald-600 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <CheckCircle2 className="w-5 h-5" />
+              </div>
+              <div>
+                <h4 className="font-serif font-bold text-sm text-[#0c2217]">Sanad/Certificate Verified</h4>
+                <p className="text-xs text-stone-600">
+                  Your academic credentials and Sanad degrees have been verified by IlmiDunya administration. Your profile is live and verified.
+                </p>
+              </div>
+            </div>
+            <Link
+              href="/tutor/profile"
+              className="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors shrink-0 whitespace-nowrap"
+            >
+              View Credentials
+            </Link>
+          </div>
+        ) : isPending ? (
           <div className="p-5 bg-[#fdf6ec] border border-[#f2dfbe] rounded-3xl flex items-center justify-between gap-4 text-[#8a5b14] shadow-xs">
             <div className="flex items-center gap-3">
               <Clock className="w-6 h-6 text-[#b8863b] animate-spin" />
@@ -203,7 +227,7 @@ export default function TutorDashboardPage() {
               Review Sanad Documents
             </Link>
           </div>
-        )}
+        ) : null}
 
         {isContactNeeded && (
           <div className="p-5 bg-[#fdf2f0] border border-[#f5d6cf] rounded-3xl flex items-center justify-between gap-4 text-[#b85d34] shadow-xs">

@@ -315,7 +315,7 @@ export const SanadModal = ({
                         title="Approve / Verify this Sanad credential"
                       >
                         <CheckCircle2 className="w-3 h-3" />
-                        <span>{isDocVerified ? 'Re-Verify' : 'Verify Doc'}</span>
+                        <span>{isDocVerified ? 'Verified' : 'Verify'}</span>
                       </button>
                     )}
                     {isAdmin && onRejectDoc && (
@@ -338,7 +338,7 @@ export const SanadModal = ({
                         title="Reject this Sanad credential"
                       >
                         <AlertCircle className="w-3 h-3" />
-                        <span>{isDocRejected ? 'Rejected (Update)' : 'Reject Doc'}</span>
+                        <span>{isDocRejected ? 'Rejected' : 'Reject'}</span>
                       </button>
                     )}
                     {isAdmin && onDeleteDoc && (

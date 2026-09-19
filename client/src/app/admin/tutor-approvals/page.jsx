@@ -47,11 +47,9 @@ export default function TutorApprovalPage() {
   const [activeTutorName, setActiveTutorName] = useState('');
   const [activeTutorId, setActiveTutorId] = useState(null);
 
-  // Reject / Contact Modals
+  // Reject Modal
   const [rejectId, setRejectId] = useState(null);
   const [rejectReason, setRejectReason] = useState('');
-  const [contactId, setContactId] = useState(null);
-  const [contactNotes, setContactNotes] = useState('');
   const [actionLoading, setActionLoading] = useState(false);
 
   // Pause Modal
@@ -223,15 +221,50 @@ export default function TutorApprovalPage() {
   }, [statusFilter]);
 
   const handleApprove = async (id) => {
-    if (!window.confirm('Are you sure you want to approve this tutor? Their profile will be made LIVE.')) return;
+    if (!window.confirm('Are you sure you want to approve this tutor? Their profile and degree credentials will be verified.')) return;
     setActionLoading(true);
     try {
       const res = await api.approveTutor(id);
       if (res.success) {
-        fetchQueue();
+        setTutors((prev) =>
+          prev.map((t) => {
+            if (t._id !== id) return t;
+            const updatedDocs = (t.sanadDocuments || []).map((d) => ({
+              ...d,
+              status: 'verified',
+              rejectionReason: ''
+            }));
+            return {
+              ...t,
+              verificationStatus: 'approved',
+              sanadDocuments: updatedDocs
+            };
+          })
+        );
+        fetchQueue(false);
       }
     } catch (err) {
       alert(err.message || 'Error approving tutor');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleDeleteTutor = async (tutorId, tutorName = 'this tutor') => {
+    if (!window.confirm(`Are you sure you want to permanently delete tutor "${tutorName}"? This will remove their application and profile. This cannot be undone.`)) {
+      return;
+    }
+    setActionLoading(true);
+    try {
+      const res = await api.deleteTutorProfile(tutorId);
+      if (res.success) {
+        setTutors((prev) => prev.filter((t) => t._id !== tutorId));
+        fetchQueue(false);
+      } else {
+        alert(res.message || 'Failed to delete tutor application');
+      }
+    } catch (err) {
+      alert(err.message || 'Error deleting tutor application');
     } finally {
       setActionLoading(false);
     }
@@ -250,24 +283,6 @@ export default function TutorApprovalPage() {
       }
     } catch (err) {
       alert(err.message || 'Error rejecting tutor');
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const handleContactSubmit = async (e) => {
-    e.preventDefault();
-    if (!contactId) return;
-    setActionLoading(true);
-    try {
-      const res = await api.contactTutor(contactId, contactNotes);
-      if (res.success) {
-        setContactId(null);
-        setContactNotes('');
-        fetchQueue();
-      }
-    } catch (err) {
-      alert(err.message || 'Error sending contact notice');
     } finally {
       setActionLoading(false);
     }
@@ -683,7 +698,7 @@ export default function TutorApprovalPage() {
                                       title={isDocVerified ? 'Re-verify this Sanad' : 'Approve and verify this Sanad document'}
                                     >
                                       <CheckCircle2 className="w-3.5 h-3.5" />
-                                      <span>{isDocVerified ? 'Verified ✓' : 'Approve Doc'}</span>
+                                      <span>{isDocVerified ? 'Verified' : 'Verify'}</span>
                                     </button>
 
                                     <button
@@ -704,7 +719,7 @@ export default function TutorApprovalPage() {
                                       title="Reject this Sanad document"
                                     >
                                       <XCircle className="w-3.5 h-3.5" />
-                                      <span>{isDocRejected ? 'Rejected ✕' : 'Reject Doc'}</span>
+                                      <span>{isDocRejected ? 'Rejected' : 'Reject'}</span>
                                     </button>
 
                                     <button
@@ -752,56 +767,39 @@ export default function TutorApprovalPage() {
                         </div>
 
                         <div className="flex flex-wrap items-center gap-2">
-                          {(tutor.verificationStatus !== 'approved' || hasPendingDocs) && (
-                            <button
-                              onClick={() => handleApprove(tutor._id)}
-                              disabled={actionLoading}
-                              className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-colors"
-                            >
-                              <CheckCircle2 className="w-4 h-4" />
-                              <span>{hasPendingDocs ? 'Approve Tutor & Verify All Sanads' : 'Approve & Make Live'}</span>
-                            </button>
-                          )}
-
                           <button
-                            onClick={() => setContactId(tutor._id)}
-                            className="px-3.5 py-2 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 cursor-pointer transition-colors"
+                            onClick={() => handleApprove(tutor._id)}
+                            disabled={actionLoading || tutor.verificationStatus === 'approved'}
+                            className={`px-4 py-2 font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 transition-colors ${
+                              tutor.verificationStatus === 'approved'
+                                ? 'bg-emerald-100 text-emerald-800 border border-emerald-300 cursor-default'
+                                : 'bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer disabled:opacity-50'
+                            }`}
                           >
-                            <Mail className="w-4 h-4" />
-                            <span>Contact Applicant</span>
+                            <CheckCircle2 className="w-4 h-4" />
+                            <span>{tutor.verificationStatus === 'approved' ? 'Approved' : 'Approve'}</span>
                           </button>
 
                           {tutor.verificationStatus !== 'rejected' && (
                             <button
                               onClick={() => setRejectId(tutor._id)}
-                              className="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 cursor-pointer transition-colors"
+                              disabled={actionLoading}
+                              className="px-3.5 py-2 bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
                             >
                               <XCircle className="w-4 h-4" />
-                              <span>Reject Application</span>
+                              <span>Reject</span>
                             </button>
                           )}
 
-                          {tutor.verificationStatus === 'approved' && !tutor.isPaused && (
-                            <button
-                              onClick={() => { setPauseId(tutor._id); setPauseReason(''); }}
-                              disabled={actionLoading}
-                              className="px-3.5 py-2 bg-orange-500 hover:bg-orange-600 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-colors"
-                            >
-                              <PauseCircle className="w-4 h-4" />
-                              <span>Pause Profile</span>
-                            </button>
-                          )}
-
-                          {tutor.isPaused && (
-                            <button
-                              onClick={() => handleResume(tutor._id)}
-                              disabled={actionLoading}
-                              className="px-3.5 py-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 cursor-pointer disabled:opacity-50 transition-colors"
-                            >
-                              <PlayCircle className="w-4 h-4" />
-                              <span>Resume Profile</span>
-                            </button>
-                          )}
+                          <button
+                            onClick={() => handleDeleteTutor(tutor._id, tutor.user?.name || 'Tutor')}
+                            disabled={actionLoading}
+                            className="px-3.5 py-2 bg-stone-100 hover:bg-rose-50 text-stone-700 hover:text-rose-700 border border-stone-300 hover:border-rose-300 font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer transition-colors"
+                            title="Delete tutor application permanently"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                            <span>Delete</span>
+                          </button>
                         </div>
                       </div>
                     </div>
@@ -943,41 +941,6 @@ export default function TutorApprovalPage() {
                   className="px-4 py-2 bg-red-600 text-white font-bold text-xs rounded-xl"
                 >
                   Confirm Rejection
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Contact Modal */}
-      {contactId && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4">
-            <h3 className="font-bold text-sm text-slate-900">Send Clarification Notice</h3>
-            <form onSubmit={handleContactSubmit} className="space-y-3">
-              <textarea
-                rows="3"
-                required
-                placeholder="What details should the applicant update?"
-                value={contactNotes}
-                onChange={(e) => setContactNotes(e.target.value)}
-                className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800"
-              />
-              <div className="flex justify-end gap-2">
-                <button
-                  type="button"
-                  onClick={() => setContactId(null)}
-                  className="px-4 py-2 border rounded-xl text-xs font-bold text-slate-700"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={actionLoading}
-                  className="px-4 py-2 bg-amber-600 text-white font-bold text-xs rounded-xl"
-                >
-                  Send Notice
                 </button>
               </div>
             </form>

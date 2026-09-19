@@ -926,6 +926,99 @@ const sendTutorStatusEmail = async (to, name, status, reason = '') => {
 };
 
 // ==========================================
+// 2B. SANAD / DEGREE DOCUMENT APPROVAL EMAIL
+// ==========================================
+const sendSanadApprovalEmail = async (to, name, documentTitle = 'Sanad / Degree Document') => {
+  const clientUrl = getClientBaseUrl();
+  const logoUrl = `${clientUrl}/logo-dark.png`;
+  const subject = `🎉 Verified: Your ${documentTitle} Has Been Approved on IlmiDunya`;
+  const dashboardUrl = `${clientUrl}/tutor/dashboard`;
+
+  const html = `
+    <!DOCTYPE html>
+    <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+      <title>Degree / Sanad Verified - IlmiDunya</title>
+      <style>
+        body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+        table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; border-collapse: collapse; }
+        body { height: 100% !important; margin: 0 !important; padding: 0 !important; width: 100% !important; background-color: #faf8f5; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+      </style>
+    </head>
+    <body style="margin: 0; padding: 0; background-color: #faf8f5;">
+      <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="table-layout: fixed; background-color: #faf8f5; padding: 30px 10px; width: 100%;">
+        <tr>
+          <td align="center" style="padding: 0;">
+            <table role="presentation" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 580px; width: 100%; background-color: #ffffff; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(12, 34, 23, 0.07); border: 1px solid #e6ded1;">
+              <!-- Header -->
+              <tr>
+                <td align="center" style="padding: 36px 30px 28px 30px; background-color: #0c2217; border-bottom: 3px solid #d4a359; color: #ffffff;">
+                  <a href="${clientUrl}" target="_blank" style="text-decoration: none; display: inline-block;">
+                    <img src="${logoUrl}" alt="IlmiDunya Pakistan" width="170" height="auto" style="display: block; width: 170px; max-width: 100%; height: auto; margin: 0 auto; border: 0;" />
+                  </a>
+                  <div style="margin-top: 14px;">
+                    <span style="display: inline-block; padding: 4px 14px; background-color: rgba(20, 61, 43, 0.85); color: #d4a359; border: 1px solid rgba(212, 163, 89, 0.45); border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px;">
+                      Sanad / Degree Verified
+                    </span>
+                  </div>
+                </td>
+              </tr>
+              <!-- Content -->
+              <tr>
+                <td style="padding: 36px 34px 26px 34px;">
+                  <h2 style="margin: 0 0 14px 0; font-size: 21px; font-weight: 900; color: #0c2217; font-family: 'Playfair Display', Georgia, serif; line-height: 28px;">
+                    Assalam-o-Alaikum, ${name}! 🎓
+                  </h2>
+                  <p style="margin: 0 0 18px 0; font-size: 14px; line-height: 1.65; color: #292524;">
+                    We are pleased to inform you that our Academic Verification Committee has reviewed and <strong>verified your degree / sanad credential</strong>:
+                  </p>
+                  <div style="padding: 14px 18px; background-color: #f0ece1; border-left: 4px solid #0c2217; border-radius: 12px; margin-bottom: 22px;">
+                    <p style="margin: 0; font-size: 14px; font-weight: 800; color: #0c2217;">
+                      📜 ${documentTitle}
+                    </p>
+                    <p style="margin: 4px 0 0 0; font-size: 12px; font-weight: 600; color: #15803d;">
+                      Status: Sanad / Certificate Verified &amp; Approved
+                    </p>
+                  </div>
+                  <p style="margin: 0 0 24px 0; font-size: 14px; line-height: 1.65; color: #292524;">
+                    Your authenticated credentials will now feature a verified badge on your public tutor profile and dashboard, giving students and parents complete confidence in your qualifications.
+                  </p>
+                  <table role="presentation" border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 24px auto;">
+                    <tr>
+                      <td align="center" style="border-radius: 14px; background-color: #0c2217;">
+                        <a href="${dashboardUrl}" target="_blank" style="display: inline-block; padding: 14px 30px; font-size: 14px; font-weight: bold; color: #ffffff; text-decoration: none; border-radius: 14px; background-color: #0c2217; border: 1px solid #d4a359;">
+                          Open Tutor Dashboard &rarr;
+                        </a>
+                      </td>
+                    </tr>
+                  </table>
+                </td>
+              </tr>
+              <!-- Footer -->
+              <tr>
+                <td align="center" style="padding: 20px 30px; background-color: #faf8f5; border-top: 1px solid #f0ece1; font-size: 12px; color: #78716c;">
+                  IlmiDunya Pakistan &bull; Quality Quranic &amp; Academic Learning Platform
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+    </html>
+  `;
+
+  return await sendEmail({
+    to,
+    subject,
+    html,
+    text: `Assalam-o-Alaikum ${name}! Your Sanad / degree credential "${documentTitle}" has been verified and approved on IlmiDunya Pakistan. Access your tutor dashboard at: ${dashboardUrl}`
+  });
+};
+
+// ==========================================
 // 3. DEDICATED 1:1 CHAT INVITATION EMAIL
 // ==========================================
 const sendDedicatedChatInvitationEmail = async ({
@@ -1709,6 +1802,7 @@ module.exports = {
   sendEarlyTutorRegistrationAdminAlert,
   sendEarlyTutorNoticeEmail,
   sendTutorStatusEmail,
+  sendSanadApprovalEmail,
   sendDedicatedChatInvitationEmail,
   sendAccountWarningEmail,
   sendAccountStatusEmail,

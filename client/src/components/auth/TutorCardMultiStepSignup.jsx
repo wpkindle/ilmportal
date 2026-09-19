@@ -32,6 +32,8 @@ import Turnstile from '../common/Turnstile';
 import CustomSelect from '../common/CustomSelect';
 import { allPakistaniCities, pakistaniCityAreas } from '../../data/pakistanAreas';
 import { compressAvatarFile } from '../../utils/imageCompressor';
+import { openDocumentInNewTab } from '../../utils/tutorHelpers';
+
 
 
 const STEPS = [
@@ -1657,13 +1659,24 @@ export default function TutorCardMultiStepSignup({ onSwitchToSignIn }) {
                             </span>
                           </div>
                         </div>
-                        <button
-                          type="button"
-                          onClick={() => removeDegreeFile(deg.id)}
-                          className="text-red-600 hover:text-red-800 font-bold text-xs shrink-0 cursor-pointer px-2 py-1 hover:bg-red-50 rounded-lg transition-colors"
-                        >
-                          Remove
-                        </button>
+                        <div className="flex items-center gap-1.5 shrink-0">
+                          <button
+                            type="button"
+                            onClick={() => openDocumentInNewTab(deg.fileUrl, deg.fileName || deg.title || 'sanad-document')}
+                            className="text-[#b85d34] hover:text-[#9e4e2a] font-bold text-xs cursor-pointer px-2 py-1 hover:bg-stone-100 rounded-lg transition-colors inline-flex items-center gap-1"
+                            title="Preview attached document"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            <span>Preview</span>
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => removeDegreeFile(deg.id)}
+                            className="text-red-600 hover:text-red-800 font-bold text-xs shrink-0 cursor-pointer px-2 py-1 hover:bg-red-50 rounded-lg transition-colors"
+                          >
+                            Remove
+                          </button>
+                        </div>
                       </div>
                     ) : (
                       <label className="cursor-pointer text-xs text-stone-500 hover:text-[#b85d34] flex flex-col items-center gap-1.5 py-1.5">

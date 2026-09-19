@@ -22,7 +22,8 @@ import {
   PlayCircle
 } from 'lucide-react';
 import VideoIntroPlayer from '../../../components/common/VideoIntroPlayer';
-import { getDocumentUrl, isPdfDocument } from '../../../utils/tutorHelpers';
+import { getDocumentUrl, isPdfDocument, openDocumentInNewTab } from '../../../utils/tutorHelpers';
+
 
 
 export default function TutorApprovalPage() {
@@ -606,20 +607,22 @@ export default function TutorApprovalPage() {
 
                                       <div className="pt-0.5">
                                         {(() => {
-                                          const resolvedUrl = getDocumentUrl(doc.fileUrl);
-                                          if (!resolvedUrl) {
+                                          if (!doc.fileUrl) {
                                             return <span className="text-[10px] text-slate-400 italic">No document file attached</span>;
                                           }
                                           return (
-                                            <a
-                                              href={resolvedUrl}
-                                              target="_blank"
-                                              rel="noopener noreferrer"
-                                              className="text-[11px] font-semibold text-[#b85d34] hover:underline inline-flex items-center gap-1"
+                                            <button
+                                              type="button"
+                                              onClick={(e) => {
+                                                e.stopPropagation();
+                                                openDocumentInNewTab(doc.fileUrl, doc.title || 'Sanad-Document');
+                                              }}
+                                              className="text-[11px] font-semibold text-[#b85d34] hover:underline inline-flex items-center gap-1 cursor-pointer bg-transparent border-none p-0"
+                                              title="Open document in a new tab"
                                             >
                                               <span>Full View</span>
                                               <ExternalLink className="w-3 h-3" />
-                                            </a>
+                                            </button>
                                           );
                                         })()}
                                       </div>

@@ -135,6 +135,7 @@ function TutorProfileContent() {
   // Staged Degrees / Sanad Documents (NO auto-save)
   const [uploadedSanads, setUploadedSanads] = useState([]);
   const [selectedSanadModal, setSelectedSanadModal] = useState(false);
+  const [activePreviewDoc, setActivePreviewDoc] = useState(null);
 
   // Staged Payment Methods & Preferred Receiving Mode (NO auto-save)
   const [stagedPaymentMethods, setStagedPaymentMethods] = useState([]);
@@ -2048,7 +2049,10 @@ function TutorProfileContent() {
                             <div className="flex items-center gap-1.5 shrink-0">
                               <button
                                 type="button"
-                                onClick={() => setSelectedSanadModal(true)}
+                                onClick={() => {
+                                  setActivePreviewDoc(doc);
+                                  setSelectedSanadModal(true);
+                                }}
                                 className="p-2 rounded-xl bg-white border border-stone-200 text-stone-600 hover:text-[#0c2217] shadow-2xs transition-colors cursor-pointer"
                                 title="Preview Document"
                               >
@@ -2922,9 +2926,12 @@ function TutorProfileContent() {
       {selectedSanadModal && (
         <SanadModal
           isOpen={selectedSanadModal}
-          onClose={() => setSelectedSanadModal(false)}
-          documents={uploadedSanads}
-          degrees={parseDegreesAndCertificates(qualifications, uploadedSanads)}
+          onClose={() => {
+            setSelectedSanadModal(false);
+            setActivePreviewDoc(null);
+          }}
+          documents={activePreviewDoc ? [activePreviewDoc] : uploadedSanads}
+          degrees={parseDegreesAndCertificates(qualifications, activePreviewDoc ? [activePreviewDoc] : uploadedSanads)}
           tutorName={name || 'Tutor'}
           canViewScans={true}
         />

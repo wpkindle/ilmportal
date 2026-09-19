@@ -39,6 +39,8 @@ import Turnstile from '../common/Turnstile';
 import CustomSelect from '../common/CustomSelect';
 import { allPakistaniCities, pakistaniCityAreas } from '../../data/pakistanAreas';
 import { compressAvatarFile } from '../../utils/imageCompressor';
+import { openDocumentInNewTab } from '../../utils/tutorHelpers';
+
 
 // Popular qualification presets for fast selection
 const QUALIFICATION_PRESETS = [
@@ -1501,13 +1503,26 @@ export default function TutorMultiStepRegister({
                               <span className="text-[10px] text-emerald-400">Ready for verification</span>
                             </div>
                           </div>
-                          <button
-                            type="button"
-                            onClick={() => handleRemoveSanadDoc(idx)}
-                            className="text-stone-400 hover:text-red-400 p-1 cursor-pointer"
-                          >
-                            <Trash2 className="w-3.5 h-3.5" />
-                          </button>
+                          <div className="flex items-center gap-1 shrink-0">
+                            {doc.fileUrl && (
+                              <button
+                                type="button"
+                                onClick={() => openDocumentInNewTab(doc.fileUrl, doc.title || 'sanad-document')}
+                                className="text-[#d4a359] hover:text-[#e4be78] p-1.5 rounded-lg hover:bg-[#153424] cursor-pointer transition-colors"
+                                title="Preview attached document"
+                              >
+                                <Eye className="w-3.5 h-3.5" />
+                              </button>
+                            )}
+                            <button
+                              type="button"
+                              onClick={() => handleRemoveSanadDoc(idx)}
+                              className="text-stone-400 hover:text-red-400 p-1.5 rounded-lg hover:bg-red-950/40 cursor-pointer transition-colors"
+                              title="Remove document"
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
                         </div>
                       ))}
                     </div>

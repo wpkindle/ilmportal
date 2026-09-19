@@ -188,6 +188,7 @@ export function getDocumentUrl(fileUrl) {
 
 /**
  * Checks whether a document is a PDF file based on its URL or MIME type.
+ * Also checks base64 %PDF- magic signature (JVBERi0).
  */
 export function isPdfDocument(fileUrl, fileType) {
   if (fileType === 'application/pdf') return true;
@@ -197,7 +198,134 @@ export function isPdfDocument(fileUrl, fileType) {
     lower.startsWith('data:application/pdf') ||
     lower.includes('application/pdf') ||
     lower.endsWith('.pdf') ||
-    lower.includes('.pdf?')
+    lower.includes('.pdf?') ||
+    fileUrl.startsWith('data:;base64,JVBERi') ||
+    fileUrl.startsWith('data:application/octet-stream;base64,JVBERi') ||
+    fileUrl.includes('JVBERi0')
   );
 }
+
+/**
+ * Converts a data URL (e.g. data:application/pdf;base64,...) to a binary Blob object.
+ */
+export function dataUrlToBlob(dataUrl) {
+  if (!dataUrl || typeof dataUrl !== 'string' || !dataUrl.startsWith('data:')) {
+    return null;
+  }
+  try {
+    const parts = dataUrl.split(',');
+    if (parts.length < 2) return null;
+    const mimeMatch = parts[0].match(/:(.*?);/);
+    const mimeType = mimeMatch ? mimeMatch[1] : 'application/pdf';
+    const isBase64 = parts[0].includes(';base64');
+
+    let byteCharacters;
+    if (isBase64) {
+      byteCharacters = atob(parts[1]);
+    } else {
+      byteCharacters = decodeURIComponent(parts[1]);
+    }
+
+    const sliceSize = 1024;
+    const byteArrays = [];
+    for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+      const slice = byteCharacters.slice(offset, offset + sliceSize);
+      const byteNumbers = new Uint8Array(slice.length);
+      for (let i = 0; i < slice.length; i++) {
+        byteNumbers[i] = slice.charCodeAt(i);
+      }
+      byteArrays.push(byteNumbers);
+    }
+    return new Blob(byteArrays, { type: mimeType });
+  } catch (err) {
+    console.error('Error converting dataUrl to Blob:', err);
+    return null;
+  }
+}
+
+/**
+ * Creates an object URL (blob:...) from a data URL.
+ */
+export function dataUrlToBlobUrl(dataUrl) {
+  if (typeof window === 'undefined') return '';
+  const blob = dataUrlToBlob(dataUrl);
+  if (!blob) return '';
+  return URL.createObjectURL(blob);
+}
+
+/**
+ * Safely opens any document URL in a new browser tab.
+ * Converts base64 data URLs to blob URLs so modern browsers (Chrome/Edge/Safari)
+ * do not block top-frame navigation (about:blank#blocked).
+ */
+export function openDocumentInNewTab(fileUrl, title = 'Document') {
+  if (!fileUrl || typeof window === 'undefined') return;
+
+  if (fileUrl.startsWith('data:')) {
+    const blob = dataUrlToBlob(fileUrl);
+    if (blob) {
+      const blobUrl = URL.createObjectURL(blob);
+      const win = window.open(blobUrl, '_blank');
+      if (win) {
+        win.focus();
+      }
+      // Revoke after 2 minutes to free memory while allowing tab rendering
+      setTimeout(() => {
+        try {
+          URL.revokeObjectURL(blobUrl);
+        } catch (e) {}
+      }, 120000);
+      return;
+    }
+  }
+
+  const resolved = getDocumentUrl(fileUrl);
+  window.open(resolved, '_blank', 'noopener,noreferrer');
+}
+
+/**
+ * Downloads any document file with a clean, sanitized filename.
+ */
+export function downloadDocument(fileUrl, filename = 'document') {
+  if (!fileUrl || typeof window === 'undefined') return;
+
+  const isPdf = isPdfDocument(fileUrl);
+  let cleanName = (filename || 'document').trim().replace(/[^a-zA-Z0-9_\-. ]/g, '_');
+  if (isPdf && !cleanName.toLowerCase().endsWith('.pdf')) {
+    cleanName += '.pdf';
+  }
+
+  if (fileUrl.startsWith('data:')) {
+    const blob = dataUrlToBlob(fileUrl);
+    if (!blob) return;
+    const blobUrl = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = blobUrl;
+    a.download = cleanName;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      try {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(blobUrl);
+      } catch (e) {}
+    }, 2000);
+  } else {
+    const resolved = getDocumentUrl(fileUrl);
+    const a = document.createElement('a');
+    a.style.display = 'none';
+    a.href = resolved;
+    a.download = cleanName;
+    a.target = '_blank';
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+      try {
+        document.body.removeChild(a);
+      } catch (e) {}
+    }, 1000);
+  }
+}
+
 
